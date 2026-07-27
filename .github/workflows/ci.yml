@@ -1,0 +1,56 @@
+# LegalHub — B2 CI quality gates.
+# Bootstrap specification §7 (row B2) + §3.11: run `dart format` (check),
+# `flutter analyze`, and `flutter test` on pull requests targeting main.
+# No build, deploy, publish, signing, or release steps are authorized at B2.
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+# Least privilege: read-only on the triggering repo. No secrets are required or
+# used by these checks (the B1 widget test needs no environment configuration).
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-gates:
+    name: format + analyze + test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Pinned to the Flutter SDK version declared in pubspec.yaml (3.44.4,
+      # which ships Dart 3.12.2). Keeping CI on the same toolchain as the
+      # lockfile prevents drift in format/analyze/test results.
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.4'
+          channel: stable
+          # Cache keyed on pubspec.* — speeds up `pub get` without bypassing
+          # the lockfile: dependencies still resolve from pubspec.lock.
+          cache: true
+
+      - name: Flutter doctor
+        run: flutter doctor -v
+
+      - name: Download dependencies
+        run: flutter pub get
+
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Static analysis
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
