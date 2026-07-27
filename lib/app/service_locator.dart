@@ -1,13 +1,22 @@
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../core/auth/auth_gateway.dart';
+import '../core/observability/error_reporter.dart';
 import '../core/sample_service.dart';
+import '../data/auth/fake_auth_gateway.dart';
+import '../data/local/in_memory_locale_store.dart';
+import '../data/local/locale_store.dart';
+import '../data/local/shared_preferences_locale_store.dart';
+import '../features/auth/presentation/auth_cubit.dart';
+import 'localization/locale_cubit.dart';
 
 /// The application's single GetIt service-locator instance.
 ///
 /// Bootstrap spec §4.5 authorizes GetIt as the dependency-injection mechanism.
-/// Registrations are kept minimal and limited to the B3 scope: a single sample
-/// service that proves the locator resolves dependencies. No feature, network,
-/// persistence, or auth services are registered here.
+/// The bootstrap registrations contain only local seams: fake auth, locale
+/// persistence, and error reporting. No network, real credentials, or legal
+/// data services are registered.
 final GetIt serviceLocator = GetIt.instance;
 
 /// Registers all application dependencies.
@@ -15,12 +24,48 @@ final GetIt serviceLocator = GetIt.instance;
 /// Must be called once during application bootstrap (see `main.dart`) before
 /// any dependency is resolved. Safe to call again only in tests after
 /// [resetServiceLocator] has cleared prior registrations.
-void configureDependencies() {
+void configureDependencies({SharedPreferences? preferences}) {
   // Lazy singleton: stateless service, created on first resolution.
-  // Per §4.5, stateless services/repositories register as lazy singletons;
-  // Cubits (none at B3) would register as factories.
+  // Per §4.5, stateless services/repositories register as lazy singletons.
+  // App-scoped Cubits below are also lazy singletons because the router and
+  // root MaterialApp must observe the same session and locale instances.
   if (!serviceLocator.isRegistered<SampleService>()) {
     serviceLocator.registerLazySingleton<SampleService>(SampleServiceImpl.new);
+  }
+  if (!serviceLocator.isRegistered<AuthGateway>()) {
+    serviceLocator.registerLazySingleton<AuthGateway>(
+      FakeAuthGateway.new,
+      dispose: (AuthGateway gateway) => (gateway as FakeAuthGateway).dispose(),
+    );
+  }
+  if (!serviceLocator.isRegistered<ErrorReporter>()) {
+    serviceLocator.registerLazySingleton<ErrorReporter>(
+      ConsoleErrorReporter.new,
+    );
+  }
+  if (!serviceLocator.isRegistered<LocaleStore>()) {
+    serviceLocator.registerLazySingleton<LocaleStore>(
+      () => preferences == null
+          ? InMemoryLocaleStore()
+          : SharedPreferencesLocaleStore(preferences),
+    );
+  }
+  if (!serviceLocator.isRegistered<LocaleCubit>()) {
+    // App-scoped because MaterialApp and routing share the selected locale.
+    serviceLocator.registerLazySingleton<LocaleCubit>(
+      () => LocaleCubit(serviceLocator<LocaleStore>()),
+      dispose: (LocaleCubit cubit) => cubit.close(),
+    );
+  }
+  if (!serviceLocator.isRegistered<AuthCubit>()) {
+    // App-scoped because the router and all screens observe one session seam.
+    serviceLocator.registerLazySingleton<AuthCubit>(
+      () => AuthCubit(
+        serviceLocator<AuthGateway>(),
+        serviceLocator<ErrorReporter>(),
+      ),
+      dispose: (AuthCubit cubit) => cubit.close(),
+    );
   }
 }
 
