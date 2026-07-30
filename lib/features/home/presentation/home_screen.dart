@@ -31,7 +31,7 @@ class HomeScreen extends StatelessWidget {
               surfaceTintColor: Colors.transparent,
               elevation: 0,
               title: Text(
-                'Lexis',
+                l10n.appTitle,
                 style: text.headlineMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),

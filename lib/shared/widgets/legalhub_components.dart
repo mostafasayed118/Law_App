@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../../app/legalhub_theme.dart';
+import '../../l10n/app_localizations.dart';
 
 /// A compact app bar used by the auth/onboarding flows.
 ///
-/// Shows the centered "Lexis" wordmark, an optional leading back button, and an
-/// optional trailing action. Mirrors the `<header>` pattern in the designs.
+/// Shows the centered LegalHub wordmark, an optional leading back button, and
+/// an optional trailing action. Mirrors the `<header>` pattern in the designs.
+/// Per decision D-01 the product brand is LegalHub; the wordmark is localized
+/// via [AppLocalizations.appTitle].
 class LegalHubAppBar extends StatelessWidget implements PreferredSizeWidget {
   const LegalHubAppBar({
     this.leading,
@@ -28,7 +31,7 @@ class LegalHubAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: actions,
       centerTitle: centerTitle,
       title: Text(
-        'Lexis',
+        AppLocalizations.of(context).appTitle,
         style: Theme.of(context).textTheme.headlineMedium?.copyWith(
           fontWeight: FontWeight.w700,
           letterSpacing: -0.3,

@@ -129,7 +129,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get continueWithApple => 'Apple';
 
   @override
-  String get newToLexis => 'Lexis\'te yeni misiniz?';
+  String get newToLegalHub => 'LegalHub\'te yeni misiniz?';
 
   @override
   String get createAccount => 'Hesap oluşturun';

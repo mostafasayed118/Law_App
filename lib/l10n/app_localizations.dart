@@ -334,11 +334,11 @@ abstract class AppLocalizations {
   /// **'Apple'**
   String get continueWithApple;
 
-  /// No description provided for @newToLexis.
+  /// No description provided for @newToLegalHub.
   ///
   /// In en, this message translates to:
-  /// **'New to Lexis?'**
-  String get newToLexis;
+  /// **'New to LegalHub?'**
+  String get newToLegalHub;
 
   /// No description provided for @createAccount.
   ///

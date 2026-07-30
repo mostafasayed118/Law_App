@@ -129,7 +129,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get continueWithApple => 'Apple';
 
   @override
-  String get newToLexis => 'جديد على Lexis؟';
+  String get newToLegalHub => 'جديد على LegalHub؟';
 
   @override
   String get createAccount => 'أنشئ حسابًا';

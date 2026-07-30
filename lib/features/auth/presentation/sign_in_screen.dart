@@ -135,7 +135,7 @@ class _SignInScreenState extends State<SignInScreen> {
               child: Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: <Widget>[
-                  Text(l10n.newToLexis, style: text.bodySmall),
+                  Text(l10n.newToLegalHub, style: text.bodySmall),
                   TextButton(
                     onPressed: () => context.go(AppRoutes.signUp),
                     child: Text(

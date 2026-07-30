@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 /// The canonical LegalHub design-system tokens, light and dark.
 ///
-/// Tokens follow the "Lex Juris" system: Midnight Blue primary, Old Gold
-/// secondary, tiered cool-white surfaces, Playfair Display + Inter pairing.
+/// Tokens follow the LegalHub design system (decision D-10): Midnight Blue
+/// primary, Old Gold secondary, tiered cool-white surfaces, and a
+/// Playfair Display + Noto Sans pairing (Arabic falls back to Noto Naskh).
 /// Light values match the light-mode designs; dark values match the
 /// `*_dark_mode` designs (e.g. `home_dashboard_dark_mode`).
 class LegalHubTheme {
