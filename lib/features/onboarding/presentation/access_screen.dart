@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../core/auth/auth_state.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/widgets.dart';
 import '../../auth/presentation/auth_cubit.dart';
 
 class AccessScreen extends StatelessWidget {
@@ -44,20 +45,14 @@ class AccessScreen extends StatelessWidget {
                   BlocBuilder<AuthCubit, AuthState>(
                     builder: (BuildContext context, AuthState state) {
                       final bool loading = state.status == AuthStatus.loading;
-                      return ElevatedButton.icon(
+                      return LoadingElevatedButton(
                         onPressed: loading
                             ? null
                             : () =>
                                   context.read<AuthCubit>().startDemoSession(),
-                        icon: loading
-                            ? const SizedBox.square(
-                                dimension: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Icon(Icons.play_arrow_outlined),
-                        label: Text(l10n.continueAsDemo),
+                        label: l10n.continueAsDemo,
+                        loading: loading,
+                        icon: Icons.play_arrow_outlined,
                       );
                     },
                   ),

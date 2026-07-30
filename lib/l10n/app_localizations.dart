@@ -267,6 +267,426 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back'**
   String get back;
+
+  /// No description provided for @signInWelcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome Back'**
+  String get signInWelcome;
+
+  /// No description provided for @signInSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to access your secure legal workstation.'**
+  String get signInSubtitle;
+
+  /// No description provided for @emailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email Address'**
+  String get emailLabel;
+
+  /// No description provided for @emailPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. counsel@firm.com'**
+  String get emailPlaceholder;
+
+  /// No description provided for @passwordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get passwordLabel;
+
+  /// No description provided for @passwordPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'••••••••'**
+  String get passwordPlaceholder;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot Password?'**
+  String get forgotPassword;
+
+  /// No description provided for @signInButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get signInButton;
+
+  /// No description provided for @orContinueWith.
+  ///
+  /// In en, this message translates to:
+  /// **'OR CONTINUE WITH'**
+  String get orContinueWith;
+
+  /// No description provided for @continueWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Google'**
+  String get continueWithGoogle;
+
+  /// No description provided for @continueWithApple.
+  ///
+  /// In en, this message translates to:
+  /// **'Apple'**
+  String get continueWithApple;
+
+  /// No description provided for @newToLexis.
+  ///
+  /// In en, this message translates to:
+  /// **'New to Lexis?'**
+  String get newToLexis;
+
+  /// No description provided for @createAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an account'**
+  String get createAccount;
+
+  /// No description provided for @encryptedConnectionNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'256-BIT ENCRYPTED CONNECTION'**
+  String get encryptedConnectionNotice;
+
+  /// No description provided for @signUpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get signUpTitle;
+
+  /// No description provided for @signUpSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your details to register your practice.'**
+  String get signUpSubtitle;
+
+  /// No description provided for @fullNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name'**
+  String get fullNameLabel;
+
+  /// No description provided for @fullNamePlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Jane Doe'**
+  String get fullNamePlaceholder;
+
+  /// No description provided for @phoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone Number'**
+  String get phoneLabel;
+
+  /// No description provided for @phonePlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'+1 (555) 000-0000'**
+  String get phonePlaceholder;
+
+  /// No description provided for @passwordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Must be at least 8 characters.'**
+  String get passwordHint;
+
+  /// No description provided for @agreeToTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'I agree to the Terms & Conditions and Privacy Policy.'**
+  String get agreeToTerms;
+
+  /// No description provided for @signUpButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get signUpButton;
+
+  /// No description provided for @alreadyHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account?'**
+  String get alreadyHaveAccount;
+
+  /// No description provided for @signInLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get signInLink;
+
+  /// No description provided for @recoverPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover Password'**
+  String get recoverPasswordTitle;
+
+  /// No description provided for @recoverPasswordBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your registered email address to receive a verification code.'**
+  String get recoverPasswordBody;
+
+  /// No description provided for @sendCodeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Code'**
+  String get sendCodeButton;
+
+  /// No description provided for @backToSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Sign In'**
+  String get backToSignIn;
+
+  /// No description provided for @codeSentNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code sent to your inbox.'**
+  String get codeSentNotice;
+
+  /// No description provided for @verifyEmailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify Email'**
+  String get verifyEmailTitle;
+
+  /// No description provided for @verifyEmailBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ve sent a 6-digit code to your email address.'**
+  String get verifyEmailBody;
+
+  /// No description provided for @verifyAndContinueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify & Continue'**
+  String get verifyAndContinueButton;
+
+  /// No description provided for @resendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend Code'**
+  String get resendCode;
+
+  /// No description provided for @resendHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Didn\'t receive the email? Check your spam folder or contact support.'**
+  String get resendHelp;
+
+  /// No description provided for @resetPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Password'**
+  String get resetPasswordTitle;
+
+  /// No description provided for @newPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get newPasswordLabel;
+
+  /// No description provided for @confirmPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get confirmPasswordLabel;
+
+  /// No description provided for @resetPasswordButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Password'**
+  String get resetPasswordButton;
+
+  /// No description provided for @resetSuccessNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Your password has been reset. You can sign in now.'**
+  String get resetSuccessNotice;
+
+  /// No description provided for @onboardingTitle1.
+  ///
+  /// In en, this message translates to:
+  /// **'Expert Legal Advice'**
+  String get onboardingTitle1;
+
+  /// No description provided for @onboardingDesc1.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect seamlessly with top-tier legal professionals. Unparalleled expertise tailored for your most critical and complex matters.'**
+  String get onboardingDesc1;
+
+  /// No description provided for @onboardingTitle2.
+  ///
+  /// In en, this message translates to:
+  /// **'Case Tracking'**
+  String get onboardingTitle2;
+
+  /// No description provided for @onboardingDesc2.
+  ///
+  /// In en, this message translates to:
+  /// **'Monitor your legal matters in real-time with precise updates. Stay informed at every procedural step with our structured timeline view.'**
+  String get onboardingDesc2;
+
+  /// No description provided for @onboardingTitle3.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure Communication'**
+  String get onboardingTitle3;
+
+  /// No description provided for @onboardingDesc3.
+  ///
+  /// In en, this message translates to:
+  /// **'Confidential messaging utilizing state-of-the-art encryption protocols. Your attorney-client privilege, protected in the digital realm.'**
+  String get onboardingDesc3;
+
+  /// No description provided for @onboardingContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get onboardingContinue;
+
+  /// No description provided for @onboardingGetStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get onboardingGetStarted;
+
+  /// No description provided for @skip.
+  ///
+  /// In en, this message translates to:
+  /// **'SKIP'**
+  String get skip;
+
+  /// No description provided for @onboardingSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re All Set'**
+  String get onboardingSuccessTitle;
+
+  /// No description provided for @onboardingSuccessBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your secure legal workstation is ready. Sign in to begin.'**
+  String get onboardingSuccessBody;
+
+  /// No description provided for @onboardingSuccessAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to Sign In'**
+  String get onboardingSuccessAction;
+
+  /// No description provided for @homeGreeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello, {name}'**
+  String homeGreeting(String name);
+
+  /// No description provided for @homeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How can we assist you with your legal needs today?'**
+  String get homeSubtitle;
+
+  /// No description provided for @searchPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Find a lawyer or legal topic...'**
+  String get searchPlaceholder;
+
+  /// No description provided for @practiceAreas.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice Areas'**
+  String get practiceAreas;
+
+  /// No description provided for @viewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'VIEW ALL'**
+  String get viewAll;
+
+  /// No description provided for @recentActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Activity'**
+  String get recentActivity;
+
+  /// No description provided for @areaCriminal.
+  ///
+  /// In en, this message translates to:
+  /// **'Criminal'**
+  String get areaCriminal;
+
+  /// No description provided for @areaCivil.
+  ///
+  /// In en, this message translates to:
+  /// **'Civil'**
+  String get areaCivil;
+
+  /// No description provided for @areaCorporate.
+  ///
+  /// In en, this message translates to:
+  /// **'Corporate'**
+  String get areaCorporate;
+
+  /// No description provided for @areaFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Family'**
+  String get areaFamily;
+
+  /// No description provided for @activeCaseChip.
+  ///
+  /// In en, this message translates to:
+  /// **'ACTIVE CASE'**
+  String get activeCaseChip;
+
+  /// No description provided for @actionRequiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Action Required'**
+  String get actionRequiredTitle;
+
+  /// No description provided for @actionRequiredBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Signature needed for retainer agreement.'**
+  String get actionRequiredBody;
+
+  /// No description provided for @consultationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Consultation'**
+  String get consultationTitle;
+
+  /// No description provided for @consultationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow at 2:00 PM via Video Call.'**
+  String get consultationBody;
+
+  /// No description provided for @casesNavigation.
+  ///
+  /// In en, this message translates to:
+  /// **'Cases'**
+  String get casesNavigation;
+
+  /// No description provided for @messagesNavigation.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages'**
+  String get messagesNavigation;
+
+  /// No description provided for @profileNavigation.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profileNavigation;
 }
 
 class _AppLocalizationsDelegate

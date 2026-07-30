@@ -50,7 +50,15 @@ class LegalHubApp extends StatelessWidget {
             onGenerateTitle: (BuildContext context) =>
                 AppLocalizations.of(context).appTitle,
             debugShowCheckedModeBanner: false,
-            theme: LegalHubTheme.forLocale(state.locale),
+            theme: LegalHubTheme.forBrightness(
+              Brightness.light,
+              locale: state.locale,
+            ),
+            darkTheme: LegalHubTheme.forBrightness(
+              Brightness.dark,
+              locale: state.locale,
+            ),
+            themeMode: ThemeMode.system,
             locale: state.locale,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,

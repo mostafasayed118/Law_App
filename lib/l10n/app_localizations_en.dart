@@ -93,4 +93,227 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get back => 'Back';
+
+  @override
+  String get signInWelcome => 'Welcome Back';
+
+  @override
+  String get signInSubtitle =>
+      'Sign in to access your secure legal workstation.';
+
+  @override
+  String get emailLabel => 'Email Address';
+
+  @override
+  String get emailPlaceholder => 'e.g. counsel@firm.com';
+
+  @override
+  String get passwordLabel => 'Password';
+
+  @override
+  String get passwordPlaceholder => '••••••••';
+
+  @override
+  String get forgotPassword => 'Forgot Password?';
+
+  @override
+  String get signInButton => 'Sign In';
+
+  @override
+  String get orContinueWith => 'OR CONTINUE WITH';
+
+  @override
+  String get continueWithGoogle => 'Google';
+
+  @override
+  String get continueWithApple => 'Apple';
+
+  @override
+  String get newToLexis => 'New to Lexis?';
+
+  @override
+  String get createAccount => 'Create an account';
+
+  @override
+  String get encryptedConnectionNotice => '256-BIT ENCRYPTED CONNECTION';
+
+  @override
+  String get signUpTitle => 'Create Account';
+
+  @override
+  String get signUpSubtitle => 'Enter your details to register your practice.';
+
+  @override
+  String get fullNameLabel => 'Full Name';
+
+  @override
+  String get fullNamePlaceholder => 'Jane Doe';
+
+  @override
+  String get phoneLabel => 'Phone Number';
+
+  @override
+  String get phonePlaceholder => '+1 (555) 000-0000';
+
+  @override
+  String get passwordHint => 'Must be at least 8 characters.';
+
+  @override
+  String get agreeToTerms =>
+      'I agree to the Terms & Conditions and Privacy Policy.';
+
+  @override
+  String get signUpButton => 'Create Account';
+
+  @override
+  String get alreadyHaveAccount => 'Already have an account?';
+
+  @override
+  String get signInLink => 'Sign In';
+
+  @override
+  String get recoverPasswordTitle => 'Recover Password';
+
+  @override
+  String get recoverPasswordBody =>
+      'Enter your registered email address to receive a verification code.';
+
+  @override
+  String get sendCodeButton => 'Send Code';
+
+  @override
+  String get backToSignIn => 'Back to Sign In';
+
+  @override
+  String get codeSentNotice => 'Verification code sent to your inbox.';
+
+  @override
+  String get verifyEmailTitle => 'Verify Email';
+
+  @override
+  String get verifyEmailBody =>
+      'We\'ve sent a 6-digit code to your email address.';
+
+  @override
+  String get verifyAndContinueButton => 'Verify & Continue';
+
+  @override
+  String get resendCode => 'Resend Code';
+
+  @override
+  String get resendHelp =>
+      'Didn\'t receive the email? Check your spam folder or contact support.';
+
+  @override
+  String get resetPasswordTitle => 'Reset Password';
+
+  @override
+  String get newPasswordLabel => 'New Password';
+
+  @override
+  String get confirmPasswordLabel => 'Confirm Password';
+
+  @override
+  String get resetPasswordButton => 'Reset Password';
+
+  @override
+  String get resetSuccessNotice =>
+      'Your password has been reset. You can sign in now.';
+
+  @override
+  String get onboardingTitle1 => 'Expert Legal Advice';
+
+  @override
+  String get onboardingDesc1 =>
+      'Connect seamlessly with top-tier legal professionals. Unparalleled expertise tailored for your most critical and complex matters.';
+
+  @override
+  String get onboardingTitle2 => 'Case Tracking';
+
+  @override
+  String get onboardingDesc2 =>
+      'Monitor your legal matters in real-time with precise updates. Stay informed at every procedural step with our structured timeline view.';
+
+  @override
+  String get onboardingTitle3 => 'Secure Communication';
+
+  @override
+  String get onboardingDesc3 =>
+      'Confidential messaging utilizing state-of-the-art encryption protocols. Your attorney-client privilege, protected in the digital realm.';
+
+  @override
+  String get onboardingContinue => 'Continue';
+
+  @override
+  String get onboardingGetStarted => 'Get Started';
+
+  @override
+  String get skip => 'SKIP';
+
+  @override
+  String get onboardingSuccessTitle => 'You\'re All Set';
+
+  @override
+  String get onboardingSuccessBody =>
+      'Your secure legal workstation is ready. Sign in to begin.';
+
+  @override
+  String get onboardingSuccessAction => 'Continue to Sign In';
+
+  @override
+  String homeGreeting(String name) {
+    return 'Hello, $name';
+  }
+
+  @override
+  String get homeSubtitle =>
+      'How can we assist you with your legal needs today?';
+
+  @override
+  String get searchPlaceholder => 'Find a lawyer or legal topic...';
+
+  @override
+  String get practiceAreas => 'Practice Areas';
+
+  @override
+  String get viewAll => 'VIEW ALL';
+
+  @override
+  String get recentActivity => 'Recent Activity';
+
+  @override
+  String get areaCriminal => 'Criminal';
+
+  @override
+  String get areaCivil => 'Civil';
+
+  @override
+  String get areaCorporate => 'Corporate';
+
+  @override
+  String get areaFamily => 'Family';
+
+  @override
+  String get activeCaseChip => 'ACTIVE CASE';
+
+  @override
+  String get actionRequiredTitle => 'Action Required';
+
+  @override
+  String get actionRequiredBody => 'Signature needed for retainer agreement.';
+
+  @override
+  String get consultationTitle => 'Consultation';
+
+  @override
+  String get consultationBody => 'Tomorrow at 2:00 PM via Video Call.';
+
+  @override
+  String get casesNavigation => 'Cases';
+
+  @override
+  String get messagesNavigation => 'Messages';
+
+  @override
+  String get profileNavigation => 'Profile';
 }
