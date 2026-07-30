@@ -56,3 +56,6 @@ app.*.map.json
 # Design reference archives (visual reference only; not part of B1 source)
 /stitch_legalhub_mobile_app/
 /stitch_legalhub_mobile_app.rar
+
+# Local tool scratch directory (not project source)
+.commandcode/
