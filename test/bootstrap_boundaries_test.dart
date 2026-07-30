@@ -116,6 +116,24 @@ void main() {
       );
     },
   );
+
+  test(
+    'redacts password-recovery credential keys (otp, new_password, newPassword)',
+    () {
+      // Regression guard: the password-recovery flow adds `otp` (a
+      // short-lived credential) and `newPassword`/`new_password` to the
+      // sensitive-key policy. These must be masked wherever they appear.
+      final Map<String, Object?> sanitized = Redactor.map(<String, Object?>{
+        'otp': '123456',
+        'newPassword': 'super-secret-123',
+        'new_password': 'also-secret-456',
+      });
+
+      expect(sanitized['otp'], '[REDACTED]');
+      expect(sanitized['newPassword'], '[REDACTED]');
+      expect(sanitized['new_password'], '[REDACTED]');
+    },
+  );
 }
 
 class _FailingAuthGateway implements AuthGateway {

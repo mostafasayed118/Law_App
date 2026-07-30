@@ -10,6 +10,9 @@ class Redactor {
 
   static const Set<String> _sensitiveKeys = <String>{
     'password',
+    'new_password',
+    'newpassword',
+    'otp',
     'token',
     'access_token',
     'refresh_token',

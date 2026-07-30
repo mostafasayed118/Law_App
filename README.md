@@ -28,11 +28,24 @@ messaging services.
   redirect logic, sign-in screen behavior (including error snackbar), the
   forgot-password reset confirm-password validator, home screen EN + AR/RTL
   copy, use-case and role-contract primitives, SharedPreferences locale store,
-  SignUpRequest redaction invariants, and the end-to-end boot/locale-switch
-  widget flow (52 tests total).
-- Coverage gaps (tracked for later batches): onboarding screens, sign-up
-  screen, forgot-password email and OTP screens, settings screen,
+  SignUpRequest redaction invariants, the end-to-end boot/locale-switch
+  widget flow, and onboarding carousel/success routing (57 tests total).
+- Coverage gaps (tracked for later batches): sign-up screen,
+  forgot-password email and OTP screens, settings screen,
   `legalhub_theme`, and the shared widgets have no dedicated tests yet.
+  Onboarding screens have a passing widget test (carousel navigation, brand
+  remediation, and onboarding-success routing) that pumps at a 411x867 phone
+  viewport.
+- Responsive finding (tracked, not fixed): `OnboardingScreen` lays out a
+  fixed-height hero container inside a `PageView` page. At the default
+  desktop widget-test surface (800x600) the page area is 325px tall and the
+  page content overflows by ~139px. A phone-class viewport (411x867) renders
+  correctly, and short real-world devices may still overflow because the page
+  content is not scrollable or flex-sized. The fix (wrap the page in a
+  `SingleChildScrollView` or make the hero container `Flexible`) is a UI
+  slice that needs EN/AR/RTL + light/dark + compact/wide checks per
+  `INSTRUCTIONS.md` §4.5 and is deferred to a dedicated responsive-hardening
+  batch.
 
 ## Brand
 

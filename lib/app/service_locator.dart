@@ -8,6 +8,8 @@ import '../data/auth/fake_auth_gateway.dart';
 import '../data/local/in_memory_locale_store.dart';
 import '../data/local/locale_store.dart';
 import '../data/local/shared_preferences_locale_store.dart';
+import '../features/auth/data/fake_password_recovery_gateway.dart';
+import '../features/auth/domain/password_recovery_gateway.dart';
 import '../features/auth/presentation/auth_cubit.dart';
 import 'localization/locale_cubit.dart';
 
@@ -55,6 +57,13 @@ void configureDependencies({SharedPreferences? preferences}) {
     serviceLocator.registerLazySingleton<LocaleCubit>(
       () => LocaleCubit(serviceLocator<LocaleStore>()),
       dispose: (LocaleCubit cubit) => cubit.close(),
+    );
+  }
+  if (!serviceLocator.isRegistered<PasswordRecoveryGateway>()) {
+    // Stateless service: lazy singleton. The recovery Cubit is feature-scoped
+    // and created per screen via BlocProvider, so it is NOT registered here.
+    serviceLocator.registerLazySingleton<PasswordRecoveryGateway>(
+      FakePasswordRecoveryGateway.new,
     );
   }
   if (!serviceLocator.isRegistered<AuthCubit>()) {
