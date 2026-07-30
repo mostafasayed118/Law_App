@@ -25,8 +25,14 @@ messaging services.
 - `SignUpRequest` pure-domain value object (features/auth/domain) with a
   redaction contract: `toRedactedMap()` is safe to embed in `AppError.context`.
 - Tests: Result, AuthCubit, LocaleCubit, Redactor, DI, validators, router
-  redirect logic, sign-in screen behavior, SignUpRequest redaction invariants,
-  and the end-to-end boot/locale-switch widget flow (36 tests total).
+  redirect logic, sign-in screen behavior (including error snackbar), the
+  forgot-password reset confirm-password validator, home screen EN + AR/RTL
+  copy, use-case and role-contract primitives, SharedPreferences locale store,
+  SignUpRequest redaction invariants, and the end-to-end boot/locale-switch
+  widget flow (52 tests total).
+- Coverage gaps (tracked for later batches): onboarding screens, sign-up
+  screen, forgot-password email and OTP screens, settings screen,
+  `legalhub_theme`, and the shared widgets have no dedicated tests yet.
 
 ## Brand
 
