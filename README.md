@@ -78,4 +78,5 @@ storage, observability policy, and feature-specific acceptance tests.
 Architecture and product decisions that are expensive to reverse or that
 deviate from the approved spec are recorded as ADRs in [`docs/adr/`](docs/adr/).
 Notable entries: ADR-0001 (brand = LegalHub), ADR-0002 (dark theme approved),
-ADR-0003 (SignUpRequest redaction contract).
+ADR-0003 (SignUpRequest redaction contract), ADR-0004 (enforce the shared/
+second-use rule; retain ViewStateView).

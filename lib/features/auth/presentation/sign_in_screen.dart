@@ -9,6 +9,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../shared/forms/validators.dart';
 import '../../../shared/widgets/widgets.dart';
 import 'auth_cubit.dart';
+import 'widgets/auth_buttons.dart';
 
 /// Sign-in screen matching `stitch_legalhub_mobile_app/sign_in`.
 ///

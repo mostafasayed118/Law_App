@@ -38,6 +38,6 @@ class _SucceedingUseCase implements UseCase<String, NoInput> {
 class _FailingUseCase implements UseCase<String, NoInput> {
   @override
   Future<Result<String>> call(NoInput input) async => Result<String>.failure(
-        const AppError(code: 'use_case_failed', userMessage: 'failed'),
-      );
+    const AppError(code: 'use_case_failed', userMessage: 'failed'),
+  );
 }

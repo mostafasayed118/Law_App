@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../app/legalhub_theme.dart';
+import '../../../../app/legalhub_theme.dart';
 
 /// A row of [length] single-digit cells for entering a verification code.
 ///

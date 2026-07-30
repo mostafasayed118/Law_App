@@ -15,14 +15,16 @@ void main() {
 
   group('SharedPreferencesLocaleStore', () {
     test('read returns null when no locale is stored', () async {
-      final SharedPreferencesLocaleStore store =
-          SharedPreferencesLocaleStore(prefs);
+      final SharedPreferencesLocaleStore store = SharedPreferencesLocaleStore(
+        prefs,
+      );
       expect(await store.read(), isNull);
     });
 
     test('write then read round-trips a supported locale code', () async {
-      final SharedPreferencesLocaleStore store =
-          SharedPreferencesLocaleStore(prefs);
+      final SharedPreferencesLocaleStore store = SharedPreferencesLocaleStore(
+        prefs,
+      );
       await store.write(const Locale('ar'));
       expect(await store.read(), const Locale('ar'));
     });
@@ -32,16 +34,18 @@ void main() {
       // supportedLocaleCodes (e.g. 'fr'). read() must treat it as a miss
       // rather than returning an unsupported Locale.
       await prefs.setString('legalhub.locale', 'fr');
-      final SharedPreferencesLocaleStore store =
-          SharedPreferencesLocaleStore(prefs);
+      final SharedPreferencesLocaleStore store = SharedPreferencesLocaleStore(
+        prefs,
+      );
       expect(await store.read(), isNull);
     });
 
     test('read accepts all three supported codes', () async {
       for (final String code in <String>['en', 'ar', 'tr']) {
         await prefs.setString('legalhub.locale', code);
-        final SharedPreferencesLocaleStore store =
-            SharedPreferencesLocaleStore(prefs);
+        final SharedPreferencesLocaleStore store = SharedPreferencesLocaleStore(
+          prefs,
+        );
         expect(await store.read(), Locale(code), reason: 'code $code');
       }
     });

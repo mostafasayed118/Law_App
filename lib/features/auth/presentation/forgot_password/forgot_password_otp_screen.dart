@@ -5,6 +5,7 @@ import '../../../../app/legalhub_theme.dart';
 import '../../../../app/router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/widgets/widgets.dart';
+import 'otp_field_row.dart';
 
 /// Step 2 — enter the 6-digit verification code.
 ///

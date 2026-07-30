@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../features/auth/presentation/auth_cubit.dart' show AuthCubit;
 import '../../../l10n/app_localizations.dart';
-import '../../../shared/widgets/legalhub_components.dart';
+import 'widgets/home_cards.dart';
 
 /// Home dashboard matching `stitch_legalhub_mobile_app/home_dashboard`.
 ///
