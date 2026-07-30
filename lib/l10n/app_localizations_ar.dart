@@ -295,6 +295,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get activeCaseChip => 'قضية نشطة';
 
   @override
+  String get activeCaseTime => 'اليوم، ١٠:٠٠ صباحًا';
+
+  @override
+  String get activeCaseTitle => 'تركة هـ. فانس ضد المدينة';
+
+  @override
+  String get activeCaseBody =>
+      'جلسة مقررة لأمر أولي بمنع مؤقت بشأن نزاع حدود العقار في المحكمة الجزئية.';
+
+  @override
+  String get activeCaseAttorney => 'المحامي ر. ستيرلينغ';
+
+  @override
   String get actionRequiredTitle => 'إجراء مطلوب';
 
   @override
@@ -305,6 +318,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get consultationBody => 'غدًا الساعة ٢:٠٠ مساءً عبر مكالمة فيديو.';
+
+  @override
+  String get signInErrorNotice => 'تعذر بدء الجلسة التجريبية.';
 
   @override
   String get casesNavigation => 'القضايا';

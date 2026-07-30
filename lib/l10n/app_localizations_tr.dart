@@ -298,6 +298,19 @@ class AppLocalizationsTr extends AppLocalizations {
   String get activeCaseChip => 'AKTİF DAVALAR';
 
   @override
+  String get activeCaseTime => 'Bugün, 10:00 ÖÖ';
+
+  @override
+  String get activeCaseTitle => 'H. Vance Mirası - Belediye Davası';
+
+  @override
+  String get activeCaseBody =>
+      'Bölge mahkemesindeki mülkiyet sınırı anlaşmazlığına ilişkin ön ihtiyati tedbir kararı için duruşma planlandı.';
+
+  @override
+  String get activeCaseAttorney => 'Av. R. Sterling';
+
+  @override
   String get actionRequiredTitle => 'İşlem Gerekli';
 
   @override
@@ -308,6 +321,9 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get consultationBody => 'Yarın 14:00\'te video görüşmesiyle.';
+
+  @override
+  String get signInErrorNotice => 'Demo oturumu başlatılamadı.';
 
   @override
   String get casesNavigation => 'Davalar';

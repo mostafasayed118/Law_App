@@ -38,8 +38,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // The real router sets initialLocation = /sign-in. The access screen is no
-    // longer routed, so the first render must be the sign-in welcome copy.
+    // The real router sets initialLocation = /sign-in, so the first render
+    // must be the sign-in welcome copy.
     expect(find.text('Welcome Back'), findsOneWidget);
     expect(find.text('Sign In'), findsWidgets);
   });

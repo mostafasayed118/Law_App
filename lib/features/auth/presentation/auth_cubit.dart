@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/auth/auth_gateway.dart';
 import '../../../core/auth/auth_state.dart';
-import '../../../core/errors/app_error.dart';
 import '../../../core/errors/result.dart';
 import '../../../core/observability/error_reporter.dart';
 
@@ -38,8 +37,3 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 }
-
-const AppError demoAuthError = AppError(
-  code: 'demo_auth_unavailable',
-  userMessage: 'The demo session is unavailable.',
-);

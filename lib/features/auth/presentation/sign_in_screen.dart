@@ -54,106 +54,118 @@ class _SignInScreenState extends State<SignInScreen> {
         LegalHubTheme.spaceXl,
       ),
       bottomNavigationBar: const SecurityBadge(),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Text(l10n.signInWelcome, style: text.displaySmall),
-            const SizedBox(height: LegalHubTheme.spaceXs),
-            Text(
-              l10n.signInSubtitle,
-              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-            const SizedBox(height: LegalHubTheme.spaceXl),
-            LabelledField(
-              label: l10n.emailLabel,
-              child: LegalHubTextField(
-                controller: _email,
-                hint: l10n.emailPlaceholder,
-                keyboardType: TextInputType.emailAddress,
-                textInputAction: TextInputAction.next,
-                validator: (v) => LegalHubValidators.email(l10n, v),
-              ),
-            ),
-            const SizedBox(height: LegalHubTheme.spaceMd),
-            PasswordField(
-              controller: _password,
-              label: l10n.passwordLabel,
-              hint: l10n.passwordPlaceholder,
-              textInputAction: TextInputAction.done,
-              validator: (v) => LegalHubValidators.required(l10n, v),
-              trailing: TextButton(
-                onPressed: () => context.go(AppRoutes.forgotPassword),
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  l10n.forgotPassword,
-                  style: text.labelLarge?.copyWith(color: scheme.secondary),
+      child: BlocListener<AuthCubit, AuthState>(
+        listenWhen: (AuthState previous, AuthState current) =>
+            previous.status != current.status &&
+            current.status == AuthStatus.error,
+        listener: (BuildContext context, AuthState state) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.signInErrorNotice)));
+        },
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Text(l10n.signInWelcome, style: text.displaySmall),
+              const SizedBox(height: LegalHubTheme.spaceXs),
+              Text(
+                l10n.signInSubtitle,
+                style: text.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
                 ),
               ),
-            ),
-            const SizedBox(height: LegalHubTheme.spaceXl),
-            BlocBuilder<AuthCubit, AuthState>(
-              builder: (BuildContext context, AuthState state) {
-                final bool loading = state.status == AuthStatus.loading;
-                return LoadingElevatedButton(
-                  onPressed: loading ? null : _submit,
-                  label: l10n.signInButton,
-                  loading: loading,
-                  icon: Icons.lock_outline,
-                );
-              },
-            ),
-            const SizedBox(height: LegalHubTheme.spaceXl),
-            EditorialDivider(label: l10n.orContinueWith),
-            const SizedBox(height: LegalHubTheme.spaceMd),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: SocialButton(
-                    label: l10n.continueWithGoogle,
-                    icon: Icons.g_mobiledata_outlined,
-                    onTap: () => context.go(AppRoutes.signUp),
+              const SizedBox(height: LegalHubTheme.spaceXl),
+              LabelledField(
+                label: l10n.emailLabel,
+                child: LegalHubTextField(
+                  controller: _email,
+                  hint: l10n.emailPlaceholder,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  validator: (v) => LegalHubValidators.email(l10n, v),
+                ),
+              ),
+              const SizedBox(height: LegalHubTheme.spaceMd),
+              PasswordField(
+                controller: _password,
+                label: l10n.passwordLabel,
+                hint: l10n.passwordPlaceholder,
+                textInputAction: TextInputAction.done,
+                validator: (v) => LegalHubValidators.required(l10n, v),
+                trailing: TextButton(
+                  onPressed: () => context.go(AppRoutes.forgotPassword),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(
+                    l10n.forgotPassword,
+                    style: text.labelLarge?.copyWith(color: scheme.secondary),
                   ),
                 ),
-                const SizedBox(width: LegalHubTheme.spaceMd),
-                Expanded(
-                  child: SocialButton(
-                    label: l10n.continueWithApple,
-                    icon: Icons.apple,
-                    onTap: () => context.go(AppRoutes.signUp),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: LegalHubTheme.spaceXl),
-            Center(
-              child: Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
+              ),
+              const SizedBox(height: LegalHubTheme.spaceXl),
+              BlocBuilder<AuthCubit, AuthState>(
+                builder: (BuildContext context, AuthState state) {
+                  final bool loading = state.status == AuthStatus.loading;
+                  return LoadingElevatedButton(
+                    onPressed: loading ? null : _submit,
+                    label: l10n.signInButton,
+                    loading: loading,
+                    icon: Icons.lock_outline,
+                  );
+                },
+              ),
+              const SizedBox(height: LegalHubTheme.spaceXl),
+              EditorialDivider(label: l10n.orContinueWith),
+              const SizedBox(height: LegalHubTheme.spaceMd),
+              Row(
                 children: <Widget>[
-                  Text(l10n.newToLegalHub, style: text.bodySmall),
-                  TextButton(
-                    onPressed: () => context.go(AppRoutes.signUp),
-                    child: Text(
-                      l10n.createAccount,
-                      style: text.bodySmall?.copyWith(
-                        color: scheme.secondary,
-                        fontWeight: FontWeight.w600,
-                        decoration: TextDecoration.underline,
-                        decorationColor: scheme.secondary.withValues(
-                          alpha: 0.3,
-                        ),
-                      ),
+                  Expanded(
+                    child: SocialButton(
+                      label: l10n.continueWithGoogle,
+                      icon: Icons.g_mobiledata_outlined,
+                      onTap: () => context.go(AppRoutes.signUp),
+                    ),
+                  ),
+                  const SizedBox(width: LegalHubTheme.spaceMd),
+                  Expanded(
+                    child: SocialButton(
+                      label: l10n.continueWithApple,
+                      icon: Icons.apple,
+                      onTap: () => context.go(AppRoutes.signUp),
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
+              const SizedBox(height: LegalHubTheme.spaceXl),
+              Center(
+                child: Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: <Widget>[
+                    Text(l10n.newToLegalHub, style: text.bodySmall),
+                    TextButton(
+                      onPressed: () => context.go(AppRoutes.signUp),
+                      child: Text(
+                        l10n.createAccount,
+                        style: text.bodySmall?.copyWith(
+                          color: scheme.secondary,
+                          fontWeight: FontWeight.w600,
+                          decoration: TextDecoration.underline,
+                          decorationColor: scheme.secondary.withValues(
+                            alpha: 0.3,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -11,7 +11,7 @@ messaging services.
 - Pinned Flutter/Dart toolchain and committed dependency lockfile.
 - GetIt dependency registration with local-only bootstrap implementations.
 - Material 3 LegalHub light theme and bundled OFL fonts (no runtime font fetch).
-  Dark tokens are defined and wired but **deferred** — see ADR-0002.
+  Dark tokens are defined and wired — approved as-is, see ADR-0002.
 - Generated English, Arabic, and Turkish localization with persisted locale.
 - Arabic RTL layout and Arabic-capable typography.
 - `Result`, `AppError`, typed async `ViewState`, and `UseCase` boundaries.
@@ -71,5 +71,5 @@ storage, observability policy, and feature-specific acceptance tests.
 
 Architecture and product decisions that are expensive to reverse or that
 deviate from the approved spec are recorded as ADRs in [`docs/adr/`](docs/adr/).
-Notable entries: ADR-0001 (brand = LegalHub), ADR-0002 (dark theme deferred),
+Notable entries: ADR-0001 (brand = LegalHub), ADR-0002 (dark theme approved),
 ADR-0003 (SignUpRequest redaction contract).

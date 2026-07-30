@@ -297,6 +297,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get activeCaseChip => 'ACTIVE CASE';
 
   @override
+  String get activeCaseTime => 'Today, 10:00 AM';
+
+  @override
+  String get activeCaseTitle => 'Estate of H. Vance vs. City';
+
+  @override
+  String get activeCaseBody =>
+      'Hearing scheduled for preliminary injunction regarding property line dispute in district court.';
+
+  @override
+  String get activeCaseAttorney => 'Atty. R. Sterling';
+
+  @override
   String get actionRequiredTitle => 'Action Required';
 
   @override
@@ -307,6 +320,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get consultationBody => 'Tomorrow at 2:00 PM via Video Call.';
+
+  @override
+  String get signInErrorNotice => 'Unable to start the demo session.';
 
   @override
   String get casesNavigation => 'Cases';

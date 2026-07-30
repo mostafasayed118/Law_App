@@ -46,8 +46,8 @@ D-01 and D-10 are now confirmed, which unblocks the **project-bootstrap** work p
 | D-09 | Payment provider / tax / PCI scope | open | Product owner + finance | Before billing/payment spec | Billing, booking payment |
 | D-11 | Video consultation provider & data-handling | open | Product owner | Before video spec | Video consultation |
 | D-12 | `plan.md` / discovery report availability | open | Product owner | Immediately | Full specification reconciliation |
-| **D-13** | Canonical body typeface: **Inter** (blue variant) vs **Source Serif 4 + Source Sans 3** (warm variant) | open | Design lead | Before theme build | Typography theme |
-| **D-14** | Dark-theme token values (not defined in design-system files) | open | Design lead | Before dark-mode UI | All dark-mode screens |
+| **D-13** | Canonical body typeface | **CONFIRMED** | Design lead | Resolved at bootstrap-spec approval | Typography theme — see `docs/legalhub_bootstrap_specification.md` |
+| **D-14** | Dark-theme token values | **CONFIRMED** (approved as-is per ADR-0002) | Design lead | Resolved 2026-07-30 | All dark-mode screens |
 
 ---
 
@@ -107,22 +107,23 @@ Derived by normalizing the three design-system files. Two files (`lexis_design_s
 
 > **Status semantics:** the design uses green "Clear"/red "Conflict" badges. Per `INSTRUCTIONS.md` §4.4 and §4.5, status must never rely on color alone and conflict results must **not** be labeled as "Clear"/clearance. Define semantic status tokens (`status-info`, `status-attention`, `status-critical`) with **text + icon**, not standalone green/red. (Green is not in the palette and must be added deliberately if used.)
 
-### 5.2 Dark theme — **D-14 (undefined)**
-The design-system files define **light values only**, yet ~40 `*_dark_mode` screens exist. Canonical dark tokens must be derived (M3 tonal inversion) and approved before any dark UI is built. Do not reverse-engineer dark values from individual HTML mockups.
+### 5.2 Dark theme — **D-14 (approved)**
+The design-system files define **light values only**, yet ~40 `*_dark_mode` screens exist. Canonical dark tokens were derived (M3 tonal inversion) and wired in `lib/app/legalhub_theme.dart`; dark mode is **approved as-is** per ADR-0002 (retroactively accepted 2026-07-30), closing D-14. New dark-mode design work may build on the existing dark tokens without a separate per-screen dark-token approval.
 
-### 5.3 Typography — canonical (pending D-13)
+### 5.3 Typography — canonical (D-13 confirmed)
+
+> **D-13 resolved at bootstrap-specification approval:** body/UI face is **Noto Sans** (verified Arabic + Turkish coverage); **Playfair Display** is retained only for optional English display headings, falling back to Noto Sans / Noto Naskh Arabic for Arabic. See `docs/legalhub_bootstrap_specification.md` §2.1 and B6. The earlier "Inter" proposal is superseded.
+
 | Role | Family | Size / Line | Weight | Tracking |
 |---|---|---|---|---|
-| display-lg | Playfair Display | 48 / 56 | 700 | -0.02em |
-| headline-lg | Playfair Display | 30 / 38 | 700 | -0.01em |
-| headline-lg-mobile | Playfair Display | 26 / 32 | 700 | — |
-| headline-md | Playfair Display | 22 / 28 | 600 | — |
-| body-lg | **Inter** *(warm variant: Source Serif 4)* | 18 / 28 | 400 | — |
-| body-md | **Inter** *(warm variant: Source Serif 4)* | 16 / 24 | 400 | — |
-| body-sm | **Inter** *(warm variant: Source Sans 3)* | 14 / 20 | 400 | — |
-| label-caps | Inter *(warm: Source Sans 3)* | 12 / 16 | 600 | 0.05em, UPPERCASE |
-
-Headline family (**Playfair Display**) is agreed across all three files. Body family is the only open typography decision (**D-13**). Localization note: Playfair Display and Inter must be validated for **Arabic** and **Turkish** glyph coverage; a fallback Arabic face is likely required (feeds bootstrap font setup).
+| display-lg | Playfair Display (AR fallback: Noto Sans / Noto Naskh Arabic) | 48 / 56 | 700 | -0.02em |
+| headline-lg | Playfair Display (AR fallback) | 30 / 38 | 700 | -0.01em |
+| headline-lg-mobile | Playfair Display (AR fallback) | 26 / 32 | 700 | — |
+| headline-md | Playfair Display (AR fallback) | 22 / 28 | 600 | — |
+| body-lg | **Noto Sans** | 18 / 28 | 400 | — |
+| body-md | **Noto Sans** | 16 / 24 | 400 | — |
+| body-sm | **Noto Sans** | 14 / 20 | 400 | — |
+| label-caps | Noto Sans | 12 / 16 | 600 | 0.05em, UPPERCASE |
 
 ### 5.4 Spacing — canonical
 4px base unit · `xs 4` · `sm 8` · `md 16` · `lg 24` · `xl 32` · `section-gap 32` · `margin-mobile 20` · `margin-desktop 40` · `container-max 1280`. Use `EdgeInsetsDirectional` for all values (RTL).
@@ -179,8 +180,8 @@ The bootstrap package builds **foundation only** — no features, no high-risk w
 - [x] D-01 brand confirmed (**LegalHub**)
 - [x] D-10 single canonical design system confirmed
 - [x] Canonical color/spacing/radius/elevation/icon tokens normalized (§5)
-- [ ] **D-13** — body typeface chosen (Inter vs Source Serif/Sans) *(blocks final theme typography)*
-- [ ] **D-14** — dark-theme token values approved *(blocks dark-mode theme)*; MVP light-only is acceptable if dark deferred
+- [x] **D-13** — body typeface confirmed: **Noto Sans** (resolved at bootstrap-spec approval; Inter/Source proposal superseded)
+- [x] **D-14** — dark-theme tokens approved as-is per ADR-0002 (dark mode retroactively accepted)
 - [ ] `primary` value confirmed as Midnight Blue `#0b1d2e` (resolve `#000000` discrepancy)
 - [ ] Font licensing/glyph coverage verified for EN + **AR** + TR (Arabic fallback face identified)
 - [ ] Supabase project (dev) provisioned; region pending D-04 (dev-only placeholder acceptable)
@@ -213,7 +214,7 @@ The bootstrap package builds **foundation only** — no features, no high-risk w
 
 The immediate next step is approval of the **project-bootstrap specification only** — not the full app build. To proceed:
 
-1. Confirm **D-13** (body typeface) and either close **D-14** (dark tokens) or approve **light-only MVP** with dark deferred.
+1. ~~Confirm **D-13** (body typeface) and either close **D-14** (dark tokens) or approve **light-only MVP** with dark deferred.~~ **D-13 confirmed (Noto Sans); D-14 resolved by ADR-0002 (dark theme approved as-is).**
 2. Confirm `primary` = Midnight Blue `#0b1d2e`.
 3. Authorize creation of a separate `docs/bootstrap_specification.md` covering §7 scope for review before any code.
 4. When possible, add `plan.md` to the workspace so it can be reconciled (D-12).

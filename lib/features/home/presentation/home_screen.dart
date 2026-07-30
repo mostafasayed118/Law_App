@@ -178,17 +178,16 @@ class HomeScreen extends StatelessWidget {
               children: <Widget>[
                 StatusChip(label: l10n.activeCaseChip),
                 Text(
-                  'Today, 10:00 AM',
+                  l10n.activeCaseTime,
                   style: text.bodySmall?.copyWith(color: scheme.outline),
                 ),
               ],
             ),
             const SizedBox(height: LegalHubTheme.spaceSm),
-            Text('Estate of H. Vance vs. City', style: text.headlineMedium),
+            Text(l10n.activeCaseTitle, style: text.headlineMedium),
             const SizedBox(height: LegalHubTheme.spaceXs),
             Text(
-              'Hearing scheduled for preliminary injunction regarding property '
-              'line dispute in district court.',
+              l10n.activeCaseBody,
               style: text.bodySmall,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -209,7 +208,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: LegalHubTheme.spaceSm),
-                    Text('Atty. R. Sterling', style: text.bodySmall),
+                    Text(l10n.activeCaseAttorney, style: text.bodySmall),
                   ],
                 ),
                 Icon(Icons.chevron_right, color: scheme.outline),

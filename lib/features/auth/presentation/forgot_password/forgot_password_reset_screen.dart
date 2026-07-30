@@ -58,7 +58,8 @@ class _ForgotPasswordResetScreenState extends State<ForgotPasswordResetScreen> {
               controller: _confirm,
               label: l10n.confirmPasswordLabel,
               hint: l10n.passwordPlaceholder,
-              validator: LegalHubValidators.matches(l10n, _password.text),
+              validator: (value) =>
+                  LegalHubValidators.matches(l10n, _password.text)(value),
             ),
             const SizedBox(height: LegalHubTheme.spaceXl),
             ElevatedButton(

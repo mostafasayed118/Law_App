@@ -646,6 +646,30 @@ abstract class AppLocalizations {
   /// **'ACTIVE CASE'**
   String get activeCaseChip;
 
+  /// No description provided for @activeCaseTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Today, 10:00 AM'**
+  String get activeCaseTime;
+
+  /// No description provided for @activeCaseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Estate of H. Vance vs. City'**
+  String get activeCaseTitle;
+
+  /// No description provided for @activeCaseBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Hearing scheduled for preliminary injunction regarding property line dispute in district court.'**
+  String get activeCaseBody;
+
+  /// No description provided for @activeCaseAttorney.
+  ///
+  /// In en, this message translates to:
+  /// **'Atty. R. Sterling'**
+  String get activeCaseAttorney;
+
   /// No description provided for @actionRequiredTitle.
   ///
   /// In en, this message translates to:
@@ -669,6 +693,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tomorrow at 2:00 PM via Video Call.'**
   String get consultationBody;
+
+  /// No description provided for @signInErrorNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to start the demo session.'**
+  String get signInErrorNotice;
 
   /// No description provided for @casesNavigation.
   ///
