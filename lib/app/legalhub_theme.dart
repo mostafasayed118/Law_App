@@ -11,7 +11,11 @@ class LegalHubTheme {
   LegalHubTheme._();
 
   // --- Light tokens ---------------------------------------------------------
-  static const Color primary = Color(0xFF041627);
+  // Canonical primary per docs/legalhub_specification.md §5.1 and
+  // docs/legalhub_bootstrap_specification.md §5.1: Midnight Blue #0b1d2e.
+  // See ADR-0005 for the reconciliation of the #000000/#041627/#0b1d2e
+  // candidates and the decision to adopt #0b1d2e as the canonical primary.
+  static const Color primary = Color(0xFF0B1D2E);
   static const Color onPrimary = Color(0xFFFFFFFF);
   static const Color primaryContainer = Color(0xFF1A2B3C);
   static const Color onPrimaryContainer = Color(0xFF8192A7);

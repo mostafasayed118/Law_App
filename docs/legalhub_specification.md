@@ -182,7 +182,7 @@ The bootstrap package builds **foundation only** — no features, no high-risk w
 - [x] Canonical color/spacing/radius/elevation/icon tokens normalized (§5)
 - [x] **D-13** — body typeface confirmed: **Noto Sans** (resolved at bootstrap-spec approval; Inter/Source proposal superseded)
 - [x] **D-14** — dark-theme tokens approved as-is per ADR-0002 (dark mode retroactively accepted)
-- [ ] `primary` value confirmed as Midnight Blue `#0b1d2e` (resolve `#000000` discrepancy)
+- [x] `primary` value confirmed as Midnight Blue `#0b1d2e` (resolve `#000000` discrepancy) — ADR-0005; code reconciled to `#0b1d2e`. `primary-container` (`#1A2B3C` vs spec `#0b1d2e`) remains a tracked deviation.
 - [ ] Font licensing/glyph coverage verified for EN + **AR** + TR (Arabic fallback face identified)
 - [ ] Supabase project (dev) provisioned; region pending D-04 (dev-only placeholder acceptable)
 - [ ] Flutter/Dart SDK versions pinned per `INSTRUCTIONS.md` §1.1
