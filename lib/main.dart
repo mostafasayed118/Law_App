@@ -16,6 +16,11 @@ Future<void> main() async {
   final LocaleCubit localeCubit = serviceLocator<LocaleCubit>();
   await localeCubit.load();
   final AuthCubit authCubit = serviceLocator<AuthCubit>();
+  // Contract-§5: restore any persisted provider session before the first
+  // frame so the router starts on the true auth state instead of a
+  // misleading default. Harmless with the fake (resolves to signed-out);
+  // meaningful once a real provider gateway is configured (Batch 3.3).
+  await authCubit.restore();
   runApp(
     LegalHubApp(
       router: createAppRouter(authCubit),

@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Required for the Supabase auth/data provider in release builds;
+         debug/profile manifests already carry it via the Flutter template. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="LegalHub"
         android:name="${applicationName}"
