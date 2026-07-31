@@ -42,6 +42,19 @@ void main() {
     );
   }
 
+  /// Sizes the test surface to a representative phone viewport.
+  ///
+  /// `OnboardingScreen` lays out fixed-height content inside a `PageView`; at
+  /// the default 800x600 widget-test surface it overflows (tracked deviation
+  /// D-T1). The phone viewport is its realistic rendering context and keeps
+  /// the bypass assertions about navigation, not layout.
+  void usePhoneViewport(WidgetTester tester) {
+    tester.view.physicalSize = const Size(411, 867);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+  }
+
   group('router redirect logic', () {
     testWidgets('keeps an unauthenticated user on the sign-in route', (
       tester,
@@ -79,5 +92,49 @@ void main() {
         expect(authCubit.state.status, AuthStatus.unauthenticated);
       },
     );
+  });
+
+  group('router onboarding bypass (1.5 pin)', () {
+    testWidgets('allows an unauthenticated user onto the onboarding route', (
+      tester,
+    ) async {
+      usePhoneViewport(tester);
+      router.go(AppRoutes.onboarding);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // The redirect whitelists onboarding routes for unauthenticated
+      // users; the first carousel page proves we landed on /onboarding
+      // rather than being bounced to /sign-in.
+      expect(find.text('Expert Legal Advice'), findsOneWidget);
+      expect(authCubit.state.isAuthenticated, isFalse);
+    });
+
+    testWidgets(
+      'allows an unauthenticated user onto the onboarding-success route',
+      (tester) async {
+        router.go(AppRoutes.onboardingSuccess);
+        await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+        await tester.pumpAndSettle();
+
+        // Same whitelist; the success screen renders for an unauthenticated
+        // user so the carousel flow can end at sign-in.
+        expect(find.text("You're All Set"), findsOneWidget);
+        expect(authCubit.state.isAuthenticated, isFalse);
+      },
+    );
+
+    testWidgets('still blocks unauthenticated access to the settings route', (
+      tester,
+    ) async {
+      router.go(AppRoutes.settings);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // The shell routes stay behind the auth gate even though the
+      // onboarding routes are whitelisted — the bypass is scoped.
+      expect(find.text('Welcome Back'), findsOneWidget);
+      expect(authCubit.state.isAuthenticated, isFalse);
+    });
   });
 }

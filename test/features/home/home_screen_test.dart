@@ -68,4 +68,34 @@ void main() {
       findsWidgets,
     );
   });
+
+  group('greeting fallback (D-T3 pin)', () {
+    testWidgets(
+      'falls back to the hardcoded Jonathan name when no session is present',
+      (tester) async {
+        await tester.pumpWidget(pumpHome(const Locale('en')));
+        await tester.pumpAndSettle();
+
+        // No session has been started, so `session?.displayName ?? 'Jonathan'`
+        // resolves to the hardcoded fallback. This pins the D-T3 deviation:
+        // the branch is reachable when HomeScreen renders without a session
+        // (direct pump — the router guard makes it unreachable via /home).
+        // Batch 5.2 must update this guard when it localizes/removes the
+        // fallback.
+        expect(find.text('Hello, Jonathan'), findsOneWidget);
+      },
+    );
+
+    testWidgets('uses the session display name once a demo session is active', (
+      tester,
+    ) async {
+      await authCubit.startDemoSession();
+      await tester.pumpWidget(pumpHome(const Locale('en')));
+      await tester.pumpAndSettle();
+
+      // The session displayName replaces the fallback entirely.
+      expect(find.text('Hello, Demo user'), findsOneWidget);
+      expect(find.text('Hello, Jonathan'), findsNothing);
+    });
+  });
 }
