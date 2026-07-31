@@ -130,21 +130,21 @@ All spacing via `EdgeInsetsDirectional`/`AlignmentDirectional`; directional icon
 
 # 7. Ordered engineering backlog
 
-| # | Ticket | Scope | Acceptance criteria | Dependencies / blockers |
-|---|---|---|---|---|
-| B1 | Project & tooling init | Flutter app, pinned SDK, `.gitignore`, `.env.example`, analysis_options | App builds & runs blank screen; `flutter analyze`/`format` clean | SDK pin, platform targets |
-| B2 | CI quality gates | CI runs format+analyze+test on PR | PR fails on lint/test error; green on clean | B1 |
-| B3 | Folder structure & DI | `app/core/data/shared/features` + GetIt `configureDependencies()` | Layers compile; DI resolves a sample service | B1 |
-| B4 | Core primitives | `Result<T>`, `AppError`, `ViewState<T>`, base use case | Unit tests for Result/error mapping pass | B3 |
-| B5 | Design-token & theme package (light) | `legalhub_design_system` ThemeData from §5.1 | No hard-coded colors; widget test renders tokens; primary=#0b1d2e | §5.1 sign-off |
-| B6 | Typography + fonts (EN/AR/TR) | Bundle Noto Sans (+ Playfair display, Arabic fallback); type scale | Glyphs render in EN/AR/TR; licensing recorded | B5, glyph validation |
-| B7 | Localization foundation | `flutter_localizations`, ARB (EN/AR/TR), locale persistence | Runtime locale switch; AR flips to RTL; no concatenated strings | B3 |
-| B8 | Shared state widgets | loading/empty/error/offline/unauthorized views | Widget tests for each state | B4, B5 |
-| B9 | Auth integration boundary | `AuthGateway`/`SessionRepository` contracts + fake impl | Cubit consumes fake session; no real keys; tests pass | B3, dev anon config |
-| B10 | Placeholder role model + capability map | 6-role enum + UX-only capability map (documented) | Unit tests; comment states "not authorization" | B4 |
-| B11 | Router + shell | GoRouter routes, unauth redirect, role-aware nav shell | Nav reflects placeholder role; RTL verified; back/focus correct | B7, B9, B10 |
-| B12 | Observability boundary | `ErrorReporter` abstraction + redaction rules | Errors routed; test asserts no PII/secret leakage | B4 |
-| B13 | Placeholder screen | One screen proving theme + l10n + RTL + a state view | Manual EN/AR check; widget test | B5, B7, B8, B11 |
+| # | Ticket | Scope | Acceptance criteria | Dependencies / blockers | Status (2026-07-31) |
+|---|---|---|---|---|---|
+| B1 | Project & tooling init | Flutter app, pinned SDK, `.gitignore`, `.env.example`, analysis_options | App builds & runs blank screen; `flutter analyze`/`format` clean | SDK pin, platform targets | ✅ **Done** — repo, `.gitignore`, `.env.example`, `analysis_options.yaml` present; Flutter pinned via CI |
+| B2 | CI quality gates | CI runs format+analyze+test on PR | PR fails on lint/test error; green on clean | B1 | ✅ **Done** — `.github/workflows/ci.yml` (push-to-main + PR triggers) |
+| B3 | Folder structure & DI | `app/core/data/shared/features` + GetIt `configureDependencies()` | Layers compile; DI resolves a sample service | B1 | ✅ **Done** — `lib/` layers mirror §4.1; `service_locator.dart` |
+| B4 | Core primitives | `Result<T>`, `AppError`, `ViewState<T>`, base use case | Unit tests for Result/error mapping pass | B3 | ✅ **Done + tested** — `core/errors`, `core/state/view_state.dart`, `core/use_cases` |
+| B5 | Design-token & theme package (light) | `legalhub_design_system` ThemeData from §5.1 | No hard-coded colors; widget test renders tokens; primary=#0b1d2e | §5.1 sign-off | ⚠️ **Deviation** — theme in-app at `lib/app/legalhub_theme.dart`; no separate package (ADR-0005 primary, ADR-0006 primaryContainer) |
+| B6 | Typography + fonts (EN/AR/TR) | Bundle Noto Sans (+ Playfair display, Arabic fallback); type scale | Glyphs render in EN/AR/TR; licensing recorded | B5, glyph validation | ✅ **Done** — fonts + OFL licenses committed under `assets/fonts/` |
+| B7 | Localization foundation | `flutter_localizations`, ARB (EN/AR/TR), locale persistence | Runtime locale switch; AR flips to RTL; no concatenated strings | B3 | ✅ **Done + tested** — EN/AR/TR ARB + `LocaleCubit` |
+| B8 | Shared state widgets | loading/empty/error/offline/unauthorized views | Widget tests for each state | B4, B5 | ✅ **Done + tested** — `ViewStateView` + per-state tests (Batch 1.1) |
+| B9 | Auth integration boundary | `AuthGateway`/`SessionRepository` contracts + fake impl | Cubit consumes fake session; no real keys; tests pass | B3, dev anon config | ✅ **Done** — `AuthGateway`/`FakeAuthGateway`; `.env` ignored, no keys |
+| B10 | Placeholder role model + capability map | 6-role enum + UX-only capability map (documented) | Unit tests; comment states "not authorization" | B4 | ✅ **Done + tested** — `user_role.dart` (D-T4 tracks pre-P1 shape) |
+| B11 | Router + shell | GoRouter routes, unauth redirect, role-aware nav shell | Nav reflects placeholder role; RTL verified; back/focus correct | B7, B9, B10 | ✅ **Done + tested** — `router.dart` GoRouter + redirect |
+| B12 | Observability boundary | `ErrorReporter` abstraction + redaction rules | Errors routed; test asserts no PII/secret leakage | B4 | ✅ **Done + tested** — `core/observability/error_reporter.dart` + tests (Batch 1.9) |
+| B13 | Placeholder screen | One screen proving theme + l10n + RTL + a state view | Manual EN/AR check; widget test | B5, B7, B8, B11 | ✅ **Done + tested** — onboarding placeholder screen |
 
 ---
 
@@ -152,15 +152,15 @@ All spacing via `EdgeInsetsDirectional`/`AlignmentDirectional`; directional icon
 
 **Test plan:** unit tests (Result/AppError, capability map, locale resolution); bloc_test for the shell/session Cubit (loading/success/unauthorized); widget tests for each shared state view and the placeholder screen; targeted EN + AR/RTL render checks (light only).
 
-**Definition of done (bootstrap):**
-- [ ] App builds/runs; `flutter analyze` & `dart format` clean; CI green.
-- [ ] Light theme sourced entirely from `legalhub_design_system`; no stray hard-coded styling.
-- [ ] EN/AR/TR localization works; AR is RTL; no concatenated strings.
-- [ ] Auth is an interface with a fake impl; no real/secret keys committed.
-- [ ] Role/capability is documented UX-only; no authorization claims.
-- [ ] Shared states + placeholder screen tested.
-- [ ] `git status`/`git diff` reviewed for secrets/real data.
-- [ ] No high-risk module, dark theme, payment, AI, or analytics present.
+**Definition of done (bootstrap) — reconciled 2026-07-31 against the as-built repo:**
+- [x] App builds/runs; `flutter analyze` & `dart format` clean; CI green. **Met** — CI present (`.github/workflows/ci.yml`, push-to-main + PR triggers); analyze clean; suite 190/190.
+- [ ] Light theme sourced entirely from `legalhub_design_system`; no stray hard-coded styling. **Deviation** — theme lives in-app at `lib/app/legalhub_theme.dart`; no separate `legalhub_design_system` package was created. Tokens honored (ADR-0005); `primaryContainer` deviation tracked in ADR-0006 / Batch 5.3.
+- [x] EN/AR/TR localization works; AR is RTL; no concatenated strings. **Met** — EN/AR/TR ARB + `flutter_localizations`; AR/RTL exercised by tests.
+- [x] Auth is an interface with a fake impl; no real/secret keys committed. **Met** — `AuthGateway`/`FakeAuthGateway`; `.env` git-ignored; `.env.example` name-only.
+- [x] Role/capability is documented UX-only; no authorization claims. **Met** — `user_role.dart` UX-only capability map (D-T4).
+- [x] Shared states + placeholder screen tested. **Met** — `ViewStateView` + per-state widget tests (Batch 1.1); onboarding placeholder screen tested.
+- [x] `git status`/`git diff` reviewed for secrets/real data. **Met** — pre-push secret/path scans on every push set.
+- [x] No high-risk module, dark theme, payment, AI, or analytics present. **Met** — confirmed by Gate 3 evidence and pre-push scans.
 
 ---
 
@@ -168,7 +168,7 @@ All spacing via `EdgeInsetsDirectional`/`AlignmentDirectional`; directional icon
 
 **Deliverables:** runnable skeleton app; theme+token package; localization scaffold; DI+router+shell; core primitives+state widgets; auth boundary; observability boundary; CI config; tests.
 
-**Approval gates:** (1) this bootstrap spec approved; (2) §5.1 token table + typeface glyph validation signed off before B5/B6; (3) per-PR CI gate; (4) **mandatory Supabase/RLS review gate before any real-data feature** (post-bootstrap).
+**Approval gates:** (1) this bootstrap spec approved; (2) §5.1 token table + typeface glyph validation signed off before B5/B6 — **satisfied (2026-07-31)**; (3) per-PR CI gate — **live** (`.github/workflows/ci.yml`, push-to-main + PR triggers); (4) **mandatory Supabase/RLS review gate before any real-data feature** — **still pending, correctly** (now the P2 gate per `p0_decision_capture.md` §3).
 
 ---
 
@@ -182,13 +182,13 @@ All spacing via `EdgeInsetsDirectional`/`AlignmentDirectional`; directional icon
 
 # Bootstrap readiness status
 
-**READY WITH CONDITIONS.**
+**READY — conditions satisfied (2026-07-31).**
 
-Conditions to satisfy before starting B5/B6 and B9:
-1. Design lead sign-off on the §5.1 token table with **primary = `#0b1d2e`**.
-2. Glyph-coverage validation for Noto Sans (+ Playfair, Arabic fallback) across EN/AR/TR.
-3. Dev-only Supabase anon config (URL + anon key) provided via env — **no service-role key**.
-4. Flutter/Dart SDK versions and min platform targets pinned.
+Conditions to satisfy before starting B5/B6 and B9 — current status:
+1. ✅ **Met** — §5.1 token table adopted with `primary = #0b1d2e` (ADR-0005; `primaryContainer` deviation tracked in ADR-0006).
+2. ✅ **Met** — Noto Sans (+ Playfair Display, Noto Naskh Arabic fallback) bundled with OFL licenses under `assets/fonts/`.
+3. ✅ **Met** — dev project provisioned (`eu-central-1`); URL + anon key live in the git-ignored `.env`; `.env.example` name-only (`p0_decision_capture.md` §2). No service-role key.
+4. ✅ **Met** — Flutter pinned via CI (`flutter: 3.44.4`); min platform targets set in `android/`/`ios/` configs.
 
 ## Exact approvals needed to begin implementation
 - Approve this `docs/legalhub_bootstrap_specification.md`.
