@@ -5,8 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/auth/auth_gateway.dart';
 import 'package:legalhub/core/auth/auth_state.dart';
-import 'package:legalhub/core/errors/app_error.dart';
-import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/auth/presentation/sign_in_screen.dart';
@@ -18,9 +16,9 @@ void main() {
   setUp(() {
     authCubit = AuthCubit(
       _FailingAuthGateway(
-        const AppError(
-          code: 'demo_auth_unavailable',
-          userMessage: 'The demo session is unavailable.',
+        const AuthFailure(
+          kind: AuthFailureKind.providerUnavailable,
+          message: 'The demo session is unavailable.',
         ),
       ),
       InMemoryErrorReporter(),
@@ -68,9 +66,9 @@ void main() {
 }
 
 class _FailingAuthGateway implements AuthGateway {
-  _FailingAuthGateway(this.error);
+  _FailingAuthGateway(this.failure);
 
-  final AppError error;
+  final AuthFailure failure;
 
   @override
   Session? get currentSession => null;
@@ -79,8 +77,12 @@ class _FailingAuthGateway implements AuthGateway {
   Stream<Session?> get sessionChanges => const Stream<Session?>.empty();
 
   @override
-  Future<Result<Session>> startDemoSession() async =>
-      Result<Session>.failure(error);
+  Future<AuthOutcome<Session>> restore() async =>
+      AuthOutcome<Session>.failure(failure);
+
+  @override
+  Future<AuthOutcome<Session>> startDemoSession() async =>
+      AuthOutcome<Session>.failure(failure);
 
   @override
   Future<void> signOut() async {}

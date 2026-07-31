@@ -3,11 +3,26 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/auth/auth_gateway.dart';
 import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/errors/app_error.dart';
-import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
+
+/// A fixed contract-§5 session used by the synthetic fakes so expected states
+/// compare equal to emitted states.
+Session demoSession() => Session(
+  userId: 'demo-user',
+  displayName: 'Demo user',
+  memberships: const <OrganizationMembership>[
+    OrganizationMembership(
+      organizationId: 'org-demo',
+      organizationName: 'Demo Firm',
+      role: UserRole.client,
+      status: MembershipStatus.active,
+    ),
+  ],
+  expiresAt: DateTime(2030, 1, 1),
+);
 
 void main() {
   group('AuthCubit initial state', () {
@@ -23,11 +38,7 @@ void main() {
     });
 
     test('starts authenticated when the gateway reports a current session', () {
-      final Session session = Session(
-        id: 'existing-session',
-        displayName: 'Existing user',
-        role: UserRole.attorney,
-      );
+      final Session session = demoSession();
       final AuthCubit cubit = AuthCubit(
         _PreauthenticatedGateway(session),
         InMemoryErrorReporter(),
@@ -37,29 +48,62 @@ void main() {
       expect(cubit.state.status, AuthStatus.authenticated);
       expect(cubit.state.session, session);
     });
+
+    test('starts reauthRequired when the gateway reports an already-expired '
+        'session (contract §5 — never a misleading authenticated boot)', () {
+      final AuthCubit cubit = AuthCubit(
+        _ExpiredSessionGateway(),
+        InMemoryErrorReporter(),
+      );
+      addTearDown(
+        cubit.close,
+      ); // The expired session is not retained in the state — re-auth is
+      // required and the stale session is dropped, matching restore().
+      expect(cubit.state.status, AuthStatus.reauthRequired);
+      expect(cubit.state.session, isNull);
+    });
   });
 
   group('AuthCubit startDemoSession', () {
     blocTest<AuthCubit, AuthState>(
-      'emits [loading, authenticated] for a local demo session without '
-      'collecting credentials',
+      'emits [loading, authenticated] with the contract-§5 demo session '
+      'without collecting credentials',
       build: () => AuthCubit(FakeAuthGateway(), InMemoryErrorReporter()),
       act: (AuthCubit cubit) => cubit.startDemoSession(),
-      expect: () => <AuthState>[
+      expect: () => <dynamic>[
         const AuthState(status: AuthStatus.loading),
-        const AuthState(
-          status: AuthStatus.authenticated,
-          session: Session(
-            id: 'demo-session',
-            displayName: 'Demo user',
-            role: UserRole.client,
-          ),
-        ),
+        isA<AuthState>()
+            .having(
+              (AuthState s) => s.status,
+              'status',
+              AuthStatus.authenticated,
+            )
+            .having((AuthState s) => s.session?.userId, 'userId', 'demo-user')
+            .having(
+              (AuthState s) => s.session?.displayName,
+              'displayName',
+              'Demo user',
+            )
+            .having(
+              (AuthState s) => s.session?.primaryRole,
+              'primaryRole',
+              UserRole.client,
+            )
+            .having(
+              (AuthState s) => s.session?.activeMembership?.organizationId,
+              'organizationId',
+              'org-demo',
+            )
+            .having(
+              (AuthState s) => s.session?.isExpired,
+              'isExpired',
+              isFalse,
+            ),
       ],
     );
 
     blocTest<AuthCubit, AuthState>(
-      'emits [loading, error] and reports a redacted error when the gateway '
+      'emits [loading, error] and reports the typed failure when the gateway '
       'fails',
       setUp: () => _failingReporter = InMemoryErrorReporter(),
       build: () =>
@@ -67,15 +111,13 @@ void main() {
       act: (AuthCubit cubit) => cubit.startDemoSession(),
       expect: () => <AuthState>[
         const AuthState(status: AuthStatus.loading),
-        AuthState(status: AuthStatus.error, error: _gatewayFailure),
+        const AuthState(status: AuthStatus.error, error: _gatewayAppError),
       ],
       verify: (_) {
-        // Privacy-by-design guard: the email-shaped PII in the error context
-        // must reach the reporter masked, never in clear text.
+        // The typed failure is mapped to an AppError and reported exactly
+        // once; nothing credential-shaped crosses the seam.
         expect(_failingReporter.reports, hasLength(1));
-        final Map<String, Object?> context =
-            _failingReporter.reports.single['context']! as Map<String, Object?>;
-        expect(context['email'], '[REDACTED]');
+        expect(_failingReporter.reports.single['code'], 'providerUnavailable');
       },
     );
 
@@ -85,7 +127,7 @@ void main() {
       build: () => AuthCubit(_countingAuthGateway, InMemoryErrorReporter()),
       act: (AuthCubit cubit) async {
         // Fire two startDemoSession calls back-to-back without awaiting
-        // between them. The guard at auth_cubit.dart:20 must keep the second
+        // between them. The guard at auth_cubit.dart must keep the second
         // from emitting or calling the gateway.
         final Future<void> first = cubit.startDemoSession();
         await cubit.startDemoSession();
@@ -93,18 +135,60 @@ void main() {
       },
       expect: () => <AuthState>[
         const AuthState(status: AuthStatus.loading),
-        const AuthState(
-          status: AuthStatus.authenticated,
-          session: Session(
-            id: 'demo-session',
-            displayName: 'Demo user',
-            role: UserRole.client,
-          ),
-        ),
+        AuthState(status: AuthStatus.authenticated, session: demoSession()),
       ],
       verify: (_) {
         expect(_countingAuthGateway.calls, 1);
       },
+    );
+  });
+
+  group('AuthCubit restore (contract §5)', () {
+    blocTest<AuthCubit, AuthState>(
+      'emits [restoring, unauthenticated] when there is no session',
+      build: () => AuthCubit(_NullSessionGateway(), InMemoryErrorReporter()),
+      act: (AuthCubit cubit) => cubit.restore(),
+      expect: () => <AuthState>[
+        const AuthState(status: AuthStatus.restoring),
+        const AuthState(status: AuthStatus.unauthenticated),
+      ],
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'emits [restoring, authenticated] for a valid current session',
+      build: () => AuthCubit(
+        _PreauthenticatedGateway(demoSession()),
+        InMemoryErrorReporter(),
+      ),
+      act: (AuthCubit cubit) => cubit.restore(),
+      expect: () => <AuthState>[
+        const AuthState(status: AuthStatus.restoring),
+        AuthState(status: AuthStatus.authenticated, session: demoSession()),
+      ],
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'emits [restoring, reauthRequired] for an expired session instead of a '
+      'misleading authenticated state',
+      build: () => AuthCubit(_ExpiredSessionGateway(), InMemoryErrorReporter()),
+      act: (AuthCubit cubit) => cubit.restore(),
+      expect: () => <AuthState>[
+        const AuthState(status: AuthStatus.restoring),
+        const AuthState(status: AuthStatus.reauthRequired),
+      ],
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'emits [restoring, error] when the provider is unavailable',
+      build: () => AuthCubit(
+        _FailingAuthGateway(_gatewayFailure),
+        InMemoryErrorReporter(),
+      ),
+      act: (AuthCubit cubit) => cubit.restore(),
+      expect: () => <AuthState>[
+        const AuthState(status: AuthStatus.restoring),
+        const AuthState(status: AuthStatus.error, error: _gatewayAppError),
+      ],
     );
   });
 
@@ -116,26 +200,29 @@ void main() {
         await cubit.startDemoSession();
         await cubit.signOut();
       },
-      expect: () => <AuthState>[
+      expect: () => <dynamic>[
         const AuthState(status: AuthStatus.loading),
-        const AuthState(
-          status: AuthStatus.authenticated,
-          session: Session(
-            id: 'demo-session',
-            displayName: 'Demo user',
-            role: UserRole.client,
-          ),
-        ),
+        isA<AuthState>()
+            .having(
+              (AuthState s) => s.status,
+              'status',
+              AuthStatus.authenticated,
+            )
+            .having((AuthState s) => s.session?.userId, 'userId', 'demo-user'),
         const AuthState(status: AuthStatus.unauthenticated),
       ],
     );
   });
 }
 
-const AppError _gatewayFailure = AppError(
-  code: 'unavailable',
+const AuthFailure _gatewayFailure = AuthFailure(
+  kind: AuthFailureKind.providerUnavailable,
+  message: 'Unavailable',
+);
+
+const AppError _gatewayAppError = AppError(
+  code: 'providerUnavailable',
   userMessage: 'Unavailable',
-  context: <String, Object?>{'email': 'person@example.com'},
 );
 
 // Holds instances across the blocTest build/verify boundary so the tests can
@@ -151,13 +238,14 @@ class _NullSessionGateway implements AuthGateway {
   Stream<Session?> get sessionChanges => const Stream<Session?>.empty();
 
   @override
-  Future<Result<Session>> startDemoSession() async => Result<Session>.success(
-    const Session(
-      id: 'demo-session',
-      displayName: 'Demo user',
-      role: UserRole.client,
-    ),
-  );
+  Future<AuthOutcome<Session>> restore() async =>
+      const AuthOutcome<Session>.failure(
+        AuthFailure(kind: AuthFailureKind.signedOut),
+      );
+
+  @override
+  Future<AuthOutcome<Session>> startDemoSession() async =>
+      AuthOutcome<Session>.success(demoSession());
 
   @override
   Future<void> signOut() async {}
@@ -175,17 +263,54 @@ class _PreauthenticatedGateway implements AuthGateway {
   Stream<Session?> get sessionChanges => const Stream<Session?>.empty();
 
   @override
-  Future<Result<Session>> startDemoSession() async =>
-      Result<Session>.success(session);
+  Future<AuthOutcome<Session>> restore() async =>
+      AuthOutcome<Session>.success(session);
+
+  @override
+  Future<AuthOutcome<Session>> startDemoSession() async =>
+      AuthOutcome<Session>.success(session);
+
+  @override
+  Future<void> signOut() async {}
+}
+
+class _ExpiredSessionGateway implements AuthGateway {
+  @override
+  Session? get currentSession => Session(
+    userId: 'expired-user',
+    displayName: 'Expired user',
+    memberships: const <OrganizationMembership>[
+      OrganizationMembership(
+        organizationId: 'org-demo',
+        organizationName: 'Demo Firm',
+        role: UserRole.client,
+        status: MembershipStatus.active,
+      ),
+    ],
+    expiresAt: DateTime(2020, 1, 1),
+  );
+
+  @override
+  Stream<Session?> get sessionChanges => const Stream<Session?>.empty();
+
+  @override
+  Future<AuthOutcome<Session>> restore() async =>
+      const AuthOutcome<Session>.failure(
+        AuthFailure(kind: AuthFailureKind.sessionExpired),
+      );
+
+  @override
+  Future<AuthOutcome<Session>> startDemoSession() async =>
+      AuthOutcome<Session>.success(demoSession());
 
   @override
   Future<void> signOut() async {}
 }
 
 class _FailingAuthGateway implements AuthGateway {
-  _FailingAuthGateway(this.error);
+  _FailingAuthGateway(this.failure);
 
-  final AppError error;
+  final AuthFailure failure;
 
   @override
   Session? get currentSession => null;
@@ -194,8 +319,12 @@ class _FailingAuthGateway implements AuthGateway {
   Stream<Session?> get sessionChanges => const Stream<Session?>.empty();
 
   @override
-  Future<Result<Session>> startDemoSession() async =>
-      Result<Session>.failure(error);
+  Future<AuthOutcome<Session>> restore() async =>
+      AuthOutcome<Session>.failure(failure);
+
+  @override
+  Future<AuthOutcome<Session>> startDemoSession() async =>
+      AuthOutcome<Session>.failure(failure);
 
   @override
   Future<void> signOut() async {}
@@ -211,17 +340,15 @@ class _CountingAuthGateway implements AuthGateway {
   Stream<Session?> get sessionChanges => const Stream<Session?>.empty();
 
   @override
-  Future<Result<Session>> startDemoSession() async {
+  Future<AuthOutcome<Session>> restore() async =>
+      AuthOutcome<Session>.success(demoSession());
+
+  @override
+  Future<AuthOutcome<Session>> startDemoSession() async {
     calls += 1;
     // Delay so the in-flight call overlaps the second startDemoSession.
     await Future<void>.delayed(const Duration(milliseconds: 20));
-    return Result<Session>.success(
-      const Session(
-        id: 'demo-session',
-        displayName: 'Demo user',
-        role: UserRole.client,
-      ),
-    );
+    return AuthOutcome<Session>.success(demoSession());
   }
 
   @override

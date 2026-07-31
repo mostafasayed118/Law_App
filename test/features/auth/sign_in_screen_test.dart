@@ -87,7 +87,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(authCubit.state.isAuthenticated, isTrue);
-    expect(authCubit.state.session?.id, 'demo-session');
+    expect(authCubit.state.session?.userId, 'demo-user');
   });
 
   testWidgets('forgot-password link routes to the forgot-password screen', (
