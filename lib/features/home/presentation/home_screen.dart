@@ -10,7 +10,8 @@ import 'widgets/home_cards.dart';
 ///
 /// Practice areas and recent activity are deterministic sample fixtures; real
 /// repositories come with a later data-layer slice. The greeting uses the
-/// authenticated session's display name.
+/// authenticated session's display name, falling back to the localized
+/// `homeFallbackName` (D-T3) when no session is present.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -20,7 +21,8 @@ class HomeScreen extends StatelessWidget {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
     final String name =
-        context.watch<AuthCubit>().state.session?.displayName ?? 'Jonathan';
+        context.watch<AuthCubit>().state.session?.displayName ??
+        l10n.homeFallbackName;
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(

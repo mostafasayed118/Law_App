@@ -83,6 +83,7 @@
   "onboardingSuccessAction": "المتابعة إلى تسجيل الدخول",
   "homeGreeting": "مرحبًا، {name}",
   "@homeGreeting": {"placeholders": {"name": {"type": "String"}}},
+  "homeFallbackName": "ضيف",
   "homeSubtitle": "كيف يمكننا مساعدتك في احتياجاتك القانونية اليوم؟",
   "searchPlaceholder": "ابحث عن محامٍ أو موضوع قانوني...",
   "practiceAreas": "مجالات الممارسة",

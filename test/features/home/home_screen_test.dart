@@ -71,20 +71,35 @@ void main() {
 
   group('greeting fallback (D-T3 pin)', () {
     testWidgets(
-      'falls back to the hardcoded Jonathan name when no session is present',
+      'falls back to the localized neutral name when no session is present',
       (tester) async {
         await tester.pumpWidget(pumpHome(const Locale('en')));
         await tester.pumpAndSettle();
 
-        // No session has been started, so `session?.displayName ?? 'Jonathan'`
-        // resolves to the hardcoded fallback. This pins the D-T3 deviation:
-        // the branch is reachable when HomeScreen renders without a session
-        // (direct pump — the router guard makes it unreachable via /home).
-        // Batch 5.2 must update this guard when it localizes/removes the
-        // fallback.
-        expect(find.text('Hello, Jonathan'), findsOneWidget);
+        // No session has been started, so `session?.displayName ??
+        // l10n.homeFallbackName` resolves to the localized neutral name.
+        // This pin guards the D-T3 resolution (5.2): the fallback is no
+        // longer a hardcoded English fixture — it flows through
+        // AppLocalizations in every locale. The branch is reachable when
+        // HomeScreen renders without a session (direct pump — the router
+        // guard makes it unreachable via /home).
+        expect(find.text('Hello, Guest'), findsOneWidget);
       },
     );
+
+    testWidgets('fallback greeting is localized in Arabic and Turkish', (
+      tester,
+    ) async {
+      // The neutral fallback must render in all three supported locales,
+      // proving the D-T3 fixture string was removed, not just renamed.
+      await tester.pumpWidget(pumpHome(const Locale('ar')));
+      await tester.pumpAndSettle();
+      expect(find.text('مرحبًا، ضيف'), findsOneWidget);
+
+      await tester.pumpWidget(pumpHome(const Locale('tr')));
+      await tester.pumpAndSettle();
+      expect(find.text('Merhaba, Misafir'), findsOneWidget);
+    });
 
     testWidgets('uses the session display name once a demo session is active', (
       tester,
@@ -95,7 +110,7 @@ void main() {
 
       // The session displayName replaces the fallback entirely.
       expect(find.text('Hello, Demo user'), findsOneWidget);
-      expect(find.text('Hello, Jonathan'), findsNothing);
+      expect(find.text('Hello, Guest'), findsNothing);
     });
   });
 }

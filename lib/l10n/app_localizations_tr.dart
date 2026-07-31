@@ -271,6 +271,9 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get homeFallbackName => 'Misafir';
+
+  @override
   String get homeSubtitle =>
       'Bugün hukuki ihtiyaçlarınızda size nasıl yardımcı olabiliriz?';
 

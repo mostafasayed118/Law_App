@@ -83,6 +83,7 @@
   "onboardingSuccessAction": "Girişe Geç",
   "homeGreeting": "Merhaba, {name}",
   "@homeGreeting": {"placeholders": {"name": {"type": "String"}}},
+  "homeFallbackName": "Misafir",
   "homeSubtitle": "Bugün hukuki ihtiyaçlarınızda size nasıl yardımcı olabiliriz?",
   "searchPlaceholder": "Avukat veya hukuki konu bulun...",
   "practiceAreas": "Uygulama Alanları",

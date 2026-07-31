@@ -83,6 +83,7 @@
   "onboardingSuccessAction": "Continue to Sign In",
   "homeGreeting": "Hello, {name}",
   "@homeGreeting": {"placeholders": {"name": {"type": "String"}}},
+  "homeFallbackName": "Guest",
   "homeSubtitle": "How can we assist you with your legal needs today?",
   "searchPlaceholder": "Find a lawyer or legal topic...",
   "practiceAreas": "Practice Areas",

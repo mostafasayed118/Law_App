@@ -269,6 +269,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get homeFallbackName => 'Guest';
+
+  @override
   String get homeSubtitle =>
       'How can we assist you with your legal needs today?';
 

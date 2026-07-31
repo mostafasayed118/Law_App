@@ -592,6 +592,12 @@ abstract class AppLocalizations {
   /// **'Hello, {name}'**
   String homeGreeting(String name);
 
+  /// No description provided for @homeFallbackName.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest'**
+  String get homeFallbackName;
+
   /// No description provided for @homeSubtitle.
   ///
   /// In en, this message translates to:

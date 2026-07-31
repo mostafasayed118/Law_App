@@ -269,6 +269,9 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get homeFallbackName => 'ضيف';
+
+  @override
   String get homeSubtitle => 'كيف يمكننا مساعدتك في احتياجاتك القانونية اليوم؟';
 
   @override
