@@ -32,7 +32,7 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
   411×867 phone viewport to avoid the overflow; the fix must keep that test
   green *and* add a default-surface (800×600) test that currently cannot pass.
 
-## D-T2: Domain value objects built but not wired into presentation
+## D-T2: Domain value objects built but not wired into presentation — **RESOLVED (2026-07-31)**
 
 - **Where:**
   - ~~`lib/features/auth/domain/sign_up_request.dart` — `SignUpRequest` with
@@ -43,32 +43,36 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
     submit, and `SignUpCubit` asserts the redaction invariant in
     `test/features/auth/sign_up_cubit_test.dart` (the failure-path `blocTest`
     pins `password`/`phone`/`email` as `[REDACTED]` in the error context).
-  - `lib/features/auth/domain/password_recovery_request.dart` —
+  - ~~`lib/features/auth/domain/password_recovery_request.dart` —
     `PasswordRecoveryRequest` with `toRedactedMap()`. Constructed by
     `forgot_password_reset_screen.dart` with **empty email/otp placeholders**
-    because routing does not thread the email and OTP from the earlier steps.
-  - `lib/features/auth/presentation/forgot_password/forgot_password_otp_screen.dart`
-    — the "Resend code" button is a no-op (`onPressed: () {}`), which implies a
-    sent code that is never sent (a §4.4 "no false assurance" issue).
-- **Status:** Tracked, partially resolved. The sign-up half is closed; the
-  recovery half remains open. The redaction contracts are tested
+    because routing does not thread the email and OTP from the earlier
+    steps.~~ **Resolved (`83f5bbf`):** the email (step 1) and OTP (step 2)
+    are threaded to the reset screen via the in-memory
+    `RecoveryRoutingContext` route `extra` (never the URL), so the VO is
+    built with **real values** from validated form fields on submit.
+  - ~~`lib/features/auth/presentation/forgot_password/forgot_password_otp_screen.dart`
+    — the "Resend code" button is a no-op (`onPressed: () {}`), which implies
+    a sent code that is never sent (a §4.4 "no false assurance" issue).~~
+    **Resolved (`83f5bbf`):** the control is now **disabled** (`onPressed:
+    null`) with the "Resend Code (unavailable in demo)" label — an honest
+    state that does not imply a code was sent.
+- **Status:** **RESOLVED (2026-07-31).** Both halves are closed in code
+  (sign-up `0d5c66d`, recovery `83f5bbf`): the redaction contracts are tested
   (`test/features/auth/sign_up_request_test.dart`,
-  `test/features/auth/password_recovery_request_test.dart`); the sign-up
-  contract is now exercised at the point PII enters the app, but the recovery
-  contract is still built with placeholder values, so that
-  privacy-by-design loop remains open.
-- **Owner:** Sign-up half resolved by Batch 1 of the codebase-audit plan (land
-  the in-flight `SignUpRequest` wiring). Recovery half owned by Batch 2
-  (wire `PasswordRecoveryRequest` into presentation, backend-free).
+  `test/features/auth/password_recovery_request_test.dart`), the recovery
+  request is built with real threaded values, and the resend control is
+  disabled. The privacy-by-design loop is closed; this entry is retained as a
+  resolved record.
+- **Owner:** Sign-up half `0d5c66d`; recovery half `83f5bbf`; ledger update by
+  Batch 4 of the codebase-audit plan.
 - **Constraint:** This slice stays backend-free. It does **not** call a real
   `AuthGateway`/`PasswordRecoveryGateway`, add Supabase, or implement real
   sign-up/reset — those are gated on the P0 product/legal decisions
   (D-02–D-09) recorded in `docs/auth_tenant_authorization_contract.md` §10.
-- **Resolution:** Wire `SignUpRequest.fromRaw` into the sign-up submit path;
-  thread email+OTP through routing so `PasswordRecoveryRequest` is built with
-  real values; replace the OTP "Resend code" no-op with an explicit
-  disabled/removed state or a documented placeholder that does not imply a
-  sent code.
+- **Resolution:** All three resolution items are complete (sign-up wiring
+  `0d5c66d`; email/OTP threading + disabled resend `83f5bbf`). Retained as a
+  historical record.
 
 ## D-T3: Hardcoded English fallback display name
 
@@ -84,3 +88,21 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
 - **Resolution:** Either localize the fallback (a neutral greeting key) or
   remove it if the no-session branch is unreachable. Decision needed before
   coding.
+
+## D-T4: Demo `Session {id, displayName, role}` shape (pre-P1)
+
+- **Where:** `lib/core/auth/auth_state.dart` / `lib/data/auth/fake_auth_gateway.dart`
+  (`Session {id, displayName, role}`) and `lib/core/roles/user_role.dart`
+  (UX-only capability map).
+- **Deviation:** The bootstrap demo session carries a single client-visible
+  `role` — technically the shape contract §5 said a future production session
+  must not rely on as the authority. Safe only because the demo session is
+  explicitly non-production and non-authoritative (`FakeAuthGateway` wording,
+  gate3 §3.3), the capability map is documented UX-only, and no server exists
+  to be fooled by a client role.
+- **Status:** Tracked. Resolved by Batch 3.1 (contract-P1 session model:
+  provider-derived `userId`, `memberships`, `expiresAt` — no single
+  client-owned `role`). **Must be recorded here before Batch 3.1 starts** (see
+  the audit plan's Batch 3 dependency note).
+- **Owner:** Batch 3 of the codebase-audit plan (domain session model).
+- **Cross-reference:** `docs/gate3_reconciliation.md` §7.
