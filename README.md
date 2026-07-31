@@ -24,13 +24,18 @@ messaging services.
   settings. Sign-up is fully wired: `SignUpScreen` builds a redaction-safe
   `SignUpRequest` on submit, hands it to a feature-scoped `SignUpCubit`
   backed by a `SignUpGateway` seam, and renders loading/success/error via
-  `ViewStateView`. Forgot-password email/OTP steps validate and route only.
+  `ViewStateView`. Forgot-password email/OTP/reset steps validate and
+  route, threading the email and OTP between steps via the in-memory
+  `RecoveryRoutingContext` route `extra` (never the URL — email is PII and
+  the OTP is a short-lived credential), so the reset screen builds a
+  `PasswordRecoveryRequest` with real values; the OTP "Resend code" control
+  is disabled by design (§4.4 no-false-assurance).
 - `SignUpRequest` pure-domain value object (features/auth/domain) with a
   redaction contract: `toRedactedMap()` is safe to embed in `AppError.context`.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (134 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (190 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), Redactor (password/OTP/email/Bearer redaction
   with leak guards), DI registration graph, validators, router redirect logic
@@ -49,32 +54,20 @@ messaging services.
   supported-code acceptance), SignUpRequest redaction invariants,
   PasswordRecoveryRequest redaction invariants, `SignUpCubit` emission
   sequences (loading→success/error, duplicate-submit guard, `resetToEmpty`
-  retry re-enable, redaction invariant on the failure path) and the sign-up
-  screen (VO construction with normalized values, terms-checkbox gating,
-  invalid-form blocking, gateway-failure `ViewStateView` error surface), and
-  the end-to-end boot / locale-switch widget flow.
-- Coverage gaps (tracked for later batches):
-  - **Cubit emission streams** — `AuthCubit` and `PasswordRecoveryCubit`
-    transitions are asserted via terminal state only, not `blocTest`
-    emission sequences. `SignUpCubit` and `LocaleCubit` now have emission
-    sequences; the remaining two are proven only at the destination, not as a
-    stream.
-  - **Shared widgets** — `ViewStateView` is exercised only on its error
-    branch (via the reset screen test); loading/empty/success/offline/
-    unauthorized branches are untested. `PasswordField` (obscure toggle),
-    `LegalHubTextField`, `LabelledField`, `home_cards`, and `auth_buttons`
-    have no dedicated tests (indirect coverage via their consuming screens
-    only).
-  - **Screen negative paths** — `settings`, `home`, and `onboarding` screens
-    are happy-path-only. The `home_screen` no-session `'Jonathan'` fallback
-    branch is not exercised.
-  - **Router bypass** — the onboarding/onboarding-success routes are reachable
-    while unauthenticated (`router.dart` redirect bypass), but no test asserts
-    this; only the deny and authenticated-redirect paths are covered.
-  - **TR locale** — only EN and AR are asserted in any test; TR translations
-    are never loaded/exercised.
-  - **Reset-screen success path** — only the error path is tested; the
-    success/snackbar/navigation path is not.
+  retry re-enable, redaction invariant on the failure path) and the sign-up    screen (VO construction with normalized values, terms-checkbox gating,
+    invalid-form blocking, gateway-failure `ViewStateView` error surface), and
+    the end-to-end boot / locale-switch widget flow. Batch 1 of the
+    codebase-audit plan added 54 tests covering `ViewStateView` all branches,
+    the error reporters (runZoned print-capture), TR locale loading,
+    form-field + feature widgets, the home no-session fallback pin, the
+    router onboarding bypass, the reset-screen success path, the dev
+    gateways, the in-memory locale store, and the onboarding-success screen.
+- Coverage: **190 tests** (2026-07-31); `flutter analyze` and the format gate
+  clean. The coverage-gap list from the codebase audit (cubit emission
+  streams, shared widgets, screen negative paths, router bypass, TR locale,
+  reset success path) was closed by Batch 1 of
+  [`docs/codebase_audit_plan.md`](docs/codebase_audit_plan.md) and is no
+  longer listed here.
 - Tracked deviations: OnboardingScreen desktop overflow (D-T1), domain VOs
   built but not wired into presentation (D-T2), and the hardcoded `'Jonathan'`
   fallback (D-T3) are recorded in [`docs/tracked_deviations.md`](docs/tracked_deviations.md).
@@ -102,7 +95,10 @@ auth flow, or real legal/client data is included.
 
 - `.env.example` is **names-only**: `SUPABASE_URL=` and `SUPABASE_ANON_KEY=` with
   no values. It documents the variables the app will one day consume; it does
-  not contain secrets.
+  not contain secrets. **Consumption decision (2026-07-31):** the URL + anon
+  key are consumed at build time via `--dart-define-from-file` starting with
+  Batch 3/P1; until then the file is aspirational (zero `String.fromEnvironment`
+  uses in `lib/`).
 - `.gitignore` excludes every env variant (`.env`, `.env.*`, `*.env`,
   `*.env.*`) except `.env.example` itself, so a local `.env` is never
   committed.
