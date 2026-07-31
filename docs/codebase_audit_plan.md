@@ -11,7 +11,10 @@
 > targets, gitignore gaps). Step 0 is **committed** (`45b0a48`); Batch 0 is
 > **completed** (`ed38fd6`–`601a2c0`, pushed); **Batch 1 committed**
 > (`d8ec850`–`a508013`, +54 tests); **Batch 2 completed** (`94c9607`, P0
-> decided, P1 approved); Batches 3–5 queued — Batch 3 decision-gate met.
+> decided, P1 approved); **Batch 4 completed** (`c6d4b69`, `1335512`,
+> `70271d4`, `f909d85` — all eight doc-drift targets closed); Batches 3 and
+> 5 queued — Batch 3 decision-gate met and its D-T4 dependency recorded
+> (`1335512`).
 >
 > **Governing docs:** `INSTRUCTIONS.md` §2.1/§3 (gates, delivery slices,
 > approval discipline) · `docs/gate3_decision.md` +
@@ -160,9 +163,10 @@ precondition is unmet, this batch does not start.
 
 **Status 2026-07-31:** decision-level preconditions met (`94c9607` — blockers
 decided, matrix signed, retention/audit documented, rollback plan, `.env`
-git-ignored, §3 approval recorded). Remaining discovery before 3.2: confirm
-the dev project has **zero tables/policies** (needs Supabase access). **Batch
-4.4 (D-T4) must still land before 3.1.**
+git-ignored, §3 approval recorded) and **Batch 4.4 (D-T4) has landed
+(`1335512`)** — the pre-3.1 dependency is satisfied. Remaining discovery
+before 3.2: confirm the dev project has **zero tables/policies** (needs
+Supabase access).
 
 | # | Task | File(s) | Exit criterion |
 |---|---|---|---|
@@ -183,17 +187,18 @@ P1.
 
 | # | Task | File(s) |
 |---|---|---|
-| 4.1 | README test count: **134 → 136** (actual) | `README.md` |
-| 4.2 | Remove the stale "AuthCubit/PasswordRecoveryCubit terminal-state-only" gap note — both are `blocTest` emission sequences since `46bcb7c` | `README.md` |
-| 4.3 | `tracked_deviations.md` D-T2: recovery half **resolved** (`83f5bbf`); "Resend" is now disabled (`onPressed: null`), not a no-op | `tracked_deviations.md` |
-| 4.4 | Add **D-T4** (`Session {id, displayName, role}` demo shape) with cross-ref to the reconciliation amendment §7. **Must land before Batch 3.1** (which resolves it) — see the dependency table | `tracked_deviations.md` |
-| 4.5 | Update README forgot-password description to reflect email/OTP threading via in-memory `extra` | `README.md` |
-| 4.6 | `.env.example` is still unconsumed (0 `String.fromEnvironment` uses) — document as aspirational or record a consumption decision | `README.md` / decision note |
-| 4.7 | Reconcile bootstrap-spec §7/§9 readiness checkboxes with reality (repo now a git repo, CI present, fonts + licenses committed) | `docs/legalhub_bootstrap_specification.md` |
-| 4.8 | `gate3_decision.md` §9 says the record will be updated "in place (as an unstaged edit, still uncommitted)" — stale since the record was committed at `1a99df0`; reconcile the §9 mechanism wording with the amendment's authoritative-record framing | `gate3_decision.md` |
+| 4.1 | **DONE** (`c6d4b69`): README test count **134 → 190** (actual) | `README.md` |
+| 4.2 | **DONE** (`c6d4b69`): removed the stale "AuthCubit/PasswordRecoveryCubit terminal-state-only" gap note — both are `blocTest` emission sequences since `46bcb7c` | `README.md` |
+| 4.3 | **DONE** (`1335512`): `tracked_deviations.md` D-T2 — recovery half **resolved** (`83f5bbf`); "Resend" is now disabled (`onPressed: null`), not a no-op | `tracked_deviations.md` |
+| 4.4 | **DONE** (`1335512`): **D-T4** (`Session {id, displayName, role}` demo shape) recorded with cross-ref to the reconciliation amendment §7. **Landed before Batch 3.1** (which resolves it) — dependency satisfied | `tracked_deviations.md` |
+| 4.5 | **DONE** (`c6d4b69`): README forgot-password description reflects email/OTP threading via in-memory `extra` | `README.md` |
+| 4.6 | **DONE** (`c6d4b69`): `.env.example` consumption decision recorded — names-only template; real URL/anon key consumed at build time via `--dart-define-from-file` from git-ignored `.env` (P1 3.3) | `README.md` |
+| 4.7 | **DONE** (`70271d4`): bootstrap-spec §7/§9 readiness reconciled — backlog status column, DoD checkboxes, readiness conditions, approval gates annotated against the as-built repo | `docs/legalhub_bootstrap_specification.md` |
+| 4.8 | **DONE** (`f909d85`): `gate3_decision.md` §9 — replaced the stale "in place (as an unstaged edit, still uncommitted)" mechanism wording with the amendment's authoritative-record framing | `gate3_decision.md` |
 
 **Acceptance:** every audit-flagged doc↔code discrepancy closed; README
-coverage map matches the actual suite.
+coverage map matches the actual suite. **Met 2026-07-31** — all eight rows
+DONE (`c6d4b69`, `1335512`, `70271d4`, `f909d85`).
 
 ---
 
