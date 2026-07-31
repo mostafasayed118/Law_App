@@ -4,6 +4,9 @@ A running list of known, documented deviations that are **not** architecture
 decisions and so do not belong in the ADR log. Each entry names the deviation,
 where it lives, its status, and the batch or slice that owns its resolution.
 
+The batches and slices cited in this file (and in `docs/adr/0007`) are
+defined in the canonical execution plan: [`codebase_audit_plan.md`](codebase_audit_plan.md).
+
 Architecture decisions — expensive to reverse, cross-feature, or
 safety-critical — live in [`adr/`](adr/). This file is for the rest: known
 bugs deferred for a focused slice, and unfinished work that is intentionally
