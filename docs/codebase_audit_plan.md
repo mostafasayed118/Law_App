@@ -12,9 +12,9 @@
 > **completed** (`ed38fd6`–`601a2c0`, pushed); **Batch 1 committed**
 > (`d8ec850`–`a508013`, +54 tests); **Batch 2 completed** (`94c9607`, P0
 > decided, P1 approved); **Batch 4 completed** (`c6d4b69`, `1335512`,
-> `70271d4`, `f909d85` — all eight doc-drift targets closed); Batches 3 and
-> 5 queued — Batch 3 decision-gate met and its D-T4 dependency recorded
-> (`1335512`).
+> `70271d4`, `f909d85`, plus follow-up `be90fd0` — all eight doc-drift
+> targets closed); Batches 3 and 5 queued — Batch 3 decision-gate met and
+> its D-T4 dependency recorded (`1335512`).
 >
 > **Governing docs:** `INSTRUCTIONS.md` §2.1/§3 (gates, delivery slices,
 > approval discipline) · `docs/gate3_decision.md` +
