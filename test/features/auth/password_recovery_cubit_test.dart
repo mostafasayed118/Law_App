@@ -1,3 +1,4 @@
+import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
@@ -17,88 +18,95 @@ void main() {
       expect(cubit.state, const ViewEmpty<void>());
     });
 
-    test('emits loading then success when the gateway succeeds', () async {
-      final PasswordRecoveryCubit cubit = PasswordRecoveryCubit(
-        _AlwaysSucceedsGateway(),
-      );
-      addTearDown(cubit.close);
+    blocTest<PasswordRecoveryCubit, ViewState<void>>(
+      'emits [loading, success] when the gateway succeeds',
+      build: () => PasswordRecoveryCubit(_AlwaysSucceedsGateway()),
+      act: (PasswordRecoveryCubit cubit) => cubit.submit(_request),
+      expect: () => <ViewState<void>>[
+        const ViewLoading<void>(),
+        const ViewSuccess<void>(null),
+      ],
+    );
 
-      await cubit.submit(_request);
+    blocTest<PasswordRecoveryCubit, ViewState<void>>(
+      'emits [loading, error] when the gateway fails',
+      build: () => PasswordRecoveryCubit(_AlwaysFailsGateway(_failure)),
+      act: (PasswordRecoveryCubit cubit) => cubit.submit(_request),
+      expect: () => <ViewState<void>>[
+        const ViewLoading<void>(),
+        ViewError<void>(_failure),
+      ],
+    );
 
-      expect(cubit.state, const ViewSuccess<void>(null));
-      // The loading state was emitted before success (verify the transition
-      // by capturing the stream).
-    });
+    blocTest<PasswordRecoveryCubit, ViewState<void>>(
+      'ignores a duplicate submit while one is in flight',
+      setUp: () => _countingGateway = _CountingGateway(),
+      build: () => PasswordRecoveryCubit(_countingGateway),
+      act: (PasswordRecoveryCubit cubit) async {
+        // Fire two submits back-to-back without awaiting between them. The
+        // second must be ignored because the first is still loading.
+        final Future<void> first = cubit.submit(_request);
+        await cubit.submit(_request);
+        await first;
+      },
+      // A single [loading, success] pair proves the second submit emitted
+      // nothing. The call-count verify below proves it never reached the
+      // gateway.
+      expect: () => <ViewState<void>>[
+        const ViewLoading<void>(),
+        const ViewSuccess<void>(null),
+      ],
+      verify: (_) {
+        expect(_countingGateway.calls, 1);
+      },
+    );
 
-    test('emits loading then error when the gateway fails', () async {
-      const AppError failure = AppError(
-        code: 'recovery_failed',
-        userMessage: 'Recovery failed',
-      );
-      final PasswordRecoveryCubit cubit = PasswordRecoveryCubit(
-        _AlwaysFailsGateway(failure),
-      );
-      addTearDown(cubit.close);
+    blocTest<PasswordRecoveryCubit, ViewState<void>>(
+      'resetToEmpty re-enables submission after an error',
+      build: () => PasswordRecoveryCubit(_AlwaysFailsGateway(_failure)),
+      act: (PasswordRecoveryCubit cubit) async {
+        await cubit.submit(_request);
+        cubit.resetToEmpty();
+      },
+      expect: () => <ViewState<void>>[
+        const ViewLoading<void>(),
+        ViewError<void>(_failure),
+        const ViewEmpty<void>(),
+      ],
+    );
 
-      await cubit.submit(_request);
-
-      expect(cubit.state, isA<ViewError<void>>());
-      expect((cubit.state as ViewError<void>).error, failure);
-    });
-
-    test('ignores a duplicate submit while one is in flight', () async {
-      final _CountingGateway gateway = _CountingGateway();
-      final PasswordRecoveryCubit cubit = PasswordRecoveryCubit(gateway);
-      addTearDown(cubit.close);
-
-      // Fire two submits back-to-back without awaiting between them. The
-      // second must be ignored because the first is still loading.
-      final Future<void> first = cubit.submit(_request);
-      await cubit.submit(_request);
-      await first;
-
-      // Only the first submit reached the gateway.
-      expect(gateway.calls, 1);
-    });
-
-    test('resetToEmpty re-enables submission after an error', () async {
-      const AppError failure = AppError(
-        code: 'recovery_failed',
-        userMessage: 'Recovery failed',
-      );
-      final PasswordRecoveryCubit cubit = PasswordRecoveryCubit(
-        _AlwaysFailsGateway(failure),
-      );
-      addTearDown(cubit.close);
-
-      await cubit.submit(_request);
-      expect(cubit.state, isA<ViewError<void>>());
-
-      cubit.resetToEmpty();
-      expect(cubit.state, const ViewEmpty<void>());
-    });
-
-    test('resetToEmpty is a no-op when not in an error state', () async {
-      final PasswordRecoveryCubit cubit = PasswordRecoveryCubit(
-        _AlwaysSucceedsGateway(),
-      );
-      addTearDown(cubit.close);
-
-      await cubit.submit(_request);
-      expect(cubit.state, const ViewSuccess<void>(null));
-
-      cubit.resetToEmpty();
-      // Still success; resetToEmpty only clears errors.
-      expect(cubit.state, const ViewSuccess<void>(null));
-    });
+    blocTest<PasswordRecoveryCubit, ViewState<void>>(
+      'resetToEmpty is a no-op when not in an error state',
+      build: () => PasswordRecoveryCubit(_AlwaysSucceedsGateway()),
+      act: (PasswordRecoveryCubit cubit) async {
+        await cubit.submit(_request);
+        cubit.resetToEmpty();
+      },
+      // Only the submit pair appears: resetToEmpty on a success state emits
+      // nothing, which is the no-op contract.
+      expect: () => <ViewState<void>>[
+        const ViewLoading<void>(),
+        const ViewSuccess<void>(null),
+      ],
+    );
   });
 }
+
+const AppError _failure = AppError(
+  code: 'recovery_failed',
+  userMessage: 'Recovery failed',
+);
 
 const PasswordRecoveryRequest _request = PasswordRecoveryRequest(
   email: 'amira@example.com',
   otp: '123456',
   newPassword: 'super-secret-123',
 );
+
+// Holds the gateway instance across the blocTest build/verify boundary so the
+// duplicate-submission test can assert the gateway was called exactly once
+// without reaching into the Cubit's private field.
+late _CountingGateway _countingGateway;
 
 class _AlwaysSucceedsGateway implements PasswordRecoveryGateway {
   @override

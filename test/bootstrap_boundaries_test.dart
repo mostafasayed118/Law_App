@@ -1,18 +1,16 @@
-import 'package:bloc_test/bloc_test.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/app/localization/locale_cubit.dart';
-import 'package:legalhub/core/auth/auth_gateway.dart';
-import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
-import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/core/state/view_state.dart';
-import 'package:legalhub/data/auth/fake_auth_gateway.dart';
-import 'package:legalhub/data/local/in_memory_locale_store.dart';
-import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 
+/// Boundary tests for the cross-cutting core primitives shared across features:
+/// `Result`, `ViewState`, and the `Redactor` privacy-by-design contract.
+///
+/// Cubit emission-stream tests live in dedicated files mirroring `lib/`:
+/// - `test/features/auth/auth_cubit_test.dart`
+/// - `test/features/auth/password_recovery_cubit_test.dart`
+/// - `test/app/localization/locale_cubit_test.dart`
 void main() {
   group('Result and shared view state boundaries', () {
     test('models success and failure explicitly', () {
@@ -38,62 +36,6 @@ void main() {
         const ViewSuccess<String>('value'),
         const ViewSuccess<String>('value'),
       );
-    });
-  });
-
-  group('AuthCubit', () {
-    blocTest<AuthCubit, AuthState>(
-      'starts a local demo session without collecting credentials',
-      build: () => AuthCubit(FakeAuthGateway(), InMemoryErrorReporter()),
-      act: (AuthCubit cubit) => cubit.startDemoSession(),
-      expect: () => <AuthState>[
-        const AuthState(status: AuthStatus.loading),
-        const AuthState(
-          status: AuthStatus.authenticated,
-          session: Session(
-            id: 'demo-session',
-            displayName: 'Demo user',
-            role: UserRole.client,
-          ),
-        ),
-      ],
-    );
-
-    test('reports a safe error when the gateway fails', () async {
-      final InMemoryErrorReporter reporter = InMemoryErrorReporter();
-      const AppError error = AppError(
-        code: 'unavailable',
-        userMessage: 'Unavailable',
-        context: <String, Object?>{'email': 'person@example.com'},
-      );
-      final AuthCubit cubit = AuthCubit(_FailingAuthGateway(error), reporter);
-
-      await cubit.startDemoSession();
-
-      expect(cubit.state.status, AuthStatus.error);
-      expect(reporter.reports.single['context'], <String, Object?>{
-        'email': '[REDACTED]',
-      });
-      await cubit.close();
-    });
-  });
-
-  group('LocaleCubit', () {
-    test('persists only supported locale codes', () async {
-      final InMemoryLocaleStore store = InMemoryLocaleStore();
-      final LocaleCubit cubit = LocaleCubit(store);
-
-      await cubit.setLocale(const Locale('ar'));
-      expect(cubit.state.locale, const Locale('ar'));
-
-      final LocaleCubit restored = LocaleCubit(store);
-      await restored.load();
-      expect(restored.state.locale, const Locale('ar'));
-
-      await cubit.setLocale(const Locale('fr'));
-      expect(cubit.state.locale, const Locale('ar'));
-      await cubit.close();
-      await restored.close();
     });
   });
 
@@ -134,23 +76,4 @@ void main() {
       expect(sanitized['new_password'], '[REDACTED]');
     },
   );
-}
-
-class _FailingAuthGateway implements AuthGateway {
-  _FailingAuthGateway(this.error);
-
-  final AppError error;
-
-  @override
-  Session? get currentSession => null;
-
-  @override
-  Stream<Session?> get sessionChanges => const Stream<Session?>.empty();
-
-  @override
-  Future<Result<Session>> startDemoSession() async =>
-      Result<Session>.failure(error);
-
-  @override
-  Future<void> signOut() async {}
 }
