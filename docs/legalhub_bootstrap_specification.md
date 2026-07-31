@@ -154,7 +154,7 @@ All spacing via `EdgeInsetsDirectional`/`AlignmentDirectional`; directional icon
 
 **Definition of done (bootstrap) — reconciled 2026-07-31 against the as-built repo:**
 - [x] App builds/runs; `flutter analyze` & `dart format` clean; CI green. **Met** — CI present (`.github/workflows/ci.yml`, push-to-main + PR triggers); analyze clean; suite 190/190.
-- [ ] Light theme sourced entirely from `legalhub_design_system`; no stray hard-coded styling. **Deviation** — theme lives in-app at `lib/app/legalhub_theme.dart`; no separate `legalhub_design_system` package was created. Tokens honored (ADR-0005); `primaryContainer` deviation tracked in ADR-0006 / Batch 5.3.
+- [ ] Light theme sourced entirely from `legalhub_design_system`; no stray hard-coded styling. **Deviation** — theme lives in-app at `lib/app/legalhub_theme.dart`; no separate `legalhub_design_system` package was created (package-structure choice folded into the token reconciliation tracked in Batch 5.3). Tokens honored (ADR-0005); `primaryContainer` token-value deviation tracked in ADR-0006 / Batch 5.3.
 - [x] EN/AR/TR localization works; AR is RTL; no concatenated strings. **Met** — EN/AR/TR ARB + `flutter_localizations`; AR/RTL exercised by tests.
 - [x] Auth is an interface with a fake impl; no real/secret keys committed. **Met** — `AuthGateway`/`FakeAuthGateway`; `.env` git-ignored; `.env.example` name-only.
 - [x] Role/capability is documented UX-only; no authorization claims. **Met** — `user_role.dart` UX-only capability map (D-T4).
