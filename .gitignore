@@ -59,3 +59,8 @@ app.*.map.json
 
 # Local tool scratch directory (not project source)
 .commandcode/
+.freebuff/
+
+# Local tool/IDE configuration (not project source; repo-local rule so it does
+# not depend on a machine-level global gitignore)
+.openclaude/
