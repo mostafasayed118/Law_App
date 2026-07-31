@@ -21,10 +21,16 @@ messaging services.
 - Redacted error-reporting boundary with no external observability SDK.
 - Auth and onboarding presentation: sign-in, sign-up, forgot-password
   (email/OTP/reset), onboarding carousel and success, home dashboard,
-  settings. SignUp/forgot-password validate and navigate only — no Cubit yet.
+  settings. Sign-up is fully wired: `SignUpScreen` builds a redaction-safe
+  `SignUpRequest` on submit, hands it to a feature-scoped `SignUpCubit`
+  backed by a `SignUpGateway` seam, and renders loading/success/error via
+  `ViewStateView`. Forgot-password email/OTP steps validate and route only.
 - `SignUpRequest` pure-domain value object (features/auth/domain) with a
   redaction contract: `toRedactedMap()` is safe to embed in `AppError.context`.
-- Tests (118 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+  Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
+  invariant is pinned by a failure-path `blocTest` in
+  `test/features/auth/sign_up_cubit_test.dart`.
+- Tests (134 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), Redactor (password/OTP/email/Bearer redaction
   with leak guards), DI registration graph, validators, router redirect logic
@@ -41,13 +47,18 @@ messaging services.
   carousel/success (page advance + Skip + Get Started + success routing),
   SharedPreferences locale store (round-trip + stale-code rejection +
   supported-code acceptance), SignUpRequest redaction invariants,
-  PasswordRecoveryRequest redaction invariants, and the end-to-end boot /
-  locale-switch widget flow.
+  PasswordRecoveryRequest redaction invariants, `SignUpCubit` emission
+  sequences (loading→success/error, duplicate-submit guard, `resetToEmpty`
+  retry re-enable, redaction invariant on the failure path) and the sign-up
+  screen (VO construction with normalized values, terms-checkbox gating,
+  invalid-form blocking, gateway-failure `ViewStateView` error surface), and
+  the end-to-end boot / locale-switch widget flow.
 - Coverage gaps (tracked for later batches):
-  - **Cubit emission streams** — `AuthCubit`, `PasswordRecoveryCubit`, and
-    `LocaleCubit` transitions are asserted via terminal state only, not
-    `blocTest` emission sequences. Loading→success/error transitions are
-    proven only at the destination, not as a stream.
+  - **Cubit emission streams** — `AuthCubit` and `PasswordRecoveryCubit`
+    transitions are asserted via terminal state only, not `blocTest`
+    emission sequences. `SignUpCubit` and `LocaleCubit` now have emission
+    sequences; the remaining two are proven only at the destination, not as a
+    stream.
   - **Shared widgets** — `ViewStateView` is exercised only on its error
     branch (via the reset screen test); loading/empty/success/offline/
     unauthorized branches are untested. `PasswordField` (obscure toggle),

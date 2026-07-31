@@ -8,7 +8,9 @@ import 'package:legalhub/core/sample_service.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/local/locale_store.dart';
 import 'package:legalhub/features/auth/data/fake_password_recovery_gateway.dart';
+import 'package:legalhub/features/auth/data/fake_sign_up_gateway.dart';
 import 'package:legalhub/features/auth/domain/password_recovery_gateway.dart';
+import 'package:legalhub/features/auth/domain/sign_up_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 
 void main() {
@@ -47,12 +49,12 @@ void main() {
     });
   });
 
-  // The full DI graph: configureDependencies() registers seven types. The
+  // The full DI graph: configureDependencies() registers eight types. The
   // earlier group only proved SampleService. These tests pin every
   // registration so a future refactor that drops a wiring line fails loudly
   // instead of breaking at runtime in a screen test.
   group('configureDependencies full registration graph', () {
-    test('registers all seven application dependencies', () {
+    test('registers all eight application dependencies', () {
       configureDependencies();
 
       expect(serviceLocator.isRegistered<SampleService>(), isTrue);
@@ -61,6 +63,7 @@ void main() {
       expect(serviceLocator.isRegistered<LocaleStore>(), isTrue);
       expect(serviceLocator.isRegistered<LocaleCubit>(), isTrue);
       expect(serviceLocator.isRegistered<PasswordRecoveryGateway>(), isTrue);
+      expect(serviceLocator.isRegistered<SignUpGateway>(), isTrue);
       expect(serviceLocator.isRegistered<AuthCubit>(), isTrue);
     });
 
@@ -97,6 +100,14 @@ void main() {
         serviceLocator<PasswordRecoveryGateway>(),
         isA<FakePasswordRecoveryGateway>(),
       );
+    });
+
+    test('wires the sign-up gateway to the fake dev implementation', () {
+      configureDependencies();
+
+      // Same boundary discipline as the recovery gateway: the dev fake is the
+      // registered seam and real sign-up remains a later approved slice.
+      expect(serviceLocator<SignUpGateway>(), isA<FakeSignUpGateway>());
     });
 
     test('wires AuthGateway to the credential-free fake', () {

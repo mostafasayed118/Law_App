@@ -32,9 +32,14 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
 ## D-T2: Domain value objects built but not wired into presentation
 
 - **Where:**
-  - `lib/features/auth/domain/sign_up_request.dart` — `SignUpRequest` with
+  - ~~`lib/features/auth/domain/sign_up_request.dart` — `SignUpRequest` with
     `toRedactedMap()` redaction contract (ADR-0003). Not constructed by
-    `lib/features/auth/presentation/sign_up_screen.dart`.
+    `lib/features/auth/presentation/sign_up_screen.dart`.~~ **Resolved:**
+    `SignUpRequest` is now wired into `SignUpScreen` via `SignUpCubit` and the
+    `SignUpGateway` seam. The screen builds the VO from validated form fields on
+    submit, and `SignUpCubit` asserts the redaction invariant in
+    `test/features/auth/sign_up_cubit_test.dart` (the failure-path `blocTest`
+    pins `password`/`phone`/`email` as `[REDACTED]` in the error context).
   - `lib/features/auth/domain/password_recovery_request.dart` —
     `PasswordRecoveryRequest` with `toRedactedMap()`. Constructed by
     `forgot_password_reset_screen.dart` with **empty email/otp placeholders**
@@ -42,13 +47,16 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
   - `lib/features/auth/presentation/forgot_password/forgot_password_otp_screen.dart`
     — the "Resend code" button is a no-op (`onPressed: () {}`), which implies a
     sent code that is never sent (a §4.4 "no false assurance" issue).
-- **Status:** Tracked, deferred. The redaction contracts are tested
+- **Status:** Tracked, partially resolved. The sign-up half is closed; the
+  recovery half remains open. The redaction contracts are tested
   (`test/auth/sign_up_request_test.dart`,
-  `test/features/auth/password_recovery_request_test.dart`) but the contracts
-  are not exercised at the point where PII enters the app, so the
-  privacy-by-design loop is open.
-- **Owner:** Batch 3 of the codebase-audit plan (wire domain VOs into
-  presentation, backend-free).
+  `test/features/auth/password_recovery_request_test.dart`); the sign-up
+  contract is now exercised at the point PII enters the app, but the recovery
+  contract is still built with placeholder values, so that
+  privacy-by-design loop remains open.
+- **Owner:** Sign-up half resolved by Batch 1 of the codebase-audit plan (land
+  the in-flight `SignUpRequest` wiring). Recovery half owned by Batch 2
+  (wire `PasswordRecoveryRequest` into presentation, backend-free).
 - **Constraint:** This slice stays backend-free. It does **not** call a real
   `AuthGateway`/`PasswordRecoveryGateway`, add Supabase, or implement real
   sign-up/reset — those are gated on the P0 product/legal decisions

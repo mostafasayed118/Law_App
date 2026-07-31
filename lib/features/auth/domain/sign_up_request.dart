@@ -16,10 +16,11 @@ import '../../../core/observability/error_reporter.dart';
 ///   feed into [AppError.context]; passing it back through [Redactor.map] is
 ///   idempotent.
 ///
-/// This object is intentionally not yet wired into [SignUpScreen]. Wiring it
-/// to the presentation layer is a follow-up slice that depends on a real
-/// [AuthGateway], which remains blocked behind the P0 product/legal decisions
-/// documented in `auth_tenant_authorization_contract.md`.
+/// This object is wired into [SignUpScreen] via [SignUpCubit]: the screen
+/// builds it from validated form fields on submit and hands it to the cubit,
+/// which calls the [SignUpGateway] seam. The gateway is a dev-only fake today;
+/// real account creation remains blocked behind the P0 product/legal
+/// decisions documented in `auth_tenant_authorization_contract.md`.
 class SignUpRequest extends Equatable {
   const SignUpRequest({
     required this.name,

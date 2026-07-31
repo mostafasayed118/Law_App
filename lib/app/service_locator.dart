@@ -9,7 +9,9 @@ import '../data/local/in_memory_locale_store.dart';
 import '../data/local/locale_store.dart';
 import '../data/local/shared_preferences_locale_store.dart';
 import '../features/auth/data/fake_password_recovery_gateway.dart';
+import '../features/auth/data/fake_sign_up_gateway.dart';
 import '../features/auth/domain/password_recovery_gateway.dart';
+import '../features/auth/domain/sign_up_gateway.dart';
 import '../features/auth/presentation/auth_cubit.dart';
 import 'localization/locale_cubit.dart';
 
@@ -65,6 +67,11 @@ void configureDependencies({SharedPreferences? preferences}) {
     serviceLocator.registerLazySingleton<PasswordRecoveryGateway>(
       FakePasswordRecoveryGateway.new,
     );
+  }
+  if (!serviceLocator.isRegistered<SignUpGateway>()) {
+    // Stateless service: lazy singleton. The sign-up Cubit is feature-scoped
+    // and created per screen via BlocProvider, so it is NOT registered here.
+    serviceLocator.registerLazySingleton<SignUpGateway>(FakeSignUpGateway.new);
   }
   if (!serviceLocator.isRegistered<AuthCubit>()) {
     // App-scoped because the router and all screens observe one session seam.
