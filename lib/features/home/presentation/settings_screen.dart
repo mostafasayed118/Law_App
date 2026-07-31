@@ -58,7 +58,7 @@ class SettingsScreen extends StatelessWidget {
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.person_outline),
-            title: Text(_roleLabel(l10n, authState.session?.role)),
+            title: Text(_roleLabel(l10n, authState.session?.primaryRole)),
             subtitle: Text(l10n.demoSessionNotice),
           ),
           const SizedBox(height: LegalHubTheme.spaceXl),

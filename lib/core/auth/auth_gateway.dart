@@ -1,23 +1,27 @@
-import '../errors/result.dart';
-import '../roles/user_role.dart';
+import 'auth_outcome.dart';
+import 'session.dart';
 
-class Session {
-  const Session({
-    required this.id,
-    required this.displayName,
-    required this.role,
-  });
+export 'auth_outcome.dart';
+export 'session.dart';
 
-  final String id;
-  final String displayName;
-  final UserRole role;
-}
-
-/// Authentication integration boundary. This bootstrap deliberately has no
-/// credential methods and no Supabase implementation.
+/// Authentication integration boundary.
+///
+/// The domain boundary returns an application [Session] via [AuthOutcome] —
+/// never raw Supabase DTOs, access tokens, refresh tokens, or provider
+/// exceptions (contract §5). Bootstrap has no provider implementation; the
+/// demo [startDemoSession] is the synthetic seam used by presentation.
 abstract interface class AuthGateway {
   Session? get currentSession;
   Stream<Session?> get sessionChanges;
-  Future<Result<Session>> startDemoSession();
+
+  /// Contract-§5 restore: re-check the provider session. Resolves to
+  /// authenticated, signed-out (no session), expired (reauthRequired), or
+  /// unavailable — never a misleading empty success.
+  Future<AuthOutcome<Session>> restore();
+
+  /// Bootstrap-only demo path — not an authentication mechanism and must not
+  /// be used as production authorization.
+  Future<AuthOutcome<Session>> startDemoSession();
+
   Future<void> signOut();
 }

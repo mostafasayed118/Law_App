@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import '../../core/auth/auth_gateway.dart';
-import '../../core/errors/result.dart';
 import '../../core/roles/user_role.dart';
 
 /// Development-only session implementation.
@@ -9,10 +8,23 @@ import '../../core/roles/user_role.dart';
 /// This class intentionally does not accept or store credentials. It is a
 /// seam for presentation tests and bootstrap navigation only; it is not an
 /// authentication mechanism and must not be used as production authorization.
+///
+/// The demo session carries the contract-§5 shape: a stable [Session.userId],
+/// organization [Session.memberships] with explicit lifecycle status (no
+/// single client-owned `role` on the session), and a [Session.expiresAt]
+/// boundary.
 class FakeAuthGateway implements AuthGateway {
   Session? _session;
   final StreamController<Session?> _changes =
       StreamController<Session?>.broadcast();
+
+  /// The demo active membership, shared by the synthetic session.
+  static const OrganizationMembership demoMembership = OrganizationMembership(
+    organizationId: 'org-demo',
+    organizationName: 'Demo Firm',
+    role: UserRole.client,
+    status: MembershipStatus.active,
+  );
 
   @override
   Session? get currentSession => _session;
@@ -21,15 +33,32 @@ class FakeAuthGateway implements AuthGateway {
   Stream<Session?> get sessionChanges => _changes.stream;
 
   @override
-  Future<Result<Session>> startDemoSession() async {
-    final Session session = const Session(
-      id: 'demo-session',
+  Future<AuthOutcome<Session>> restore() async {
+    final Session? session = _session;
+    if (session == null) {
+      return const AuthOutcome<Session>.failure(
+        AuthFailure(kind: AuthFailureKind.signedOut),
+      );
+    }
+    if (session.isExpired) {
+      return const AuthOutcome<Session>.failure(
+        AuthFailure(kind: AuthFailureKind.sessionExpired),
+      );
+    }
+    return AuthOutcome<Session>.success(session);
+  }
+
+  @override
+  Future<AuthOutcome<Session>> startDemoSession() async {
+    final Session session = Session(
+      userId: 'demo-user',
       displayName: 'Demo user',
-      role: UserRole.client,
+      memberships: const <OrganizationMembership>[demoMembership],
+      expiresAt: DateTime.now().add(const Duration(hours: 8)),
     );
     _session = session;
     _changes.add(session);
-    return Result<Session>.success(session);
+    return AuthOutcome<Session>.success(session);
   }
 
   @override

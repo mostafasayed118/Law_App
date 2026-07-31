@@ -134,7 +134,11 @@ class _AppShell extends StatelessWidget {
     final String location = GoRouterState.of(context).uri.path;
     final int index = location == AppRoutes.settings ? 1 : 0;
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final UserRole role = authCubit.state.session?.role ?? UserRole.client;
+    // UX-only projection from the active membership's org-scoped role. The
+    // session itself carries no client-owned role (contract §5); this is a
+    // navigation hint, never an authorization grant.
+    final UserRole role =
+        authCubit.state.session?.primaryRole ?? UserRole.client;
     final RoleCapability capabilities = roleCapabilities[role]!;
     final List<NavigationDestination> destinations = <NavigationDestination>[
       if (capabilities.canViewHome)
