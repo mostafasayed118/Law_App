@@ -16,7 +16,9 @@
 > targets closed); **Batch 3.1+3.4 completed** (`1042daf`, `e98e61b` —
 > contract-§5 session model, D-T4 resolved, suite 205/205); **Batch 3.2
 > completed** (`b1ae361`, `88c3005` — Supabase adapter behind the seam,
-> suite 220/220); Batch 3.3 queued (config); Batch 5 queued.
+> suite 220/220); **Batch 5 completed** (`6c3d274`, `a17b747`, `77c43de`,
+> `75ff17b` — D-T1/D-T3 resolved, ADR-0008 supersedes ADR-0006, suite
+> 222/222); Batch 3.3 queued (config).
 >
 > **Governing docs:** `INSTRUCTIONS.md` §2.1/§3 (gates, delivery slices,
 > approval discipline) · `docs/gate3_decision.md` +
@@ -208,15 +210,20 @@ DONE (`c6d4b69`, `1335512`, `70271d4`, `f909d85`).
 
 ---
 
-## Batch 5 — Responsive hardening + token reconciliation *(maps to the earlier plan's Batch 5)*
+## Batch 5 — Responsive hardening + token reconciliation *(maps to the earlier plan's Batch 5)* — **COMPLETED (2026-08-01)**
 
 **Source:** `tracked_deviations.md` D-T1/D-T3 · `docs/adr/0006`.
 
+**Status 2026-08-01:** all three rows DONE — D-T1 and D-T3 resolved in
+`tracked_deviations.md`, `primaryContainer` reconciled to the code value
+`#1A2B3C` by ADR-0008 (supersedes ADR-0006; the spec table was updated, not
+the code). Suite 222/222.
+
 | # | Task | File(s) |
 |---|---|---|
-| 5.1 | D-T1: OnboardingScreen overflow at compact/desktop (800×600, ~139px) — `SingleChildScrollView`/`Flexible`; keep the 411×867 test green **and** add the 800×600 test | `onboarding_screen.dart` + test |
-| 5.2 | D-T3: `'Jonathan'` fallback — localize neutrally or remove (decision cross-refs Batch 1.4) | `home_screen.dart` |
-| 5.3 | ADR-0006: render `primaryContainer` candidates (`#1A2B3C` vs spec `#0b1d2e`) EN/AR/RTL + light/dark; decide code-vs-spec; update the loser and supersede ADR-0006 | `legalhub_theme.dart`, spec table, new ADR |
+| 5.1 | **DONE** (`6c3d274`): D-T1 resolved — carousel page is now `LayoutBuilder` + `SingleChildScrollView` + `ConstrainedBox(minHeight)` (centers at phone heights, scrolls at compact/desktop); the 411×867 tests stay green **and** a default-surface 800×600 test asserting `takeException() == null` was added | `onboarding_screen.dart` + test |
+| 5.2 | **DONE** (`a17b747`): D-T3 resolved — the no-session branch was reachable only via direct pump, so the fallback was **localized, not removed**: `l10n.homeFallbackName` (`Guest`/`ضيف`/`Misafir`) across EN/AR/TR, pinned with AR/TR assertions | `home_screen.dart` + 3 `.arb` + generated l10n + test |
+| 5.3 | **DONE** (`77c43de`): ADR-0006 superseded by **ADR-0008** — candidates rendered (light-theme consumer surfaces, live WCAG contrast; spec value collapses the M3 container role, so the code value `#1A2B3C` won); spec §5.1 rows updated to `#1a2b3c`/`#8192a7`, theme test now pins both, ADR-0005/0006 open conditions annotated closed | `docs/adr/0008` (new), spec table, `legalhub_theme_test.dart`, ADR index |
 
 ---
 
