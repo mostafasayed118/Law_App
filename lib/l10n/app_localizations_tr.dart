@@ -202,6 +202,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get resendCode => 'Kodu Yeniden Gönder';
 
   @override
+  String get resendCodeUnavailable =>
+      'Kodu Yeniden Gönder (demoda kullanılamıyor)';
+
+  @override
   String get resendHelp =>
       'E-posta gelmedi mi? Spam klasörünüzü kontrol edin veya destekle iletişime geçin.';
 

@@ -6,6 +6,7 @@ import '../../../../app/router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/forms/validators.dart';
 import '../../../../shared/widgets/widgets.dart';
+import 'recovery_routing_context.dart';
 
 /// Step 1 — request a recovery code by email.
 ///
@@ -100,7 +101,13 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context).codeSentNotice)),
       );
-      context.go(AppRoutes.forgotPasswordOtp);
+      // Thread the entered email to the OTP step via in-memory `extra` (never
+      // via the URL — email is PII and must not appear in history/logs). The
+      // OTP is unknown at this step and filled in by the OTP screen.
+      context.go(
+        AppRoutes.forgotPasswordOtp,
+        extra: RecoveryRoutingContext(email: _email.text.trim(), otp: ''),
+      );
     }
   }
 }

@@ -13,6 +13,7 @@ import '../../domain/password_recovery_gateway.dart';
 import '../../domain/password_recovery_request.dart';
 import '../password_recovery_cubit.dart';
 import '../widgets/auth_buttons.dart';
+import 'recovery_routing_context.dart';
 
 /// Step 3 — set a new password and confirm it.
 ///
@@ -24,12 +25,13 @@ import '../widgets/auth_buttons.dart';
 /// later, approved data-layer slice (P1, gated behind the P0 decisions in
 /// `docs/auth_tenant_authorization_contract.md` §10).
 ///
-/// The email and OTP captured in steps 1–2 are not yet threaded through
-/// routing to this screen, so the [PasswordRecoveryRequest] built here carries
-/// the new password and empty email/OTP placeholders. When the real flow lands
-/// and routing passes those values, this assembly step is the single place to
-/// fill them in; the redaction contract on [PasswordRecoveryRequest] already
-/// guarantees they will be safe in any diagnostic.
+/// The email and OTP captured in steps 1–2 are threaded to this screen via
+/// [RecoveryRoutingContext] (GoRouter in-memory `extra`, never the URL), so the
+/// [PasswordRecoveryRequest] built here carries real values — closing the
+/// recovery half of D-T2. On deep-link/refresh `extra` is null and the screen
+/// falls back to [RecoveryRoutingContext.empty], reproducing the prior
+/// placeholder behavior. The redaction contract on [PasswordRecoveryRequest]
+/// guarantees these values are safe in any diagnostic.
 class ForgotPasswordResetScreen extends StatefulWidget {
   const ForgotPasswordResetScreen({super.key});
 
@@ -54,6 +56,20 @@ class _ForgotPasswordResetScreenState extends State<ForgotPasswordResetScreen> {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final TextTheme text = Theme.of(context).textTheme;
+    // Capture the threaded email/OTP once at build time, when a GoRouterState
+    // is guaranteed to exist above this screen in the normal flow. Outside a
+    // router (e.g. direct unit-test pumps) GoRouterState.of throws; guard so
+    // the screen stays reachable and falls back to the empty context — the
+    // same behavior as a deep-link/refresh with no `extra`.
+    RecoveryRoutingContext routing = RecoveryRoutingContext.empty;
+    try {
+      final Object? extra = GoRouterState.of(context).extra;
+      routing = extra is RecoveryRoutingContext
+          ? extra
+          : RecoveryRoutingContext.empty;
+    } on Object catch (_) {
+      routing = RecoveryRoutingContext.empty;
+    }
     return BlocProvider<PasswordRecoveryCubit>(
       create: (_) =>
           PasswordRecoveryCubit(serviceLocator<PasswordRecoveryGateway>()),
@@ -120,7 +136,7 @@ class _ForgotPasswordResetScreenState extends State<ForgotPasswordResetScreen> {
                             LoadingElevatedButton(
                               onPressed: loading
                                   ? null
-                                  : () => _submit(context),
+                                  : () => _submit(context, routing),
                               label: l10n.resetPasswordButton,
                               loading: loading,
                               icon: Icons.lock_outline,
@@ -139,13 +155,14 @@ class _ForgotPasswordResetScreenState extends State<ForgotPasswordResetScreen> {
     );
   }
 
-  void _submit(BuildContext context) {
+  void _submit(BuildContext context, RecoveryRoutingContext routing) {
     if (_formKey.currentState?.validate() ?? false) {
       final PasswordRecoveryRequest request = PasswordRecoveryRequest.fromRaw(
-        // Email and OTP come from the prior recovery steps; routing does not
-        // thread them here yet. See the class doc for the follow-up note.
-        email: '',
-        otp: '',
+        // Email from step 1 and OTP from step 2, threaded via in-memory `extra`.
+        // Empty fallback on deep-link/refresh reproduces prior placeholder
+        // behavior so the screen stays reachable without a backend.
+        email: routing.email,
+        otp: routing.otp,
         newPassword: _password.text,
       );
       context.read<PasswordRecoveryCubit>().submit(request);

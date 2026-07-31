@@ -62,6 +62,7 @@
   "verifyEmailBody": "لقد أرسلنا رمزًا من ٦ أرقام إلى بريدك الإلكتروني.",
   "verifyAndContinueButton": "تأكيد ومتابعة",
   "resendCode": "إعادة إرسال الرمز",
+  "resendCodeUnavailable": "إعادة إرسال الرمز (غير متاح في النسخة التجريبية)",
   "resendHelp": "لم يصلك البريد؟ تحقق من مجلد الرسائل غير المرغوبة أو تواصل مع الدعم.",
   "resetPasswordTitle": "إعادة تعيين كلمة المرور",
   "newPasswordLabel": "كلمة المرور الجديدة",

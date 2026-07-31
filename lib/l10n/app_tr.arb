@@ -62,6 +62,7 @@
   "verifyEmailBody": "E-posta adresinize 6 haneli bir kod gönderdik.",
   "verifyAndContinueButton": "Doğrula ve Devam Et",
   "resendCode": "Kodu Yeniden Gönder",
+  "resendCodeUnavailable": "Kodu Yeniden Gönder (demoda kullanılamıyor)",
   "resendHelp": "E-posta gelmedi mi? Spam klasörünüzü kontrol edin veya destekle iletişime geçin.",
   "resetPasswordTitle": "Parolayı Sıfırla",
   "newPasswordLabel": "Yeni Parola",

@@ -200,6 +200,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get resendCode => 'إعادة إرسال الرمز';
 
   @override
+  String get resendCodeUnavailable =>
+      'إعادة إرسال الرمز (غير متاح في النسخة التجريبية)';
+
+  @override
   String get resendHelp =>
       'لم يصلك البريد؟ تحقق من مجلد الرسائل غير المرغوبة أو تواصل مع الدعم.';
 

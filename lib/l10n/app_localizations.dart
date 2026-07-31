@@ -472,6 +472,12 @@ abstract class AppLocalizations {
   /// **'Resend Code'**
   String get resendCode;
 
+  /// No description provided for @resendCodeUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend Code (unavailable in demo)'**
+  String get resendCodeUnavailable;
+
   /// No description provided for @resendHelp.
   ///
   /// In en, this message translates to:

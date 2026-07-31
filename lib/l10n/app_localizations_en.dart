@@ -201,6 +201,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get resendCode => 'Resend Code';
 
   @override
+  String get resendCodeUnavailable => 'Resend Code (unavailable in demo)';
+
+  @override
   String get resendHelp =>
       'Didn\'t receive the email? Check your spam folder or contact support.';
 
