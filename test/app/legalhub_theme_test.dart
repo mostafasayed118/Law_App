@@ -18,19 +18,16 @@ void main() {
       },
     );
 
-    test(
-      'light primaryContainer is #1A2B3C — a tracked deviation from spec #0b1d2e',
-      () {
-        // ADR-0005 Open condition: primary-container (#1A2B3C in code vs
-        // #0b1d2e in spec) is a separate tracked deviation to be reconciled in
-        // a follow-up batch with a light/dark + EN/AR/RTL visual review.
-        // Pinning the current value here means that follow-up batch has a
-        // failing test to update, so the change can't slip in silently.
-        final ThemeData light = LegalHubTheme.light;
+    test('light primaryContainer is #1A2B3C — canonical per ADR-0008', () {
+      // ADR-0008 reconciled the container pair to the code values: #1A2B3C
+      // (was a tracked deviation vs spec #0b1d2e, superseding ADR-0006) and
+      // onPrimaryContainer #8192A7. Pinning the current value here means a
+      // future change must update this guard and the spec table together.
+      final ThemeData light = LegalHubTheme.light;
 
-        expect(light.colorScheme.primaryContainer, const Color(0xFF1A2B3C));
-      },
-    );
+      expect(light.colorScheme.primaryContainer, const Color(0xFF1A2B3C));
+      expect(light.colorScheme.onPrimaryContainer, const Color(0xFF8192A7));
+    });
 
     test('light secondary is Old Gold #775A19', () {
       final ThemeData light = LegalHubTheme.light;

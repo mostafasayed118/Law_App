@@ -1,6 +1,6 @@
 # ADR-0006: primaryContainer remains #1A2B3C (tracked deviation from spec #0b1d2e)
 
-- Status: Accepted (deviation recorded, not reconciled)
+- Status: Superseded by ADR-0008 (2026-08-01)
 - Date: 2026-07-31
 - Related: ADR-0005 (canonical `primary` = `#0b1d2e`), D-10 (canonical design
   system), `docs/legalhub_specification.md` §5.1, ADR-0002 (dark theme approved
@@ -80,3 +80,6 @@ design-review batch) must render both candidate values under EN/AR/RTL +
 light/dark and supersede this ADR with the chosen value. Until then, this ADR
 is the standing record that the code and spec disagree on purpose, not by
 accident.
+
+**Closed by ADR-0008 (2026-08-01):** Batch 5 rendered both candidates, chose
+the code value `#1A2B3C`, and updated the spec table — this ADR is superseded.

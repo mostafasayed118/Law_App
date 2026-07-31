@@ -76,8 +76,8 @@ Derived by normalizing the three design-system files. Two files (`lexis_design_s
 |---|---|---|
 | primary | `#0b1d2e` | Midnight/Ink Blue. **Discrepancy:** design files list `primary:#000000` but the narrative + `primary-container` describe Midnight Blue `#0b1d2e`/`#041627`. Canonical = Midnight Blue; confirm at D-10 sign-off. |
 | on-primary | `#ffffff` | |
-| primary-container | `#0b1d2e` | |
-| on-primary-container | `#74859b` | |
+| primary-container | `#1a2b3c` | Reconciled to the code value per ADR-0008 (was `#0b1d2e`, identical to `primary` — collapses the M3 container role). |
+| on-primary-container | `#8192a7` | Paired with the container per ADR-0008 (was `#74859b`). |
 | secondary | `#775a19` | "Old Gold / Legal Bronze" — accent & important statuses |
 | on-secondary | `#ffffff` | |
 | secondary-container | `#fdd587` | |
@@ -182,7 +182,7 @@ The bootstrap package builds **foundation only** — no features, no high-risk w
 - [x] Canonical color/spacing/radius/elevation/icon tokens normalized (§5)
 - [x] **D-13** — body typeface confirmed: **Noto Sans** (resolved at bootstrap-spec approval; Inter/Source proposal superseded)
 - [x] **D-14** — dark-theme tokens approved as-is per ADR-0002 (dark mode retroactively accepted)
-- [x] `primary` value confirmed as Midnight Blue `#0b1d2e` (resolve `#000000` discrepancy) — ADR-0005; code reconciled to `#0b1d2e`. `primary-container` (`#1A2B3C` vs spec `#0b1d2e`) remains a tracked deviation.
+- [x] `primary` value confirmed as Midnight Blue `#0b1d2e` (resolve `#000000` discrepancy) — ADR-0005; code reconciled to `#0b1d2e`. `primary-container` reconciled to the code value `#1A2B3C` by ADR-0008 (supersedes ADR-0006); spec table updated to match.
 - [ ] Font licensing/glyph coverage verified for EN + **AR** + TR (Arabic fallback face identified)
 - [ ] Supabase project (dev) provisioned; region pending D-04 (dev-only placeholder acceptable)
 - [ ] Flutter/Dart SDK versions pinned per `INSTRUCTIONS.md` §1.1

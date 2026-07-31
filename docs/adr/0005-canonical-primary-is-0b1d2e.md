@@ -75,3 +75,8 @@ This ADR records the `primary` reconciliation only. It does **not**:
 deviation recorded here for traceability. It should be reconciled in a
 follow-up batch that reviews the rendered container surfaces under
 EN/AR/RTL + light/dark before adopting the spec value.
+
+**Closed by ADR-0008 (2026-08-01):** the render review chose the code value
+`#1A2B3C` as canonical (the spec value collapses the M3 container role), and
+the spec table was updated to match — see ADR-0008, which supersedes
+ADR-0006.
