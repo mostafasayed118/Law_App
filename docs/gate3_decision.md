@@ -241,14 +241,15 @@ This evidence supports the Option C approval; it does not authorize a commit.
 
 ---
 
-## 9. How to fill the §10.2 / §10.5 placeholders
+## 9. How the §10.2 / §10.5 owner assignment was recorded
 
-Send the real owner name/role for §10.2 (jurisdiction/policy) and §10.5
-(human authority). On receipt, this record will be updated **in place** (as
-an unstaged edit, still uncommitted) to replace the two
-`PLACEHOLDER — NOT YET ASSIGNED` rows with the real assignments, and the
-record's status will remain ACCEPTED (design-only). No other change to this
-decision is implied by filling those fields.
+The §10.2 (jurisdiction/policy) and §10.5 (human authority) owner rows were
+assigned on 2026-07-31 via `docs/gate3_reconciliation.md` §6/§10 (committed
+`45b0a48`) — the amendment is the **authoritative record** of the as-built
+assignment and of this record's status remaining ACCEPTED (design-only).
+This record was **not** edited in place; the earlier placeholder-fill
+mechanism described here is superseded by that amendment. No other change
+to this decision is implied by the assignment.
 
 ---
 
