@@ -27,7 +27,7 @@ bindings were regenerated with `flutter gen-l10n`.
 ## Consequences
 
 - User-facing strings and the app-bar wordmark consistently read "LegalHub".
-- A regression is detectable: `test/auth/sign_in_screen_test.dart` asserts
-  `find.textContaining('Lexis')` finds nothing on the sign-in screen.
+- A regression is detectable: `test/features/auth/sign_in_screen_test.dart`
+  asserts `find.textContaining('Lexis')` finds nothing on the sign-in screen.
 - Any new screen that needs the wordmark must use `AppLocalizations.appTitle`
   rather than a string literal.

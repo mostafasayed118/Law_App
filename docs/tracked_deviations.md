@@ -52,7 +52,7 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
     sent code that is never sent (a §4.4 "no false assurance" issue).
 - **Status:** Tracked, partially resolved. The sign-up half is closed; the
   recovery half remains open. The redaction contracts are tested
-  (`test/auth/sign_up_request_test.dart`,
+  (`test/features/auth/sign_up_request_test.dart`,
   `test/features/auth/password_recovery_request_test.dart`); the sign-up
   contract is now exercised at the point PII enters the app, but the recovery
   contract is still built with placeholder values, so that
