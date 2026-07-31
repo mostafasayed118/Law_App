@@ -14,8 +14,9 @@
 > decided, P1 approved); **Batch 4 completed** (`c6d4b69`, `1335512`,
 > `70271d4`, `f909d85`, plus follow-up `be90fd0` — all eight doc-drift
 > targets closed); **Batch 3.1+3.4 completed** (`1042daf`, `e98e61b` —
-> contract-§5 session model, D-T4 resolved, suite 205/205); Batch 3.2/3.3
-> gated on the zero-tables confirmation; Batch 5 queued.
+> contract-§5 session model, D-T4 resolved, suite 205/205); **Batch 3.2
+> completed** (`b1ae361`, `88c3005` — Supabase adapter behind the seam,
+> suite 220/220); Batch 3.3 queued (config); Batch 5 queued.
 >
 > **Governing docs:** `INSTRUCTIONS.md` §2.1/§3 (gates, delivery slices,
 > approval discipline) · `docs/gate3_decision.md` +
@@ -162,19 +163,21 @@ permission matrix · retention/audit documented · rollback plan · no productio
 credentials · **explicit implementation approval recorded in §3**. If any
 precondition is unmet, this batch does not start.
 
-**Status 2026-07-31:** decision-level preconditions met (`94c9607` — blockers
-decided, matrix signed, retention/audit documented, rollback plan, `.env`
-git-ignored, §3 approval recorded) and **D-T4 has landed (`1335512`) and
-been resolved by Batch 3.1** (`1042daf`, `e98e61b` — see rows 3.1/3.4).
-Remaining before 3.2: confirm the dev project has **zero tables/policies**
-(needs Supabase access). Note: `main.dart` does not call
-`AuthCubit.restore()` yet — that startup wiring lands with 3.2; the seam is
-tested, not dead code.
+**Status 2026-08-01:** decision-level preconditions met (`94c9607`) and
+**D-T4 has landed (`1335512`) and been resolved by Batch 3.1** (`1042daf`,
+`e98e61b` — see rows 3.1/3.4). **The zero-tables gate passed 2026-08-01**
+(read-only REST probe: 200, `TABLE_COUNT=0`, no `definitions` block) and
+**Batch 3.2 is complete** (`b1ae361`, `88c3005`): `main.dart` now awaits
+`AuthCubit.restore()` at startup; the seam is tested, not dead code.
+**Finding for 3.3:** the local git-ignored `.env` currently holds a
+`service_role` key (not `anon`; same `iat` as the original — the reset did
+not re-mint it). 3.3 must consume the **anon public key only** and the
+adapter's DI flip must refuse a non-anon key.
 
 | # | Task | File(s) | Exit criterion |
 |---|---|---|---|
 | 3.1 | **DONE** (`1042daf`): session model per contract §5 (`userId`, `memberships`, `expiresAt`), `AuthOutcome`/`AuthFailure`, membership summary behind the `AuthGateway` seam. **Resolved D-T4** (recorded `1335512`, resolved `1042daf`) | `lib/core/auth/*` | presentation cannot grant a role — **met**: no session-level role; UX projection via `activeMembership.primaryRole` |
-| 3.2 | Data: provider adapter (`supabase_flutter`) in the data layer; DTOs/tokens never cross to presentation — **gated on zero-tables/policies confirmation** | `lib/data/auth/*` | boundary tests |
+| 3.2 | **DONE** (`b1ae361`, `88c3005`): provider adapter (`supabase_flutter ^2.16.0`) in the data layer — token-free `SupabaseAuthApi` seam, GoTrue-backed impl (the only file importing provider types), `SupabaseAuthGateway` (restore signed-out/expired/valid, missing expiry → reauthRequired, demo-denial, signOut), `restore()` wired at startup, INTERNET permission for release. DTOs/tokens never cross to presentation — **met**: snapshot surface pinned to `[userId, displayName, expiresAt]`. **Gate passed 2026-08-01**: REST 200 + `TABLE_COUNT=0` (zero tables verified) | `lib/data/auth/*`, `lib/main.dart`, `android/.../AndroidManifest.xml`, `pubspec.yaml` | boundary tests green (suite 220/220) |
 | 3.3 | Config: `--dart-define-from-file` with URL/anon key only; **no service-role key** | build config, `.env.example` stays name-only | no key in VCS |
 | 3.4 | **DONE** (`e98e61b`): Unit/Cubit tests — restore (signed-out/authenticated/expired→reauthRequired/unavailable), startDemoSession, expiry, sign-out, membership transitions with synthetic fakes | new + updated tests | emission-sequence tests green (suite 205/205) |
 
