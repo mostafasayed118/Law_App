@@ -35,7 +35,7 @@ messaging services.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (190 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (222 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), Redactor (password/OTP/email/Bearer redaction
   with leak guards), DI registration graph, validators, router redirect logic
@@ -62,18 +62,24 @@ messaging services.
     form-field + feature widgets, the home no-session fallback pin, the
     router onboarding bypass, the reset-screen success path, the dev
     gateways, the in-memory locale store, and the onboarding-success screen.
-- Coverage: **190 tests** (2026-07-31); `flutter analyze` and the format gate
+    Batch 5 added the 800×600 onboarding no-overflow test and the EN/AR/TR
+    localized-fallback assertions.
+- Coverage: **222 tests** (2026-08-01); `flutter analyze` and the format gate
   clean. The coverage-gap list from the codebase audit (cubit emission
   streams, shared widgets, screen negative paths, router bypass, TR locale,
   reset success path) was closed by Batch 1 of
   [`docs/codebase_audit_plan.md`](docs/codebase_audit_plan.md) and is no
   longer listed here.
-- Tracked deviations: OnboardingScreen desktop overflow (D-T1), domain VOs
-  built but not wired into presentation (D-T2), and the hardcoded `'Jonathan'`
-  fallback (D-T3) are recorded in [`docs/tracked_deviations.md`](docs/tracked_deviations.md).
-  The `primaryContainer` token deviation (`#1A2B3C` vs spec `#0b1d2e`) is
-  recorded as ADR-0006 in [`docs/adr/`](docs/adr/). These are the standing
-  references; this README does not duplicate their detail.
+- Tracked deviations: D-T1 (OnboardingScreen desktop overflow) and D-T3 (the
+  hardcoded `'Jonathan'` fallback) were **resolved by Batch 5** — the carousel
+  page now scrolls at compact heights and the no-session greeting fallback is
+  a localized `homeFallbackName` key (`Guest`/`ضيف`/`Misafir`). D-T2 (domain
+  VOs) was resolved earlier. All are recorded in
+  [`docs/tracked_deviations.md`](docs/tracked_deviations.md). The
+  `primaryContainer` token was **reconciled to the code value `#1A2B3C` by
+  ADR-0008** (supersedes ADR-0006); the spec table now matches the code.
+  These are the standing references; this README does not duplicate their
+  detail.
 
 ## Brand
 
@@ -143,7 +149,7 @@ deviate from the approved spec are recorded as ADRs in [`docs/adr/`](docs/adr/).
 Notable entries: ADR-0001 (brand = LegalHub), ADR-0002 (dark theme approved),
 ADR-0003 (SignUpRequest redaction contract), ADR-0004 (enforce the shared/
 second-use rule; retain ViewStateView), ADR-0005 (canonical primary = #0b1d2e),
-ADR-0006 (primaryContainer remains #1A2B3C as a tracked deviation).
+ADR-0008 (primaryContainer = #1A2B3C, supersedes ADR-0006).
 Known deviations that are not architecture decisions (a deferred render bug,
 unwired-but-tested domain contracts, a hardcoded fixture string) live in
 [`docs/tracked_deviations.md`](docs/tracked_deviations.md).

@@ -14,23 +14,25 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
 
 ---
 
-## D-T1: OnboardingScreen overflows at compact/desktop heights
+## D-T1: OnboardingScreen overflows at compact/desktop heights — **RESOLVED (2026-08-01)**
 
-- **Where:** `lib/features/onboarding/presentation/onboarding_screen.dart`.
-- **Deviation:** The `PageView` page lays out a fixed-height hero container.
-  At the default desktop widget-test surface (800×600) the page area is ~325px
-  tall and the page content overflows by ~139px. A phone-class viewport
-  (411×867) renders correctly. Short real-world devices may still overflow
-  because the page content is not scrollable or flex-sized.
-- **Status:** Tracked, deferred. Not a regression — documented in the README
-  since the onboarding slice landed.
-- **Owner:** Batch 5 of the codebase-audit plan (responsive-hardening slice).
-- **Resolution:** Wrap the page in a `SingleChildScrollView` or make the hero
-  container `Flexible`; verify EN/AR/RTL + light/dark at both 411×867 and
-  800×600 per `INSTRUCTIONS.md` §4.5.
-- **Regression guard:** The existing onboarding widget test pumps at a
-  411×867 phone viewport to avoid the overflow; the fix must keep that test
-  green *and* add a default-surface (800×600) test that currently cannot pass.
+- **Where:** ~~`lib/features/onboarding/presentation/onboarding_screen.dart` —
+  the `PageView` page laid out a fixed-height hero container that overflowed
+  by ~139px at the 800×600 widget-test surface.~~ **Resolved:** the carousel
+  page is now `LayoutBuilder` + `SingleChildScrollView` +
+  `ConstrainedBox(minHeight)` with the content Column centered inside — it
+  centers at phone-class heights and scrolls at compact/desktop heights.
+- **Status:** **RESOLVED (2026-08-01).** The existing 411×867 tests stay green
+  and a default-surface (800×600) test asserting `takeException() == null` was
+  added to `test/features/onboarding/onboarding_screen_test.dart`.
+- **Owner:** Resolved by Batch 5 of the codebase-audit plan
+  (responsive-hardening slice).
+- **Resolution:** Wrap the page in a `SingleChildScrollView` over a
+  `ConstrainedBox` with `minHeight` = viewport minus padding, so the column
+  centers when it fits and scrolls when it does not.
+- **Regression guard:** `onboarding_screen_test.dart` — the 411×867 tests
+  (centered layout unchanged) *and* the new 800×600 test (no overflow
+  exception) both pin the behavior.
 
 ## D-T2: Domain value objects built but not wired into presentation — **RESOLVED (2026-07-31)**
 
@@ -74,20 +76,25 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
   `0d5c66d`; email/OTP threading + disabled resend `83f5bbf`). Retained as a
   historical record.
 
-## D-T3: Hardcoded English fallback display name
+## D-T3: Hardcoded English fallback display name — **RESOLVED (2026-08-01)**
 
-- **Where:** `lib/features/home/presentation/home_screen.dart` — greeting uses
-  `session?.displayName ?? 'Jonathan'`.
+- **Where:** ~~`lib/features/home/presentation/home_screen.dart` — greeting
+  used `session?.displayName ?? 'Jonathan'`.~~ **Resolved:** the fallback is
+  now `l10n.homeFallbackName` — a localized neutral name key
+  (`Guest`/`ضيف`/`Misafir`), so the branch renders localized text in every
+  supported locale instead of a hardcoded English fixture.
 - **Deviation:** A hardcoded English name used as the no-session fallback. Not
   localizable; not synthetic-neutral.
-- **Status:** Tracked, minor. Likely demo-era fixture; flagged for a decision
-  on whether the no-session branch is reachable in practice (the router
-  redirects unauthenticated users away from `/home`).
-- **Owner:** Batch 5 of the codebase-audit plan, pending the reachability
-  decision.
-- **Resolution:** Either localize the fallback (a neutral greeting key) or
-  remove it if the no-session branch is unreachable. Decision needed before
-  coding.
+- **Status:** **RESOLVED (2026-08-01).** The reachability decision: the
+  no-session branch is reachable only by direct pump (the router guard
+  redirects unauthenticated users away from `/home`), so the fallback was
+  **localized, not removed** — keeping the greeting defined for any render
+  context. Pinned in `test/features/home/home_screen_test.dart` with EN
+  (`Hello, Guest`) plus AR/TR assertions proving the key resolves in all
+  locales.
+- **Owner:** Resolved by Batch 5 of the codebase-audit plan.
+- **Resolution:** Add a `homeFallbackName` localization key (EN/AR/TR) and use
+  it as the no-session fallback in the greeting.
 
 ## D-T4: Demo `Session {id, displayName, role}` shape (pre-P1) — **RESOLVED (2026-07-31)**
 
