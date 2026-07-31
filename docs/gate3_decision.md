@@ -13,6 +13,10 @@
 >
 > **Supersedes:** none. This is the first Gate 3 decision for the auth/tenant
 > authorization contract.
+>
+> **Amended by:** `docs/gate3_reconciliation.md` (2026-07-31) — records
+> closeout authorization, the realized §3.1 file set, §4 screen
+> reclassification, and the §10.2/§10.5 sole-owner assignment.
 
 ---
 
@@ -64,8 +68,8 @@ open as §10.6 and are required before P2/P3.
 
 | §10 item | Assignment | Status |
 |---|---|---|
-| §10.2 Jurisdiction and policy owner (D-03) | **[YOUR NAME / ROLE]** | **PLACEHOLDER — NOT YET ASSIGNED.** The owner's acceptance message carried the literal token `[YOUR NAME / ROLE]`; an actual named owner has not yet been provided. This field must be filled with a real name/role before P2 begins, and before the contract's human-accountability clauses can be treated as having an assignee. |
-| §10.5 Human-authority owner (D-06) | **[YOUR NAME / ROLE]** | **PLACEHOLDER — NOT YET ASSIGNED.** Same as §10.2: literal token provided, real owner not yet named. Must be filled before P2 begins. |
+| §10.2 Jurisdiction and policy owner (D-03) | `Project Owner (github.com/mostafasayed118)` | **ASSIGNED (2026-07-31).** Filled via `docs/gate3_reconciliation.md` §6/§10; the underlying jurisdiction/policy *decision* remains open per that amendment. |
+| §10.5 Human-authority owner (D-06) | `Project Owner (github.com/mostafasayed118)` | **ASSIGNED (2026-07-31).** Filled via `docs/gate3_reconciliation.md` §6/§10; the underlying authority-model *decision* remains open per that amendment. |
 
 **All other §10 blockers remain open and are not assigned by this record.**
 See §4 below for per-phase gating.
@@ -167,7 +171,7 @@ The following remain excluded regardless of the §3 permitted slice:
 
 | Phase | Status after this decision | Authorization required to proceed |
 |---|---|---|
-| P0 — Decision capture | Partially advanced: §5 policy shape confirmed; §10.2/§10.5 placeholders only. | Close §10.2, §10.5 with real owners; close §10.1 (product model), §10.7 (org semantics), §10.8 (role vocabulary) before P2. |
+| P0 — Decision capture | Partially advanced: §5 policy shape confirmed; §10.2/§10.5 assigned to the project owner (2026-07-31, per `docs/gate3_reconciliation.md`). | Close §10.1 (product model), §10.7 (org semantics), §10.8 (role vocabulary) before P2. |
 | P1 — Domain contracts + synthetic adapter | **Approved (design-only, Option C).** WIP remains uncommitted. | Separate closeout/commit authorization from the owner. |
 | P2 — Non-production schema + enforcement | Not authorized. | All §10 blockers relevant to identity/tenant decided; non-production backend available; signed permission matrix; retention/deletion/audit documented; rollback plan; mandatory Supabase/RLS review gate (bootstrap spec §6/§9). |
 | P3 — Auth + org UX | Not authorized. | P2 exit (cross-tenant denial proven across every access path) + explicit P3 approval. |
@@ -182,9 +186,14 @@ real-data feature" (§6/§9) remains in force and independently blocks P2.
 
 The following must be closed before the corresponding next step:
 
-1. **§10.2 (D-03) jurisdiction/policy owner** — real name/role required (the
-   `[YOUR NAME / ROLE]` token is not an assignment).
-2. **§10.5 (D-06) human-authority owner** — real name/role required (same).
+1. **§10.2 (D-03) jurisdiction/policy owner** — **SATISFIED (2026-07-31):**
+   assigned to `Project Owner (github.com/mostafasayed118)` per
+   `docs/gate3_reconciliation.md` §6/§10; the underlying jurisdiction/policy
+   *decision* remains open per that amendment.
+2. **§10.5 (D-06) human-authority owner** — **SATISFIED (2026-07-31):**
+   assigned to `Project Owner (github.com/mostafasayed118)` per
+   `docs/gate3_reconciliation.md` §6/§10; the underlying authority-model
+   *decision* remains open per that amendment.
 3. **§10.1 (D-02) product model** — firm/marketplace/portal/combo; required
    before P2.
 4. **§10.6 authentication policy** — full production policy (MFA, SSO/SCIM,
