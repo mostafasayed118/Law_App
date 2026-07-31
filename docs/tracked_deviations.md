@@ -89,20 +89,26 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
   remove it if the no-session branch is unreachable. Decision needed before
   coding.
 
-## D-T4: Demo `Session {id, displayName, role}` shape (pre-P1)
+## D-T4: Demo `Session {id, displayName, role}` shape (pre-P1) — **RESOLVED (2026-07-31)**
 
-- **Where:** `lib/core/auth/auth_state.dart` / `lib/data/auth/fake_auth_gateway.dart`
-  (`Session {id, displayName, role}`) and `lib/core/roles/user_role.dart`
-  (UX-only capability map).
-- **Deviation:** The bootstrap demo session carries a single client-visible
-  `role` — technically the shape contract §5 said a future production session
-  must not rely on as the authority. Safe only because the demo session is
-  explicitly non-production and non-authoritative (`FakeAuthGateway` wording,
-  gate3 §3.3), the capability map is documented UX-only, and no server exists
-  to be fooled by a client role.
-- **Status:** Tracked. Resolved by Batch 3.1 (contract-P1 session model:
-  provider-derived `userId`, `memberships`, `expiresAt` — no single
-  client-owned `role`). **Must be recorded here before Batch 3.1 starts** (see
-  the audit plan's Batch 3 dependency note).
-- **Owner:** Batch 3 of the codebase-audit plan (domain session model).
+- **Where:**
+  - ~~`lib/core/auth/auth_state.dart` / `lib/data/auth/fake_auth_gateway.dart`
+    (`Session {id, displayName, role}`) and `lib/core/roles/user_role.dart`
+    (UX-only capability map).~~ **Resolved (`1042daf`):** the demo session
+    now carries the contract-§5 shape — `Session {userId, displayName,
+    memberships, expiresAt}` with **no single client-owned `role`**.
+- **Deviation:** The bootstrap demo session used to carry a single
+  client-visible `role` — technically the shape contract §5 said a future
+  production session must not rely on as the authority. Safe only while the
+  demo session is explicitly non-production and non-authoritative
+  (`FakeAuthGateway` wording, gate3 §3.3), the capability map is documented
+  UX-only, and no server exists to be fooled by a client role.
+- **Status:** **RESOLVED (2026-07-31, `1042daf`).** Batch 3.1 replaced the
+  demo shape with the contract-§5 model: roles now live only inside
+  `OrganizationMembership` with explicit lifecycle status, and presentation
+  reads a UX-only `primaryRole` projection from the active membership — it
+  cannot grant itself a role. Expired sessions resolve to `reauthRequired`
+  rather than a misleading authenticated state.
+- **Owner:** Resolved by Batch 3 of the codebase-audit plan (domain session
+  model).
 - **Cross-reference:** `docs/gate3_reconciliation.md` §7.

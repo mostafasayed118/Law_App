@@ -13,8 +13,9 @@
 > (`d8ec850`–`a508013`, +54 tests); **Batch 2 completed** (`94c9607`, P0
 > decided, P1 approved); **Batch 4 completed** (`c6d4b69`, `1335512`,
 > `70271d4`, `f909d85`, plus follow-up `be90fd0` — all eight doc-drift
-> targets closed); Batches 3 and 5 queued — Batch 3 decision-gate met and
-> its D-T4 dependency recorded (`1335512`).
+> targets closed); **Batch 3.1+3.4 completed** (`1042daf`, `e98e61b` —
+> contract-§5 session model, D-T4 resolved, suite 205/205); Batch 3.2/3.3
+> gated on the zero-tables confirmation; Batch 5 queued.
 >
 > **Governing docs:** `INSTRUCTIONS.md` §2.1/§3 (gates, delivery slices,
 > approval discipline) · `docs/gate3_decision.md` +
@@ -163,17 +164,19 @@ precondition is unmet, this batch does not start.
 
 **Status 2026-07-31:** decision-level preconditions met (`94c9607` — blockers
 decided, matrix signed, retention/audit documented, rollback plan, `.env`
-git-ignored, §3 approval recorded) and **Batch 4.4 (D-T4) has landed
-(`1335512`)** — the pre-3.1 dependency is satisfied. Remaining discovery
-before 3.2: confirm the dev project has **zero tables/policies** (needs
-Supabase access).
+git-ignored, §3 approval recorded) and **D-T4 has landed (`1335512`) and
+been resolved by Batch 3.1** (`1042daf`, `e98e61b` — see rows 3.1/3.4).
+Remaining before 3.2: confirm the dev project has **zero tables/policies**
+(needs Supabase access). Note: `main.dart` does not call
+`AuthCubit.restore()` yet — that startup wiring lands with 3.2; the seam is
+tested, not dead code.
 
 | # | Task | File(s) | Exit criterion |
 |---|---|---|---|
-| 3.1 | Domain: session model per contract §5 (`userId`, `memberships`, `expiresAt`), `AuthOutcome`/`AuthFailure`, membership summary behind the `AuthGateway` seam. Resolves the D-T4 demo-session shape — **D-T4 must be recorded in the ledger (Batch 4.4) before this lands** | `lib/core/auth/*`, `lib/features/auth/domain/*` | presentation cannot grant a role |
-| 3.2 | Data: provider adapter (`supabase_flutter`) in the data layer; DTOs/tokens never cross to presentation | `lib/data/auth/*` | boundary tests |
+| 3.1 | **DONE** (`1042daf`): session model per contract §5 (`userId`, `memberships`, `expiresAt`), `AuthOutcome`/`AuthFailure`, membership summary behind the `AuthGateway` seam. **Resolved D-T4** (recorded `1335512`, resolved `1042daf`) | `lib/core/auth/*` | presentation cannot grant a role — **met**: no session-level role; UX projection via `activeMembership.primaryRole` |
+| 3.2 | Data: provider adapter (`supabase_flutter`) in the data layer; DTOs/tokens never cross to presentation — **gated on zero-tables/policies confirmation** | `lib/data/auth/*` | boundary tests |
 | 3.3 | Config: `--dart-define-from-file` with URL/anon key only; **no service-role key** | build config, `.env.example` stays name-only | no key in VCS |
-| 3.4 | Unit/Cubit tests: restore, sign-in, reset, expiry, sign-out, membership transitions with synthetic fakes | new tests | emission-sequence tests green |
+| 3.4 | **DONE** (`e98e61b`): Unit/Cubit tests — restore (signed-out/authenticated/expired→reauthRequired/unavailable), startDemoSession, expiry, sign-out, membership transitions with synthetic fakes | new + updated tests | emission-sequence tests green (suite 205/205) |
 
 **Acceptance (gate3 §5):** P1 exit = "Flutter presentation cannot grant a
 role or bypass a denied result." Org-a/org-b policy tests belong to P2, not
