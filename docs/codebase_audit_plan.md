@@ -9,8 +9,8 @@
 > **Status:** REVISED 2026-07-31 — incorporates the four delta rows from the
 > forensic audit (CI present, Gate 3 paper-trail gap, concrete doc-drift
 > targets, gitignore gaps). Step 0 is **committed** (`45b0a48`); Batch 0 is
-> partially executed (`ed38fd6` gitignore; decisions 0.3/0.4 made); Batches
-> 1–5 are queued.
+> **completed** (`ed38fd6`–`601a2c0`, pushed); **Batch 1 committed**
+> (`d8ec850`–`a508013`, +54 tests); Batches 2–5 are queued.
 >
 > **Governing docs:** `INSTRUCTIONS.md` §2.1/§3 (gates, delivery slices,
 > approval discipline) · `docs/gate3_decision.md` +
@@ -118,7 +118,7 @@ ones).
 | 1.7 | Reset-screen **success** path (snackbar + navigate to sign-in) — only error path is tested | `forgot_password_reset_screen_test.dart` | success asserted |
 | 1.8 | Refresh email/OTP step tests to `83f5bbf` reality (threading + disabled "Resend") — current step tests predate the screen change (`57e60d4`) | `forgot_password_steps_test.dart` | no stale assertions |
 | 1.9 | Direct unit tests: `fake_sign_up_gateway`, `fake_password_recovery_gateway`, `in_memory_locale_store`, `onboarding_success_screen`, `ConsoleErrorReporter`/`InMemoryErrorReporter` (Redactor is covered; reporters aren't) | new test files | suite green |
-| 1.10 | Normalize test layout: `test/auth/` → `test/features/auth/` (two files sit at the root level today) | `test/auth/*` | `git mv` + green suite |
+| 1.10 | **DONE** (`a508013`): normalized test layout — `test/auth/` → `test/features/auth/` (both stragglers relocated; ADR-0001 + D-T2 path refs updated) | relocated files + doc refs | suite green (190/190) |
 
 **Acceptance:** the README coverage-gap list shrinks to zero or becomes an
 explicit, dated deferral list. **Verification:** `flutter test` +
