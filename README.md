@@ -24,28 +24,52 @@ messaging services.
   settings. SignUp/forgot-password validate and navigate only — no Cubit yet.
 - `SignUpRequest` pure-domain value object (features/auth/domain) with a
   redaction contract: `toRedactedMap()` is safe to embed in `AppError.context`.
-- Tests: Result, AuthCubit, LocaleCubit, Redactor, DI, validators, router
-  redirect logic, sign-in screen behavior (including error snackbar), the
-  forgot-password reset confirm-password validator, home screen EN + AR/RTL
-  copy, use-case and role-contract primitives, SharedPreferences locale store,
-  SignUpRequest redaction invariants, the end-to-end boot/locale-switch
-  widget flow, and onboarding carousel/success routing (57 tests total).
-- Coverage gaps (tracked for later batches): sign-up screen,
-  forgot-password email and OTP screens, settings screen,
-  `legalhub_theme`, and the shared widgets have no dedicated tests yet.
-  Onboarding screens have a passing widget test (carousel navigation, brand
-  remediation, and onboarding-success routing) that pumps at a 411x867 phone
-  viewport.
-- Responsive finding (tracked, not fixed): `OnboardingScreen` lays out a
-  fixed-height hero container inside a `PageView` page. At the default
-  desktop widget-test surface (800x600) the page area is 325px tall and the
-  page content overflows by ~139px. A phone-class viewport (411x867) renders
-  correctly, and short real-world devices may still overflow because the page
-  content is not scrollable or flex-sized. The fix (wrap the page in a
-  `SingleChildScrollView` or make the hero container `Flexible`) is a UI
-  slice that needs EN/AR/RTL + light/dark + compact/wide checks per
-  `INSTRUCTIONS.md` §4.5 and is deferred to a dedicated responsive-hardening
-  batch.
+- Tests (118 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+  session + gateway-failure error path), LocaleCubit (locale persistence +
+  unsupported-code rejection), Redactor (password/OTP/email/Bearer redaction
+  with leak guards), DI registration graph, validators, router redirect logic
+  (unauthenticated-deny + authenticated-redirect), sign-in screen (welcome copy
+  + empty-form blocking + valid submit + forgot link + error snackbar),
+  sign-up screen (title + 4 fields + terms-checkbox gating + invalid-form
+  blocking + stub-submit snackbar/route), forgot-password email step (empty
+  blocking + valid-email route), forgot-password OTP step (disabled-until-6-
+  digits + route), `OtpFieldRow` (length, code concatenation, clear,
+  completion notifier), forgot-password reset screen (confirm-password
+  stale-capture regression + ViewStateView error surface + retry), home screen
+  (EN + AR/RTL localized activity cards), settings screen (title + language
+  dropdown + demo-session notice + sign-out + locale switch), onboarding
+  carousel/success (page advance + Skip + Get Started + success routing),
+  SharedPreferences locale store (round-trip + stale-code rejection +
+  supported-code acceptance), SignUpRequest redaction invariants,
+  PasswordRecoveryRequest redaction invariants, and the end-to-end boot /
+  locale-switch widget flow.
+- Coverage gaps (tracked for later batches):
+  - **Cubit emission streams** — `AuthCubit`, `PasswordRecoveryCubit`, and
+    `LocaleCubit` transitions are asserted via terminal state only, not
+    `blocTest` emission sequences. Loading→success/error transitions are
+    proven only at the destination, not as a stream.
+  - **Shared widgets** — `ViewStateView` is exercised only on its error
+    branch (via the reset screen test); loading/empty/success/offline/
+    unauthorized branches are untested. `PasswordField` (obscure toggle),
+    `LegalHubTextField`, `LabelledField`, `home_cards`, and `auth_buttons`
+    have no dedicated tests (indirect coverage via their consuming screens
+    only).
+  - **Screen negative paths** — `settings`, `home`, and `onboarding` screens
+    are happy-path-only. The `home_screen` no-session `'Jonathan'` fallback
+    branch is not exercised.
+  - **Router bypass** — the onboarding/onboarding-success routes are reachable
+    while unauthenticated (`router.dart` redirect bypass), but no test asserts
+    this; only the deny and authenticated-redirect paths are covered.
+  - **TR locale** — only EN and AR are asserted in any test; TR translations
+    are never loaded/exercised.
+  - **Reset-screen success path** — only the error path is tested; the
+    success/snackbar/navigation path is not.
+- Tracked deviations: OnboardingScreen desktop overflow (D-T1), domain VOs
+  built but not wired into presentation (D-T2), and the hardcoded `'Jonathan'`
+  fallback (D-T3) are recorded in [`docs/tracked_deviations.md`](docs/tracked_deviations.md).
+  The `primaryContainer` token deviation (`#1A2B3C` vs spec `#0b1d2e`) is
+  recorded as ADR-0006 in [`docs/adr/`](docs/adr/). These are the standing
+  references; this README does not duplicate their detail.
 
 ## Brand
 
@@ -62,6 +86,25 @@ boundary and ship with corresponding policy tests before it is exposed here.
 
 No Supabase client, Sentry SDK, service-role key, credential form, production
 auth flow, or real legal/client data is included.
+
+### Secret and environment posture
+
+- `.env.example` is **names-only**: `SUPABASE_URL=` and `SUPABASE_ANON_KEY=` with
+  no values. It documents the variables the app will one day consume; it does
+  not contain secrets.
+- `.gitignore` excludes every env variant (`.env`, `.env.*`, `*.env`,
+  `*.env.*`) except `.env.example` itself, so a local `.env` is never
+  committed.
+- A **service-role key is never permitted on the Flutter client.** Only the
+  approved public Supabase URL/anon configuration belongs in a client build,
+  injected at build time via `--dart-define(-from-file)`. Service-role keys
+  and privileged credentials belong only in controlled server/edge-function
+  environments.
+- No backend SDK is imported anywhere in `lib/` — a codebase audit confirmed
+  zero references to `supabase`, `firebase`, `paymob`, `http`, `dio`, `sqflite`,
+  or `hive`. The only `Supabase` mention in code is a comment in
+  `core/observability/error_reporter.dart` stating it is a future integration
+  that must not be wired into the client now.
 
 ## Run and verify
 
@@ -92,4 +135,8 @@ Architecture and product decisions that are expensive to reverse or that
 deviate from the approved spec are recorded as ADRs in [`docs/adr/`](docs/adr/).
 Notable entries: ADR-0001 (brand = LegalHub), ADR-0002 (dark theme approved),
 ADR-0003 (SignUpRequest redaction contract), ADR-0004 (enforce the shared/
-second-use rule; retain ViewStateView).
+second-use rule; retain ViewStateView), ADR-0005 (canonical primary = #0b1d2e),
+ADR-0006 (primaryContainer remains #1A2B3C as a tracked deviation).
+Known deviations that are not architecture decisions (a deferred render bug,
+unwired-but-tested domain contracts, a hardcoded fixture string) live in
+[`docs/tracked_deviations.md`](docs/tracked_deviations.md).
