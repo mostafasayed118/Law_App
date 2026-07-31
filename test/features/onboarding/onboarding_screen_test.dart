@@ -65,6 +65,22 @@ void main() {
       expect(find.textContaining('Lexis'), findsNothing);
     });
 
+    testWidgets('renders without overflow at the default 800x600 surface', (
+      tester,
+    ) async {
+      // Default widget-test surface is 800x600 — the D-T1 compact/desktop
+      // height that previously overflowed the fixed-height page content by
+      // ~139px. The scrollable page (LayoutBuilder + SingleChildScrollView)
+      // must absorb it without a RenderFlex overflow exception.
+      await tester.pumpWidget(pumpIsolated());
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Expert Legal Advice'), findsOneWidget);
+      expect(find.text('Continue'), findsOneWidget);
+      expect(find.text('SKIP'), findsOneWidget);
+    });
+
     testWidgets('advances through the carousel via the Continue button', (
       tester,
     ) async {
