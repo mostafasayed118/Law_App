@@ -1,10 +1,14 @@
 # LegalHub — B2 CI quality gates.
 # Bootstrap specification §7 (row B2) + §3.11: run `dart format` (check),
-# `flutter analyze`, and `flutter test` on pull requests targeting main.
+# `flutter analyze`, and `flutter test` on pushes to main and pull requests
+# targeting main.
 # No build, deploy, publish, signing, or release steps are authorized at B2.
 name: CI
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
