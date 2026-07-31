@@ -74,25 +74,28 @@ void main() {
       expect(redacted.values.join(), isNot(contains('amira@example.com')));
     });
 
-    test('toRedactedMap is safe to feed into AppError.context (idempotent)', () {
-      const PasswordRecoveryRequest request = PasswordRecoveryRequest(
-        email: 'amira@example.com',
-        otp: '123456',
-        newPassword: 'super-secret-123',
-      );
+    test(
+      'toRedactedMap is safe to feed into AppError.context (idempotent)',
+      () {
+        const PasswordRecoveryRequest request = PasswordRecoveryRequest(
+          email: 'amira@example.com',
+          otp: '123456',
+          newPassword: 'super-secret-123',
+        );
 
-      // The redaction contract: the diagnostic map produced by
-      // PasswordRecoveryRequest is already sanitized, and re-running it
-      // through Redactor.map must be idempotent (no clear-text leaks even if
-      // the consumer re-redacts).
-      final Map<String, Object?> once = request.toRedactedMap();
-      final Map<String, Object?> twice = Redactor.map(once);
+        // The redaction contract: the diagnostic map produced by
+        // PasswordRecoveryRequest is already sanitized, and re-running it
+        // through Redactor.map must be idempotent (no clear-text leaks even if
+        // the consumer re-redacts).
+        final Map<String, Object?> once = request.toRedactedMap();
+        final Map<String, Object?> twice = Redactor.map(once);
 
-      expect(twice, once);
-      expect(twice.values.join(), isNot(contains('super-secret-123')));
-      expect(twice.values.join(), isNot(contains('123456')));
-      expect(twice.values.join(), isNot(contains('amira@example.com')));
-    });
+        expect(twice, once);
+        expect(twice.values.join(), isNot(contains('super-secret-123')));
+        expect(twice.values.join(), isNot(contains('123456')));
+        expect(twice.values.join(), isNot(contains('amira@example.com')));
+      },
+    );
 
     test('produces a PasswordRecoveryRequest from validated raw input', () {
       final PasswordRecoveryRequest request = PasswordRecoveryRequest.fromRaw(

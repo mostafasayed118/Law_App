@@ -10,8 +10,11 @@ import 'package:legalhub/features/auth/presentation/forgot_password/otp_field_ro
 // OtpFieldRow's TextFields need a Material ancestor (MaterialApp.home alone does
 // not provide one), so each pump wraps the row in a Scaffold.
 void main() {
-  Widget pumpRow({int length = 6, GlobalKey<OtpFieldRowState>? key,
-      ValueNotifier<bool>? notifier}) {
+  Widget pumpRow({
+    int length = 6,
+    GlobalKey<OtpFieldRowState>? key,
+    ValueNotifier<bool>? notifier,
+  }) {
     return MaterialApp(
       home: Scaffold(
         body: OtpFieldRow(
@@ -73,8 +76,9 @@ void main() {
     await tester.pump();
 
     expect(key.currentState?.code, '');
-    for (final TextField t
-        in tester.widgetList<TextField>(find.byType(TextField))) {
+    for (final TextField t in tester.widgetList<TextField>(
+      find.byType(TextField),
+    )) {
       expect(t.controller?.text, '');
     }
   });

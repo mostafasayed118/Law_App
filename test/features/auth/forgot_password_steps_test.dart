@@ -124,21 +124,22 @@ void main() {
   });
 
   group('ForgotPasswordOtpScreen (step 2)', () {
-    testWidgets('renders the verify-email title and is disabled until 6 digits', (
-      tester,
-    ) async {
-      await tester.pumpWidget(pumpAt(AppRoutes.forgotPasswordOtp));
-      await tester.pumpAndSettle();
+    testWidgets(
+      'renders the verify-email title and is disabled until 6 digits',
+      (tester) async {
+        await tester.pumpWidget(pumpAt(AppRoutes.forgotPasswordOtp));
+        await tester.pumpAndSettle();
 
-      expect(find.text('Verify Email'), findsOneWidget);
-      expect(find.text('Verify & Continue'), findsOneWidget);
+        expect(find.text('Verify Email'), findsOneWidget);
+        expect(find.text('Verify & Continue'), findsOneWidget);
 
-      // No digits entered: the verify button is disabled (onPressed null).
-      final ElevatedButton button = tester.widget<ElevatedButton>(
-        find.byType(ElevatedButton).first,
-      );
-      expect(button.onPressed, isNull);
-    });
+        // No digits entered: the verify button is disabled (onPressed null).
+        final ElevatedButton button = tester.widget<ElevatedButton>(
+          find.byType(ElevatedButton).first,
+        );
+        expect(button.onPressed, isNull);
+      },
+    );
 
     testWidgets(
       'enables Verify & Continue once all 6 digits cells are filled and routes to reset',

@@ -35,31 +35,37 @@ void main() {
       expect(error.context, isEmpty);
     });
 
-    test('toLogMap flattens code, userMessage, technicalMessage, and context', () {
-      const AppError error = AppError(
-        code: 'recovery_failed',
-        userMessage: 'Recovery failed',
-        technicalMessage: 'edge timeout',
-        context: <String, Object?>{'attempt': 2},
-      );
+    test(
+      'toLogMap flattens code, userMessage, technicalMessage, and context',
+      () {
+        const AppError error = AppError(
+          code: 'recovery_failed',
+          userMessage: 'Recovery failed',
+          technicalMessage: 'edge timeout',
+          context: <String, Object?>{'attempt': 2},
+        );
 
-      final Map<String, Object?> map = error.toLogMap();
+        final Map<String, Object?> map = error.toLogMap();
 
-      expect(map['code'], 'recovery_failed');
-      expect(map['message'], 'Recovery failed');
-      expect(map['technical_message'], 'edge timeout');
-      expect(map['context'], <String, Object?>{'attempt': 2});
-    });
+        expect(map['code'], 'recovery_failed');
+        expect(map['message'], 'Recovery failed');
+        expect(map['technical_message'], 'edge timeout');
+        expect(map['context'], <String, Object?>{'attempt': 2});
+      },
+    );
 
-    test('toLogMap omits technicalMessage when null and context when empty', () {
-      const AppError error = AppError(code: 'x', userMessage: 'm');
+    test(
+      'toLogMap omits technicalMessage when null and context when empty',
+      () {
+        const AppError error = AppError(code: 'x', userMessage: 'm');
 
-      final Map<String, Object?> map = error.toLogMap();
+        final Map<String, Object?> map = error.toLogMap();
 
-      expect(map.containsKey('technical_message'), isFalse);
-      expect(map.containsKey('context'), isFalse);
-      expect(map.keys, <String>['code', 'message']);
-    });
+        expect(map.containsKey('technical_message'), isFalse);
+        expect(map.containsKey('context'), isFalse);
+        expect(map.keys, <String>['code', 'message']);
+      },
+    );
 
     // The class doc states protected content, credentials, and session
     // material must never be passed as diagnostic context. AppError does not

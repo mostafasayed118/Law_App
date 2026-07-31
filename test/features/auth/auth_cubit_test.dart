@@ -62,10 +62,8 @@ void main() {
       'emits [loading, error] and reports a redacted error when the gateway '
       'fails',
       setUp: () => _failingReporter = InMemoryErrorReporter(),
-      build: () => AuthCubit(
-        _FailingAuthGateway(_gatewayFailure),
-        _failingReporter,
-      ),
+      build: () =>
+          AuthCubit(_FailingAuthGateway(_gatewayFailure), _failingReporter),
       act: (AuthCubit cubit) => cubit.startDemoSession(),
       expect: () => <AuthState>[
         const AuthState(status: AuthStatus.loading),
@@ -76,8 +74,7 @@ void main() {
         // must reach the reporter masked, never in clear text.
         expect(_failingReporter.reports, hasLength(1));
         final Map<String, Object?> context =
-            _failingReporter.reports.single['context']!
-                as Map<String, Object?>;
+            _failingReporter.reports.single['context']! as Map<String, Object?>;
         expect(context['email'], '[REDACTED]');
       },
     );
@@ -154,14 +151,13 @@ class _NullSessionGateway implements AuthGateway {
   Stream<Session?> get sessionChanges => const Stream<Session?>.empty();
 
   @override
-  Future<Result<Session>> startDemoSession() async =>
-      Result<Session>.success(
-        const Session(
-          id: 'demo-session',
-          displayName: 'Demo user',
-          role: UserRole.client,
-        ),
-      );
+  Future<Result<Session>> startDemoSession() async => Result<Session>.success(
+    const Session(
+      id: 'demo-session',
+      displayName: 'Demo user',
+      role: UserRole.client,
+    ),
+  );
 
   @override
   Future<void> signOut() async {}

@@ -65,11 +65,9 @@ class _ForgotPasswordResetScreenState extends State<ForgotPasswordResetScreen> {
               onPressed: () => context.go(AppRoutes.forgotPasswordOtp),
             ),
             child: BlocListener<PasswordRecoveryCubit, ViewState<void>>(
-              listenWhen: (
-                ViewState<void> previous,
-                ViewState<void> current,
-              ) =>
-                  current is ViewSuccess<void> && previous is! ViewSuccess<void>,
+              listenWhen: (ViewState<void> previous, ViewState<void> current) =>
+                  current is ViewSuccess<void> &&
+                  previous is! ViewSuccess<void>,
               listener: (BuildContext context, ViewState<void> state) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(l10n.resetSuccessNotice)),
@@ -94,10 +92,10 @@ class _ForgotPasswordResetScreenState extends State<ForgotPasswordResetScreen> {
                       controller: _confirm,
                       label: l10n.confirmPasswordLabel,
                       hint: l10n.passwordPlaceholder,
-                      validator: (value) =>
-                          LegalHubValidators.matches(l10n, _password.text)(
-                        value,
-                      ),
+                      validator: (value) => LegalHubValidators.matches(
+                        l10n,
+                        _password.text,
+                      )(value),
                     ),
                     const SizedBox(height: LegalHubTheme.spaceXl),
                     BlocBuilder<PasswordRecoveryCubit, ViewState<void>>(
@@ -120,7 +118,9 @@ class _ForgotPasswordResetScreenState extends State<ForgotPasswordResetScreen> {
                                 ),
                               ),
                             LoadingElevatedButton(
-                              onPressed: loading ? null : () => _submit(context),
+                              onPressed: loading
+                                  ? null
+                                  : () => _submit(context),
                               label: l10n.resetPasswordButton,
                               loading: loading,
                               icon: Icons.lock_outline,

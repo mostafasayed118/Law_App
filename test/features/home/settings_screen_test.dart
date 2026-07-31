@@ -79,24 +79,25 @@ void main() {
     },
   );
 
-  testWidgets('sign-out button invokes AuthCubit.signOut and clears the session', (
-    tester,
-  ) async {
-    await tester.pumpWidget(pumpScreen());
-    await tester.pumpAndSettle();
+  testWidgets(
+    'sign-out button invokes AuthCubit.signOut and clears the session',
+    (tester) async {
+      await tester.pumpWidget(pumpScreen());
+      await tester.pumpAndSettle();
 
-    // Authenticate first so the sign-out button has a session to clear.
-    await authCubit.startDemoSession();
-    await tester.pumpAndSettle();
-    expect(authCubit.state.isAuthenticated, isTrue);
+      // Authenticate first so the sign-out button has a session to clear.
+      await authCubit.startDemoSession();
+      await tester.pumpAndSettle();
+      expect(authCubit.state.isAuthenticated, isTrue);
 
-    // Tap the "End demo session" outlined button.
-    await tester.tap(find.text('End demo session'));
-    await tester.pumpAndSettle();
+      // Tap the "End demo session" outlined button.
+      await tester.tap(find.text('End demo session'));
+      await tester.pumpAndSettle();
 
-    expect(authCubit.state.isAuthenticated, isFalse);
-    expect(authCubit.state.status, AuthStatus.unauthenticated);
-  });
+      expect(authCubit.state.isAuthenticated, isFalse);
+      expect(authCubit.state.status, AuthStatus.unauthenticated);
+    },
+  );
 
   testWidgets('selecting a locale from the dropdown updates LocaleCubit', (
     tester,

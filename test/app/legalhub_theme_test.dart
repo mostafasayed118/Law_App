@@ -9,11 +9,14 @@ import 'package:legalhub/app/legalhub_theme.dart';
 // elevated buttons, and links.
 void main() {
   group('LegalHubTheme light tokens (ADR-0005)', () {
-    test('light ColorScheme.primary is the canonical Midnight Blue #0b1d2e', () {
-      final ThemeData light = LegalHubTheme.light;
+    test(
+      'light ColorScheme.primary is the canonical Midnight Blue #0b1d2e',
+      () {
+        final ThemeData light = LegalHubTheme.light;
 
-      expect(light.colorScheme.primary, const Color(0xFF0B1D2E));
-    });
+        expect(light.colorScheme.primary, const Color(0xFF0B1D2E));
+      },
+    );
 
     test(
       'light primaryContainer is #1A2B3C — a tracked deviation from spec #0b1d2e',
