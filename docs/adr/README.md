@@ -8,6 +8,7 @@
 | [0004](0004-shared-second-use-rule-and-viewstateview.md) | Enforce the shared/ second-use rule; retain ViewStateView | Accepted |
 | [0005](0005-canonical-primary-is-0b1d2e.md) | Canonical primary token is Midnight Blue #0b1d2e | Accepted |
 | [0006](0006-primarycontainer-tracked-deviation.md) | primaryContainer remains #1A2B3C (tracked deviation from spec #0b1d2e) | Accepted (deviation recorded, not reconciled) |
+| [0007](0007-no-backend-until-p0-closes.md) | No backend package until P0 closes; backend-free batches proceed | Accepted |
 
 ADRs record decisions that are expensive to reverse or that deviate from an
 approved specification. They do not approve deferred work; they make implicit
