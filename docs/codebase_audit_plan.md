@@ -10,7 +10,8 @@
 > forensic audit (CI present, Gate 3 paper-trail gap, concrete doc-drift
 > targets, gitignore gaps). Step 0 is **committed** (`45b0a48`); Batch 0 is
 > **completed** (`ed38fd6`–`601a2c0`, pushed); **Batch 1 committed**
-> (`d8ec850`–`a508013`, +54 tests); Batches 2–5 are queued.
+> (`d8ec850`–`a508013`, +54 tests); **Batch 2 completed** (`94c9607`, P0
+> decided, P1 approved); Batches 3–5 queued — Batch 3 decision-gate met.
 >
 > **Governing docs:** `INSTRUCTIONS.md` §2.1/§3 (gates, delivery slices,
 > approval discipline) · `docs/gate3_decision.md` +
@@ -134,11 +135,11 @@ placeholders **replaced** (`45b0a48`).
 
 | # | Task | File(s) | Verification |
 |---|---|---|---|
-| 2.1 | For each blocker **D-02…D-10b**: record Owner + Decision + Decided-on, **or** a dated deferral with owner + risk note. No decision is a decision without owner+date | `p0_decision_capture.md` §1 | every row has owner+date |
-| 2.2 | Fill the §2 P1-readiness checklist (6 boxes) as items close; record the Supabase project ref/region when available | `p0_decision_capture.md` §2 | boxes reflect reality |
-| 2.3 | Populate the §3 slice-map approvals table as approvals are granted (empty today) | `p0_decision_capture.md` §3 | approvals recorded |
+| 2.1 | **DONE** (`94c9607`): all ten blockers D-02…D-10b recorded with Owner + Decision + Decided-on (2026-07-31) | `p0_decision_capture.md` §1 | every row has owner+date |
+| 2.2 | **DONE** (`94c9607`): §2 P1-readiness checklist fully satisfied — dev project provisioned (`eu-central-1`), ref kept in the local git-ignored `.env` by owner's choice, rollback plan + permission matrix in place | `p0_decision_capture.md` §2 | boxes reflect reality |
+| 2.3 | **DONE** (`94c9607`): §3 slice-map approvals populated — P1 **APPROVED** by Project Owner 2026-07-31 | `p0_decision_capture.md` §3 | approvals recorded |
 | 2.4 | **DONE** (`45b0a48`): §10.2/§10.5 owner identity recorded in `gate3_decision.md` §2.2 per `gate3_reconciliation.md` §6/§10 — recorded via the amendment's commit; the record's §9 mechanism wording is separately tracked as 4.8 | `gate3_decision.md` | placeholders replaced in `45b0a48` |
-| 2.5 | Highest-leverage answers to drive first (§4 open questions): D-02 product model, D-03 jurisdiction owner, D-04 provider project, D-07 auth policy, permission matrix | — | answered in §1/§2 |
+| 2.5 | **DONE** (`94c9607`): §4 open questions resolved (D-02 product model, D-03 jurisdiction owner, D-04 provider project, D-07 auth policy, permission matrix) | `p0_decision_capture.md` §4 | answered in §1/§2 |
 
 **Acceptance:** the P0 ledger is either decided or explicitly deferred with
 owners — no silent `OPEN`. **Docs-only, no code.**
@@ -156,6 +157,12 @@ project inspected (ref/region recorded) · signed **positive + negative**
 permission matrix · retention/audit documented · rollback plan · no production
 credentials · **explicit implementation approval recorded in §3**. If any
 precondition is unmet, this batch does not start.
+
+**Status 2026-07-31:** decision-level preconditions met (`94c9607` — blockers
+decided, matrix signed, retention/audit documented, rollback plan, `.env`
+git-ignored, §3 approval recorded). Remaining discovery before 3.2: confirm
+the dev project has **zero tables/policies** (needs Supabase access). **Batch
+4.4 (D-T4) must still land before 3.1.**
 
 | # | Task | File(s) | Exit criterion |
 |---|---|---|---|
