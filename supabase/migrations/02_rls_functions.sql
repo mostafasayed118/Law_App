@@ -124,10 +124,11 @@ $$;
 -- definer, so a client-executable helper would let anon or authenticated call
 -- them. write_audit in particular would let any caller forge audit rows
 -- claiming any actor (audit-integrity break, contract §8) and
--- expire_stale_invitations would let anyone flip invite statuses. None is
--- granted to authenticated; service_role retains EXECUTE (trusted backend
--- role). RPCs and triggers call these helpers from definer context, and
--- policies resolve them as the table owner — no client grant is needed.
+-- expire_stale_invitations would let anyone flip invite statuses. Default-deny:
+-- nothing is granted to authenticated here; service_role retains EXECUTE
+-- (trusted backend role). RPCs and triggers call these helpers from definer
+-- context — no client grant is needed for them. Two read-only helpers are
+-- re-opened below because RLS policy quals need them (R-4).
 revoke execute on function public.write_audit(
   text, text, uuid, text, uuid, uuid, text, uuid
 ) from public, anon, authenticated;
@@ -137,6 +138,23 @@ revoke execute on function public.active_membership(uuid) from public, anon, aut
 revoke execute on function public.is_active_member(uuid) from public, anon, authenticated;
 revoke execute on function public.has_org_role(uuid, public.org_role) from public, anon, authenticated;
 revoke execute on function public.is_platform_owner() from public, anon, authenticated;
+
+-- Policy-evaluation grants (R-4, amended 2026-08-01): Postgres RLS policy quals
+-- execute as the QUERYING role, so a function called inside a policy requires
+-- that role's EXECUTE — SECURITY DEFINER changes the body's privilege context,
+-- not the caller's right to invoke. The policy quals reference exactly two
+-- read-only, auth.uid()-self-scoped helpers:
+--   organizations_select_active_member  -> is_active_member(id)
+--   memberships_select_org_roster       -> is_active_member(organization_id)
+--   invitations_select_partner          -> has_org_role(organization_id,'partner')
+-- Without these grants every policy-gated read errors (r3 rehearsal finding
+-- R-4). active_membership is NOT granted — it is only invoked from inside the
+-- security-definer bodies above, so no client grant is needed.
+-- NOTE: these grants also expose both helpers as PostgREST /rpc/ endpoints.
+-- Intentional and safe: both are auth.uid()-self-scoped (a caller can only
+-- learn facts about themselves; no cross-tenant data, no forge surface).
+grant execute on function public.is_active_member(uuid) to authenticated;
+grant execute on function public.has_org_role(uuid, public.org_role) to authenticated;
 
 -- Hardening (R-3): revoke the hosting's default EXECUTE grant so future public
 -- functions created by this role do not inherit anon/authenticated EXECUTE.
