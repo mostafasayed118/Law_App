@@ -36,7 +36,7 @@
 | Ephemeral rehearsal (r3, R-3 slice) | `docs/p2_rehearsal_evidence_r3_2026-08-01.md` (`38e4832`) | ✅ Executed — NOT PASSED (finding R-4) |
 | Ephemeral rehearsal (r4, R-4 slice) | `docs/p2_rehearsal_evidence_r4_2026-08-01.md` (`d0379d2`) | ✅ Executed — **PASSED (twin gates green, 38 PASS + 2 RECORDED)** |
 | **Apply approval (this record)** | this document | ✅ **APPROVED 2026-08-01** (slice ref reconciled to `3704a1d`) |
-| Apply execution (dev project) | separate execution slice | ⏳ not started — gated by §4 conditions |
+| Apply execution (dev project) | docs/p2_apply_execution_2026-08-01.md (3bcd968) | ✅ Executed — Up 1–5 GREEN, §4.5 smoke PARTIAL (manual smoke pending, see evidence §6) |
 
 ## 2. Gate criteria confirmation — plan §6 exit criteria vs. r2 evidence (r4 re-confirmed)
 
