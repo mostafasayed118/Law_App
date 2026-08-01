@@ -94,17 +94,20 @@ controls**. Any future organization, matter, document, billing, conflict,
 approval, or AI capability must enforce authorization in the server/data
 boundary and ship with corresponding policy tests before it is exposed here.
 
-No Supabase client, Sentry SDK, service-role key, credential form, production
-auth flow, or real legal/client data is included.
+No Sentry SDK, service-role key, credential form, production auth flow, or real
+legal/client data is included. The Supabase client exists **only** inside the
+data-layer adapter behind the `AuthGateway` seam (Batch 3.2/3.3); DTOs and
+tokens never cross to presentation (contract §2.6).
 
 ### Secret and environment posture
 
 - `.env.example` is **names-only**: `SUPABASE_URL=` and `SUPABASE_ANON_KEY=` with
   no values. It documents the variables the app will one day consume; it does
   not contain secrets. **Consumption decision (2026-07-31):** the URL + anon
-  key are consumed at build time via `--dart-define-from-file` starting with
-  Batch 3/P1; until then the file is aspirational (zero `String.fromEnvironment`
-  uses in `lib/`).
+  key are consumed at build time via `--dart-define-from-file` — **landed in
+  Batch 3.3**: `SupabaseEnv.fromEnvironment()` reads both via
+  `String.fromEnvironment`, and the DI flip refuses any key whose JWT `role`
+  claim is not `anon` (a service-role key fails fast at configure time).
 - `.gitignore` excludes every env variant (`.env`, `.env.*`, `*.env`,
   `*.env.*`) except `.env.example` itself, so a local `.env` is never
   committed.
@@ -113,11 +116,12 @@ auth flow, or real legal/client data is included.
   injected at build time via `--dart-define(-from-file)`. Service-role keys
   and privileged credentials belong only in controlled server/edge-function
   environments.
-- No backend SDK is imported anywhere in `lib/` — a codebase audit confirmed
-  zero references to `supabase`, `firebase`, `paymob`, `http`, `dio`, `sqflite`,
-  or `hive`. The only `Supabase` mention in code is a comment in
-  `core/observability/error_reporter.dart` stating it is a future integration
-  that must not be wired into the client now.
+- The only backend SDK imported anywhere in `lib/` is `supabase_flutter`, and
+  it is confined to one file: `lib/data/auth/supabase_auth_api_impl.dart` (the
+  GoTrue-backed adapter). Every layer above consumes the provider-neutral
+  `SupabaseAuthApi`/`AuthGateway` seams — DTOs and tokens are stripped at the
+  adapter boundary. No `firebase`, `paymob`, `http`, `dio`, `sqflite`, or
+  `hive` appears in `lib/`.
 
 ## Run and verify
 
@@ -127,7 +131,10 @@ flutter gen-l10n
 dart format --output=none --set-exit-if-changed lib test
 flutter analyze
 flutter test
-flutter run
+# With real Supabase config (Batch 3.3): the anon public key + URL come from
+# the git-ignored .env file at build time. Omitting the flag runs the fake
+# gateway (env-less local runs and tests keep working).
+flutter run --dart-define-from-file=.env
 ```
 
 ## Fonts and licenses

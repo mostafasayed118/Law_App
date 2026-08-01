@@ -18,7 +18,8 @@
 > completed** (`b1ae361`, `88c3005` — Supabase adapter behind the seam,
 > suite 220/220); **Batch 5 completed** (`6c3d274`, `a17b747`, `77c43de`,
 > `75ff17b` — D-T1/D-T3 resolved, ADR-0008 supersedes ADR-0006, suite
-> 222/222); Batch 3.3 queued (config).
+> 222/222); **Batch 3.3 completed** (`cc917b7`, `e8c70b9` — build-time
+> config + anon-key guard + DI flip, suite 235/235).
 >
 > **Governing docs:** `INSTRUCTIONS.md` §2.1/§3 (gates, delivery slices,
 > approval discipline) · `docs/gate3_decision.md` +
@@ -171,16 +172,18 @@ precondition is unmet, this batch does not start.
 (read-only REST probe: 200, `TABLE_COUNT=0`, no `definitions` block) and
 **Batch 3.2 is complete** (`b1ae361`, `88c3005`): `main.dart` now awaits
 `AuthCubit.restore()` at startup; the seam is tested, not dead code.
-**Finding for 3.3:** the local git-ignored `.env` currently holds a
-`service_role` key (not `anon`; same `iat` as the original — the reset did
-not re-mint it). 3.3 must consume the **anon public key only** and the
-adapter's DI flip must refuse a non-anon key.
+**Finding for 3.3 — RESOLVED (2026-08-01):** the `.env` key was swapped
+to the anon public key (role claim verified `anon` via read-only decode)
+and Batch 3.3 landed: `--dart-define-from-file` consumption +
+`SupabaseEnv.ensureAnonKey` guard + DI flip (`cc917b7`, `e8c70b9`). The
+guard refuses any non-anon key at configure time, so a service-role key
+can never be consumed on the Flutter client.
 
 | # | Task | File(s) | Exit criterion |
 |---|---|---|---|
 | 3.1 | **DONE** (`1042daf`): session model per contract §5 (`userId`, `memberships`, `expiresAt`), `AuthOutcome`/`AuthFailure`, membership summary behind the `AuthGateway` seam. **Resolved D-T4** (recorded `1335512`, resolved `1042daf`) | `lib/core/auth/*` | presentation cannot grant a role — **met**: no session-level role; UX projection via `activeMembership.primaryRole` |
 | 3.2 | **DONE** (`b1ae361`, `88c3005`): provider adapter (`supabase_flutter ^2.16.0`) in the data layer — token-free `SupabaseAuthApi` seam, GoTrue-backed impl (the only file importing provider types), `SupabaseAuthGateway` (restore signed-out/expired/valid, missing expiry → reauthRequired, demo-denial, signOut), `restore()` wired at startup, INTERNET permission for release. DTOs/tokens never cross to presentation — **met**: snapshot surface pinned to `[userId, displayName, expiresAt]`. **Gate passed 2026-08-01**: REST 200 + `TABLE_COUNT=0` (zero tables verified) | `lib/data/auth/*`, `lib/main.dart`, `android/.../AndroidManifest.xml`, `pubspec.yaml` | boundary tests green (suite 220/220) |
-| 3.3 | Config: `--dart-define-from-file` with URL/anon key only; **no service-role key** | build config, `.env.example` stays name-only | no key in VCS |
+| 3.3 | **DONE** (`cc917b7`, `e8c70b9`): `--dart-define-from-file` consumption — `SupabaseEnv` (URL + anon key via `String.fromEnvironment`; `.env.example` stays name-only), `initializeSupabase` behind the data layer (`publishableKey:` — the ^2.16 rename), DI flip with the **anon-key guard** (`ensureAnonKey` refuses any key whose role claim is not `anon`), wired in `main.dart` before `configureDependencies` | `lib/data/auth/supabase_env.dart`, `supabase_auth_api_impl.dart`, `service_locator.dart`, `main.dart` + tests | no key in VCS — **met**: `.env` git-ignored; only the anon public key is ever consumed |
 | 3.4 | **DONE** (`e98e61b`): Unit/Cubit tests — restore (signed-out/authenticated/expired→reauthRequired/unavailable), startDemoSession, expiry, sign-out, membership transitions with synthetic fakes | new + updated tests | emission-sequence tests green (suite 205/205) |
 
 **Acceptance (gate3 §5):** P1 exit = "Flutter presentation cannot grant a

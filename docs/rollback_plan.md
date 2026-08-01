@@ -34,6 +34,10 @@
 - `.env` (or equivalent dart-define file) holding the Supabase URL + anon
   key is **git-ignored**, never committed. `.env.example` stays name-only
   with empty values (existing project convention, bootstrap spec §4.6).
+- Since Batch 3.3 the client build consumes the URL + anon key via
+  `--dart-define-from-file`, and the DI flip **refuses a non-anon key**
+  (`SupabaseEnv.ensureAnonKey`): a service-role key in `.env` fails fast at
+  configure time rather than wiring a privileged credential into the client.
 - Rollback = regenerate the local env file from `.env.example` + the actual
   dev-project values; no code change is needed to "roll back" a
   configuration mistake since nothing sensitive is in version control.
