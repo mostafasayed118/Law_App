@@ -2,13 +2,16 @@
 
 > **Record type:** Discovery draft for the **mandatory Supabase/RLS review
 > gate** (bootstrap spec §6/§9) and the separate **P2 approval**
-> (`docs/p0_decision_capture.md` §3, currently `_OPEN_`). **Docs-only.**
+> (`docs/p0_decision_capture.md` §3, **recorded 2026-08-01**). **Docs-only.**
 > No schema, migration, RLS policy, storage policy, RPC, edge function,
 > storage bucket, realtime channel, or production configuration is created,
 > applied, or authorized by this document. The SQL here is an *illustrative
 > design sketch for review*, not an executable migration.
 >
-> **Status:** DRAFT — for review, not approved.
+> **Status:** **APPROVED (2026-08-01)** as the RLS-gate review artifact.
+> §8 decisions Q1–Q6 are answered below; P2 approval is recorded in
+> `docs/p0_decision_capture.md` §3. This still authorizes **no** Supabase
+> change — reviewed migrations remain a separate approved slice.
 >
 > **Date:** 2026-08-01.
 >
@@ -30,12 +33,14 @@
 | Retention/deletion/audit documented for touched data | ✅ D-05 + contract §8 |
 | Rollback plan for schema/policy/config/client | ✅ `docs/rollback_plan.md` |
 | **P1 complete** (the §3 "blocked on P1 completion" precondition) | ✅ **Now satisfied** — Batch 3.1–3.3 committed and pushed (`1042daf`, `b1ae361`/`88c3005`, `cc917b7`/`e8c70b9`/`d18b2c7`) |
-| Mandatory Supabase/RLS review gate (bootstrap spec §6/§9) | ⏳ **This draft is the review input** |
-| Explicit P2 approval in `p0_decision_capture.md` §3 | ⏳ `_OPEN_` — requires this review to pass |
+| Mandatory Supabase/RLS review gate (bootstrap spec §6/§9) | ✅ **Passed (2026-08-01)** — §8 Q1–Q6 answered; this draft is the review record |
+| Explicit P2 approval in `p0_decision_capture.md` §3 | ✅ **Recorded (2026-08-01)** — see §3 |
 
 **Conclusion:** the decision-level preconditions for P2 are fully satisfied.
-What remains is the review of this design (this document), then the recorded
-P2 approval. Nothing here authorizes any Supabase change.
+The RLS-gate review passed on 2026-08-01 (§8 decisions answered) and the P2
+approval is recorded in `p0_decision_capture.md` §3. What remains before any
+Supabase change is authoring the reviewed migrations as a separate approved
+slice.
 
 ---
 
@@ -59,7 +64,8 @@ organization, membership, invitation, and audit concepts"):**
 - Storage buckets and realtime channels — **none exist** on the dev project
   (zero tables verified 2026-08-01). The *policy posture* for them is
   specified in §5 so the first bucket/channel ships with default-deny
-  policies, but no bucket/channel policy is created now (open decision Q4).
+  policies, but no bucket/channel policy is created now (deferral confirmed,
+  Q4).
 - Real client/legal data, production config, service-role usage, or any
   compliance claim.
 
@@ -332,7 +338,7 @@ reads. Since the dev project has **zero buckets and zero channels**, P2 ships
 no storage/realtime policy. Instead:
 
 - The design commits the **pattern**: every future bucket's policies must be
-  reviewed against this matrix before creation (open decision Q4), and
+  reviewed against this matrix before creation (Q4 confirmed), and
   signed URLs are short-lived, issued only after server-side scope
   validation (contract §7).
 - The **policy-test suite** includes the future-facing negative tests
@@ -390,26 +396,37 @@ forward.
 
 ---
 
-## 8. Open design decisions for the reviewer (not silently encoded)
+## 8. Gate-review decisions (Q1–Q6, answered 2026-08-01)
 
-1. **`platform_config.owner_user_id` seeding** — how the owner's `auth.users`
-   id is first populated (migration seed vs first-run RPC). Recommended:
-   migration seed by verified id, audited.
-2. **Invitation token hashing** — sha-256 hash stored, token shown once,
-   short-lived (7 days), single-use (D-10a). Confirm no plaintext anywhere.
-3. **`researchAnalyst`/`admin` code enum** — intentionally absent from the
-   schema (D-09). Confirm the four-value `org_role` enum is the MVP shape.
-4. **Storage/realtime deferral** — P2 ships table RLS + audit only; the
-   first bucket/channel must pass a matrix review before creation. Confirm
-   this deferral is acceptable (no objects exist to protect).
-5. **No direct table mutation from the client** — the entire client-reachable
-   surface is the §5.3 RPC list. Confirm no MVP action needs a raw
-   INSERT/UPDATE/DELETE policy beyond own-profile.
-6. **System-actor audit convention** — `audit_events.actor_user_id` is
-   nullable for system events (signup trigger, invitation expiry cleanup);
-   confirm a `'system'` action/outcome convention (or a reserved synthetic
-   actor) is the agreed way to distinguish machine-generated records from
-   human actions.
+Decisions recorded by the RLS-gate review. Owner for all:
+`Project Owner (github.com/mostafasayed118)`, decided 2026-08-01.
+
+1. **Q1 — `platform_config.owner_user_id` seeding: RESOLVED.** Seed by
+   **migration with the verified owner `auth.users` id**, audited; no
+   first-run RPC (keeps the client-reachable surface minimal). Subsequent
+   changes require a reviewed migration — the deliberate path, not a
+   runtime backdoor.
+2. **Q2 — Invitation token hashing: RESOLVED.** Store a **sha-256 hash** of
+   the one-time token; the literal token is shown to the inviter exactly
+   once and never stored or logged in plaintext; 7-day expiry, single-use
+   (D-10a).
+3. **Q3 — `researchAnalyst`/`admin` code enum: RESOLVED.** The **four-value
+   `org_role` enum is the MVP shape** (D-09). `researchAnalyst` and `admin`
+   are not org roles and must not be added to the schema; the code-side
+   enum stays as UX-only candidate vocabulary. Tracked as **D-T5** in
+   `docs/tracked_deviations.md`.
+4. **Q4 — Storage/realtime deferral: RESOLVED.** P2 ships **table RLS +
+   audit only**; the first bucket/channel must pass a matrix review before
+   creation (zero objects exist to protect).
+5. **Q5 — No direct table mutation from the client: RESOLVED.** The entire
+   client-reachable surface is the §5.3 RPC list; the only raw policy is
+   own-profile SELECT/UPDATE. No MVP action needs a broader raw
+   INSERT/UPDATE/DELETE.
+6. **Q6 — System-actor audit convention: RESOLVED.** Machine-generated
+   records (signup trigger, invitation-expiry cleanup) use a **null
+   `actor_user_id` with a `system:` action prefix** (e.g.
+   `system:profile_created`) to distinguish them from human actions; human
+   actions always carry the authenticated actor.
 
 ---
 
@@ -423,6 +440,6 @@ forward.
   no compliance claim.
 - The code (`lib/`) is untouched by this document.
 
-**Next step:** reviewer/owner sign-off on §8 decisions → record P2 approval
-in `p0_decision_capture.md` §3 → author reviewed migrations as a separate
-approved slice.
+**Next step:** author the reviewed migrations (`01_org_schema.sql` +
+paired `.down.sql`, RLS functions, policies, RPCs, seed) as a separate
+approved slice — still nothing is applied to Supabase without a further gate.

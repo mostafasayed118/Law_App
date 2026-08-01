@@ -173,7 +173,7 @@ The following remain excluded regardless of the §3 permitted slice:
 |---|---|---|
 | P0 — Decision capture | Partially advanced: §5 policy shape confirmed; §10.2/§10.5 assigned to the project owner (2026-07-31, per `docs/gate3_reconciliation.md`). | Close §10.1 (product model), §10.7 (org semantics), §10.8 (role vocabulary) before P2. |
 | P1 — Domain contracts + synthetic adapter | **Approved (design-only, Option C).** WIP remains uncommitted. | Separate closeout/commit authorization from the owner. |
-| P2 — Non-production schema + enforcement | Not authorized. | All §10 blockers relevant to identity/tenant decided; non-production backend available; signed permission matrix; retention/deletion/audit documented; rollback plan; mandatory Supabase/RLS review gate (bootstrap spec §6/§9). |
+| P2 — Non-production schema + enforcement | Not authorized *(as of this record). **P2 approved 2026-08-01** via `docs/p0_decision_capture.md` §3 — RLS gate review passed, §8 Q1–Q6 answered.* | All §10 blockers relevant to identity/tenant decided; non-production backend available; signed permission matrix; retention/deletion/audit documented; rollback plan; mandatory Supabase/RLS review gate (bootstrap spec §6/§9). |
 | P3 — Auth + org UX | Not authorized. | P2 exit (cross-tenant denial proven across every access path) + explicit P3 approval. |
 | P4 — Security review + controlled rollout | Not authorized. | P3 exit + explicit release approval. |
 

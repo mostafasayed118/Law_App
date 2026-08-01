@@ -119,3 +119,20 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
 - **Owner:** Resolved by Batch 3 of the codebase-audit plan (domain session
   model).
 - **Cross-reference:** `docs/gate3_reconciliation.md` §7.
+
+## D-T5: `UserRole` code enum (six values) vs P2 `org_role` schema enum (four) — **TRACKED (2026-08-01)**
+
+- **Where:** `lib/core/roles/user_role.dart` declares six `UserRole` values
+  including `researchAnalyst` and `admin`; the approved P2 schema enum
+  (`docs/p2_schema_rls_design.md` §4.1) contains **four** MVP org roles
+  (`client`, `attorney`, `partner`, `compliance_officer`) per D-09.
+- **Deviation:** intentional vocabulary divergence — `researchAnalyst` and
+  `admin` are not org roles in MVP and must **not** be added to the schema;
+  the code-side enum stays as UX-only candidate vocabulary (its own doc
+  comment marks the capability map as UX-only, never authorization).
+- **Status:** **TRACKED (2026-08-01).** Confirmed intentional by the P2 RLS
+  gate review (Q3). Not to be "fixed" by adding non-MVP roles to the schema
+  enum, nor by silently deleting code enum values before P3.
+- **Owner:** P2 RLS gate review (2026-08-01).
+- **Cross-reference:** `docs/p2_schema_rls_design.md` §3 (reconciliation
+  flag), §4.1; `docs/p0_decision_capture.md` §1 D-09.

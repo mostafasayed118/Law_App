@@ -187,8 +187,7 @@ docs-hygiene batch; recording it here makes the divergence reviewable now.
 
 ## 8. What remains in force
 
-- Contract-P2 (schema/RLS/enforcement), P3 (production UX), P4 (security
-  review + rollout) remain **not authorized** — record §5 unchanged.
+- Contract-P2 (schema/RLS/enforcement), P3 (production UX), P4 (security review + rollout) remain **not authorized** — record §5 unchanged. *(Updated 2026-08-01: P2 was subsequently **approved** via `docs/p0_decision_capture.md` §3 — RLS gate review passed, §8 Q1–Q6 answered; P3/P4 remain not authorized.)*
 - `docs/adr/0007-no-backend-until-p0-closes.md` stands: no Supabase package,
   migration, RLS, storage policy, RPC, or edge function until
   `p0_decision_capture.md` closes the required blockers and its §3 approval
