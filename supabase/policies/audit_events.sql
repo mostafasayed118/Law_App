@@ -1,0 +1,15 @@
+-- policies/audit_events.sql — P2 reviewed policy (REVIEWED, NOT APPLIED)
+-- Source of truth: docs/p2_schema_rls_design.md §5.2 + README refinement #2.
+-- Backout: git revert of this policy commit (design §7).
+--
+-- NO policies. The matrix §6 requirement ("platform_owner_admin reading audit
+-- is itself an audited action") and contract §8's scope-checked-reader rule
+-- are satisfiable only through RPCs (read_org_audit / read_platform_audit),
+-- which audit their own reads. A raw SELECT policy cannot audit a read.
+-- 01 grants nothing on audit_events, so even the SELECT grant is absent;
+-- append-only is enforced by the absence of any INSERT/UPDATE/DELETE policy
+-- and grant (rows are written only by write_audit, security definer).
+--
+-- This file intentionally contains no create policy statements. It exists to
+-- make the audit posture explicit and reviewable, and to reserve the file
+-- path so a future policy cannot be added without a reviewed diff.

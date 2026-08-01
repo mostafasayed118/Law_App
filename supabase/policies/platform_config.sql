@@ -1,0 +1,11 @@
+-- policies/platform_config.sql — P2 reviewed policy (REVIEWED, NOT APPLIED)
+-- Source of truth: docs/p2_schema_rls_design.md §5.2 (gate-approved).
+-- Backout: git revert of this policy commit (design §7).
+--
+-- NO policies. platform_config is read only by the security-definer
+-- is_platform_owner() function; the client has no grant (01 grants nothing
+-- here). The owner capability is therefore never client-readable and never
+-- client-writable — changes require a reviewed migration (Q1).
+--
+-- This file intentionally contains no create policy statements (same
+-- rationale as audit_events.sql: explicit, reviewable posture).
