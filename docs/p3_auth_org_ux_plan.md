@@ -39,7 +39,7 @@ session-lifecycle states (expiry → re-auth, denial, offline, retry).
 | P2 decision + approval | `docs/p0_decision_capture.md` §3 · `docs/p2_apply_approval_2026-08-01.md` | ✅ Approved 2026-08-01 |
 | P2 apply executed (dev project) | `docs/p2_apply_execution_2026-08-01.md` (`3bcd968`) | ✅ Up 1–5 GREEN; §4.5 manual smoke **pending** (see §3) |
 | Client bootstrap (B1–B13) | current `lib/` + `test/` | ✅ Scaffolded auth/onboarding/home/settings on fakes |
-| **P3 plan (this document)** | this document (`3bcd7b0`) | ✅ **APPROVED 2026-08-02** — Project Owner (ledger §14) |
+| **P3 plan (this document)** | this document (`275724e` — approval recorded; draft `3bcd7b0`) | ✅ **APPROVED 2026-08-02** — Project Owner (ledger §14) |
 | P3 implementation | `lib/`, `test/` (code only — no schema/RLS changes) | ⏳ not started — gated on per-step commit/approval discipline (INSTRUCTIONS.md §3) |
 | P3 verification | widget/integration tests EN/AR/TR + RTL + expiry + denial (contract §11-P3 exit) | ⏳ blocked on implementation |
 
