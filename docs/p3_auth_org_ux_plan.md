@@ -8,9 +8,10 @@
 > dev project per `docs/p2_apply_execution_2026-08-01.md`), so every server
 > surface named here is **live on the dev project**, not hypothetical.
 >
-> **Status: PLAN DRAFT — awaiting owner approval (Gate 3 spec gate).**
-> Nothing in this document changes code, the schema, or RLS; it is the
-> plan artifact the owner reviews before P3 implementation is approved.
+> **Status: PLAN APPROVED (2026-08-02).** The Project Owner approved this
+> Gate 3 spec (ledger §14). Implementation is a separate slice requiring
+> per-step commit/approval per `INSTRUCTIONS.md` §3. Nothing in this
+> document changes code, the schema, or RLS.
 >
 > **Date:** 2026-08-02. **Owner:** Project Owner
 > (github.com/mostafasayed118).
@@ -38,8 +39,8 @@ session-lifecycle states (expiry → re-auth, denial, offline, retry).
 | P2 decision + approval | `docs/p0_decision_capture.md` §3 · `docs/p2_apply_approval_2026-08-01.md` | ✅ Approved 2026-08-01 |
 | P2 apply executed (dev project) | `docs/p2_apply_execution_2026-08-01.md` (`3bcd968`) | ✅ Up 1–5 GREEN; §4.5 manual smoke **pending** (see §3) |
 | Client bootstrap (B1–B13) | current `lib/` + `test/` | ✅ Scaffolded auth/onboarding/home/settings on fakes |
-| **P3 plan (this document)** | this document | ⏳ **DRAFT — awaiting owner approval** |
-| P3 implementation | `lib/`, `test/` (code only — no schema/RLS changes) | ⏳ blocked on this plan's approval |
+| **P3 plan (this document)** | this document (`3bcd7b0`) | ✅ **APPROVED 2026-08-02** — Project Owner (ledger §14) |
+| P3 implementation | `lib/`, `test/` (code only — no schema/RLS changes) | ⏳ not started — gated on per-step commit/approval discipline (INSTRUCTIONS.md §3) |
 | P3 verification | widget/integration tests EN/AR/TR + RTL + expiry + denial (contract §11-P3 exit) | ⏳ blocked on implementation |
 
 **Exit criteria (contract §11-P3):** widget/integration tests cover
@@ -378,9 +379,12 @@ staging; no real client/legal data.
 
 ## 14. Ledger / forward hooks
 
-- `docs/p0_decision_capture.md` §3 P3 row stays **Blocked** until the owner
-  approves this plan; this document is the pointer to flip it to
-  "PLAN APPROVED" (owner + date).
+- **Plan approval recorded (2026-08-02):** Project Owner
+  (github.com/mostafasayed118) approved this Gate 3 spec; the
+  `docs/p0_decision_capture.md` §3 P3 row is flipped to **PLAN APPROVED**
+  pointing here. Implementation is gated on per-step commit/approval per
+  `INSTRUCTIONS.md` §3 — this record authorizes the plan decision, not a
+  bundle of commits.
 - P2 §4.5 manual smoke remains pending and is the P2-close prerequisite
   this plan depends on for end-to-end verification (§3).
 - The D-T6-resolution forward hook (partner member display names) is tracked
