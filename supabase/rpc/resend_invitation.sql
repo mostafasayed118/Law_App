@@ -1,6 +1,9 @@
 -- rpc/resend_invitation.sql — P2 reviewed RPC (REVIEWED, NOT APPLIED)
 -- Source of truth: docs/p2_schema_rls_design.md §5.3 + §4.5 (D-10a).
 -- Backout: rpc/_down.sql.
+-- R-1 (amended, rehearsal finding): pgcrypto calls qualified as extensions.* —
+-- pgcrypto lives in the `extensions` schema on this hosting, and the unqualified
+-- forms fail under the pinned search_path = public. Verified in the rehearsal.
 --
 -- Partner of the org rotates an existing PENDING invite's token and expiry
 -- (resend). A new literal token is returned once; only its hash is stored
@@ -26,9 +29,9 @@ begin
     raise exception 'only pending invitations can be resent';
   end if;
 
-  v_token := encode(gen_random_bytes(32), 'hex');
+  v_token := encode(extensions.gen_random_bytes(32), 'hex');
   update public.invitations
-     set token_hash = encode(digest(v_token, 'sha256'), 'hex'),
+     set token_hash = encode(extensions.digest(v_token, 'sha256'), 'hex'),
          expires_at = now() + interval '7 days'
    where id = p_invitation_id;
 

@@ -1,6 +1,9 @@
 -- rpc/accept_invitation.sql — P2 reviewed RPC (REVIEWED, NOT APPLIED)
 -- Source of truth: docs/p2_schema_rls_design.md §5.3 + §4.5 (D-10a).
 -- Backout: rpc/_down.sql.
+-- R-1 (amended, rehearsal finding): pgcrypto call qualified as extensions.* —
+-- pgcrypto lives in the `extensions` schema on this hosting, and the unqualified
+-- form fails under the pinned search_path = public. Verified in the rehearsal.
 --
 -- Redeems the one-time token: sha-256(hash) match, status pending,
 -- unexpired, and the caller's email matches the invited email (D-10a).
@@ -18,7 +21,7 @@ declare
 begin
   select * into v_inv
     from public.invitations
-   where token_hash = encode(digest(p_token, 'sha256'), 'hex')
+   where token_hash = encode(extensions.digest(p_token, 'sha256'), 'hex')
      and status = 'pending'
    limit 1;
 

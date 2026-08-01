@@ -6,9 +6,10 @@
 begin;
 
 -- sha-256 token hashing (Q2) and one-time token generation (invite_member).
--- Supabase usually provides pgcrypto in the `extensions` schema; the rehearsal
--- must confirm `digest` resolves under the pinned search_path = public
--- (qualify as extensions.digest at apply time if needed). Flagged in README.
+-- pgcrypto lives in the `extensions` schema on this hosting; the token RPCs
+-- qualify extensions.digest/extensions.gen_random_bytes explicitly (R-1
+-- amendment, 2026-08-01). gen_random_uuid() below is core Postgres and
+-- resolves without qualification.
 create extension if not exists pgcrypto;
 
 -- 4.1 Enums (four MVP org roles per D-09/Q3; researchAnalyst/admin excluded)

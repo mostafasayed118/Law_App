@@ -7,8 +7,12 @@ begin;
 
 -- 5.1 Helper: single unambiguous active-membership rule (contract §3.3).
 -- Suspended/removed memberships never authorize anything (status = 'active').
+-- SETOF (amended, rehearsal finding R-2): a single-composite return made
+-- `exists(select 1 from fn())` always true even when no row matched — the
+-- cross-tenant SELECT leak. SETOF yields zero rows on no match, so
+-- is_active_member()/has_org_role() correctly return false for non-members.
 create or replace function public.active_membership(p_org uuid)
-returns public.memberships
+returns setof public.memberships
 language sql stable security definer set search_path = public as $$
   select * from public.memberships
   where organization_id = p_org

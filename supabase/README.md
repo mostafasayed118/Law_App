@@ -63,10 +63,13 @@ Each step verified with `supabase db diff` before/after per `rollback_plan.md` �
    actor reference cleared (D-05 + contract §8).
 5. **`invitations.accepted_by`/`accepted_at` stay nullable** and are bound
    only by the security-definer `accept_invitation` RPC, never by the client.
-6. **pgcrypto** is required (sha-256 `digest`); on Supabase it usually lives
-   in the `extensions` schema — the rehearsal must confirm `digest` resolves
-   under the pinned `search_path = public` (qualify as `extensions.digest`
-   at apply time if needed). Flagged, not silently handled.
+6. **pgcrypto** is required (sha-256 `digest`). The 2026-08-01 ephemeral
+   rehearsal confirmed pgcrypto lives in the `extensions` schema on this
+   hosting, so the unqualified `gen_random_bytes`/`digest` calls failed under
+   the pinned `search_path = public`. **Amended (R-1):** the three token RPCs
+   (`invite_member`, `resend_invitation`, `accept_invitation`) now qualify
+   `extensions.*` explicitly. Verified in the rehearsal's ephemeral fix; the
+   amended slice must be re-rehearsed before apply.
 7. **`remove_membership` refuses self-removal** (`auth.uid() = p_user_id` →
    error) — self-deletion belongs to `delete_my_account` (D-05). This is a
    hardening beyond matrix §3's unqualified "Remove a member | ✅ (own org)"

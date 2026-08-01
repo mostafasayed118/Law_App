@@ -1,6 +1,9 @@
 -- rpc/invite_member.sql — P2 reviewed RPC (REVIEWED, NOT APPLIED)
 -- Source of truth: docs/p2_schema_rls_design.md §5.3 + §4.5 (D-10a, D-06).
 -- Backout: rpc/_down.sql.
+-- R-1 (amended, rehearsal finding): pgcrypto calls qualified as extensions.* —
+-- pgcrypto lives in the `extensions` schema on this hosting, and the unqualified
+-- forms fail under the pinned search_path = public. Verified in the rehearsal.
 --
 -- Partner of the org invites a new member. The role is validated server-side
 -- (never elevated beyond an MVP org role; org_role enum enforces the set).
@@ -24,7 +27,7 @@ begin
     raise exception 'a valid email is required';
   end if;
 
-  v_token := encode(gen_random_bytes(32), 'hex');
+  v_token := encode(extensions.gen_random_bytes(32), 'hex');
 
   insert into public.invitations (
     organization_id, email, role, token_hash, expires_at, created_by
@@ -32,7 +35,7 @@ begin
     p_organization_id,
     lower(trim(p_email)),
     p_role,
-    encode(digest(v_token, 'sha256'), 'hex'),
+    encode(extensions.digest(v_token, 'sha256'), 'hex'),
     now() + interval '7 days',
     auth.uid()
   );
