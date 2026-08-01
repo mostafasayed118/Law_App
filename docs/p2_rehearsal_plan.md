@@ -5,8 +5,8 @@
 > and `docs/rollback_plan.md` §2/§5 — the gate artifact that turns the
 > REVIEWED/NOT APPLIED slice (`b5f7e7c`) into an applied-and-proven one.
 >
-> **Status: EXECUTED (r1/r2) — r3 NOT PASSED (R-4) — ⏳ r4 PENDING (2026-08-01)** —
-> three ephemeral runs recorded: r1 NOT
+> **Status: EXECUTED — r1 NOT PASSED · r2 PASSED · r3 NOT PASSED (R-4) · r4 PASSED (2026-08-01)** —
+> four ephemeral runs recorded: r1 NOT
 > PASSED (`docs/p2_rehearsal_evidence_2026-08-01.md`, `3266c23`), r2 PASSED
 > on the amended slice (`docs/p2_rehearsal_evidence_r2_2026-08-01.md`,
 > `2c31b27`), and r3 NOT PASSED (`docs/p2_rehearsal_evidence_r3_2026-08-01.md`,
@@ -15,13 +15,14 @@
 > execute as the querying role and call `is_active_member`/`has_org_role`);
 > the R-3 default-privileges hardening itself held (assertion (b) byte-equal).
 > The slice is amended for R-4 (policy-evaluation grants on exactly those two
-> helpers, uniform revoke kept) and **r4 re-rehearsal is PENDING**, gated on
-> the twin assertions: policy reads succeed AND `write_audit` stays denied.
-> **Forward hook:** the apply-approval record
-> (`docs/p2_apply_approval_2026-08-01.md`, `d9cb842`) still cites the slice
-> at `83593c2`; before any re-apply its slice reference must be reconciled to
-> the R-4-amended slice (in the record's §3 decision scope / §4 execution
-> conditions — an amendment or an explicit re-confirmation at r4-pass time).
+> helpers, uniform revoke kept) and **r4 PASSED**
+> (`docs/p2_rehearsal_evidence_r4_2026-08-01.md`, `d0379d2`) — the twin
+> gates held live: policy reads succeed AND `write_audit` stays denied;
+> 38 PASS + 2 RECORDED, zero matrix failures; assertion (b) byte-equal.
+> **Forward hook (resolved 2026-08-01):** the apply-approval record
+> (`docs/p2_apply_approval_2026-08-01.md`, `d9cb842`) slice reference was
+> reconciled from `83593c2` to the R-4-amended slice `3704a1d` in the same
+> batch as this flip.
 > Running this plan was itself a separate approval slice;
 > nothing
 > in it authorizes applying anything to the shared dev project — the apply
@@ -48,20 +49,21 @@ evidence record the apply-approval gate consumes.
 |---|---|---|
 | P2 approval recorded | `docs/p0_decision_capture.md` §3 | ✅ Approved 2026-08-01 |
 | RLS-gate design review passed | `docs/p2_schema_rls_design.md` §8 (Q1–Q6) | ✅ Passed 2026-08-01 |
-| Reviewed migration slice | `supabase/` (`b5f7e7c`, amended `83593c2` R-1/R-2, `c95dcf4` R-3, R-4 policy-evaluation grants) | ✅ Committed & pushed, REVIEWED/NOT APPLIED |
-| **Ephemeral rehearsal (this plan)** | `docs/p2_rehearsal_plan.md` | ✅ **EXECUTED 2026-08-01** — r1 NOT PASSED (`docs/p2_rehearsal_evidence_2026-08-01.md`, `3266c23`); r2 PASSED (`docs/p2_rehearsal_evidence_r2_2026-08-01.md`, `2c31b27`); **r3 NOT PASSED — R-4** (`docs/p2_rehearsal_evidence_r3_2026-08-01.md`, `38e4832`); ⏳ **r4 PENDING** — R-4 amendment (policy-evaluation grants) |
-| Apply approval for the dev project | explicit owner authorization | ✅ **APPROVED 2026-08-01** — `docs/p2_apply_approval_2026-08-01.md` (slice ref `83593c2` — **reconcile to the R-4-amended slice before re-apply**, forward hook) |
+| Reviewed migration slice | `supabase/` (`b5f7e7c`, amended `83593c2` R-1/R-2, `c95dcf4` R-3, `3704a1d` R-4 policy-evaluation grants) | ✅ Committed & pushed, REVIEWED/NOT APPLIED |
+| **Ephemeral rehearsal (this plan)** | `docs/p2_rehearsal_plan.md` | ✅ **EXECUTED 2026-08-01** — r1 NOT PASSED (`docs/p2_rehearsal_evidence_2026-08-01.md`, `3266c23`); r2 PASSED (`docs/p2_rehearsal_evidence_r2_2026-08-01.md`, `2c31b27`); **r3 NOT PASSED — R-4** (`docs/p2_rehearsal_evidence_r3_2026-08-01.md`, `38e4832`); **r4 PASSED** (`docs/p2_rehearsal_evidence_r4_2026-08-01.md`, `d0379d2`) |
+| Apply approval for the dev project | explicit owner authorization | ✅ **APPROVED 2026-08-01** — `docs/p2_apply_approval_2026-08-01.md` (slice ref reconciled to the R-4-amended slice `3704a1d`) |
 
 **Conclusion:** the decision-level and review-level preconditions are
-satisfied. Three ephemeral runs are recorded: r2 **PASSED** on the then-
-amended slice, then **r3 NOT PASSED (R-4)** — the R-3 default-privileges
-hardening held (assertion (b) byte-equal) but the blanket revoke broke the
-policy surface. The slice is amended for R-4 (policy-evaluation grants on
-the two policy-referenced helpers) and the dev apply remains reverted to
-baseline. What remains before any further Supabase change: **r4 re-rehearsal**
-on the R-4-amended slice passing the twin gates (policy reads succeed;
-`write_audit` stays denied), then the apply **execution** slice against the
-dev project under the apply-approval record's §4 conditions.
+satisfied. Four ephemeral runs are recorded: r1 NOT PASSED
+(`docs/p2_rehearsal_evidence_2026-08-01.md`, `3266c23`), r2 **PASSED** on
+the then-amended slice (`2c31b27`), **r3 NOT PASSED (R-4)** (`38e4832`) — the
+R-3 default-privileges hardening held (assertion (b) byte-equal) but the
+blanket revoke broke the policy surface — and **r4 PASSED** on the
+R-4-amended slice (`d0379d2`) — the twin gates held (policy reads succeed;
+`write_audit` stays denied), 38 PASS + 2 RECORDED, assertion (b) byte-equal.
+The dev apply remains reverted to baseline. What remains before any further
+Supabase change: the apply **execution** slice against the dev project under
+the apply-approval record's §4 conditions (slice ref reconciled to `3704a1d`).
 
 ---
 

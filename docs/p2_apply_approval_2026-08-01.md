@@ -29,12 +29,16 @@
 | RLS-gate design review passed | `docs/p2_schema_rls_design.md` §8 (Q1–Q6) | ✅ Passed 2026-08-01 |
 | Reviewed migration slice | `supabase/` (`b5f7e7c`) | ✅ Committed & pushed, REVIEWED/NOT APPLIED |
 | Slice amendment (R-1/R-2) | `supabase/` (`83593c2`) | ✅ Committed & pushed, REVIEWED/NOT APPLIED |
+| Slice amendment (R-3) | `supabase/` (`c95dcf4`) | ✅ Committed & pushed, REVIEWED/NOT APPLIED |
+| Slice amendment (R-4) | `supabase/` (`3704a1d`) | ✅ Committed & pushed, REVIEWED/NOT APPLIED |
 | Ephemeral rehearsal (r1) | `docs/p2_rehearsal_evidence_2026-08-01.md` (`3266c23`) | ✅ Executed — NOT PASSED (findings R-1/R-2) |
 | Ephemeral rehearsal (r2, amended slice) | `docs/p2_rehearsal_evidence_r2_2026-08-01.md` (`2c31b27`) | ✅ Executed — PASSED (38 PASS + 2 RECORDED) |
-| **Apply approval (this record)** | this document | ✅ **APPROVED 2026-08-01** |
+| Ephemeral rehearsal (r3, R-3 slice) | `docs/p2_rehearsal_evidence_r3_2026-08-01.md` (`38e4832`) | ✅ Executed — NOT PASSED (finding R-4) |
+| Ephemeral rehearsal (r4, R-4 slice) | `docs/p2_rehearsal_evidence_r4_2026-08-01.md` (`d0379d2`) | ✅ Executed — **PASSED (twin gates green, 38 PASS + 2 RECORDED)** |
+| **Apply approval (this record)** | this document | ✅ **APPROVED 2026-08-01** (slice ref reconciled to `3704a1d`) |
 | Apply execution (dev project) | separate execution slice | ⏳ not started — gated by §4 conditions |
 
-## 2. Gate criteria confirmation — plan §6 exit criteria vs. r2 evidence
+## 2. Gate criteria confirmation — plan §6 exit criteria vs. r2 evidence (r4 re-confirmed)
 
 The rehearsal passes when, against the ephemeral project, **all five** §6
 criteria hold. Each is confirmed against
@@ -53,10 +57,24 @@ criteria hold. Each is confirmed against
 apply approval below. No known failing assertion remains (the r1 findings
 R-1/R-2 were fixed in `83593c2` and re-verified as resolved in r2).
 
+**r4 re-confirmation (reconciliation of this record, 2026-08-01):** the R-3
+amendment (`c95dcf4`) subsequently hardened `authenticated` EXECUTE on the 7
+security-definer helpers, which surfaced a **latent slice bug** (r3, finding
+R-4: RLS policy quals execute as the querying role, so the policy-referenced
+helpers need `authenticated` EXECUTE) and broke the policy read surface until
+the R-4 amendment (`3704a1d`) granted EXECUTE on exactly `is_active_member` +
+`has_org_role`. The **r4 rehearsal** (`docs/p2_rehearsal_evidence_r4_2026-08-01.md`,
+`d0379d2`) re-confirms **all five** §6 criteria on the R-4-amended slice — and
+adds the assertion r2 could not make: **`write_audit` stays denied to
+`authenticated`/`anon`** (privilege matrix and live probes) while the twin
+gates hold (canary roster succeeds; both R-2 cross-org negatives → 0 rows).
+This record's slice reference is reconciled from `83593c2` to `3704a1d` below.
+
 ## 3. Decision
 
 **APPLY APPROVED.** The Project Owner authorizes applying the reviewed and
-amended slice (`supabase/`, as committed in `83593c2`) to the shared dev
+amended slice (`supabase/`, as committed in `3704a1d` — the R-4-amended
+slice, reconciled from `83593c2` per this record's §2) to the shared dev
 project (`eutmvevpskerzpqmwplv`, `eu-central-1`) in the `supabase/README.md`
 apply order, subject to the §4 execution conditions.
 
@@ -82,9 +100,9 @@ rows the SQL rehearsal could not assert).
    the up sequence runs against the same baseline the rehearsal proved.
 2. **Verify, don't guess (Q1):** the `03_platform_config_seed.sql`
    `<OWNER_USER_ID>` token is filled from the **dev project's own** verified
-   `auth.users.id` — **not** the rehearsal project's id (`cf0d7676-…` was a
-   synthetic identity in the throwaway project and is invalid for the dev
-   seed).
+   `auth.users.id` — **not** the rehearsal project's id (the r4 run's
+   `5573f7c6-…` was a synthetic identity in the throwaway project and is
+   invalid for the dev seed).
 3. **Rollback pairing standing by (rollback_plan §1/§5):** the paired
    `down.sql` files and `rpc/_down.sql` + policy `git revert` are ready
    before step 1; **any** trigger condition (a matrix negative row starts
@@ -115,3 +133,9 @@ rows the SQL rehearsal could not assert).
   (2026-08-01), this document as the pointer.
 - `docs/p2_rehearsal_plan.md` §1 gate table — rehearsal rows updated to
   executed/PASSED, apply-approval row updated to APPROVED (2026-08-01).
+- **Slice reference reconciled (2026-08-01):** this record's §1 gate table,
+  §2 criteria, and §3 decision scope now cite the **R-4-amended slice
+  `3704a1d`** (reconciled from `83593c2`), with the r4 rehearsal (`d0379d2`)
+  re-confirming all five exit criteria plus the `write_audit` denial — per
+  the forward hook recorded in `docs/p2_rehearsal_evidence_r4_2026-08-01.md`
+  §8 and resolved in `docs/p2_rehearsal_plan.md` in the same batch.
