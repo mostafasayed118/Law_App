@@ -118,20 +118,31 @@ end;
 $$;
 
 -- Default-deny on EXECUTE: Postgres grants EXECUTE to PUBLIC on new functions
--- unless revoked. Every one of these is security definer, so PUBLIC-executable
--- would let anon call them. write_audit in particular would let any caller
--- forge audit rows claiming any actor (audit-integrity break, contract §8) and
+-- unless revoked, and Supabase hosting additionally grants EXECUTE to anon,
+-- authenticated and service_role on every new public function via
+-- pg_default_acl (rehearsal finding R-3). Every one of these is security
+-- definer, so a client-executable helper would let anon or authenticated call
+-- them. write_audit in particular would let any caller forge audit rows
+-- claiming any actor (audit-integrity break, contract §8) and
 -- expire_stale_invitations would let anyone flip invite statuses. None is
--- granted to authenticated: RPCs and triggers call them from definer context,
--- and policies resolve them as the table owner — no client grant is needed.
+-- granted to authenticated; service_role retains EXECUTE (trusted backend
+-- role). RPCs and triggers call these helpers from definer context, and
+-- policies resolve them as the table owner — no client grant is needed.
 revoke execute on function public.write_audit(
   text, text, uuid, text, uuid, uuid, text, uuid
-) from public, anon;
-revoke execute on function public.expire_stale_invitations() from public, anon;
-revoke execute on function public.handle_new_user() from public, anon;
-revoke execute on function public.active_membership(uuid) from public, anon;
-revoke execute on function public.is_active_member(uuid) from public, anon;
-revoke execute on function public.has_org_role(uuid, public.org_role) from public, anon;
-revoke execute on function public.is_platform_owner() from public, anon;
+) from public, anon, authenticated;
+revoke execute on function public.expire_stale_invitations() from public, anon, authenticated;
+revoke execute on function public.handle_new_user() from public, anon, authenticated;
+revoke execute on function public.active_membership(uuid) from public, anon, authenticated;
+revoke execute on function public.is_active_member(uuid) from public, anon, authenticated;
+revoke execute on function public.has_org_role(uuid, public.org_role) from public, anon, authenticated;
+revoke execute on function public.is_platform_owner() from public, anon, authenticated;
+
+-- Hardening (R-3): revoke the hosting's default EXECUTE grant so future public
+-- functions created by this role do not inherit anon/authenticated EXECUTE.
+-- service_role and postgres are intentionally left intact (trusted backend);
+-- explicit grants remain possible. Paired revert in the .down.sql.
+alter default privileges in schema public
+  revoke execute on functions from anon, authenticated;
 
 commit;

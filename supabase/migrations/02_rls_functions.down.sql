@@ -14,4 +14,9 @@ drop function if exists public.has_org_role(uuid, public.org_role);
 drop function if exists public.is_active_member(uuid);
 drop function if exists public.active_membership(uuid);
 
+-- Revert the R-3 default-privileges hardening so the down sequence restores
+-- the hosting's byte-equal baseline (pg_default_acl back to Supabase default).
+alter default privileges in schema public
+  grant execute on functions to anon, authenticated;
+
 commit;
