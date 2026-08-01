@@ -5,10 +5,23 @@
 > and `docs/rollback_plan.md` §2/§5 — the gate artifact that turns the
 > REVIEWED/NOT APPLIED slice (`b5f7e7c`) into an applied-and-proven one.
 >
-> **Status: EXECUTED (2026-08-01)** — two ephemeral runs recorded: r1 NOT
+> **Status: EXECUTED (r1/r2) — ⏳ r3 PENDING (2026-08-01)** — two ephemeral
+> runs recorded: r1 NOT
 > PASSED (`docs/p2_rehearsal_evidence_2026-08-01.md`, `3266c23`) and r2 PASSED
 > on the amended slice (`docs/p2_rehearsal_evidence_r2_2026-08-01.md`,
-> `2c31b27`). Running this plan was itself a separate approval slice; nothing
+> `2c31b27`). The dev apply attempt surfaced **finding R-3** (this hosting's
+> `pg_default_acl` grants `authenticated` EXECUTE on every new public
+> function); the slice was amended at `c95dcf4` — revoke `authenticated` on
+> all 7 security-definer helpers + default-privileges hardening, with down
+> pairing — so **r3 re-rehearsal on `c95dcf4` is PENDING** and must pass
+> assertions (a)/(b) (§3 step 2, §5 steps 4–5, §6 criteria 3–4) before any
+> further dev apply. **Forward hook:** the apply-approval record
+> (`docs/p2_apply_approval_2026-08-01.md`, `d9cb842`) still cites the slice
+> at `83593c2`; before any re-apply its slice reference must be reconciled to
+> `c95dcf4` (in the record's §3 decision scope / §4 execution conditions —
+> an amendment or an explicit re-confirmation at r3-pass time).
+> Running this plan was itself a separate approval slice;
+> nothing
 > in it authorizes applying anything to the shared dev project — the apply
 > approval is recorded separately in `docs/p2_apply_approval_2026-08-01.md`.
 >
@@ -33,15 +46,18 @@ evidence record the apply-approval gate consumes.
 |---|---|---|
 | P2 approval recorded | `docs/p0_decision_capture.md` §3 | ✅ Approved 2026-08-01 |
 | RLS-gate design review passed | `docs/p2_schema_rls_design.md` §8 (Q1–Q6) | ✅ Passed 2026-08-01 |
-| Reviewed migration slice | `supabase/` (`b5f7e7c`) | ✅ Committed & pushed, REVIEWED/NOT APPLIED |
-| **Ephemeral rehearsal (this plan)** | `docs/p2_rehearsal_plan.md` | ✅ **EXECUTED 2026-08-01** — r1 NOT PASSED (`docs/p2_rehearsal_evidence_2026-08-01.md`, `3266c23`); r2 PASSED on the amended slice (`docs/p2_rehearsal_evidence_r2_2026-08-01.md`, `2c31b27`) |
-| Apply approval for the dev project | explicit owner authorization | ✅ **APPROVED 2026-08-01** — `docs/p2_apply_approval_2026-08-01.md` |
+| Reviewed migration slice | `supabase/` (`b5f7e7c`, amended `83593c2` R-1/R-2, `c95dcf4` R-3) | ✅ Committed & pushed, REVIEWED/NOT APPLIED |
+| **Ephemeral rehearsal (this plan)** | `docs/p2_rehearsal_plan.md` | ✅ **EXECUTED (r1/r2) 2026-08-01** — r1 NOT PASSED (`docs/p2_rehearsal_evidence_2026-08-01.md`, `3266c23`); r2 PASSED on the amended slice (`docs/p2_rehearsal_evidence_r2_2026-08-01.md`, `2c31b27`); ⏳ **r3 PENDING** — R-3 amendment `c95dcf4` (assertions a/b) |
+| Apply approval for the dev project | explicit owner authorization | ✅ **APPROVED 2026-08-01** — `docs/p2_apply_approval_2026-08-01.md` (slice ref `83593c2` — **reconcile to `c95dcf4` before re-apply**, forward hook) |
 
 **Conclusion:** the decision-level and review-level preconditions are
-satisfied, the ephemeral rehearsal ran twice and **PASSED** on the amended
-slice, and the apply approval is recorded (`docs/p2_apply_approval_2026-08-01.md`).
-What remains before any Supabase change is the apply **execution** slice
-against the dev project, under that record's §4 conditions.
+satisfied, and the ephemeral rehearsal ran twice with r2 **PASSED** on the
+then-amended slice. The dev apply attempt surfaced **finding R-3** (hosting
+default EXECUTE for `authenticated`), so the slice was amended again
+(`c95dcf4`) and the apply was reverted to baseline. What remains before any
+further Supabase change: **r3 re-rehearsal** on `c95dcf4` passing assertions
+(a) and (b), then the apply **execution** slice against the dev project
+under the apply-approval record's §4 conditions.
 
 ---
 
@@ -79,7 +95,7 @@ expected objects appear.
 |---|---|---|
 | 0 | Baseline check | `TABLE_COUNT=0`; `supabase db diff` clean |
 | 1 | `migrations/01_org_schema.sql` | enums `org_role`/`membership_status`/`invitation_status` exist; 6 tables exist; RLS enabled on all six (`\d+` shows `Row security: enabled`); `anon`/`authenticated` have **no** table grants except the narrow ones (`\dp` — profiles select+update(display_name,locale), orgs/memberships/invitations select only, nothing on audit_events/platform_config) |
-| 2 | `migrations/02_rls_functions.sql` | 7 security-definer functions exist; `revoke execute from public, anon` held (try `select public.write_audit('x','y')` as anon → **denied**); signup trigger `on_auth_user_created` exists on `auth.users`; `is_platform_owner()` false for everyone (seed not yet applied) |
+| 2 | `migrations/02_rls_functions.sql` | 7 security-definer functions exist; **R-3 assertion (a):** `revoke execute from public, anon, authenticated` held — `has_function_privilege('authenticated', 'public.write_audit(text,text,uuid,text,uuid,uuid,text,uuid)', 'EXECUTE')` → **false** (same check for the other 6 helpers), and the live probe `select public.write_audit('x','y')` → **denied** as `anon` **and** as `authenticated`; hardening verified — new public functions do **not** inherit anon/authenticated EXECUTE (`pg_default_acl`); signup trigger `on_auth_user_created` exists on `auth.users`; `is_platform_owner()` false for everyone (seed not yet applied) |
 | 3 | `migrations/03_platform_config_seed.sql` (fill token) | `platform_config` has exactly 1 row; `is_platform_owner()` true **only** for the owner uid; a non-owner returns false |
 | 4 | `policies/*.sql` | **5** `create policy` statements exist (profiles ×2 — select/update — plus orgs/memberships/invitations ×1 each); **zero** policies on `audit_events`/`platform_config` (intentional, RPC-only posture) |
 | 5 | `rpc/*.sql` | 17 RPCs exist; each granted **only** to `authenticated` (revoked from public/anon); `_down.sql` drops all 17 |
@@ -187,8 +203,8 @@ above, the org-b variant denies — proven by changing only the
 | 1 | `rpc/_down.sql` | 17 RPCs gone; `\df public.*` empty of the slice's functions |
 | 2 | `git revert` the policy commit (or drop the **5** policies) | `\dp` grants back to the narrow set; matrix §2/§3 positive rows no longer pass on the policies (removed) |
 | 3 | `migrations/03_platform_config_seed.down.sql` | `is_platform_owner()` false for everyone |
-| 4 | `migrations/02_rls_functions.down.sql` | 7 functions gone; trigger gone; `write_audit` no longer callable |
-| 5 | `migrations/01_org_schema.down.sql` | tables + enums gone; `supabase db diff` equals the **pre-up baseline** (schema equality, rollback_plan §1) |
+| 4 | `migrations/02_rls_functions.down.sql` | 7 functions gone; trigger gone; `write_audit` no longer callable; **R-3 assertion (b):** `pg_default_acl` restored — the `alter default privileges` grant is re-applied, queried and compared to the pre-up snapshot (byte-equal) |
+| 5 | `migrations/01_org_schema.down.sql` | tables + enums gone; `supabase db diff` equals the **pre-up baseline** (schema equality **and `pg_default_acl` byte-equal** to the pre-up snapshot — the R-3 hardening is fully reverted, rollback_plan §1) |
 
 **Trigger conditions (rollback_plan §5) — any of these = immediate revert,
 never fix-forward:**
@@ -212,8 +228,11 @@ The rehearsal passes when, against the ephemeral project:
    rehearsal). The matrix-§2-vs-slice row that surfaced one such finding is
    **RESOLVED (D-T6)** by the matrix §2 addendum (2026-08-01).
 3. All three reviewer assertions passed (auth.users DELETE, policy-helper
-   canary, audit self-audit).
-4. The full down sequence restored the pre-up baseline (schema equality).
+   canary, audit self-audit) **plus R-3 assertion (a): `authenticated`
+   EXECUTE denied on all 7 security-definer helpers, incl. `write_audit`.**
+4. The full down sequence restored the pre-up baseline — schema equality
+   **and `pg_default_acl` byte-equal to the pre-up snapshot (R-3 assertion
+   (b); the default-privileges hardening fully reverted)**.
 5. No trigger condition fired.
 
 The pass evidence becomes the input to the separate **apply approval** for
