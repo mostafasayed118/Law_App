@@ -1,5 +1,5 @@
 -- rpc/_down.sql — consolidated backout for the entire P2 RPC surface
--- (REVIEWED, NOT APPLIED). Mirrors README rollback row "rpc/*.sql -> _down.sql".
+-- (REVIEWED — rollback standby; not run on dev). Mirrors README rollback row "rpc/*.sql -> _down.sql".
 
 begin;
 

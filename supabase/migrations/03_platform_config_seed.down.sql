@@ -1,5 +1,5 @@
 -- 03_platform_config_seed.down.sql — backout for 03_platform_config_seed.sql
--- (REVIEWED, NOT APPLIED)
+-- (REVIEWED — rollback standby; not run on dev)
 
 begin;
 

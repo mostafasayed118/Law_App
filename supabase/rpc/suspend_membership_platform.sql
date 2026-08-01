@@ -1,4 +1,4 @@
--- rpc/suspend_membership_platform.sql — P2 reviewed RPC (REVIEWED, NOT APPLIED)
+-- rpc/suspend_membership_platform.sql — P2 reviewed RPC (REVIEWED & APPLIED — dev project, 2026-08-01)
 -- Source of truth: docs/p2_schema_rls_design.md §5.3 + matrix §3/§5 (Addendum).
 -- Backout: rpc/_down.sql.
 --

@@ -27,10 +27,10 @@
 |---|---|---|
 | P2 approval recorded | `docs/p0_decision_capture.md` §3 | ✅ Approved 2026-08-01 |
 | RLS-gate design review passed | `docs/p2_schema_rls_design.md` §8 (Q1–Q6) | ✅ Passed 2026-08-01 |
-| Reviewed migration slice | `supabase/` (`b5f7e7c`) | ✅ Committed & pushed, REVIEWED/NOT APPLIED |
-| Slice amendment (R-1/R-2) | `supabase/` (`83593c2`) | ✅ Committed & pushed, REVIEWED/NOT APPLIED |
-| Slice amendment (R-3) | `supabase/` (`c95dcf4`) | ✅ Committed & pushed, REVIEWED/NOT APPLIED |
-| Slice amendment (R-4) | `supabase/` (`3704a1d`) | ✅ Committed & pushed, REVIEWED/NOT APPLIED |
+| Reviewed migration slice | `supabase/` (`b5f7e7c`) | ✅ Committed & pushed, REVIEWED (superseded by later amendments — never applied) |
+| Slice amendment (R-1/R-2) | `supabase/` (`83593c2`) | ✅ Committed & pushed, REVIEWED (superseded by later amendments — never applied) |
+| Slice amendment (R-3) | `supabase/` (`c95dcf4`) | ✅ Committed & pushed, REVIEWED (superseded by later amendments — never applied) |
+| Slice amendment (R-4) | `supabase/` (`3704a1d`) | ✅ Committed & pushed, REVIEWED — applied to the dev project 2026-08-01 (execution row below) |
 | Ephemeral rehearsal (r1) | `docs/p2_rehearsal_evidence_2026-08-01.md` (`3266c23`) | ✅ Executed — NOT PASSED (findings R-1/R-2) |
 | Ephemeral rehearsal (r2, amended slice) | `docs/p2_rehearsal_evidence_r2_2026-08-01.md` (`2c31b27`) | ✅ Executed — PASSED (38 PASS + 2 RECORDED) |
 | Ephemeral rehearsal (r3, R-3 slice) | `docs/p2_rehearsal_evidence_r3_2026-08-01.md` (`38e4832`) | ✅ Executed — NOT PASSED (finding R-4) |
