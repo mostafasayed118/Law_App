@@ -40,9 +40,22 @@ every table below — this is the default-deny baseline (contract §2.1).
 | Sign up / sign in | ✅ | — | — | — | — | — |
 | View own profile | ❌ deny | ✅ own only | ✅ own only | ✅ own only | ✅ own only | ✅ own only |
 | Edit own profile | ❌ deny | ✅ own only | ✅ own only | ✅ own only | ✅ own only | ✅ own only |
-| View **another** user's profile (any org) | ❌ deny | ❌ deny | ❌ deny | ✅ same org only | ❌ deny | ✅ any org (metadata only, see §5) |
+| View **another** user's profile (any org) | ❌ deny | ❌ deny | ❌ deny | ❌ deny | ❌ deny | ✅ any org (metadata only, see §5) |
 | Delete own account | ❌ deny | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Sign out | ✅ (no-op) | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+> **§2 addendum (2026-08-01, D-T6):** the `partner` cell for "View
+> **another** user's profile" is amended from "✅ same org only" to "❌
+> deny". The gate-approved design (`docs/p2_schema_rls_design.md` §5.2) makes
+> `profiles` **own-row-only**, and the reviewed slice (`b5f7e7c`) ships no
+> partner profile-metadata RPC (`list_members_metadata` is owner-gated) — the
+> matrix row promised a capability the approved design deliberately did not
+> implement. Resolution: **amend the matrix, not the slice** — the default-deny
+> direction (own-row-only for every non-owner role), with the partner's §3
+> roster access unchanged. Partners needing a member's display name in P3 is
+> a separate reviewed RPC decision, not this row. Recorded as **D-T6** in
+> `docs/tracked_deviations.md`; this addendum satisfies the §7
+> dated-addendum discipline.
 
 **Negative tests required (contract §9 identity/session block):**
 - No valid session → every non-sign-up/in row above denies, not empty-success.

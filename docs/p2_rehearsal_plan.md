@@ -123,7 +123,7 @@ can actually produce.
 |---|---|---|
 | View own profile | `client@org-a` `select * from profiles` where `user_id = auth.uid()` → 1 row | `client@org-a` reads `client@org-b`'s profile row → 0 rows |
 | Edit own profile | Own-row `update profiles set display_name=...` → succeeds | `update` setting `user_id` ≠ `auth.uid()` → denied (RLS WITH CHECK) |
-| View another user's profile | **RECORDED FINDING (matrix §2 vs slice):** the matrix §2 partner row ("view another user's profile ✅ same org only") has **no implementation path in the committed slice** — `profiles_select_own` is own-row-only (design §5.2) and no RPC exposes same-org profile metadata to partners (`list_members_metadata` is owner-gated). The rehearsal asserts the **actual** behavior (partner sees only own profile row), and the matrix row is recorded as a finding with resolution options — amend matrix §2 to own-row-only, or add a partner-profile-metadata RPC — tracked like the reactivate gap (D-T6 pattern) before dev apply | `client@org-a` reads another org's profile → 0 rows; **anon** `select` → denied, not empty-success |
+| View another user's profile | **RESOLVED (D-T6):** the matrix §2 partner row was **amended to "❌ deny"** (own-row-only for every non-owner role) via a dated §2 addendum — the default-deny direction, aligning the signed matrix with the approved design (§5.2) and the committed slice. No partner-profile-metadata RPC exists (and none was added — Q5 surface minimality). The rehearsal asserts the **actual** behavior: `profiles_select_own` returns own row only; a partner selecting another user's profile row → 0 rows | `client@org-a` reads another org's profile → 0 rows; **anon** `select` → denied, not empty-success |
 | Delete own account | `delete_my_account()` → identity removed, **audit row survives** with `actor_user_id` nulled | `delete_demo_account` by a non-owner → denied; session-token invalidation after deletion → **provider-level check** (GoTrue), covered by the rollback_plan §1 manual smoke, not the SQL rehearsal |
 
 ### §3 Organization & membership
@@ -201,10 +201,11 @@ The rehearsal passes when, against the ephemeral project:
    `db diff` evidence recorded.
 2. Every §4 positive row passed and every §4 negative row denied — recorded
    row by row (matrix §9's ≥1-positive/≥1-negative contract met).
-   **Recorded-finding rows** (e.g. the matrix §2 vs slice partner-profile
-   row) assert the **observed** behavior and are logged as findings — they
-   are not treated as must-pass matrix promises (their resolution path is
-   tracked before dev apply, not in this rehearsal).
+   **Recorded-finding rows** (if any remain) assert the **observed** behavior
+   and are logged as findings — they are not treated as must-pass matrix
+   promises (their resolution path is tracked before dev apply, not in this
+   rehearsal). The matrix-§2-vs-slice row that surfaced one such finding is
+   **RESOLVED (D-T6)** by the matrix §2 addendum (2026-08-01).
 3. All three reviewer assertions passed (auth.users DELETE, policy-helper
    canary, audit self-audit).
 4. The full down sequence restored the pre-up baseline (schema equality).

@@ -136,3 +136,24 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
 - **Owner:** P2 RLS gate review (2026-08-01).
 - **Cross-reference:** `docs/p2_schema_rls_design.md` §3 (reconciliation
   flag), §4.1; `docs/p0_decision_capture.md` §1 D-09.
+
+## D-T6: Matrix §2 "partner views another user's profile (same org)" vs own-row-only profiles — **RESOLVED (2026-08-01)**
+
+- **Where:** `docs/permission_matrix.md` §2 row "View **another** user's
+  profile (any org)" promised `partner` = "✅ same org only"; the gate-approved
+  design (`docs/p2_schema_rls_design.md` §5.2) makes `profiles` **own-row-only**
+  and the reviewed slice (`supabase/policies/profiles.sql`, `b5f7e7c`) ships
+  no partner profile-metadata RPC (`list_members_metadata` is owner-gated).
+- **Deviation:** the signed matrix row promised a partner capability the
+  approved design deliberately did not implement — surfaced by the rehearsal
+  plan (`docs/p2_rehearsal_plan.md` §4) as a recorded finding before any apply.
+- **Status:** **RESOLVED (2026-08-01).** Decision: **amend the matrix, not
+  the slice.** The matrix §2 partner cell was narrowed to "❌ deny" via a
+  dated §2 addendum — the default-deny direction, aligning the signed matrix
+  with the approved design and the committed slice. No partner-profile-metadata
+  RPC was added: that would widen the client surface (Q5) to satisfy an
+  outdated row, and the approved design already chose own-row-only.
+- **Owner:** Project Owner (github.com/mostafasayed118), 2026-08-01.
+- **Cross-reference:** `docs/permission_matrix.md` §2 (addendum),
+  §7 (dated-addendum discipline); `docs/p2_schema_rls_design.md` §5.2;
+  `docs/p2_rehearsal_plan.md` §4 (row updated to RESOLVED).
