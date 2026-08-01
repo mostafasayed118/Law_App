@@ -53,9 +53,9 @@ void main() {
     await tester.pumpWidget(pumpScreen());
     await tester.pumpAndSettle();
 
-    final String expectedExpiry = DateFormat.yMMMd('en').add_jm().format(
-      session.expiresAt,
-    );
+    final String expectedExpiry = DateFormat.yMMMd(
+      'en',
+    ).add_jm().format(session.expiresAt);
     expect(find.text('Profile'), findsOneWidget);
     expect(find.text('Demo user'), findsOneWidget);
     expect(find.text('demo-user'), findsOneWidget);
@@ -142,7 +142,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Session expired. Please sign in again.'), findsOneWidget);
+      expect(
+        find.text('Session expired. Please sign in again.'),
+        findsOneWidget,
+      );
       expect(find.text('Demo user'), findsNothing);
       // restore() cannot resurrect an expired session: no Retry affordance in
       // this branch (finding #3).

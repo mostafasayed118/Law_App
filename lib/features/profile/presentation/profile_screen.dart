@@ -33,14 +33,16 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l10n.profileNavigation)),
       body: switch (viewState) {
-        ViewSuccess<Session>(data: final Session session) =>
-          _ProfileBody(session: session),
+        ViewSuccess<Session>(data: final Session session) => _ProfileBody(
+          session: session,
+        ),
         _ => Center(
           // Retry only for a recoverable error: restore() cannot resurrect an
           // expired session, so the expired branch offers no Retry loop.
           child: ViewStateView<Session>(
             state: viewState,
-            onRetry: viewState is ViewError<Session> &&
+            onRetry:
+                viewState is ViewError<Session> &&
                     viewState.error.code != 'sessionExpired'
                 ? () => context.read<AuthCubit>().restore()
                 : null,
@@ -90,9 +92,7 @@ class _ProfileBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final DateFormat expiresFormat = DateFormat.yMMMd(
-      l10n.localeName,
-    ).add_jm();
+    final DateFormat expiresFormat = DateFormat.yMMMd(l10n.localeName).add_jm();
     return ListView(
       padding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
       children: <Widget>[
