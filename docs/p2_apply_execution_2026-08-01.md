@@ -149,4 +149,6 @@ subsequent P3 work on the applied schema.
 PARTIAL) — the approval record's row must be flipped to "executed — see
 `docs/p2_apply_execution_2026-08-01.md`" in a follow-up commit (same batch or
 immediate follow-up), so a reader cross-referencing the approval record does not see
-"not started" beside an executed evidence record.
+"not started" beside an executed evidence record. **(Resolved 2026-08-01:** the
+approval record's §1 row was flipped to "executed" in `598aee8`; the §4.5 manual
+smoke remains the only open item, per §6's forward hook.)
