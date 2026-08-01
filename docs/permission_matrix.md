@@ -52,7 +52,7 @@ every table below — this is the default-deny baseline (contract §2.1).
 > matrix row promised a capability the approved design deliberately did not
 > implement. Resolution: **amend the matrix, not the slice** — the default-deny
 > direction (own-row-only for every non-owner role), with the partner's §3
-> roster access unchanged. Partners needing a member's display name in P3 is
+> roster access unchanged. A partner needing a member's display name in P3 is
 > a separate reviewed RPC decision, not this row. Recorded as **D-T6** in
 > `docs/tracked_deviations.md`; this addendum satisfies the §7
 > dated-addendum discipline.

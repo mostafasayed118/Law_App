@@ -230,6 +230,18 @@ the code). Suite 222/222.
 
 ---
 
+## Forward hooks — tracked deferrals (must not silently evaporate)
+
+> **Hook 1 — P3 display-name RPC (D-T6):** the matrix §2 addendum and the
+> D-T6 ledger entry defer the partner's need for a member's display name to
+> "a separate reviewed RPC decision" in P3. When P3 planning starts, revisit
+> `docs/p2_schema_rls_design.md` §5.2 (`profiles` own-row-only) and decide
+> whether to add a narrow display-name RPC. Any such RPC **widens** the
+> approved client surface — it requires a dated matrix addendum per matrix
+> §7 before it can ship, and it must be reviewed, not silently picked up.
+
+---
+
 ## Sequencing & governance
 
 | Order | Batch | Depends on | Branch shape | Gate |
