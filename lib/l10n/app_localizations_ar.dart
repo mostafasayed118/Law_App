@@ -337,4 +337,20 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get profileNavigation => 'الملف';
+
+  @override
+  String get profileNameLabel => 'الاسم';
+
+  @override
+  String get profileAccountIdLabel => 'معرّف الحساب';
+
+  @override
+  String get profileRoleLabel => 'الدور';
+
+  @override
+  String get profileExpiresLabel => 'تنتهي الجلسة';
+
+  @override
+  String get profileSessionExpired =>
+      'انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.';
 }

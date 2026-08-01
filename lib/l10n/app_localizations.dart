@@ -729,6 +729,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Profile'**
   String get profileNavigation;
+
+  /// No description provided for @profileNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get profileNameLabel;
+
+  /// No description provided for @profileAccountIdLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Account ID'**
+  String get profileAccountIdLabel;
+
+  /// No description provided for @profileRoleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get profileRoleLabel;
+
+  /// No description provided for @profileExpiresLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Session expires'**
+  String get profileExpiresLabel;
+
+  /// No description provided for @profileSessionExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Session expired. Please sign in again.'**
+  String get profileSessionExpired;
 }
 
 class _AppLocalizationsDelegate

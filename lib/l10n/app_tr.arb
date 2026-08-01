@@ -105,5 +105,10 @@
   "signInErrorNotice": "Demo oturumu başlatılamadı.",
   "casesNavigation": "Davalar",
   "messagesNavigation": "Mesajlar",
-  "profileNavigation": "Profil"
+  "profileNavigation": "Profil",
+  "profileNameLabel": "Ad",
+  "profileAccountIdLabel": "Hesap Kimliği",
+  "profileRoleLabel": "Rol",
+  "profileExpiresLabel": "Oturum süresi",
+  "profileSessionExpired": "Oturum süresi doldu. Lütfen tekrar giriş yapın."
 }

@@ -338,4 +338,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileNavigation => 'Profile';
+
+  @override
+  String get profileNameLabel => 'Name';
+
+  @override
+  String get profileAccountIdLabel => 'Account ID';
+
+  @override
+  String get profileRoleLabel => 'Role';
+
+  @override
+  String get profileExpiresLabel => 'Session expires';
+
+  @override
+  String get profileSessionExpired => 'Session expired. Please sign in again.';
 }
