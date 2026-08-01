@@ -759,6 +759,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Session expired. Please sign in again.'**
   String get profileSessionExpired;
+
+  /// No description provided for @notificationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notificationsTitle;
+
+  /// No description provided for @notificationsNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferences are stored on this device. Notification delivery is planned for a later release.'**
+  String get notificationsNote;
+
+  /// No description provided for @notifAppointmentReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Appointment reminders'**
+  String get notifAppointmentReminders;
+
+  /// No description provided for @notifActivityUpdates.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity updates'**
+  String get notifActivityUpdates;
+
+  /// No description provided for @notifSystemAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'System alerts'**
+  String get notifSystemAlerts;
 }
 
 class _AppLocalizationsDelegate

@@ -110,5 +110,10 @@
   "profileAccountIdLabel": "Account ID",
   "profileRoleLabel": "Role",
   "profileExpiresLabel": "Session expires",
-  "profileSessionExpired": "Session expired. Please sign in again."
+  "profileSessionExpired": "Session expired. Please sign in again.",
+  "notificationsTitle": "Notifications",
+  "notificationsNote": "Preferences are stored on this device. Notification delivery is planned for a later release.",
+  "notifAppointmentReminders": "Appointment reminders",
+  "notifActivityUpdates": "Activity updates",
+  "notifSystemAlerts": "System alerts"
 }
