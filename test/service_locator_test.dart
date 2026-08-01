@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/localization/locale_cubit.dart';
 import 'package:legalhub/app/service_locator.dart';
@@ -6,12 +9,54 @@ import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/core/sample_service.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
+import 'package:legalhub/data/auth/supabase_auth_api.dart';
+import 'package:legalhub/data/auth/supabase_auth_gateway.dart';
+import 'package:legalhub/data/auth/supabase_env.dart';
 import 'package:legalhub/data/local/locale_store.dart';
 import 'package:legalhub/features/auth/data/fake_password_recovery_gateway.dart';
 import 'package:legalhub/features/auth/data/fake_sign_up_gateway.dart';
 import 'package:legalhub/features/auth/domain/password_recovery_gateway.dart';
 import 'package:legalhub/features/auth/domain/sign_up_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
+
+/// Hand-rolled fake of the [SupabaseAuthApi] seam for the DI flip test.
+/// The real `SupabaseAuthApiImpl.bind()` needs a running `Supabase.instance`,
+/// which no test should spin up — the flip's test seam injects this instead.
+class _FakeSupabaseAuthApi implements SupabaseAuthApi {
+  final StreamController<SupabaseAuthSnapshot?> _changes =
+      StreamController<SupabaseAuthSnapshot?>.broadcast();
+
+  @override
+  SupabaseAuthSnapshot? get currentSnapshot => null;
+
+  @override
+  Stream<SupabaseAuthSnapshot?> get snapshotChanges => _changes.stream;
+
+  @override
+  Future<SupabaseAuthSnapshot?> restore() async => null;
+
+  @override
+  Future<void> signOut() async {}
+
+  @override
+  Future<void> dispose() async => _changes.close();
+}
+
+/// Builds a JWT-shaped string whose payload carries the given role claim.
+/// Matches the base64url convention used by the supabase adapter tests.
+String _jwtWithRole(String role) {
+  final String header = base64Url
+      .encode(utf8.encode('{"alg":"HS256","typ":"JWT"}'))
+      .replaceAll('=', '');
+  final String payload = base64Url
+      .encode(utf8.encode('{"iss":"supabase","role":"$role"}'))
+      .replaceAll('=', '');
+  return '$header.$payload.signature';
+}
+
+/// Builds a JWT-shaped string whose payload carries `role: anon` — a valid
+/// anon-public-key shape for the guard, without any real credential.
+String _anonJwt() => _jwtWithRole('anon');
 
 void main() {
   // Ensure a clean locator between tests; GetIt is a process-global singleton.
@@ -110,13 +155,56 @@ void main() {
       expect(serviceLocator<SignUpGateway>(), isA<FakeSignUpGateway>());
     });
 
-    test('wires AuthGateway to the credential-free fake', () {
+    test('stays on the credential-free fake when no env is injected', () {
       configureDependencies();
 
-      // Auth must not silently gain a real credential backend; the fake
-      // intentionally accepts no credentials. Asserting the concrete type keeps
-      // that boundary explicit until a real gateway is an approved slice.
+      // With no build-time env (tests, env-less runs) the flip keeps the
+      // fake. Asserting the concrete type pins the unconfigured default so a
+      // future change that flips the default breaks loudly.
       expect(serviceLocator<AuthGateway>(), isA<FakeAuthGateway>());
+    });
+
+    test('flips to SupabaseAuthGateway when env carries an anon key', () {
+      configureDependencies(
+        supabaseEnv: SupabaseEnv(
+          url: 'https://example.supabase.co',
+          anonKey: _anonJwt(),
+        ),
+        // The real bind() needs a running Supabase.instance; tests inject
+        // the seam instead (the flip's test seam, not production code).
+        supabaseAuthApiFactory: _FakeSupabaseAuthApi.new,
+      );
+
+      expect(serviceLocator<AuthGateway>(), isA<SupabaseAuthGateway>());
+    });
+
+    test('refuses a non-anon key at configure time (Batch 3.3 guard)', () {
+      expect(
+        () => configureDependencies(
+          supabaseEnv: SupabaseEnv(
+            url: 'https://example.supabase.co',
+            anonKey: _jwtWithRole('service_role'),
+          ),
+          supabaseAuthApiFactory: _FakeSupabaseAuthApi.new,
+        ),
+        throwsStateError,
+      );
+
+      // Nothing must be wired when the guard refused the key.
+      expect(serviceLocator.isRegistered<AuthGateway>(), isFalse);
+    });
+
+    test('refuses an undecodable anon-key value at configure time', () {
+      expect(
+        () => configureDependencies(
+          supabaseEnv: SupabaseEnv(
+            url: 'https://example.supabase.co',
+            anonKey: 'not-a-jwt',
+          ),
+          supabaseAuthApiFactory: _FakeSupabaseAuthApi.new,
+        ),
+        throwsStateError,
+      );
     });
 
     test('constructs AuthCubit from the registered gateway and reporter', () {
