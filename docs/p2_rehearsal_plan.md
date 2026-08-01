@@ -5,9 +5,12 @@
 > and `docs/rollback_plan.md` §2/§5 — the gate artifact that turns the
 > REVIEWED/NOT APPLIED slice (`b5f7e7c`) into an applied-and-proven one.
 >
-> **Status: DRAFT — for review, not executed.** Running this plan is itself a
-> separate approval slice. Nothing here authorizes applying anything to the
-> shared dev project; the rehearsal runs in an **ephemeral** environment.
+> **Status: EXECUTED (2026-08-01)** — two ephemeral runs recorded: r1 NOT
+> PASSED (`docs/p2_rehearsal_evidence_2026-08-01.md`, `3266c23`) and r2 PASSED
+> on the amended slice (`docs/p2_rehearsal_evidence_r2_2026-08-01.md`,
+> `2c31b27`). Running this plan was itself a separate approval slice; nothing
+> in it authorizes applying anything to the shared dev project — the apply
+> approval is recorded separately in `docs/p2_apply_approval_2026-08-01.md`.
 >
 > **Date:** 2026-08-01. **Owner:** Project Owner (github.com/mostafasayed118).
 >
@@ -31,12 +34,14 @@ evidence record the apply-approval gate consumes.
 | P2 approval recorded | `docs/p0_decision_capture.md` §3 | ✅ Approved 2026-08-01 |
 | RLS-gate design review passed | `docs/p2_schema_rls_design.md` §8 (Q1–Q6) | ✅ Passed 2026-08-01 |
 | Reviewed migration slice | `supabase/` (`b5f7e7c`) | ✅ Committed & pushed, REVIEWED/NOT APPLIED |
-| **Ephemeral rehearsal (this plan)** | `docs/p2_rehearsal_plan.md` | ⏳ **DRAFT — the next gate input** |
-| Apply approval for the dev project | explicit owner authorization | ⏳ blocked on rehearsal-pass evidence |
+| **Ephemeral rehearsal (this plan)** | `docs/p2_rehearsal_plan.md` | ✅ **EXECUTED 2026-08-01** — r1 NOT PASSED (`docs/p2_rehearsal_evidence_2026-08-01.md`, `3266c23`); r2 PASSED on the amended slice (`docs/p2_rehearsal_evidence_r2_2026-08-01.md`, `2c31b27`) |
+| Apply approval for the dev project | explicit owner authorization | ✅ **APPROVED 2026-08-01** — `docs/p2_apply_approval_2026-08-01.md` |
 
 **Conclusion:** the decision-level and review-level preconditions are
-satisfied. What remains before any Supabase change is: run this rehearsal
-ephemerally, record the evidence, then a separate apply approval.
+satisfied, the ephemeral rehearsal ran twice and **PASSED** on the amended
+slice, and the apply approval is recorded (`docs/p2_apply_approval_2026-08-01.md`).
+What remains before any Supabase change is the apply **execution** slice
+against the dev project, under that record's §4 conditions.
 
 ---
 
