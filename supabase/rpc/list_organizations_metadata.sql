@@ -1,4 +1,4 @@
--- rpc/list_organizations_metadata.sql — P2 reviewed RPC (REVIEWED, NOT APPLIED)
+-- rpc/list_organizations_metadata.sql — P2 reviewed RPC (REVIEWED & APPLIED — dev project, 2026-08-01)
 -- Source of truth: docs/p2_schema_rls_design.md §5.3 + matrix §5 (Addendum).
 -- Backout: rpc/_down.sql.
 --

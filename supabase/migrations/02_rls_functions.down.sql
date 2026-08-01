@@ -1,5 +1,5 @@
 -- 02_rls_functions.down.sql — backout for 02_rls_functions.sql
--- (REVIEWED, NOT APPLIED)
+-- (REVIEWED — rollback standby; not run on dev)
 
 begin;
 

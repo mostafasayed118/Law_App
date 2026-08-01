@@ -1,4 +1,4 @@
--- rpc/create_organization.sql — P2 reviewed RPC (REVIEWED, NOT APPLIED)
+-- rpc/create_organization.sql — P2 reviewed RPC (REVIEWED & APPLIED — dev project, 2026-08-01)
 -- Source of truth: docs/p2_schema_rls_design.md §5.3 + §4.3/D-08.
 -- Backout: rpc/_down.sql.
 --
