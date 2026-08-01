@@ -6,11 +6,25 @@ import 'app/legalhub_theme.dart';
 import 'app/localization/locale_cubit.dart';
 import 'app/router.dart';
 import 'app/service_locator.dart';
+import 'data/auth/supabase_auth_api_impl.dart';
+import 'data/auth/supabase_env.dart';
 import 'features/auth/presentation/auth_cubit.dart';
 import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Batch 3.3: consume build-time config (`--dart-define-from-file=.env`).
+  // When no env file is injected, the DI flip stays on the fake gateway and
+  // no provider is initialized — env-less runs and tests keep working.
+  final SupabaseEnv supabaseEnv = SupabaseEnv.fromEnvironment();
+  if (supabaseEnv.isConfigured) {
+    // Anon-key guard: refuse a non-anon key before any provider is wired.
+    SupabaseEnv.ensureAnonKey(supabaseEnv.anonKey);
+    await initializeSupabase(
+      url: supabaseEnv.url,
+      anonKey: supabaseEnv.anonKey,
+    );
+  }
   final SharedPreferences preferences = await SharedPreferences.getInstance();
   configureDependencies(preferences: preferences);
   final LocaleCubit localeCubit = serviceLocator<LocaleCubit>();

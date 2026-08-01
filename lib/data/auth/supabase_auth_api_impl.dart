@@ -4,6 +4,22 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_auth_api.dart';
 
+/// Initializes the app-level Supabase client with build-time config.
+///
+/// Lives in the data layer so `main.dart` (app bootstrap) never imports
+/// provider types. The URL + anon public key come from `SupabaseEnv`
+/// (`--dart-define-from-file=.env`); the anon-key guard in [SupabaseEnv]
+/// must have run before this is called so a service-role key is refused
+/// before any provider is wired (Batch 3.3).
+Future<void> initializeSupabase({
+  required String url,
+  required String anonKey,
+}) {
+  // supabase_flutter ^2.16 renamed the param to publishableKey (the anon
+  // public key); the env var keeps the dashboard's "anon public" naming.
+  return Supabase.initialize(url: url, publishableKey: anonKey);
+}
+
 /// [SupabaseAuthApi] backed by the GoTrue auth client.
 ///
 /// This is the **only** file that imports provider types. It maps

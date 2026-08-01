@@ -5,6 +5,10 @@ import '../core/auth/auth_gateway.dart';
 import '../core/observability/error_reporter.dart';
 import '../core/sample_service.dart';
 import '../data/auth/fake_auth_gateway.dart';
+import '../data/auth/supabase_auth_api.dart';
+import '../data/auth/supabase_auth_api_impl.dart';
+import '../data/auth/supabase_auth_gateway.dart';
+import '../data/auth/supabase_env.dart';
 import '../data/local/in_memory_locale_store.dart';
 import '../data/local/locale_store.dart';
 import '../data/local/shared_preferences_locale_store.dart';
@@ -28,7 +32,16 @@ final GetIt serviceLocator = GetIt.instance;
 /// Must be called once during application bootstrap (see `main.dart`) before
 /// any dependency is resolved. Safe to call again only in tests after
 /// [resetServiceLocator] has cleared prior registrations.
-void configureDependencies({SharedPreferences? preferences}) {
+///
+/// [supabaseEnv] and [supabaseAuthApiFactory] are test seams: when the build
+/// injects a configured URL + anon key (Batch 3.3, `--dart-define-from-file`),
+/// the real [SupabaseAuthGateway] is registered; otherwise the credential-free
+/// [FakeAuthGateway] stays, so tests and env-less local runs keep working.
+void configureDependencies({
+  SharedPreferences? preferences,
+  SupabaseEnv? supabaseEnv,
+  SupabaseAuthApi Function()? supabaseAuthApiFactory,
+}) {
   // Lazy singleton: stateless service, created on first resolution.
   // Per §4.5, stateless services/repositories register as lazy singletons.
   // App-scoped Cubits below are also lazy singletons because the router and
@@ -37,10 +50,25 @@ void configureDependencies({SharedPreferences? preferences}) {
     serviceLocator.registerLazySingleton<SampleService>(SampleServiceImpl.new);
   }
   if (!serviceLocator.isRegistered<AuthGateway>()) {
-    serviceLocator.registerLazySingleton<AuthGateway>(
-      FakeAuthGateway.new,
-      dispose: (AuthGateway gateway) => (gateway as FakeAuthGateway).dispose(),
-    );
+    final SupabaseEnv env = supabaseEnv ?? SupabaseEnv.fromEnvironment();
+    if (env.isConfigured) {
+      // Batch 3.3 anon-key guard: refuse a non-anon key before wiring any
+      // provider, so a service-role key can never reach the client build.
+      SupabaseEnv.ensureAnonKey(env.anonKey);
+      serviceLocator.registerLazySingleton<AuthGateway>(
+        () => SupabaseAuthGateway(
+          (supabaseAuthApiFactory ?? SupabaseAuthApiImpl.bind)(),
+        ),
+        dispose: (AuthGateway gateway) =>
+            (gateway as SupabaseAuthGateway).dispose(),
+      );
+    } else {
+      serviceLocator.registerLazySingleton<AuthGateway>(
+        FakeAuthGateway.new,
+        dispose: (AuthGateway gateway) =>
+            (gateway as FakeAuthGateway).dispose(),
+      );
+    }
   }
   if (!serviceLocator.isRegistered<ErrorReporter>()) {
     serviceLocator.registerLazySingleton<ErrorReporter>(
