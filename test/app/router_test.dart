@@ -5,8 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:legalhub/app/localization/locale_cubit.dart';
 import 'package:legalhub/app/router.dart';
 import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/auth/auth_gateway.dart';
 import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
+import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/local/in_memory_locale_store.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
@@ -35,15 +37,20 @@ void main() {
   /// A localized harness matching the one used by [LegalHubApp] so route
   /// builders resolve [AppLocalizations.of] and a real theme, and route
   /// builders find the [AuthCubit] and [LocaleCubit] providers the app
-  /// wires app-wide.
-  Widget harness({required Widget child}) {
+  /// wires app-wide. Optional overrides let capability-variant tests inject
+  /// their own cubit + router.
+  Widget harness({
+    required Widget child,
+    AuthCubit? cubitOverride,
+    GoRouter? routerOverride,
+  }) {
     return MultiBlocProvider(
       providers: <BlocProvider<dynamic>>[
-        BlocProvider<AuthCubit>.value(value: authCubit),
+        BlocProvider<AuthCubit>.value(value: cubitOverride ?? authCubit),
         BlocProvider<LocaleCubit>.value(value: localeCubit),
       ],
       child: MaterialApp.router(
-        routerConfig: router,
+        routerConfig: routerOverride ?? router,
         theme: ThemeData.light(),
         locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -216,5 +223,244 @@ void main() {
         expect(selectedIndex(tester), 1);
       },
     );
+
+    // The real capability map grants every role both destinations today, so
+    // the per-role matrix pins the *current* contract. The variant tests
+    // below inject a restricted map (via the capabilitiesForRole seam) to
+    // pin the shell for combinations that do not exist yet — a role without
+    // canViewSettings renders only Home, and the index/tap target stay in
+    // range for every capability combination.
+    testWidgets(
+      'renders both destinations and highlights correctly for every role '
+      '(real capability map)',
+      (tester) async {
+        // The loop only visits /home, /settings, /profile — none of which
+        // resolve from the service locator, so no configureDependencies is
+        // needed here.
+        for (final UserRole role in UserRole.values) {
+          final AuthCubit roleCubit = AuthCubit(
+            RoleGateway(sessionForRole(role)),
+            InMemoryErrorReporter(),
+          );
+          addTearDown(roleCubit.close);
+          final GoRouter roleRouter = createAppRouter(roleCubit);
+          addTearDown(roleRouter.dispose);
+
+          await tester.pumpWidget(
+            harness(
+              child: const SizedBox.shrink(),
+              cubitOverride: roleCubit,
+              routerOverride: roleRouter,
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          // Both destinations render for every role in the real map.
+          expect(
+            find.byType(NavigationDestination),
+            findsNWidgets(2),
+            reason: 'role $role renders both destinations',
+          );
+          // Lands on /home via the authenticated redirect.
+          expect(selectedIndex(tester), 0, reason: 'role $role on /home');
+
+          roleRouter.go(AppRoutes.settings);
+          await tester.pumpAndSettle();
+          expect(selectedIndex(tester), 1, reason: 'role $role on /settings');
+
+          roleRouter.go(AppRoutes.profile);
+          await tester.pumpAndSettle();
+          expect(selectedIndex(tester), 1, reason: 'role $role on /profile');
+        }
+      },
+    );
+
+    // Material 3's NavigationBar requires >= 2 destinations, so a role with
+    // fewer visible destinations gets no bottom bar at all (graceful
+    // degradation, never a framework assertion). These variants pin that the
+    // shell stays crash-free and the body still renders for capability
+    // combinations that do not exist in the real map yet.
+    testWidgets(
+      'renders no NavigationBar when only Home is visible (canViewSettings '
+      'false)',
+      (tester) async {
+        final AuthCubit restrictedCubit = AuthCubit(
+          RoleGateway(sessionForRole(UserRole.client)),
+          InMemoryErrorReporter(),
+        );
+        addTearDown(restrictedCubit.close);
+        final GoRouter restrictedRouter = createAppRouter(
+          restrictedCubit,
+          capabilitiesForRole: <UserRole, RoleCapability>{
+            UserRole.client: const RoleCapability(
+              canViewHome: true,
+              canViewSettings: false,
+            ),
+          },
+        );
+        addTearDown(restrictedRouter.dispose);
+
+        await tester.pumpWidget(
+          harness(
+            child: const SizedBox.shrink(),
+            cubitOverride: restrictedCubit,
+            routerOverride: restrictedRouter,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Single visible destination → no bottom bar, no framework assert.
+        expect(find.byType(NavigationBar), findsNothing);
+        // The shell body still renders the redirected route (/home).
+        expect(find.textContaining('Hello, User client'), findsOneWidget);
+
+        // A settings-descendant route stays reachable by URL without crash.
+        restrictedRouter.go(AppRoutes.settings);
+        await tester.pumpAndSettle();
+        expect(find.text('Settings'), findsWidgets);
+      },
+    );
+
+    testWidgets(
+      'renders no NavigationBar when only Settings is visible (canViewHome '
+      'false)',
+      (tester) async {
+        final AuthCubit restrictedCubit = AuthCubit(
+          RoleGateway(sessionForRole(UserRole.attorney)),
+          InMemoryErrorReporter(),
+        );
+        addTearDown(restrictedCubit.close);
+        final GoRouter restrictedRouter = createAppRouter(
+          restrictedCubit,
+          capabilitiesForRole: <UserRole, RoleCapability>{
+            UserRole.attorney: const RoleCapability(
+              canViewHome: false,
+              canViewSettings: true,
+            ),
+          },
+        );
+        addTearDown(restrictedRouter.dispose);
+
+        await tester.pumpWidget(
+          harness(
+            child: const SizedBox.shrink(),
+            cubitOverride: restrictedCubit,
+            routerOverride: restrictedRouter,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Single visible destination → no bottom bar, no framework assert.
+        expect(find.byType(NavigationBar), findsNothing);
+        // The authenticated redirect still lands on /home and the body
+        // renders even though the destination list is settings-only.
+        expect(find.textContaining('Hello, User attorney'), findsOneWidget);
+
+        restrictedRouter.go(AppRoutes.settings);
+        await tester.pumpAndSettle();
+        expect(find.text('Settings'), findsWidgets);
+      },
+    );
+
+    testWidgets('tapping a destination navigates to its route', (tester) async {
+      await authCubit.startDemoSession();
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // On /home the settings destination is unselected (outlined icon);
+      // tapping it must navigate via its route, not a hardcoded index.
+      await tester.tap(find.byIcon(Icons.settings_outlined));
+      await tester.pumpAndSettle();
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        AppRoutes.settings,
+      );
+
+      // Back on /settings, the home destination is unselected; tapping it
+      // returns to /home.
+      await tester.tap(find.byIcon(Icons.home_outlined));
+      await tester.pumpAndSettle();
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        AppRoutes.home,
+      );
+    });
+
+    testWidgets('renders no NavigationBar when no destination is visible', (
+      tester,
+    ) async {
+      final AuthCubit emptyCubit = AuthCubit(
+        RoleGateway(sessionForRole(UserRole.admin)),
+        InMemoryErrorReporter(),
+      );
+      addTearDown(emptyCubit.close);
+      final GoRouter emptyRouter = createAppRouter(
+        emptyCubit,
+        capabilitiesForRole: <UserRole, RoleCapability>{
+          UserRole.admin: const RoleCapability(
+            canViewHome: false,
+            canViewSettings: false,
+          ),
+        },
+      );
+      addTearDown(emptyRouter.dispose);
+
+      await tester.pumpWidget(
+        harness(
+          child: const SizedBox.shrink(),
+          cubitOverride: emptyCubit,
+          routerOverride: emptyRouter,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(NavigationBar), findsNothing);
+      // The body still renders the redirected route with no bar at all.
+      expect(find.textContaining('Hello, User admin'), findsOneWidget);
+    });
   });
 }
+
+/// Test-only gateway emitting a fixed [Session] for a chosen role, so shell
+/// capability rendering can be pinned per role without touching the shared
+/// demo client session.
+class RoleGateway implements AuthGateway {
+  RoleGateway(this._session);
+
+  final Session _session;
+
+  @override
+  Session? get currentSession => _session;
+
+  @override
+  Stream<Session?> get sessionChanges => const Stream<Session?>.empty();
+
+  @override
+  Future<AuthOutcome<Session>> restore() async {
+    return AuthOutcome<Session>.success(_session);
+  }
+
+  @override
+  Future<AuthOutcome<Session>> startDemoSession() async {
+    return AuthOutcome<Session>.success(_session);
+  }
+
+  @override
+  Future<void> signOut() async {}
+}
+
+/// Builds a session whose active membership carries [role], so the shell's
+/// UX-only capability projection reads that role.
+Session sessionForRole(UserRole role) => Session(
+  userId: 'user-$role',
+  displayName: 'User ${role.name}',
+  memberships: <OrganizationMembership>[
+    OrganizationMembership(
+      organizationId: 'org-demo',
+      organizationName: 'Demo Firm',
+      role: role,
+      status: MembershipStatus.active,
+    ),
+  ],
+  expiresAt: DateTime.now().add(const Duration(hours: 8)),
+);
