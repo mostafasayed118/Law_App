@@ -39,6 +39,10 @@ screen owns and makes "what is actually reusable" unanswerable by inspection.
      `lib/features/home/presentation/widgets/home_cards.dart`.
 3. **Retain `ViewStateView` in `lib/shared/widgets/view_state_view.dart`.**
 
+> **Later deleted:** `SecurityBadge` was removed in `df6e5f4` (2026-08-02) —
+> the presentational encrypted-connection badge was dropped from the sign-in
+> screen together with the `AuthScaffold.bottomNavigationBar` param it consumed.
+
 `legalhub_components.dart` now contains only `LegalHubAppBar` (the one genuinely
 cross-feature component used by `AuthScaffold`). The `widgets.dart` barrel was
 trimmed to export only genuinely-shared widgets: `LabelledField`,
