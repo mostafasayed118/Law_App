@@ -26,7 +26,8 @@
 #         entry (through `4b5e4fc`, suite 277/277), the P2 apply records'
 #         slice ref (`3704a1d` in approval + execution), the r3/r4 evidence
 #         verdicts (`NOT PASSED (R-4)` / `38 PASS + 2 RECORDED`), the
-#         rehearsal plan's evidence citations (`d0379d2`/`38e4832`), and the
+#         rehearsal plan's four evidence citations (`3266c23`–`d0379d2`),
+#         and the
 #         README suite count are also asserted against the CURRENT on-disk
 #         docs (not just committed content at cited hashes), so a committed
 #         doc that quietly drops a marker fails CI even without breaking a
@@ -261,7 +262,7 @@ semantic_rows() {
 docs/p2_rehearsal_evidence_r4_2026-08-01.md|38 PASS + 2 RECORDED
 docs/p2_rehearsal_evidence_r3_2026-08-01.md|NOT PASSED (R-4)
 EOF
-  for plan_cite in d0379d2 38e4832; do
+  for plan_cite in 3266c23 2c31b27 38e4832 d0379d2; do
     if grep -q "$plan_cite" docs/p2_rehearsal_plan.md 2>/dev/null; then
       ok "rehearsal-plan evidence citation ($plan_cite) in working tree"
     else
