@@ -77,7 +77,10 @@ class _ForgotPasswordResetScreenState extends State<ForgotPasswordResetScreen> {
         builder: (BuildContext context) {
           return AuthScaffold(
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
+              icon: const DirectionalIcon(
+                icon: Icons.arrow_back,
+                mirroredIcon: Icons.arrow_forward,
+              ),
               onPressed: () => context.go(AppRoutes.forgotPasswordOtp),
             ),
             child: BlocListener<PasswordRecoveryCubit, ViewState<void>>(

@@ -5,6 +5,11 @@
 -- Partner of the org changes a member's role in THAT org. The target
 -- membership must be in the same org the caller partners (tenant isolation:
 -- a partner in org-a cannot change a role in org-b). Audited.
+--
+-- Hardened 2026-08-03 (code-only, NOT yet applied): the org must retain at
+-- least one active partner after the change, so a partner can no longer
+-- demote the org's last partner and lock the org out of membership
+-- management (zero-partner lockout, audit finding).
 
 create or replace function public.change_member_role(
   p_organization_id uuid,
@@ -25,6 +30,23 @@ begin
      and user_id = p_user_id;
   if not found then
     raise exception 'membership not found in this organization';
+  end if;
+
+  -- Last-partner guard: a demotion must never leave the org without an
+  -- active partner. The target counts only if it is an active partner today
+  -- and the change takes that away.
+  if p_role <> 'partner' and v_old_role = 'partner' then
+    if not exists (
+      select 1
+        from public.memberships
+       where organization_id = p_organization_id
+         and role = 'partner'
+         and status = 'active'
+         and user_id <> p_user_id
+       limit 1
+    ) then
+      raise exception 'organization must retain at least one active partner';
+    end if;
   end if;
 
   update public.memberships

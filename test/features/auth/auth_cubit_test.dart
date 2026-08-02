@@ -143,6 +143,72 @@ void main() {
     );
   });
 
+  group('AuthCubit signIn (contract §5 credential path)', () {
+    blocTest<AuthCubit, AuthState>(
+      'emits [loading, authenticated] with the demo session on the dev fake',
+      build: () => AuthCubit(FakeAuthGateway(), InMemoryErrorReporter()),
+      act: (AuthCubit cubit) =>
+          cubit.signIn(email: 'amira@example.com', password: 'any-password'),
+      expect: () => <dynamic>[
+        const AuthState(status: AuthStatus.loading),
+        isA<AuthState>()
+            .having(
+              (AuthState s) => s.status,
+              'status',
+              AuthStatus.authenticated,
+            )
+            .having((AuthState s) => s.session?.userId, 'userId', 'demo-user')
+            .having(
+              (AuthState s) => s.session?.primaryRole,
+              'primaryRole',
+              UserRole.client,
+            ),
+      ],
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'emits [loading, error] and reports the typed failure when credentials '
+      'are rejected',
+      setUp: () => _failingReporter = InMemoryErrorReporter(),
+      build: () =>
+          AuthCubit(_FailingAuthGateway(_gatewayFailure), _failingReporter),
+      act: (AuthCubit cubit) =>
+          cubit.signIn(email: 'amira@example.com', password: 'wrong-password'),
+      expect: () => <AuthState>[
+        const AuthState(status: AuthStatus.loading),
+        const AuthState(status: AuthStatus.error, error: _gatewayAppError),
+      ],
+      verify: (_) {
+        expect(_failingReporter.reports, hasLength(1));
+        expect(_failingReporter.reports.single['code'], 'providerUnavailable');
+      },
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'ignores a duplicate signIn while one is in flight',
+      setUp: () => _countingAuthGateway = _CountingAuthGateway(),
+      build: () => AuthCubit(_countingAuthGateway, InMemoryErrorReporter()),
+      act: (AuthCubit cubit) async {
+        final Future<void> first = cubit.signIn(
+          email: 'amira@example.com',
+          password: 'any-password',
+        );
+        await cubit.signIn(
+          email: 'amira@example.com',
+          password: 'any-password',
+        );
+        await first;
+      },
+      expect: () => <AuthState>[
+        const AuthState(status: AuthStatus.loading),
+        AuthState(status: AuthStatus.authenticated, session: demoSession()),
+      ],
+      verify: (_) {
+        expect(_countingAuthGateway.calls, 1);
+      },
+    );
+  });
+
   group('AuthCubit restore (contract §5)', () {
     blocTest<AuthCubit, AuthState>(
       'emits [restoring, unauthenticated] when there is no session',
@@ -248,6 +314,12 @@ class _NullSessionGateway implements AuthGateway {
       AuthOutcome<Session>.success(demoSession());
 
   @override
+  Future<AuthOutcome<Session>> signIn({
+    required String email,
+    required String password,
+  }) async => AuthOutcome<Session>.success(demoSession());
+
+  @override
   Future<void> signOut() async {}
 }
 
@@ -269,6 +341,12 @@ class _PreauthenticatedGateway implements AuthGateway {
   @override
   Future<AuthOutcome<Session>> startDemoSession() async =>
       AuthOutcome<Session>.success(session);
+
+  @override
+  Future<AuthOutcome<Session>> signIn({
+    required String email,
+    required String password,
+  }) async => AuthOutcome<Session>.success(session);
 
   @override
   Future<void> signOut() async {}
@@ -304,6 +382,12 @@ class _ExpiredSessionGateway implements AuthGateway {
       AuthOutcome<Session>.success(demoSession());
 
   @override
+  Future<AuthOutcome<Session>> signIn({
+    required String email,
+    required String password,
+  }) async => AuthOutcome<Session>.success(demoSession());
+
+  @override
   Future<void> signOut() async {}
 }
 
@@ -327,6 +411,12 @@ class _FailingAuthGateway implements AuthGateway {
       AuthOutcome<Session>.failure(failure);
 
   @override
+  Future<AuthOutcome<Session>> signIn({
+    required String email,
+    required String password,
+  }) async => AuthOutcome<Session>.failure(failure);
+
+  @override
   Future<void> signOut() async {}
 }
 
@@ -347,6 +437,16 @@ class _CountingAuthGateway implements AuthGateway {
   Future<AuthOutcome<Session>> startDemoSession() async {
     calls += 1;
     // Delay so the in-flight call overlaps the second startDemoSession.
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    return AuthOutcome<Session>.success(demoSession());
+  }
+
+  @override
+  Future<AuthOutcome<Session>> signIn({
+    required String email,
+    required String password,
+  }) async {
+    calls += 1;
     await Future<void>.delayed(const Duration(milliseconds: 20));
     return AuthOutcome<Session>.success(demoSession());
   }

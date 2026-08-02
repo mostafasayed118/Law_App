@@ -194,6 +194,16 @@ class FailingAuthGateway implements AuthGateway {
   }
 
   @override
+  Future<AuthOutcome<Session>> signIn({
+    required String email,
+    required String password,
+  }) async {
+    return const AuthOutcome<Session>.failure(
+      AuthFailure(kind: AuthFailureKind.providerUnavailable),
+    );
+  }
+
+  @override
   Future<void> signOut() async {}
 }
 
@@ -216,6 +226,16 @@ class ExpiredSessionGateway implements AuthGateway {
 
   @override
   Future<AuthOutcome<Session>> startDemoSession() async {
+    return const AuthOutcome<Session>.failure(
+      AuthFailure(kind: AuthFailureKind.sessionExpired),
+    );
+  }
+
+  @override
+  Future<AuthOutcome<Session>> signIn({
+    required String email,
+    required String password,
+  }) async {
     return const AuthOutcome<Session>.failure(
       AuthFailure(kind: AuthFailureKind.sessionExpired),
     );

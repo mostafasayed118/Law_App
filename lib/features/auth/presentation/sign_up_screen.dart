@@ -73,7 +73,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
         },
         child: AuthScaffold(
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon: const DirectionalIcon(
+              icon: Icons.arrow_back,
+              mirroredIcon: Icons.arrow_forward,
+            ),
             onPressed: () => context.go(AppRoutes.signIn),
           ),
           maxWidth: 520,

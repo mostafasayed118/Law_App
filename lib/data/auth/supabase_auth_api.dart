@@ -29,6 +29,39 @@ class SupabaseAuthSnapshot extends Equatable {
   List<Object?> get props => <Object?>[userId, displayName, expiresAt];
 }
 
+/// Typed, provider-neutral reasons a Supabase auth call can fail.
+enum SupabaseAuthFailureKind {
+  /// The supplied credentials were rejected by the provider.
+  invalidCredentials,
+
+  /// The email already has a registered account.
+  emailInUse,
+
+  /// The account is disabled.
+  userDisabled,
+
+  /// The provider rate-limited the request.
+  rateLimited,
+
+  /// An unspecified failure.
+  unknown,
+}
+
+/// A provider-neutral auth failure crossing the [SupabaseAuthApi] seam.
+///
+/// The provider exception (GoTrue `AuthException`) is mapped to this type
+/// inside [SupabaseAuthApiImpl], the only file allowed to import provider
+/// types — no consumer above the seam ever sees a provider exception or DTO.
+class SupabaseAuthException implements Exception {
+  const SupabaseAuthException({required this.kind, this.message});
+
+  final SupabaseAuthFailureKind kind;
+  final String? message;
+
+  @override
+  String toString() => 'SupabaseAuthException($kind)';
+}
+
 /// Minimal auth surface the [SupabaseAuthGateway] depends on.
 ///
 /// Keeping this interface free of GoTrue DTOs is what guarantees provider
@@ -44,6 +77,23 @@ abstract interface class SupabaseAuthApi {
   /// Re-reads the provider session (after `Supabase.initialize` has already
   /// restored any persisted session from local storage).
   Future<SupabaseAuthSnapshot?> restore();
+
+  /// Signs in with email + password. Returns the snapshot of the new
+  /// session, or throws [SupabaseAuthException] on provider rejection.
+  Future<SupabaseAuthSnapshot?> signInWithPassword({
+    required String email,
+    required String password,
+  });
+
+  /// Creates an account with email + password and display metadata (full
+  /// name, phone). No session is minted on this project: email confirmation
+  /// is enabled, so sign-up ends at the verification boundary. Throws
+  /// [SupabaseAuthException] on provider rejection.
+  Future<void> signUp({
+    required String email,
+    required String password,
+    required Map<String, String> metadata,
+  });
 
   Future<void> signOut();
 

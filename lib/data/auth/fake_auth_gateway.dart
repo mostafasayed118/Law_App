@@ -49,6 +49,17 @@ class FakeAuthGateway implements AuthGateway {
   }
 
   @override
+  Future<AuthOutcome<Session>> signIn({
+    required String email,
+    required String password,
+  }) async {
+    // The dev fake never accepts or stores the credentials; like
+    // startDemoSession it resolves to the demo session so env-less runs and
+    // tests exercise the full sign-in submit path without a provider.
+    return startDemoSession();
+  }
+
+  @override
   Future<AuthOutcome<Session>> startDemoSession() async {
     final Session session = Session(
       userId: 'demo-user',

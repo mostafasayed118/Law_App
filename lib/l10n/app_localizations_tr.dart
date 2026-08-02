@@ -327,7 +327,22 @@ class AppLocalizationsTr extends AppLocalizations {
   String get consultationBody => 'Yarın 14:00\'te video görüşmesiyle.';
 
   @override
-  String get signInErrorNotice => 'Demo oturumu başlatılamadı.';
+  String get signInErrorNotice =>
+      'Oturum açılamadı. Lütfen bilgilerinizi kontrol edip tekrar deneyin.';
+
+  @override
+  String get validatorRequired => 'Bu alan zorunludur.';
+
+  @override
+  String get validatorEmailInvalid => 'Geçerli bir e-posta adresi girin.';
+
+  @override
+  String validatorMinLength(int count) {
+    return 'En az $count karakter olmalıdır.';
+  }
+
+  @override
+  String get validatorMismatch => 'Şifreler eşleşmiyor.';
 
   @override
   String get casesNavigation => 'Davalar';

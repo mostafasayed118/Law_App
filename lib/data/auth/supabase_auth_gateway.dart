@@ -53,6 +53,54 @@ class SupabaseAuthGateway implements AuthGateway {
   }
 
   @override
+  Future<AuthOutcome<Session>> signIn({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final SupabaseAuthSnapshot? snapshot = await _api.signInWithPassword(
+        email: email,
+        password: password,
+      );
+      if (snapshot == null) {
+        return const AuthOutcome<Session>.failure(
+          AuthFailure(
+            kind: AuthFailureKind.unknown,
+            message: 'Sign-in returned no session.',
+          ),
+        );
+      }
+      final Session session = _toSession(snapshot)!;
+      if (session.isExpired) {
+        return const AuthOutcome<Session>.failure(
+          AuthFailure(kind: AuthFailureKind.sessionExpired),
+        );
+      }
+      _session = session;
+      return AuthOutcome<Session>.success(session);
+    } on SupabaseAuthException catch (e) {
+      // Provider-neutral mapping: the typed kind and a non-sensitive message
+      // leave the seam; the GoTrue exception never does (contract §5).
+      return AuthOutcome<Session>.failure(
+        AuthFailure(kind: _mapFailureKind(e.kind), message: e.message),
+      );
+    }
+  }
+
+  AuthFailureKind _mapFailureKind(SupabaseAuthFailureKind kind) {
+    return switch (kind) {
+      SupabaseAuthFailureKind.invalidCredentials =>
+        AuthFailureKind.invalidCredentials,
+      SupabaseAuthFailureKind.userDisabled => AuthFailureKind.userDisabled,
+      SupabaseAuthFailureKind.rateLimited ||
+      SupabaseAuthFailureKind.unknown => AuthFailureKind.providerUnavailable,
+      // Unreachable on the sign-in path (sign-up surfaces it); kept
+      // exhaustive so a future kind addition fails loudly.
+      SupabaseAuthFailureKind.emailInUse => AuthFailureKind.unknown,
+    };
+  }
+
+  @override
   Future<AuthOutcome<Session>> startDemoSession() async {
     // A real provider must never mint a demo session (contract §5: the demo
     // path is bootstrap-only). Deny rather than fabricate an authority.

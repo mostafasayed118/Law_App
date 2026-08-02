@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/legalhub_theme.dart';
+import '../../formatting/display_case.dart';
 
 /// A labelled form-field row used across the auth/onboarding flows.
 ///
@@ -32,7 +33,7 @@ class LabelledField extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Text(
-              label.toUpperCase(),
+              displayUppercase(label, Localizations.localeOf(context)),
               style: text.labelLarge?.copyWith(color: scheme.onSurfaceVariant),
             ),
             ?trailing,

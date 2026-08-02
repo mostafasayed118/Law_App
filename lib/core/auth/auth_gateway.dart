@@ -19,6 +19,16 @@ abstract interface class AuthGateway {
   /// unavailable — never a misleading empty success.
   Future<AuthOutcome<Session>> restore();
 
+  /// Credential sign-in (contract §5). Resolves to authenticated or a typed
+  /// failure (invalidCredentials, userDisabled, providerUnavailable) — never
+  /// a raw provider exception. The dev fake resolves to the demo session
+  /// without accepting or storing the credentials; a configured provider
+  /// signs in with them.
+  Future<AuthOutcome<Session>> signIn({
+    required String email,
+    required String password,
+  });
+
   /// Bootstrap-only demo path — not an authentication mechanism and must not
   /// be used as production authorization.
   Future<AuthOutcome<Session>> startDemoSession();

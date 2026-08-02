@@ -36,6 +36,19 @@ class _FakeSupabaseAuthApi implements SupabaseAuthApi {
   Future<SupabaseAuthSnapshot?> restore() async => null;
 
   @override
+  Future<SupabaseAuthSnapshot?> signInWithPassword({
+    required String email,
+    required String password,
+  }) async => null;
+
+  @override
+  Future<void> signUp({
+    required String email,
+    required String password,
+    required Map<String, String> metadata,
+  }) async {}
+
+  @override
   Future<void> signOut() async {}
 
   @override

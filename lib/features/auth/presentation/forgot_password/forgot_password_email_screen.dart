@@ -38,7 +38,10 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
     final TextTheme text = Theme.of(context).textTheme;
     return AuthScaffold(
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
+        icon: const DirectionalIcon(
+          icon: Icons.arrow_back,
+          mirroredIcon: Icons.arrow_forward,
+        ),
         onPressed: () => context.go(AppRoutes.signIn),
       ),
       child: Form(
@@ -79,14 +82,22 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
             const SizedBox(height: LegalHubTheme.spaceLg),
             ElevatedButton.icon(
               onPressed: _submit,
-              icon: const Icon(Icons.arrow_forward, size: 18),
+              icon: const DirectionalIcon(
+                icon: Icons.arrow_forward,
+                mirroredIcon: Icons.arrow_back,
+                size: 18,
+              ),
               label: Text(l10n.sendCodeButton),
             ),
             const SizedBox(height: LegalHubTheme.spaceXl),
             Center(
               child: TextButton.icon(
                 onPressed: () => context.go(AppRoutes.signIn),
-                icon: const Icon(Icons.arrow_back, size: 18),
+                icon: const DirectionalIcon(
+                  icon: Icons.arrow_back,
+                  mirroredIcon: Icons.arrow_forward,
+                  size: 18,
+                ),
                 label: Text(l10n.backToSignIn),
               ),
             ),

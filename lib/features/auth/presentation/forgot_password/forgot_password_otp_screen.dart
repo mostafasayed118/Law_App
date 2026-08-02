@@ -54,7 +54,10 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
     final TextTheme text = Theme.of(context).textTheme;
     return AuthScaffold(
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
+        icon: const DirectionalIcon(
+          icon: Icons.arrow_back,
+          mirroredIcon: Icons.arrow_forward,
+        ),
         onPressed: () => context.go(AppRoutes.forgotPassword),
       ),
       child: Column(

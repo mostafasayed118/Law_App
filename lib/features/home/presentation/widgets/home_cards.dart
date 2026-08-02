@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/legalhub_theme.dart';
+import '../../../../shared/formatting/display_case.dart';
 
 /// A section header with an optional trailing "VIEW ALL"-style action.
 class SectionHeader extends StatelessWidget {
@@ -31,7 +32,7 @@ class SectionHeader extends StatelessWidget {
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             child: Text(
-              actionLabel!.toUpperCase(),
+              displayUppercase(actionLabel!, Localizations.localeOf(context)),
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                 color: Theme.of(context).colorScheme.secondary,
                 letterSpacing: 0.5,
@@ -71,7 +72,7 @@ class StatusChip extends StatelessWidget {
         ),
       ),
       child: Text(
-        label.toUpperCase(),
+        displayUppercase(label, Localizations.localeOf(context)),
         style: Theme.of(context).textTheme.labelLarge?.copyWith(
           color: foreground ?? scheme.onSurfaceVariant,
           letterSpacing: 0.5,

@@ -54,6 +54,68 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
       _toSnapshot(_client.currentSession);
 
   @override
+  Future<SupabaseAuthSnapshot?> signInWithPassword({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final AuthResponse response = await _client.signInWithPassword(
+        email: email,
+        password: password,
+      );
+      return _toSnapshot(response.session);
+    } on AuthException catch (e) {
+      // Provider errors are mapped here so no consumer above the seam ever
+      // sees a GoTrue exception (contract §5, §2.6).
+      throw SupabaseAuthException(kind: _failureKindFor(e), message: e.message);
+    }
+  }
+
+  @override
+  Future<void> signUp({
+    required String email,
+    required String password,
+    required Map<String, String> metadata,
+  }) async {
+    try {
+      // GoTrue stores non-reserved keys as raw user_metadata; full_name and
+      // phone are the display-name sources read by _displayNameFrom.
+      await _client.signUp(
+        email: email,
+        password: password,
+        data: <String, dynamic>{
+          for (final MapEntry<String, String> entry in metadata.entries)
+            entry.key: entry.value,
+        },
+      );
+    } on AuthException catch (e) {
+      throw SupabaseAuthException(kind: _failureKindFor(e), message: e.message);
+    }
+  }
+
+  /// Maps a GoTrue [AuthException] to the provider-neutral failure kind.
+  /// Status codes and message fragments are the stable GoTrue surface;
+  /// everything else is [SupabaseAuthFailureKind.unknown] with the message
+  /// preserved for diagnostics.
+  SupabaseAuthFailureKind _failureKindFor(AuthException e) {
+    // GoTrue reports the status code as a String (gotrue >= 2.26).
+    if (e.statusCode == '429') {
+      return SupabaseAuthFailureKind.rateLimited;
+    }
+    final String message = e.message.toLowerCase();
+    if (message.contains('invalid login credentials')) {
+      return SupabaseAuthFailureKind.invalidCredentials;
+    }
+    if (message.contains('already registered')) {
+      return SupabaseAuthFailureKind.emailInUse;
+    }
+    if (message.contains('disabled')) {
+      return SupabaseAuthFailureKind.userDisabled;
+    }
+    return SupabaseAuthFailureKind.unknown;
+  }
+
+  @override
   Future<void> signOut() => _client.signOut();
 
   @override

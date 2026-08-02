@@ -11,9 +11,9 @@ void main() {
 
   group('LegalHubValidators.required', () {
     test('rejects null and whitespace-only values', () {
-      expect(LegalHubValidators.required(l10n, null), l10n.stateError);
-      expect(LegalHubValidators.required(l10n, ''), l10n.stateError);
-      expect(LegalHubValidators.required(l10n, '   '), l10n.stateError);
+      expect(LegalHubValidators.required(l10n, null), l10n.validatorRequired);
+      expect(LegalHubValidators.required(l10n, ''), l10n.validatorRequired);
+      expect(LegalHubValidators.required(l10n, '   '), l10n.validatorRequired);
     });
 
     test('accepts non-empty trimmed values', () {
@@ -24,13 +24,19 @@ void main() {
 
   group('LegalHubValidators.email', () {
     test('rejects empty and malformed addresses', () {
-      expect(LegalHubValidators.email(l10n, null), l10n.stateError);
-      expect(LegalHubValidators.email(l10n, ''), l10n.stateError);
-      expect(LegalHubValidators.email(l10n, 'plainstring'), l10n.stateError);
-      expect(LegalHubValidators.email(l10n, 'no-tld@domain'), l10n.stateError);
+      expect(LegalHubValidators.email(l10n, null), l10n.validatorEmailInvalid);
+      expect(LegalHubValidators.email(l10n, ''), l10n.validatorEmailInvalid);
+      expect(
+        LegalHubValidators.email(l10n, 'plainstring'),
+        l10n.validatorEmailInvalid,
+      );
+      expect(
+        LegalHubValidators.email(l10n, 'no-tld@domain'),
+        l10n.validatorEmailInvalid,
+      );
       expect(
         LegalHubValidators.email(l10n, 'space in@domain.com'),
-        l10n.stateError,
+        l10n.validatorEmailInvalid,
       );
     });
 
@@ -47,9 +53,9 @@ void main() {
 
     test('rejects values shorter than the threshold', () {
       final v = LegalHubValidators.minLength(l10n, 8);
-      expect(v(null), l10n.stateError);
-      expect(v(''), l10n.stateError);
-      expect(v('1234567'), l10n.stateError);
+      expect(v(null), l10n.validatorMinLength(8));
+      expect(v(''), l10n.validatorMinLength(8));
+      expect(v('1234567'), l10n.validatorMinLength(8));
     });
 
     test('accepts values at or beyond the threshold', () {
@@ -62,9 +68,9 @@ void main() {
   group('LegalHubValidators.matches', () {
     test('rejects empty, null, or differing values', () {
       final v = LegalHubValidators.matches(l10n, 'secret');
-      expect(v(null), l10n.stateError);
-      expect(v(''), l10n.stateError);
-      expect(v('different'), l10n.stateError);
+      expect(v(null), l10n.validatorMismatch);
+      expect(v(''), l10n.validatorMismatch);
+      expect(v('different'), l10n.validatorMismatch);
     });
 
     test('accepts an exact match', () {

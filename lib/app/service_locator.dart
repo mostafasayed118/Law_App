@@ -14,6 +14,7 @@ import '../data/local/locale_store.dart';
 import '../data/local/shared_preferences_locale_store.dart';
 import '../features/auth/data/fake_password_recovery_gateway.dart';
 import '../features/auth/data/fake_sign_up_gateway.dart';
+import '../features/auth/data/supabase_sign_up_gateway.dart';
 import '../features/auth/domain/password_recovery_gateway.dart';
 import '../features/auth/domain/sign_up_gateway.dart';
 import '../features/auth/presentation/auth_cubit.dart';
@@ -49,11 +50,11 @@ void configureDependencies({
   // Per §4.5, stateless services/repositories register as lazy singletons.
   // App-scoped Cubits below are also lazy singletons because the router and
   // root MaterialApp must observe the same session and locale instances.
+  final SupabaseEnv env = supabaseEnv ?? SupabaseEnv.fromEnvironment();
   if (!serviceLocator.isRegistered<SampleService>()) {
     serviceLocator.registerLazySingleton<SampleService>(SampleServiceImpl.new);
   }
   if (!serviceLocator.isRegistered<AuthGateway>()) {
-    final SupabaseEnv env = supabaseEnv ?? SupabaseEnv.fromEnvironment();
     if (env.isConfigured) {
       // Batch 3.3 anon-key guard: refuse a non-anon key before wiring any
       // provider, so a service-role key can never reach the client build.
@@ -109,7 +110,19 @@ void configureDependencies({
   if (!serviceLocator.isRegistered<SignUpGateway>()) {
     // Stateless service: lazy singleton. The sign-up Cubit is feature-scoped
     // and created per screen via BlocProvider, so it is NOT registered here.
-    serviceLocator.registerLazySingleton<SignUpGateway>(FakeSignUpGateway.new);
+    // Like AuthGateway, the flip swaps the dev fake for the Supabase-backed
+    // implementation when the build is configured (Batch 3.3 env pattern).
+    if (env.isConfigured) {
+      serviceLocator.registerLazySingleton<SignUpGateway>(
+        () => SupabaseSignUpGateway(
+          (supabaseAuthApiFactory ?? SupabaseAuthApiImpl.bind)(),
+        ),
+      );
+    } else {
+      serviceLocator.registerLazySingleton<SignUpGateway>(
+        FakeSignUpGateway.new,
+      );
+    }
   }
   if (!serviceLocator.isRegistered<AuthCubit>()) {
     // App-scoped because the router and all screens observe one session seam.

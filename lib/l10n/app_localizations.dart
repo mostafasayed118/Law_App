@@ -703,8 +703,32 @@ abstract class AppLocalizations {
   /// No description provided for @signInErrorNotice.
   ///
   /// In en, this message translates to:
-  /// **'Unable to start the demo session.'**
+  /// **'Unable to sign in. Please check your credentials and try again.'**
   String get signInErrorNotice;
+
+  /// No description provided for @validatorRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required.'**
+  String get validatorRequired;
+
+  /// No description provided for @validatorEmailInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address.'**
+  String get validatorEmailInvalid;
+
+  /// No description provided for @validatorMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Must be at least {count} characters.'**
+  String validatorMinLength(int count);
+
+  /// No description provided for @validatorMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match.'**
+  String get validatorMismatch;
 
   /// No description provided for @casesNavigation.
   ///

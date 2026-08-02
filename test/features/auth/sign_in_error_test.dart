@@ -61,7 +61,12 @@ void main() {
 
     expect(authCubit.state.status, AuthStatus.error);
     expect(find.byType(SnackBar), findsOneWidget);
-    expect(find.text('Unable to start the demo session.'), findsOneWidget);
+    expect(
+      find.text(
+        'Unable to sign in. Please check your credentials and try again.',
+      ),
+      findsOneWidget,
+    );
   });
 }
 
@@ -83,6 +88,12 @@ class _FailingAuthGateway implements AuthGateway {
   @override
   Future<AuthOutcome<Session>> startDemoSession() async =>
       AuthOutcome<Session>.failure(failure);
+
+  @override
+  Future<AuthOutcome<Session>> signIn({
+    required String email,
+    required String password,
+  }) async => AuthOutcome<Session>.failure(failure);
 
   @override
   Future<void> signOut() async {}

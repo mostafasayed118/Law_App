@@ -19,6 +19,11 @@ class _FakeSupabaseAuthApi implements SupabaseAuthApi {
 
   int restoreCalls = 0;
   int signOutCalls = 0;
+  int signInCalls = 0;
+  String? lastSignInEmail;
+  String? lastSignInPassword;
+  SupabaseAuthException? signInError;
+  SupabaseAuthSnapshot? signInResult;
 
   @override
   Stream<SupabaseAuthSnapshot?> get snapshotChanges => _changes.stream;
@@ -28,6 +33,28 @@ class _FakeSupabaseAuthApi implements SupabaseAuthApi {
     restoreCalls++;
     return currentSnapshot;
   }
+
+  @override
+  Future<SupabaseAuthSnapshot?> signInWithPassword({
+    required String email,
+    required String password,
+  }) async {
+    signInCalls++;
+    lastSignInEmail = email;
+    lastSignInPassword = password;
+    final SupabaseAuthException? error = signInError;
+    if (error != null) {
+      throw error;
+    }
+    return signInResult;
+  }
+
+  @override
+  Future<void> signUp({
+    required String email,
+    required String password,
+    required Map<String, String> metadata,
+  }) async {}
 
   @override
   Future<void> signOut() async {
@@ -190,6 +217,91 @@ void main() {
 
       expect(api.signOutCalls, 1);
       expect(gateway.currentSession, isNull);
+    });
+  });
+
+  group('SupabaseAuthGateway signIn', () {
+    test(
+      'signs in through the provider and maps the snapshot to a Session',
+      () async {
+        final DateTime expiresAt = DateTime.now().add(const Duration(hours: 8));
+        final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null);
+        api.signInResult = SupabaseAuthSnapshot(
+          userId: 'u-1',
+          displayName: 'Amira Hassan',
+          expiresAt: expiresAt,
+        );
+        final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+        addTearDown(gateway.dispose);
+
+        final AuthOutcome<Session> outcome = await gateway.signIn(
+          email: 'amira@example.com',
+          password: 'secret-pass',
+        );
+
+        expect(outcome.isSuccess, isTrue);
+        expect(outcome.valueOrNull?.userId, 'u-1');
+        expect(gateway.currentSession?.userId, 'u-1');
+        // The credentials reach the provider seam exactly as entered; nothing
+        // is stored on the domain session.
+        expect(api.signInCalls, 1);
+        expect(api.lastSignInEmail, 'amira@example.com');
+        expect(api.lastSignInPassword, 'secret-pass');
+      },
+    );
+
+    test('maps invalidCredentials to AuthFailed(invalidCredentials)', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null);
+      api.signInError = const SupabaseAuthException(
+        kind: SupabaseAuthFailureKind.invalidCredentials,
+        message: 'Invalid login credentials',
+      );
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      final AuthOutcome<Session> outcome = await gateway.signIn(
+        email: 'amira@example.com',
+        password: 'wrong-pass',
+      );
+
+      expect(outcome.isSuccess, isFalse);
+      expect(outcome.failureOrNull?.kind, AuthFailureKind.invalidCredentials);
+      expect(outcome.failureOrNull?.message, 'Invalid login credentials');
+      expect(gateway.currentSession, isNull);
+    });
+
+    test('maps rateLimited to providerUnavailable', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null);
+      api.signInError = const SupabaseAuthException(
+        kind: SupabaseAuthFailureKind.rateLimited,
+      );
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      final AuthOutcome<Session> outcome = await gateway.signIn(
+        email: 'amira@example.com',
+        password: 'any-pass',
+      );
+
+      expect(outcome.failureOrNull?.kind, AuthFailureKind.providerUnavailable);
+    });
+
+    test('resolves an expired sign-in snapshot to sessionExpired', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null);
+      api.signInResult = SupabaseAuthSnapshot(
+        userId: 'u-1',
+        displayName: 'Amira',
+        expiresAt: DateTime.now().subtract(const Duration(hours: 1)),
+      );
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      final AuthOutcome<Session> outcome = await gateway.signIn(
+        email: 'amira@example.com',
+        password: 'any-pass',
+      );
+
+      expect(outcome.failureOrNull?.kind, AuthFailureKind.sessionExpired);
     });
   });
 

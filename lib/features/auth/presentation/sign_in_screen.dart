@@ -43,7 +43,10 @@ class _SignInScreenState extends State<SignInScreen> {
     final TextTheme text = Theme.of(context).textTheme;
     return AuthScaffold(
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
+        icon: const DirectionalIcon(
+          icon: Icons.arrow_back,
+          mirroredIcon: Icons.arrow_forward,
+        ),
         onPressed: () =>
             context.canPop() ? context.pop() : context.go(AppRoutes.onboarding),
       ),
@@ -173,8 +176,12 @@ class _SignInScreenState extends State<SignInScreen> {
 
   void _submit() {
     if (_formKey.currentState?.validate() ?? false) {
-      // No real auth gateway exists yet; use the demo session seam.
-      context.read<AuthCubit>().startDemoSession();
+      // Real sign-in when a provider is configured; the dev fake resolves
+      // the same path to the demo session (credentials never stored).
+      context.read<AuthCubit>().signIn(
+        email: _email.text.trim(),
+        password: _password.text,
+      );
     }
   }
 }

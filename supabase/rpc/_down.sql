@@ -1,7 +1,15 @@
 -- rpc/_down.sql — consolidated backout for the entire P2 RPC surface
 -- (REVIEWED — rollback standby; not run on dev). Mirrors README rollback row "rpc/*.sql -> _down.sql".
+--
+-- Hardened 2026-08-03 (code-only, NOT yet applied): the backout now also
+-- revokes the per-function EXECUTE grants the RPC files gave to
+-- `authenticated`, so a full rollback restores the default-deny posture
+-- instead of leaving an orphaned grant surface.
 
 begin;
+
+revoke execute on all functions in schema public from authenticated;
+revoke execute on all functions in schema public from anon, public;
 
 drop function if exists public.create_organization(text);
 drop function if exists public.accept_invitation(text);
@@ -21,9 +29,7 @@ drop function if exists public.delete_demo_account(uuid);
 drop function if exists public.read_org_audit(uuid);
 drop function if exists public.read_platform_audit();
 
--- Note: dropping the functions does not drop the per-function execute grants
--- granted to `authenticated`; run `revoke execute on all functions in schema
--- public from authenticated;` if a full privilege reset is desired. The
--- RPC-specific revoke-from-public/anon lines in each file are idempotent.
+-- The revokes above run first so the drops below are the final privilege
+-- reset: functions are gone and no execute grant survives in any role.
 
 commit;

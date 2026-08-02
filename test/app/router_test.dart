@@ -523,6 +523,14 @@ class RoleGateway implements AuthGateway {
   }
 
   @override
+  Future<AuthOutcome<Session>> signIn({
+    required String email,
+    required String password,
+  }) async {
+    return AuthOutcome<Session>.success(_session);
+  }
+
+  @override
   Future<void> signOut() async {}
 }
 

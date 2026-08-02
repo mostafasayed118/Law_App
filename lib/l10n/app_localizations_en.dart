@@ -325,7 +325,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get consultationBody => 'Tomorrow at 2:00 PM via Video Call.';
 
   @override
-  String get signInErrorNotice => 'Unable to start the demo session.';
+  String get signInErrorNotice =>
+      'Unable to sign in. Please check your credentials and try again.';
+
+  @override
+  String get validatorRequired => 'This field is required.';
+
+  @override
+  String get validatorEmailInvalid => 'Enter a valid email address.';
+
+  @override
+  String validatorMinLength(int count) {
+    return 'Must be at least $count characters.';
+  }
+
+  @override
+  String get validatorMismatch => 'Passwords do not match.';
 
   @override
   String get casesNavigation => 'Cases';

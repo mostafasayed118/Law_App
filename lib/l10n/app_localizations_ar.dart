@@ -324,7 +324,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get consultationBody => 'غدًا الساعة ٢:٠٠ مساءً عبر مكالمة فيديو.';
 
   @override
-  String get signInErrorNotice => 'تعذر بدء الجلسة التجريبية.';
+  String get signInErrorNotice =>
+      'تعذر تسجيل الدخول. يرجى التحقق من بياناتك والمحاولة مرة أخرى.';
+
+  @override
+  String get validatorRequired => 'هذا الحقل مطلوب.';
+
+  @override
+  String get validatorEmailInvalid => 'أدخل عنوان بريد إلكتروني صالح.';
+
+  @override
+  String validatorMinLength(int count) {
+    return 'يجب أن يكون على الأقل $count أحرف.';
+  }
+
+  @override
+  String get validatorMismatch => 'كلمتا المرور غير متطابقتين.';
 
   @override
   String get casesNavigation => 'القضايا';

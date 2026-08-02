@@ -90,17 +90,20 @@ Decided **and** the §4 Definition of Ready checklist is satisfied.
   backup/cross-border processing constraints? Affects provider project
   selection and storage config.
 - **Owner:** Project Owner (github.com/mostafasayed118)
-- **Decision:** **Region: `eu-central-1` (Frankfurt)** on a Supabase
+- **Decision:** **Region: `West Europe (London)`** on a Supabase
   free/dev tier project. No real cross-border processing constraints apply
   (synthetic data only); this is a technical proximity choice, not a
   compliance determination.
 - **Decided on:** 2026-07-31
 - **Blocks slice:** P1 (provider project selection), P2 (storage policies).
-- **Evidence / notes:** **Provisioned 2026-07-31** (`eu-central-1`, free/dev
-  tier). The project ref is kept in the local, git-ignored `.env` only by the
-  owner's choice — not sensitive, but not needed in this shared doc for the
-  gate to close. (Reconciled 2026-07-31 from an earlier "not yet provisioned"
-  note to match the §2 checklist and the kickoff prompt.)
+- **Evidence / notes:** **Provisioned 2026-07-31** (`West Europe (London)`,
+  free/dev tier). The project ref is kept in the local, git-ignored `.env`
+  only by the owner's choice — not sensitive, but not needed in this shared
+  doc for the gate to close. (Reconciled 2026-07-31 from an earlier "not yet
+  provisioned" note to match the §2 checklist and the kickoff prompt;
+  region corrected 2026-08-03 from a recorded `eu-central-1` to the actual
+  `West Europe (London)` — confirmed against the live project via the
+  Supabase CLI, `supabase projects list`.)
 
 ### D-05 — Retention, deletion, legal hold, export
 
@@ -267,12 +270,13 @@ of the following are true (mirrors contract §12):
 - [x] All blockers in the "Blocks slice: P1" set above (D-02, D-03, D-04,
       D-07, D-08, D-09) are **Decided** (2026-07-31, see §1 above).
 - [x] A non-production Supabase project exists. **Provisioned 2026-07-31**,
-      region `eu-central-1`. Project ref: _not recorded in this shared doc
-      by owner's choice — kept in the local, git-ignored `.env` only; the
-      ref is not sensitive but recording it here isn't necessary for the
-      gate to close._ Migrations/policies/functions/storage config
-      inspection is N/A — this is a freshly created project with nothing in
-      it yet.
+      region `West Europe (London)` (recorded initially as `eu-central-1`;
+      corrected 2026-08-03 to the actual region). Project ref: _not recorded
+      in this shared doc by owner's choice — kept in the local, git-ignored
+      `.env` only; the ref is not sensitive but recording it here isn't
+      necessary for the gate to close._ Migrations/policies/functions/storage
+      config inspection is N/A — this is a freshly created project with
+      nothing in it yet.
 - [x] A signed permission matrix exists covering **positive and negative**
       cases for each approved MVP action (contract §9). Location:
       `docs/permission_matrix.md` (added 2026-07-31).
@@ -322,8 +326,9 @@ see the corresponding decisions in §1:
 1. **Product model (D-02):** ✅ multi-tenant law-firm client portal.
 2. **Jurisdiction + policy owner (D-03):** ✅ N/A for demo scope; owner of
    record is the Project Owner.
-3. **Provider project:** ✅ provisioned 2026-07-31 (`eu-central-1`); project
-   ref kept in the local, git-ignored `.env` only — see §2.
+3. **Provider project:** ✅ provisioned 2026-07-31 (`West Europe (London)`;
+   region corrected 2026-08-03 from the initially recorded `eu-central-1`);
+   project ref kept in the local, git-ignored `.env` only — see §2.
 4. **Auth policy (D-07):** ✅ email+password, email verification required,
    MFA/SSO deferred to v1.
 5. **Permission matrix:** ✅ `docs/permission_matrix.md`.

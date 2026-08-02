@@ -79,7 +79,8 @@ void main() {
 
     // Invoke the submit callback directly to avoid hit-test fragility in the
     // scrollable auth form; the goal is to verify the validated form routes
-    // through to AuthCubit.startDemoSession.
+    // through to AuthCubit.signIn (which the dev fake resolves to the demo
+    // session).
     final ElevatedButton button = tester.widget<ElevatedButton>(
       find.byType(ElevatedButton).last,
     );

@@ -6,6 +6,10 @@
 -- never a DELETE). A suspended membership no longer authorizes anything —
 -- active_membership() filters status = 'active', so a stale client session
 -- cannot project capabilities (matrix §3 negative). Audited.
+--
+-- Hardened 2026-08-03 (code-only, NOT yet applied): the org must retain at
+-- least one active partner after the suspension, closing the same
+-- zero-partner lockout that change_member_role now guards (audit finding).
 
 create or replace function public.suspend_membership(
   p_organization_id uuid,
@@ -15,6 +19,27 @@ language plpgsql security definer set search_path = public as $$
 begin
   if not public.has_org_role(p_organization_id, 'partner') then
     raise exception 'permission denied';
+  end if;
+
+  -- Last-partner guard: suspending the org's only active partner locks the
+  -- org out of membership management.
+  if exists (
+    select 1
+      from public.memberships
+     where organization_id = p_organization_id
+       and user_id = p_user_id
+       and role = 'partner'
+       and status = 'active'
+  ) and not exists (
+    select 1
+      from public.memberships
+     where organization_id = p_organization_id
+       and role = 'partner'
+       and status = 'active'
+       and user_id <> p_user_id
+     limit 1
+  ) then
+    raise exception 'organization must retain at least one active partner';
   end if;
 
   update public.memberships

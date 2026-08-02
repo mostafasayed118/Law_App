@@ -18,6 +18,11 @@ messaging services.
 - Cubit/Bloc state-management baseline.
 - Development-only demo-session gateway that never accepts credentials.
 - Auth-aware GoRouter shell and UX-only role capability hints.
+- Real Supabase sign-in/sign-up behind the existing seams: when the build is
+  configured with a URL + anon key (`--dart-define-from-file=.env`),
+  sign-in goes through GoTrue (`AuthGateway.signIn`) and sign-up through
+  `SupabaseSignUpGateway` (email verification enabled); env-less runs and
+  tests keep the credential-free fakes.
 - Redacted error-reporting boundary with no external observability SDK.
 - Auth and onboarding presentation: sign-in, sign-up, forgot-password
   (email/OTP/reset), onboarding carousel and success, home dashboard,
@@ -35,7 +40,7 @@ messaging services.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (277 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (307 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), Redactor (password/OTP/email/Bearer redaction
   with leak guards), DI registration graph, validators, router redirect logic
@@ -64,7 +69,7 @@ messaging services.
     gateways, the in-memory locale store, and the onboarding-success screen.
     Batch 5 added the 800×600 onboarding no-overflow test and the EN/AR/TR
     localized-fallback assertions.
-- Coverage: **277 tests** (2026-08-01); `flutter analyze` and the format gate
+- Coverage: **307 tests** (2026-08-03); `flutter analyze` and the format gate
   clean. The coverage-gap list from the codebase audit (cubit emission
   streams, shared widgets, screen negative paths, router bypass, TR locale,
   reset success path) was closed by Batch 1 of

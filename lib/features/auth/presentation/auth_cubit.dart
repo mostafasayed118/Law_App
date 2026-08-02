@@ -41,6 +41,22 @@ class AuthCubit extends Cubit<AuthState> {
     await _applySessionOutcome(outcome);
   }
 
+  /// Credential sign-in (contract §5): `loading` → authenticated /
+  /// unauthenticated / reauthRequired / error. With the dev fake the same
+  /// call resolves to the demo session; with a configured provider it signs
+  /// in with the entered credentials.
+  Future<void> signIn({required String email, required String password}) async {
+    if (state.status == AuthStatus.loading || state.isAuthenticated) {
+      return;
+    }
+    emit(const AuthState(status: AuthStatus.loading));
+    final AuthOutcome<Session> outcome = await _gateway.signIn(
+      email: email,
+      password: password,
+    );
+    await _applySessionOutcome(outcome);
+  }
+
   Future<void> startDemoSession() async {
     if (state.status == AuthStatus.loading || state.isAuthenticated) {
       return;

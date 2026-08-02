@@ -7,6 +7,10 @@
 -- removed memberships no longer authorize anything via active_membership()).
 -- A member cannot remove themselves via this RPC (use delete_my_account for
 -- self-deletion, D-05). Audited.
+--
+-- Hardened 2026-08-03 (code-only, NOT yet applied): the org must retain at
+-- least one active partner after the removal, closing the same zero-partner
+-- lockout that change_member_role now guards (audit finding).
 
 create or replace function public.remove_membership(
   p_organization_id uuid,
@@ -19,6 +23,27 @@ begin
   end if;
   if not public.has_org_role(p_organization_id, 'partner') then
     raise exception 'permission denied';
+  end if;
+
+  -- Last-partner guard: removing the org's only active partner locks the
+  -- org out of membership management.
+  if exists (
+    select 1
+      from public.memberships
+     where organization_id = p_organization_id
+       and user_id = p_user_id
+       and role = 'partner'
+       and status = 'active'
+  ) and not exists (
+    select 1
+      from public.memberships
+     where organization_id = p_organization_id
+       and role = 'partner'
+       and status = 'active'
+       and user_id <> p_user_id
+     limit 1
+  ) then
+    raise exception 'organization must retain at least one active partner';
   end if;
 
   update public.memberships

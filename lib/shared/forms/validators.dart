@@ -14,14 +14,14 @@ class LegalHubValidators {
   /// Non-empty trimmed value.
   static String? required(AppLocalizations l10n, String? value) {
     final String text = value?.trim() ?? '';
-    return text.isEmpty ? l10n.stateError : null;
+    return text.isEmpty ? l10n.validatorRequired : null;
   }
 
   /// Valid email shape.
   static String? email(AppLocalizations l10n, String? value) {
     final String text = value?.trim() ?? '';
     if (text.isEmpty || !_emailRegex.hasMatch(text)) {
-      return l10n.stateError;
+      return l10n.validatorEmailInvalid;
     }
     return null;
   }
@@ -36,7 +36,9 @@ class LegalHubValidators {
     }
     return (String? value) {
       final String text = value ?? '';
-      return text.length < minLength ? l10n.stateError : null;
+      return text.length < minLength
+          ? l10n.validatorMinLength(minLength)
+          : null;
     };
   }
 
@@ -47,7 +49,7 @@ class LegalHubValidators {
   ) {
     return (String? value) {
       final String text = value ?? '';
-      return (text.isEmpty || text != other) ? l10n.stateError : null;
+      return (text.isEmpty || text != other) ? l10n.validatorMismatch : null;
     };
   }
 }

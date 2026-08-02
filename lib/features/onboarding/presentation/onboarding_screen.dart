@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../app/router.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/widgets.dart';
 
 /// Three-step onboarding carousel matching
 /// `stitch_legalhub_mobile_app/onboarding`.
@@ -137,7 +138,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       backgroundColor: scheme.primaryContainer,
                       foregroundColor: scheme.onPrimaryContainer,
                     ),
-                    icon: const Icon(Icons.arrow_forward, size: 18),
+                    icon: DirectionalIcon(
+                      icon: Icons.arrow_forward,
+                      mirroredIcon: Icons.arrow_back,
+                      size: 18,
+                    ),
                     label: Text(
                       _current == _pageCount - 1
                           ? l10n.onboardingGetStarted

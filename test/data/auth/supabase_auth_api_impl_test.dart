@@ -133,6 +133,157 @@ void main() {
       verify(() => client.signOut()).called(1);
     });
 
+    test(
+      'signs in with the credentials and maps the session to a snapshot',
+      () async {
+        const int exp = 1893456000; // 2030-01-01 UTC
+        when(
+          () => client.signInWithPassword(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+          ),
+        ).thenAnswer(
+          (_) async => AuthResponse(
+            session: _session(
+              exp: exp,
+              user: _user(
+                userMetadata: const <String, dynamic>{
+                  'full_name': 'Amira Hassan',
+                },
+              ),
+            ),
+          ),
+        );
+
+        final SupabaseAuthSnapshot? snapshot = await api.signInWithPassword(
+          email: 'amira@example.com',
+          password: 'secret-pass',
+        );
+
+        verify(
+          () => client.signInWithPassword(
+            email: 'amira@example.com',
+            password: 'secret-pass',
+          ),
+        ).called(1);
+        expect(snapshot?.userId, 'u-1');
+        expect(snapshot?.displayName, 'Amira Hassan');
+      },
+    );
+
+    test('maps invalid-credentials rejection to a typed exception', () async {
+      when(
+        () => client.signInWithPassword(
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+        ),
+      ).thenThrow(
+        const AuthException('Invalid login credentials', statusCode: '400'),
+      );
+
+      await expectLater(
+        api.signInWithPassword(
+          email: 'amira@example.com',
+          password: 'wrong-pass',
+        ),
+        throwsA(
+          isA<SupabaseAuthException>()
+              .having(
+                (SupabaseAuthException e) => e.kind,
+                'kind',
+                SupabaseAuthFailureKind.invalidCredentials,
+              )
+              .having(
+                (SupabaseAuthException e) => e.message,
+                'message',
+                'Invalid login credentials',
+              ),
+        ),
+      );
+    });
+
+    test('maps a rate-limited rejection to rateLimited', () async {
+      when(
+        () => client.signInWithPassword(
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+        ),
+      ).thenThrow(
+        const AuthException('Rate limit exceeded', statusCode: '429'),
+      );
+
+      await expectLater(
+        api.signInWithPassword(
+          email: 'amira@example.com',
+          password: 'secret-pass',
+        ),
+        throwsA(
+          isA<SupabaseAuthException>().having(
+            (SupabaseAuthException e) => e.kind,
+            'kind',
+            SupabaseAuthFailureKind.rateLimited,
+          ),
+        ),
+      );
+    });
+
+    test('creates the account with metadata via the provider client', () async {
+      when(
+        () => client.signUp(
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+          data: any(named: 'data'),
+        ),
+      ).thenAnswer(
+        (_) async => AuthResponse(
+          user: _user(
+            userMetadata: const <String, dynamic>{'full_name': 'Amira'},
+          ),
+        ),
+      );
+
+      await api.signUp(
+        email: 'amira@example.com',
+        password: 'secret-pass',
+        metadata: const <String, String>{'full_name': 'Amira'},
+      );
+
+      verify(
+        () => client.signUp(
+          email: 'amira@example.com',
+          password: 'secret-pass',
+          data: const <String, dynamic>{'full_name': 'Amira'},
+        ),
+      ).called(1);
+    });
+
+    test('maps a duplicate-email sign-up to a typed exception', () async {
+      when(
+        () => client.signUp(
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+          data: any(named: 'data'),
+        ),
+      ).thenThrow(
+        const AuthException('User already registered', statusCode: '422'),
+      );
+
+      await expectLater(
+        api.signUp(
+          email: 'amira@example.com',
+          password: 'secret-pass',
+          metadata: const <String, String>{'full_name': 'Amira'},
+        ),
+        throwsA(
+          isA<SupabaseAuthException>().having(
+            (SupabaseAuthException e) => e.kind,
+            'kind',
+            SupabaseAuthFailureKind.emailInUse,
+          ),
+        ),
+      );
+    });
+
     test('forwards provider auth-state changes as snapshots', () async {
       const int exp = 1893456000;
       final List<SupabaseAuthSnapshot?> seen = <SupabaseAuthSnapshot?>[];

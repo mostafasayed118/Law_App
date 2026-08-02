@@ -10,6 +10,12 @@
 -- The literal token is returned to the inviter exactly once; only its
 -- sha-256 hash is stored (Q2). 7-day expiry, single-use (D-10a).
 -- The pending unique partial index enforces one pending invite per (org, email).
+--
+-- Hardened 2026-08-03 (code-only, NOT yet applied): an email that already
+-- has any membership row in the org is refused up front, instead of issuing
+-- a dead-end invite that accept_invitation can never redeem (the
+-- unique(organization_id, user_id) constraint would reject the acceptance;
+-- audit finding).
 
 create or replace function public.invite_member(
   p_organization_id uuid,
@@ -25,6 +31,22 @@ begin
   end if;
   if p_email is null or position('@' in p_email) = 0 then
     raise exception 'a valid email is required';
+  end if;
+
+  -- Existing-member guard: any membership row (active, suspended, removed, or
+  -- invited) means acceptance would collide with unique(organization_id,
+  -- user_id); refuse the invite instead of issuing a dead-end token. The
+  -- email must match the membership's owning auth.users row — matching by
+  -- email alone is never a principal (contract §3.1).
+  if exists (
+    select 1
+      from public.memberships m
+      join auth.users u on u.id = m.user_id
+     where m.organization_id = p_organization_id
+       and u.email = lower(trim(p_email))
+     limit 1
+  ) then
+    raise exception 'user already has a membership in this organization';
   end if;
 
   v_token := encode(extensions.gen_random_bytes(32), 'hex');

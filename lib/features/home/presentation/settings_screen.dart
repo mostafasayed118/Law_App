@@ -6,8 +6,8 @@ import '../../../app/legalhub_theme.dart';
 import '../../../app/localization/locale_cubit.dart';
 import '../../../app/router.dart';
 import '../../../core/auth/auth_state.dart';
-import '../../../core/roles/user_role.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/widgets.dart';
 import '../../auth/presentation/auth_cubit.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -60,7 +60,7 @@ class SettingsScreen extends StatelessWidget {
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.person_outline),
-            title: Text(_roleLabel(l10n, authState.session?.primaryRole)),
+            title: RoleLabel(role: authState.session?.primaryRole),
             subtitle: Text(l10n.demoSessionNotice),
           ),
           const SizedBox(height: LegalHubTheme.spaceXl),
@@ -86,16 +86,5 @@ class SettingsScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _roleLabel(AppLocalizations l10n, UserRole? role) {
-    return switch (role) {
-      UserRole.attorney => l10n.roleAttorney,
-      UserRole.partner => l10n.rolePartner,
-      UserRole.complianceOfficer => l10n.roleComplianceOfficer,
-      UserRole.researchAnalyst => l10n.roleResearchAnalyst,
-      UserRole.admin => l10n.roleAdmin,
-      UserRole.client || null => l10n.roleClient,
-    };
   }
 }

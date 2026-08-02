@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../features/auth/presentation/auth_cubit.dart' show AuthCubit;
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/widgets.dart';
 import 'widgets/home_cards.dart';
 
 /// Home dashboard matching `stitch_legalhub_mobile_app/home_dashboard`.
@@ -12,8 +13,21 @@ import 'widgets/home_cards.dart';
 /// repositories come with a later data-layer slice. The greeting uses the
 /// authenticated session's display name, falling back to the localized
 /// `homeFallbackName` (D-T3) when no session is present.
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,11 +92,10 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: LegalHubTheme.spaceLg),
-                  TextField(
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.search, size: 20),
-                      hintText: l10n.searchPlaceholder,
-                    ),
+                  LegalHubTextField(
+                    controller: _searchController,
+                    hint: l10n.searchPlaceholder,
+                    prefixIcon: Icons.search,
                   ),
                 ]),
               ),
@@ -213,7 +226,11 @@ class HomeScreen extends StatelessWidget {
                     Text(l10n.activeCaseAttorney, style: text.bodySmall),
                   ],
                 ),
-                Icon(Icons.chevron_right, color: scheme.outline),
+                DirectionalIcon(
+                  icon: Icons.chevron_right,
+                  mirroredIcon: Icons.chevron_left,
+                  color: scheme.outline,
+                ),
               ],
             ),
           ],

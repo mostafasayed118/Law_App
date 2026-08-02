@@ -6,11 +6,10 @@ import '../../../app/legalhub_theme.dart';
 import '../../../core/auth/auth_state.dart';
 import '../../../core/auth/session.dart';
 import '../../../core/errors/app_error.dart';
-import '../../../core/roles/user_role.dart';
 import '../../../core/state/view_state.dart';
 import '../../../features/auth/presentation/auth_cubit.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../../shared/widgets/view_state_view.dart';
+import '../../../shared/widgets/widgets.dart';
 
 /// Read-only projection of the authenticated session's identity.
 ///
@@ -113,7 +112,7 @@ class _ProfileBody extends StatelessWidget {
         ListTile(
           contentPadding: EdgeInsets.zero,
           leading: const Icon(Icons.work_outline),
-          title: Text(_roleLabel(l10n, session.primaryRole)),
+          title: RoleLabel(role: session.primaryRole),
           subtitle: Text(l10n.profileRoleLabel),
         ),
         const SizedBox(height: LegalHubTheme.spaceSm),
@@ -125,19 +124,5 @@ class _ProfileBody extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  /// UX-only projection of the active membership's organization-scoped role.
-  /// Mirrors the settings-screen mapping; duplicated here per the approved
-  /// slice (shared extraction is a flagged follow-up, ADR-0004 second use).
-  String _roleLabel(AppLocalizations l10n, UserRole? role) {
-    return switch (role) {
-      UserRole.attorney => l10n.roleAttorney,
-      UserRole.partner => l10n.rolePartner,
-      UserRole.complianceOfficer => l10n.roleComplianceOfficer,
-      UserRole.researchAnalyst => l10n.roleResearchAnalyst,
-      UserRole.admin => l10n.roleAdmin,
-      UserRole.client || null => l10n.roleClient,
-    };
   }
 }
