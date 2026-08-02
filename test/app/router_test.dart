@@ -419,6 +419,83 @@ void main() {
       expect(find.textContaining('Hello, User admin'), findsOneWidget);
     });
   });
+
+  group('shell navigation end-to-end flow', () {
+    testWidgets(
+      'drives settings → notifications → profile → settings through the '
+      'shell nav',
+      (tester) async {
+        // NotificationSettingsScreen resolves its store from the locator.
+        await resetServiceLocator();
+        configureDependencies();
+        addTearDown(() => resetServiceLocator());
+
+        await authCubit.startDemoSession();
+        await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+        await tester.pumpAndSettle();
+
+        // 1. Authenticated redirect lands on /home; open /settings via the
+        //    bottom NavigationBar (the shell's tap target, not router.go).
+        await tester.tap(find.byIcon(Icons.settings_outlined));
+        await tester.pumpAndSettle();
+        expect(
+          router.routerDelegate.currentConfiguration.uri.path,
+          AppRoutes.settings,
+        );
+        expect(find.text('Language'), findsWidgets);
+
+        // 2. Notifications tile → the notification-settings screen.
+        await tester.tap(find.text('Notifications'));
+        await tester.pumpAndSettle();
+        expect(
+          router.routerDelegate.currentConfiguration.uri.path,
+          AppRoutes.notifications,
+        );
+        expect(find.byType(SwitchListTile), findsNWidgets(3));
+        // The settings destination stays highlighted on the descendant route
+        // (the 768127b/32803ae behavior).
+        expect(
+          tester
+              .widget<NavigationBar>(find.byType(NavigationBar))
+              .selectedIndex,
+          1,
+        );
+
+        // 3. context.go replaces (no back stack), so the shell nav bar is the
+        //    realistic way back: tap the highlighted settings destination.
+        await tester.tap(find.byIcon(Icons.settings));
+        await tester.pumpAndSettle();
+        expect(
+          router.routerDelegate.currentConfiguration.uri.path,
+          AppRoutes.settings,
+        );
+
+        // 4. Profile tile → the profile screen.
+        await tester.tap(find.text('Profile'));
+        await tester.pumpAndSettle();
+        expect(
+          router.routerDelegate.currentConfiguration.uri.path,
+          AppRoutes.profile,
+        );
+        expect(find.text('Demo user'), findsOneWidget);
+        expect(
+          tester
+              .widget<NavigationBar>(find.byType(NavigationBar))
+              .selectedIndex,
+          1,
+        );
+
+        // 5. Back to /settings via the shell nav bar.
+        await tester.tap(find.byIcon(Icons.settings));
+        await tester.pumpAndSettle();
+        expect(
+          router.routerDelegate.currentConfiguration.uri.path,
+          AppRoutes.settings,
+        );
+        expect(find.text('Language'), findsWidgets);
+      },
+    );
+  });
 }
 
 /// Test-only gateway emitting a fixed [Session] for a chosen role, so shell
