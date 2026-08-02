@@ -1,0 +1,206 @@
+import '../../core/organizations/organization_gateway.dart';
+import '../../core/roles/user_role.dart';
+import 'supabase_org_api.dart';
+
+/// [OrganizationGateway] backed by the Supabase provider via [SupabaseOrgApi].
+///
+/// Domain mapping happens here: raw rows/scalars from the seam become
+/// [OrgMember]/[OrganizationSummary]/[InviteResult], roles are validated
+/// against the server-assignable surface before any call, and typed
+/// [OrgFailure]s replace [SupabaseOrgException]s (contract §5 pattern).
+class SupabaseOrganizationGateway implements OrganizationGateway {
+  SupabaseOrganizationGateway(this._api);
+
+  final SupabaseOrgApi _api;
+
+  @override
+  Future<OrgOutcome<OrganizationSummary>> createOrganization({
+    required String name,
+  }) async {
+    if (name.trim().isEmpty) {
+      return const OrgOutcome<OrganizationSummary>.failure(
+        OrgFailure(kind: OrgFailureKind.invalidName),
+      );
+    }
+    try {
+      final String id = await _api.createOrganization(name: name.trim());
+      return OrgOutcome<OrganizationSummary>.success(
+        OrganizationSummary(
+          id: id,
+          name: name.trim(),
+          createdAt: DateTime.now(),
+        ),
+      );
+    } on SupabaseOrgException catch (e) {
+      return OrgOutcome<OrganizationSummary>.failure(
+        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+      );
+    }
+  }
+
+  @override
+  Future<OrgOutcome<List<OrgMember>>> listMembers({
+    required String organizationId,
+  }) async {
+    try {
+      final List<Map<String, dynamic>> rows = await _api.listMembers(
+        organizationId: organizationId,
+      );
+      return OrgOutcome<List<OrgMember>>.success(
+        rows.map(_memberFromRow).toList(growable: false),
+      );
+    } on SupabaseOrgException catch (e) {
+      return OrgOutcome<List<OrgMember>>.failure(
+        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+      );
+    } on FormatException catch (e) {
+      // Provider drift (unexpected role/status name) surfaces loudly, never
+      // as a silently wrong member.
+      return OrgOutcome<List<OrgMember>>.failure(
+        OrgFailure(kind: OrgFailureKind.unknown, message: e.message),
+      );
+    }
+  }
+
+  @override
+  Future<OrgOutcome<InviteResult>> inviteMember({
+    required String organizationId,
+    required String email,
+    required UserRole role,
+  }) async {
+    final String? roleName = _assignableRoleName(role);
+    if (roleName == null) {
+      return const OrgOutcome<InviteResult>.failure(
+        OrgFailure(kind: OrgFailureKind.invalidRole),
+      );
+    }
+    if (email.trim().isEmpty) {
+      return const OrgOutcome<InviteResult>.failure(
+        OrgFailure(kind: OrgFailureKind.unknown, message: 'Email is required.'),
+      );
+    }
+    try {
+      final String token = await _api.inviteMember(
+        organizationId: organizationId,
+        email: email.trim(),
+        role: roleName,
+      );
+      return OrgOutcome<InviteResult>.success(
+        InviteResult(
+          organizationId: organizationId,
+          email: email.trim(),
+          token: token,
+        ),
+      );
+    } on SupabaseOrgException catch (e) {
+      return OrgOutcome<InviteResult>.failure(
+        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+      );
+    }
+  }
+
+  @override
+  Future<OrgOutcome<void>> changeMemberRole({
+    required String organizationId,
+    required String userId,
+    required UserRole role,
+  }) async {
+    final String? roleName = _assignableRoleName(role);
+    if (roleName == null) {
+      return const OrgOutcome<void>.failure(
+        OrgFailure(kind: OrgFailureKind.invalidRole),
+      );
+    }
+    return _runVoid(
+      () => _api.changeMemberRole(
+        organizationId: organizationId,
+        userId: userId,
+        role: roleName,
+      ),
+    );
+  }
+
+  @override
+  Future<OrgOutcome<void>> suspendMember({
+    required String organizationId,
+    required String userId,
+  }) => _runVoid(
+    () => _api.suspendMember(organizationId: organizationId, userId: userId),
+  );
+
+  @override
+  Future<OrgOutcome<void>> reactivateMember({
+    required String organizationId,
+    required String userId,
+  }) => _runVoid(
+    () => _api.reactivateMember(organizationId: organizationId, userId: userId),
+  );
+
+  @override
+  Future<OrgOutcome<void>> removeMember({
+    required String organizationId,
+    required String userId,
+  }) => _runVoid(
+    () => _api.removeMember(organizationId: organizationId, userId: userId),
+  );
+
+  Future<OrgOutcome<void>> _runVoid(Future<void> Function() call) async {
+    try {
+      await call();
+      return const OrgOutcome<void>.success(null);
+    } on SupabaseOrgException catch (e) {
+      return OrgOutcome<void>.failure(
+        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+      );
+    }
+  }
+
+  /// Only the three server-assignable roles may leave the boundary; anything
+  /// else is rejected with [OrgFailureKind.invalidRole] (loud, never a
+  /// silently wrong role on the server).
+  String? _assignableRoleName(UserRole role) {
+    return switch (role) {
+      UserRole.client => 'client',
+      UserRole.attorney => 'attorney',
+      UserRole.partner => 'partner',
+      _ => null,
+    };
+  }
+
+  OrgMember _memberFromRow(Map<String, dynamic> row) {
+    final UserRole? role = userRoleFromServerName(row['role'] as String?);
+    if (role == null) {
+      throw FormatException('Unknown server role name: ${row['role']}');
+    }
+    final MembershipStatus? status = membershipStatusFromServerName(
+      row['status'] as String?,
+    );
+    if (status == null) {
+      throw FormatException('Unknown server status name: ${row['status']}');
+    }
+    return OrgMember(
+      organizationId: row['organization_id'] as String,
+      userId: row['user_id'] as String,
+      displayName: (row['display_name'] as String?) ?? 'User',
+      locale: row['locale'] as String?,
+      role: role,
+      status: status,
+      createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
+      updatedAt: DateTime.parse(row['updated_at'] as String).toLocal(),
+    );
+  }
+
+  OrgFailureKind _mapKind(SupabaseOrgFailureKind kind) {
+    return switch (kind) {
+      SupabaseOrgFailureKind.denied => OrgFailureKind.denied,
+      SupabaseOrgFailureKind.duplicateMember => OrgFailureKind.duplicateMember,
+      SupabaseOrgFailureKind.lastPartner => OrgFailureKind.lastPartner,
+      SupabaseOrgFailureKind.invalidName => OrgFailureKind.invalidName,
+      SupabaseOrgFailureKind.invalidInvitation =>
+        OrgFailureKind.invalidInvitation,
+      SupabaseOrgFailureKind.providerUnavailable =>
+        OrgFailureKind.providerUnavailable,
+      SupabaseOrgFailureKind.unknown => OrgFailureKind.unknown,
+    };
+  }
+}

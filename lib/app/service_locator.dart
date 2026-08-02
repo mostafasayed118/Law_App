@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/auth/auth_gateway.dart';
 import '../core/observability/error_reporter.dart';
+import '../core/organizations/organization_gateway.dart';
 import '../core/sample_service.dart';
 import '../data/auth/fake_auth_gateway.dart';
 import '../data/auth/supabase_auth_api.dart';
@@ -12,6 +13,10 @@ import '../data/auth/supabase_env.dart';
 import '../data/local/in_memory_locale_store.dart';
 import '../data/local/locale_store.dart';
 import '../data/local/shared_preferences_locale_store.dart';
+import '../data/orgs/fake_organization_gateway.dart';
+import '../data/orgs/supabase_org_api.dart';
+import '../data/orgs/supabase_org_api_impl.dart';
+import '../data/orgs/supabase_organization_gateway.dart';
 import '../features/auth/data/fake_password_recovery_gateway.dart';
 import '../features/auth/data/fake_sign_up_gateway.dart';
 import '../features/auth/data/supabase_sign_up_gateway.dart';
@@ -45,6 +50,7 @@ void configureDependencies({
   SharedPreferences? preferences,
   SupabaseEnv? supabaseEnv,
   SupabaseAuthApi Function()? supabaseAuthApiFactory,
+  SupabaseOrgApi Function()? supabaseOrgApiFactory,
 }) {
   // Lazy singleton: stateless service, created on first resolution.
   // Per §4.5, stateless services/repositories register as lazy singletons.
@@ -121,6 +127,21 @@ void configureDependencies({
     } else {
       serviceLocator.registerLazySingleton<SignUpGateway>(
         FakeSignUpGateway.new,
+      );
+    }
+  }
+  if (!serviceLocator.isRegistered<OrganizationGateway>()) {
+    // Like AuthGateway, the flip swaps the dev fake for the Supabase-backed
+    // implementation when the build is configured (Batch 3.3 env pattern).
+    if (env.isConfigured) {
+      serviceLocator.registerLazySingleton<OrganizationGateway>(
+        () => SupabaseOrganizationGateway(
+          (supabaseOrgApiFactory ?? SupabaseOrgApiImpl.bind)(),
+        ),
+      );
+    } else {
+      serviceLocator.registerLazySingleton<OrganizationGateway>(
+        FakeOrganizationGateway.new,
       );
     }
   }

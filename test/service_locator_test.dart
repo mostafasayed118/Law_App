@@ -7,12 +7,16 @@ import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/auth/auth_gateway.dart';
 import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
+import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/sample_service.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/auth/supabase_auth_api.dart';
 import 'package:legalhub/data/auth/supabase_auth_gateway.dart';
 import 'package:legalhub/data/auth/supabase_env.dart';
 import 'package:legalhub/data/local/locale_store.dart';
+import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
+import 'package:legalhub/data/orgs/supabase_org_api.dart';
+import 'package:legalhub/data/orgs/supabase_organization_gateway.dart';
 import 'package:legalhub/features/auth/data/fake_password_recovery_gateway.dart';
 import 'package:legalhub/features/auth/data/fake_sign_up_gateway.dart';
 import 'package:legalhub/features/auth/domain/password_recovery_gateway.dart';
@@ -53,6 +57,49 @@ class _FakeSupabaseAuthApi implements SupabaseAuthApi {
 
   @override
   Future<void> dispose() async => _changes.close();
+}
+
+/// Hand-rolled fake of the [SupabaseOrgApi] seam for the DI flip test.
+class _FakeSupabaseOrgApi implements SupabaseOrgApi {
+  @override
+  Future<String> createOrganization({required String name}) async => 'org-1';
+
+  @override
+  Future<List<Map<String, dynamic>>> listMembers({
+    required String organizationId,
+  }) async => <Map<String, dynamic>>[];
+
+  @override
+  Future<String> inviteMember({
+    required String organizationId,
+    required String email,
+    required String role,
+  }) async => 'token';
+
+  @override
+  Future<void> changeMemberRole({
+    required String organizationId,
+    required String userId,
+    required String role,
+  }) async {}
+
+  @override
+  Future<void> suspendMember({
+    required String organizationId,
+    required String userId,
+  }) async {}
+
+  @override
+  Future<void> reactivateMember({
+    required String organizationId,
+    required String userId,
+  }) async {}
+
+  @override
+  Future<void> removeMember({
+    required String organizationId,
+    required String userId,
+  }) async {}
 }
 
 /// Builds a JWT-shaped string whose payload carries the given role claim.
@@ -107,7 +154,7 @@ void main() {
     });
   });
 
-  // The full DI graph: configureDependencies() registers eight types. The
+  // The full DI graph: configureDependencies() registers nine types. The
   // earlier group only proved SampleService. These tests pin every
   // registration so a future refactor that drops a wiring line fails loudly
   // instead of breaking at runtime in a screen test.
@@ -122,6 +169,7 @@ void main() {
       expect(serviceLocator.isRegistered<LocaleCubit>(), isTrue);
       expect(serviceLocator.isRegistered<PasswordRecoveryGateway>(), isTrue);
       expect(serviceLocator.isRegistered<SignUpGateway>(), isTrue);
+      expect(serviceLocator.isRegistered<OrganizationGateway>(), isTrue);
       expect(serviceLocator.isRegistered<AuthCubit>(), isTrue);
     });
 
@@ -175,6 +223,34 @@ void main() {
       // fake. Asserting the concrete type pins the unconfigured default so a
       // future change that flips the default breaks loudly.
       expect(serviceLocator<AuthGateway>(), isA<FakeAuthGateway>());
+    });
+
+    test('wires the organization gateway to the fake dev implementation', () {
+      configureDependencies();
+
+      // Same boundary discipline as the auth/sign-up fakes: the dev fake is
+      // the registered seam until the configured-env flip takes over.
+      expect(
+        serviceLocator<OrganizationGateway>(),
+        isA<FakeOrganizationGateway>(),
+      );
+    });
+
+    test('flips OrganizationGateway when env carries an anon key', () {
+      configureDependencies(
+        supabaseEnv: SupabaseEnv(
+          url: 'https://example.supabase.co',
+          anonKey: _anonJwt(),
+        ),
+        // The real bind() needs a running Supabase.instance; tests inject
+        // the seam instead (the flip's test seam, not production code).
+        supabaseOrgApiFactory: _FakeSupabaseOrgApi.new,
+      );
+
+      expect(
+        serviceLocator<OrganizationGateway>(),
+        isA<SupabaseOrganizationGateway>(),
+      );
     });
 
     test('flips to SupabaseAuthGateway when env carries an anon key', () {
