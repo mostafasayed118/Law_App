@@ -21,6 +21,11 @@
 #      c. The §3 file-presence claims are re-verified at the approval commit
 #         (`f7621df`): 10 files present, the org-context trio absent (then and
 #         now), and `password_recovery_cubit.dart` absent at approval.
+#      d. Working-tree markers: the A-string in both Gate 3 docs, the D-T2/D-T4
+#         RESOLVED entries, and the README suite count are also asserted
+#         against the CURRENT on-disk docs (not just committed content at
+#         cited hashes), so a committed doc that quietly drops a marker fails
+#         CI even without breaking a cited hash.
 #
 #   3. SUITE RECONCILIATION — the audit plan's N/N suite claims for the 8
 #      milestone commits are recomputed from the tree at each revision
@@ -199,6 +204,35 @@ semantic_rows() {
     fail "§3.1c claim violated: password_recovery_cubit.dart IS at f7621df (should be untracked WIP)"
   else
     ok "password_recovery_cubit.dart untracked at approval (confirmed)"
+  fi
+
+  note "--- 2d. Working-tree markers (current docs, not committed content) ---"
+  local wt_file wt_count head_plain head_gen head_total
+  for wt_file in docs/gate3_reconciliation.md docs/gate3_decision.md; do
+    wt_count=$(grep -cF 'Project Owner (github.com/mostafasayed118)' "$wt_file" 2>/dev/null || true)
+    if [ "${wt_count:-0}" -gt 0 ]; then
+      ok "A-string present in working tree: $wt_file"
+    else
+      fail "A-string MISSING from working tree: $wt_file"
+    fi
+  done
+  if grep -qE '^## D-T2:.*RESOLVED \(2026-07-31\)' docs/tracked_deviations.md 2>/dev/null; then
+    ok "D-T2 RESOLVED entry in working tree tracked_deviations.md"
+  else
+    fail "D-T2 RESOLVED entry MISSING from working tree tracked_deviations.md"
+  fi
+  if grep -qE '^## D-T4:.*RESOLVED \(2026-07-31\)' docs/tracked_deviations.md 2>/dev/null; then
+    ok "D-T4 RESOLVED entry in working tree tracked_deviations.md"
+  else
+    fail "D-T4 RESOLVED entry MISSING from working tree tracked_deviations.md"
+  fi
+  head_plain=$(git grep -hE '(^|[^A-Za-z])(test|testWidgets|blocTest)\(' -- test/ 2>/dev/null | wc -l | tr -d ' ')
+  head_gen=$(git grep -hE 'blocTest<' -- test/ 2>/dev/null | wc -l | tr -d ' ')
+  head_total=$((head_plain + head_gen))
+  if [ -f README.md ] && grep -qE "Tests \($head_total total\)" README.md && grep -qE "\*\*$head_total tests\*\*" README.md; then
+    ok "README test count ($head_total) matches suite in working tree"
+  else
+    fail "README test count stale: suite in working tree is $head_total, README claim differs"
   fi
 }
 

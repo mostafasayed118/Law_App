@@ -32,7 +32,15 @@ scripts/verify_ledger.sh path/to/other.md   # sweep extra docs for hash integrit
      at `94c9607`, contract-§5 session fields at `1042daf`);
    - the §3 file-presence claims are re-verified at the approval commit
      (`f7621df`): 10 files present, the org-context trio absent (then and now),
-     `password_recovery_cubit.dart` absent at approval.
+     `password_recovery_cubit.dart` absent at approval;
+   - **working-tree markers** (added to close the committed-content-only gap):
+     the A-string in both Gate 3 docs, the D-T2/D-T4 RESOLVED entries in
+     `tracked_deviations.md`, and the README suite count are asserted against
+     the **current on-disk docs**. The README count is checked dynamically —
+     the pass counts `test(`/`testWidgets(`/`blocTest(` + `blocTest<...>`
+     declarations in the working tree and greps the README for that exact
+     number, so a committed doc that quietly drops a marker (or a README that
+     drifts behind the suite) fails even when every cited hash still resolves.
 3. **Suite reconciliation** — the audit plan's N/N suite claims for the 8
    milestone commits are recomputed from the tree at each revision and compared
    to the claimed figure. The count is `test(`/`testWidgets(`/`blocTest(` plain
@@ -48,6 +56,10 @@ scripts/verify_ledger.sh path/to/other.md   # sweep extra docs for hash integrit
 
 ### Extending
 
+- **New working-tree markers**: add a `grep` assertion in the `2d` block of
+  `semantic_rows()`. The README count check is dynamic (it recomputes the
+  suite total and greps for that number), so it needs no maintenance as the
+  suite grows — but the README itself must be kept in sync.
 - **New milestone suite counts**: add a `hash:count` pair to the `pairs`
   variable in `suite_reconciliation()`. Verify the count first with
   `flutter test` at that commit, then record it.
@@ -65,5 +77,10 @@ scripts/verify_ledger.sh path/to/other.md   # sweep extra docs for hash integrit
 - The as-built-table subject check is a paraphrase heuristic; a semantic
   mismatch that shares words (or a paraphrase that shares none) can slip past
   it. It is a reviewer aid, not a substitute for reading the diff.
+- The working-tree marker pass greps the current docs but does not parse them;
+  it catches a dropped marker or a stale count, not a subtly reworded claim.
+- The dynamic README count uses `git grep` on the working tree, which counts
+  *tracked* files only — an un-staged new test file is not counted until staged
+  (a non-issue in CI's clean checkout, where working tree == pushed commit).
 - It does not run `flutter test`; it is a static git-object gate. Pair it with
   the suite run when the change touches `test/`.
