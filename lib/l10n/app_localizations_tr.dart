@@ -337,4 +337,36 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get profileNavigation => 'Profil';
+
+  @override
+  String get profileNameLabel => 'Ad';
+
+  @override
+  String get profileAccountIdLabel => 'Hesap Kimliği';
+
+  @override
+  String get profileRoleLabel => 'Rol';
+
+  @override
+  String get profileExpiresLabel => 'Oturum süresi';
+
+  @override
+  String get profileSessionExpired =>
+      'Oturum süresi doldu. Lütfen tekrar giriş yapın.';
+
+  @override
+  String get notificationsTitle => 'Bildirimler';
+
+  @override
+  String get notificationsNote =>
+      'Tercihler bu cihazda saklanır. Bildirim teslimi daha sonraki bir sürümde planlanmıştır.';
+
+  @override
+  String get notifAppointmentReminders => 'Randevu hatırlatmaları';
+
+  @override
+  String get notifActivityUpdates => 'Etkinlik güncellemeleri';
+
+  @override
+  String get notifSystemAlerts => 'Sistem uyarıları';
 }

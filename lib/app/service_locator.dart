@@ -17,6 +17,9 @@ import '../features/auth/data/fake_sign_up_gateway.dart';
 import '../features/auth/domain/password_recovery_gateway.dart';
 import '../features/auth/domain/sign_up_gateway.dart';
 import '../features/auth/presentation/auth_cubit.dart';
+import '../features/notifications/data/in_memory_notification_prefs_store.dart';
+import '../features/notifications/data/shared_preferences_notification_prefs_store.dart';
+import '../features/notifications/domain/notification_prefs_store.dart';
 import 'localization/locale_cubit.dart';
 
 /// The application's single GetIt service-locator instance.
@@ -80,6 +83,13 @@ void configureDependencies({
       () => preferences == null
           ? InMemoryLocaleStore()
           : SharedPreferencesLocaleStore(preferences),
+    );
+  }
+  if (!serviceLocator.isRegistered<NotificationPrefsStore>()) {
+    serviceLocator.registerLazySingleton<NotificationPrefsStore>(
+      () => preferences == null
+          ? InMemoryNotificationPrefsStore()
+          : SharedPreferencesNotificationPrefsStore(preferences),
     );
   }
   if (!serviceLocator.isRegistered<LocaleCubit>()) {

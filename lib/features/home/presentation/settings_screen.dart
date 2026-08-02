@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../app/legalhub_theme.dart';
 import '../../../app/localization/locale_cubit.dart';
+import '../../../app/router.dart';
 import '../../../core/auth/auth_state.dart';
 import '../../../core/roles/user_role.dart';
 import '../../../l10n/app_localizations.dart';
@@ -60,6 +62,20 @@ class SettingsScreen extends StatelessWidget {
             leading: const Icon(Icons.person_outline),
             title: Text(_roleLabel(l10n, authState.session?.primaryRole)),
             subtitle: Text(l10n.demoSessionNotice),
+          ),
+          const SizedBox(height: LegalHubTheme.spaceXl),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.person_outline),
+            title: Text(l10n.profileNavigation),
+            onTap: () => context.go(AppRoutes.profile),
+          ),
+          const SizedBox(height: LegalHubTheme.spaceSm),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.notifications_outlined),
+            title: Text(l10n.notificationsTitle),
+            onTap: () => context.go(AppRoutes.notifications),
           ),
           const SizedBox(height: LegalHubTheme.spaceXl),
           OutlinedButton.icon(

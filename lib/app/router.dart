@@ -12,8 +12,10 @@ import '../features/auth/presentation/sign_in_screen.dart';
 import '../features/auth/presentation/sign_up_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/home/presentation/settings_screen.dart';
+import '../features/notifications/presentation/notification_settings_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/onboarding/presentation/onboarding_success_screen.dart';
+import '../features/profile/presentation/profile_screen.dart';
 import '../l10n/app_localizations.dart';
 
 class AppRoutes {
@@ -28,6 +30,8 @@ class AppRoutes {
   static const String onboardingSuccess = '/onboarding/success';
   static const String home = '/home';
   static const String settings = '/settings';
+  static const String profile = '/profile';
+  static const String notifications = '/notifications';
 }
 
 /// Routes are navigation UX only. They do not authorize access to any future
@@ -84,6 +88,16 @@ GoRouter createAppRouter(AuthCubit authCubit) => GoRouter(
           path: AppRoutes.settings,
           builder: (BuildContext context, GoRouterState state) =>
               const SettingsScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.profile,
+          builder: (BuildContext context, GoRouterState state) =>
+              const ProfileScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.notifications,
+          builder: (BuildContext context, GoRouterState state) =>
+              const NotificationSettingsScreen(),
         ),
       ],
     ),

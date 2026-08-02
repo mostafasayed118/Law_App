@@ -104,5 +104,15 @@
   "signInErrorNotice": "تعذر بدء الجلسة التجريبية.",
   "casesNavigation": "القضايا",
   "messagesNavigation": "الرسائل",
-  "profileNavigation": "الملف"
+  "profileNavigation": "الملف",
+  "profileNameLabel": "الاسم",
+  "profileAccountIdLabel": "معرّف الحساب",
+  "profileRoleLabel": "الدور",
+  "profileExpiresLabel": "تنتهي الجلسة",
+  "profileSessionExpired": "انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.",
+  "notificationsTitle": "الإشعارات",
+  "notificationsNote": "تُحفظ التفضيلات على هذا الجهاز. تسليم الإشعارات مُخطط له في إصدار لاحق.",
+  "notifAppointmentReminders": "تذكيرات المواعيد",
+  "notifActivityUpdates": "تحديثات النشاط",
+  "notifSystemAlerts": "تنبيهات النظام"
 }

@@ -334,4 +334,36 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get profileNavigation => 'الملف';
+
+  @override
+  String get profileNameLabel => 'الاسم';
+
+  @override
+  String get profileAccountIdLabel => 'معرّف الحساب';
+
+  @override
+  String get profileRoleLabel => 'الدور';
+
+  @override
+  String get profileExpiresLabel => 'تنتهي الجلسة';
+
+  @override
+  String get profileSessionExpired =>
+      'انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.';
+
+  @override
+  String get notificationsTitle => 'الإشعارات';
+
+  @override
+  String get notificationsNote =>
+      'تُحفظ التفضيلات على هذا الجهاز. تسليم الإشعارات مُخطط له في إصدار لاحق.';
+
+  @override
+  String get notifAppointmentReminders => 'تذكيرات المواعيد';
+
+  @override
+  String get notifActivityUpdates => 'تحديثات النشاط';
+
+  @override
+  String get notifSystemAlerts => 'تنبيهات النظام';
 }

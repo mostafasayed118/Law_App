@@ -104,5 +104,15 @@
   "signInErrorNotice": "Demo oturumu başlatılamadı.",
   "casesNavigation": "Davalar",
   "messagesNavigation": "Mesajlar",
-  "profileNavigation": "Profil"
+  "profileNavigation": "Profil",
+  "profileNameLabel": "Ad",
+  "profileAccountIdLabel": "Hesap Kimliği",
+  "profileRoleLabel": "Rol",
+  "profileExpiresLabel": "Oturum süresi",
+  "profileSessionExpired": "Oturum süresi doldu. Lütfen tekrar giriş yapın.",
+  "notificationsTitle": "Bildirimler",
+  "notificationsNote": "Tercihler bu cihazda saklanır. Bildirim teslimi daha sonraki bir sürümde planlanmıştır.",
+  "notifAppointmentReminders": "Randevu hatırlatmaları",
+  "notifActivityUpdates": "Etkinlik güncellemeleri",
+  "notifSystemAlerts": "Sistem uyarıları"
 }
