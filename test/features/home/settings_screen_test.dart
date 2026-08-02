@@ -167,4 +167,44 @@ void main() {
       expect(find.byType(SwitchListTile), findsNWidgets(3));
     },
   );
+
+  testWidgets('profile tile navigates to the profile screen', (tester) async {
+    // ProfileScreen is a pure projection of AuthCubit state (no store or
+    // gateway resolved from the locator), so no service-locator setup is
+    // needed here — unlike the notifications screen. Authenticate so the
+    // redirect admits the shell routes and identity renders.
+    await authCubit.startDemoSession();
+
+    final GoRouter router = createAppRouter(authCubit);
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: <BlocProvider<dynamic>>[
+          BlocProvider<AuthCubit>.value(value: authCubit),
+          BlocProvider<LocaleCubit>.value(value: localeCubit),
+        ],
+        child: MaterialApp.router(
+          routerConfig: router,
+          locale: const Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Authenticated redirect lands on /home; open the settings surface.
+    router.go(AppRoutes.settings);
+    await tester.pumpAndSettle();
+    expect(find.text('Language'), findsWidgets);
+
+    // Tap the profile tile — the wiring under test.
+    await tester.tap(find.text('Profile'));
+    await tester.pumpAndSettle();
+
+    // The profile screen is reachable: title + rendered session identity.
+    expect(find.text('Profile'), findsOneWidget);
+    expect(find.text('Demo user'), findsOneWidget);
+  });
 }
