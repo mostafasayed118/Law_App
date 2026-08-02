@@ -58,5 +58,22 @@ void main() {
         }
       },
     );
+
+    test('every role can reach at least one destination (shell invariant)', () {
+      // _AppShell reads roleCapabilities[role]! and renders its bottom
+      // NavigationBar only when at least two destinations are granted (Material
+      // 3 asserts destinations.length >= 2). A role granting no destination
+      // would be stranded with no navigation at all — the one state this map
+      // must never contain. Pinned at the map level here so the shell contract
+      // holds regardless of rendering behavior.
+      for (final UserRole role in UserRole.values) {
+        final RoleCapability cap = roleCapabilities[role]!;
+        expect(
+          cap.canViewHome || cap.canViewSettings,
+          isTrue,
+          reason: 'role $role must grant at least one destination',
+        );
+      }
+    });
   });
 }
