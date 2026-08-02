@@ -22,10 +22,11 @@
 #         (`f7621df`): 10 files present, the org-context trio absent (then and
 #         now), and `password_recovery_cubit.dart` absent at approval.
 #      d. Working-tree markers: the A-string in both Gate 3 docs, the D-T2/D-T4
-#         RESOLVED entries, and the README suite count are also asserted
-#         against the CURRENT on-disk docs (not just committed content at
-#         cited hashes), so a committed doc that quietly drops a marker fails
-#         CI even without breaking a cited hash.
+#         RESOLVED entries, the plan header's shell-nav arc entry (through
+#         `4b5e4fc`, suite 277/277), and the README suite count are also
+#         asserted against the CURRENT on-disk docs (not just committed
+#         content at cited hashes), so a committed doc that quietly drops a
+#         marker fails CI even without breaking a cited hash.
 #
 #   3. SUITE RECONCILIATION — the audit plan's N/N suite claims for the 8
 #      milestone commits are recomputed from the tree at each revision
@@ -207,7 +208,7 @@ semantic_rows() {
   fi
 
   note "--- 2d. Working-tree markers (current docs, not committed content) ---"
-  local wt_file wt_count head_plain head_gen head_total
+  local wt_file wt_count head_plain head_gen head_total plan_hdr
   for wt_file in docs/gate3_reconciliation.md docs/gate3_decision.md; do
     wt_count=$(grep -cF 'Project Owner (github.com/mostafasayed118)' "$wt_file" 2>/dev/null || true)
     if [ "${wt_count:-0}" -gt 0 ]; then
@@ -225,6 +226,14 @@ semantic_rows() {
     ok "D-T4 RESOLVED entry in working tree tracked_deviations.md"
   else
     fail "D-T4 RESOLVED entry MISSING from working tree tracked_deviations.md"
+  fi
+  plan_hdr=$(awk 'BEGIN{p=0} /^>/{p=1; print; next} p && !/^>/{exit}' docs/codebase_audit_plan.md 2>/dev/null)
+  if printf '%s' "$plan_hdr" | grep -q 'Shell navigation arc' \
+      && printf '%s' "$plan_hdr" | grep -q '4b5e4fc' \
+      && printf '%s' "$plan_hdr" | grep -q '277/277'; then
+    ok "plan header blockquote: shell-nav arc entry through 4b5e4fc, suite 277/277"
+  else
+    fail "plan header blockquote missing shell-nav arc entry (through 4b5e4fc, suite 277/277)"
   fi
   head_plain=$(git grep -hE '(^|[^A-Za-z])(test|testWidgets|blocTest)\(' -- test/ 2>/dev/null | wc -l | tr -d ' ')
   head_gen=$(git grep -hE 'blocTest<' -- test/ 2>/dev/null | wc -l | tr -d ' ')

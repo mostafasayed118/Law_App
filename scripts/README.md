@@ -35,8 +35,10 @@ scripts/verify_ledger.sh path/to/other.md   # sweep extra docs for hash integrit
      `password_recovery_cubit.dart` absent at approval;
    - **working-tree markers** (added to close the committed-content-only gap):
      the A-string in both Gate 3 docs, the D-T2/D-T4 RESOLVED entries in
-     `tracked_deviations.md`, and the README suite count are asserted against
-     the **current on-disk docs**. The README count is checked dynamically —
+     `tracked_deviations.md`, the audit plan's header blockquote shell-nav
+     arc entry (through `4b5e4fc`, suite 277/277), and the README suite
+     count are asserted against the **current on-disk docs**. The README
+     count is checked dynamically —
      the pass counts `test(`/`testWidgets(`/`blocTest(` + `blocTest<...>`
      declarations in the working tree and greps the README for that exact
      number, so a committed doc that quietly drops a marker (or a README that
@@ -60,6 +62,10 @@ scripts/verify_ledger.sh path/to/other.md   # sweep extra docs for hash integrit
   `semantic_rows()`. The README count check is dynamic (it recomputes the
   suite total and greps for that number), so it needs no maintenance as the
   suite grows — but the README itself must be kept in sync.
+- The plan-header arc tokens (`4b5e4fc`, `277/277`) are **intentionally
+  pinned** to the shell-nav arc record — when a future arc supersedes that
+  record, advance the tokens deliberately in the same commit as the plan
+  amendment, or the gate will red by design.
 - **New milestone suite counts**: add a `hash:count` pair to the `pairs`
   variable in `suite_reconciliation()`. Verify the count first with
   `flutter test` at that commit, then record it.
