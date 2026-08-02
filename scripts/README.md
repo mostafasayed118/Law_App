@@ -12,6 +12,7 @@ the **actual git object database** — not the docs' claims about it.
 ```bash
 scripts/verify_ledger.sh                 # canonical docs (audit plan + gate3 reconciliation)
 scripts/verify_ledger.sh path/to/other.md   # sweep extra docs for hash integrity only
+scripts/verify_ledger.sh --selftest      # prove the gate's teeth (below)
 ```
 
 ### What it checks
@@ -53,12 +54,25 @@ scripts/verify_ledger.sh path/to/other.md   # sweep extra docs for hash integrit
    declarations **plus** the `blocTest<...>` generic form (the two shapes the
    cubit tests use), which is exactly what reconciles each claimed total.
 
+### `--selftest` mode
+
+Proves the battery's teeth on demand without touching the repo: creates a
+scratch worktree at `HEAD`, then injects each known drift class — dead hash,
+missing marker, wrong suite claim, dropped verdict, stale README count,
+dropped citation — and asserts the battery FAILs with the expected message on
+each. The baseline (unmutated scratch tree) must PASS first, or the selftest
+aborts. Cleanup is automatic (the scratch worktree is removed and pruned on
+exit). Runtime is roughly 7 battery runs (~15–30s on this repo). Note: the
+selftest exercises the **committed tree at HEAD** — exactly what CI runs —
+not uncommitted working-tree edits.
+
 ### Exit codes
 
-- `0` — all checks passed (WARNs allowed).
+- `0` — all checks passed (WARNs allowed); in `--selftest` mode, all drift
+  classes were detected.
 - `1` — at least one FAIL (unresolvable/dangling hash, missing marker,
-  file-presence violation, suite-count mismatch). Do not commit/push docs
-  amendments on a FAIL.
+  file-presence violation, suite-count mismatch); in `--selftest` mode, a
+  drift class evaded the gate. Do not commit/push docs amendments on a FAIL.
 
 ### Extending
 
@@ -96,3 +110,6 @@ scripts/verify_ledger.sh path/to/other.md   # sweep extra docs for hash integrit
   (a non-issue in CI's clean checkout, where working tree == pushed commit).
 - It does not run `flutter test`; it is a static git-object gate. Pair it with
   the suite run when the change touches `test/`.
+- The selftest's drift injections mutate the *scratch* worktree only; the
+  repo working tree is never touched. The suite-claim drift is injected via a
+  tampered script copy (the claim lives in the battery, not the docs).

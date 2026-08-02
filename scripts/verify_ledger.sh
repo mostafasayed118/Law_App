@@ -43,6 +43,11 @@
 #     With no args, verifies docs/codebase_audit_plan.md and
 #     docs/gate3_reconciliation.md (the canonical ledger). Extra doc paths are
 #     swept for hash integrity only.
+#   scripts/verify_ledger.sh --selftest
+#     Proves the battery's teeth on demand: injects each known drift class
+#     (dead hash, missing marker, wrong suite claim, dropped verdict, stale
+#     README count, dropped citation) into a scratch worktree and asserts the
+#     battery FAILs on each. Never mutates the repo working tree.
 #
 # Exit codes:
 #   0 — all checks passed
@@ -54,6 +59,24 @@
 # cheap static gate. See scripts/README.md.
 
 set -u
+
+# --selftest mode: injects each known drift class into a scratch worktree and
+# asserts the battery FAILs on each (proves the gate's teeth without mutating
+# the repo). All selftest state is global so the EXIT trap can clean up safely
+# under `set -u`.
+SELFTEST_MODE=0
+SELFTEST_BASE=""
+SELFTEST_WT=""
+SELFTEST_SCRIPT=""
+SELFTEST_OK=0
+SELFTEST_TOTAL=0
+
+if [ "$#" -gt 0 ] && [ "$1" = "--selftest" ]; then
+  SELFTEST_MODE=1
+  shift
+fi
+
+trap 'if [ -n "$SELFTEST_BASE" ]; then rm -rf "$SELFTEST_BASE"; git worktree prune >/dev/null 2>&1; fi' EXIT
 
 DEFAULT_DOCS=("docs/codebase_audit_plan.md" "docs/gate3_reconciliation.md")
 if [ "$#" -gt 0 ]; then
@@ -301,8 +324,97 @@ suite_reconciliation() {
 }
 
 # ---------------------------------------------------------------------------
+# SELFTEST — prove the battery's teeth on demand (never mutates the repo)
+# ---------------------------------------------------------------------------
+expect_fail() {  # $1 drift label, $2 literal FAIL message the battery must emit
+  SELFTEST_TOTAL=$((SELFTEST_TOTAL + 1))
+  local out rc
+  out=$( ( cd "$SELFTEST_WT" && bash "$SELFTEST_SCRIPT" ) 2>&1 )
+  rc=$?
+  if [ "$rc" -ne 0 ] && printf '%s' "$out" | grep -qF "$2"; then
+    SELFTEST_OK=$((SELFTEST_OK + 1))
+    ok "selftest: $1 — battery FAILed (rc=$rc), matched '$2'"
+  else
+    fail "selftest: $1 — battery rc=$rc, expected FAIL matching '$2'"
+    printf '%s\n' "$out" | tail -4
+  fi
+}
+
+selftest() {
+  local base wt script_abs out rc
+  script_abs=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/verify_ledger.sh
+  SELFTEST_SCRIPT="$script_abs"
+  base=$(mktemp -d)
+  SELFTEST_BASE="$base"
+  wt="$base/wt"
+  SELFTEST_WT="$wt"
+
+  note "selftest: scratch worktree at $(git rev-parse --short HEAD) — $wt"
+  if ! git worktree add --detach "$wt" HEAD >/dev/null 2>&1; then
+    fail "selftest: could not create scratch worktree"
+    return 1
+  fi
+
+  note "selftest: baseline — battery on unmutated scratch tree (must PASS)"
+  out=$( ( cd "$wt" && bash "$script_abs" ) 2>&1 )
+  rc=$?
+  if [ "$rc" -ne 0 ]; then
+    fail "selftest: baseline battery FAILed (rc=$rc) — committed state is red; aborting"
+    printf '%s\n' "$out" | tail -4
+    return 1
+  fi
+  ok "selftest: baseline PASS (rc=0)"
+
+  # 1. Dead hash — a cited hash stops resolving
+  ( cd "$wt" && sed -i 's/06e14e9/fffffff/g' docs/gate3_reconciliation.md )
+  expect_fail "dead hash" "unresolvable hash: fffffff"
+  ( cd "$wt" && git checkout -- docs/gate3_reconciliation.md )
+
+  # 2. Missing marker — a working-tree doc drops a pinned marker string
+  ( cd "$wt" && sed -i 's|Project Owner (github.com/mostafasayed118)||g' docs/gate3_reconciliation.md )
+  expect_fail "missing marker" "A-string MISSING from working tree: docs/gate3_reconciliation.md"
+  ( cd "$wt" && git checkout -- docs/gate3_reconciliation.md )
+
+  # 3. Wrong suite claim — the claimed figure drifts from the tree (tampered
+  #    script copy; the claim lives in the battery, not the docs)
+  sed 's/4b5e4fc:277/4b5e4fc:999/' "$script_abs" > "$base/tampered.sh"
+  SELFTEST_SCRIPT="$base/tampered.sh"
+  expect_fail "wrong suite claim" "suite mismatch: claimed 999"
+  SELFTEST_SCRIPT="$script_abs"
+
+  # 4. Dropped verdict — an evidence record loses its PASS/FAIL verdict
+  ( cd "$wt" && sed -i 's/38 PASS + 2 RECORDED/0 PASS/g' docs/p2_rehearsal_evidence_r4_2026-08-01.md )
+  expect_fail "dropped verdict" "evidence verdict '38 PASS + 2 RECORDED' MISSING"
+  ( cd "$wt" && git checkout -- docs/p2_rehearsal_evidence_r4_2026-08-01.md )
+
+  # 5. Stale README count — the README claim drifts behind the suite
+  ( cd "$wt" && sed -i 's/Tests (277 total)/Tests (222 total)/; s/\*\*277 tests\*\*/**222 tests**/' README.md )
+  expect_fail "stale README count" "README test count stale"
+  ( cd "$wt" && git checkout -- README.md )
+
+  # 6. Dropped citation — the rehearsal plan loses an evidence landing hash
+  ( cd "$wt" && sed -i 's/d0379d2/9999999/g' docs/p2_rehearsal_plan.md )
+  expect_fail "dropped citation" "rehearsal-plan evidence citation (d0379d2) MISSING"
+  ( cd "$wt" && git checkout -- docs/p2_rehearsal_plan.md )
+
+  note "selftest: $SELFTEST_OK/$SELFTEST_TOTAL drift classes detected"
+}
+
+# ---------------------------------------------------------------------------
 # RUN
 # ---------------------------------------------------------------------------
+if [ "$SELFTEST_MODE" -eq 1 ]; then
+  printf '\n== verify_ledger SELFTEST (drift-injection teeth check) ==\n'
+  selftest
+  printf '\n== summary: %d passed, %d warnings, %d failures ==\n' "$PASSES" "$WARNS" "$FAILS"
+  if [ "$FAILS" -gt 0 ]; then
+    printf 'RESULT: FAIL — %d failure(s). A drift class evaded the gate. Fix the battery.\n' "$FAILS"
+    exit 1
+  fi
+  printf 'RESULT: PASS — all %d drift classes detected.\n' "$SELFTEST_TOTAL"
+  exit 0
+fi
+
 printf '\n== verify_ledger == docs: %s\n' "${DOCS[*]}"
 printf '== 1. Hash integrity ==\n'
 hash_integrity
