@@ -62,7 +62,7 @@ realized scope of that work:
 | `0d5c66d` | SignUpRequest → SignUpCubit → Gateway seam | Completed sign-up wiring (backend-free) |
 | `2c05655` | p0_decision_capture + ADR-0007 | Backend gate artifact |
 | `1a99df0` | Gate 3 record cherry-picked into main | The record this amendment amends |
-| `83f5bbf` | email/OTP threading | Closed the D-T2 recovery half in code; `tracked_deviations.md` D-T2 itself is still stale and is scheduled for the docs-hygiene batch |
+| `83f5bbf` | email/OTP threading | Closed the D-T2 recovery half in code; the `tracked_deviations.md` D-T2 ledger entry was updated in the docs-hygiene batch (audit plan 4.3, `1335512`) — **D-T2 RESOLVED (2026-07-31)** |
 
 **Effect:** §3.4's "no commit authorized" constraint is superseded by this
 recorded authorization for the commits above, and the §7 acknowledgment
