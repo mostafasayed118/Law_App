@@ -25,7 +25,8 @@
 #         D-T2/D-T4/D-T6 RESOLVED entries, the plan header's shell-nav arc
 #         entry (through `4b5e4fc`, suite 277/277), the P2 apply records'
 #         slice ref (`3704a1d` in approval + execution), the r3/r4 evidence
-#         verdicts (`NOT PASSED (R-4)` / `38 PASS + 2 RECORDED`), and the
+#         verdicts (`NOT PASSED (R-4)` / `38 PASS + 2 RECORDED`), the
+#         rehearsal plan's evidence citations (`d0379d2`/`38e4832`), and the
 #         README suite count are also asserted against the CURRENT on-disk
 #         docs (not just committed content at cited hashes), so a committed
 #         doc that quietly drops a marker fails CI even without breaking a
@@ -211,7 +212,7 @@ semantic_rows() {
   fi
 
   note "--- 2d. Working-tree markers (current docs, not committed content) ---"
-  local wt_file wt_count head_plain head_gen head_total plan_hdr p2_record ev_file ev_token
+  local wt_file wt_count head_plain head_gen head_total plan_hdr p2_record ev_file ev_token plan_cite
   for wt_file in docs/gate3_reconciliation.md docs/gate3_decision.md; do
     wt_count=$(grep -cF 'Project Owner (github.com/mostafasayed118)' "$wt_file" 2>/dev/null || true)
     if [ "${wt_count:-0}" -gt 0 ]; then
@@ -260,6 +261,13 @@ semantic_rows() {
 docs/p2_rehearsal_evidence_r4_2026-08-01.md|38 PASS + 2 RECORDED
 docs/p2_rehearsal_evidence_r3_2026-08-01.md|NOT PASSED (R-4)
 EOF
+  for plan_cite in d0379d2 38e4832; do
+    if grep -q "$plan_cite" docs/p2_rehearsal_plan.md 2>/dev/null; then
+      ok "rehearsal-plan evidence citation ($plan_cite) in working tree"
+    else
+      fail "rehearsal-plan evidence citation ($plan_cite) MISSING from working tree"
+    fi
+  done
   head_plain=$(git grep -hE '(^|[^A-Za-z])(test|testWidgets|blocTest)\(' -- test/ 2>/dev/null | wc -l | tr -d ' ')
   head_gen=$(git grep -hE 'blocTest<' -- test/ 2>/dev/null | wc -l | tr -d ' ')
   head_total=$((head_plain + head_gen))

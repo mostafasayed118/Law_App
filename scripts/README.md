@@ -39,9 +39,10 @@ scripts/verify_ledger.sh path/to/other.md   # sweep extra docs for hash integrit
      arc entry (through `4b5e4fc`, suite 277/277), the P2 apply records'
      slice ref (`3704a1d` in both approval and execution), the r3/r4
      evidence verdicts (`NOT PASSED (R-4)` in the r3 record, `38 PASS +
-     2 RECORDED` in the r4 record), and the README suite count are asserted
-     against the **current on-disk docs**. The README count is checked
-     dynamically —
+     2 RECORDED` in the r4 record), the rehearsal plan's evidence
+     citations (`d0379d2`/`38e4832`), and the README suite count are
+     asserted against the **current on-disk docs**. The README count is
+     checked dynamically —
      the pass counts `test(`/`testWidgets(`/`blocTest(` + `blocTest<...>`
      declarations in the working tree and greps the README for that exact
      number, so a committed doc that quietly drops a marker (or a README that
@@ -66,7 +67,8 @@ scripts/verify_ledger.sh path/to/other.md   # sweep extra docs for hash integrit
   suite total and greps for that number), so it needs no maintenance as the
   suite grows — but the README itself must be kept in sync.
 - The plan-header arc tokens (`4b5e4fc`, `277/277`), the apply-approval
-  slice ref (`3704a1d`), and the r3/r4 evidence verdict strings are
+  slice ref (`3704a1d`), the r3/r4 evidence verdict strings, and the
+  rehearsal plan's evidence citations (`d0379d2`/`38e4832`) are
   **intentionally pinned** to their records — when a future amendment
   supersedes them, advance the tokens deliberately in the same commit as the
   doc amendment, or the gate will red by design.
