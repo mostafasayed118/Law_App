@@ -1,7 +1,7 @@
 -- rpc/_down.sql — consolidated backout for the entire P2 RPC surface
 -- (REVIEWED — rollback standby; not run on dev). Mirrors README rollback row "rpc/*.sql -> _down.sql".
 --
--- Hardened 2026-08-03 (code-only, NOT yet applied): the backout now also
+-- Hardened 2026-08-03 (REVIEWED — rollback standby; not run on dev): the backout now also
 -- revokes the per-function EXECUTE grants the RPC files gave to
 -- `authenticated`, so a full rollback restores the default-deny posture
 -- instead of leaving an orphaned grant surface.

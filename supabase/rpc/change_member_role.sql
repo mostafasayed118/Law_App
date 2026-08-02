@@ -6,7 +6,7 @@
 -- membership must be in the same org the caller partners (tenant isolation:
 -- a partner in org-a cannot change a role in org-b). Audited.
 --
--- Hardened 2026-08-03 (code-only, NOT yet applied): the org must retain at
+-- Hardened 2026-08-03 (HARDENED & APPLIED — dev project, 2026-08-03): the org must retain at
 -- least one active partner after the change, so a partner can no longer
 -- demote the org's last partner and lock the org out of membership
 -- management (zero-partner lockout, audit finding).

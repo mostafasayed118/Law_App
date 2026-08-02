@@ -7,7 +7,7 @@
 -- active_membership() filters status = 'active', so a stale client session
 -- cannot project capabilities (matrix §3 negative). Audited.
 --
--- Hardened 2026-08-03 (code-only, NOT yet applied): the org must retain at
+-- Hardened 2026-08-03 (HARDENED & APPLIED — dev project, 2026-08-03): the org must retain at
 -- least one active partner after the suspension, closing the same
 -- zero-partner lockout that change_member_role now guards (audit finding).
 

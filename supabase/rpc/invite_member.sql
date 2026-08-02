@@ -11,7 +11,7 @@
 -- sha-256 hash is stored (Q2). 7-day expiry, single-use (D-10a).
 -- The pending unique partial index enforces one pending invite per (org, email).
 --
--- Hardened 2026-08-03 (code-only, NOT yet applied): an email that already
+-- Hardened 2026-08-03 (HARDENED & APPLIED — dev project, 2026-08-03): an email that already
 -- has any membership row in the org is refused up front, instead of issuing
 -- a dead-end invite that accept_invitation can never redeem (the
 -- unique(organization_id, user_id) constraint would reject the acceptance;

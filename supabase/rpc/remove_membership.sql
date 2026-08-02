@@ -8,7 +8,7 @@
 -- A member cannot remove themselves via this RPC (use delete_my_account for
 -- self-deletion, D-05). Audited.
 --
--- Hardened 2026-08-03 (code-only, NOT yet applied): the org must retain at
+-- Hardened 2026-08-03 (HARDENED & APPLIED — dev project, 2026-08-03): the org must retain at
 -- least one active partner after the removal, closing the same zero-partner
 -- lockout that change_member_role now guards (audit finding).
 
