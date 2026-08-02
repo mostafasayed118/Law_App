@@ -19,7 +19,11 @@
 > suite 220/220); **Batch 5 completed** (`6c3d274`, `a17b747`, `77c43de`,
 > `75ff17b` — D-T1/D-T3 resolved, ADR-0008 supersedes ADR-0006, suite
 > 222/222); **Batch 3.3 completed** (`cc917b7`, `e8c70b9` — build-time
-> config + anon-key guard + DI flip, suite 235/235).
+> config + anon-key guard + DI flip, suite 235/235); **UI foundation
+> merged** (`7f2bf39`, PR #2, 2026-08-02): `feat/foundation-screens`
+> profile + notifications screens merged into `main` — `ProfileScreen`,
+> notification-prefs domain/stores/cubit/settings screen, EN/AR/TR keys,
+> +27 tests (suite 261/261, CI green on push).
 >
 > **Governing docs:** `INSTRUCTIONS.md` §2.1/§3 (gates, delivery slices,
 > approval discipline) · `docs/gate3_decision.md` +
