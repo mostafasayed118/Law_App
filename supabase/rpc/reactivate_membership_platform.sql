@@ -1,4 +1,4 @@
--- rpc/reactivate_membership_platform.sql — P2 reviewed RPC (REVIEWED, NOT APPLIED)
+-- rpc/reactivate_membership_platform.sql — P2 reviewed RPC (REVIEWED & APPLIED — dev project, 2026-08-01)
 -- Source of truth: docs/permission_matrix.md §3 owner row ("Suspend / reactivate
 -- a membership | ✅ (any org)") — ADDED to complete the signed matrix row that
 -- design §5.3's list omitted (design listed only suspend_membership_platform).

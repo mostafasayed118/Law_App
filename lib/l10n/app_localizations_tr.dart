@@ -135,9 +135,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get createAccount => 'Hesap oluşturun';
 
   @override
-  String get encryptedConnectionNotice => '256-BİT ŞİFRELİ BAĞLANTI';
-
-  @override
   String get signUpTitle => 'Hesap Oluştur';
 
   @override

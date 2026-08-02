@@ -27,16 +27,16 @@
 |---|---|---|
 | P2 approval recorded | `docs/p0_decision_capture.md` §3 | ✅ Approved 2026-08-01 |
 | RLS-gate design review passed | `docs/p2_schema_rls_design.md` §8 (Q1–Q6) | ✅ Passed 2026-08-01 |
-| Reviewed migration slice | `supabase/` (`b5f7e7c`) | ✅ Committed & pushed, REVIEWED/NOT APPLIED |
-| Slice amendment (R-1/R-2) | `supabase/` (`83593c2`) | ✅ Committed & pushed, REVIEWED/NOT APPLIED |
-| Slice amendment (R-3) | `supabase/` (`c95dcf4`) | ✅ Committed & pushed, REVIEWED/NOT APPLIED |
-| Slice amendment (R-4) | `supabase/` (`3704a1d`) | ✅ Committed & pushed, REVIEWED/NOT APPLIED |
+| Reviewed migration slice | `supabase/` (`b5f7e7c`) | ✅ Committed & pushed, REVIEWED (superseded by later amendments — never applied) |
+| Slice amendment (R-1/R-2) | `supabase/` (`83593c2`) | ✅ Committed & pushed, REVIEWED (superseded by later amendments — never applied) |
+| Slice amendment (R-3) | `supabase/` (`c95dcf4`) | ✅ Committed & pushed, REVIEWED (superseded by later amendments — never applied) |
+| Slice amendment (R-4) | `supabase/` (`3704a1d`) | ✅ Committed & pushed, REVIEWED — applied to the dev project 2026-08-01 (execution row below) |
 | Ephemeral rehearsal (r1) | `docs/p2_rehearsal_evidence_2026-08-01.md` (`3266c23`) | ✅ Executed — NOT PASSED (findings R-1/R-2) |
 | Ephemeral rehearsal (r2, amended slice) | `docs/p2_rehearsal_evidence_r2_2026-08-01.md` (`2c31b27`) | ✅ Executed — PASSED (38 PASS + 2 RECORDED) |
 | Ephemeral rehearsal (r3, R-3 slice) | `docs/p2_rehearsal_evidence_r3_2026-08-01.md` (`38e4832`) | ✅ Executed — NOT PASSED (finding R-4) |
 | Ephemeral rehearsal (r4, R-4 slice) | `docs/p2_rehearsal_evidence_r4_2026-08-01.md` (`d0379d2`) | ✅ Executed — **PASSED (twin gates green, 38 PASS + 2 RECORDED)** |
 | **Apply approval (this record)** | this document | ✅ **APPROVED 2026-08-01** (slice ref reconciled to `3704a1d`) |
-| Apply execution (dev project) | separate execution slice | ⏳ not started — gated by §4 conditions |
+| Apply execution (dev project) | docs/p2_apply_execution_2026-08-01.md (3bcd968) | ✅ Executed — Up 1–5 GREEN, §4.5 smoke PARTIAL (manual smoke pending, see evidence §6) |
 
 ## 2. Gate criteria confirmation — plan §6 exit criteria vs. r2 evidence (r4 re-confirmed)
 

@@ -17,7 +17,6 @@ class AuthScaffold extends StatelessWidget {
     this.leading,
     this.maxWidth = 480,
     this.scrollPadding,
-    this.bottomNavigationBar,
     super.key,
   });
 
@@ -25,7 +24,6 @@ class AuthScaffold extends StatelessWidget {
   final Widget? leading;
   final double maxWidth;
   final EdgeInsetsGeometry? scrollPadding;
-  final Widget? bottomNavigationBar;
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +47,6 @@ class AuthScaffold extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: bottomNavigationBar,
     );
   }
 }

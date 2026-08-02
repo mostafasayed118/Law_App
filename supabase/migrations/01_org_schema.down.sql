@@ -1,4 +1,4 @@
--- 01_org_schema.down.sql — backout for 01_org_schema.sql (REVIEWED, NOT APPLIED)
+-- 01_org_schema.down.sql — backout for 01_org_schema.sql (REVIEWED — rollback standby; not run on dev)
 
 begin;
 

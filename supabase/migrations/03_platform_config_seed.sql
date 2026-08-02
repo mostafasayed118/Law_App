@@ -1,4 +1,4 @@
--- 03_platform_config_seed.sql — P2 reviewed migration (REVIEWED, NOT APPLIED)
+-- 03_platform_config_seed.sql — P2 reviewed migration (REVIEWED & APPLIED — dev project, 2026-08-01)
 -- Q1: platform_config.owner_user_id seeded by migration with the VERIFIED
 -- owner auth.users id — no first-run RPC (keeps the client surface minimal).
 -- Source of truth: docs/p2_schema_rls_design.md §8 Q1 (gate-approved).

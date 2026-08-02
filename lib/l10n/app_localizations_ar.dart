@@ -135,9 +135,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get createAccount => 'أنشئ حسابًا';
 
   @override
-  String get encryptedConnectionNotice => 'اتصال مشفّر 256-بت';
-
-  @override
   String get signUpTitle => 'إنشاء حساب';
 
   @override

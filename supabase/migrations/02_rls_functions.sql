@@ -1,4 +1,4 @@
--- 02_rls_functions.sql — P2 reviewed migration (REVIEWED, NOT APPLIED)
+-- 02_rls_functions.sql — P2 reviewed migration (REVIEWED & APPLIED — dev project, 2026-08-01)
 -- Helper functions + signup trigger + expiry cleanup (security definer).
 -- Source of truth: docs/p2_schema_rls_design.md §5.1 + §4.2 (gate-approved).
 -- Rollback: 02_rls_functions.down.sql (same directory).

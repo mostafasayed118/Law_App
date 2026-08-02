@@ -54,7 +54,6 @@ class _SignInScreenState extends State<SignInScreen> {
         LegalHubTheme.marginMobile,
         LegalHubTheme.spaceXl,
       ),
-      bottomNavigationBar: const SecurityBadge(),
       child: BlocListener<AuthCubit, AuthState>(
         listenWhen: (AuthState previous, AuthState current) =>
             previous.status != current.status &&

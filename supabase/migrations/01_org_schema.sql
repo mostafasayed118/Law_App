@@ -1,4 +1,4 @@
--- 01_org_schema.sql — P2 reviewed migration (REVIEWED, NOT APPLIED)
+-- 01_org_schema.sql — P2 reviewed migration (REVIEWED & APPLIED — dev project, 2026-08-01)
 -- Enums, tables, RLS enable, default-deny revokes + narrow grants.
 -- Source of truth: docs/p2_schema_rls_design.md §4 (gate-approved 2026-08-01).
 -- Rollback: 01_org_schema.down.sql (same directory).

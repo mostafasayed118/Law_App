@@ -1,4 +1,4 @@
--- rpc/change_member_role.sql — P2 reviewed RPC (REVIEWED, NOT APPLIED)
+-- rpc/change_member_role.sql — P2 reviewed RPC (REVIEWED & APPLIED — dev project, 2026-08-01)
 -- Source of truth: docs/p2_schema_rls_design.md §5.3 + §4.4 (D-06).
 -- Backout: rpc/_down.sql.
 --

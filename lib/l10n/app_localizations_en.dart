@@ -135,9 +135,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createAccount => 'Create an account';
 
   @override
-  String get encryptedConnectionNotice => '256-BIT ENCRYPTED CONNECTION';
-
-  @override
   String get signUpTitle => 'Create Account';
 
   @override

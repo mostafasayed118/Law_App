@@ -1,4 +1,4 @@
--- policies/platform_config.sql — P2 reviewed policy (REVIEWED, NOT APPLIED)
+-- policies/platform_config.sql — P2 reviewed policy (REVIEWED & APPLIED — dev project, 2026-08-01)
 -- Source of truth: docs/p2_schema_rls_design.md §5.2 (gate-approved).
 -- Backout: git revert of this policy commit (design §7).
 --

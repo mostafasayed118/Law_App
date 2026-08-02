@@ -149,4 +149,14 @@ subsequent P3 work on the applied schema.
 PARTIAL) — the approval record's row must be flipped to "executed — see
 `docs/p2_apply_execution_2026-08-01.md`" in a follow-up commit (same batch or
 immediate follow-up), so a reader cross-referencing the approval record does not see
-"not started" beside an executed evidence record.
+"not started" beside an executed evidence record. **(Resolved 2026-08-01:** the
+approval record's §1 row was flipped to "executed" in `598aee8`; the §4.5 manual
+smoke remains the only open item, per §6's forward hook.)
+
+**Ledger note (2026-08-01 comment-only cleanup):** the `(REVIEWED, NOT APPLIED)`
+markers on the slice's 26 up-file headers (`migrations/` ×3, `policies/` ×6,
+`rpc/` ×17) were flipped to `(REVIEWED & APPLIED — dev project, 2026-08-01)` and
+the 4 backout headers (`*.down.sql` ×3 + `rpc/_down.sql`) reworded to `(REVIEWED
+— rollback standby; not run on dev)` — **comment-only**, functional SQL byte-
+identical to the applied `3704a1d` slice; the applied-slice pin in §1 is
+unchanged. A `git diff 3704a1d HEAD` shows only these header comments.

@@ -99,17 +99,4 @@ void main() {
       expect(find.text('OR CONTINUE WITH'), findsOneWidget);
     });
   });
-
-  group('SecurityBadge', () {
-    testWidgets('renders the localized encrypted-connection notice', (
-      tester,
-    ) async {
-      await tester.pumpWidget(pumpButton(const SecurityBadge()));
-
-      // The badge is presentational only and must not claim a real transport
-      // guarantee; the label comes from AppLocalizations.
-      expect(find.text('256-BIT ENCRYPTED CONNECTION'), findsOneWidget);
-      expect(find.byIcon(Icons.verified_user_outlined), findsOneWidget);
-    });
-  });
 }

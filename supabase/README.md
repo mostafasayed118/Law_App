@@ -7,11 +7,17 @@
 > `docs/permission_matrix.md` · `docs/rollback_plan.md` §1/§2 ·
 > `docs/gate3_decision.md` §5 · `docs/adr/0007`.
 >
-> **Status: REVIEWED — NOT APPLIED.** Nothing in this directory has been or
-> will be run against any Supabase project. Applying it is a **separate
-> approval slice**: it requires (1) the ephemeral rehearsal from
-> `docs/rollback_plan.md` §2 and `docs/p2_schema_rls_design.md` §7, and
-> (2) explicit owner authorization per `INSTRUCTIONS.md` §2.1 gates.
+> **Status: REVIEWED & APPLIED (dev project, 2026-08-01).** The slice was
+> applied to the shared dev project (`eutmvevpskerzpqmwplv`) under the
+> apply-approval record's §4 conditions: Up 1–5 applied and verified GREEN —
+> evidence in `docs/p2_apply_execution_2026-08-01.md` (`3bcd968`). The §4.5
+> post-apply **manual smoke** (signup loop with a real inbox) remains
+> pending. Applying it was a **separate approval slice** requiring (1) the
+> ephemeral rehearsal from `docs/rollback_plan.md` §2 and
+> `docs/p2_schema_rls_design.md` §7, and (2) explicit owner authorization per
+> `INSTRUCTIONS.md` §2.1 gates — both recorded (rehearsal r4 PASSED,
+> `docs/p2_rehearsal_evidence_r4_2026-08-01.md`; approval
+> `docs/p2_apply_approval_2026-08-01.md`).
 >
 > **Date:** 2026-08-01. **Owner:** Project Owner (github.com/mostafasayed118).
 
@@ -27,7 +33,7 @@
 | `policies/*.sql` | Per-table RLS policies (versioned in git, never edited in dashboard) | `git revert` of the policy commit (design §7) |
 | `rpc/*.sql` | Narrow RPC surface (security definer, each audited) | `rpc/_down.sql` (drops the whole surface) |
 
-## Apply order (when authorized, after rehearsal)
+## Apply order (as executed on the dev project, 2026-08-01)
 
 ```
 1. migrations/01_org_schema.sql
@@ -97,7 +103,8 @@ starting to pass = immediate revert, never fix-forward (rollback_plan §5).
 
 ## What this directory does NOT authorize
 
-- No Supabase change — nothing here has been or will be run.
-- No P2 "applied" status, no matter/doc schema, no storage/realtime policy
-  (Q4 deferral), no real data, no service-role usage, no compliance claim.
+- No Supabase change beyond the reviewed + applied slice (Up 1–5, executed
+  2026-08-01 on the dev project; §4.5 manual smoke pending).
+- No matter/doc schema, no storage/realtime policy (Q4 deferral), no real
+  data, no service-role usage, no compliance claim.
 - The Flutter code (`lib/`) is untouched by this slice.
