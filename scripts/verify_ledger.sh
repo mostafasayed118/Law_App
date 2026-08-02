@@ -21,9 +21,10 @@
 #      c. The §3 file-presence claims are re-verified at the approval commit
 #         (`f7621df`): 10 files present, the org-context trio absent (then and
 #         now), and `password_recovery_cubit.dart` absent at approval.
-#      d. Working-tree markers: the A-string in both Gate 3 docs, the D-T2/D-T4
-#         RESOLVED entries, the plan header's shell-nav arc entry (through
-#         `4b5e4fc`, suite 277/277), and the README suite count are also
+#      d. Working-tree markers: the A-string in both Gate 3 docs, the
+#         D-T2/D-T4/D-T6 RESOLVED entries, the plan header's shell-nav arc
+#         entry (through `4b5e4fc`, suite 277/277), the apply-approval
+#         record's slice ref (`3704a1d`), and the README suite count are also
 #         asserted against the CURRENT on-disk docs (not just committed
 #         content at cited hashes), so a committed doc that quietly drops a
 #         marker fails CI even without breaking a cited hash.
@@ -227,6 +228,11 @@ semantic_rows() {
   else
     fail "D-T4 RESOLVED entry MISSING from working tree tracked_deviations.md"
   fi
+  if grep -qE '^## D-T6:.*RESOLVED \(2026-08-01\)' docs/tracked_deviations.md 2>/dev/null; then
+    ok "D-T6 RESOLVED entry in working tree tracked_deviations.md"
+  else
+    fail "D-T6 RESOLVED entry MISSING from working tree tracked_deviations.md"
+  fi
   plan_hdr=$(awk 'BEGIN{p=0} /^>/{p=1; print; next} p && !/^>/{exit}' docs/codebase_audit_plan.md 2>/dev/null)
   if printf '%s' "$plan_hdr" | grep -q 'Shell navigation arc' \
       && printf '%s' "$plan_hdr" | grep -q '4b5e4fc' \
@@ -234,6 +240,11 @@ semantic_rows() {
     ok "plan header blockquote: shell-nav arc entry through 4b5e4fc, suite 277/277"
   else
     fail "plan header blockquote missing shell-nav arc entry (through 4b5e4fc, suite 277/277)"
+  fi
+  if grep -q '3704a1d' docs/p2_apply_approval_2026-08-01.md 2>/dev/null; then
+    ok "apply-approval record slice ref (3704a1d) in working tree"
+  else
+    fail "apply-approval record missing slice ref 3704a1d in working tree"
   fi
   head_plain=$(git grep -hE '(^|[^A-Za-z])(test|testWidgets|blocTest)\(' -- test/ 2>/dev/null | wc -l | tr -d ' ')
   head_gen=$(git grep -hE 'blocTest<' -- test/ 2>/dev/null | wc -l | tr -d ' ')
