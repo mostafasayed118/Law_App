@@ -2,6 +2,10 @@
 # Bootstrap specification §7 (row B2) + §3.11: run `dart format` (check),
 # `flutter analyze`, and `flutter test` on pushes to main and pull requests
 # targeting main.
+# Plus a repo-local static gate (scripts/verify_ledger.sh, beyond B2): fails if
+# the governance ledger cites an unresolvable/dangling hash, misses a byte-exact
+# content marker, or drifts a recorded suite count. Needs only bash + git, so it
+# runs before the Flutter toolchain to fail fast.
 # No build, deploy, publish, signing, or release steps are authorized at B2.
 name: CI
 
@@ -31,6 +35,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          # Full history (not shallow): the ledger gate below validates cited
+          # hashes against the whole object database (`git rev-list --all`,
+          # `git show <hash>:<path>`), so a depth-1 clone would make every
+          # cited hash look dangling and fail the gate spuriously.
+          fetch-depth: 0
+
+      - name: Verify governance ledger
+        # Static docs gate (scripts/README.md): fails if any hash cited in the
+        # audit plan / Gate 3 reconciliation is unresolvable or dangling, a
+        # byte-exact content marker is missing, or a recorded suite count has
+        # drifted. No Flutter needed — kept before toolchain setup to fail
+        # fast and cheap.
+        run: bash scripts/verify_ledger.sh
 
       # Pinned to the Flutter SDK version declared in pubspec.yaml (3.44.4,
       # which ships Dart 3.12.2). Keeping CI on the same toolchain as the
