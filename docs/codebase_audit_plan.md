@@ -24,14 +24,18 @@
 > profile + notifications screens merged into `main` — `ProfileScreen`,
 > notification-prefs domain/stores/cubit/settings screen, EN/AR/TR keys,
 > +27 tests (suite 261/261, CI green on push). **Shell navigation arc
-> completed** (`8092f0e`–`8aa0414`, 2026-08-02): settings-descendant
+> completed** (`8092f0e`–`4b5e4fc`, 2026-08-02): settings-descendant
 > surfaces wired and pinned — notifications (`8092f0e`) and profile
 > (`3998aef`) tile-navigation tests, settings highlight on descendant
 > routes (`768127b`), capability-derived shell nav index with
 > `capabilitiesForRole` seam and no-bar guard for <2 destinations
-> (`32803ae`), and map-level `roleCapabilities` invariants
+> (`32803ae`), map-level `roleCapabilities` invariants
 > (at-least-one-destination `356f1b1`, capability-route alignment
-> `8aa0414`); suite 275/275, CI green on push.
+> `8aa0414`), end-to-end shell nav flow test driven through the real
+> router — settings → notifications → profile → settings via the nav
+> bar (`7117901`) — demo-flow home ↔ settings round-trip in the
+> app-level harness (`3a4ed7b`), and Arabic RTL round-trip variant
+> (`4b5e4fc`); suite 277/277, CI green on push.
 >
 > **Governing docs:** `INSTRUCTIONS.md` §2.1/§3 (gates, delivery slices,
 > approval discipline) · `docs/gate3_decision.md` +
