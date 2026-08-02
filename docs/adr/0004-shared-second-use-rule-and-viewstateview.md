@@ -98,10 +98,16 @@ It does not:
 - A future audit can re-check the barrel against the same rule; this ADR is the
   baseline for that comparison.
 
-## Open condition
+## Open condition — RESOLVED (retained by use)
 
-`ViewStateView`'s retention is justified by its cross-cutting contract, but the
-cleaner proof is a real consumer. Batch 4 of the audit plan (`PasswordRecoveryCubit`)
-is the first slice intended to drive a `ViewState`-powered flow; wiring it there
-converts "retained by contract" into "retained by use." If that slice is
-cancelled, revisit this decision.
+> **Update (2026-08-02):** the open condition is closed. `ViewStateView` is now
+> adopted by two real consumers, converting its retention from "by contract" to
+> "by use":
+> - `PasswordRecoveryCubit` / `ForgotPasswordResetScreen` render
+>   `ViewStateView<void>` (first adopter, the Batch-4 slice this ADR named).
+> - `SignUpCubit` / `SignUpScreen` render `ViewStateView<void>` for the
+>   submit loading/success/error path.
+>
+> Both sites render the shared widget for async-state presentation, proving the
+> app-level cross-cutting responsibility this ADR claimed. No further
+> retention justification is required.
