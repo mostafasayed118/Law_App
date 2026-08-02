@@ -2,7 +2,7 @@
 
 | Script | What it verifies | When to run |
 |---|---|---|
-| `verify_ledger.sh` | Governance-ledger integrity (below) | **Before committing any `docs/` amendment** that touches the audit plan or Gate 3 reconciliation; wire into CI as a cheap static gate |
+| `verify_ledger.sh` | Governance-ledger integrity (below) | **Before committing any `docs/` amendment** that touches the audit plan or Gate 3 reconciliation; wired into CI as a cheap static gate (`ci.yml` on every push/PR) plus a **nightly teeth-prover** (`ledger-selftest.yml`, 02:00 UTC + `workflow_dispatch`) |
 
 ## `verify_ledger.sh`
 
@@ -113,3 +113,17 @@ not uncommitted working-tree edits.
 - The selftest's drift injections mutate the *scratch* worktree only; the
   repo working tree is never touched. The suite-claim drift is injected via a
   tampered script copy (the claim lives in the battery, not the docs).
+
+## CI wiring
+
+- **`ci.yml`** runs `scripts/verify_ledger.sh` (the plain battery, no
+  `--selftest`) on every push to `main` and PR targeting `main` — the
+  committed-ledger gate on the exact pushed bytes.
+- **`ledger-selftest.yml`** runs `scripts/verify_ledger.sh --selftest`
+  nightly (02:00 UTC, default branch) and on demand via `workflow_dispatch`.
+  It proves the battery still detects all six drift classes on the runner,
+  catching a silent regression in the gate's detection logic even without a
+  push. Needs only bash + git (no Flutter toolchain), and checkouts with full
+  history (`fetch-depth: 0`) because the selftest creates a scratch worktree
+  at HEAD and the battery validates cited hashes against the whole object
+  database.

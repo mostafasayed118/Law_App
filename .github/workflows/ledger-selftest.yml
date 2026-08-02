@@ -1,0 +1,50 @@
+# LegalHub — scheduled teeth-prover for the governance ledger battery.
+# The push/PR gate (ci.yml) runs scripts/verify_ledger.sh on every commit;
+# this workflow proves the battery itself still has teeth on a cadence by
+# running its --selftest mode (drift-injection: dead hash, missing marker,
+# wrong suite claim, dropped verdict, stale README count, dropped citation —
+# each must red the battery). Needs only bash + git, no Flutter toolchain.
+# Runs nightly (02:00 UTC) and on demand via workflow_dispatch, so a silent
+# regression in the gate's detection logic is caught even if no commit pushes.
+# No build, deploy, publish, signing, or release steps are authorized at B2.
+name: Ledger selftest
+
+on:
+  schedule:
+    # Nightly at 02:00 UTC. GitHub cron is UTC; the default branch is used.
+    # Schedules can be delayed under load — this is a low-priority check, so
+    # occasional late starts are acceptable.
+    - cron: '0 2 * * *'
+  # On-demand trigger so the teeth check can be run immediately after a
+  # battery change (Actions → "Ledger selftest" → Run workflow), without
+  # waiting for the next nightly window or faking a push.
+  workflow_dispatch:
+
+# Least privilege: read-only on the triggering repo. The selftest creates a
+# scratch worktree inside its own working directory; no secrets are required.
+permissions:
+  contents: read
+
+jobs:
+  ledger-selftest:
+    name: verify_ledger --selftest
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          # Full history (not shallow): the selftest creates a scratch
+          # worktree at HEAD and runs the whole battery inside it, and the
+          # battery validates cited hashes against the whole object database
+          # (`git rev-list --all`, `git show <hash>:<path>`), so a depth-1
+          # clone would make every cited hash look dangling and fail the
+          # baseline spuriously.
+          fetch-depth: 0
+
+      - name: Prove ledger teeth (--selftest)
+        # Exit code 1 (any drift class evading the gate, or a failed
+        # baseline) fails the job — same fail-fast philosophy as the
+        # ci.yml ledger step.
+        run: bash scripts/verify_ledger.sh --selftest
