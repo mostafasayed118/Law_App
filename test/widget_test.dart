@@ -102,4 +102,52 @@ void main() {
     expect(find.text('الإعدادات'), findsNWidgets(2));
     expect(find.text('اللغة'), findsWidgets);
   });
+
+  testWidgets('demo flow drives the shell nav round-trip under Arabic RTL', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      LegalHubApp(
+        router: router,
+        authCubit: authCubit,
+        localeCubit: localeCubit,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await authCubit.startDemoSession();
+    await tester.pumpAndSettle();
+
+    // Switch to Arabic via the settings dropdown (same path as the EN flow
+    // above) so the shell renders RTL before the round-trip.
+    await tester.ensureVisible(find.text('Settings'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byType(DropdownButton<Locale>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(DropdownButton<Locale>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('AR').last);
+    await tester.pumpAndSettle();
+
+    // RTL is active: Arabic settings title + nav label (2 total).
+    expect(find.text('الإعدادات'), findsNWidgets(2));
+    expect(find.text('اللغة'), findsWidgets);
+
+    // Round-trip home ↔ settings under RTL: the nav labels are Arabic, and
+    // tapping each destination must still route via its own route through
+    // the real GoRouter — pinned end-to-end under right-to-left layout.
+    await tester.ensureVisible(find.text('الرئيسية'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('الرئيسية'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('مرحبًا'), findsOneWidget);
+
+    await tester.ensureVisible(find.text('الإعدادات'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('الإعدادات'));
+    await tester.pumpAndSettle();
+    expect(find.text('اللغة'), findsWidgets);
+  });
 }
