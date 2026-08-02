@@ -146,7 +146,14 @@ class _AppShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String location = GoRouterState.of(context).uri.path;
-    final int index = location == AppRoutes.settings ? 1 : 0;
+    // The settings destination stays highlighted on the settings surface and
+    // the screens reached from it (profile, notifications); every other
+    // shell route (home) is destination 0.
+    final bool onSettingsSurface =
+        location == AppRoutes.settings ||
+        location == AppRoutes.profile ||
+        location == AppRoutes.notifications;
+    final int index = onSettingsSurface ? 1 : 0;
     final AppLocalizations l10n = AppLocalizations.of(context);
     // UX-only projection from the active membership's org-scoped role. The
     // session itself carries no client-owned role (contract §5); this is a
