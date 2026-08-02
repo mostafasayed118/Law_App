@@ -11,8 +11,10 @@
 > applied to the shared dev project (`eutmvevpskerzpqmwplv`) under the
 > apply-approval record's §4 conditions: Up 1–5 applied and verified GREEN —
 > evidence in `docs/p2_apply_execution_2026-08-01.md` (`3bcd968`). The §4.5
-> post-apply **manual smoke** (signup loop with a real inbox) remains
-> pending. Applying it was a **separate approval slice** requiring (1) the
+> post-apply **manual smoke** (signup loop with a real inbox) is **deferred**
+> — P2 closed 2026-08-03 on the probe battery + rehearsals; the provider loop
+> was not executed (see `docs/p2_close_decision_2026-08-03.md`). Applying it was a
+> **separate approval slice** requiring (1) the
 > ephemeral rehearsal from `docs/rollback_plan.md` §2 and
 > `docs/p2_schema_rls_design.md` §7, and (2) explicit owner authorization per
 > `INSTRUCTIONS.md` §2.1 gates — both recorded (rehearsal r4 PASSED,
@@ -104,7 +106,8 @@ starting to pass = immediate revert, never fix-forward (rollback_plan §5).
 ## What this directory does NOT authorize
 
 - No Supabase change beyond the reviewed + applied slice (Up 1–5, executed
-  2026-08-01 on the dev project; §4.5 manual smoke pending).
+  2026-08-01 on the dev project; P2 closed 2026-08-03, §4.5 provider loop
+  deferred — `docs/p2_close_decision_2026-08-03.md`).
 - No matter/doc schema, no storage/realtime policy (Q4 deferral), no real
   data, no service-role usage, no compliance claim.
 - The Flutter code (`lib/`) is untouched by this slice.

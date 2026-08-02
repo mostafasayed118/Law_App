@@ -37,7 +37,7 @@ session-lifecycle states (expiry → re-auth, denial, offline, retry).
 | Gate step | Artifact | Status |
 |---|---|---|
 | P2 decision + approval | `docs/p0_decision_capture.md` §3 · `docs/p2_apply_approval_2026-08-01.md` | ✅ Approved 2026-08-01 |
-| P2 apply executed (dev project) | `docs/p2_apply_execution_2026-08-01.md` (`3bcd968`) | ✅ Up 1–5 GREEN; §4.5 manual smoke **pending** (see §3) |
+| P2 apply executed (dev project) | `docs/p2_apply_execution_2026-08-01.md` (`3bcd968`) | ✅ Up 1–5 GREEN; **P2 closed 2026-08-03** — §4.5 provider loop DEFERRED (not executed; see `docs/p2_close_decision_2026-08-03.md`) (§3) |
 | Client bootstrap (B1–B13) | current `lib/` + `test/` | ✅ Scaffolded auth/onboarding/home/settings on fakes |
 | **P3 plan (this document)** | this document (`275724e` — approval recorded; draft `3bcd7b0`) | ✅ **APPROVED 2026-08-02** — Project Owner (ledger §14) |
 | P3 implementation | `lib/`, `test/` (code only — no schema/RLS changes) | ⏳ not started — gated on per-step commit/approval discipline (INSTRUCTIONS.md §3) |
@@ -102,7 +102,7 @@ distinctly from generic errors.
 |---|---|
 | Applied dev project (`eutmvevpskerzpqmwplv`) | ✅ Up 1–5 GREEN — the 17 RPCs + policies + trigger are live |
 | `.env` (URL + **anon** key, git-ignored) | ✅ owner-held; anon-key guard must stay in front of any provider wiring |
-| P2 §4.5 **manual post-apply smoke** | ⏳ **pending** — signup → email-confirm → sign-in loop with a real inbox. P3 code can proceed against the applied schema; end-to-end P3 verification should run **after** (or in parallel with) the smoke, and the smoke result is a P2-close prerequisite this plan records, not re-opens |
+| P2 §4.5 **provider loop** (post-apply) | ✅ **P2 closed 2026-08-03; loop DEFERRED as documented residual risk** — not executed (no signup/email/confirm against the dev project); see `docs/p2_close_decision_2026-08-03.md`. P3 end-to-end verification runs against the applied schema with the provider loop deferred to P3, not re-opened as a P2 prerequisite |
 | Provider behaviors observed at apply | email confirmation **enabled** (signup → pending state); sign-in returns `invalid_credentials` for unknown users; reset returns generic `200 {}` — P3 must handle each distinctly |
 
 ---
@@ -334,9 +334,12 @@ fake otherwise, so tests and env-less runs keep working).
   offline/unauthorized/retry states; expiry → reauth; destructive
   confirmation; RTL mirroring assertions.
 - **Integration (contract §9 client-assertable rows):** against the applied
-  dev project once the §4.5 manual smoke passes — sign-in positive/negative,
-  sign-up pending, org switch, partner invite loop (real token →
-  accept), non-partner denial, owner-only denial.
+  dev project, with the provider-level loop **deferred** per the P2 close
+  decision (`docs/p2_close_decision_2026-08-03.md`) — env-gated tests cover
+  sign-in-like client-assertable surface, sign-up pending is a UI state,
+  org/switch, partner invite loop (real token → accept), non-partner denial,
+  owner-only denial; the GoTrue signup → confirm → sign-in provider loop
+  itself is re-attempted only if a controlled inbox exists.
 - **Fakes vs real:** fakes (existing pattern) keep CI deterministic;
   provider-backed integration tests are env-gated like today.
 
@@ -385,7 +388,9 @@ staging; no real client/legal data.
   pointing here. Implementation is gated on per-step commit/approval per
   `INSTRUCTIONS.md` §3 — this record authorizes the plan decision, not a
   bundle of commits.
-- P2 §4.5 manual smoke remains pending and is the P2-close prerequisite
-  this plan depends on for end-to-end verification (§3).
+- **P2 closed (2026-08-03, owner decision):** §4.5 provider loop **deferred**,
+  not executed — `docs/p2_close_decision_2026-08-03.md`. This plan's end-to-end
+  verification (§3) runs against the applied schema with the loop deferred to a
+  controlled-inbox exercise; it is not a P2-open prerequisite (§3).
 - The D-T6-resolution forward hook (partner member display names) is tracked
   here (§13 Q1), not silently resolved inside this slice.

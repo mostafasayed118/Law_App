@@ -8,8 +8,9 @@
 > of the rehearsal evidence series (`r1`–`r4`): the rehearsals proved the slice
 > on throwaway environments; this record proves the same slice applied to the
 > real dev project, with the rollback pairing standing by.
-> **Status: APPLY EXECUTED — Up 1–5 all GREEN; §4.5 post-apply smoke PARTIAL
-> (full signup loop deferred to a manual smoke — see §6).**
+> **Status: APPLY EXECUTED — Up 1–5 all GREEN; §4.5 post-apply smoke DEFERRED
+> as documented residual risk (P2 closed 2026-08-03 — NOT passed) — see §6
+> and `docs/p2_close_decision_2026-08-03.md`.**
 > **Owner:** Project Owner (github.com/mostafasayed118), 2026-08-01.
 
 ---
@@ -85,7 +86,7 @@ verification and was the sole evidence vehicle for all four rehearsals. Any futu
 
 ---
 
-## 6. §4.5 post-apply smoke — PARTIAL (full loop deferred to a manual smoke)
+## 6. §4.5 post-apply smoke — observed, then DEFERRED (loop not executed)
 
 The smoke exercised the GoTrue/API endpoints against the applied schema with a
 **synthetic identity** (cleaned up after; zero residue confirmed). Results:
@@ -100,18 +101,19 @@ The smoke exercised the GoTrue/API endpoints against the applied schema with a
 | Trigger → profiles | — | 0 profile rows | No user was created, so no trigger fired (the trigger→profile path was proven in r4 via direct `auth.users` inserts) |
 | Cleanup | — | 0 remaining users/profiles | Zero residue; applied state 6/25/5/3 intact |
 
-**Verdict: PARTIAL — the apply cannot be declared complete until the full loop
-runs.** The provider endpoints are live and respond correctly against the applied
+**Verdict: DEFERRED (2026-08-03) — the provider loop was NOT executed; see the
+close decision `docs/p2_close_decision_2026-08-03.md`.** The provider endpoints are live and respond correctly against the applied
 schema, but the complete **signup → email-confirm → sign-in** loop requires a real
 (non-reserved-TLD) email, clicking the confirmation link, and a password-grant
 sign-in — a **manual smoke** per §4.5's own wording. The `429` stop was a deliberate
 halt (not truncation): continuing would have sent more real confirmation emails and
 hammered the provider rate limit.
 
-**Forward hook (§4.5 PENDING):** a manual smoke with a real inbox — complete the
-signup confirmation flow, then password-grant sign-in, then a password-reset round
-trip — and record the result as a dated addendum to this record before the apply is
-declared fully complete.
+**Forward hook (§4.5 DEFERRED):** the provider loop (signup confirmation flow,
+password-grant sign-in, password-reset round trip) is **deferred** as a
+documented residual risk to the P3 end-to-end verification — an owner decision
+recorded 2026-08-03 in `docs/p2_close_decision_2026-08-03.md`, not a live
+pending item on this record.
 
 ---
 
@@ -134,24 +136,28 @@ declared fully complete.
 apply-approval's §4 conditions. Conditions 1 (baseline), 2 (Q1 verified, PII
 redacted), 3 (rollback standing by), 4 (probe-battery substitute for the
 Docker-unavailable `db diff` — recorded), and 6 (no scope beyond the slice) are met.
-Condition **5 (post-apply smoke) is PARTIAL**: the full signup loop is deferred to a
-manual smoke per §6's forward hook.
+Condition **5 (post-apply smoke) is DEFERRED, not passed** — the provider loop
+was not executed; the 2026-08-03 close decision
+(`docs/p2_close_decision_2026-08-03.md`) records it as a documented residual
+risk to the P3 end-to-end verification, per §6's forward hook.
 
 Nothing beyond the authorized slice touched the dev project; the Flutter client
 (`lib/`) was not changed; no storage/realtime, no matter/doc schema, no production,
 no service-role key usage, no real client data. The evidence record is the input to
-declaring the P2 dev apply complete (pending the §6 manual smoke) and to any
+declaring the P2 dev apply complete (per the 2026-08-03 close decision — the
+§6 provider loop is DEFERRED residual risk, not a pending blocker) and to any
 subsequent P3 work on the applied schema.
 
 **Ledger note (forward hook):** `docs/p2_apply_approval_2026-08-01.md` (`3f0d462`)
 §1 gate table still reads "Apply execution (dev project) | ⏳ not started — gated by
 §4 conditions". This record **is** the apply-execution result (Up 1–5 executed, §4.5
-PARTIAL) — the approval record's row must be flipped to "executed — see
+DEFERRED) — the approval record's row must be flipped to "executed — see
 `docs/p2_apply_execution_2026-08-01.md`" in a follow-up commit (same batch or
 immediate follow-up), so a reader cross-referencing the approval record does not see
 "not started" beside an executed evidence record. **(Resolved 2026-08-01:** the
-approval record's §1 row was flipped to "executed" in `598aee8`; the §4.5 manual
-smoke remains the only open item, per §6's forward hook.)
+approval record's §1 row was flipped to "executed" in `598aee8`; the §4.5
+provider loop is DEFERRED (not passed) per the 2026-08-03 close decision
+(`docs/p2_close_decision_2026-08-03.md`) — see §6's forward hook.)
 
 **Ledger note (2026-08-01 comment-only cleanup):** the `(REVIEWED, NOT APPLIED)`
 markers on the slice's 26 up-file headers (`migrations/` ×3, `policies/` ×6,
