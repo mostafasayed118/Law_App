@@ -73,6 +73,24 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Language'), findsWidgets);
 
+    // Round-trip home ↔ settings through the shell nav bar: tapping each
+    // destination must navigate via its own route (the record-based tap
+    // target in _AppShell, not a hardcoded index) — pinned end-to-end in the
+    // app-level harness as a user would drive it.
+    await tester.ensureVisible(find.text('Home'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Home'));
+    await tester.pumpAndSettle();
+    // Back on /home: the demo greeting proves the Home destination routed
+    // through the real GoRouter rather than a static swap.
+    expect(find.textContaining('Hello, Demo user'), findsOneWidget);
+
+    await tester.ensureVisible(find.text('Settings'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+    expect(find.text('Language'), findsWidgets);
+
     // Locale switch to Arabic flips UI to RTL strings.
     await tester.ensureVisible(find.byType(DropdownButton<Locale>));
     await tester.pumpAndSettle();
