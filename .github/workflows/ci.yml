@@ -30,7 +30,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Pinned to the Flutter SDK version declared in pubspec.yaml (3.44.4,
       # which ships Dart 3.12.2). Keeping CI on the same toolchain as the
