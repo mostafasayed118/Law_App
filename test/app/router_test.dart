@@ -136,5 +136,19 @@ void main() {
       expect(find.text('Welcome Back'), findsOneWidget);
       expect(authCubit.state.isAuthenticated, isFalse);
     });
+
+    testWidgets(
+      'still blocks unauthenticated access to the notifications route',
+      (tester) async {
+        router.go(AppRoutes.notifications);
+        await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+        await tester.pumpAndSettle();
+
+        // Same scoped bypass: the notifications route stays behind the auth
+        // gate like every other shell route.
+        expect(find.text('Welcome Back'), findsOneWidget);
+        expect(authCubit.state.isAuthenticated, isFalse);
+      },
+    );
   });
 }
