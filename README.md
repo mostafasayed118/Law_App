@@ -23,6 +23,12 @@ messaging services.
   sign-in goes through GoTrue (`AuthGateway.signIn`) and sign-up through
   `SupabaseSignUpGateway` (email verification enabled); env-less runs and
   tests keep the credential-free fakes.
+- P3 organization/membership data layer behind the same flip pattern:
+  `OrganizationGateway` (create org, member list, invite with one-time token,
+  change role / suspend / reactivate / remove) with a PostgREST RPC adapter,
+  a dev fake mirroring the server's last-active-partner and existing-member
+  guards, and typed failures — screens are a follow-up slice
+  ([spec](docs/p3_organization_membership_spec_2026-08-03.md)).
 - Redacted error-reporting boundary with no external observability SDK.
 - Auth and onboarding presentation: sign-in, sign-up, forgot-password
   (email/OTP/reset), onboarding carousel and success, home dashboard,
@@ -40,7 +46,7 @@ messaging services.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (307 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (340 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), Redactor (password/OTP/email/Bearer redaction
   with leak guards), DI registration graph, validators, router redirect logic
@@ -69,12 +75,16 @@ messaging services.
     gateways, the in-memory locale store, and the onboarding-success screen.
     Batch 5 added the 800×600 onboarding no-overflow test and the EN/AR/TR
     localized-fallback assertions.
-- Coverage: **307 tests** (2026-08-03); `flutter analyze` and the format gate
+- Coverage: **340 tests** (2026-08-03); `flutter analyze` and the format gate
   clean. The coverage-gap list from the codebase audit (cubit emission
   streams, shared widgets, screen negative paths, router bypass, TR locale,
   reset success path) was closed by Batch 1 of
   [`docs/codebase_audit_plan.md`](docs/codebase_audit_plan.md) and is no
-  longer listed here.
+  longer listed here. The P3 organization data layer (2026-08-03) added the
+  Supabase org RPC adapter (provider error mapping pinned), the org gateway
+  (role-surface validation, loud unknown-role handling, typed failures) and
+  the dev fake (mirrored last-partner/existing-member guards) — see
+  [`docs/p3_organization_membership_spec_2026-08-03.md`](docs/p3_organization_membership_spec_2026-08-03.md).
 - Tracked deviations: D-T1 (OnboardingScreen desktop overflow) and D-T3 (the
   hardcoded `'Jonathan'` fallback) were **resolved by Batch 5** — the carousel
   page now scrolls at compact heights and the no-session greeting fallback is
