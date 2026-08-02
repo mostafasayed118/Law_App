@@ -119,11 +119,20 @@ close.
 The approved vocabulary (`AuthOutcome<T>`, `AuthFailure(Kind)`,
 `SignInRequest`, `PasswordResetRequest`, `ResetCodeRequest`,
 `PasswordUpdateRequest`, `OrganizationMembership`, `MembershipStatus`,
-`Session{memberships, expiresAt}`) was **not built**. The realized vocabulary
-is provider-neutral and smaller:
+`Session{memberships, expiresAt}`) was **not built** at amendment time. The
+realized vocabulary is provider-neutral and smaller:
 
-- `Session {id, displayName, role}` — the bootstrap-era demo session shape.
-  See §7.
+> **Later superseded (2026-08-02, Batch 3.1 `1042daf`):** six of the nine
+> approved types were subsequently built and are live in `lib/core/auth/`:
+> `AuthOutcome`/`AuthFailure`/`AuthFailureKind` (`auth_outcome.dart`) and
+> `OrganizationMembership`/`MembershipStatus`/`Session{userId, memberships,
+> expiresAt}` (`session.dart`, contract-§5 shape). The demo `Session {id,
+> displayName, role}` shape below no longer exists (D-T4 RESOLVED). Still
+> not built: `SignInRequest`, `PasswordResetRequest`, `ResetCodeRequest`,
+> `PasswordUpdateRequest`.
+
+- ~~`Session {id, displayName, role}`~~ — the bootstrap-era demo session
+  shape. See §7. *(Superseded by the contract-§5 session model, Batch 3.1.)*
 - `SignUpRequest` / `PasswordRecoveryRequest` — pure-domain value objects
   with `toRedactedMap()` delegating to `Redactor` (ADR-0003); tested for
   redaction idempotence.
@@ -168,11 +177,17 @@ change any P0 blocker status in
 held, but the underlying §10 *decisions* (jurisdiction, policy, authority
 model) remain open decisions to be made by that owner.
 
-## 7. Session shape — tracked-deviation candidate
+## 7. Session shape — tracked-deviation (D-T4: RESOLVED)
+
+> **Update (2026-08-02):** this candidate was accepted into the ledger as
+> **D-T4** and is **RESOLVED** — Batch 3.1 (`1042daf`) replaced the demo
+> `Session {id, displayName, role}` with the contract-§5 shape
+> (`Session {userId, memberships, expiresAt}`). The analysis below is
+> retained as historical context; see `tracked_deviations.md` D-T4.
 
 `Session {id, displayName, role}` is technically the shape contract §5 said a
 future session must not be ("must not contain only one client-controlled
-`role` as the authority"). This is **safe here** because:
+`role` as the authority"). This was **safe here** because:
 
 - the demo session is explicitly non-production and non-authoritative
   (`FakeAuthGateway` wording, §3.3);
@@ -182,8 +197,9 @@ future session must not be ("must not contain only one client-controlled
 The concern becomes live only when a production session model is introduced
 (contract-P1 provider adapter), at which point the §5 session contract
 (provider-derived `userId`, `memberships`, `expiresAt`) is mandatory. This
-entry is proposed for the tracked-deviations ledger as **D-T4** in the
-docs-hygiene batch; recording it here makes the divergence reviewable now.
+entry was recorded in the tracked-deviations ledger as **D-T4** and is
+**RESOLVED** (Batch 3.1, `1042daf`) — see `tracked_deviations.md` D-T4; the
+divergence it described no longer exists in code.
 
 ## 8. What remains in force
 
