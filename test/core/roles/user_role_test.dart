@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:legalhub/app/router.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 
 void main() {
@@ -72,6 +73,31 @@ void main() {
           cap.canViewHome || cap.canViewSettings,
           isTrue,
           reason: 'role $role must grant at least one destination',
+        );
+      }
+    });
+
+    test('every granted destination maps to a shell-rendered route', () {
+      // _AppShell renders a bottom-NavigationBar destination for exactly two
+      // routes: home and settings. A role granting a destination outside that
+      // set would be a capability flag with no route behind it — dead at best,
+      // a stranded navigation at worst. AppRoutes is the single source of
+      // truth for route strings, so this pin survives path changes and fails
+      // if the pairing ever drifts.
+      const Set<String> shellDestinations = <String>{
+        AppRoutes.home,
+        AppRoutes.settings,
+      };
+      for (final UserRole role in UserRole.values) {
+        final RoleCapability cap = roleCapabilities[role]!;
+        final Set<String> granted = <String>{
+          if (cap.canViewHome) AppRoutes.home,
+          if (cap.canViewSettings) AppRoutes.settings,
+        };
+        expect(
+          granted.difference(shellDestinations),
+          isEmpty,
+          reason: 'role $role grants a destination the shell does not render',
         );
       }
     });
