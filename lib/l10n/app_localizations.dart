@@ -346,12 +346,6 @@ abstract class AppLocalizations {
   /// **'Create an account'**
   String get createAccount;
 
-  /// No description provided for @encryptedConnectionNotice.
-  ///
-  /// In en, this message translates to:
-  /// **'256-BIT ENCRYPTED CONNECTION'**
-  String get encryptedConnectionNotice;
-
   /// No description provided for @signUpTitle.
   ///
   /// In en, this message translates to:
