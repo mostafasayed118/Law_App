@@ -23,11 +23,11 @@
 #         now), and `password_recovery_cubit.dart` absent at approval.
 #      d. Working-tree markers: the A-string in both Gate 3 docs, the
 #         D-T2/D-T4/D-T6 RESOLVED entries, the plan header's shell-nav arc
-#         entry (through `4b5e4fc`, suite 277/277), the apply-approval
-#         record's slice ref (`3704a1d`), and the README suite count are also
-#         asserted against the CURRENT on-disk docs (not just committed
-#         content at cited hashes), so a committed doc that quietly drops a
-#         marker fails CI even without breaking a cited hash.
+#         entry (through `4b5e4fc`, suite 277/277), the P2 apply records'
+#         slice ref (`3704a1d` in approval + execution), and the README suite
+#         count are also asserted against the CURRENT on-disk docs (not just
+#         committed content at cited hashes), so a committed doc that quietly
+#         drops a marker fails CI even without breaking a cited hash.
 #
 #   3. SUITE RECONCILIATION — the audit plan's N/N suite claims for the 8
 #      milestone commits are recomputed from the tree at each revision
@@ -209,7 +209,7 @@ semantic_rows() {
   fi
 
   note "--- 2d. Working-tree markers (current docs, not committed content) ---"
-  local wt_file wt_count head_plain head_gen head_total plan_hdr
+  local wt_file wt_count head_plain head_gen head_total plan_hdr p2_record
   for wt_file in docs/gate3_reconciliation.md docs/gate3_decision.md; do
     wt_count=$(grep -cF 'Project Owner (github.com/mostafasayed118)' "$wt_file" 2>/dev/null || true)
     if [ "${wt_count:-0}" -gt 0 ]; then
@@ -241,11 +241,13 @@ semantic_rows() {
   else
     fail "plan header blockquote missing shell-nav arc entry (through 4b5e4fc, suite 277/277)"
   fi
-  if grep -q '3704a1d' docs/p2_apply_approval_2026-08-01.md 2>/dev/null; then
-    ok "apply-approval record slice ref (3704a1d) in working tree"
-  else
-    fail "apply-approval record missing slice ref 3704a1d in working tree"
-  fi
+  for p2_record in docs/p2_apply_approval_2026-08-01.md docs/p2_apply_execution_2026-08-01.md; do
+    if grep -q '3704a1d' "$p2_record" 2>/dev/null; then
+      ok "slice ref 3704a1d in working tree: $p2_record"
+    else
+      fail "slice ref 3704a1d MISSING from working tree: $p2_record"
+    fi
+  done
   head_plain=$(git grep -hE '(^|[^A-Za-z])(test|testWidgets|blocTest)\(' -- test/ 2>/dev/null | wc -l | tr -d ' ')
   head_gen=$(git grep -hE 'blocTest<' -- test/ 2>/dev/null | wc -l | tr -d ' ')
   head_total=$((head_plain + head_gen))

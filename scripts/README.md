@@ -36,10 +36,10 @@ scripts/verify_ledger.sh path/to/other.md   # sweep extra docs for hash integrit
    - **working-tree markers** (added to close the committed-content-only gap):
      the A-string in both Gate 3 docs, the D-T2/D-T4/D-T6 RESOLVED entries in
      `tracked_deviations.md`, the audit plan's header blockquote shell-nav
-     arc entry (through `4b5e4fc`, suite 277/277), the apply-approval
-     record's slice ref (`3704a1d`), and the README suite count are asserted
-     against the **current on-disk docs**. The README count is checked
-     dynamically —
+     arc entry (through `4b5e4fc`, suite 277/277), the P2 apply records'
+     slice ref (`3704a1d` in both approval and execution), and the README
+     suite count are asserted against the **current on-disk docs**. The README
+     count is checked dynamically —
      the pass counts `test(`/`testWidgets(`/`blocTest(` + `blocTest<...>`
      declarations in the working tree and greps the README for that exact
      number, so a committed doc that quietly drops a marker (or a README that
