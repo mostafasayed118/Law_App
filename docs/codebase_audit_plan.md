@@ -23,7 +23,15 @@
 > merged** (`7f2bf39`, PR #2, 2026-08-02): `feat/foundation-screens`
 > profile + notifications screens merged into `main` — `ProfileScreen`,
 > notification-prefs domain/stores/cubit/settings screen, EN/AR/TR keys,
-> +27 tests (suite 261/261, CI green on push).
+> +27 tests (suite 261/261, CI green on push). **Shell navigation arc
+> completed** (`8092f0e`–`8aa0414`, 2026-08-02): settings-descendant
+> surfaces wired and pinned — notifications (`8092f0e`) and profile
+> (`3998aef`) tile-navigation tests, settings highlight on descendant
+> routes (`768127b`), capability-derived shell nav index with
+> `capabilitiesForRole` seam and no-bar guard for <2 destinations
+> (`32803ae`), and map-level `roleCapabilities` invariants
+> (at-least-one-destination `356f1b1`, capability-route alignment
+> `8aa0414`); suite 275/275, CI green on push.
 >
 > **Governing docs:** `INSTRUCTIONS.md` §2.1/§3 (gates, delivery slices,
 > approval discipline) · `docs/gate3_decision.md` +
