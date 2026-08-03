@@ -105,11 +105,15 @@ begin
   );
 
   return query
-    -- members: membership metadata joined with identity metadata
+    -- members: membership metadata joined with identity metadata (LEFT JOIN +
+    -- COALESCE — defensive against orphan memberships: a membership whose
+    -- profiles row is missing still appears, with a static fallback name,
+    -- instead of dropping the roster row)
     select m.organization_id, m.user_id, null::uuid, null::text,
-           p.display_name, p.locale, m.role, m.status, m.created_at, m.updated_at
+           coalesce(p.display_name, 'Unknown member'), coalesce(p.locale, 'en'),
+           m.role, m.status, m.created_at, m.updated_at
       from public.memberships m
-      join public.profiles p on p.user_id = m.user_id
+      left join public.profiles p on p.user_id = m.user_id
      where m.organization_id = p_organization_id
     union all
     -- pending invitations only: revoked/expired/accepted rows leave the roster
@@ -145,6 +149,12 @@ Design choices embodied in the sketch:
 - **Audit on success only** — the guard failure raises
   `'permission denied'` with no audit row, identical to every applied RPC;
   the allowed read writes one redacted audit row.
+- **Orphan-membership defense** — the member branch is a **LEFT JOIN** with
+  **COALESCE** on `profiles` (`'Unknown member'` / `'en'` fallbacks): a
+  membership row is never dropped from the roster over a missing profile
+  row, and the fallback is a static, redaction-safe string (no uuid, no
+  email — ADR-0003). The signup trigger normally guarantees the profile
+  row; this is belt-and-braces, not a new identity surface.
 
 ---
 
@@ -248,6 +258,7 @@ owner, not a suspended/removed partner.
 | Invitation ids present | every invited row carries `invitation_id`; every member row carries NULL (R1 extension) |
 | Invited email ≠ profile data | invited rows carry `email`; display_name/locale NULL (no fabricated identity) |
 | The caller's own row | present in the roster (partner is a member) |
+| Orphan-membership defense (LEFT JOIN + COALESCE) | a membership whose `profiles` row is missing still appears, with the static fallback `'Unknown member'`/`'en'` — no row dropped, no error, no uuid/email leakage |
 
 **No policy change — the D-T6 pair (the pivotal assertion):**
 `profiles` stays own-row-only **and** the RPC returns other members' names.
@@ -286,6 +297,14 @@ The Phase 3 client slice (post-approval) must map this contract:
   non-partner sessions keep today's behavior (fake-real — unchanged, per
   this amendment's scope); owner sessions keep `list_members_metadata`
   (unchanged).
+- **Denial mapping (confirmed for the client slice):** the RPC raises the
+  same generic `'permission denied'` text as every applied RPC, and the
+  client must map it through the existing `_kindFor` convention to the
+  generic **`denied`** `AppError` kind (the established P3 mapping — P3
+  spec §3 "Error mapping"; no new failure kind is introduced by this RPC).
+  The denial is non-enumerating by construction (§4): cross-org,
+  non-partner, suspended/removed, and owner-no-bypass are
+  indistinguishable to the caller.
 - The current fake's invited-row convention (`userId = email`) is a client
   mapping detail to reconcile in that slice; it does not constrain the
   server contract above.

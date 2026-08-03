@@ -100,6 +100,7 @@ or deny), per contract §9 and the matrix §2 addendum (2026-08-03).
 | anon | — | no session → denied (no grant), not empty-success |
 | Cross-org invite leakage | — | org-a's pending invite never appears in any org-b-scoped output (unreachable — org-b is denied before the union) |
 | Generic denial (no enumeration) | — | every denial is the same `permission denied` text — cross-org, non-partner, suspended, owner-no-bypass are indistinguishable |
+| Orphan-membership defense (LEFT JOIN + COALESCE) | after directly deleting one member's `profiles` row via elevated SQL in the ephemeral project (rehearsal-only fixture; no policy exists for this in-app), the RPC still returns that membership row with the static fallback `'Unknown member'`/`'en'` — no row dropped, no error | no member row ever drops from the roster over a missing profile row; the fallback is static — no uuid or email appears in `display_name` |
 
 **Cross-cutting asserts (the amendment does not disturb the P2 surface):**
 
