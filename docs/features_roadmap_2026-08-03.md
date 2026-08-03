@@ -24,7 +24,13 @@
 > (`deb72d8`); 4.1 (deep-link recovery) **APPROVED + IMPLEMENTED
 > 2026-08-03** (scope note `docs/p4_41_deeplink_recovery_scope_2026-08-03.md`),
 > committed with this roadmap's gate-table row.
-> Everything in §8 stays deferred until P0 closes.
+> Phase 5 (consultation booking, MVP, no live payment) is **DRAFT 2026-08-03
+> — UNSCHEDULED.** `feat/booking-flow` (3 commits, 2026-08-02) was **shelved
+> on the owner's review**: spec-listed (§4 MVP) but headless (no screen /
+> route), unverifiable approval citations in its code comments, and 60 main
+> commits of divergence at review time. Landing requires the gate-table row
+> below + `docs/booking_scope_2026-08-03.md` (decision record + real ACs).
+> Everything in §9 stays deferred until P0 closes.
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
 >
@@ -86,11 +92,11 @@ that blocks it).
 | `accept_invitation` | ✅ `acceptInvitation` | Phase 2 (UX decision) / Phase 4 (deep link) | **R3** in the P3 spec; token-entry UX decided (accept screen) |
 | `delete_my_account` | ✅ `deleteMyAccount` | Phase 2 | D-05 requires the hard-delete action (cascade identity + memberships) |
 | `list_organizations_metadata` | ❌ | Phase 2 (owner) or Phase 3 (member-facing) | backs the active-org switcher, D-08 |
-| `read_org_audit` | ❌ | deferred (§8) | audit surfacing is P2-gated; `platform_owner_admin` self-audit rules apply |
-| `read_platform_audit` | ❌ | deferred (§8) | owner-gated; audit table never publicly readable (matrix §6) |
-| `delete_demo_account` | ❌ | deferred (§8) | `platform_owner_admin`-only; no owner admin screen until the Addendum's server-side enforcement story is complete |
-| `suspend_membership_platform` | ❌ | deferred (§8) | `platform_owner_admin`-only |
-| `reactivate_membership_platform` | ❌ | deferred (§8) | `platform_owner_admin`-only |
+| `read_org_audit` | ❌ | deferred (§9) | audit surfacing is P2-gated; `platform_owner_admin` self-audit rules apply |
+| `read_platform_audit` | ❌ | deferred (§9) | owner-gated; audit table never publicly readable (matrix §6) |
+| `delete_demo_account` | ❌ | deferred (§9) | `platform_owner_admin`-only; no owner admin screen until the Addendum's server-side enforcement story is complete |
+| `suspend_membership_platform` | ❌ | deferred (§9) | `platform_owner_admin`-only |
+| `reactivate_membership_platform` | ❌ | deferred (§9) | `platform_owner_admin`-only |
 
 ## 3. Phase 1 — P3 org & membership UI slice (next approved batch)
 
@@ -196,7 +202,45 @@ backout in place).
   "check your inbox" state closes the false-assurance gap. Client-only;
   standard slice gate.
 
-## 7. Sequencing & governance gate table
+## 7. Phase 5 — Consultation booking (MVP, no live payment)
+
+**Gate:** scope note approval → decision-record ratification (D-B7 resolved
+2026-08-03: standalone) → **land the shelved layer** (merge
+`feat/booking-flow`; four checks green on the merged tree; AC↔test map
+closed per scope note §5) → UI + routing slice (screen, /book route,
+app-shell entry, EN/AR/TR) → full B2 gate stack → owner push approval.
+Client-only; no server change (payment is gated on D-09).
+
+The domain + state-machine layer already exists on `feat/booking-flow`
+(`BookingGateway` seam, `BookingRequest` redaction contract, `BookingCubit`
+4-step machine category → dateTime → review → success) — **shelved
+2026-08-03** because it is unreachable from the app shell (no screen, no
+route) and its code comments cite approvals ("SPEC AC#8", "D2/D3/D4", "G1")
+that exist in no tracked document. The missing UI slice is the deliverable
+of this phase; the shelved layer is reused as-is after the decision record
+(`docs/booking_scope_2026-08-03.md`) is ratified.
+
+**Sequencing note (D-B7 — DECIDED 2026-08-03: standalone):** spec §4 lists
+"Attorney discovery (read-only)" before booking and the design set carries
+`attorney_search, attorney_profile` ahead of the booking screens — but the
+spec does not couple them (separate MVP bullets, separate screen groups;
+the booking flow row has no attorney step). Phase 5 proceeds with the
+shelved flow as built (category/topic/slot); a future discovery phase adds
+an optional `attorneyId` to `BookingRequest` + a "book from attorney
+profile" entry behind the same `BookingGateway` seam (scope note §3 D-B7).
+
+| # | Slice | Scope | New files (sketch) | Tests |
+|---|---|---|---|---|
+| 5.0 | Land the shelved layer | Merge `feat/booking-flow` (3 commits, 2026-08-02); four checks green on the merged tree; verify the AC↔test map (scope note §5 — AC-1–AC-6 covered by the branch's 25 test declarations, AC-7–AC-9 added below) | (branch: 8 lib files + 3 test files) | branch suite + gate stack |
+| 5.1 | Booking screen + wizard shell | Renders BookingState; category → dateTime → review → success; one-step back; editCategory; submit error surface; local-only wording (no live-payment copy) | `features/booking/presentation/booking_screen.dart` | widget: step transitions, guard no-ops, error surface |
+| 5.2 | Route + shell wiring | `/book` route, capability-aware entry, draft never in route params/extra | `router.dart`, shell | redirect + capability tests |
+| 5.3 | l10n | All new strings EN/AR/TR | 3 `.arb` + generated l10n | TR/AR resolution pins |
+
+**Exit:** four checks green; suite + README count in lockstep (the ledger §2d
+check); `service_locator_test` registration pin retained; no push without
+owner approval.
+
+## 8. Sequencing & governance gate table
 
 | Order | Phase | Depends on | Server changes? | Gate to pass | Status |
 |---|---|---|---|---|---|
@@ -204,7 +248,8 @@ backout in place).
 | 2 | Phase 2 — org lifecycle wiring | Phase 1 (same seams) | no | spec-lite scope note → approval → gate stack | **SHIPPED 2026-08-03 (`68aafc6`, slices 2.1–2.4)** |
 | 3 | Phase 3 — server amendments | Phase 1/2 (surface defined) | **yes** | spec → RLS-gate review → rehearsal evidence → apply approval → apply execution → matrix addendum | **APPLIED 2026-08-03** (`docs/p3_r1_roster_rpc_design_2026-08-03.md` + matrix §2 addendum + `docs/p3_r1_rehearsal_plan_2026-08-03.md` + evidence r1 PASSED + `supabase/rpc/list_org_members_metadata.sql` + `_down.sql` drop → applied to dev project on the owner's dated apply approval) |
 | 4 | Phase 4 — auth plumbing | — | 4.1 yes (platform config) | platform config approval → gate stack | **4.2 SHIPPED 2026-08-03 (`deb72d8`); 4.1 APPROVED + IMPLEMENTED 2026-08-03 (scope note `docs/p4_41_deeplink_recovery_scope_2026-08-03.md`); R1 = dashboard Redirect URL (owner-side)** |
-| — | §8 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Deferred |
+| 5 | Phase 5 — consultation booking (no live payment) | MVP spec §4; auth/org track (§§3–4); D-B7 resolved (standalone) | no | scope note → decision-record ratification → UI + routing slice → gate stack → owner push approval | **UNSCHEDULED** — DRAFT scope note `docs/booking_scope_2026-08-03.md`; `feat/booking-flow` shelved 2026-08-03 |
+| — | §9 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Deferred |
 
 Rules that apply to every phase (definition-of-done from
 `docs/codebase_audit_plan.md`): scope/assumptions/non-goals documented ·
@@ -213,7 +258,7 @@ secrets and real data · verification commands actually run and reported
 honestly · **no commit, push, or deployment without explicit owner
 approval**.
 
-## 8. Explicitly deferred (do NOT build until P0 closes + policy tests exist)
+## 9. Explicitly deferred (do NOT build until P0 closes + policy tests exist)
 
 Per README boundary + `docs/permission_matrix.md` §4/§6: **matters,
 documents, messages, storage, realtime, audit surfacing, billing, AI**.
@@ -225,7 +270,7 @@ RPCs (`delete_demo_account`, `suspend_membership_platform`,
 `reactivate_membership_platform`) stay unwired until the Addendum's
 server-side enforcement + auditing story is complete.
 
-## 9. Ledger hooks (what to update when a phase lands)
+## 10. Ledger hooks (what to update when a phase lands)
 
 - P3 spec §1 status line → "UI slice implemented" + commit ref, and
   `docs/p0_decision_capture.md` §3 P3 row → APPROVED/executed with date.
@@ -237,3 +282,4 @@ server-side enforcement + auditing story is complete.
   touches `lib/` or `test/` (the ledger gate's §2d README-count check fails
   if the suite count drifts from the README claim — keep them in lockstep).
 - This roadmap's status header + gate table as each row advances.
+- Phase 5 landing: README test-count + implemented-foundation lines in lockstep (the ledger gate's §2d check) — booking's ~975 branch test lines count once committed; `docs/booking_scope_2026-08-03.md` decision record ratified.
