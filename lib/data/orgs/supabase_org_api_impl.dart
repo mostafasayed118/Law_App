@@ -66,8 +66,8 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
   }) async {
     try {
       final PostgrestResponse<dynamic> response = await _rpc(
-        'list_members_metadata',
-        const <String, dynamic>{},
+        'list_org_members_metadata',
+        <String, dynamic>{'p_organization_id': organizationId},
       );
       final Object? data = response.data;
       if (data is! List<dynamic>) {

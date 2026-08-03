@@ -57,9 +57,9 @@ MembershipStatus? membershipStatusFromServerName(String? name) {
 /// timestamps) only — never matter/document/message content (contract §5.3).
 ///
 /// [invitationId] is set for invited rows when the read surface exposes it
-/// (dev fake today; the member-facing roster RPC is Phase 3 R1). It stays
-/// null for real members and for surfaces that cannot expose it — the
-/// Resend/Revoke actions are disabled rather than guessing an id.
+/// (the R1 member-facing roster exposes real ids; the fake mirrors the
+/// convention). It stays null for real members — the Resend/Revoke actions
+/// are disabled rather than guessing an id.
 class OrgMember extends Equatable {
   const OrgMember({
     required this.organizationId,

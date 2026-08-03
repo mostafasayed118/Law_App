@@ -227,6 +227,59 @@ void main() {
 
       expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
     });
+
+    test(
+      'maps an invited row by email with a real invitation id (R1)',
+      () async {
+        api.listRows = <Map<String, dynamic>>[
+          <String, dynamic>{
+            'organization_id': 'org-1',
+            // RPC contract §8: invited rows carry no user id yet.
+            'user_id': null,
+            'invitation_id': 'inv-7',
+            'email': 'new@y.test',
+            'display_name': null,
+            'locale': null,
+            'role': 'client',
+            'status': 'invited',
+            'created_at': '2026-07-25T10:00:00.000Z',
+            'updated_at': '2026-07-25T10:00:00.000Z',
+          },
+        ];
+
+        final OrgOutcome<List<OrgMember>> outcome = await gateway.listMembers(
+          organizationId: 'org-1',
+        );
+
+        final OrgMember invited = outcome.valueOrNull!.single;
+        expect(invited.userId, 'new@y.test');
+        expect(invited.displayName, 'new@y.test');
+        expect(invited.locale, isNull);
+        expect(invited.role, UserRole.client);
+        expect(invited.status, MembershipStatus.invited);
+        expect(invited.invitationId, 'inv-7');
+      },
+    );
+
+    test('surfaces a row with neither user_id nor email loudly', () async {
+      api.listRows = <Map<String, dynamic>>[
+        <String, dynamic>{
+          'organization_id': 'org-1',
+          'user_id': null,
+          'email': null,
+          'role': 'client',
+          'status': 'invited',
+          'created_at': '2026-07-25T10:00:00.000Z',
+          'updated_at': '2026-07-25T10:00:00.000Z',
+        },
+      ];
+
+      final OrgOutcome<List<OrgMember>> outcome = await gateway.listMembers(
+        organizationId: 'org-1',
+      );
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
+    });
   });
 
   group('inviteMember', () {

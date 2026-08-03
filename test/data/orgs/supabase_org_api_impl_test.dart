@@ -143,8 +143,8 @@ void main() {
       );
     });
 
-    test('listMembers returns only map rows', () async {
-      data['list_members_metadata'] = <dynamic>[
+    test('listMembers sends the org id and returns only map rows', () async {
+      data['list_org_members_metadata'] = <dynamic>[
         <String, dynamic>{'user_id': 'u-1'},
         'not-a-map',
       ];
@@ -154,7 +154,24 @@ void main() {
       );
 
       expect(rows, hasLength(1));
-      expect(calls, <String>['list_members_metadata:']);
+      expect(calls, <String>['list_org_members_metadata:org-1']);
+    });
+
+    test('maps a roster denial to the denied kind', () async {
+      errors['list_org_members_metadata'] = const PostgrestException(
+        message: 'permission denied',
+      );
+
+      await expectLater(
+        api.listMembers(organizationId: 'org-1'),
+        throwsA(
+          isA<SupabaseOrgException>().having(
+            (e) => e.kind,
+            'kind',
+            SupabaseOrgFailureKind.denied,
+          ),
+        ),
+      );
     });
 
     test('maps the invalid-name raise', () async {

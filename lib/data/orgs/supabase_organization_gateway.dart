@@ -221,19 +221,28 @@ class SupabaseOrganizationGateway implements OrganizationGateway {
     if (status == null) {
       throw FormatException('Unknown server status name: ${row['status']}');
     }
+    // R1 invited rows carry no user id yet (RPC §3): the invited address is
+    // the roster identity until the invite is accepted — the same
+    // `userId = email` convention the fake uses (design §8 reconciliation).
+    final String? userId = row['user_id'] as String?;
+    final String? email = row['email'] as String?;
+    if (userId == null && email == null) {
+      // Loud, never a silently empty roster identity (provider drift).
+      throw FormatException('Member row has neither user_id nor email');
+    }
+    final String identity = userId ?? email!;
     return OrgMember(
       organizationId: row['organization_id'] as String,
-      userId: row['user_id'] as String,
-      displayName: (row['display_name'] as String?) ?? 'User',
+      userId: identity,
+      displayName: (row['display_name'] as String?) ?? identity,
       locale: row['locale'] as String?,
       role: role,
       status: status,
       createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
       updatedAt: DateTime.parse(row['updated_at'] as String).toLocal(),
-      // The platform-owner metadata surface exposes no invitation id (R1 —
-      // the member-facing roster RPC must union invitations). Null keeps the
-      // Resend/Revoke actions disabled instead of guessing an id.
-      invitationId: null,
+      // The member-facing surface exposes the invitation id for invited
+      // rows (R1), so Resend/Revoke target a real id; member rows stay null.
+      invitationId: row['invitation_id'] as String?,
     );
   }
 

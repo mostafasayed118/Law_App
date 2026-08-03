@@ -63,23 +63,25 @@ policy tests before it is exposed here.
 
 `supabase/rpc/` ships 17 applied P2 RPCs plus the applied Phase 3 R1
 `list_org_members_metadata` (18 total, §5); the client `SupabaseOrgApi` seam
-maps **7**. The remaining 10 are committed and rehearsed server-side but
+maps **11** (`listMembers` routes to the R1 member-facing RPC). The remaining
+7 are committed and rehearsed server-side but
 have no Flutter surface. Each row names the owning phase below (or the gate
 that blocks it).
 
 | RPC (`supabase/rpc/`) | Wired in client today? | Owning phase | Notes |
 |---|---|---|---|
 | `create_organization` | ✅ `createOrganization` | — | shipped |
-| `list_members_metadata` | ✅ `listMembers` | — | **owner-only** (R1: member-facing roster needs a new RPC, Phase 3) |
+| `list_members_metadata` | — | owner surface (unused in app UI) | platform-owner-only; the app roster uses the R1 RPC below |
+| `list_org_members_metadata` | ✅ `listMembers` | Phase 3 (R1, applied) | **member-facing roster** — partner-scoped (design §8 client slice) |
 | `invite_member` | ✅ `inviteMember` | — | shipped |
 | `change_member_role` | ✅ `changeMemberRole` | — | shipped |
 | `suspend_membership` | ✅ `suspendMember` | — | shipped |
 | `reactivate_membership` | ✅ `reactivateMember` | — | shipped |
 | `remove_membership` | ✅ `removeMember` | — | shipped |
-| `resend_invitation` | ❌ | Phase 2 | partner-only per D-10a / matrix §3; `invalidInvitation` kind already mapped |
-| `revoke_invitation` | ❌ | Phase 2 | partner-only per D-10a / matrix §3 |
-| `accept_invitation` | ❌ | Phase 2 (UX decision) / Phase 4 (deep link) | **R3** in the P3 spec; token-entry UX decision required |
-| `delete_my_account` | ❌ | Phase 2 | D-05 requires the hard-delete action (cascade identity + memberships) |
+| `resend_invitation` | ✅ `resendInvitation` | Phase 2 | partner-only per D-10a / matrix §3; `invalidInvitation` kind already mapped |
+| `revoke_invitation` | ✅ `revokeInvitation` | Phase 2 | partner-only per D-10a / matrix §3 |
+| `accept_invitation` | ✅ `acceptInvitation` | Phase 2 (UX decision) / Phase 4 (deep link) | **R3** in the P3 spec; token-entry UX decided (accept screen) |
+| `delete_my_account` | ✅ `deleteMyAccount` | Phase 2 | D-05 requires the hard-delete action (cascade identity + memberships) |
 | `list_organizations_metadata` | ❌ | Phase 2 (owner) or Phase 3 (member-facing) | backs the active-org switcher, D-08 |
 | `read_org_audit` | ❌ | deferred (§8) | audit surfacing is P2-gated; `platform_owner_admin` self-audit rules apply |
 | `read_platform_audit` | ❌ | deferred (§8) | owner-gated; audit table never publicly readable (matrix §6) |
@@ -145,25 +147,29 @@ rollback pairing (`docs/rollback_plan.md`), and — because every row below
 **widens the approved client surface** — a dated matrix addendum per
 `docs/permission_matrix.md` §7 **before** it ships.
 
-**Design status (2026-08-03):** R1 is **APPROVED + IMPLEMENTED (repo
-artifact), NOT APPLIED** — `docs/p3_r1_roster_rpc_design_2026-08-03.md`
+**Design status (2026-08-03):** R1 is **APPROVED + IMPLEMENTED + APPLIED
+2026-08-03** — `docs/p3_r1_roster_rpc_design_2026-08-03.md`
 (signature, SECURITY DEFINER justification, R-4 grant analysis, RLS negative
-cases, rollback pairing), the matrix §2 addendum (2026-08-03, PROPOSED),
-`docs/p3_r1_rehearsal_plan_2026-08-03.md` (ephemeral-only; not executed),
-and the forward artifact `supabase/rpc/list_org_members_metadata.sql` +
-one-line `_down.sql` drop (added 2026-08-03, **uncommitted**). **No
-dev-project change** until the rehearsal passes and a dated apply approval
-is recorded.
+cases, rollback pairing), the matrix §2 addendum (2026-08-03),
+`docs/p3_r1_rehearsal_plan_2026-08-03.md` (executed; evidence
+`docs/p3_r1_rehearsal_evidence_r1_2026-08-03.md` — r1 **PASSED**, finding A1
+folded in), and the forward artifact `supabase/rpc/list_org_members_metadata.sql`
++ one-line `_down.sql` drop. **Applied to the dev project on 2026-08-03**
+on the owner's dated apply approval (18 slice RPCs; grant matrix verified;
+backout in place).
 
 - **3.1 Member-facing roster RPC (R1)** — `list_members_metadata` is
   platform-owner-only; a partner-visible roster needs a new RPC + policy
   tests. Recorded as R1 in the P3 spec §5, **not assumed**. **APPROVED +
-  IMPLEMENTED (repo artifact) 2026-08-03**: `list_org_members_metadata(p_organization_id)`
+  IMPLEMENTED + APPLIED 2026-08-03**: `list_org_members_metadata(p_organization_id)`
   — partner-scoped, unions pending `invitations` with `invitation_id` (the
   Phase 2.1 R1 extension), returns display_name/locale from `profiles` under
   the in-body guard; added as `supabase/rpc/list_org_members_metadata.sql`
-  (+ one-line `_down.sql` backout, **uncommitted**), **NOT applied**;
-  rehearsed per the plan above.
+  (+ one-line `_down.sql` backout), **applied to the dev project 2026-08-03**
+  after rehearsal r1 passed (evidence record). **Client slice shipped**:
+  `listMembers` routes to this RPC with the invited-row mapping (email
+  identity + real `invitation_id`, design §8) — `SupabaseOrgApi` seam maps 11
+  of 18 RPCs.
 - **3.2 Display-name RPC (audit-plan forward hook 1)** — partners need
   member display names; `profiles` is own-row-only (D-T6). Separate reviewed
   RPC decision; requires the dated matrix addendum first. **ABSORBED into
@@ -191,8 +197,8 @@ is recorded.
 | Order | Phase | Depends on | Server changes? | Gate to pass | Status |
 |---|---|---|---|---|---|
 | 1 | Phase 1 — P3 org/membership UI | P3 spec approval | no | spec approval → slice → B2 gate stack → owner push approval | **SHIPPED 2026-08-03 (`03862ce`, suite 408, ledger PASS 115)** |
-| 2 | Phase 2 — org lifecycle wiring | Phase 1 (same seams) | no | spec-lite scope note → approval → gate stack | **APPROVED 2026-08-03 (`docs/p3_phase2_scope_2026-08-03.md`) — implementing slices 2.1–2.4** |
-| 3 | Phase 3 — server amendments | Phase 1/2 (surface defined) | **yes** | spec → RLS-gate review → rehearsal evidence → apply approval → apply execution → matrix addendum | **IMPLEMENTED (repo artifact) 2026-08-03 — NOT APPLIED** (`docs/p3_r1_roster_rpc_design_2026-08-03.md` + matrix §2 addendum + `docs/p3_r1_rehearsal_plan_2026-08-03.md` + `supabase/rpc/list_org_members_metadata.sql` + `_down.sql` drop); no dev-project change until rehearsal passes and apply approval |
+| 2 | Phase 2 — org lifecycle wiring | Phase 1 (same seams) | no | spec-lite scope note → approval → gate stack | **SHIPPED 2026-08-03 (`68aafc6`, slices 2.1–2.4)** |
+| 3 | Phase 3 — server amendments | Phase 1/2 (surface defined) | **yes** | spec → RLS-gate review → rehearsal evidence → apply approval → apply execution → matrix addendum | **APPLIED 2026-08-03** (`docs/p3_r1_roster_rpc_design_2026-08-03.md` + matrix §2 addendum + `docs/p3_r1_rehearsal_plan_2026-08-03.md` + evidence r1 PASSED + `supabase/rpc/list_org_members_metadata.sql` + `_down.sql` drop → applied to dev project on the owner's dated apply approval) |
 | 4 | Phase 4 — auth plumbing | — | 4.1 yes (platform config) | platform config approval → gate stack | Not started |
 | — | §8 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Deferred |
 

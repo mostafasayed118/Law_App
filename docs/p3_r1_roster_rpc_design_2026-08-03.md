@@ -308,9 +308,12 @@ The RPC is thus proven to be the **only** widened path — the exact
 
 ---
 
-## 8. Client contract (recorded forward hook — NOT implemented here)
+## 8. Client contract (IMPLEMENTED in the R1 client slice, 2026-08-03)
 
-The Phase 3 client slice (post-approval) must map this contract:
+The Phase 3 client slice maps this contract — `listMembers` routes to
+`list_org_members_metadata`, invited rows map by email with a real
+`invitation_id` (design §4 covers the guard, so non-partners and
+cross-org callers receive the generic `denied` mapping):
 
 | Row kind | `user_id` | `invitation_id` | `email` | `display_name` | Client mapping |
 |---|---|---|---|---|---|

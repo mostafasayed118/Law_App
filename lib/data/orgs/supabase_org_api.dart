@@ -45,9 +45,11 @@ abstract interface class SupabaseOrgApi {
   /// `create_organization(p_name)` — returns the new organization id.
   Future<String> createOrganization({required String name});
 
-  /// `list_members_metadata` rows for one organization. NOTE: the RPC is
-  /// platform-owner-only; the member-facing member list surface is a P3
-  /// follow-up. Returns raw map rows (identity + membership metadata).
+  /// `list_org_members_metadata(p_organization_id)` rows for ONE
+  /// organization (Phase 3 R1, applied): partner-scoped member roster with
+  /// identity metadata + pending invitations (invited rows carry
+  /// `invitation_id` + `email` with a NULL `user_id`). Returns raw map rows
+  /// (identity + membership metadata).
   Future<List<Map<String, dynamic>>> listMembers({
     required String organizationId,
   });
