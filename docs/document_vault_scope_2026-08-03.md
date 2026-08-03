@@ -69,7 +69,7 @@
 | AC-2 | **Metadata-only line pin: no body/preview/download/upload affordances anywhere** | `document_list_screen_test.dart` (rows show metadata only; no action buttons) |
 | AC-3 | Empty + error states work client-side | `document_cubit_test.dart` (empty, error, retry) + widget tests |
 | AC-4 | Capability gating is a nav hint only (every role `canViewDocuments` true) | `user_role_test.dart` capability pin + home/router entry tests |
-| AC-5 | All new strings resolve in EN/AR/TR (per-locale resolution, no silent EN copy; local-only wording, no e-signature/legal-advice claim) | `app_localizations_test.dart` 8.3 pin (Phase 7 7.3 pattern) |
+| AC-5 | All new strings resolve in EN/AR/TR (per-locale resolution, no silent EN copy; local-only wording, no e-signature/legal-advice claim) | `app_localizations_test.dart` 8.2 pin (Phase 7 7.3 pattern) |
 
 ## 6. Risks
 

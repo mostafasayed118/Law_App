@@ -318,6 +318,95 @@ void main() {
       expect(en.matterEntrySubtitle, isNot(contains('legal advice')));
       expect(en.matterLocalOnlyNote, isNot(contains('legal advice')));
     });
+
+    test('resolves the vault keys in every locale (8.2 pin)', () {
+      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+      final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+      final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+      // Vault list surface (slice 8.1).
+      expect(en.vaultTitle, 'Documents');
+      expect(ar.vaultTitle, 'المستندات');
+      expect(tr.vaultTitle, 'Belgeler');
+      expect(en.vaultEmpty, 'No documents are available.');
+      expect(ar.vaultEmpty, 'لا توجد مستندات متاحة.');
+      expect(tr.vaultEmpty, 'Kullanılabilir belge yok.');
+      expect(en.vaultError, 'Unable to load documents.');
+      expect(ar.vaultError, 'تعذّر تحميل المستندات.');
+      expect(tr.vaultError, 'Belgeler yüklenemedi.');
+      expect(
+        en.vaultLocalOnlyNote,
+        'Demo mode — synthetic document metadata only. No real files are listed.',
+      );
+      expect(
+        ar.vaultLocalOnlyNote,
+        'وضع تجريبي — بيانات وصفية اصطناعية للمستندات فقط. لا يتم عرض ملفات حقيقية.',
+      );
+      expect(
+        tr.vaultLocalOnlyNote,
+        'Demo modu — yalnızca sentetik belge meta verileri. Gerçek dosyalar listelenmez.',
+      );
+
+      // Home entry (slice 8.1).
+      expect(en.vaultEntryTitle, 'Document vault');
+      expect(ar.vaultEntryTitle, 'خزنة المستندات');
+      expect(tr.vaultEntryTitle, 'Belge kasası');
+      expect(
+        en.vaultEntrySubtitle,
+        'Browse demo document metadata — development demo.',
+      );
+      expect(
+        ar.vaultEntrySubtitle,
+        'تصفح البيانات الوصفية للمستندات التجريبية — عرض تجريبي للتطوير.',
+      );
+      expect(
+        tr.vaultEntrySubtitle,
+        'Demo belge meta verilerine göz atın — geliştirme demosu.',
+      );
+
+      // Document-type labels (slice 8.1 type chips).
+      expect(en.documentTypeContract, 'Contract');
+      expect(ar.documentTypeContract, 'عقد');
+      expect(tr.documentTypeContract, 'Sözleşme');
+      expect(en.documentTypeBrief, 'Brief');
+      expect(ar.documentTypeBrief, 'مذكرة');
+      expect(tr.documentTypeBrief, 'Özet');
+      expect(en.documentTypeEvidence, 'Evidence');
+      expect(ar.documentTypeEvidence, 'دليل');
+      expect(tr.documentTypeEvidence, 'Kanıt');
+      expect(en.documentTypeCorrespondence, 'Correspondence');
+      expect(ar.documentTypeCorrespondence, 'مراسلات');
+      expect(tr.documentTypeCorrespondence, 'Yazışma');
+
+      // Real per-locale wording, not silent copies of EN.
+      expect(tr.vaultTitle, isNot(en.vaultTitle));
+      expect(ar.vaultEmpty, isNot(en.vaultEmpty));
+      expect(tr.vaultEntryTitle, isNot(en.vaultEntryTitle));
+      expect(ar.vaultLocalOnlyNote, isNot(en.vaultLocalOnlyNote));
+      expect(tr.documentTypeContract, isNot(en.documentTypeContract));
+      expect(
+        ar.documentTypeCorrespondence,
+        isNot(en.documentTypeCorrespondence),
+      );
+    });
+
+    test(
+      'vault copy is local-only wording, no e-signature/legal-advice claim (AC-5)',
+      () {
+        final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+
+        // AC-5 pin (document_vault_scope_2026-08-03.md §5 AC-5, risk R1):
+        // the demo/local-only framing is literal copy, and it must not drift
+        // into legal-advice or e-signature-claim territory. The exact
+        // per-locale wording is pinned in the 8.2 resolution test above;
+        // this test only guards the framing rails.
+        expect(en.vaultEntrySubtitle, contains('demo'));
+        expect(en.vaultEntrySubtitle, isNot(contains('legal advice')));
+        expect(en.vaultLocalOnlyNote, isNot(contains('legal advice')));
+        expect(en.vaultEntrySubtitle, isNot(contains('e-signature')));
+        expect(en.vaultLocalOnlyNote, isNot(contains('e-signature')));
+      },
+    );
   });
 
   group('AppLocalizations widget rendering', () {
