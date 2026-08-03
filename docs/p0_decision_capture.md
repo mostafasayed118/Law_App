@@ -1,6 +1,6 @@
 # LegalHub — P0 Decision Capture (Pre-Backend)
 
-> **Status: P1 APPROVED (2026-07-31); P2 APPROVED (2026-08-01); P3 data layer + code-based recovery SHIPPED (2026-08-03), org UI blocked.** All ten §1 blockers are decided, the
+> **Status: P1 APPROVED (2026-07-31); P2 APPROVED (2026-08-01); P3 data layer + code-based recovery SHIPPED (2026-08-03); org UI SHIPPED 2026-08-03 (roadmap Phase 1, `03862ce`); Phase 2 org lifecycle wiring APPROVED 2026-08-03 — implementing slices 2.1–2.4.** All ten §1 blockers are decided, the
 > §2 Definition-of-Ready checklist is fully satisfied (Supabase dev project
 > provisioned, `.env` confirmed git-ignored, rollback plan written), and the
 > §3 explicit implementation-approval sign-off is now recorded. **Batch 3 /
