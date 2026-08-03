@@ -38,10 +38,13 @@
 > pins) — per the gate-table row below and the decision record in
 > `docs/attorney_discovery_scope_2026-08-03.md` (D-A1…D-A6 ratified, incl.
 > the D-B7 additive `attorneyId` booking hook).
-> Phase 7 (matter dashboard, read-first, client-only) **APPROVED 2026-08-03**
-> (scope note `docs/matter_dashboard_scope_2026-08-03.md`; D-M1…D-M7
-> ratified, incl. D-M7 active-org switcher per D-08). Implementation starts
-> with slice 7.0 behind the standard slice gate.
+> Phase 7 (matter dashboard, read-first, client-only) **IMPLEMENTED AND
+> SHIPPED 2026-08-03** (`b31bc1a` slice 7.0 ActiveOrgStore + org switcher;
+> `5740594` slice 7.1 gateway seam + fake + list surface; `82d77dc` slice
+> 7.2 read-only details; `c2cf3cb` slice 7.3 l10n pins) — per the
+> gate-table row below and the decision record in
+> `docs/matter_dashboard_scope_2026-08-03.md` (D-M1…D-M7 ratified, incl.
+> the D-M7 active-org switcher per D-08).
 > Everything in §11 stays deferred until P0 closes.
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
@@ -293,8 +296,17 @@ attorney messaging.
 
 ## 9. Phase 7 — Matter dashboard (read-first, client-only) + org switcher
 
-**Status: APPROVED 2026-08-03** (owner ratification of D-M1…D-M7). Scope
-note `docs/matter_dashboard_scope_2026-08-03.md`. Spec basis: MVP §4
+**Status: IMPLEMENTED + SHIPPED 2026-08-03** — `b31bc1a` (slice 7.0:
+ActiveOrgStore + client-side org switcher, D-08/D-M7, AC-4), `5740594`
+(slice 7.1: MatterGateway seam + dev fake + read-first list with status
+filter, AC-1/AC-2/AC-5), `82d77dc` (slice 7.2: read-only matter details
++ `/matters/:id`, AC-3), `c2cf3cb` (slice 7.3: EN/AR/TR l10n pins, AC-6).
+Full gate stack passed on the merged tree: format CLEAN, analyze clean,
+**605 tests pass**, ledger PASS 115. Pushed to `origin/main` on the
+owner's approval.
+
+Scope note `docs/matter_dashboard_scope_2026-08-03.md` (D-M1…D-M7
+ratified). Spec basis: MVP §4
 "Case/matter dashboard & details (read-first)" + §6 remediation row 156
 (`case_management_dashboard, case_details, shared_case_workspace`); org
 switcher per D-08 (client-side UX convenience only — the server re-derives
@@ -328,7 +340,7 @@ their §11 gates).
 | 4 | Phase 4 — auth plumbing | — | 4.1 yes (platform config) | platform config approval → gate stack | **4.2 SHIPPED 2026-08-03 (`deb72d8`); 4.1 APPROVED + IMPLEMENTED 2026-08-03 (scope note `docs/p4_41_deeplink_recovery_scope_2026-08-03.md`); R1 = dashboard Redirect URL (owner-side)** |
 | 5 | Phase 5 — consultation booking (no live payment) | MVP spec §4; auth/org track (§§3–4); D-B7 resolved (standalone) | no | scope note → decision-record ratification → UI + routing slice → gate stack → owner push approval | **SHIPPED 2026-08-03** (`05f13c8` + `0eb7ec9` + `3bd3d29` + `d55e273`, suite 521, ledger PASS 115; pushed to origin/main) |
 | 6 | Phase 6 — attorney discovery (read-only, client-only) | MVP spec §4; D-B7 additive `attorneyId` hook; Phase 5 booking seams | no | scope note → decision-record ratification (D-A1…D-A6) → slices 6.1–6.3 → gate stack → owner push approval | **SHIPPED 2026-08-03** (`0f93042` + `7b5c589` + `d389c69`, suite 565, ledger PASS 115; pushed to origin/main) |
-| 7 | Phase 7 — matter dashboard (read-first, client-only) + org switcher | MVP spec §4; D-08 org semantics; Phase 6 seams (synthetic attorney roster for assignment) | no | scope note → decision-record ratification (D-M1…D-M7) → slices 7.0–7.3 → gate stack → owner push approval | **APPROVED 2026-08-03** — scope note `docs/matter_dashboard_scope_2026-08-03.md` (D-M1…D-M7 ratified); slices 7.0–7.3 pending |
+| 7 | Phase 7 — matter dashboard (read-first, client-only) + org switcher | MVP spec §4; D-08 org semantics; Phase 6 seams (synthetic attorney roster for assignment) | no | scope note → decision-record ratification (D-M1…D-M7) → slices 7.0–7.3 → gate stack → owner push approval | **SHIPPED 2026-08-03** (`b31bc1a` + `5740594` + `82d77dc` + `c2cf3cb`, suite 605, ledger PASS 115; pushed to origin/main) |
 | — | §11 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Deferred |
 
 Rules that apply to every phase (definition-of-done from
