@@ -58,6 +58,34 @@ every table below — this is the default-deny baseline (contract §2.1).
 > `docs/tracked_deviations.md`; this addendum satisfies the §7
 > dated-addendum discipline.
 
+> **§2 addendum (2026-08-03, Phase 3 R1 design — PROPOSED; takes effect on
+> apply approval):** the D-T6 forward hook materializes as a reviewed RPC
+> decision. The `partner` cell for "View **another** user's profile" is
+> amended from "❌ deny" to a **narrow, RPC-bounded allowance**: ✅ own-org
+> member **metadata** (display_name, locale, role, status, timestamps, and
+> the `invitation_id` for pending invites) via the new partner-scoped RPC
+> `list_org_members_metadata(p_organization_id)` — design
+> `docs/p3_r1_roster_rpc_design_2026-08-03.md`, rehearsal plan
+> `docs/p3_r1_rehearsal_plan_2026-08-03.md`. The raw `profiles` table stays
+> **own-row-only** (D-T6 unchanged); cross-org metadata stays ❌ deny; no
+> other role gains anything. This supersedes the 2026-08-01 addendum's
+> "separate RPC decision" reservation (that decision is now **this** RPC),
+> and roadmap Phase 3.2's separate display-name RPC is **absorbed** into it
+> (Q5 surface minimality — exactly one new RPC). The addendum is inert until
+> the RPC exists and the rehearsal proves the negative rows below.
+
+**Positive / negative rows for the new RPC (`list_org_members_metadata`,
+contract §9 — every row needs ≥1 positive + ≥1 negative test):**
+
+| Row | Positive (must pass) | Negative (must deny) |
+|---|---|---|
+| Partner reads own org roster + member metadata (names, locale, role, status, timestamps) via the RPC | `partner@org-a` → full roster incl. display names | `client`/`attorney`/`compliance_officer` of org-a → denied (own-row-only does not apply — denied entirely); anon → denied (no grant) |
+| Pending invites + invitation ids via the RPC (R1 extension) | `partner@org-a` → pending invites with `invitation_id`; no token material | revoked/expired/accepted invites never appear; invite rows of another org unreachable |
+| Cross-org via the RPC (org param swapped) | — | `partner@org-a` with `org-b` → denied (same generic `permission denied` as a nonexistent org — no enumeration) |
+| Suspended / removed partner via the RPC | — | suspended or removed partner → denied, stale client session notwithstanding |
+| `platform_owner_admin` via the RPC (no partner membership) | — | denied — `is_platform_owner()` is not a bypass; the owner surface stays `list_members_metadata` |
+| Raw `profiles` reads (D-T6 pair) | — | `partner@org-a` `select` on another member's `profiles` row → 0 rows — the RPC is the **only** widened path |
+
 **Negative tests required (contract §9 identity/session block):**
 - No valid session → every non-sign-up/in row above denies, not empty-success.
 - Expired/revoked session → re-auth required; a cached client role/org
