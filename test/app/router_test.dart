@@ -72,6 +72,9 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
   }
 
+  int selectedIndex(WidgetTester tester) =>
+      tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex;
+
   group('router redirect logic', () {
     testWidgets('keeps an unauthenticated user on the sign-in route', (
       tester,
@@ -169,10 +172,45 @@ void main() {
     );
   });
 
-  group('shell NavigationBar selected index', () {
-    int selectedIndex(WidgetTester tester) =>
-        tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex;
+  group('organization route (1.5 pin)', () {
+    testWidgets('renders the roster for an authenticated demo session', (
+      tester,
+    ) async {
+      // OrganizationHubScreen resolves the OrganizationGateway from the
+      // locator (the dev fake in env-less runs).
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
 
+      await authCubit.startDemoSession();
+      router.go(AppRoutes.organizations);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // The demo session's active membership (org-demo) routes the hub
+      // straight to the roster; the settings destination stays highlighted.
+      expect(find.text('Demo Firm'), findsOneWidget);
+      expect(find.text('Demo user'), findsOneWidget);
+      expect(selectedIndex(tester), 1);
+    });
+
+    testWidgets('blocks unauthenticated access to the organization route', (
+      tester,
+    ) async {
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      router.go(AppRoutes.organizations);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Welcome Back'), findsOneWidget);
+      expect(authCubit.state.isAuthenticated, isFalse);
+    });
+  });
+
+  group('shell NavigationBar selected index', () {
     testWidgets('highlights home on /home', (tester) async {
       await authCubit.startDemoSession();
       await tester.pumpWidget(harness(child: const SizedBox.shrink()));

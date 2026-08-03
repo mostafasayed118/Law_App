@@ -77,6 +77,13 @@ class SettingsScreen extends StatelessWidget {
             title: Text(l10n.notificationsTitle),
             onTap: () => context.go(AppRoutes.notifications),
           ),
+          const SizedBox(height: LegalHubTheme.spaceSm),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.domain_outlined),
+            title: Text(l10n.orgTitle),
+            onTap: () => context.go(AppRoutes.organizations),
+          ),
           const SizedBox(height: LegalHubTheme.spaceXl),
           OutlinedButton.icon(
             onPressed: () => context.read<AuthCubit>().signOut(),

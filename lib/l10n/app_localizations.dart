@@ -807,6 +807,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'System alerts'**
   String get notifSystemAlerts;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @orgTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Organization'**
+  String get orgTitle;
+
+  /// No description provided for @createOrgTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Organization'**
+  String get createOrgTitle;
+
+  /// No description provided for @createOrgSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Give your firm a name. You will become its first partner.'**
+  String get createOrgSubtitle;
+
+  /// No description provided for @orgNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Organization name'**
+  String get orgNameLabel;
+
+  /// No description provided for @orgNamePlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Sterling & Associates'**
+  String get orgNamePlaceholder;
+
+  /// No description provided for @createOrgButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Organization'**
+  String get createOrgButton;
+
+  /// No description provided for @rosterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Members'**
+  String get rosterTitle;
+
+  /// No description provided for @rosterEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No members yet.'**
+  String get rosterEmpty;
+
+  /// No description provided for @inviteMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Member'**
+  String get inviteMember;
+
+  /// No description provided for @inviteEmailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite by email'**
+  String get inviteEmailLabel;
+
+  /// No description provided for @inviteRoleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign role'**
+  String get inviteRoleLabel;
+
+  /// No description provided for @inviteSendButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Invitation'**
+  String get inviteSendButton;
+
+  /// No description provided for @inviteTokenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation Token'**
+  String get inviteTokenTitle;
+
+  /// No description provided for @inviteTokenBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Share this one-time token with {email}. It cannot be shown again.'**
+  String inviteTokenBody(String email);
+
+  /// No description provided for @inviteTokenCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy token'**
+  String get inviteTokenCopy;
+
+  /// No description provided for @inviteTokenCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Token copied to clipboard.'**
+  String get inviteTokenCopied;
+
+  /// No description provided for @memberStatusInvited.
+  ///
+  /// In en, this message translates to:
+  /// **'INVITED'**
+  String get memberStatusInvited;
+
+  /// No description provided for @memberStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'ACTIVE'**
+  String get memberStatusActive;
+
+  /// No description provided for @memberStatusSuspended.
+  ///
+  /// In en, this message translates to:
+  /// **'SUSPENDED'**
+  String get memberStatusSuspended;
+
+  /// No description provided for @memberStatusRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'REMOVED'**
+  String get memberStatusRemoved;
+
+  /// No description provided for @actionChangeRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Change role'**
+  String get actionChangeRole;
+
+  /// No description provided for @actionSuspend.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspend'**
+  String get actionSuspend;
+
+  /// No description provided for @actionReactivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Reactivate'**
+  String get actionReactivate;
+
+  /// No description provided for @actionRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get actionRemove;
+
+  /// No description provided for @removeMemberConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove member?'**
+  String get removeMemberConfirmTitle;
+
+  /// No description provided for @removeMemberConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name} from this organization?'**
+  String removeMemberConfirmBody(String name);
+
+  /// No description provided for @removeMemberConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get removeMemberConfirmAction;
+
+  /// No description provided for @orgErrorDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to perform this action.'**
+  String get orgErrorDenied;
+
+  /// No description provided for @orgErrorDuplicateMember.
+  ///
+  /// In en, this message translates to:
+  /// **'This person is already a member of the organization.'**
+  String get orgErrorDuplicateMember;
+
+  /// No description provided for @orgErrorLastPartner.
+  ///
+  /// In en, this message translates to:
+  /// **'The organization must keep at least one active partner.'**
+  String get orgErrorLastPartner;
+
+  /// No description provided for @orgErrorInvalidRole.
+  ///
+  /// In en, this message translates to:
+  /// **'This role cannot be assigned.'**
+  String get orgErrorInvalidRole;
+
+  /// No description provided for @orgErrorInvalidName.
+  ///
+  /// In en, this message translates to:
+  /// **'The organization name cannot be empty.'**
+  String get orgErrorInvalidName;
+
+  /// No description provided for @orgErrorInvalidInvitation.
+  ///
+  /// In en, this message translates to:
+  /// **'The invitation is invalid or expired.'**
+  String get orgErrorInvalidInvitation;
+
+  /// No description provided for @orgErrorProviderUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The service is unavailable right now. Please try again.'**
+  String get orgErrorProviderUnavailable;
+
+  /// No description provided for @orgErrorUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get orgErrorUnknown;
 }
 
 class _AppLocalizationsDelegate

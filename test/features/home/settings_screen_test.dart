@@ -168,6 +168,50 @@ void main() {
     },
   );
 
+  testWidgets('organization tile navigates to the organization surface', (
+    tester,
+  ) async {
+    // OrganizationHubScreen resolves the OrganizationGateway from the locator.
+    await resetServiceLocator();
+    configureDependencies();
+    addTearDown(() => resetServiceLocator());
+
+    await authCubit.startDemoSession();
+
+    final GoRouter router = createAppRouter(authCubit);
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: <BlocProvider<dynamic>>[
+          BlocProvider<AuthCubit>.value(value: authCubit),
+          BlocProvider<LocaleCubit>.value(value: localeCubit),
+        ],
+        child: MaterialApp.router(
+          routerConfig: router,
+          locale: const Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Authenticated redirect lands on /home; open the settings surface.
+    router.go(AppRoutes.settings);
+    await tester.pumpAndSettle();
+    expect(find.text('Language'), findsWidgets);
+
+    // Tap the organization tile — the wiring under test.
+    await tester.tap(find.text('Organization'));
+    await tester.pumpAndSettle();
+
+    // The organization surface renders the demo org roster (active
+    // membership from the demo session routes the hub to the roster).
+    expect(find.text('Demo Firm'), findsOneWidget);
+    expect(find.text('Demo user'), findsOneWidget);
+  });
+
   testWidgets('profile tile navigates to the profile screen', (tester) async {
     // ProfileScreen is a pure projection of AuthCubit state (no store or
     // gateway resolved from the locator), so no service-locator setup is

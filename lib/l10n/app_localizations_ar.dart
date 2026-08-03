@@ -381,4 +381,118 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get notifSystemAlerts => 'تنبيهات النظام';
+
+  @override
+  String get cancel => 'إلغاء';
+
+  @override
+  String get orgTitle => 'المؤسسة';
+
+  @override
+  String get createOrgTitle => 'إنشاء مؤسسة';
+
+  @override
+  String get createOrgSubtitle => 'أعطِ شركتك اسمًا. ستصبح شريكها الأول.';
+
+  @override
+  String get orgNameLabel => 'اسم المؤسسة';
+
+  @override
+  String get orgNamePlaceholder => 'مثال: ستيرلينغ وشركاه';
+
+  @override
+  String get createOrgButton => 'إنشاء مؤسسة';
+
+  @override
+  String get rosterTitle => 'الأعضاء';
+
+  @override
+  String get rosterEmpty => 'لا يوجد أعضاء بعد.';
+
+  @override
+  String get inviteMember => 'دعوة عضو';
+
+  @override
+  String get inviteEmailLabel => 'الدعوة عبر البريد الإلكتروني';
+
+  @override
+  String get inviteRoleLabel => 'تعيين الدور';
+
+  @override
+  String get inviteSendButton => 'إرسال الدعوة';
+
+  @override
+  String get inviteTokenTitle => 'رمز الدعوة';
+
+  @override
+  String inviteTokenBody(String email) {
+    return 'شارك رمز الاستخدام لمرة واحدة هذا مع $email. لا يمكن عرضه مرة أخرى.';
+  }
+
+  @override
+  String get inviteTokenCopy => 'نسخ الرمز';
+
+  @override
+  String get inviteTokenCopied => 'تم نسخ الرمز إلى الحافظة.';
+
+  @override
+  String get memberStatusInvited => 'مدعو';
+
+  @override
+  String get memberStatusActive => 'نشط';
+
+  @override
+  String get memberStatusSuspended => 'موقوف';
+
+  @override
+  String get memberStatusRemoved => 'مزال';
+
+  @override
+  String get actionChangeRole => 'تغيير الدور';
+
+  @override
+  String get actionSuspend => 'إيقاف';
+
+  @override
+  String get actionReactivate => 'إعادة التفعيل';
+
+  @override
+  String get actionRemove => 'إزالة';
+
+  @override
+  String get removeMemberConfirmTitle => 'إزالة العضو؟';
+
+  @override
+  String removeMemberConfirmBody(String name) {
+    return 'إزالة $name من هذه المؤسسة؟';
+  }
+
+  @override
+  String get removeMemberConfirmAction => 'إزالة';
+
+  @override
+  String get orgErrorDenied => 'ليس لديك صلاحية تنفيذ هذا الإجراء.';
+
+  @override
+  String get orgErrorDuplicateMember => 'هذا الشخص عضو بالفعل في المؤسسة.';
+
+  @override
+  String get orgErrorLastPartner =>
+      'يجب أن تحتفظ المؤسسة بشريك نشط واحد على الأقل.';
+
+  @override
+  String get orgErrorInvalidRole => 'لا يمكن تعيين هذا الدور.';
+
+  @override
+  String get orgErrorInvalidName => 'لا يمكن أن يكون اسم المؤسسة فارغًا.';
+
+  @override
+  String get orgErrorInvalidInvitation => 'الدعوة غير صالحة أو منتهية.';
+
+  @override
+  String get orgErrorProviderUnavailable =>
+      'الخدمة غير متاحة الآن. حاول مرة أخرى.';
+
+  @override
+  String get orgErrorUnknown => 'حدث خطأ ما. حاول مرة أخرى.';
 }

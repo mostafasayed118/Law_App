@@ -301,14 +301,17 @@ decision-capture level.
 ## 3. Slice map and approval log
 
 The phased implementation proposal (contract §11), with the blocker set each
-slice depends on and the approval record once granted.
+slice depends on and the approval record once granted. Feature sequencing
+beyond the approved batches is owned by the planning roadmap
+(`docs/features_roadmap_2026-08-03.md`); each phase row there gates on the
+approval recorded in this table (Phase 1 = the P3 org/membership UI slice).
 
 | Slice | Depends on blockers | Status | Approved by | Date |
 | --- | --- | --- | --- | --- |
 | P0 — Decision capture (this doc) | — | **Decisions closed 2026-07-31** | Project Owner | 2026-07-31 |
 | P1 — Domain contracts + provider adapter (add `supabase_flutter`, adapter behind `AuthGateway`) | D-02, D-03, D-04, D-07, D-08, D-09 + §2 checklist | **APPROVED — §2 fully satisfied** | Project Owner (github.com/mostafasayed118) | 2026-07-31 |
 | P2 — Non-production schema + default-deny RLS/storage/realtime + narrow RPCs, with positive/negative policy tests | P1 + D-05, D-06, D-10a, D-10b | **APPROVED (2026-08-01)** — RLS gate review passed; §8 Q1–Q6 answered in `docs/p2_schema_rls_design.md`; **APPLY APPROVED (2026-08-01)** — ephemeral rehearsals PASSED (r2, re-confirmed on the R-4 slice in r4; 38 PASS + 2 RECORDED, twin gates green); decision in `docs/p2_apply_approval_2026-08-01.md`; **APPLY EXECUTED (2026-08-01)** — Up 1–5 GREEN on the dev project; evidence `docs/p2_apply_execution_2026-08-01.md` (§4.5 manual post-apply smoke pending) | Project Owner (github.com/mostafasayed118) | 2026-08-01 |
-| P3 — Auth + organization UX (loading/denial/offline/expiry/retry states, EN/AR/TR + RTL) | P2 | **Partially executed:** org/membership data layer (`bf4c953`) + code-based recovery (`c2496df`, D1 revised per p3 spec §5) shipped 2026-08-03 under the owner's approval batch (p3 spec §6); org **UI** still Blocked pending p3 spec approval | Project Owner (data layer + recovery, 2026-08-03); org UI approval _OPEN_ | 2026-08-03 |
+| P3 — Auth + organization UX (loading/denial/offline/expiry/retry states, EN/AR/TR + RTL) | P2 | **Partially executed:** org/membership data layer (`bf4c953`) + code-based recovery (`c2496df`, D1 revised per p3 spec §5) shipped 2026-08-03 under the owner's approval batch (p3 spec §6); org **UI APPROVED 2026-08-03** (roadmap Phase 1 — p3 spec approved by owner; implementation started as slices 1.1–1.6 per `docs/features_roadmap_2026-08-03.md` §3) | Project Owner (data layer + recovery + org UI approval, 2026-08-03) | 2026-08-03 |
 | P4 — Security review + controlled rollout (threat model, dependency/config review, staging verification, rollback rehearsal, release approval) | P3 | Blocked | _OPEN_ | _OPEN_ |
 
 An approval in this table is the "explicit implementation approval" of

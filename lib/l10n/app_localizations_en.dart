@@ -381,4 +381,122 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notifSystemAlerts => 'System alerts';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get orgTitle => 'Organization';
+
+  @override
+  String get createOrgTitle => 'Create Organization';
+
+  @override
+  String get createOrgSubtitle =>
+      'Give your firm a name. You will become its first partner.';
+
+  @override
+  String get orgNameLabel => 'Organization name';
+
+  @override
+  String get orgNamePlaceholder => 'e.g. Sterling & Associates';
+
+  @override
+  String get createOrgButton => 'Create Organization';
+
+  @override
+  String get rosterTitle => 'Members';
+
+  @override
+  String get rosterEmpty => 'No members yet.';
+
+  @override
+  String get inviteMember => 'Invite Member';
+
+  @override
+  String get inviteEmailLabel => 'Invite by email';
+
+  @override
+  String get inviteRoleLabel => 'Assign role';
+
+  @override
+  String get inviteSendButton => 'Send Invitation';
+
+  @override
+  String get inviteTokenTitle => 'Invitation Token';
+
+  @override
+  String inviteTokenBody(String email) {
+    return 'Share this one-time token with $email. It cannot be shown again.';
+  }
+
+  @override
+  String get inviteTokenCopy => 'Copy token';
+
+  @override
+  String get inviteTokenCopied => 'Token copied to clipboard.';
+
+  @override
+  String get memberStatusInvited => 'INVITED';
+
+  @override
+  String get memberStatusActive => 'ACTIVE';
+
+  @override
+  String get memberStatusSuspended => 'SUSPENDED';
+
+  @override
+  String get memberStatusRemoved => 'REMOVED';
+
+  @override
+  String get actionChangeRole => 'Change role';
+
+  @override
+  String get actionSuspend => 'Suspend';
+
+  @override
+  String get actionReactivate => 'Reactivate';
+
+  @override
+  String get actionRemove => 'Remove';
+
+  @override
+  String get removeMemberConfirmTitle => 'Remove member?';
+
+  @override
+  String removeMemberConfirmBody(String name) {
+    return 'Remove $name from this organization?';
+  }
+
+  @override
+  String get removeMemberConfirmAction => 'Remove';
+
+  @override
+  String get orgErrorDenied =>
+      'You don\'t have permission to perform this action.';
+
+  @override
+  String get orgErrorDuplicateMember =>
+      'This person is already a member of the organization.';
+
+  @override
+  String get orgErrorLastPartner =>
+      'The organization must keep at least one active partner.';
+
+  @override
+  String get orgErrorInvalidRole => 'This role cannot be assigned.';
+
+  @override
+  String get orgErrorInvalidName => 'The organization name cannot be empty.';
+
+  @override
+  String get orgErrorInvalidInvitation =>
+      'The invitation is invalid or expired.';
+
+  @override
+  String get orgErrorProviderUnavailable =>
+      'The service is unavailable right now. Please try again.';
+
+  @override
+  String get orgErrorUnknown => 'Something went wrong. Please try again.';
 }

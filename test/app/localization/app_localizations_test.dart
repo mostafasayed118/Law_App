@@ -31,6 +31,22 @@ void main() {
       expect(tr.stateLoading, isNot(en.stateLoading));
       expect(tr.retry, isNot(en.retry));
     });
+
+    test('resolves the org surface keys in every locale (1.6 pin)', () {
+      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+      final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+      final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+      expect(en.orgTitle, 'Organization');
+      expect(ar.orgTitle, 'المؤسسة');
+      expect(tr.orgTitle, 'Kuruluş');
+      expect(en.rosterTitle, 'Members');
+      expect(tr.rosterTitle, 'Üyeler');
+      expect(ar.rosterTitle, 'الأعضاء');
+      // Real per-locale wording, not silent copies of EN.
+      expect(tr.orgErrorLastPartner, isNot(en.orgErrorLastPartner));
+      expect(ar.orgErrorLastPartner, isNot(en.orgErrorLastPartner));
+    });
   });
 
   group('AppLocalizations widget rendering', () {

@@ -5,8 +5,12 @@
 > RPC mapping, acceptance criteria, risks, and what this slice explicitly
 > does NOT do. Data-layer foundation committed 2026-08-03; screens are a
 > follow-up slice gated on this spec + approval.
-> **Status: SPEC DRAFT — data-layer foundation implemented (2026-08-03);
-> UI slice NOT started (needs approval on this spec).**
+> **Planning owner:** `docs/features_roadmap_2026-08-03.md` — this slice is
+> **Phase 1** of that roadmap, the owning planning document for feature
+> sequencing; this spec is the Phase 1 contract.
+> **Status: SPEC APPROVED (2026-08-03, recorded in `docs/p0_decision_capture.md`
+> §3 P3 row). UI slice implementation started as roadmap Phase 1 slices
+> 1.1–1.6 (create org → roster → invite → member actions → router/shell → l10n).**
 > **Owner:** Project Owner (github.com/mostafasayed118).
 
 ---
@@ -109,4 +113,6 @@ slice).
 - Data-layer foundation: implemented under the owner's 2026-08-03 approval
   batch (no UI, no behavior visible to end users beyond the demo fake).
 - UI slice: requires approval of this spec (governance pattern: spec →
-  approval → implementation), then a follow-up batch.
+  approval → implementation), then a follow-up batch; tracked as **Phase 1**
+  of the planning roadmap (`docs/features_roadmap_2026-08-03.md` §3), whose
+  status stays "BLOCKED (approval open)" until this approval lands.

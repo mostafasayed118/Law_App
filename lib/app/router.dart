@@ -15,6 +15,7 @@ import '../features/home/presentation/settings_screen.dart';
 import '../features/notifications/presentation/notification_settings_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/onboarding/presentation/onboarding_success_screen.dart';
+import '../features/orgs/presentation/organization_hub_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
 import '../l10n/app_localizations.dart';
 
@@ -30,6 +31,7 @@ class AppRoutes {
   static const String onboardingSuccess = '/onboarding/success';
   static const String home = '/home';
   static const String settings = '/settings';
+  static const String organizations = '/organizations';
   static const String profile = '/profile';
   static const String notifications = '/notifications';
 }
@@ -100,6 +102,11 @@ GoRouter createAppRouter(
           path: AppRoutes.settings,
           builder: (BuildContext context, GoRouterState state) =>
               const SettingsScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.organizations,
+          builder: (BuildContext context, GoRouterState state) =>
+              const OrganizationHubScreen(),
         ),
         GoRoute(
           path: AppRoutes.profile,
@@ -205,7 +212,8 @@ class _AppShell extends StatelessWidget {
     final bool onSettingsSurface =
         location == AppRoutes.settings ||
         location == AppRoutes.profile ||
-        location == AppRoutes.notifications;
+        location == AppRoutes.notifications ||
+        location == AppRoutes.organizations;
     final String targetRoute = onSettingsSurface
         ? AppRoutes.settings
         : AppRoutes.home;

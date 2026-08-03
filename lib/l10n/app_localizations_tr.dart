@@ -384,4 +384,120 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get notifSystemAlerts => 'Sistem uyarıları';
+
+  @override
+  String get cancel => 'İptal';
+
+  @override
+  String get orgTitle => 'Kuruluş';
+
+  @override
+  String get createOrgTitle => 'Kuruluş Oluştur';
+
+  @override
+  String get createOrgSubtitle =>
+      'Firmanıza bir ad verin. İlk ortağı siz olacaksınız.';
+
+  @override
+  String get orgNameLabel => 'Kuruluş adı';
+
+  @override
+  String get orgNamePlaceholder => 'ör. Sterling & Associates';
+
+  @override
+  String get createOrgButton => 'Kuruluş Oluştur';
+
+  @override
+  String get rosterTitle => 'Üyeler';
+
+  @override
+  String get rosterEmpty => 'Henüz üye yok.';
+
+  @override
+  String get inviteMember => 'Üye Davet Et';
+
+  @override
+  String get inviteEmailLabel => 'E-posta ile davet et';
+
+  @override
+  String get inviteRoleLabel => 'Rol ata';
+
+  @override
+  String get inviteSendButton => 'Davetiye Gönder';
+
+  @override
+  String get inviteTokenTitle => 'Davetiye Kodu';
+
+  @override
+  String inviteTokenBody(String email) {
+    return 'Bu tek kullanımlık kodu $email ile paylaşın. Bir daha gösterilemez.';
+  }
+
+  @override
+  String get inviteTokenCopy => 'Kodu kopyala';
+
+  @override
+  String get inviteTokenCopied => 'Kod panoya kopyalandı.';
+
+  @override
+  String get memberStatusInvited => 'DAVETLİ';
+
+  @override
+  String get memberStatusActive => 'AKTİF';
+
+  @override
+  String get memberStatusSuspended => 'ASKIDA';
+
+  @override
+  String get memberStatusRemoved => 'KALDIRILDI';
+
+  @override
+  String get actionChangeRole => 'Rolü değiştir';
+
+  @override
+  String get actionSuspend => 'Askıya al';
+
+  @override
+  String get actionReactivate => 'Yeniden etkinleştir';
+
+  @override
+  String get actionRemove => 'Kaldır';
+
+  @override
+  String get removeMemberConfirmTitle => 'Üye kaldırılsın mı?';
+
+  @override
+  String removeMemberConfirmBody(String name) {
+    return '$name bu kuruluştan kaldırılsın mı?';
+  }
+
+  @override
+  String get removeMemberConfirmAction => 'Kaldır';
+
+  @override
+  String get orgErrorDenied => 'Bu işlemi yapma izniniz yok.';
+
+  @override
+  String get orgErrorDuplicateMember => 'Bu kişi zaten kuruluşun bir üyesi.';
+
+  @override
+  String get orgErrorLastPartner =>
+      'Kuruluşun en az bir aktif ortağı olmalıdır.';
+
+  @override
+  String get orgErrorInvalidRole => 'Bu rol atanamaz.';
+
+  @override
+  String get orgErrorInvalidName => 'Kuruluş adı boş olamaz.';
+
+  @override
+  String get orgErrorInvalidInvitation =>
+      'Davetiye geçersiz veya süresi dolmuş.';
+
+  @override
+  String get orgErrorProviderUnavailable =>
+      'Hizmet şu anda kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get orgErrorUnknown => 'Bir şeyler ters gitti. Lütfen tekrar deneyin.';
 }
