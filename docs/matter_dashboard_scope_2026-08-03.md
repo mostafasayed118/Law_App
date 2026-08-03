@@ -16,12 +16,12 @@
   org id) and `docs/features_roadmap_2026-08-03.md` §4 slice **2.3**
   ("`Session.memberships` exists but there is no selector UI") — declared,
   never shipped despite the Phase 2 gate row reading "slices 2.1–2.4".
-- §10 boundary: `docs/features_roadmap_2026-08-03.md` §10 defers
+- §11 boundary: `docs/features_roadmap_2026-08-03.md` §11 defers
   **matters** (and documents/messages/storage/realtime/audit/billing/AI)
   until P0 closes + policy tests exist; `docs/permission_matrix.md` §4/§6
   requires that "an org role alone never grants matter access". This phase
   ships a **client-only fake-domain surface**; the real matters data path
-  (table + RLS + storage + realtime) stays §10-deferred and untouched.
+  (table + RLS + storage + realtime) stays §11-deferred and untouched.
 - Precedent: Phase 5 (`docs/booking_scope_2026-08-03.md` D-B3 fake-domain)
   and Phase 6 (`docs/attorney_discovery_scope_2026-08-03.md` D-A2 fake
   gateway seam, D-A4 synthetic non-PII, D-A6 nav-hint gating) — same
@@ -33,7 +33,7 @@
 |---|---|---|
 | D-M1 | Matter surfaces are **read-first**: no create / edit / close / upload / action from matter surfaces. Details render a read-only projection of the synthetic matter; no action affordances | **ratified 2026-08-03** |
 | D-M2 | **Fake-domain**: synthetic matter list via a `MatterGateway` seam + dev fake (the Phase 5 D-B3 / Phase 6 D-A2 pattern). No backend, no schema/RLS/policy, no matrix addendum (no server change) | **ratified 2026-08-03** |
-| D-M3 | **§10 boundary**: this phase is client-only demo surface. The real matters data path (table, RLS, storage, realtime) stays deferred per roadmap §10; nothing here grants or implies server-side matter access ("an org role alone never grants matter access" is untouched) | **ratified 2026-08-03** |
+| D-M3 | **§11 boundary**: this phase is client-only demo surface. The real matters data path (table, RLS, storage, realtime) stays deferred per roadmap §11; nothing here grants or implies server-side matter access ("an org role alone never grants matter access" is untouched) | **ratified 2026-08-03** |
 | D-M4 | Matter previews carry **synthetic, non-PII data only**: stable synthetic id, generic demo title, practice area, lifecycle status (open/active/closed chip), assigned-attorney display name (reusing the Phase 6 synthetic roster), created date. No client names, no real-looking case numbers, no contact data | **ratified 2026-08-03** |
 | D-M5 | Matter list is a **client-side view** over the fake list (status filter only); details are a read-only projection of the same VO. No server search RPC | **ratified 2026-08-03** |
 | D-M6 | Role gating: matter dashboard + org-switcher entry visible to every bootstrap role via `RoleCapability` (navigation hint only, never authorization — same posture as `canBookConsultation` / `canViewAttorneyDiscovery`) | **ratified 2026-08-03** |
@@ -43,7 +43,7 @@
 
 - No matter messaging, no document upload/preview, no availability, no
   billing, no realtime from any matter surface — those are separate MVP rows
-  (spec §6 rows 154/155) with their own §10 gates.
+  (spec §6 rows 154/155) with their own §11 gates.
 - The demo session carries one active membership (`org-demo`); the switcher
   renders that membership and pins the *shape* (multi-org is a D-08
   contract, not a demo fixture).
@@ -80,8 +80,8 @@
   cases (local-only note + generic demo wording, D-M4).
 - **R2 — read-only line:** any matter action (create/edit/close/upload) is
   out (D-M1); the details surface carries no action affordances.
-- **R3 — §10 boundary:** the client-only surface must not imply server
-  matter access; the deferral text in roadmap §10 is preserved, and the
+- **R3 — §11 boundary:** the client-only surface must not imply server
+  matter access; the deferral text in roadmap §11 is preserved, and the
   matrix's "org role alone never grants matter access" invariant is
   untouched.
 - **R4 — scope creep:** no messaging/documents/availability/billing from
