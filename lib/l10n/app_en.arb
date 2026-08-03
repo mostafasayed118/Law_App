@@ -172,5 +172,8 @@
   "orgErrorInvalidName": "The organization name cannot be empty.",
   "orgErrorInvalidInvitation": "The invitation is invalid or expired.",
   "orgErrorProviderUnavailable": "The service is unavailable right now. Please try again.",
-  "orgErrorUnknown": "Something went wrong. Please try again."
+  "orgErrorUnknown": "Something went wrong. Please try again.",
+  "signUpCheckInboxTitle": "Check Your Inbox",
+  "signUpCheckInboxBody": "We've sent a verification link to your email. Open it to activate your account, then sign in.",
+  "signUpCheckInboxAction": "Continue to Sign In"
 }

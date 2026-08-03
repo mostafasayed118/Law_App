@@ -172,5 +172,8 @@
   "orgErrorInvalidName": "Kuruluş adı boş olamaz.",
   "orgErrorInvalidInvitation": "Davetiye geçersiz veya süresi dolmuş.",
   "orgErrorProviderUnavailable": "Hizmet şu anda kullanılamıyor. Lütfen tekrar deneyin.",
-  "orgErrorUnknown": "Bir şeyler ters gitti. Lütfen tekrar deneyin."
+  "orgErrorUnknown": "Bir şeyler ters gitti. Lütfen tekrar deneyin.",
+  "signUpCheckInboxTitle": "Gelen Kutunuzu Kontrol Edin",
+  "signUpCheckInboxBody": "E-posta adresinize bir doğrulama bağlantısı gönderdik. Hesabınızı etkinleştirmek için bağlantıyı açın, ardından giriş yapın.",
+  "signUpCheckInboxAction": "Girişe Geç"
 }

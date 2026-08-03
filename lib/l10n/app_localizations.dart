@@ -1107,6 +1107,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Something went wrong. Please try again.'**
   String get orgErrorUnknown;
+
+  /// No description provided for @signUpCheckInboxTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check Your Inbox'**
+  String get signUpCheckInboxTitle;
+
+  /// No description provided for @signUpCheckInboxBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ve sent a verification link to your email. Open it to activate your account, then sign in.'**
+  String get signUpCheckInboxBody;
+
+  /// No description provided for @signUpCheckInboxAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to Sign In'**
+  String get signUpCheckInboxAction;
 }
 
 class _AppLocalizationsDelegate

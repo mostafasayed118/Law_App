@@ -546,4 +546,14 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get orgErrorUnknown => 'Bir şeyler ters gitti. Lütfen tekrar deneyin.';
+
+  @override
+  String get signUpCheckInboxTitle => 'Gelen Kutunuzu Kontrol Edin';
+
+  @override
+  String get signUpCheckInboxBody =>
+      'E-posta adresinize bir doğrulama bağlantısı gönderdik. Hesabınızı etkinleştirmek için bağlantıyı açın, ardından giriş yapın.';
+
+  @override
+  String get signUpCheckInboxAction => 'Girişe Geç';
 }

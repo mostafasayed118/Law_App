@@ -545,4 +545,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get orgErrorUnknown => 'Something went wrong. Please try again.';
+
+  @override
+  String get signUpCheckInboxTitle => 'Check Your Inbox';
+
+  @override
+  String get signUpCheckInboxBody =>
+      'We\'ve sent a verification link to your email. Open it to activate your account, then sign in.';
+
+  @override
+  String get signUpCheckInboxAction => 'Continue to Sign In';
 }

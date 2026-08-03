@@ -541,4 +541,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get orgErrorUnknown => 'حدث خطأ ما. حاول مرة أخرى.';
+
+  @override
+  String get signUpCheckInboxTitle => 'تحقق من بريدك الوارد';
+
+  @override
+  String get signUpCheckInboxBody =>
+      'أرسلنا رابط التحقق إلى بريدك الإلكتروني. افتحه لتفعيل حسابك، ثم سجّل الدخول.';
+
+  @override
+  String get signUpCheckInboxAction => 'المتابعة إلى تسجيل الدخول';
 }

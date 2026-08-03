@@ -58,6 +58,23 @@ void main() {
       expect(ar.cancel, 'إلغاء');
       expect(tr.cancel, 'İptal');
     });
+
+    test('resolves the sign-up check-inbox keys in every locale (4.2 pin)', () {
+      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+      final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+      final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+      expect(en.signUpCheckInboxTitle, 'Check Your Inbox');
+      expect(ar.signUpCheckInboxTitle, 'تحقق من بريدك الوارد');
+      expect(tr.signUpCheckInboxTitle, 'Gelen Kutunuzu Kontrol Edin');
+      expect(en.signUpCheckInboxAction, 'Continue to Sign In');
+      expect(ar.signUpCheckInboxAction, 'المتابعة إلى تسجيل الدخول');
+      expect(tr.signUpCheckInboxAction, 'Girişe Geç');
+      // Real per-locale wording, not silent copies of EN.
+      expect(tr.signUpCheckInboxBody, isNot(en.signUpCheckInboxBody));
+      expect(ar.signUpCheckInboxBody, isNot(en.signUpCheckInboxBody));
+      expect(tr.signUpCheckInboxTitle, isNot(en.signUpCheckInboxTitle));
+    });
   });
 
   group('AppLocalizations widget rendering', () {

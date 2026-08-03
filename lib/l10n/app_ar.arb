@@ -172,5 +172,8 @@
   "orgErrorInvalidName": "لا يمكن أن يكون اسم المؤسسة فارغًا.",
   "orgErrorInvalidInvitation": "الدعوة غير صالحة أو منتهية.",
   "orgErrorProviderUnavailable": "الخدمة غير متاحة الآن. حاول مرة أخرى.",
-  "orgErrorUnknown": "حدث خطأ ما. حاول مرة أخرى."
+  "orgErrorUnknown": "حدث خطأ ما. حاول مرة أخرى.",
+  "signUpCheckInboxTitle": "تحقق من بريدك الوارد",
+  "signUpCheckInboxBody": "أرسلنا رابط التحقق إلى بريدك الإلكتروني. افتحه لتفعيل حسابك، ثم سجّل الدخول.",
+  "signUpCheckInboxAction": "المتابعة إلى تسجيل الدخول"
 }

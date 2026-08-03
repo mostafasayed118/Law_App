@@ -14,11 +14,13 @@ import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
 // SignUpScreen now builds a redaction-safe SignUpRequest on submit and hands
-// it to a SignUpCubit backed by a SignUpGateway seam. The default dev fake
-// always succeeds, so the stub behavior (snackbar + route to sign-in) is
-// preserved; these tests also pin the new wiring: the VO is constructed with
-// the entered (normalized) values, and a gateway failure renders the
-// ViewStateView error surface.
+// it to a SignUpCubit backed by a SignUpGateway seam. On success (Phase 4.2)
+// the form is replaced by a "check your inbox" confirmation instead of the
+// old snackbar + silent route to sign-in; the user verifies email first and
+// taps the explicit action to continue. These tests pin that wiring: the VO
+// is constructed with the entered (normalized) values, success renders the
+// check-inbox state (no auto-route), the action routes to sign-in, and a
+// gateway failure renders the ViewStateView error surface.
 void main() {
   late FakeAuthGateway authGateway;
   late AuthCubit authCubit;
@@ -120,13 +122,13 @@ void main() {
   );
 
   testWidgets(
-    'valid submit builds a SignUpRequest with normalized values and routes '
-    'to sign-in',
+    'valid submit builds a SignUpRequest with normalized values and shows '
+    'the check-inbox state instead of routing',
     (tester) async {
       // Substitute the dev fake with a capturing gateway so the test can
-      // assert the VO the screen constructed, not just the navigation side
-      // effect. The capturing gateway implements the real contract
-      // interface (no contract mocking per INSTRUCTIONS §5).
+      // assert the VO the screen constructed, not just the success surface.
+      // The capturing gateway implements the real contract interface (no
+      // contract mocking per INSTRUCTIONS §5).
       final _CapturingSignUpGateway gateway = _CapturingSignUpGateway();
       await serviceLocator.reset();
       serviceLocator.registerSingleton<SignUpGateway>(gateway);
@@ -152,8 +154,40 @@ void main() {
       expect(gateway.received!.phone, '+201234567890');
       expect(gateway.received!.password, 'strong-pw-1');
 
-      // Success: snackbar + navigation to sign-in (unchanged stub behavior).
-      expect(find.textContaining('Verification code sent'), findsOneWidget);
+      // Success (Phase 4.2): the form is replaced by the check-your-inbox
+      // confirmation. No snackbar, no silent route to sign-in — the user
+      // must verify email first.
+      expect(find.text('Check Your Inbox'), findsOneWidget);
+      expect(find.textContaining('verification link'), findsOneWidget);
+      expect(find.text('Continue to Sign In'), findsOneWidget);
+      expect(find.textContaining('Verification code sent'), findsNothing);
+      expect(find.text('Welcome Back'), findsNothing);
+      // The form itself is gone.
+      expect(find.text('Create Account'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'tapping Continue to Sign In from the check-inbox state routes to sign-in',
+    (tester) async {
+      await tester.pumpWidget(pumpScreen());
+      await tester.pumpAndSettle();
+
+      await fillValidForm(tester);
+
+      final ElevatedButton button = tester.widget<ElevatedButton>(
+        find.byType(ElevatedButton).first,
+      );
+      button.onPressed!();
+      await tester.pumpAndSettle();
+
+      // We are still on the sign-up route showing the confirmation.
+      expect(find.text('Check Your Inbox'), findsOneWidget);
+      expect(find.text('Welcome Back'), findsNothing);
+
+      // The explicit action routes to sign-in.
+      await tester.tap(find.text('Continue to Sign In'));
+      await tester.pumpAndSettle();
       expect(find.text('Welcome Back'), findsOneWidget);
     },
   );

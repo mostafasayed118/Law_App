@@ -48,14 +48,15 @@ messaging services.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (451 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (453 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), Redactor (password/OTP/email/Bearer redaction
   with leak guards), DI registration graph, validators, router redirect logic
   (unauthenticated-deny + authenticated-redirect), sign-in screen (welcome copy
   + empty-form blocking + valid submit + forgot link + error snackbar),
   sign-up screen (title + 4 fields + terms-checkbox gating + invalid-form
-  blocking + stub-submit snackbar/route), forgot-password email step (empty
+  blocking + check-inbox success state + continue-to-sign-in route),
+  forgot-password email step (empty
   blocking + gateway send + route), forgot-password OTP step (disabled-until-6-
   digits + gateway verify + real resend), `OtpFieldRow` (length, code
   concatenation, clear, completion notifier), forgot-password reset screen
@@ -72,8 +73,9 @@ messaging services.
   redaction), the recovery OTP API seam (send without create-user/redirect,
   magiclink verify, wrong-code mapping, password update + session clear),
   the sign-up screen (VO construction with normalized values, terms-checkbox
-  gating, invalid-form blocking, gateway-failure `ViewStateView` error
-  surface), and the end-to-end boot / locale-switch widget flow. Batch 1 of
+  gating, invalid-form blocking, check-inbox success surface + its explicit
+  sign-in action, gateway-failure `ViewStateView` error surface), and the
+  end-to-end boot / locale-switch widget flow. Batch 1 of
   the codebase-audit plan added 54 tests covering `ViewStateView` all
   branches, the error reporters (runZoned print-capture), TR locale loading,
   form-field + feature widgets, the home no-session fallback pin, the router
@@ -81,7 +83,7 @@ messaging services.
   in-memory locale store, and the onboarding-success screen. Batch 5 added
   the 800×600 onboarding no-overflow test and the EN/AR/TR localized-fallback
   assertions.
-- Coverage: **451 tests** (2026-08-03); `flutter analyze` and the format gate
+- Coverage: **453 tests** (2026-08-03); `flutter analyze` and the format gate
   clean. The coverage-gap list from the codebase audit (cubit emission
   streams, shared widgets, screen negative paths, router bypass, TR locale,
   reset success path) was closed by Batch 1 of
