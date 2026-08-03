@@ -45,10 +45,13 @@
 > gate-table row below and the decision record in
 > `docs/matter_dashboard_scope_2026-08-03.md` (D-M1…D-M7 ratified, incl.
 > the D-M7 active-org switcher per D-08).
-> Phase 8 (document vault, read-first, metadata-only, client-only) **APPROVED
-> 2026-08-03** (scope note `docs/document_vault_scope_2026-08-03.md`;
-> D-V1…D-V6 ratified, incl. the metadata-only line — no document bodies ever
-> exist). Implementation starts with slice 8.0 behind the standard slice gate.
+> Phase 8 (document vault, read-first, metadata-only, client-only)
+> **IMPLEMENTED AND SHIPPED 2026-08-03** (`22d63e5` slice 8.0 gateway seam
+> + fake + metadata VO; `29fd40a` slice 8.1 vault list + type chips +
+> entry; `430b62b` slice 8.2 l10n pins) — per the gate-table row below and
+> the decision record in
+> `docs/document_vault_scope_2026-08-03.md` (D-V1…D-V6 ratified, incl. the
+> metadata-only line — no document bodies ever exist).
 > Everything in §12 stays deferred until P0 closes.
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
@@ -336,8 +339,16 @@ their §12 gates).
 
 ## 10. Phase 8 — Document vault (read-first, metadata-only, client-only)
 
-**Status: APPROVED 2026-08-03** (owner ratification of D-V1…D-V6). Scope
-note `docs/document_vault_scope_2026-08-03.md`. Spec basis: MVP §4
+**Status: IMPLEMENTED + SHIPPED 2026-08-03** — `22d63e5` (slice 8.0:
+Document VO + DocumentType + gateway seam + dev fake, D-V2/D-V4, AC-1),
+`29fd40a` (slice 8.1: read-first vault list + type chips + capability
+entry, D-V1/D-V5, AC-2/AC-3/AC-4), `430b62b` (slice 8.2: EN/AR/TR l10n
+pins, AC-5). Full gate stack passed on the merged tree: format CLEAN,
+analyze clean, **626 tests pass**, ledger PASS 115. Pushed to
+`origin/main` on the owner's approval.
+
+Scope note `docs/document_vault_scope_2026-08-03.md` (D-V1…D-V6
+ratified). Spec basis: MVP §4
 "Document vault (scoped, no e-signature)" + §6 remediation row 155
 (`document_vault`).
 
@@ -368,7 +379,7 @@ realtime (the §12 deferred list keeps its gate).
 | 5 | Phase 5 — consultation booking (no live payment) | MVP spec §4; auth/org track (§§3–4); D-B7 resolved (standalone) | no | scope note → decision-record ratification → UI + routing slice → gate stack → owner push approval | **SHIPPED 2026-08-03** (`05f13c8` + `0eb7ec9` + `3bd3d29` + `d55e273`, suite 521, ledger PASS 115; pushed to origin/main) |
 | 6 | Phase 6 — attorney discovery (read-only, client-only) | MVP spec §4; D-B7 additive `attorneyId` hook; Phase 5 booking seams | no | scope note → decision-record ratification (D-A1…D-A6) → slices 6.1–6.3 → gate stack → owner push approval | **SHIPPED 2026-08-03** (`0f93042` + `7b5c589` + `d389c69`, suite 565, ledger PASS 115; pushed to origin/main) |
 | 7 | Phase 7 — matter dashboard (read-first, client-only) + org switcher | MVP spec §4; D-08 org semantics; Phase 6 seams (synthetic attorney roster for assignment) | no | scope note → decision-record ratification (D-M1…D-M7) → slices 7.0–7.3 → gate stack → owner push approval | **SHIPPED 2026-08-03** (`b31bc1a` + `5740594` + `82d77dc` + `c2cf3cb`, suite 605, ledger PASS 115; pushed to origin/main) |
-| 8 | Phase 8 — document vault (read-first, metadata-only, client-only) | MVP spec §4; Phase 7 seams (fake-domain pattern) | no | scope note → decision-record ratification (D-V1…D-V6) → slices 8.0–8.2 → gate stack → owner push approval | **APPROVED 2026-08-03** — scope note `docs/document_vault_scope_2026-08-03.md` (D-V1…D-V6 ratified); slices 8.0–8.2 pending |
+| 8 | Phase 8 — document vault (read-first, metadata-only, client-only) | MVP spec §4; Phase 7 seams (fake-domain pattern) | no | scope note → decision-record ratification (D-V1…D-V6) → slices 8.0–8.2 → gate stack → owner push approval | **SHIPPED 2026-08-03** (`22d63e5` + `29fd40a` + `430b62b`, suite 626, ledger PASS 115; pushed to origin/main) |
 | — | §12 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Deferred |
 
 Rules that apply to every phase (definition-of-done from
@@ -382,7 +393,10 @@ approval**.
 
 Per README boundary + `docs/permission_matrix.md` §4/§6: **matters,
 documents, messages, storage, realtime, audit surfacing, billing, AI**.
-The matrix requires the `platform_owner_admin` deny-row test and per-row
+The client-only document-metadata surface shipped as Phase 8 (slices
+8.0–8.2, `22d63e5`/`29fd40a`/`430b62b`) carries no real document data —
+the real documents data path stays deferred here with the rest. The
+matrix requires the `platform_owner_admin` deny-row test and per-row
 negative policy tests **before any of these ship**, and an org role alone
 never grants matter access. The audit RPCs exist (`read_org_audit`,
 `read_platform_audit`) but surfacing them is P2-gated; the owner-only admin
