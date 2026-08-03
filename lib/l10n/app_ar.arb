@@ -223,5 +223,15 @@
   "discoveryProfileTitle": "ملف المحامي",
   "discoveryProfileNotFound": "المحامي غير موجود.",
   "discoveryProfileBio": "نبذة",
-  "discoveryProfileBook": "احجز مع هذا المحامي"
+  "discoveryProfileBook": "احجز مع هذا المحامي",
+  "matterTitle": "القضايا",
+  "matterFilterAll": "الكل",
+  "matterStatusOpen": "مفتوحة",
+  "matterStatusActive": "نشطة",
+  "matterStatusClosed": "مغلقة",
+  "matterEmpty": "لا توجد قضايا تطابق عامل التصفية.",
+  "matterError": "تعذّر تحميل القضايا.",
+  "matterLocalOnlyNote": "وضع تجريبي — قضايا اصطناعية فقط. لا يتم عرض قضايا حقيقية.",
+  "matterEntryTitle": "قضاياي",
+  "matterEntrySubtitle": "تصفح ملفات القضايا التجريبية — عرض تجريبي للتطوير."
 }

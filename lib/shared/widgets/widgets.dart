@@ -17,5 +17,6 @@ export 'form_fields/password_field.dart';
 export 'layout/auth_scaffold.dart';
 export 'layout/icon_hero_badge.dart';
 export 'legalhub_components.dart';
+export 'practice_area_label.dart';
 export 'role_label.dart';
 export 'view_state_view.dart';

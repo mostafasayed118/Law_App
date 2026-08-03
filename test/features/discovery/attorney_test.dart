@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:legalhub/core/practice_area.dart';
 import 'package:legalhub/features/discovery/domain/attorney.dart';
 
 void main() {

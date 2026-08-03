@@ -417,6 +417,40 @@ void main() {
     });
   });
 
+  group('matter route (Phase 7 slice 7.1)', () {
+    testWidgets('renders the matter list for an authenticated demo session', (
+      tester,
+    ) async {
+      // MatterListScreen resolves MatterGateway from the locator (the
+      // dev fake in env-less runs).
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      router.go(AppRoutes.matters);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // The /matters route renders the matter list, not home; the
+      // shell keeps home highlighted (not a settings descendant).
+      expect(find.text('Matters'), findsOneWidget);
+      expect(find.text('Demo acquisition review'), findsOneWidget);
+      expect(selectedIndex(tester), 0);
+    });
+
+    testWidgets('blocks unauthenticated access to the matter route', (
+      tester,
+    ) async {
+      router.go(AppRoutes.matters);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Welcome Back'), findsOneWidget);
+      expect(authCubit.state.isAuthenticated, isFalse);
+    });
+  });
+
   group('organization route (1.5 pin)', () {
     testWidgets('renders the roster for an authenticated demo session', (
       tester,
@@ -604,6 +638,7 @@ void main() {
               canViewSettings: false,
               canBookConsultation: true,
               canViewAttorneyDiscovery: true,
+              canViewMatters: true,
             ),
           },
         );
@@ -647,6 +682,7 @@ void main() {
               canViewSettings: true,
               canBookConsultation: false,
               canViewAttorneyDiscovery: false,
+              canViewMatters: false,
             ),
           },
         );
@@ -713,6 +749,7 @@ void main() {
             canViewSettings: false,
             canBookConsultation: false,
             canViewAttorneyDiscovery: false,
+            canViewMatters: false,
           ),
         },
       );

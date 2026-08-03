@@ -1365,6 +1365,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Book with this attorney'**
   String get discoveryProfileBook;
+
+  /// No description provided for @matterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Matters'**
+  String get matterTitle;
+
+  /// No description provided for @matterFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get matterFilterAll;
+
+  /// No description provided for @matterStatusOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get matterStatusOpen;
+
+  /// No description provided for @matterStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get matterStatusActive;
+
+  /// No description provided for @matterStatusClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get matterStatusClosed;
+
+  /// No description provided for @matterEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No matters match the filter.'**
+  String get matterEmpty;
+
+  /// No description provided for @matterError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load matters.'**
+  String get matterError;
+
+  /// No description provided for @matterLocalOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo mode — synthetic matters only. No real cases are listed.'**
+  String get matterLocalOnlyNote;
+
+  /// No description provided for @matterEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My matters'**
+  String get matterEntryTitle;
+
+  /// No description provided for @matterEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse demo matter files — development demo.'**
+  String get matterEntrySubtitle;
 }
 
 class _AppLocalizationsDelegate

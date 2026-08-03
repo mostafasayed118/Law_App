@@ -680,4 +680,36 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get discoveryProfileBook => 'احجز مع هذا المحامي';
+
+  @override
+  String get matterTitle => 'القضايا';
+
+  @override
+  String get matterFilterAll => 'الكل';
+
+  @override
+  String get matterStatusOpen => 'مفتوحة';
+
+  @override
+  String get matterStatusActive => 'نشطة';
+
+  @override
+  String get matterStatusClosed => 'مغلقة';
+
+  @override
+  String get matterEmpty => 'لا توجد قضايا تطابق عامل التصفية.';
+
+  @override
+  String get matterError => 'تعذّر تحميل القضايا.';
+
+  @override
+  String get matterLocalOnlyNote =>
+      'وضع تجريبي — قضايا اصطناعية فقط. لا يتم عرض قضايا حقيقية.';
+
+  @override
+  String get matterEntryTitle => 'قضاياي';
+
+  @override
+  String get matterEntrySubtitle =>
+      'تصفح ملفات القضايا التجريبية — عرض تجريبي للتطوير.';
 }

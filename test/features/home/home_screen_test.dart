@@ -118,6 +118,7 @@ void main() {
                   canViewSettings: true,
                   canBookConsultation: false,
                   canViewAttorneyDiscovery: true,
+                  canViewMatters: true,
                 ),
               },
             ),
@@ -165,6 +166,7 @@ void main() {
                   canViewSettings: true,
                   canBookConsultation: true,
                   canViewAttorneyDiscovery: false,
+                  canViewMatters: false,
                 ),
               },
             ),
@@ -174,6 +176,50 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Find an attorney'), findsNothing);
+    });
+  });
+
+  group('matter entry (Phase 7 slice 7.1)', () {
+    testWidgets('renders the entry card with the default capability map', (
+      tester,
+    ) async {
+      await tester.pumpWidget(pumpHome(const Locale('en')));
+      await tester.pumpAndSettle();
+
+      // The default roleCapabilities grants canViewMatters to every
+      // bootstrap role (D-M6), so the demo client sees the matter entry
+      // on the dashboard (nav hint only, never an authorization grant).
+      expect(find.text('My matters'), findsOneWidget);
+      expect(find.textContaining('Browse demo matter files'), findsOneWidget);
+    });
+
+    testWidgets('hides the entry when the capability is not granted', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        BlocProvider<AuthCubit>.value(
+          value: authCubit,
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: HomeScreen(
+              capabilitiesForRole: <UserRole, RoleCapability>{
+                UserRole.client: const RoleCapability(
+                  canViewHome: true,
+                  canViewSettings: true,
+                  canBookConsultation: true,
+                  canViewAttorneyDiscovery: true,
+                  canViewMatters: false,
+                ),
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('My matters'), findsNothing);
     });
   });
 

@@ -223,5 +223,15 @@
   "discoveryProfileTitle": "Avukat profili",
   "discoveryProfileNotFound": "Avukat bulunamadı.",
   "discoveryProfileBio": "Hakkında",
-  "discoveryProfileBook": "Bu avukatla rezervasyon yap"
+  "discoveryProfileBook": "Bu avukatla rezervasyon yap",
+  "matterTitle": "Davalar",
+  "matterFilterAll": "Tümü",
+  "matterStatusOpen": "Açık",
+  "matterStatusActive": "Aktif",
+  "matterStatusClosed": "Kapalı",
+  "matterEmpty": "Filtreyle eşleşen dava yok.",
+  "matterError": "Davalar yüklenemedi.",
+  "matterLocalOnlyNote": "Demo modu — yalnızca sentetik davalar. Gerçek davalar listelenmez.",
+  "matterEntryTitle": "Davalarım",
+  "matterEntrySubtitle": "Demo dava dosyalarına göz atın — geliştirme demosu."
 }

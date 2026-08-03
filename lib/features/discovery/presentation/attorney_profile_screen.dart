@@ -8,9 +8,9 @@ import '../../../app/service_locator.dart';
 import '../../../core/state/view_state.dart';
 import '../../../features/booking/domain/booking_prefill.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/widgets.dart';
 import '../domain/attorney.dart';
 import '../domain/attorney_gateway.dart';
-import 'attorney_labels.dart';
 import 'discovery_cubit.dart';
 import 'discovery_state.dart';
 

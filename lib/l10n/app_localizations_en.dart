@@ -685,4 +685,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get discoveryProfileBook => 'Book with this attorney';
+
+  @override
+  String get matterTitle => 'Matters';
+
+  @override
+  String get matterFilterAll => 'All';
+
+  @override
+  String get matterStatusOpen => 'Open';
+
+  @override
+  String get matterStatusActive => 'Active';
+
+  @override
+  String get matterStatusClosed => 'Closed';
+
+  @override
+  String get matterEmpty => 'No matters match the filter.';
+
+  @override
+  String get matterError => 'Unable to load matters.';
+
+  @override
+  String get matterLocalOnlyNote =>
+      'Demo mode — synthetic matters only. No real cases are listed.';
+
+  @override
+  String get matterEntryTitle => 'My matters';
+
+  @override
+  String get matterEntrySubtitle =>
+      'Browse demo matter files — development demo.';
 }

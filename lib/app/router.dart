@@ -15,6 +15,7 @@ import '../features/discovery/presentation/attorney_profile_screen.dart';
 import '../features/discovery/presentation/attorney_search_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/home/presentation/settings_screen.dart';
+import '../features/matters/presentation/matter_list_screen.dart';
 import '../features/notifications/presentation/notification_settings_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/onboarding/presentation/onboarding_success_screen.dart';
@@ -42,6 +43,7 @@ class AppRoutes {
   static const String book = '/book';
   static const String discovery = '/discovery';
   static const String discoveryProfile = '/discovery/:attorneyId';
+  static const String matters = '/matters';
 
   /// The profile route for one attorney (path-param substitution).
   static String attorneyProfile(String attorneyId) => '/discovery/$attorneyId';
@@ -125,6 +127,11 @@ GoRouter createAppRouter(
               AttorneyProfileScreen(
                 attorneyId: state.pathParameters['attorneyId'] ?? '',
               ),
+        ),
+        GoRoute(
+          path: AppRoutes.matters,
+          builder: (BuildContext context, GoRouterState state) =>
+              const MatterListScreen(),
         ),
         GoRoute(
           path: AppRoutes.settings,

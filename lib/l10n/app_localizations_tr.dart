@@ -686,4 +686,36 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get discoveryProfileBook => 'Bu avukatla rezervasyon yap';
+
+  @override
+  String get matterTitle => 'Davalar';
+
+  @override
+  String get matterFilterAll => 'Tümü';
+
+  @override
+  String get matterStatusOpen => 'Açık';
+
+  @override
+  String get matterStatusActive => 'Aktif';
+
+  @override
+  String get matterStatusClosed => 'Kapalı';
+
+  @override
+  String get matterEmpty => 'Filtreyle eşleşen dava yok.';
+
+  @override
+  String get matterError => 'Davalar yüklenemedi.';
+
+  @override
+  String get matterLocalOnlyNote =>
+      'Demo modu — yalnızca sentetik davalar. Gerçek davalar listelenmez.';
+
+  @override
+  String get matterEntryTitle => 'Davalarım';
+
+  @override
+  String get matterEntrySubtitle =>
+      'Demo dava dosyalarına göz atın — geliştirme demosu.';
 }

@@ -29,6 +29,8 @@ import '../features/booking/domain/booking_gateway.dart';
 import '../features/booking/domain/booking_prefill.dart';
 import '../features/discovery/data/fake_attorney_gateway.dart';
 import '../features/discovery/domain/attorney_gateway.dart';
+import '../features/matters/data/fake_matter_gateway.dart';
+import '../features/matters/domain/matter_gateway.dart';
 import '../features/notifications/data/in_memory_notification_prefs_store.dart';
 import '../features/notifications/data/shared_preferences_notification_prefs_store.dart';
 import '../features/notifications/domain/notification_prefs_store.dart';
@@ -191,6 +193,13 @@ void configureDependencies({
     // in-memory only, never serialized. The org hub seeds/reads it; the
     // server re-derives membership per D-08.
     serviceLocator.registerLazySingleton<ActiveOrgStore>(ActiveOrgStore.new);
+  }
+  if (!serviceLocator.isRegistered<MatterGateway>()) {
+    // Stateless service: lazy singleton. The matter Cubit is feature-scoped
+    // and created per screen via BlocProvider, so it is NOT registered here.
+    // Fake-domain (D-M2): a real matters backend is a later approved
+    // data-layer slice (roadmap §11 boundary).
+    serviceLocator.registerLazySingleton<MatterGateway>(FakeMatterGateway.new);
   }
   if (!serviceLocator.isRegistered<AuthCubit>()) {
     // App-scoped because the router and all screens observe one session seam.

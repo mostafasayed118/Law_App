@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../core/practice_area.dart';
 import '../../../core/state/view_state.dart';
 import '../domain/attorney.dart';
 

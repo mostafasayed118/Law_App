@@ -18,6 +18,7 @@ class RoleCapability extends Equatable {
     required this.canViewSettings,
     required this.canBookConsultation,
     required this.canViewAttorneyDiscovery,
+    required this.canViewMatters,
   });
 
   final bool canViewHome;
@@ -34,12 +35,18 @@ class RoleCapability extends Equatable {
   /// (D-A1/D-A2).
   final bool canViewAttorneyDiscovery;
 
+  /// Phase 7 (scope note D-M6): whether the home dashboard offers the matter
+  /// dashboard entry. A navigation/visibility hint only, like the other
+  /// flags — matters are read-first and the list is synthetic (D-M1/D-M2).
+  final bool canViewMatters;
+
   @override
   List<Object?> get props => <Object?>[
     canViewHome,
     canViewSettings,
     canBookConsultation,
     canViewAttorneyDiscovery,
+    canViewMatters,
   ];
 }
 
@@ -50,35 +57,41 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewSettings: true,
         canBookConsultation: true,
         canViewAttorneyDiscovery: true,
+        canViewMatters: true,
       ),
       UserRole.attorney: RoleCapability(
         canViewHome: true,
         canViewSettings: true,
         canBookConsultation: true,
         canViewAttorneyDiscovery: true,
+        canViewMatters: true,
       ),
       UserRole.partner: RoleCapability(
         canViewHome: true,
         canViewSettings: true,
         canBookConsultation: true,
         canViewAttorneyDiscovery: true,
+        canViewMatters: true,
       ),
       UserRole.complianceOfficer: RoleCapability(
         canViewHome: true,
         canViewSettings: true,
         canBookConsultation: true,
         canViewAttorneyDiscovery: true,
+        canViewMatters: true,
       ),
       UserRole.researchAnalyst: RoleCapability(
         canViewHome: true,
         canViewSettings: true,
         canBookConsultation: true,
         canViewAttorneyDiscovery: true,
+        canViewMatters: true,
       ),
       UserRole.admin: RoleCapability(
         canViewHome: true,
         canViewSettings: true,
         canBookConsultation: true,
         canViewAttorneyDiscovery: true,
+        canViewMatters: true,
       ),
     };

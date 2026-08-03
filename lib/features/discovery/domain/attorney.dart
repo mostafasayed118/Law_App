@@ -1,14 +1,5 @@
 import 'package:equatable/equatable.dart';
-
-/// The practice areas an attorney profile may list (Phase 6, D-A5).
-///
-/// Four values mirroring the home dashboard's practice-area fixtures
-/// (`l10n.areaCorporate` … `l10n.areaFamily`), which the discovery surface
-/// reuses for labels — no new l10n keys are needed for the areas themselves.
-/// The enum-pin test in `attorney_test.dart` enforces the set, so adding an
-/// area is a deliberate owner decision (same discipline as the `BookingCategory`
-/// G2 pin).
-enum PracticeArea { corporate, civil, criminal, family }
+import '../../../core/practice_area.dart';
 
 /// A synthetic attorney profile (Phase 6, owner decision D-A4).
 ///

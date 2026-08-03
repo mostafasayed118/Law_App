@@ -23,18 +23,21 @@ void main() {
         canViewSettings: true,
         canBookConsultation: true,
         canViewAttorneyDiscovery: true,
+        canViewMatters: true,
       );
       const RoleCapability b = RoleCapability(
         canViewHome: true,
         canViewSettings: true,
         canBookConsultation: true,
         canViewAttorneyDiscovery: true,
+        canViewMatters: true,
       );
       const RoleCapability c = RoleCapability(
         canViewHome: true,
         canViewSettings: false,
         canBookConsultation: false,
         canViewAttorneyDiscovery: false,
+        canViewMatters: false,
       );
 
       expect(a, equals(b));

@@ -237,5 +237,15 @@
   "discoveryProfileTitle": "Attorney profile",
   "discoveryProfileNotFound": "Attorney not found.",
   "discoveryProfileBio": "About",
-  "discoveryProfileBook": "Book with this attorney"
+  "discoveryProfileBook": "Book with this attorney",
+  "matterTitle": "Matters",
+  "matterFilterAll": "All",
+  "matterStatusOpen": "Open",
+  "matterStatusActive": "Active",
+  "matterStatusClosed": "Closed",
+  "matterEmpty": "No matters match the filter.",
+  "matterError": "Unable to load matters.",
+  "matterLocalOnlyNote": "Demo mode — synthetic matters only. No real cases are listed.",
+  "matterEntryTitle": "My matters",
+  "matterEntrySubtitle": "Browse demo matter files — development demo."
 }

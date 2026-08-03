@@ -4,6 +4,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/practice_area.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/features/discovery/domain/attorney.dart';
 import 'package:legalhub/features/discovery/domain/attorney_gateway.dart';

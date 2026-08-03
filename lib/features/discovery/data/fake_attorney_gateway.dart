@@ -1,4 +1,5 @@
 import '../../../core/errors/result.dart';
+import '../../../core/practice_area.dart';
 import '../domain/attorney.dart';
 import '../domain/attorney_gateway.dart';
 

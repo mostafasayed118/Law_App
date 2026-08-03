@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/errors/app_error.dart';
 import '../../../core/errors/result.dart';
+import '../../../core/practice_area.dart';
 import '../../../core/state/view_state.dart';
 import '../domain/attorney.dart';
 import '../domain/attorney_gateway.dart';

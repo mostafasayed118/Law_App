@@ -28,6 +28,8 @@ import 'package:legalhub/features/booking/domain/booking_gateway.dart';
 import 'package:legalhub/features/booking/domain/booking_prefill.dart';
 import 'package:legalhub/features/discovery/data/fake_attorney_gateway.dart';
 import 'package:legalhub/features/discovery/domain/attorney_gateway.dart';
+import 'package:legalhub/features/matters/data/fake_matter_gateway.dart';
+import 'package:legalhub/features/matters/domain/matter_gateway.dart';
 import 'package:legalhub/features/orgs/presentation/active_org_store.dart';
 
 /// Hand-rolled fake of the [SupabaseAuthApi] seam for the DI flip test.
@@ -207,6 +209,7 @@ void main() {
       expect(serviceLocator.isRegistered<BookingPrefill>(), isTrue);
       expect(serviceLocator.isRegistered<AttorneyGateway>(), isTrue);
       expect(serviceLocator.isRegistered<ActiveOrgStore>(), isTrue);
+      expect(serviceLocator.isRegistered<MatterGateway>(), isTrue);
       expect(serviceLocator.isRegistered<AuthCubit>(), isTrue);
     });
 
@@ -305,6 +308,15 @@ void main() {
       // the dev fake is the registered seam; a real attorney backend is a
       // later approved data-layer slice.
       expect(serviceLocator<AttorneyGateway>(), isA<FakeAttorneyGateway>());
+    });
+
+    test('wires the matter gateway to the fake dev implementation', () {
+      configureDependencies();
+
+      // D-M2: same boundary discipline as the discovery/booking gateways —
+      // the dev fake is the registered seam; a real matter backend is a
+      // later approved data-layer slice.
+      expect(serviceLocator<MatterGateway>(), isA<FakeMatterGateway>());
     });
 
     test('wires the booking gateway to the fake dev implementation', () {
