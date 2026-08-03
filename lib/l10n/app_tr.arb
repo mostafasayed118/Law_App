@@ -202,5 +202,13 @@
   "bookingSuccessBody": "Referans: {referenceId}",
   "bookingDone": "Bitti",
   "bookingEntryTitle": "Danışma rezervasyonu",
-  "bookingEntrySubtitle": "Bir danışma planlayın — geliştirme demosu."
+  "bookingEntrySubtitle": "Bir danışma planlayın — geliştirme demosu.",
+  "discoveryTitle": "Avukat Bul",
+  "discoverySearchHint": "İsme veya uygulama alanına göre ara",
+  "discoveryFilterAll": "Tümü",
+  "discoveryEmpty": "Aramanızla eşleşen avukat yok.",
+  "discoveryError": "Avukatlar yüklenemedi.",
+  "discoveryLocalOnlyNote": "Demo modu — yalnızca sentetik profiller. Gerçek avukatlar listelenmez veya iletişime geçilmez.",
+  "discoveryEntryTitle": "Bir avukat bul",
+  "discoveryEntrySubtitle": "Demo avukat profillerine göz atın — geliştirme demosu."
 }

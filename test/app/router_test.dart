@@ -296,6 +296,40 @@ void main() {
     });
   });
 
+  group('discovery route (Phase 6 slice 6.1)', () {
+    testWidgets('renders the search surface for an authenticated demo session', (
+      tester,
+    ) async {
+      // AttorneySearchScreen resolves AttorneyGateway from the locator
+      // (the dev fake in env-less runs).
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      router.go(AppRoutes.discovery);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // The /discovery route renders the search surface, not home; the
+      // shell keeps home highlighted (not a settings descendant).
+      expect(find.text('Find an Attorney'), findsOneWidget);
+      expect(find.text('Layla Mansour'), findsOneWidget);
+      expect(selectedIndex(tester), 0);
+    });
+
+    testWidgets('blocks unauthenticated access to the discovery route', (
+      tester,
+    ) async {
+      router.go(AppRoutes.discovery);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Welcome Back'), findsOneWidget);
+      expect(authCubit.state.isAuthenticated, isFalse);
+    });
+  });
+
   group('organization route (1.5 pin)', () {
     testWidgets('renders the roster for an authenticated demo session', (
       tester,
@@ -482,6 +516,7 @@ void main() {
               canViewHome: true,
               canViewSettings: false,
               canBookConsultation: true,
+              canViewAttorneyDiscovery: true,
             ),
           },
         );
@@ -524,6 +559,7 @@ void main() {
               canViewHome: false,
               canViewSettings: true,
               canBookConsultation: false,
+              canViewAttorneyDiscovery: false,
             ),
           },
         );
@@ -589,6 +625,7 @@ void main() {
             canViewHome: false,
             canViewSettings: false,
             canBookConsultation: false,
+            canViewAttorneyDiscovery: false,
           ),
         },
       );

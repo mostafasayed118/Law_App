@@ -639,4 +639,30 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get bookingEntrySubtitle =>
       'Schedule a consultation — development demo.';
+
+  @override
+  String get discoveryTitle => 'Find an Attorney';
+
+  @override
+  String get discoverySearchHint => 'Search by name or practice area';
+
+  @override
+  String get discoveryFilterAll => 'All';
+
+  @override
+  String get discoveryEmpty => 'No attorneys match your search.';
+
+  @override
+  String get discoveryError => 'Unable to load attorneys.';
+
+  @override
+  String get discoveryLocalOnlyNote =>
+      'Demo mode — synthetic profiles only. No real attorneys are listed or contacted.';
+
+  @override
+  String get discoveryEntryTitle => 'Find an attorney';
+
+  @override
+  String get discoveryEntrySubtitle =>
+      'Browse demo attorney profiles — development demo.';
 }

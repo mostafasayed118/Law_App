@@ -640,4 +640,30 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get bookingEntrySubtitle =>
       'Bir danışma planlayın — geliştirme demosu.';
+
+  @override
+  String get discoveryTitle => 'Avukat Bul';
+
+  @override
+  String get discoverySearchHint => 'İsme veya uygulama alanına göre ara';
+
+  @override
+  String get discoveryFilterAll => 'Tümü';
+
+  @override
+  String get discoveryEmpty => 'Aramanızla eşleşen avukat yok.';
+
+  @override
+  String get discoveryError => 'Avukatlar yüklenemedi.';
+
+  @override
+  String get discoveryLocalOnlyNote =>
+      'Demo modu — yalnızca sentetik profiller. Gerçek avukatlar listelenmez veya iletişime geçilmez.';
+
+  @override
+  String get discoveryEntryTitle => 'Bir avukat bul';
+
+  @override
+  String get discoveryEntrySubtitle =>
+      'Demo avukat profillerine göz atın — geliştirme demosu.';
 }

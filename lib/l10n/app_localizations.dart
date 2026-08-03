@@ -1281,6 +1281,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Schedule a consultation — development demo.'**
   String get bookingEntrySubtitle;
+
+  /// No description provided for @discoveryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find an Attorney'**
+  String get discoveryTitle;
+
+  /// No description provided for @discoverySearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name or practice area'**
+  String get discoverySearchHint;
+
+  /// No description provided for @discoveryFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get discoveryFilterAll;
+
+  /// No description provided for @discoveryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No attorneys match your search.'**
+  String get discoveryEmpty;
+
+  /// No description provided for @discoveryError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load attorneys.'**
+  String get discoveryError;
+
+  /// No description provided for @discoveryLocalOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo mode — synthetic profiles only. No real attorneys are listed or contacted.'**
+  String get discoveryLocalOnlyNote;
+
+  /// No description provided for @discoveryEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find an attorney'**
+  String get discoveryEntryTitle;
+
+  /// No description provided for @discoveryEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse demo attorney profiles — development demo.'**
+  String get discoveryEntrySubtitle;
 }
 
 class _AppLocalizationsDelegate

@@ -11,6 +11,7 @@ import '../features/auth/presentation/forgot_password/forgot_password_reset_scre
 import '../features/auth/presentation/sign_in_screen.dart';
 import '../features/auth/presentation/sign_up_screen.dart';
 import '../features/booking/presentation/booking_screen.dart';
+import '../features/discovery/presentation/attorney_search_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/home/presentation/settings_screen.dart';
 import '../features/notifications/presentation/notification_settings_screen.dart';
@@ -38,6 +39,7 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String notifications = '/notifications';
   static const String book = '/book';
+  static const String discovery = '/discovery';
 }
 
 /// Routes are navigation UX only. They do not authorize access to any future
@@ -106,6 +108,11 @@ GoRouter createAppRouter(
           path: AppRoutes.book,
           builder: (BuildContext context, GoRouterState state) =>
               const BookingScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.discovery,
+          builder: (BuildContext context, GoRouterState state) =>
+              const AttorneySearchScreen(),
         ),
         GoRoute(
           path: AppRoutes.settings,

@@ -22,16 +22,19 @@ void main() {
         canViewHome: true,
         canViewSettings: true,
         canBookConsultation: true,
+        canViewAttorneyDiscovery: true,
       );
       const RoleCapability b = RoleCapability(
         canViewHome: true,
         canViewSettings: true,
         canBookConsultation: true,
+        canViewAttorneyDiscovery: true,
       );
       const RoleCapability c = RoleCapability(
         canViewHome: true,
         canViewSettings: false,
         canBookConsultation: false,
+        canViewAttorneyDiscovery: false,
       );
 
       expect(a, equals(b));
@@ -48,7 +51,7 @@ void main() {
     });
 
     test(
-      'grants home + settings visibility to every role in the bootstrap',
+      'grants home + settings + booking + discovery visibility to every role',
       () {
         // The bootstrap capability map is intentionally degenerate: every role
         // can see home + settings. This test pins that current-state contract
@@ -62,6 +65,9 @@ void main() {
           // Phase 5 (D-B7 standalone): every bootstrap role also gets the
           // booking entry in the demo capability map.
           expect(cap.canBookConsultation, isTrue, reason: 'role $role');
+          // Phase 6 (D-A6): discovery is visible to every bootstrap role —
+          // navigation hint only, never authorization.
+          expect(cap.canViewAttorneyDiscovery, isTrue, reason: 'role $role');
         }
       },
     );

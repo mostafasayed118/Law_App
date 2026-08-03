@@ -202,5 +202,13 @@
   "bookingSuccessBody": "المرجع: {referenceId}",
   "bookingDone": "تم",
   "bookingEntryTitle": "احجز استشارة",
-  "bookingEntrySubtitle": "جدولة استشارة — عرض تجريبي للتطوير."
+  "bookingEntrySubtitle": "جدولة استشارة — عرض تجريبي للتطوير.",
+  "discoveryTitle": "ابحث عن محامٍ",
+  "discoverySearchHint": "ابحث بالاسم أو مجال الممارسة",
+  "discoveryFilterAll": "الكل",
+  "discoveryEmpty": "لا يوجد محامون يطابقون بحثك.",
+  "discoveryError": "تعذّر تحميل المحامين.",
+  "discoveryLocalOnlyNote": "وضع تجريبي — ملفات تعريفية اصطناعية فقط. لا يتم عرض محامين حقيقيين أو التواصل معهم.",
+  "discoveryEntryTitle": "ابحث عن محامٍ",
+  "discoveryEntrySubtitle": "تصفح ملفات المحامين التجريبية — عرض تجريبي للتطوير."
 }

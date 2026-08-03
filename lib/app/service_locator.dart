@@ -26,6 +26,8 @@ import '../features/auth/domain/sign_up_gateway.dart';
 import '../features/auth/presentation/auth_cubit.dart';
 import '../features/booking/data/fake_booking_gateway.dart';
 import '../features/booking/domain/booking_gateway.dart';
+import '../features/discovery/data/fake_attorney_gateway.dart';
+import '../features/discovery/domain/attorney_gateway.dart';
 import '../features/notifications/data/in_memory_notification_prefs_store.dart';
 import '../features/notifications/data/shared_preferences_notification_prefs_store.dart';
 import '../features/notifications/domain/notification_prefs_store.dart';
@@ -164,6 +166,15 @@ void configureDependencies({
     // and created per screen via BlocProvider, so it is NOT registered here.
     serviceLocator.registerLazySingleton<BookingGateway>(
       FakeBookingGateway.new,
+    );
+  }
+  if (!serviceLocator.isRegistered<AttorneyGateway>()) {
+    // Stateless service: lazy singleton. The discovery Cubit is feature-scoped
+    // and created per screen via BlocProvider, so it is NOT registered here.
+    // Fake-domain (D-A2): a real attorney backend is a later approved
+    // data-layer slice.
+    serviceLocator.registerLazySingleton<AttorneyGateway>(
+      FakeAttorneyGateway.new,
     );
   }
   if (!serviceLocator.isRegistered<AuthCubit>()) {

@@ -117,6 +117,7 @@ void main() {
                   canViewHome: true,
                   canViewSettings: true,
                   canBookConsultation: false,
+                  canViewAttorneyDiscovery: true,
                 ),
               },
             ),
@@ -126,6 +127,53 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Book a consultation'), findsNothing);
+    });
+  });
+
+  group('discovery entry (Phase 6 slice 6.1)', () {
+    testWidgets('renders the entry card with the default capability map', (
+      tester,
+    ) async {
+      await tester.pumpWidget(pumpHome(const Locale('en')));
+      await tester.pumpAndSettle();
+
+      // The default roleCapabilities grants canViewAttorneyDiscovery to
+      // every bootstrap role (D-A6), so the demo client sees the discovery
+      // entry on the dashboard (nav hint only, never an authorization
+      // grant).
+      expect(find.text('Find an attorney'), findsOneWidget);
+      expect(
+        find.textContaining('Browse demo attorney profiles'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('hides the entry when the capability is not granted', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        BlocProvider<AuthCubit>.value(
+          value: authCubit,
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: HomeScreen(
+              capabilitiesForRole: <UserRole, RoleCapability>{
+                UserRole.client: const RoleCapability(
+                  canViewHome: true,
+                  canViewSettings: true,
+                  canBookConsultation: true,
+                  canViewAttorneyDiscovery: false,
+                ),
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Find an attorney'), findsNothing);
     });
   });
 

@@ -634,4 +634,30 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get bookingEntrySubtitle => 'جدولة استشارة — عرض تجريبي للتطوير.';
+
+  @override
+  String get discoveryTitle => 'ابحث عن محامٍ';
+
+  @override
+  String get discoverySearchHint => 'ابحث بالاسم أو مجال الممارسة';
+
+  @override
+  String get discoveryFilterAll => 'الكل';
+
+  @override
+  String get discoveryEmpty => 'لا يوجد محامون يطابقون بحثك.';
+
+  @override
+  String get discoveryError => 'تعذّر تحميل المحامين.';
+
+  @override
+  String get discoveryLocalOnlyNote =>
+      'وضع تجريبي — ملفات تعريفية اصطناعية فقط. لا يتم عرض محامين حقيقيين أو التواصل معهم.';
+
+  @override
+  String get discoveryEntryTitle => 'ابحث عن محامٍ';
+
+  @override
+  String get discoveryEntrySubtitle =>
+      'تصفح ملفات المحامين التجريبية — عرض تجريبي للتطوير.';
 }

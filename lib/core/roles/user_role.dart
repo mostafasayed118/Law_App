@@ -17,6 +17,7 @@ class RoleCapability extends Equatable {
     required this.canViewHome,
     required this.canViewSettings,
     required this.canBookConsultation,
+    required this.canViewAttorneyDiscovery,
   });
 
   final bool canViewHome;
@@ -27,11 +28,18 @@ class RoleCapability extends Equatable {
   /// other flags — the demo booking flow makes no backend promise (D-B3).
   final bool canBookConsultation;
 
+  /// Phase 6 (scope note D-A6): whether the home dashboard offers the
+  /// attorney-discovery entry. A navigation/visibility hint only, like the
+  /// other flags — discovery is read-only and the profile list is synthetic
+  /// (D-A1/D-A2).
+  final bool canViewAttorneyDiscovery;
+
   @override
   List<Object?> get props => <Object?>[
     canViewHome,
     canViewSettings,
     canBookConsultation,
+    canViewAttorneyDiscovery,
   ];
 }
 
@@ -41,30 +49,36 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewHome: true,
         canViewSettings: true,
         canBookConsultation: true,
+        canViewAttorneyDiscovery: true,
       ),
       UserRole.attorney: RoleCapability(
         canViewHome: true,
         canViewSettings: true,
         canBookConsultation: true,
+        canViewAttorneyDiscovery: true,
       ),
       UserRole.partner: RoleCapability(
         canViewHome: true,
         canViewSettings: true,
         canBookConsultation: true,
+        canViewAttorneyDiscovery: true,
       ),
       UserRole.complianceOfficer: RoleCapability(
         canViewHome: true,
         canViewSettings: true,
         canBookConsultation: true,
+        canViewAttorneyDiscovery: true,
       ),
       UserRole.researchAnalyst: RoleCapability(
         canViewHome: true,
         canViewSettings: true,
         canBookConsultation: true,
+        canViewAttorneyDiscovery: true,
       ),
       UserRole.admin: RoleCapability(
         canViewHome: true,
         canViewSettings: true,
         canBookConsultation: true,
+        canViewAttorneyDiscovery: true,
       ),
     };

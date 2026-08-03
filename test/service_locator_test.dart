@@ -25,6 +25,8 @@ import 'package:legalhub/features/auth/domain/sign_up_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/booking/data/fake_booking_gateway.dart';
 import 'package:legalhub/features/booking/domain/booking_gateway.dart';
+import 'package:legalhub/features/discovery/data/fake_attorney_gateway.dart';
+import 'package:legalhub/features/discovery/domain/attorney_gateway.dart';
 
 /// Hand-rolled fake of the [SupabaseAuthApi] seam for the DI flip test.
 /// The real `SupabaseAuthApiImpl.bind()` needs a running `Supabase.instance`,
@@ -200,6 +202,7 @@ void main() {
       expect(serviceLocator.isRegistered<SignUpGateway>(), isTrue);
       expect(serviceLocator.isRegistered<OrganizationGateway>(), isTrue);
       expect(serviceLocator.isRegistered<BookingGateway>(), isTrue);
+      expect(serviceLocator.isRegistered<AttorneyGateway>(), isTrue);
       expect(serviceLocator.isRegistered<AuthCubit>(), isTrue);
     });
 
@@ -228,6 +231,13 @@ void main() {
         identical(
           serviceLocator<BookingGateway>(),
           serviceLocator<BookingGateway>(),
+        ),
+        isTrue,
+      );
+      expect(
+        identical(
+          serviceLocator<AttorneyGateway>(),
+          serviceLocator<AttorneyGateway>(),
         ),
         isTrue,
       );
@@ -268,6 +278,15 @@ void main() {
       // Same boundary discipline as the recovery gateway: the dev fake is the
       // registered seam and real sign-up remains a later approved slice.
       expect(serviceLocator<SignUpGateway>(), isA<FakeSignUpGateway>());
+    });
+
+    test('wires the attorney gateway to the fake dev implementation', () {
+      configureDependencies();
+
+      // D-A2: same boundary discipline as the booking/recovery gateways —
+      // the dev fake is the registered seam; a real attorney backend is a
+      // later approved data-layer slice.
+      expect(serviceLocator<AttorneyGateway>(), isA<FakeAttorneyGateway>());
     });
 
     test('wires the booking gateway to the fake dev implementation', () {

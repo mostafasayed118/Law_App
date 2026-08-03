@@ -8,6 +8,7 @@ import '../../../app/router.dart';
 import '../../../core/roles/user_role.dart';
 import '../../../features/auth/presentation/auth_cubit.dart' show AuthCubit;
 import '../../../features/booking/presentation/booking_entry_card.dart';
+import '../../../features/discovery/presentation/discovery_entry_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/widgets.dart';
 import 'widgets/home_cards.dart';
@@ -114,6 +115,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (capabilities.canBookConsultation) ...[
                     const SizedBox(height: LegalHubTheme.spaceLg),
                     BookingEntryCard(onTap: () => context.go(AppRoutes.book)),
+                  ],
+                  if (capabilities.canViewAttorneyDiscovery) ...[
+                    const SizedBox(height: LegalHubTheme.spaceMd),
+                    DiscoveryEntryCard(
+                      onTap: () => context.go(AppRoutes.discovery),
+                    ),
                   ],
                 ]),
               ),

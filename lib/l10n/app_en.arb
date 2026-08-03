@@ -216,5 +216,13 @@
   },
   "bookingDone": "Done",
   "bookingEntryTitle": "Book a consultation",
-  "bookingEntrySubtitle": "Schedule a consultation — development demo."
+  "bookingEntrySubtitle": "Schedule a consultation — development demo.",
+  "discoveryTitle": "Find an Attorney",
+  "discoverySearchHint": "Search by name or practice area",
+  "discoveryFilterAll": "All",
+  "discoveryEmpty": "No attorneys match your search.",
+  "discoveryError": "Unable to load attorneys.",
+  "discoveryLocalOnlyNote": "Demo mode — synthetic profiles only. No real attorneys are listed or contacted.",
+  "discoveryEntryTitle": "Find an attorney",
+  "discoveryEntrySubtitle": "Browse demo attorney profiles — development demo."
 }
