@@ -39,7 +39,7 @@
 | D-B4 | Single `/book` route with an internal step switcher; the draft never travels in route params / GoRouter `extra` | implemented |
 | D-B5 | Review → category "Edit category" jump (an addition beyond the 4-step diagram, ratified here) | implemented |
 | D-B6 | No live-payment copy anywhere (spec §6); `booking_success` wording stays local-only | implemented |
-| D-B7 | **DECIDED 2026-08-03 — (a) standalone.** Attorney-discovery dependency: spec §4 lists "Attorney discovery (read-only)" before booking and the design set carries `attorney_search, attorney_profile` ahead of the booking screens, but the spec does not couple them (separate MVP bullets, separate screen groups; the booking flow row has no attorney step). Phase 5 proceeds with the shelved flow as built (category/topic/slot); a future discovery phase adds an **optional** `attorneyId` to `BookingRequest` + a "book from attorney profile" entry behind the same `BookingGateway` seam — an additive slice, not a Phase 5 blocker. | decided 2026-08-03 (a) |
+| D-B7 | **DECIDED 2026-08-03 — (a) standalone**; **LANDED 2026-08-03** in `05f13c8`/`0eb7ec9`. Attorney-discovery dependency: spec §4 lists "Attorney discovery (read-only)" before booking and the design set carries `attorney_search, attorney_profile` ahead of the booking screens, but the spec does not couple them (separate MVP bullets, separate screen groups; the booking flow row has no attorney step). Phase 5 proceeds with the shelved flow as built (category/topic/slot); a future discovery phase adds an **optional** `attorneyId` to `BookingRequest` + a "book from attorney profile" entry behind the same `BookingGateway` seam — an additive slice, not a Phase 5 blocker. | decided 2026-08-03 (a); landed (additive `attorneyId` slice deferred) |
 
 ## 4. Scope
 
@@ -100,10 +100,12 @@ must map to a named test; an AC without one is not met.
 - Fake-domain: the real booking data contract is deferred to P2/P3; this
   phase adds no backend, no schema/RLS/policy, no matrix addendum (booking
   is not an org-surface).
-- No attorney-discovery integration (D-B7 decided 2026-08-03: standalone; additive `attorneyId` slice later), no availability logic, no payment, no
+- No attorney-discovery integration (D-B7 decided 2026-08-03: standalone; additive `attorneyId` slice **deferred**, see decision record), no availability logic, no payment, no
   video/phone/in-person consultation modes (D-B1).
-- The four checks were **NOT** run against the branch on this machine (R1) —
-  green-ness is asserted by its authors, not verified here.
+- The four checks were **NOT** run against the branch on this machine at
+  drafting time (R1) — at landing (`05f13c8`/`0eb7ec9`/`3bd3d29`) the full
+  gate stack was run on the merged tree: format CLEAN, analyze clean, 521
+  tests pass, ledger PASS 115.
 
 ## 7. Risks
 
@@ -124,5 +126,6 @@ must map to a named test; an AC without one is not met.
 
 ## 8. Exit
 
-Roadmap row advanced → decision record ratified → UI + routing slice built →
-four checks green → suite/README count in lockstep → owner push approval.
+Roadmap row advanced → decision record ratified (D-B1…D-B7) → UI + routing
+slice built → four checks green → suite/README count in lockstep (521) →
+owner push approval. **All met 2026-08-03** — Phase 5 SHIPPED.

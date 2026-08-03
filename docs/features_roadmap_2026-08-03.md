@@ -24,12 +24,14 @@
 > (`deb72d8`); 4.1 (deep-link recovery) **APPROVED + IMPLEMENTED
 > 2026-08-03** (scope note `docs/p4_41_deeplink_recovery_scope_2026-08-03.md`),
 > committed with this roadmap's gate-table row.
-> Phase 5 (consultation booking, MVP, no live payment) is **DRAFT 2026-08-03
-> — UNSCHEDULED.** `feat/booking-flow` (3 commits, 2026-08-02) was **shelved
-> on the owner's review**: spec-listed (§4 MVP) but headless (no screen /
-> route), unverifiable approval citations in its code comments, and 60 main
-> commits of divergence at review time. Landing requires the gate-table row
-> below + `docs/booking_scope_2026-08-03.md` (decision record + real ACs).
+> Phase 5 (consultation booking, MVP, no live payment) **IMPLEMENTED AND
+> SHIPPED 2026-08-03** (`05f13c8` slice 5.0 land the shelved layer; `0eb7ec9`
+> slices 5.1–5.2 screen + route + capability entry + l10n; `3bd3d29` slice
+> 5.3 l10n pin; `d55e273` README sync to 521) — the `feat/booking-flow`
+> layer was previously **shelved** (spec-listed §4 MVP but headless;
+> unverifiable approval citations in its code comments; 60 main commits of
+> divergence), landed per the gate-table row below and the decision record
+> in `docs/booking_scope_2026-08-03.md` (D-B1…D-B7 ratified, D-B7 standalone).
 > Everything in §9 stays deferred until P0 closes.
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
@@ -204,8 +206,15 @@ backout in place).
 
 ## 7. Phase 5 — Consultation booking (MVP, no live payment)
 
-**Gate:** scope note approval → decision-record ratification (D-B7 resolved
-2026-08-03: standalone) → **land the shelved layer** (merge
+**Status: IMPLEMENTED + SHIPPED 2026-08-03** — `05f13c8` (slice 5.0: land
+the shelved layer + DI), `0eb7ec9` (slices 5.1–5.2: wizard screen, `/book`
+route, capability entry, EN/AR/TR l10n), `3bd3d29` (slice 5.3: l10n
+resolution pin), `d55e273` (README count sync). Full gate stack passed on
+the merged tree: format CLEAN, analyze clean, **521 tests pass**, ledger
+PASS 115. Pushed to `origin/main` on the owner's approval.
+
+**Gate (as designed):** scope note approval → decision-record ratification
+(D-B7 resolved 2026-08-03: standalone) → **land the shelved layer** (merge
 `feat/booking-flow`; four checks green on the merged tree; AC↔test map
 closed per scope note §5) → UI + routing slice (screen, /book route,
 app-shell entry, EN/AR/TR) → full B2 gate stack → owner push approval.
@@ -248,7 +257,7 @@ owner approval.
 | 2 | Phase 2 — org lifecycle wiring | Phase 1 (same seams) | no | spec-lite scope note → approval → gate stack | **SHIPPED 2026-08-03 (`68aafc6`, slices 2.1–2.4)** |
 | 3 | Phase 3 — server amendments | Phase 1/2 (surface defined) | **yes** | spec → RLS-gate review → rehearsal evidence → apply approval → apply execution → matrix addendum | **APPLIED 2026-08-03** (`docs/p3_r1_roster_rpc_design_2026-08-03.md` + matrix §2 addendum + `docs/p3_r1_rehearsal_plan_2026-08-03.md` + evidence r1 PASSED + `supabase/rpc/list_org_members_metadata.sql` + `_down.sql` drop → applied to dev project on the owner's dated apply approval) |
 | 4 | Phase 4 — auth plumbing | — | 4.1 yes (platform config) | platform config approval → gate stack | **4.2 SHIPPED 2026-08-03 (`deb72d8`); 4.1 APPROVED + IMPLEMENTED 2026-08-03 (scope note `docs/p4_41_deeplink_recovery_scope_2026-08-03.md`); R1 = dashboard Redirect URL (owner-side)** |
-| 5 | Phase 5 — consultation booking (no live payment) | MVP spec §4; auth/org track (§§3–4); D-B7 resolved (standalone) | no | scope note → decision-record ratification → UI + routing slice → gate stack → owner push approval | **UNSCHEDULED** — DRAFT scope note `docs/booking_scope_2026-08-03.md`; `feat/booking-flow` shelved 2026-08-03 |
+| 5 | Phase 5 — consultation booking (no live payment) | MVP spec §4; auth/org track (§§3–4); D-B7 resolved (standalone) | no | scope note → decision-record ratification → UI + routing slice → gate stack → owner push approval | **SHIPPED 2026-08-03** (`05f13c8` + `0eb7ec9` + `3bd3d29` + `d55e273`, suite 521, ledger PASS 115; pushed to origin/main) |
 | — | §9 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Deferred |
 
 Rules that apply to every phase (definition-of-done from
