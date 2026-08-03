@@ -101,10 +101,22 @@ confirmed-empty baseline) before anything is applied to the shared dev
 project (contract §11-P2 exit, rollback_plan §2). Any matrix negative row
 starting to pass = immediate revert, never fix-forward (rollback_plan §5).
 
+## Phase 3 R1 (applied 2026-08-03)
+
+On 2026-08-03 the reviewed forward artifact `rpc/list_org_members_metadata.sql`
+(partner-scoped roster RPC, design `docs/p3_r1_roster_rpc_design_2026-08-03.md`)
+and its one-line `rpc/_down.sql` drop were added to the repo. The ephemeral
+rehearsal passed (r1 evidence `docs/p3_r1_rehearsal_evidence_r1_2026-08-03.md`,
+finding A1 folded in), the owner recorded the dated apply approval, and the
+RPC was **applied to the dev project on 2026-08-03** — the applied surface
+is now the P2 slice (Up 1–5) **plus** the 18th RPC, with the amended
+`_down.sql` drop line as backout.
+
 ## What this directory does NOT authorize
 
 - No Supabase change beyond the reviewed + applied slice (Up 1–5, executed
-  2026-08-01 on the dev project; §4.5 manual smoke pending).
+  2026-08-01 on the dev project; §4.5 manual smoke pending) and the
+  **applied** Phase 3 R1 slice above (2026-08-03).
 - No matter/doc schema, no storage/realtime policy (Q4 deferral), no real
   data, no service-role usage, no compliance claim.
 - The Flutter code (`lib/`) is untouched by this slice.

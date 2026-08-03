@@ -8,11 +8,15 @@
 > (`docs/p3_r1_roster_rpc_design_2026-08-03.md`) into an applied-and-proven
 > one.
 >
-> **Status: READY — NOT EXECUTED.** Requires owner approval of the design
-> first; then this plan runs **ephemeral-only** and produces r-series
-> evidence (`docs/p3_r1_rehearsal_evidence_r1_2026-08-03.md`). Running this
-> plan authorizes nothing on the shared dev project — the apply approval is
-> a separate dated record after the rehearsal passes.
+> **Status: EXECUTED — r1 PASSED 2026-08-03.** The design was **approved
+> 2026-08-03** (owner directed implementation); this plan ran
+> **ephemeral-only** against `law-app-p3-r1-rehearsal-r1`
+> (`iqmesfjgbzcczcncdbdt`, created + deleted 2026-08-03) and produced the
+> r1 evidence record (`docs/p3_r1_rehearsal_evidence_r1_2026-08-03.md`).
+> One finding (A1: UNION column aliases) was folded into the slice and
+> re-probed. After the owner's dated apply approval, the slice was applied
+> to the dev project on 2026-08-03. Running this plan authorized nothing
+> beyond the rehearsal — the apply approval was a separate dated record.
 >
 > **Date:** 2026-08-03. **Owner:** Project Owner (github.com/mostafasayed118).
 >
@@ -35,10 +39,10 @@ dev project.
 | Gate step | Artifact | Status |
 |---|---|---|
 | Spec record (R1 + R1 extension) | P3 spec §5 · Phase 2 scope note §3/§5 | ✅ Recorded |
-| RLS-gate design review | `docs/p3_r1_roster_rpc_design_2026-08-03.md` + matrix §2 addendum | ⏳ **Awaiting owner review** |
-| **Ephemeral rehearsal (this plan)** | `docs/p3_r1_rehearsal_plan_2026-08-03.md` → evidence r1 | 📋 Ready, **not executed** |
-| Apply approval for the dev project | explicit dated owner record | ⛔ Blocked on rehearsal pass |
-| Apply execution + verify | per apply-approval record | ⛔ Not started |
+| RLS-gate design review | `docs/p3_r1_roster_rpc_design_2026-08-03.md` + matrix §2 addendum | ✅ **Approved 2026-08-03** (owner directed implementation) |
+| **Ephemeral rehearsal (this plan)** | `docs/p3_r1_rehearsal_plan_2026-08-03.md` → evidence r1 | ✅ **PASSED 2026-08-03** (finding A1 folded in, re-probed) |
+| Apply approval for the dev project | explicit dated owner record | ✅ **Approved 2026-08-03** |
+| Apply execution + verify | per apply-approval record | ✅ **Applied 2026-08-03** to `eutmvevpskerzpqmwplv` (18 RPCs; grant matrix verified; `_down.sql` backout in place) |
 | Close (matrix addendum takes effect, D-T6 cross-ref, roadmap) | post-apply records | ⛔ Not started |
 
 ---
@@ -51,10 +55,12 @@ dev project.
 - **Baseline before the amendment:** the **full committed P2 slice exactly
   as applied to dev** (`3704a1d`): migrations `01_org_schema` →
   `02_rls_functions` → `03_platform_config_seed` (owner uid filled from the
-  ephemeral project's own verified `auth.users` id), the 5 policy files, and
-  the 17 RPC files. The amendment rehearses **on top of** the applied P2
-  surface — a `db reset`/re-apply of the committed slice on the ephemeral
-  project is acceptable.
+  ephemeral project's own verified `auth.users` id), the 6 policy files, and
+  the 17 RPC files. The R1 forward artifact
+  (`supabase/rpc/list_org_members_metadata.sql`) exists in the repo working
+  tree but is **unapplied** — it is NOT part of the applied baseline. The
+  amendment rehearses **on top of** the applied P2 surface — a `db reset`/
+  re-apply of the committed slice on the ephemeral project is acceptable.
 - **Connectivity:** URL + anon key from the local git-ignored `.env`. **No
   service-role key anywhere.** No credential leaves the machine.
 - **Rehearsal evidence:** every step's output pasted into

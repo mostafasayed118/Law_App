@@ -2,17 +2,25 @@
 
 > **Record type:** The RLS-gate design review artifact for Phase 3, R1 — the
 > partner-scoped member-metadata RPC (`list_org_members_metadata`). **Docs
-> only.** No schema, RPC, policy, grant, or dev-project change is created,
-> applied, or authorized by this document. The SQL here is an *illustrative
-> design sketch for review*, not an executable migration. Following the P2
-> discipline gate: **design → review → rehearsal → approval → apply →
-> verify → close**; this document is step 1 (design, awaiting owner review).
+> only**: this document itself creates, applies, or authorizes no schema,
+> RPC, policy, grant, or dev-project change. The §3 SQL was an *illustrative
+> design sketch for review*; on **owner approval 2026-08-03** it was
+> materialized as the forward artifact `supabase/rpc/list_org_members_metadata.sql`
+> (+ one-line `_down.sql` backout) **in the repo working tree, uncommitted**.
+> **Nothing has been applied to any project.** Following the P2 discipline
+> gate: **design → review → rehearsal → approval → apply → verify →
+> close**; this document is step 1 (design, **owner-approved 2026-08-03**)
+> — rehearsal → apply remain.
 >
-> **Status:** **DESIGNED (2026-08-03) — NOT APPROVED, NOT IMPLEMENTED.**
-> Owner review pending. Nothing reaches `supabase/` or the dev project until
-> the rehearsal plan (`docs/p3_r1_rehearsal_plan_2026-08-03.md`) passes
-> against an ephemeral project and the owner records explicit apply
-> approval.
+> **Status:** **APPROVED + IMPLEMENTED + APPLIED (dev) 2026-08-03.** The
+> owner approved the design and directed implementation; the forward
+> artifact `supabase/rpc/list_org_members_metadata.sql` and its one-line
+> `_down.sql` backout were added to the repo. The ephemeral rehearsal passed
+> (`docs/p3_r1_rehearsal_evidence_r1_2026-08-03.md`, r1 — one finding A1
+> folded in: UNION column aliases), the owner recorded the dated apply
+> approval, and the RPC was applied to the dev project
+> (`eutmvevpskerzpqmwplv`) on 2026-08-03 with the verified grant matrix.
+> Backout: the amended `_down.sql` drop line.
 >
 > **Date:** 2026-08-03.
 >
@@ -34,16 +42,18 @@
 | Phase 3 gate step (P2 discipline) | Artifact | Status |
 |---|---|---|
 | Spec record | R1 in `docs/p3_organization_membership_spec_2026-08-03.md` §5; R1 extension in `docs/p3_phase2_scope_2026-08-03.md` §3/§5 | ✅ Recorded |
-| RLS-gate design review | **This document** + matrix §2 addendum (2026-08-03) | ⏳ **Awaiting owner review** |
-| Ephemeral rehearsal with evidence (r-series) | `docs/p3_r1_rehearsal_plan_2026-08-03.md` | 📋 Plan written; **not executed** (needs design approval to run) |
-| Dated apply-approval record | (none yet) | ⛔ Not started — blocked on rehearsal pass |
-| Apply execution with rollback pairing | (none yet) | ⛔ Not started |
+| RLS-gate design review | **This document** + matrix §2 addendum (2026-08-03) | ✅ **Approved 2026-08-03** (owner directed implementation) |
+| Implementation (repo artifact) | `supabase/rpc/list_org_members_metadata.sql` + one-line `rpc/_down.sql` drop | ✅ Added 2026-08-03 (amended with finding A1 aliases) |
+| Ephemeral rehearsal with evidence (r-series) | `docs/p3_r1_rehearsal_plan_2026-08-03.md` → evidence r1 | ✅ **PASSED 2026-08-03** (finding A1 folded in, re-probed) |
+| Dated apply-approval record | owner approval 2026-08-03 | ✅ Recorded (apply authorized after rehearsal pass) |
+| Apply execution with rollback pairing | RPC applied to dev `eutmvevpskerzpqmwplv` | ✅ **Applied 2026-08-03**; 18 slice RPCs; grant matrix verified; backout = amended `_down.sql` drop line |
 | Matrix addendum before it ships | §2 addendum inserted into `docs/permission_matrix.md` (2026-08-03) | ✅ Authored (PROPOSED; takes effect on apply approval) |
 
-**Constraint reminder:** no schema/RPC/policy change on the dev project, no
-implementation code, no service-role key, no real data, and **no new RPC
-beyond the one reviewed amendment** (Q5 surface minimality) until rehearsal
-passes and apply approval is recorded.
+**Constraint reminder:** no schema/RPC/policy change **on the dev project**
+beyond the applied R1 slice; no service-role key; no real data; no further
+RPC beyond the one reviewed amendment (Q5 surface minimality). The slice was
+applied on 2026-08-03 with the rehearsal-passed grant matrix; any further
+change requires a new design → review → rehearsal → apply cycle.
 
 ---
 
@@ -109,8 +119,9 @@ begin
     -- COALESCE — defensive against orphan memberships: a membership whose
     -- profiles row is missing still appears, with a static fallback name,
     -- instead of dropping the roster row)
-    select m.organization_id, m.user_id, null::uuid, null::text,
-           coalesce(p.display_name, '(no profile)'), coalesce(p.locale, 'en'),
+    select m.organization_id, m.user_id, null::uuid as invitation_id, null::text as email,
+           coalesce(p.display_name, '(no profile)') as display_name,
+           coalesce(p.locale, 'en') as locale,
            m.role, m.status, m.created_at, m.updated_at
       from public.memberships m
       left join public.profiles p on p.user_id = m.user_id
@@ -260,6 +271,19 @@ owner, not a suspended/removed partner.
 | The caller's own row | present in the roster (partner is a member) |
 | Orphan-membership defense (LEFT JOIN + COALESCE) | a membership whose `profiles` row is missing still appears, with the static fallback `'(no profile)'`/`'en'` — no row dropped, no error, no uuid/email leakage |
 
+**Roster-surface divergence (audit finding F1, 2026-08-03):** the
+orphan-membership defense above applies **only to this RPC** — it does not
+change the shipped owner surface. `list_members_metadata`
+(`supabase/rpc/list_members_metadata.sql`) joins `profiles` with an **INNER
+JOIN**: an orphan membership (missing profile row) is silently **dropped**
+from the owner roster, never fallback-named. That asymmetry is
+**intentional**: the owner surface assumes complete data (trusted owner,
+signup-trigger guarantee) and stays strict, while the partner surface is
+defensive (belt-and-braces, redaction-safe fallback, ADR-0003). The
+divergence is deliberate and is **not** reconciled by this amendment —
+parity would require a separate reviewed RPC amendment (the Q5 minimality
+trigger, §9), never a silent change to the owner surface or `_down.sql`.
+
 **No policy change — the D-T6 pair (the pivotal assertion):**
 `profiles` stays own-row-only **and** the RPC returns other members' names.
 The rehearsal asserts both sides of the pair:
@@ -317,6 +341,15 @@ The Phase 3 client slice (post-approval) must map this contract:
 |---|---|---|
 | `supabase/rpc/list_org_members_metadata.sql` | `rpc/_down.sql` amended with `drop function if exists public.list_org_members_metadata(uuid);` (the file's blanket `revoke execute on all functions in schema public from authenticated` already covers the grant) | RPC inventory returns to 17; `has_function_privilege('authenticated', ..., 'EXECUTE')` on the dropped name → false; `\df public.*` back to the P2 set; `pg_default_acl` byte-equal; policy reads still work (R-4 canary) |
 
+> **Note (audit finding F4, 2026-08-03):** the `_down.sql` header still
+> reads "consolidated backout for the entire P2 RPC surface" and becomes
+> slightly stale once the R1 drop line lands — the one-line amendment
+> discipline (rehearsal §3 step 2) deliberately does not refresh the header
+> comment. The staleness is benign: the **drop list**, not the header, is the
+> authoritative backout, and the blanket revoke already strips the R1
+> grant. The header is refreshed only if the file is touched for another
+> reason (e.g. a future amendment) — never as part of the one-line diff.
+
 **Trigger conditions (rollback_plan §5 + this amendment's own):** any of
 these = immediate revert, never fix-forward:
 
@@ -350,21 +383,31 @@ reject → amend this doc):
 7. The matrix §2 addendum (2026-08-03) and roadmap update
    (`docs/features_roadmap_2026-08-03.md`: Phase 3 → DESIGNED) reflect this
    design exactly.
+8. **Roster-surface divergence (audit finding F1) confirmed intentional:**
+   the owner confirms that the new partner RPC keeps orphan memberships with
+   the `'(no profile)'` fallback (LEFT JOIN + COALESCE) while the shipped
+   owner RPC `list_members_metadata` drops them (INNER JOIN) — and that the
+   owner surface **intentionally stays strict** (§6). **This confirmation is
+   recorded in the dated apply-approval record** (apply approval is blocked
+   without it).
 
 ---
 
 ## 11. What this document does NOT authorize
 
 - No Supabase project change, migration, RPC, policy, grant, or config —
-   nothing here has been or will be run.
-- No implementation code (`supabase/`, `lib/`, `test/` untouched).
+   nothing here has been **applied or run**.
+- No implementation beyond the reviewed amendment: the forward artifact
+   (`supabase/rpc/list_org_members_metadata.sql`) and its one-line
+   `_down.sql` backout exist in the repo; `lib/` and `test/` are untouched.
 - No dev-project change of any kind until the rehearsal
    (`docs/p3_r1_rehearsal_plan_2026-08-03.md`) passes against an ephemeral
    project and the owner records dated apply approval.
 - No second RPC, no policy widening, no invite emails (R2), no deep links
    (Phase 4), no real data, no service-role key, no compliance claim.
 
-**Next step:** owner review of this design + the matrix §2 addendum +
-rehearsal plan. On approval, the rehearsal plan runs ephemeral-only and
-produces the r-series evidence; apply to the dev project happens only under
-a separate dated apply-approval record.
+**Next step:** the approved design's rehearsal plan
+(`docs/p3_r1_rehearsal_plan_2026-08-03.md`) runs ephemeral-only and produces
+the r-series evidence; apply to the dev project happens only under a
+separate dated apply-approval record (which must record the owner's F1
+confirmation per §10 item 8).

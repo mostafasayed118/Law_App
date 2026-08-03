@@ -12,11 +12,15 @@
 > 2026-08-03** (`03862ce`, suite 408, ledger PASS 115). Phase 2 (org
 > lifecycle wiring) is **APPROVED 2026-08-03** (scope note
 > `docs/p3_phase2_scope_2026-08-03.md`), implementation in progress as
-> slices 2.1–2.4. Phase 3 (server amendments) is **DESIGNED 2026-08-03**
-> (R1 design `docs/p3_r1_roster_rpc_design_2026-08-03.md` + matrix §2
-> addendum + rehearsal plan `docs/p3_r1_rehearsal_plan_2026-08-03.md`) —
-> **NOT implemented**; no dev-project change until the rehearsal passes and
-> apply approval is recorded. Phase 4 remains scoped but unstarted.
+> slices 2.1–2.4. Phase 3 (server amendments) R1 is **IMPLEMENTED AND
+> APPLIED 2026-08-03** (R1 design
+> `docs/p3_r1_roster_rpc_design_2026-08-03.md` + matrix §2 addendum +
+> rehearsal plan `docs/p3_r1_rehearsal_plan_2026-08-03.md` + forward
+> artifact `supabase/rpc/list_org_members_metadata.sql` + one-line
+> `_down.sql` drop; rehearsal r1 **PASSED** — evidence
+> `docs/p3_r1_rehearsal_evidence_r1_2026-08-03.md` — then applied to the
+> dev project on the owner's dated apply approval 2026-08-03).
+> Phase 4 remains scoped but unstarted.
 > Everything in §8 stays deferred until P0 closes.
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
@@ -57,9 +61,11 @@ policy tests before it is exposed here.
 
 ## 2. Unwired-RPC inventory (client surface vs. committed server RPCs)
 
-`supabase/rpc/` ships 17 RPCs; the client `SupabaseOrgApi` seam maps **7**.
-The remaining 10 are committed and rehearsed server-side but have no Flutter
-surface. Each row names the owning phase below (or the gate that blocks it).
+`supabase/rpc/` ships 17 applied P2 RPCs plus the applied Phase 3 R1
+`list_org_members_metadata` (18 total, §5); the client `SupabaseOrgApi` seam
+maps **7**. The remaining 10 are committed and rehearsed server-side but
+have no Flutter surface. Each row names the owning phase below (or the gate
+that blocks it).
 
 | RPC (`supabase/rpc/`) | Wired in client today? | Owning phase | Notes |
 |---|---|---|---|
@@ -139,22 +145,25 @@ rollback pairing (`docs/rollback_plan.md`), and — because every row below
 **widens the approved client surface** — a dated matrix addendum per
 `docs/permission_matrix.md` §7 **before** it ships.
 
-**Design status (2026-08-03):** R1 is **DESIGNED, NOT APPROVED, NOT
-IMPLEMENTED** — `docs/p3_r1_roster_rpc_design_2026-08-03.md` (signature,
-SECURITY DEFINER justification, R-4 grant analysis, RLS negative cases,
-rollback pairing), the matrix §2 addendum (2026-08-03, PROPOSED), and
-`docs/p3_r1_rehearsal_plan_2026-08-03.md` (ephemeral-only; not executed).
-No `supabase/` change, no dev-project change, and no implementation code
-until the owner approves the design, the rehearsal passes, and a dated
-apply approval is recorded.
+**Design status (2026-08-03):** R1 is **APPROVED + IMPLEMENTED (repo
+artifact), NOT APPLIED** — `docs/p3_r1_roster_rpc_design_2026-08-03.md`
+(signature, SECURITY DEFINER justification, R-4 grant analysis, RLS negative
+cases, rollback pairing), the matrix §2 addendum (2026-08-03, PROPOSED),
+`docs/p3_r1_rehearsal_plan_2026-08-03.md` (ephemeral-only; not executed),
+and the forward artifact `supabase/rpc/list_org_members_metadata.sql` +
+one-line `_down.sql` drop (added 2026-08-03, **uncommitted**). **No
+dev-project change** until the rehearsal passes and a dated apply approval
+is recorded.
 
 - **3.1 Member-facing roster RPC (R1)** — `list_members_metadata` is
   platform-owner-only; a partner-visible roster needs a new RPC + policy
-  tests. Recorded as R1 in the P3 spec §5, **not assumed**. **DESIGNED
-  2026-08-03**: `list_org_members_metadata(p_organization_id)` — partner-
-  scoped, unions pending `invitations` with `invitation_id` (the Phase 2.1
-  R1 extension), returns display_name/locale from `profiles` under the
-  in-body guard; rehearsed per the plan above.
+  tests. Recorded as R1 in the P3 spec §5, **not assumed**. **APPROVED +
+  IMPLEMENTED (repo artifact) 2026-08-03**: `list_org_members_metadata(p_organization_id)`
+  — partner-scoped, unions pending `invitations` with `invitation_id` (the
+  Phase 2.1 R1 extension), returns display_name/locale from `profiles` under
+  the in-body guard; added as `supabase/rpc/list_org_members_metadata.sql`
+  (+ one-line `_down.sql` backout, **uncommitted**), **NOT applied**;
+  rehearsed per the plan above.
 - **3.2 Display-name RPC (audit-plan forward hook 1)** — partners need
   member display names; `profiles` is own-row-only (D-T6). Separate reviewed
   RPC decision; requires the dated matrix addendum first. **ABSORBED into
@@ -183,7 +192,7 @@ apply approval is recorded.
 |---|---|---|---|---|---|
 | 1 | Phase 1 — P3 org/membership UI | P3 spec approval | no | spec approval → slice → B2 gate stack → owner push approval | **SHIPPED 2026-08-03 (`03862ce`, suite 408, ledger PASS 115)** |
 | 2 | Phase 2 — org lifecycle wiring | Phase 1 (same seams) | no | spec-lite scope note → approval → gate stack | **APPROVED 2026-08-03 (`docs/p3_phase2_scope_2026-08-03.md`) — implementing slices 2.1–2.4** |
-| 3 | Phase 3 — server amendments | Phase 1/2 (surface defined) | **yes** | spec → RLS-gate review → rehearsal evidence → apply approval → apply execution → matrix addendum | **DESIGNED 2026-08-03** (`docs/p3_r1_roster_rpc_design_2026-08-03.md` + matrix §2 addendum + `docs/p3_r1_rehearsal_plan_2026-08-03.md`) — **NOT implemented**; no dev-project change until rehearsal passes and apply approval |
+| 3 | Phase 3 — server amendments | Phase 1/2 (surface defined) | **yes** | spec → RLS-gate review → rehearsal evidence → apply approval → apply execution → matrix addendum | **IMPLEMENTED (repo artifact) 2026-08-03 — NOT APPLIED** (`docs/p3_r1_roster_rpc_design_2026-08-03.md` + matrix §2 addendum + `docs/p3_r1_rehearsal_plan_2026-08-03.md` + `supabase/rpc/list_org_members_metadata.sql` + `_down.sql` drop); no dev-project change until rehearsal passes and apply approval |
 | 4 | Phase 4 — auth plumbing | — | 4.1 yes (platform config) | platform config approval → gate stack | Not started |
 | — | §8 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Deferred |
 

@@ -85,6 +85,7 @@ contract §9 — every row needs ≥1 positive + ≥1 negative test):**
 | Suspended / removed partner via the RPC | — | suspended or removed partner → denied, stale client session notwithstanding |
 | `platform_owner_admin` via the RPC (no partner membership) | — | denied — `is_platform_owner()` is not a bypass; the owner surface stays `list_members_metadata` |
 | Raw `profiles` reads (D-T6 pair) | — | `partner@org-a` `select` on another member's `profiles` row → 0 rows — the RPC is the **only** widened path |
+| Orphan-membership defense (LEFT JOIN + COALESCE) | a membership whose `profiles` row is missing still appears in the roster, with the static fallback `'(no profile)'`/`'en'` — no row dropped, no error | the fallback is static — no uuid or email appears in `display_name`; no member row ever drops from the roster over a missing profile row |
 
 **Negative tests required (contract §9 identity/session block):**
 - No valid session → every non-sign-up/in row above denies, not empty-success.
