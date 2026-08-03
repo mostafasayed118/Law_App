@@ -53,7 +53,8 @@ every table below — this is the default-deny baseline (contract §2.1).
 > implement. Resolution: **amend the matrix, not the slice** — the default-deny
 > direction (own-row-only for every non-owner role), with the partner's §3
 > roster access unchanged. A partner needing a member's display name in P3 is
-> a separate reviewed RPC decision, not this row. Recorded as **D-T6** in
+> a separate reviewed RPC decision, not this row (sequenced as **Phase 3.2**
+> of the planning roadmap, `docs/features_roadmap_2026-08-03.md`). Recorded as **D-T6** in
 > `docs/tracked_deviations.md`; this addendum satisfies the §7
 > dated-addendum discipline.
 
@@ -81,6 +82,13 @@ every table below — this is the default-deny baseline (contract §2.1).
 | Remove a member | ❌ deny | ❌ deny | ✅ (own org) | ❌ deny | ❌ deny |
 | Delete a synthetic demo account | ❌ deny | ❌ deny | ❌ deny | ❌ deny | ✅ |
 | Switch active organization (own memberships) | ✅ | ✅ | ✅ | ✅ | n/a (no org membership) |
+
+The partner-facing client surface for these rows (invite, change role,
+suspend/reactivate, remove, switch active org) is the P3 org/membership UI
+slice — **Phase 1** of the planning roadmap
+(`docs/features_roadmap_2026-08-03.md`, the owning planning document); rows
+needing new server RPCs (member-facing roster, display names) are Phase 3
+there.
 
 **Negative tests required (contract §9 tenant/membership block):**
 - An active `org-a` member cannot read/write/subscribe-to/download `org-b`
@@ -138,7 +146,9 @@ matrix (a single powerful account):
   `platform_owner_admin` actor reference — **it is not exempt from
   auditing just because it's the owner's own account.**
 - Enforced server-side only (RLS/RPC); a client-side "isOwner" flag is a UX
-  affordance, never the authorization boundary.
+  affordance, never the authorization boundary. No owner admin screen ships
+  until the Addendum's server-side enforcement + auditing story is complete —
+  deferred in the planning roadmap (`docs/features_roadmap_2026-08-03.md` §8).
 
 **Negative test required:** an authenticated session bearing the
 `platform_owner_admin` capability but attempting to read a document/message
@@ -169,4 +179,5 @@ This matrix satisfies the "signed permission matrix... positive and negative
 cases" precondition in `p0_decision_capture.md` §2. It must be extended (not
 replaced) as new MVP actions are approved — do not silently widen an
 existing row without a dated addendum, per the same discipline used in
-`gate3_reconciliation.md`.
+`gate3_reconciliation.md`. Planned extensions and their sequencing live in
+the planning roadmap (`docs/features_roadmap_2026-08-03.md`).

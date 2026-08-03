@@ -158,7 +158,8 @@ The following remain excluded regardless of the §3 permitted slice:
 - No invitation UX or invitation backend.
 - No sign-in / sign-up / recovery **screens**. The P1 slice is contracts,
   fakes, and tests only. Any screen built on `AuthCubit`,
-  `PasswordRecoveryCubit`, or `OrganizationContextCubit` is P3 work and
+  `PasswordRecoveryCubit`, or `OrganizationContextCubit` is P3 work
+  (roadmap **Phase 1**, `docs/features_roadmap_2026-08-03.md`) and
   remains gated.
 - No legal workflow, conflict check, waiver, ethical wall, regulatory
   filing, research/AI, payment, analytics, or compliance claim.
@@ -174,7 +175,7 @@ The following remain excluded regardless of the §3 permitted slice:
 | P0 — Decision capture | Partially advanced: §5 policy shape confirmed; §10.2/§10.5 assigned to the project owner (2026-07-31, per `docs/gate3_reconciliation.md`). | Close §10.1 (product model), §10.7 (org semantics), §10.8 (role vocabulary) before P2. |
 | P1 — Domain contracts + synthetic adapter | **Approved (design-only, Option C).** WIP remains uncommitted. | Separate closeout/commit authorization from the owner. |
 | P2 — Non-production schema + enforcement | Not authorized *(as of this record). **P2 approved 2026-08-01** via `docs/p0_decision_capture.md` §3 — RLS gate review passed, §8 Q1–Q6 answered.* | All §10 blockers relevant to identity/tenant decided; non-production backend available; signed permission matrix; retention/deletion/audit documented; rollback plan; mandatory Supabase/RLS review gate (bootstrap spec §6/§9). |
-| P3 — Auth + org UX | Not authorized. | P2 exit (cross-tenant denial proven across every access path) + explicit P3 approval. |
+| P3 — Auth + org UX | Not authorized. | P2 exit (cross-tenant denial proven across every access path) + explicit P3 approval — the org/membership UI slice is **Phase 1** of the planning roadmap (`docs/features_roadmap_2026-08-03.md`, the owning planning document), gated on owner approval of `docs/p3_organization_membership_spec_2026-08-03.md`. |
 | P4 — Security review + controlled rollout | Not authorized. | P3 exit + explicit release approval. |
 
 The bootstrap spec's "future gate: mandatory Supabase/RLS review before any

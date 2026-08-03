@@ -41,7 +41,9 @@
 > approval discipline) · `docs/gate3_decision.md` +
 > `docs/gate3_reconciliation.md` · `docs/p0_decision_capture.md` ·
 > `docs/adr/0007` · `docs/tracked_deviations.md` ·
-> `docs/legalhub_bootstrap_specification.md`.
+> `docs/legalhub_bootstrap_specification.md` ·
+> `docs/features_roadmap_2026-08-03.md` (owning planning document for
+> post-`006fd62` feature work).
 >
 > **Constraints:** Every batch is a delivery slice per `INSTRUCTIONS.md`
 > §2.1 (Understanding → Discovery → Recommendation → Slice → **Gate** →
@@ -254,7 +256,9 @@ the code). Suite 222/222.
 > `docs/p2_schema_rls_design.md` §5.2 (`profiles` own-row-only) and decide
 > whether to add a narrow display-name RPC. Any such RPC **widens** the
 > approved client surface — it requires a dated matrix addendum per matrix
-> §7 before it can ship, and it must be reviewed, not silently picked up.
+> §7 before it can ship, and it must be reviewed, not silently picked
+> up. Sequenced as **Phase 3.2** of the planning roadmap
+> (`docs/features_roadmap_2026-08-03.md`).
 
 ---
 

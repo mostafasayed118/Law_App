@@ -7,6 +7,10 @@ where it lives, its status, and the batch or slice that owns its resolution.
 The batches and slices cited in this file (and in `docs/adr/0007`) are
 defined in the canonical execution plan: [`codebase_audit_plan.md`](codebase_audit_plan.md).
 
+Planned feature work beyond those batches — including the P3
+org/membership UI slice and its follow-up phases — is sequenced in the
+owning planning document: [`features_roadmap_2026-08-03.md`](features_roadmap_2026-08-03.md).
+
 Architecture decisions — expensive to reverse, cross-feature, or
 safety-critical — live in [`adr/`](adr/). This file is for the rest: known
 bugs deferred for a focused slice, and unfinished work that is intentionally
@@ -141,7 +145,8 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
   comment marks the capability map as UX-only, never authorization).
 - **Status:** **TRACKED (2026-08-01).** Confirmed intentional by the P2 RLS
   gate review (Q3). Not to be "fixed" by adding non-MVP roles to the schema
-  enum, nor by silently deleting code enum values before P3.
+  enum, nor by silently deleting code enum values before P3 (the P3 UI
+  slice is roadmap **Phase 1**, `docs/features_roadmap_2026-08-03.md`).
 - **Owner:** P2 RLS gate review (2026-08-01).
 - **Cross-reference:** `docs/p2_schema_rls_design.md` §3 (reconciliation
   flag), §4.1; `docs/p0_decision_capture.md` §1 D-09.
@@ -165,4 +170,6 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
 - **Owner:** Project Owner (github.com/mostafasayed118), 2026-08-01.
 - **Cross-reference:** `docs/permission_matrix.md` §2 (addendum),
   §7 (dated-addendum discipline); `docs/p2_schema_rls_design.md` §5.2;
-  `docs/p2_rehearsal_plan.md` §4 (row updated to RESOLVED).
+  `docs/p2_rehearsal_plan.md` §4 (row updated to RESOLVED);
+  `docs/features_roadmap_2026-08-03.md` Phase 3.2 (display-name RPC
+  forward hook).
