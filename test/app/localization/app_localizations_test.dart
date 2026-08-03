@@ -59,6 +59,28 @@ void main() {
       expect(tr.cancel, 'İptal');
     });
 
+    test('resolves the booking surface keys in every locale (5.3 pin)', () {
+      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+      final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+      final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+      expect(en.bookingTitle, 'Book a Consultation');
+      expect(ar.bookingTitle, 'احجز استشارة');
+      expect(tr.bookingTitle, 'Danışma Rezervasyonu');
+      expect(en.bookingCategoryGeneral, 'General');
+      expect(ar.bookingCategoryGeneral, 'عامة');
+      expect(tr.bookingCategoryGeneral, 'Genel');
+      expect(en.bookingSuccessTitle, 'Booking confirmed');
+      expect(ar.bookingSuccessTitle, 'تم تأكيد الحجز');
+      expect(tr.bookingSuccessTitle, 'Rezervasyon onaylandı');
+      // Real per-locale wording, not silent copies of EN.
+      expect(tr.bookingConfirmFailed, isNot(en.bookingConfirmFailed));
+      expect(ar.bookingConfirmFailed, isNot(en.bookingConfirmFailed));
+      // The local-only demo note resolves in every locale (D-B3/D-B6 copy).
+      expect(tr.bookingLocalOnlyNote, isNot(en.bookingLocalOnlyNote));
+      expect(ar.bookingLocalOnlyNote, isNot(en.bookingLocalOnlyNote));
+    });
+
     test('resolves the sign-up check-inbox keys in every locale (4.2 pin)', () {
       final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
       final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
