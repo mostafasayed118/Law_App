@@ -18,9 +18,10 @@ import 'package:legalhub/l10n/app_localizations.dart';
 // placeholders). These tests pump the whole flow through the router with a
 // capturing gateway so the asserted object is the one the screen built.
 //
-// Also pins the §4.4 no-false-assurance fix: the OTP "Resend" control is
-// disabled and carries the "unavailable in demo" label, not the plain
-// "Resend Code" label that implies a code was sent.
+// Also pins the real resend wiring (2026-08-03, D1 revised): the OTP "Resend"
+// control repeats the step-1 code request through the gateway and carries the
+// plain "Resend Code" label, because a real provider path exists in
+// configured builds and the dev fake acknowledges sends.
 void main() {
   late FakeAuthGateway authGateway;
   late AuthCubit authCubit;
@@ -105,8 +106,12 @@ void main() {
   );
 
   testWidgets(
-    'the OTP resend control is disabled and does not imply a sent code',
+    'the OTP resend control repeats the step-1 request for the same email',
     (tester) async {
+      final _CapturingRecoveryGateway gateway = _CapturingRecoveryGateway();
+      await serviceLocator.reset();
+      serviceLocator.registerSingleton<PasswordRecoveryGateway>(gateway);
+
       await tester.pumpWidget(pumpRouter());
       await tester.pumpAndSettle();
 
@@ -121,22 +126,50 @@ void main() {
           .onPressed!();
       await tester.pumpAndSettle();
 
-      // The resend control is disabled (onPressed null) — §4.4 no-false-
-      // assurance: a tappable no-op would imply a code was sent.
+      // The resend control is enabled and carries the plain "Resend Code"
+      // label — a real provider path exists, so it is never a false
+      // assurance (2026-08-03, D1 revised).
       final TextButton resend = tester.widget<TextButton>(
         find.byType(TextButton).last,
       );
-      expect(resend.onPressed, isNull);
-      // The label states "unavailable in demo", not the plain "Resend Code"
-      // that implies a sent code.
-      expect(find.text('Resend Code (unavailable in demo)'), findsOneWidget);
-      expect(find.text('Resend Code'), findsNothing);
+      expect(resend.onPressed, isNotNull);
+      expect(find.text('Resend Code'), findsOneWidget);
+
+      // Tapping resend repeats the step-1 request with the threaded email and
+      // shows the code-sent acknowledgement.
+      resend.onPressed!();
+      await tester.pumpAndSettle();
+      expect(gateway.requestedEmails, <String>[
+        'amira@example.com',
+        'amira@example.com',
+      ]);
+      expect(
+        find.text('Verification code sent to your inbox.'),
+        findsOneWidget,
+      );
     },
   );
 }
 
 class _CapturingRecoveryGateway implements PasswordRecoveryGateway {
   PasswordRecoveryRequest? received;
+  final List<String> requestedEmails = <String>[];
+  final List<String> verifiedEmails = <String>[];
+
+  @override
+  Future<Result<void>> requestCode({required String email}) async {
+    requestedEmails.add(email);
+    return Result<void>.success(null);
+  }
+
+  @override
+  Future<Result<void>> verifyCode({
+    required String email,
+    required String otp,
+  }) async {
+    verifiedEmails.add(email);
+    return Result<void>.success(null);
+  }
 
   @override
   Future<Result<void>> reset(PasswordRecoveryRequest request) async {

@@ -110,6 +110,16 @@ late _CountingGateway _countingGateway;
 
 class _AlwaysSucceedsGateway implements PasswordRecoveryGateway {
   @override
+  Future<Result<void>> requestCode({required String email}) async =>
+      const Result<void>.success(null);
+
+  @override
+  Future<Result<void>> verifyCode({
+    required String email,
+    required String otp,
+  }) async => const Result<void>.success(null);
+
+  @override
   Future<Result<void>> reset(PasswordRecoveryRequest request) async {
     await Future<void>.delayed(const Duration(milliseconds: 5));
     return Result<void>.success(null);
@@ -122,6 +132,16 @@ class _AlwaysFailsGateway implements PasswordRecoveryGateway {
   final AppError error;
 
   @override
+  Future<Result<void>> requestCode({required String email}) async =>
+      const Result<void>.success(null);
+
+  @override
+  Future<Result<void>> verifyCode({
+    required String email,
+    required String otp,
+  }) async => const Result<void>.success(null);
+
+  @override
   Future<Result<void>> reset(PasswordRecoveryRequest request) async {
     await Future<void>.delayed(const Duration(milliseconds: 5));
     return Result<void>.failure(error);
@@ -129,6 +149,16 @@ class _AlwaysFailsGateway implements PasswordRecoveryGateway {
 }
 
 class _CountingGateway implements PasswordRecoveryGateway {
+  @override
+  Future<Result<void>> requestCode({required String email}) async =>
+      const Result<void>.success(null);
+
+  @override
+  Future<Result<void>> verifyCode({
+    required String email,
+    required String otp,
+  }) async => const Result<void>.success(null);
+
   int calls = 0;
 
   @override

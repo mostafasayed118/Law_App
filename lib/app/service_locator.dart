@@ -19,6 +19,7 @@ import '../data/orgs/supabase_org_api_impl.dart';
 import '../data/orgs/supabase_organization_gateway.dart';
 import '../features/auth/data/fake_password_recovery_gateway.dart';
 import '../features/auth/data/fake_sign_up_gateway.dart';
+import '../features/auth/data/supabase_password_recovery_gateway.dart';
 import '../features/auth/data/supabase_sign_up_gateway.dart';
 import '../features/auth/domain/password_recovery_gateway.dart';
 import '../features/auth/domain/sign_up_gateway.dart';
@@ -109,9 +110,20 @@ void configureDependencies({
   if (!serviceLocator.isRegistered<PasswordRecoveryGateway>()) {
     // Stateless service: lazy singleton. The recovery Cubit is feature-scoped
     // and created per screen via BlocProvider, so it is NOT registered here.
-    serviceLocator.registerLazySingleton<PasswordRecoveryGateway>(
-      FakePasswordRecoveryGateway.new,
-    );
+    // Like AuthGateway/SignUpGateway, the flip swaps the dev fake for the
+    // Supabase-backed implementation when the build is configured (Batch 3.3
+    // env pattern). Code-based recovery needs no deep links (2026-08-03).
+    if (env.isConfigured) {
+      serviceLocator.registerLazySingleton<PasswordRecoveryGateway>(
+        () => SupabasePasswordRecoveryGateway(
+          (supabaseAuthApiFactory ?? SupabaseAuthApiImpl.bind)(),
+        ),
+      );
+    } else {
+      serviceLocator.registerLazySingleton<PasswordRecoveryGateway>(
+        FakePasswordRecoveryGateway.new,
+      );
+    }
   }
   if (!serviceLocator.isRegistered<SignUpGateway>()) {
     // Stateless service: lazy singleton. The sign-up Cubit is feature-scoped

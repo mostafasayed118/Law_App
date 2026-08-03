@@ -3,16 +3,21 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/legalhub_theme.dart';
 import '../../../../app/router.dart';
+import '../../../../app/service_locator.dart';
+import '../../../../core/errors/app_error.dart';
+import '../../../../core/errors/result.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/forms/validators.dart';
 import '../../../../shared/widgets/widgets.dart';
+import '../../domain/password_recovery_gateway.dart';
 import 'recovery_routing_context.dart';
 
 /// Step 1 — request a recovery code by email.
 ///
-/// No recovery gateway exists yet; "Send Code" routes to the OTP screen after
-/// a confirmation snackbar. A real `PasswordRecoveryCubit` + recovery gateway
-/// is a later data-layer slice.
+/// "Send Code" calls the [PasswordRecoveryGateway] seam: the Supabase-backed
+/// implementation mails a real 6-digit code in configured builds; the dev fake
+/// acknowledges without sending (2026-08-03, D1 revised). Only on success does
+/// the screen advance to the OTP step, so the flow is never half-wired.
 class ForgotPasswordEmailScreen extends StatefulWidget {
   const ForgotPasswordEmailScreen({super.key});
 
@@ -24,6 +29,7 @@ class ForgotPasswordEmailScreen extends StatefulWidget {
 class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _email = TextEditingController();
+  bool _sending = false;
 
   @override
   void dispose() {
@@ -81,12 +87,17 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
             ),
             const SizedBox(height: LegalHubTheme.spaceLg),
             ElevatedButton.icon(
-              onPressed: _submit,
-              icon: const DirectionalIcon(
-                icon: Icons.arrow_forward,
-                mirroredIcon: Icons.arrow_back,
-                size: 18,
-              ),
+              onPressed: _sending ? null : _submit,
+              icon: _sending
+                  ? const SizedBox.square(
+                      dimension: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const DirectionalIcon(
+                      icon: Icons.arrow_forward,
+                      mirroredIcon: Icons.arrow_back,
+                      size: 18,
+                    ),
               label: Text(l10n.sendCodeButton),
             ),
             const SizedBox(height: LegalHubTheme.spaceXl),
@@ -107,18 +118,34 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
     );
   }
 
-  void _submit() {
-    if (_formKey.currentState?.validate() ?? false) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).codeSentNotice)),
-      );
-      // Thread the entered email to the OTP step via in-memory `extra` (never
-      // via the URL — email is PII and must not appear in history/logs). The
-      // OTP is unknown at this step and filled in by the OTP screen.
-      context.go(
-        AppRoutes.forgotPasswordOtp,
-        extra: RecoveryRoutingContext(email: _email.text.trim(), otp: ''),
-      );
+  Future<void> _submit() async {
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      return;
+    }
+    setState(() => _sending = true);
+    final Result<void> result = await serviceLocator<PasswordRecoveryGateway>()
+        .requestCode(email: _email.text.trim());
+    if (!mounted) {
+      return;
+    }
+    setState(() => _sending = false);
+    switch (result) {
+      case Success<void>():
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context).codeSentNotice)),
+        );
+        // Thread the entered email to the OTP step via in-memory `extra` (never
+        // via the URL — email is PII and must not appear in history/logs). The
+        // OTP is unknown at this step and filled in by the OTP screen.
+        context.go(
+          AppRoutes.forgotPasswordOtp,
+          extra: RecoveryRoutingContext(email: _email.text.trim(), otp: ''),
+        );
+        return;
+      case Failure<void>(error: final AppError error):
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error.userMessage)));
     }
   }
 }

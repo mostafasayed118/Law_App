@@ -97,5 +97,26 @@ abstract interface class SupabaseAuthApi {
 
   Future<void> signOut();
 
+  /// Sends a recovery OTP code to [email]. With no redirect target the
+  /// provider mails a short-lived 6-digit code instead of a link; an unknown
+  /// address is acknowledged without enumeration (the provider rejects
+  /// non-existent accounts with a signups-for-otp error, which the caller
+  /// may treat as a benign non-delivery). Throws [SupabaseAuthException] on
+  /// provider rejection.
+  Future<void> sendRecoveryOtp({required String email});
+
+  /// Verifies a recovery [token] emailed to [email], establishing the
+  /// short-lived session used by [updatePassword]. Throws
+  /// [SupabaseAuthException] when the code is wrong or expired.
+  Future<void> verifyRecoveryOtp({
+    required String email,
+    required String token,
+  });
+
+  /// Sets a new password with the session established by [verifyRecoveryOtp],
+  /// then clears the provider session so a recovery never leaves the app
+  /// authenticated on the next launch. Throws [SupabaseAuthException].
+  Future<void> updatePassword({required String newPassword});
+
   Future<void> dispose();
 }

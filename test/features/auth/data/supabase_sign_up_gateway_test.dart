@@ -56,6 +56,18 @@ class _FakeSupabaseAuthApi implements SupabaseAuthApi {
   Future<void> signOut() async {}
 
   @override
+  Future<void> sendRecoveryOtp({required String email}) async {}
+
+  @override
+  Future<void> verifyRecoveryOtp({
+    required String email,
+    required String token,
+  }) async {}
+
+  @override
+  Future<void> updatePassword({required String newPassword}) async {}
+
+  @override
   Future<void> dispose() async => _changes.close();
 }
 

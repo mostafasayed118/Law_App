@@ -68,6 +68,16 @@ void main() {
 
 class _FailingRecoveryGateway implements PasswordRecoveryGateway {
   @override
+  Future<Result<void>> requestCode({required String email}) async =>
+      const Result<void>.success(null);
+
+  @override
+  Future<Result<void>> verifyCode({
+    required String email,
+    required String otp,
+  }) async => const Result<void>.success(null);
+
+  @override
   Future<Result<void>> reset(PasswordRecoveryRequest request) async {
     return Result<void>.failure(
       const AppError(code: 'recovery_failed', userMessage: 'Recovery failed'),

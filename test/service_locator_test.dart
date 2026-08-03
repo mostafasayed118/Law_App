@@ -19,6 +19,7 @@ import 'package:legalhub/data/orgs/supabase_org_api.dart';
 import 'package:legalhub/data/orgs/supabase_organization_gateway.dart';
 import 'package:legalhub/features/auth/data/fake_password_recovery_gateway.dart';
 import 'package:legalhub/features/auth/data/fake_sign_up_gateway.dart';
+import 'package:legalhub/features/auth/data/supabase_password_recovery_gateway.dart';
 import 'package:legalhub/features/auth/domain/password_recovery_gateway.dart';
 import 'package:legalhub/features/auth/domain/sign_up_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
@@ -54,6 +55,18 @@ class _FakeSupabaseAuthApi implements SupabaseAuthApi {
 
   @override
   Future<void> signOut() async {}
+
+  @override
+  Future<void> sendRecoveryOtp({required String email}) async {}
+
+  @override
+  Future<void> verifyRecoveryOtp({
+    required String email,
+    required String token,
+  }) async {}
+
+  @override
+  Future<void> updatePassword({required String newPassword}) async {}
 
   @override
   Future<void> dispose() async => _changes.close();
@@ -199,12 +212,29 @@ void main() {
     test('wires the recovery gateway to the fake dev implementation', () {
       configureDependencies();
 
-      // The dev-only fake is the registered seam; a real backend is a later
-      // approved data-layer slice. Pinning the concrete type catches a future
-      // swap that forgets to update this test.
+      // In unconfigured builds the dev-only fake is the registered seam.
+      // Pinning the concrete type catches a future swap that forgets to
+      // update this test.
       expect(
         serviceLocator<PasswordRecoveryGateway>(),
         isA<FakePasswordRecoveryGateway>(),
+      );
+    });
+
+    test('flips PasswordRecoveryGateway when env carries an anon key', () {
+      configureDependencies(
+        supabaseEnv: SupabaseEnv(
+          url: 'https://example.supabase.co',
+          anonKey: _anonJwt(),
+        ),
+        // The real bind() needs a running Supabase.instance; tests inject
+        // the seam instead (the flip's test seam, not production code).
+        supabaseAuthApiFactory: _FakeSupabaseAuthApi.new,
+      );
+
+      expect(
+        serviceLocator<PasswordRecoveryGateway>(),
+        isA<SupabasePasswordRecoveryGateway>(),
       );
     });
 

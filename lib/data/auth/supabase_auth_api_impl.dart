@@ -103,7 +103,11 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
       return SupabaseAuthFailureKind.rateLimited;
     }
     final String message = e.message.toLowerCase();
-    if (message.contains('invalid login credentials')) {
+    if (message.contains('invalid login credentials') ||
+        message.contains('token has expired') ||
+        message.contains('token is invalid') ||
+        message.contains('otp expired') ||
+        message.contains('invalid token')) {
       return SupabaseAuthFailureKind.invalidCredentials;
     }
     if (message.contains('already registered')) {
@@ -117,6 +121,47 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
 
   @override
   Future<void> signOut() => _client.signOut();
+
+  @override
+  Future<void> sendRecoveryOtp({required String email}) async {
+    try {
+      // No emailRedirectTo -> the provider sends a 6-digit OTP, not a link.
+      await _client.signInWithOtp(email: email, shouldCreateUser: false);
+    } on AuthException catch (e) {
+      throw SupabaseAuthException(kind: _failureKindFor(e), message: e.message);
+    }
+  }
+
+  @override
+  Future<void> verifyRecoveryOtp({
+    required String email,
+    required String token,
+  }) async {
+    try {
+      // Email OTPs are verified with the magiclink type (the provider's
+      // "email" OTP path); the dart client's OtpType enum has no 'email'
+      // member, and the live provider accepts magiclink for these codes.
+      await _client.verifyOTP(
+        email: email,
+        token: token,
+        type: OtpType.magiclink,
+      );
+    } on AuthException catch (e) {
+      throw SupabaseAuthException(kind: _failureKindFor(e), message: e.message);
+    }
+  }
+
+  @override
+  Future<void> updatePassword({required String newPassword}) async {
+    try {
+      await _client.updateUser(UserAttributes(password: newPassword));
+      // Recovery must not leave the app authenticated on the next launch:
+      // the verify session is a means to an end, not a sign-in.
+      await _client.signOut();
+    } on AuthException catch (e) {
+      throw SupabaseAuthException(kind: _failureKindFor(e), message: e.message);
+    }
+  }
 
   @override
   Future<void> dispose() async {

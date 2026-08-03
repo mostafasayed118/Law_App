@@ -46,7 +46,7 @@ messaging services.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (340 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (355 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), Redactor (password/OTP/email/Bearer redaction
   with leak guards), DI registration graph, validators, router redirect logic
@@ -54,28 +54,32 @@ messaging services.
   + empty-form blocking + valid submit + forgot link + error snackbar),
   sign-up screen (title + 4 fields + terms-checkbox gating + invalid-form
   blocking + stub-submit snackbar/route), forgot-password email step (empty
-  blocking + valid-email route), forgot-password OTP step (disabled-until-6-
-  digits + route), `OtpFieldRow` (length, code concatenation, clear,
-  completion notifier), forgot-password reset screen (confirm-password
-  stale-capture regression + ViewStateView error surface + retry), home screen
-  (EN + AR/RTL localized activity cards), settings screen (title + language
-  dropdown + demo-session notice + sign-out + locale switch), onboarding
-  carousel/success (page advance + Skip + Get Started + success routing),
-  SharedPreferences locale store (round-trip + stale-code rejection +
-  supported-code acceptance), SignUpRequest redaction invariants,
+  blocking + gateway send + route), forgot-password OTP step (disabled-until-6-
+  digits + gateway verify + real resend), `OtpFieldRow` (length, code
+  concatenation, clear, completion notifier), forgot-password reset screen
+  (confirm-password stale-capture regression + ViewStateView error surface +
+  retry), home screen (EN + AR/RTL localized activity cards), settings screen
+  (title + language dropdown + demo-session notice + sign-out + locale
+  switch), onboarding carousel/success (page advance + Skip + Get Started +
+  success routing), SharedPreferences locale store (round-trip + stale-code
+  rejection + supported-code acceptance), SignUpRequest redaction invariants,
   PasswordRecoveryRequest redaction invariants, `SignUpCubit` emission
   sequences (loading→success/error, duplicate-submit guard, `resetToEmpty`
-  retry re-enable, redaction invariant on the failure path) and the sign-up    screen (VO construction with normalized values, terms-checkbox gating,
-    invalid-form blocking, gateway-failure `ViewStateView` error surface), and
-    the end-to-end boot / locale-switch widget flow. Batch 1 of the
-    codebase-audit plan added 54 tests covering `ViewStateView` all branches,
-    the error reporters (runZoned print-capture), TR locale loading,
-    form-field + feature widgets, the home no-session fallback pin, the
-    router onboarding bypass, the reset-screen success path, the dev
-    gateways, the in-memory locale store, and the onboarding-success screen.
-    Batch 5 added the 800×600 onboarding no-overflow test and the EN/AR/TR
-    localized-fallback assertions.
-- Coverage: **340 tests** (2026-08-03); `flutter analyze` and the format gate
+  retry re-enable, redaction invariant on the failure path), the Supabase
+  recovery gateway (delegation + failure mapping + non-enumerating ack +
+  redaction), the recovery OTP API seam (send without create-user/redirect,
+  magiclink verify, wrong-code mapping, password update + session clear),
+  the sign-up screen (VO construction with normalized values, terms-checkbox
+  gating, invalid-form blocking, gateway-failure `ViewStateView` error
+  surface), and the end-to-end boot / locale-switch widget flow. Batch 1 of
+  the codebase-audit plan added 54 tests covering `ViewStateView` all
+  branches, the error reporters (runZoned print-capture), TR locale loading,
+  form-field + feature widgets, the home no-session fallback pin, the router
+  onboarding bypass, the reset-screen success path, the dev gateways, the
+  in-memory locale store, and the onboarding-success screen. Batch 5 added
+  the 800×600 onboarding no-overflow test and the EN/AR/TR localized-fallback
+  assertions.
+- Coverage: **355 tests** (2026-08-03); `flutter analyze` and the format gate
   clean. The coverage-gap list from the codebase audit (cubit emission
   streams, shared widgets, screen negative paths, router bypass, TR locale,
   reset success path) was closed by Batch 1 of
@@ -85,6 +89,12 @@ messaging services.
   (role-surface validation, loud unknown-role handling, typed failures) and
   the dev fake (mirrored last-partner/existing-member guards) — see
   [`docs/p3_organization_membership_spec_2026-08-03.md`](docs/p3_organization_membership_spec_2026-08-03.md).
+  The real password-recovery slice (2026-08-03, D1 revised) wired the
+  Supabase-backed recovery gateway behind the `PasswordRecoveryGateway` seam
+  (send OTP → verify OTP → change password, no deep links needed), flipped DI
+  on `env.isConfigured`, wired the email/OTP/resend screens to the gateway
+  with non-enumerating acknowledgement, and pinned it with gateway, API-seam,
+  screen, and DI-flip tests.
 - Tracked deviations: D-T1 (OnboardingScreen desktop overflow) and D-T3 (the
   hardcoded `'Jonathan'` fallback) were **resolved by Batch 5** — the carousel
   page now scrolls at compact heights and the no-session greeting fallback is

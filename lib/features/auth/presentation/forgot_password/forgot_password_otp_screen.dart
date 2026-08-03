@@ -3,23 +3,26 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/legalhub_theme.dart';
 import '../../../../app/router.dart';
+import '../../../../app/service_locator.dart';
+import '../../../../core/errors/app_error.dart';
+import '../../../../core/errors/result.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/widgets/widgets.dart';
+import '../../domain/password_recovery_gateway.dart';
 import 'otp_field_row.dart';
 import 'recovery_routing_context.dart';
 
 /// Step 2 — enter the 6-digit verification code.
 ///
 /// Reads the email threaded from step 1 via [RecoveryRoutingContext] (GoRouter
-/// `extra`) and, on verify, threads the entered 6-digit code onward to the
-/// reset screen so [PasswordRecoveryRequest] is built with real values, not
-/// placeholders. Real OTP verification is a later, backend-gated slice; the
-/// "Verify & Continue" action here only validates that 6 digits are present.
+/// `extra`). "Verify & Continue" calls the [PasswordRecoveryGateway] seam: in
+/// configured builds the Supabase-backed implementation really verifies the
+/// emailed code (2026-08-03, D1 revised); only a correct, unexpired code
+/// advances to the reset step. On success the email and the entered code are
+/// threaded onward via [RecoveryRoutingContext] so [PasswordRecoveryRequest]
+/// is built with real values, not placeholders.
 ///
-/// The "Resend code" control is intentionally **disabled** in this demo: no
-/// gateway exists, so it must not imply a code was sent (INSTRUCTIONS §4.4 —
-/// no false assurance). When a real recovery gateway lands, this control is
-/// the single place to wire the resend action.
+/// "Resend code" repeats the step-1 request for the same email.
 class ForgotPasswordOtpScreen extends StatefulWidget {
   const ForgotPasswordOtpScreen({super.key});
 
@@ -31,6 +34,8 @@ class ForgotPasswordOtpScreen extends StatefulWidget {
 class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
   final ValueNotifier<bool> _complete = ValueNotifier<bool>(false);
   final GlobalKey<OtpFieldRowState> _otpKey = GlobalKey<OtpFieldRowState>();
+  bool _verifying = false;
+  bool _resending = false;
 
   @override
   void dispose() {
@@ -81,18 +86,25 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
             valueListenable: _complete,
             builder: (BuildContext context, bool complete, Widget? _) {
               return ElevatedButton(
-                onPressed: complete ? _verify : null,
-                child: Text(l10n.verifyAndContinueButton),
+                onPressed: complete && !_verifying ? _verify : null,
+                child: _verifying
+                    ? const SizedBox.square(
+                        dimension: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(l10n.verifyAndContinueButton),
               );
             },
           ),
           const SizedBox(height: LegalHubTheme.spaceLg),
-          // Disabled by design: no resend gateway exists. A disabled control is
-          // honest; a tappable no-op would imply a code was sent (§4.4).
+          // Real resend: repeats the step-1 request for the threaded email
+          // (2026-08-03, D1 revised).
           Center(
             child: TextButton(
-              onPressed: null,
-              child: Text(l10n.resendCodeUnavailable),
+              onPressed: _resending ? null : _resend,
+              child: Text(
+                _resending ? l10n.resendCodeUnavailable : l10n.resendCode,
+              ),
             ),
           ),
           const SizedBox(height: LegalHubTheme.spaceMd),
@@ -108,17 +120,56 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
     );
   }
 
-  void _verify() {
+  Future<void> _verify() async {
     final RecoveryRoutingContext incoming = _contextFrom(
       GoRouterState.of(context),
     );
     final String otp = _otpKey.currentState?.code ?? '';
-    // Thread both the email from step 1 and the entered OTP to the reset step.
-    // In-memory `extra` only — the OTP is a short-lived credential and must
-    // not appear in the URL.
-    context.go(
-      AppRoutes.forgotPasswordReset,
-      extra: RecoveryRoutingContext(email: incoming.email, otp: otp),
+    setState(() => _verifying = true);
+    final Result<void> result = await serviceLocator<PasswordRecoveryGateway>()
+        .verifyCode(email: incoming.email, otp: otp);
+    if (!mounted) {
+      return;
+    }
+    setState(() => _verifying = false);
+    switch (result) {
+      case Success<void>():
+        // Thread both the email from step 1 and the verified OTP to the reset
+        // step. In-memory `extra` only — the OTP is a short-lived credential
+        // and must not appear in the URL.
+        context.go(
+          AppRoutes.forgotPasswordReset,
+          extra: RecoveryRoutingContext(email: incoming.email, otp: otp),
+        );
+        return;
+      case Failure<void>(error: final AppError error):
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error.userMessage)));
+    }
+  }
+
+  Future<void> _resend() async {
+    final RecoveryRoutingContext incoming = _contextFrom(
+      GoRouterState.of(context),
     );
+    setState(() => _resending = true);
+    final Result<void> result = await serviceLocator<PasswordRecoveryGateway>()
+        .requestCode(email: incoming.email);
+    if (!mounted) {
+      return;
+    }
+    setState(() => _resending = false);
+    switch (result) {
+      case Success<void>():
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context).codeSentNotice)),
+        );
+        return;
+      case Failure<void>(error: final AppError error):
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error.userMessage)));
+    }
   }
 }

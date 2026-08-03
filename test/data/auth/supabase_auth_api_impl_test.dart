@@ -52,6 +52,10 @@ void main() {
       events = StreamController<AuthState>.broadcast();
       when(() => client.onAuthStateChange).thenAnswer((_) => events.stream);
       when(() => client.currentSession).thenReturn(null);
+      // mocktail cannot synthesize enum/class instances for `any()` matchers;
+      // the fallbacks are dummy values that are never interacted with.
+      registerFallbackValue(OtpType.magiclink);
+      registerFallbackValue(UserAttributes());
       api = SupabaseAuthApiImpl(client);
       addTearDown(() async {
         await events.close();
@@ -312,6 +316,104 @@ void main() {
       await Future<void>.delayed(Duration.zero);
 
       expect(seen.last, isNull);
+    });
+
+    group('recovery OTP', () {
+      test(
+        'sends the OTP without creating a user or redirect target',
+        () async {
+          when(
+            () => client.signInWithOtp(
+              email: any(named: 'email'),
+              shouldCreateUser: any(named: 'shouldCreateUser'),
+              emailRedirectTo: any(named: 'emailRedirectTo'),
+            ),
+          ).thenAnswer((_) async {});
+
+          await api.sendRecoveryOtp(email: 'amira@example.com');
+
+          // No redirect -> the provider mails a 6-digit code, not a link; no
+          // user may be created by a recovery request.
+          verify(
+            () => client.signInWithOtp(
+              email: 'amira@example.com',
+              shouldCreateUser: false,
+              emailRedirectTo: null,
+            ),
+          ).called(1);
+        },
+      );
+
+      test('verifies the emailed code via the magiclink OTP path', () async {
+        when(
+          () => client.verifyOTP(
+            email: any(named: 'email'),
+            token: any(named: 'token'),
+            type: any(named: 'type'),
+          ),
+        ).thenAnswer(
+          (_) async => AuthResponse(user: _user(email: 'amira@example.com')),
+        );
+
+        await api.verifyRecoveryOtp(
+          email: 'amira@example.com',
+          token: '123456',
+        );
+
+        // The dart client has no 'email' OtpType; the provider accepts
+        // magiclink for email OTP codes (verified live, 2026-08-03).
+        verify(
+          () => client.verifyOTP(
+            email: 'amira@example.com',
+            token: '123456',
+            type: OtpType.magiclink,
+          ),
+        ).called(1);
+      });
+
+      test('maps a wrong or expired code to invalidCredentials', () async {
+        when(
+          () => client.verifyOTP(
+            email: any(named: 'email'),
+            token: any(named: 'token'),
+            type: any(named: 'type'),
+          ),
+        ).thenThrow(
+          const AuthException(
+            'Token has expired or is invalid',
+            statusCode: '403',
+          ),
+        );
+
+        await expectLater(
+          api.verifyRecoveryOtp(email: 'amira@example.com', token: '000000'),
+          throwsA(
+            isA<SupabaseAuthException>().having(
+              (SupabaseAuthException e) => e.kind,
+              'kind',
+              SupabaseAuthFailureKind.invalidCredentials,
+            ),
+          ),
+        );
+      });
+
+      test('updates the password then clears the recovery session', () async {
+        when(() => client.updateUser(any())).thenAnswer(
+          (_) async => UserResponse.fromJson(<String, dynamic>{
+            'id': 'u-1',
+            'aud': 'authenticated',
+            'email': 'amira@example.com',
+            'created_at': '2026-07-25T00:00:00Z',
+          }),
+        );
+        when(() => client.signOut()).thenAnswer((_) async {});
+
+        await api.updatePassword(newPassword: 'new-secret-pass');
+
+        verify(() => client.updateUser(any())).called(1);
+        // Recovery must not leave the app authenticated on next launch.
+        verify(() => client.signOut()).called(1);
+      });
     });
   });
 }

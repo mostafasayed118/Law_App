@@ -13,16 +13,17 @@ import 'package:legalhub/l10n/app_localizations.dart';
 // These tests pin the step-level behavior after the email/OTP threading
 // change (83f5bbf). Step 1 threads the entered email to step 2 via
 // RecoveryRoutingContext (GoRouter in-memory `extra`, never the URL — email is
-// PII); step 2 validates 6 digits, threads email+OTP onward, and keeps the
-// "Resend code" control disabled (INSTRUCTIONS §4.4 — no false assurance: no
-// gateway exists, so a tappable control would imply a code was sent). The
-// end-to-end request-object proof lives in forgot_password_threading_test.dart;
-// this file pins each step in isolation.
+// PII); step 2 verifies the 6-digit code through the PasswordRecoveryGateway
+// seam, threads email+OTP onward, and keeps "Resend code" enabled — the code
+// really is sent by the Supabase-backed gateway in configured builds and the
+// dev fake acknowledges, so the control is never a false assurance
+// (2026-08-03, D1 revised). The end-to-end request-object proof lives in
+// forgot_password_threading_test.dart; this file pins each step in isolation.
 //
-// The steps have no cubit/gateway of their own. The OTP step routes to the
-// reset step, which resolves PasswordRecoveryGateway from the service
-// locator. configureDependencies() is idempotent and registers the dev fake,
-// so the router can navigate through the reset screen without a backend.
+// The steps resolve PasswordRecoveryGateway from the service locator.
+// configureDependencies() is idempotent and registers the dev fake (which
+// acknowledges sends and accepts any code), so the router can navigate
+// through the whole flow without a backend.
 void main() {
   late FakeAuthGateway gateway;
   late AuthCubit authCubit;
@@ -159,15 +160,16 @@ void main() {
         );
         expect(button.onPressed, isNull);
 
-        // The resend control is disabled by design (83f5bbf, §4.4): no
-        // gateway exists, so it must not imply a code was sent. The label
-        // states "unavailable in demo" rather than the plain "Resend Code".
+        // The resend control is enabled and carries the plain "Resend Code"
+        // label: a real recovery gateway exists in configured builds and the
+        // dev fake acknowledges, so the control is never a false assurance
+        // (2026-08-03, D1 revised).
         final TextButton resend = tester.widget<TextButton>(
           find.byType(TextButton).last,
         );
-        expect(resend.onPressed, isNull);
-        expect(find.text('Resend Code (unavailable in demo)'), findsOneWidget);
-        expect(find.text('Resend Code'), findsNothing);
+        expect(resend.onPressed, isNotNull);
+        expect(find.text('Resend Code'), findsOneWidget);
+        expect(find.text('Resend Code (unavailable in demo)'), findsNothing);
       },
     );
 
