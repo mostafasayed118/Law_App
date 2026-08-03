@@ -1,6 +1,6 @@
 # LegalHub — P0 Decision Capture (Pre-Backend)
 
-> **Status: P1 APPROVED (2026-07-31); P2 APPROVED (2026-08-01); P3 data layer + code-based recovery SHIPPED (2026-08-03); org UI SHIPPED 2026-08-03 (roadmap Phase 1, `03862ce`); Phase 2 org lifecycle wiring APPROVED 2026-08-03 — implementing slices 2.1–2.4.** All ten §1 blockers are decided, the
+> **Status: P1 APPROVED (2026-07-31); P2 APPROVED (2026-08-01); P3 PLAN APPROVED (2026-08-02).** All ten §1 blockers are decided, the
 > §2 Definition-of-Ready checklist is fully satisfied (Supabase dev project
 > provisioned, `.env` confirmed git-ignored, rollback plan written), and the
 > §3 explicit implementation-approval sign-off is now recorded. **Batch 3 /
@@ -90,20 +90,17 @@ Decided **and** the §4 Definition of Ready checklist is satisfied.
   backup/cross-border processing constraints? Affects provider project
   selection and storage config.
 - **Owner:** Project Owner (github.com/mostafasayed118)
-- **Decision:** **Region: `West Europe (London)`** on a Supabase
+- **Decision:** **Region: `eu-central-1` (Frankfurt)** on a Supabase
   free/dev tier project. No real cross-border processing constraints apply
   (synthetic data only); this is a technical proximity choice, not a
   compliance determination.
 - **Decided on:** 2026-07-31
 - **Blocks slice:** P1 (provider project selection), P2 (storage policies).
-- **Evidence / notes:** **Provisioned 2026-07-31** (`West Europe (London)`,
-  free/dev tier). The project ref is kept in the local, git-ignored `.env`
-  only by the owner's choice — not sensitive, but not needed in this shared
-  doc for the gate to close. (Reconciled 2026-07-31 from an earlier "not yet
-  provisioned" note to match the §2 checklist and the kickoff prompt;
-  region corrected 2026-08-03 from a recorded `eu-central-1` to the actual
-  `West Europe (London)` — confirmed against the live project via the
-  Supabase CLI, `supabase projects list`.)
+- **Evidence / notes:** **Provisioned 2026-07-31** (`eu-central-1`, free/dev
+  tier). The project ref is kept in the local, git-ignored `.env` only by the
+  owner's choice — not sensitive, but not needed in this shared doc for the
+  gate to close. (Reconciled 2026-07-31 from an earlier "not yet provisioned"
+  note to match the §2 checklist and the kickoff prompt.)
 
 ### D-05 — Retention, deletion, legal hold, export
 
@@ -270,13 +267,12 @@ of the following are true (mirrors contract §12):
 - [x] All blockers in the "Blocks slice: P1" set above (D-02, D-03, D-04,
       D-07, D-08, D-09) are **Decided** (2026-07-31, see §1 above).
 - [x] A non-production Supabase project exists. **Provisioned 2026-07-31**,
-      region `West Europe (London)` (recorded initially as `eu-central-1`;
-      corrected 2026-08-03 to the actual region). Project ref: _not recorded
-      in this shared doc by owner's choice — kept in the local, git-ignored
-      `.env` only; the ref is not sensitive but recording it here isn't
-      necessary for the gate to close._ Migrations/policies/functions/storage
-      config inspection is N/A — this is a freshly created project with
-      nothing in it yet.
+      region `eu-central-1`. Project ref: _not recorded in this shared doc
+      by owner's choice — kept in the local, git-ignored `.env` only; the
+      ref is not sensitive but recording it here isn't necessary for the
+      gate to close._ Migrations/policies/functions/storage config
+      inspection is N/A — this is a freshly created project with nothing in
+      it yet.
 - [x] A signed permission matrix exists covering **positive and negative**
       cases for each approved MVP action (contract §9). Location:
       `docs/permission_matrix.md` (added 2026-07-31).
@@ -301,17 +297,14 @@ decision-capture level.
 ## 3. Slice map and approval log
 
 The phased implementation proposal (contract §11), with the blocker set each
-slice depends on and the approval record once granted. Feature sequencing
-beyond the approved batches is owned by the planning roadmap
-(`docs/features_roadmap_2026-08-03.md`); each phase row there gates on the
-approval recorded in this table (Phase 1 = the P3 org/membership UI slice).
+slice depends on and the approval record once granted.
 
 | Slice | Depends on blockers | Status | Approved by | Date |
 | --- | --- | --- | --- | --- |
 | P0 — Decision capture (this doc) | — | **Decisions closed 2026-07-31** | Project Owner | 2026-07-31 |
 | P1 — Domain contracts + provider adapter (add `supabase_flutter`, adapter behind `AuthGateway`) | D-02, D-03, D-04, D-07, D-08, D-09 + §2 checklist | **APPROVED — §2 fully satisfied** | Project Owner (github.com/mostafasayed118) | 2026-07-31 |
-| P2 — Non-production schema + default-deny RLS/storage/realtime + narrow RPCs, with positive/negative policy tests | P1 + D-05, D-06, D-10a, D-10b | **APPROVED (2026-08-01)** — RLS gate review passed; §8 Q1–Q6 answered in `docs/p2_schema_rls_design.md`; **APPLY APPROVED (2026-08-01)** — ephemeral rehearsals PASSED (r2, re-confirmed on the R-4 slice in r4; 38 PASS + 2 RECORDED, twin gates green); decision in `docs/p2_apply_approval_2026-08-01.md`; **APPLY EXECUTED (2026-08-01)** — Up 1–5 GREEN on the dev project; evidence `docs/p2_apply_execution_2026-08-01.md` (§4.5 manual post-apply smoke pending) | Project Owner (github.com/mostafasayed118) | 2026-08-01 |
-| P3 — Auth + organization UX (loading/denial/offline/expiry/retry states, EN/AR/TR + RTL) | P2 | **Partially executed:** org/membership data layer (`bf4c953`) + code-based recovery (`c2496df`, D1 revised per p3 spec §5) shipped 2026-08-03 under the owner's approval batch (p3 spec §6); org **UI APPROVED 2026-08-03** (roadmap Phase 1 — p3 spec approved by owner; implementation started as slices 1.1–1.6 per `docs/features_roadmap_2026-08-03.md` §3) | Project Owner (data layer + recovery + org UI approval, 2026-08-03) | 2026-08-03 |
+| P2 — Non-production schema + default-deny RLS/storage/realtime + narrow RPCs, with positive/negative policy tests | P1 + D-05, D-06, D-10a, D-10b | **APPROVED (2026-08-01)** — RLS gate review passed; §8 Q1–Q6 answered in `docs/p2_schema_rls_design.md`; **APPLY APPROVED (2026-08-01)** — ephemeral rehearsals PASSED (r2, re-confirmed on the R-4 slice in r4; 38 PASS + 2 RECORDED, twin gates green); decision in `docs/p2_apply_approval_2026-08-01.md`; **APPLY EXECUTED (2026-08-01)** — Up 1–5 GREEN on the dev project; evidence `docs/p2_apply_execution_2026-08-01.md`; **P2 CLOSED (2026-08-03)** — closed on the probe battery + r2/r4 rehearsals; §4.5 provider loop DEFERRED as documented residual risk (not executed, not passed — see `docs/p2_close_decision_2026-08-03.md`) | Project Owner (github.com/mostafasayed118) | 2026-08-01 |
+| P3 — Auth + organization UX (loading/denial/offline/expiry/retry states, EN/AR/TR + RTL) | P2 | **PLAN APPROVED (2026-08-02)** — Gate 3 spec approved; plan: `docs/p3_auth_org_ux_plan.md` (implementation gated on per-step commit/approval per INSTRUCTIONS.md §3) | Project Owner (github.com/mostafasayed118) | 2026-08-02 |
 | P4 — Security review + controlled rollout (threat model, dependency/config review, staging verification, rollback rehearsal, release approval) | P3 | Blocked | _OPEN_ | _OPEN_ |
 
 An approval in this table is the "explicit implementation approval" of
@@ -329,9 +322,8 @@ see the corresponding decisions in §1:
 1. **Product model (D-02):** ✅ multi-tenant law-firm client portal.
 2. **Jurisdiction + policy owner (D-03):** ✅ N/A for demo scope; owner of
    record is the Project Owner.
-3. **Provider project:** ✅ provisioned 2026-07-31 (`West Europe (London)`;
-   region corrected 2026-08-03 from the initially recorded `eu-central-1`);
-   project ref kept in the local, git-ignored `.env` only — see §2.
+3. **Provider project:** ✅ provisioned 2026-07-31 (`eu-central-1`); project
+   ref kept in the local, git-ignored `.env` only — see §2.
 4. **Auth policy (D-07):** ✅ email+password, email verification required,
    MFA/SSO deferred to v1.
 5. **Permission matrix:** ✅ `docs/permission_matrix.md`.
