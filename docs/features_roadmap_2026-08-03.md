@@ -106,7 +106,7 @@ that blocks it).
 | `revoke_invitation` | ✅ `revokeInvitation` | Phase 2 | partner-only per D-10a / matrix §3 |
 | `accept_invitation` | ✅ `acceptInvitation` | Phase 2 (UX decision) / Phase 4 (deep link) | **R3** in the P3 spec; token-entry UX decided (accept screen) |
 | `delete_my_account` | ✅ `deleteMyAccount` | Phase 2 | D-05 requires the hard-delete action (cascade identity + memberships) |
-| `list_organizations_metadata` | ❌ | Phase 2 (owner) or Phase 3 (member-facing) | backs the active-org switcher, D-08 |
+| `list_organizations_metadata` | ❌ | Phase 2 (owner) or Phase 3 (member-facing) | **SHIPPED via the client-side path** — the active-org switcher (Phase 7 slice 7.0, `b31bc1a`) reads `Session.memberships` + the `ActiveOrgStore` per D-08/D-M7 (server re-derives membership; never trusts a client-selected org id); the RPC stays unwired, an enrichment-only option |
 | `read_org_audit` | ❌ | deferred (§11) | audit surfacing is P2-gated; `platform_owner_admin` self-audit rules apply |
 | `read_platform_audit` | ❌ | deferred (§11) | owner-gated; audit table never publicly readable (matrix §6) |
 | `delete_demo_account` | ❌ | deferred (§11) | `platform_owner_admin`-only; no owner admin screen until the Addendum's server-side enforcement story is complete |
@@ -152,11 +152,11 @@ rehearsed, and applied (`3704a1d`).
   partner-only guard, `invalidInvitation` surfaced. Matrix §3 rows exist.
 - **2.2 Delete own account** — wire `delete_my_account` (D-05); profile-screen
   action with redaction-safe confirm; fake mirrors cascade. Matrix §2 row.
-- **2.3 Active-org switcher** — `Session.memberships` exists but there is no
-  selector UI. Owner path: `list_organizations_metadata`. Member-facing path
-  requires the Phase 3 RPC (matrix §3 "switch active organization" is a UX
-  hint only — server re-derives membership per D-08; never trust the
-  client-selected org id).
+- **2.3 Active-org switcher** — **SHIPPED as Phase 7 slice 7.0** (`b31bc1a`,
+  `ActiveOrgStore` + switcher sheet listing `Session.memberships`, D-08/D-M7).
+  Owner path: `list_organizations_metadata` (still unwired — enrichment-only;
+  the client reads `Session.memberships`, and the server re-derives
+  membership per D-08 — never trusts a client-selected org id).
 - **2.4 Invitation acceptance (R3)** — `accept_invitation(token)` is already
   failure-mapped (`invalidInvitation`). Needs the **token-entry UX decision**
   (paste-screen vs. deep link). Recommendation: paste-screen in Phase 2;
