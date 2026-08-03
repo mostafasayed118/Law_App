@@ -23,22 +23,35 @@ import 'booking_slot.dart';
 ///   contexts hit toString(), and Equatable does not guarantee a safe string
 ///   form for the free-text topic.
 class BookingRequest extends Equatable {
-  const BookingRequest({required this.category, this.topic, this.slot});
+  const BookingRequest({
+    required this.category,
+    this.topic,
+    this.slot,
+    this.attorneyId,
+  });
 
   final BookingCategory category;
   final String? topic;
   final BookingSlot? slot;
+
+  /// Optional synthetic attorney id carried from the discovery profile
+  /// prefill (Phase 6 D-A3 — the D-B7 additive slice). Never blocks the
+  /// standalone flow (AC-5); it is a stable non-PII id, so no new
+  /// redaction contract applies, but it still passes through
+  /// [Redactor.map] idempotently.
+  final String? attorneyId;
 
   /// A diagnostic-safe map representation (see [Redactor.map] semantics).
   Map<String, Object?> toRedactedMap() => Redactor.map(<String, Object?>{
     'category': category.name,
     'topic': topic,
     'slotId': slot?.id,
+    'attorneyId': attorneyId,
   });
 
   @override
   String toString() => '[REDACTED]';
 
   @override
-  List<Object?> get props => <Object?>[category, topic, slot];
+  List<Object?> get props => <Object?>[category, topic, slot, attorneyId];
 }

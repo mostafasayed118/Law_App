@@ -297,11 +297,92 @@ void main() {
   });
 
   group('discovery route (Phase 6 slice 6.1)', () {
-    testWidgets('renders the search surface for an authenticated demo session', (
+    testWidgets(
+      'renders the search surface for an authenticated demo session',
+      (tester) async {
+        // AttorneySearchScreen resolves AttorneyGateway from the locator
+        // (the dev fake in env-less runs).
+        await resetServiceLocator();
+        configureDependencies();
+        addTearDown(() => resetServiceLocator());
+
+        await authCubit.startDemoSession();
+        router.go(AppRoutes.discovery);
+        await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+        await tester.pumpAndSettle();
+
+        // The /discovery route renders the search surface, not home; the
+        // shell keeps home highlighted (not a settings descendant).
+        expect(find.text('Find an Attorney'), findsOneWidget);
+        expect(find.text('Layla Mansour'), findsOneWidget);
+        expect(selectedIndex(tester), 0);
+      },
+    );
+
+    testWidgets('blocks unauthenticated access to the discovery route', (
       tester,
     ) async {
-      // AttorneySearchScreen resolves AttorneyGateway from the locator
-      // (the dev fake in env-less runs).
+      router.go(AppRoutes.discovery);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Welcome Back'), findsOneWidget);
+      expect(authCubit.state.isAuthenticated, isFalse);
+    });
+  });
+
+  group('discovery profile route (Phase 6 slice 6.2)', () {
+    testWidgets('renders the profile for an authenticated demo session', (
+      tester,
+    ) async {
+      usePhoneViewport(tester);
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      router.go('/discovery/atty-1');
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // The profile route renders the synthetic profile (AC-3), not
+      // home; the shell keeps home highlighted.
+      expect(find.text('Attorney profile'), findsOneWidget);
+      expect(find.text('Layla Mansour'), findsOneWidget);
+      expect(find.text('Book with this attorney'), findsOneWidget);
+      expect(selectedIndex(tester), 0);
+    });
+
+    testWidgets(
+      'Book with this attorney routes to /book with the prefill (AC-4)',
+      (tester) async {
+        usePhoneViewport(tester);
+        await resetServiceLocator();
+        configureDependencies();
+        addTearDown(() => resetServiceLocator());
+
+        await authCubit.startDemoSession();
+        router.go('/discovery/atty-1');
+        await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Book with this attorney'));
+        await tester.pumpAndSettle();
+
+        // The wizard's category step renders the prefill note — proof the
+        // draft carries the optional attorneyId (D-A3).
+        expect(
+          router.routerDelegate.currentConfiguration.uri.path,
+          AppRoutes.book,
+        );
+        expect(find.text('Booking with Layla Mansour'), findsOneWidget);
+      },
+    );
+
+    testWidgets('tapping a search result opens its profile (slice 6.2)', (
+      tester,
+    ) async {
+      usePhoneViewport(tester);
       await resetServiceLocator();
       configureDependencies();
       addTearDown(() => resetServiceLocator());
@@ -311,17 +392,23 @@ void main() {
       await tester.pumpWidget(harness(child: const SizedBox.shrink()));
       await tester.pumpAndSettle();
 
-      // The /discovery route renders the search surface, not home; the
-      // shell keeps home highlighted (not a settings descendant).
-      expect(find.text('Find an Attorney'), findsOneWidget);
-      expect(find.text('Layla Mansour'), findsOneWidget);
-      expect(selectedIndex(tester), 0);
+      // A search row is a tap target into the profile route (the slice
+      // 6.2 affordance); the profile renders for the tapped attorney.
+      await tester.tap(find.text('Layla Mansour'));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        AppRoutes.attorneyProfile('atty-1'),
+      );
+      expect(find.text('Attorney profile'), findsOneWidget);
+      expect(find.text('Book with this attorney'), findsOneWidget);
     });
 
-    testWidgets('blocks unauthenticated access to the discovery route', (
+    testWidgets('blocks unauthenticated access to the profile route', (
       tester,
     ) async {
-      router.go(AppRoutes.discovery);
+      router.go('/discovery/atty-1');
       await tester.pumpWidget(harness(child: const SizedBox.shrink()));
       await tester.pumpAndSettle();
 

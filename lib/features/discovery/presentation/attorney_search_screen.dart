@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../app/legalhub_theme.dart';
+import '../../../app/router.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/widgets.dart';
 import '../domain/attorney.dart';
 import '../domain/attorney_gateway.dart';
+import 'attorney_labels.dart';
 import 'discovery_cubit.dart';
 import 'discovery_state.dart';
 
@@ -135,7 +138,11 @@ class _SearchSurfaceState extends State<_SearchSurface> {
                 children: <Widget>[
                   for (final Attorney attorney
                       in state.visibleAttorneys) ...<Widget>[
-                    _AttorneyTile(attorney: attorney),
+                    _AttorneyTile(
+                      attorney: attorney,
+                      onTap: () =>
+                          context.go(AppRoutes.attorneyProfile(attorney.id)),
+                    ),
                     const SizedBox(height: LegalHubTheme.spaceSm),
                   ],
                 ],
@@ -203,7 +210,7 @@ class _AreaFilterChips extends StatelessWidget {
           for (final PracticeArea area in PracticeArea.values) ...<Widget>[
             const SizedBox(width: LegalHubTheme.spaceSm),
             FilterChip(
-              label: Text(_practiceAreaLabel(l10n, area)),
+              label: Text(practiceAreaLabel(l10n, area)),
               selected: selected == area,
               onSelected: (bool value) =>
                   cubit.setPracticeArea(value ? area : null),
@@ -216,12 +223,13 @@ class _AreaFilterChips extends StatelessWidget {
 }
 
 class _AttorneyTile extends StatelessWidget {
-  const _AttorneyTile({required this.attorney});
+  const _AttorneyTile({required this.attorney, required this.onTap});
 
   final Attorney attorney;
 
-  /// Slice 6.2 wires profile navigation here; until then the rows render
-  /// non-interactively (no chevron affordance) so the surface stays honest.
+  /// Phase 6 slice 6.2: tapping a row opens the attorney profile route.
+  final VoidCallback onTap;
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
@@ -236,51 +244,47 @@ class _AttorneyTile extends StatelessWidget {
         side: BorderSide(color: scheme.outlineVariant),
       ),
       clipBehavior: Clip.antiAlias,
-      child: Padding(
-        padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-        child: Row(
-          children: <Widget>[
-            CircleAvatar(
-              backgroundColor: scheme.primaryContainer,
-              child: Text(
-                attorney.name.isEmpty
-                    ? '?'
-                    : attorney.name.substring(0, 1).toUpperCase(),
-                style: TextStyle(color: scheme.onPrimaryContainer),
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
+          child: Row(
+            children: <Widget>[
+              CircleAvatar(
+                backgroundColor: scheme.primaryContainer,
+                child: Text(
+                  attorney.name.isEmpty
+                      ? '?'
+                      : attorney.name.substring(0, 1).toUpperCase(),
+                  style: TextStyle(color: scheme.onPrimaryContainer),
+                ),
               ),
-            ),
-            const SizedBox(width: LegalHubTheme.spaceMd),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    attorney.name,
-                    style: text.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
+              const SizedBox(width: LegalHubTheme.spaceMd),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      attorney.name,
+                      style: text.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${_practiceAreaLabel(l10n, attorney.practiceArea)} · ${attorney.locale}',
-                    style: text.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
+                    const SizedBox(height: 2),
+                    Text(
+                      '${practiceAreaLabel(l10n, attorney.practiceArea)} · ${attorney.locale}',
+                      style: text.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+              Icon(Icons.chevron_right, color: scheme.outline),
+            ],
+          ),
         ),
       ),
     );
   }
 }
-
-String _practiceAreaLabel(AppLocalizations l10n, PracticeArea area) =>
-    switch (area) {
-      PracticeArea.corporate => l10n.areaCorporate,
-      PracticeArea.civil => l10n.areaCivil,
-      PracticeArea.criminal => l10n.areaCriminal,
-      PracticeArea.family => l10n.areaFamily,
-    };

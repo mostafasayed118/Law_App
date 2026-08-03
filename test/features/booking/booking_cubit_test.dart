@@ -450,6 +450,8 @@ void main() {
         expect(gateway.received?.category, BookingCategory.urgent);
         expect(gateway.received?.topic, 'urgent matter');
         expect(gateway.received?.slot, _slot);
+        // AC-5: the standalone flow (no prefill) sends no attorneyId.
+        expect(gateway.received?.attorneyId, isNull);
       },
     );
 
@@ -678,6 +680,47 @@ void main() {
         ),
       ],
       verify: (_) => expect(gateway.confirmCalls, 1),
+    );
+
+    test('seeds the attorney prefill into the initial draft (D-A3)', () {
+      final BookingCubit prefilled = BookingCubit(
+        gateway,
+        attorneyId: 'atty-1',
+        attorneyName: 'Layla Mansour',
+      );
+      addTearDown(prefilled.close);
+
+      expect(prefilled.state.draft.attorneyId, 'atty-1');
+      expect(prefilled.state.draft.attorneyName, 'Layla Mansour');
+
+      // The standalone flow seeds nothing (AC-5).
+      final BookingCubit standalone = BookingCubit(gateway);
+      addTearDown(standalone.close);
+      expect(standalone.state.draft.attorneyId, isNull);
+      expect(standalone.state.draft.attorneyName, isNull);
+    });
+
+    test(
+      'confirm carries the prefilled attorneyId into the request (AC-4)',
+      () async {
+        final BookingCubit cubit = BookingCubit(
+          gateway,
+          attorneyId: 'atty-1',
+          attorneyName: 'Layla Mansour',
+        );
+        addTearDown(cubit.close);
+
+        cubit.selectCategory(BookingCategory.general);
+        await cubit.continueFromCategory();
+        cubit.selectSlot(_slot);
+        cubit.continueFromDateTime();
+        await cubit.confirm();
+
+        expect(cubit.state.step, BookingStep.success);
+        expect(gateway.received?.attorneyId, 'atty-1');
+        // The display name is presentation-only and never leaves the draft.
+        expect(gateway.received?.category, BookingCategory.general);
+      },
     );
   });
 }

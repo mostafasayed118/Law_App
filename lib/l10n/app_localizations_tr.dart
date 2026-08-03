@@ -666,4 +666,24 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get discoveryEntrySubtitle =>
       'Demo avukat profillerine göz atın — geliştirme demosu.';
+
+  @override
+  String get bookingSummaryAttorney => 'Avukat';
+
+  @override
+  String bookingAttorneyPrefill(String name) {
+    return '$name ile rezervasyon';
+  }
+
+  @override
+  String get discoveryProfileTitle => 'Avukat profili';
+
+  @override
+  String get discoveryProfileNotFound => 'Avukat bulunamadı.';
+
+  @override
+  String get discoveryProfileBio => 'Hakkında';
+
+  @override
+  String get discoveryProfileBook => 'Bu avukatla rezervasyon yap';
 }

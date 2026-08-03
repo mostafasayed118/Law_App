@@ -25,6 +25,7 @@ import 'package:legalhub/features/auth/domain/sign_up_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/booking/data/fake_booking_gateway.dart';
 import 'package:legalhub/features/booking/domain/booking_gateway.dart';
+import 'package:legalhub/features/booking/domain/booking_prefill.dart';
 import 'package:legalhub/features/discovery/data/fake_attorney_gateway.dart';
 import 'package:legalhub/features/discovery/domain/attorney_gateway.dart';
 
@@ -202,6 +203,7 @@ void main() {
       expect(serviceLocator.isRegistered<SignUpGateway>(), isTrue);
       expect(serviceLocator.isRegistered<OrganizationGateway>(), isTrue);
       expect(serviceLocator.isRegistered<BookingGateway>(), isTrue);
+      expect(serviceLocator.isRegistered<BookingPrefill>(), isTrue);
       expect(serviceLocator.isRegistered<AttorneyGateway>(), isTrue);
       expect(serviceLocator.isRegistered<AuthCubit>(), isTrue);
     });
@@ -238,6 +240,13 @@ void main() {
         identical(
           serviceLocator<AttorneyGateway>(),
           serviceLocator<AttorneyGateway>(),
+        ),
+        isTrue,
+      );
+      expect(
+        identical(
+          serviceLocator<BookingPrefill>(),
+          serviceLocator<BookingPrefill>(),
         ),
         isTrue,
       );

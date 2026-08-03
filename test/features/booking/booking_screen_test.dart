@@ -6,6 +6,7 @@ import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/booking/data/fake_booking_gateway.dart';
 import 'package:legalhub/features/booking/domain/booking_confirmation.dart';
 import 'package:legalhub/features/booking/domain/booking_gateway.dart';
+import 'package:legalhub/features/booking/domain/booking_prefill.dart';
 import 'package:legalhub/features/booking/domain/booking_request.dart';
 import 'package:legalhub/features/booking/domain/booking_slot.dart';
 import 'package:legalhub/features/booking/presentation/booking_screen.dart';
@@ -187,5 +188,32 @@ void main() {
       expect(find.text('Review your booking'), findsOneWidget);
       expect(find.text('General'), findsOneWidget);
     });
+
+    testWidgets(
+      'seeds the draft from the prefill holder and clears it (D-A3/AC-5)',
+      (tester) async {
+        configureDependencies();
+        serviceLocator<BookingPrefill>()
+          ..attorneyId = 'atty-1'
+          ..attorneyName = 'Layla Mansour';
+
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: const BookingScreen(),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // The category step confirms the prefill reached the draft.
+        expect(find.text('Booking with Layla Mansour'), findsOneWidget);
+
+        // Consumed at cubit creation: a later standalone visit starts
+        // fresh (AC-5).
+        expect(serviceLocator<BookingPrefill>().attorneyId, isNull);
+        expect(serviceLocator<BookingPrefill>().attorneyName, isNull);
+      },
+    );
   });
 }

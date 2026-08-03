@@ -665,4 +665,24 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get discoveryEntrySubtitle =>
       'Browse demo attorney profiles — development demo.';
+
+  @override
+  String get bookingSummaryAttorney => 'Attorney';
+
+  @override
+  String bookingAttorneyPrefill(String name) {
+    return 'Booking with $name';
+  }
+
+  @override
+  String get discoveryProfileTitle => 'Attorney profile';
+
+  @override
+  String get discoveryProfileNotFound => 'Attorney not found.';
+
+  @override
+  String get discoveryProfileBio => 'About';
+
+  @override
+  String get discoveryProfileBook => 'Book with this attorney';
 }

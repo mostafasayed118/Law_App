@@ -67,6 +67,43 @@ void main() {
     });
   });
 
+  group('BookingRequest attorneyId (Phase 6 D-A3/D-B7)', () {
+    test('carries the optional attorney id through props and redaction', () {
+      const BookingRequest request = BookingRequest(
+        category: BookingCategory.general,
+        attorneyId: 'atty-1',
+      );
+
+      expect(request.toString(), '[REDACTED]');
+      expect(request.toRedactedMap()['attorneyId'], 'atty-1');
+    });
+
+    test('equates on attorneyId (requests differ when only it differs)', () {
+      const BookingRequest first = BookingRequest(
+        category: BookingCategory.general,
+        attorneyId: 'atty-1',
+      );
+      const BookingRequest second = BookingRequest(
+        category: BookingCategory.general,
+        attorneyId: 'atty-1',
+      );
+      const BookingRequest standalone = BookingRequest(
+        category: BookingCategory.general,
+      );
+
+      expect(second, first);
+      expect(standalone, isNot(first));
+    });
+
+    test('is null for the standalone flow (AC-5)', () {
+      const BookingRequest request = BookingRequest(
+        category: BookingCategory.general,
+      );
+
+      expect(request.attorneyId, isNull);
+    });
+  });
+
   group('BookingRequest value semantics', () {
     test('equates on category, topic, and slot (Equatable props)', () {
       final DateTime startsAt = DateTime(2026, 8, 10, 10);

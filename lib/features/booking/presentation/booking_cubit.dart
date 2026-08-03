@@ -27,7 +27,18 @@ import 'booking_state.dart';
 /// Widgets render [BookingState] and dispatch intents; they never mutate the
 /// draft or call the gateway directly.
 class BookingCubit extends Cubit<BookingState> {
-  BookingCubit(this._gateway) : super(const BookingState());
+  /// [attorneyId]/[attorneyName] seed the draft from the discovery
+  /// profile prefill (Phase 6 D-A3); both default to null so the
+  /// standalone flow is unchanged (AC-5).
+  BookingCubit(this._gateway, {String? attorneyId, String? attorneyName})
+    : super(
+        BookingState(
+          draft: BookingDraft(
+            attorneyId: attorneyId,
+            attorneyName: attorneyName,
+          ),
+        ),
+      );
 
   final BookingGateway _gateway;
 
@@ -42,6 +53,8 @@ class BookingCubit extends Cubit<BookingState> {
           category: category,
           topic: draft.topic,
           slot: draft.slot,
+          attorneyId: draft.attorneyId,
+          attorneyName: draft.attorneyName,
         ),
       ),
     );
@@ -60,6 +73,8 @@ class BookingCubit extends Cubit<BookingState> {
           category: draft.category,
           topic: topic,
           slot: draft.slot,
+          attorneyId: draft.attorneyId,
+          attorneyName: draft.attorneyName,
         ),
       ),
     );
@@ -111,6 +126,8 @@ class BookingCubit extends Cubit<BookingState> {
           category: draft.category,
           topic: draft.topic,
           slot: slot,
+          attorneyId: draft.attorneyId,
+          attorneyName: draft.attorneyName,
         ),
       ),
     );
@@ -219,6 +236,7 @@ class BookingCubit extends Cubit<BookingState> {
         category: category,
         topic: draft.topic?.trim(),
         slot: slot,
+        attorneyId: draft.attorneyId,
       ),
     );
     if (isClosed) {

@@ -660,4 +660,24 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get discoveryEntrySubtitle =>
       'تصفح ملفات المحامين التجريبية — عرض تجريبي للتطوير.';
+
+  @override
+  String get bookingSummaryAttorney => 'المحامي';
+
+  @override
+  String bookingAttorneyPrefill(String name) {
+    return 'الحجز مع $name';
+  }
+
+  @override
+  String get discoveryProfileTitle => 'ملف المحامي';
+
+  @override
+  String get discoveryProfileNotFound => 'المحامي غير موجود.';
+
+  @override
+  String get discoveryProfileBio => 'نبذة';
+
+  @override
+  String get discoveryProfileBook => 'احجز مع هذا المحامي';
 }

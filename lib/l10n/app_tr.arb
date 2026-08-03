@@ -210,5 +210,18 @@
   "discoveryError": "Avukatlar yüklenemedi.",
   "discoveryLocalOnlyNote": "Demo modu — yalnızca sentetik profiller. Gerçek avukatlar listelenmez veya iletişime geçilmez.",
   "discoveryEntryTitle": "Bir avukat bul",
-  "discoveryEntrySubtitle": "Demo avukat profillerine göz atın — geliştirme demosu."
+  "discoveryEntrySubtitle": "Demo avukat profillerine göz atın — geliştirme demosu.",
+  "bookingSummaryAttorney": "Avukat",
+  "bookingAttorneyPrefill": "{name} ile rezervasyon",
+  "@bookingAttorneyPrefill": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "discoveryProfileTitle": "Avukat profili",
+  "discoveryProfileNotFound": "Avukat bulunamadı.",
+  "discoveryProfileBio": "Hakkında",
+  "discoveryProfileBook": "Bu avukatla rezervasyon yap"
 }

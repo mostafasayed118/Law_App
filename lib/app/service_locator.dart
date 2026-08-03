@@ -26,6 +26,7 @@ import '../features/auth/domain/sign_up_gateway.dart';
 import '../features/auth/presentation/auth_cubit.dart';
 import '../features/booking/data/fake_booking_gateway.dart';
 import '../features/booking/domain/booking_gateway.dart';
+import '../features/booking/domain/booking_prefill.dart';
 import '../features/discovery/data/fake_attorney_gateway.dart';
 import '../features/discovery/domain/attorney_gateway.dart';
 import '../features/notifications/data/in_memory_notification_prefs_store.dart';
@@ -167,6 +168,13 @@ void configureDependencies({
     serviceLocator.registerLazySingleton<BookingGateway>(
       FakeBookingGateway.new,
     );
+  }
+  if (!serviceLocator.isRegistered<BookingPrefill>()) {
+    // Transient prefill holder (Phase 6 D-A3): app-scoped, in-memory only;
+    // consumed and cleared by BookingScreen at cubit creation. Never
+    // serialized; nothing booking-related travels in route params or
+    // GoRouter extra (D-B4).
+    serviceLocator.registerLazySingleton<BookingPrefill>(BookingPrefill.new);
   }
   if (!serviceLocator.isRegistered<AttorneyGateway>()) {
     // Stateless service: lazy singleton. The discovery Cubit is feature-scoped

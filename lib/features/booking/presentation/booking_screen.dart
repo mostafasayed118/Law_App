@@ -10,6 +10,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/widgets.dart';
 import '../domain/booking_category.dart';
 import '../domain/booking_gateway.dart';
+import '../domain/booking_prefill.dart';
 import '../domain/booking_slot.dart';
 import 'booking_cubit.dart';
 import 'booking_state.dart';
@@ -28,8 +29,21 @@ class BookingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<BookingCubit>(
-      create: (BuildContext context) =>
-          BookingCubit(serviceLocator<BookingGateway>()),
+      create: (BuildContext context) {
+        // Phase 6 D-A3: a discovery profile may pre-fill the booking with an
+        // optional attorney before navigating here. The prefill is consumed
+        // once at cubit creation and cleared, so a later standalone /book
+        // visit starts fresh (AC-5). It never travels in route params or
+        // GoRouter extra (D-B4).
+        final BookingPrefill prefill = serviceLocator<BookingPrefill>();
+        final BookingCubit cubit = BookingCubit(
+          serviceLocator<BookingGateway>(),
+          attorneyId: prefill.attorneyId,
+          attorneyName: prefill.attorneyName,
+        );
+        prefill.clear();
+        return cubit;
+      },
       child: const _BookingWizard(),
     );
   }
@@ -117,6 +131,10 @@ class _CategoryStep extends StatelessWidget {
         ],
         const SizedBox(height: LegalHubTheme.spaceMd),
         _TopicField(),
+        if (state.draft.attorneyDisplayName != null) ...[
+          const SizedBox(height: LegalHubTheme.spaceMd),
+          _PrefillNote(name: state.draft.attorneyDisplayName!),
+        ],
         const SizedBox(height: LegalHubTheme.spaceLg),
         Text(
           l10n.bookingLocalOnlyNote,
@@ -297,6 +315,11 @@ class _ReviewStep extends StatelessWidget {
               ? l10n.bookingSummaryNotSet
               : draft.topic!,
         ),
+        if (draft.attorneyDisplayName != null)
+          _SummaryRow(
+            label: l10n.bookingSummaryAttorney,
+            value: draft.attorneyDisplayName!,
+          ),
         _SummaryRow(
           label: l10n.bookingSummaryTime,
           value: draft.slot == null
@@ -411,6 +434,33 @@ class _SuccessStep extends StatelessWidget {
             child: Text(l10n.bookingDone),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _PrefillNote extends StatelessWidget {
+  const _PrefillNote({required this.name});
+
+  final String name;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final ColorScheme scheme = Theme.of(context).colorScheme;
+    final TextTheme text = Theme.of(context).textTheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
+      decoration: BoxDecoration(
+        color: scheme.secondaryContainer,
+        borderRadius: const BorderRadius.all(
+          Radius.circular(LegalHubTheme.radiusLg),
+        ),
+      ),
+      child: Text(
+        l10n.bookingAttorneyPrefill(name),
+        style: text.bodySmall?.copyWith(color: scheme.onSecondaryContainer),
       ),
     );
   }

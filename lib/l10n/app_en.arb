@@ -224,5 +224,18 @@
   "discoveryError": "Unable to load attorneys.",
   "discoveryLocalOnlyNote": "Demo mode — synthetic profiles only. No real attorneys are listed or contacted.",
   "discoveryEntryTitle": "Find an attorney",
-  "discoveryEntrySubtitle": "Browse demo attorney profiles — development demo."
+  "discoveryEntrySubtitle": "Browse demo attorney profiles — development demo.",
+  "bookingSummaryAttorney": "Attorney",
+  "bookingAttorneyPrefill": "Booking with {name}",
+  "@bookingAttorneyPrefill": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "discoveryProfileTitle": "Attorney profile",
+  "discoveryProfileNotFound": "Attorney not found.",
+  "discoveryProfileBio": "About",
+  "discoveryProfileBook": "Book with this attorney"
 }

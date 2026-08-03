@@ -11,6 +11,7 @@ import '../features/auth/presentation/forgot_password/forgot_password_reset_scre
 import '../features/auth/presentation/sign_in_screen.dart';
 import '../features/auth/presentation/sign_up_screen.dart';
 import '../features/booking/presentation/booking_screen.dart';
+import '../features/discovery/presentation/attorney_profile_screen.dart';
 import '../features/discovery/presentation/attorney_search_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/home/presentation/settings_screen.dart';
@@ -40,6 +41,10 @@ class AppRoutes {
   static const String notifications = '/notifications';
   static const String book = '/book';
   static const String discovery = '/discovery';
+  static const String discoveryProfile = '/discovery/:attorneyId';
+
+  /// The profile route for one attorney (path-param substitution).
+  static String attorneyProfile(String attorneyId) => '/discovery/$attorneyId';
 }
 
 /// Routes are navigation UX only. They do not authorize access to any future
@@ -113,6 +118,13 @@ GoRouter createAppRouter(
           path: AppRoutes.discovery,
           builder: (BuildContext context, GoRouterState state) =>
               const AttorneySearchScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.discoveryProfile,
+          builder: (BuildContext context, GoRouterState state) =>
+              AttorneyProfileScreen(
+                attorneyId: state.pathParameters['attorneyId'] ?? '',
+              ),
         ),
         GoRoute(
           path: AppRoutes.settings,

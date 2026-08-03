@@ -210,5 +210,18 @@
   "discoveryError": "تعذّر تحميل المحامين.",
   "discoveryLocalOnlyNote": "وضع تجريبي — ملفات تعريفية اصطناعية فقط. لا يتم عرض محامين حقيقيين أو التواصل معهم.",
   "discoveryEntryTitle": "ابحث عن محامٍ",
-  "discoveryEntrySubtitle": "تصفح ملفات المحامين التجريبية — عرض تجريبي للتطوير."
+  "discoveryEntrySubtitle": "تصفح ملفات المحامين التجريبية — عرض تجريبي للتطوير.",
+  "bookingSummaryAttorney": "المحامي",
+  "bookingAttorneyPrefill": "الحجز مع {name}",
+  "@bookingAttorneyPrefill": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "discoveryProfileTitle": "ملف المحامي",
+  "discoveryProfileNotFound": "المحامي غير موجود.",
+  "discoveryProfileBio": "نبذة",
+  "discoveryProfileBook": "احجز مع هذا المحامي"
 }

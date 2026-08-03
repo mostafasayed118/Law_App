@@ -25,14 +25,39 @@ enum BookingSubmitStatus { idle, submitting, success, error }
 /// [BookingCubit.confirm] builds the gateway-bound [BookingRequest] from this
 /// draft, trimming the topic at that boundary.
 class BookingDraft extends Equatable {
-  const BookingDraft({this.category, this.topic, this.slot});
+  const BookingDraft({
+    this.category,
+    this.topic,
+    this.slot,
+    this.attorneyId,
+    this.attorneyName,
+  });
 
   final BookingCategory? category;
   final String? topic;
   final BookingSlot? slot;
 
+  /// Optional attorney prefill from the discovery profile (Phase 6
+  /// D-A3): the stable synthetic id travels into
+  /// [BookingRequest.attorneyId]; the display name is presentation-only
+  /// (the review step shows it) and never leaves the draft.
+  final String? attorneyId;
+  final String? attorneyName;
+
+  /// The attorney display label for prefill surfaces (Phase 6 D-A3):
+  /// prefers the display name and falls back to the id, so a partially
+  /// built draft (id without name) still renders. The profile always
+  /// sets both together; the fallback only guards consistency.
+  String? get attorneyDisplayName => attorneyName ?? attorneyId;
+
   @override
-  List<Object?> get props => <Object?>[category, topic, slot];
+  List<Object?> get props => <Object?>[
+    category,
+    topic,
+    slot,
+    attorneyId,
+    attorneyName,
+  ];
 }
 
 /// Immutable state of the booking flow.

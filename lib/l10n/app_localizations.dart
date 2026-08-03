@@ -1329,6 +1329,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Browse demo attorney profiles — development demo.'**
   String get discoveryEntrySubtitle;
+
+  /// No description provided for @bookingSummaryAttorney.
+  ///
+  /// In en, this message translates to:
+  /// **'Attorney'**
+  String get bookingSummaryAttorney;
+
+  /// No description provided for @bookingAttorneyPrefill.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking with {name}'**
+  String bookingAttorneyPrefill(String name);
+
+  /// No description provided for @discoveryProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Attorney profile'**
+  String get discoveryProfileTitle;
+
+  /// No description provided for @discoveryProfileNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Attorney not found.'**
+  String get discoveryProfileNotFound;
+
+  /// No description provided for @discoveryProfileBio.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get discoveryProfileBio;
+
+  /// No description provided for @discoveryProfileBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Book with this attorney'**
+  String get discoveryProfileBook;
 }
 
 class _AppLocalizationsDelegate
