@@ -556,4 +556,88 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get signUpCheckInboxAction => 'Girişe Geç';
+
+  @override
+  String get bookingTitle => 'Danışma Rezervasyonu';
+
+  @override
+  String get bookingLocalOnlyNote =>
+      'Demo modu — hiçbir danışma fiilen rezerve edilmez veya gönderilmez.';
+
+  @override
+  String get bookingCategoryStepTitle => 'Danışma türü';
+
+  @override
+  String get bookingCategoryGeneral => 'Genel';
+
+  @override
+  String get bookingCategoryFollowUp => 'Takip';
+
+  @override
+  String get bookingCategoryUrgent => 'Acil';
+
+  @override
+  String get bookingTopicLabel => 'Konu (isteğe bağlı)';
+
+  @override
+  String get bookingTopicPlaceholder => 'Sorunuzu kısaca açıklayın';
+
+  @override
+  String get bookingContinue => 'Devam';
+
+  @override
+  String get bookingSelectDateTimeStep => 'Tarih ve saat seçin';
+
+  @override
+  String get bookingSlotsEmpty => 'Uygun zaman yok.';
+
+  @override
+  String get bookingSlotsError => 'Uygun zamanlar yüklenemedi.';
+
+  @override
+  String bookingDurationMinutes(int minutes) {
+    return '$minutes dk';
+  }
+
+  @override
+  String get bookingReviewStep => 'Rezervasyonunuzu gözden geçirin';
+
+  @override
+  String get bookingSummaryType => 'Tür';
+
+  @override
+  String get bookingSummaryTopic => 'Konu';
+
+  @override
+  String get bookingSummaryTime => 'Zaman';
+
+  @override
+  String get bookingSummaryNotSet => 'Belirtilmedi';
+
+  @override
+  String get bookingEditCategory => 'Türü düzenle';
+
+  @override
+  String get bookingConfirm => 'Rezervasyonu onayla';
+
+  @override
+  String get bookingConfirmFailed => 'Onaylanamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get bookingSuccessTitle => 'Rezervasyon onaylandı';
+
+  @override
+  String bookingSuccessBody(String referenceId) {
+    return 'Referans: $referenceId';
+  }
+
+  @override
+  String get bookingDone => 'Bitti';
+
+  @override
+  String get bookingEntryTitle => 'Danışma rezervasyonu';
+
+  @override
+  String get bookingEntrySubtitle =>
+      'Bir danışma planlayın — geliştirme demosu.';
 }

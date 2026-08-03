@@ -260,6 +260,42 @@ void main() {
     );
   });
 
+  group('booking route (Phase 5 slice 5.2)', () {
+    testWidgets(
+      'renders the booking wizard for an authenticated demo session',
+      (tester) async {
+        // BookingScreen resolves BookingGateway from the locator (the dev
+        // fake in env-less runs).
+        await resetServiceLocator();
+        configureDependencies();
+        addTearDown(() => resetServiceLocator());
+
+        await authCubit.startDemoSession();
+        router.go(AppRoutes.book);
+        await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+        await tester.pumpAndSettle();
+
+        // The /book route renders the wizard's category step, not home; the
+        // shell keeps home highlighted (the /book route is not a settings
+        // descendant).
+        expect(find.text('Book a Consultation'), findsOneWidget);
+        expect(find.text('Consultation type'), findsOneWidget);
+        expect(selectedIndex(tester), 0);
+      },
+    );
+
+    testWidgets('blocks unauthenticated access to the booking route', (
+      tester,
+    ) async {
+      router.go(AppRoutes.book);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Welcome Back'), findsOneWidget);
+      expect(authCubit.state.isAuthenticated, isFalse);
+    });
+  });
+
   group('organization route (1.5 pin)', () {
     testWidgets('renders the roster for an authenticated demo session', (
       tester,
@@ -445,6 +481,7 @@ void main() {
             UserRole.client: const RoleCapability(
               canViewHome: true,
               canViewSettings: false,
+              canBookConsultation: true,
             ),
           },
         );
@@ -486,6 +523,7 @@ void main() {
             UserRole.attorney: const RoleCapability(
               canViewHome: false,
               canViewSettings: true,
+              canBookConsultation: false,
             ),
           },
         );
@@ -550,6 +588,7 @@ void main() {
           UserRole.admin: const RoleCapability(
             canViewHome: false,
             canViewSettings: false,
+            canBookConsultation: false,
           ),
         },
       );

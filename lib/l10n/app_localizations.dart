@@ -1125,6 +1125,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Continue to Sign In'**
   String get signUpCheckInboxAction;
+
+  /// No description provided for @bookingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Book a Consultation'**
+  String get bookingTitle;
+
+  /// No description provided for @bookingLocalOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo mode — no consultation is actually booked or sent.'**
+  String get bookingLocalOnlyNote;
+
+  /// No description provided for @bookingCategoryStepTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Consultation type'**
+  String get bookingCategoryStepTitle;
+
+  /// No description provided for @bookingCategoryGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get bookingCategoryGeneral;
+
+  /// No description provided for @bookingCategoryFollowUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow-up'**
+  String get bookingCategoryFollowUp;
+
+  /// No description provided for @bookingCategoryUrgent.
+  ///
+  /// In en, this message translates to:
+  /// **'Urgent'**
+  String get bookingCategoryUrgent;
+
+  /// No description provided for @bookingTopicLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Topic (optional)'**
+  String get bookingTopicLabel;
+
+  /// No description provided for @bookingTopicPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Briefly describe your question'**
+  String get bookingTopicPlaceholder;
+
+  /// No description provided for @bookingContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get bookingContinue;
+
+  /// No description provided for @bookingSelectDateTimeStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Select date & time'**
+  String get bookingSelectDateTimeStep;
+
+  /// No description provided for @bookingSlotsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No times available.'**
+  String get bookingSlotsEmpty;
+
+  /// No description provided for @bookingSlotsError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load available times.'**
+  String get bookingSlotsError;
+
+  /// No description provided for @bookingDurationMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String bookingDurationMinutes(int minutes);
+
+  /// No description provided for @bookingReviewStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Review your booking'**
+  String get bookingReviewStep;
+
+  /// No description provided for @bookingSummaryType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get bookingSummaryType;
+
+  /// No description provided for @bookingSummaryTopic.
+  ///
+  /// In en, this message translates to:
+  /// **'Topic'**
+  String get bookingSummaryTopic;
+
+  /// No description provided for @bookingSummaryTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get bookingSummaryTime;
+
+  /// No description provided for @bookingSummaryNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not specified'**
+  String get bookingSummaryNotSet;
+
+  /// No description provided for @bookingEditCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit category'**
+  String get bookingEditCategory;
+
+  /// No description provided for @bookingConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm booking'**
+  String get bookingConfirm;
+
+  /// No description provided for @bookingConfirmFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to confirm. Please try again.'**
+  String get bookingConfirmFailed;
+
+  /// No description provided for @bookingSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking confirmed'**
+  String get bookingSuccessTitle;
+
+  /// No description provided for @bookingSuccessBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference: {referenceId}'**
+  String bookingSuccessBody(String referenceId);
+
+  /// No description provided for @bookingDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get bookingDone;
+
+  /// No description provided for @bookingEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Book a consultation'**
+  String get bookingEntryTitle;
+
+  /// No description provided for @bookingEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule a consultation — development demo.'**
+  String get bookingEntrySubtitle;
 }
 
 class _AppLocalizationsDelegate

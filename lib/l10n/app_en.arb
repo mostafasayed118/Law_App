@@ -176,4 +176,45 @@
   "signUpCheckInboxTitle": "Check Your Inbox",
   "signUpCheckInboxBody": "We've sent a verification link to your email. Open it to activate your account, then sign in.",
   "signUpCheckInboxAction": "Continue to Sign In"
+,
+  "bookingTitle": "Book a Consultation",
+  "bookingLocalOnlyNote": "Demo mode — no consultation is actually booked or sent.",
+  "bookingCategoryStepTitle": "Consultation type",
+  "bookingCategoryGeneral": "General",
+  "bookingCategoryFollowUp": "Follow-up",
+  "bookingCategoryUrgent": "Urgent",
+  "bookingTopicLabel": "Topic (optional)",
+  "bookingTopicPlaceholder": "Briefly describe your question",
+  "bookingContinue": "Continue",
+  "bookingSelectDateTimeStep": "Select date & time",
+  "bookingSlotsEmpty": "No times available.",
+  "bookingSlotsError": "Unable to load available times.",
+  "bookingDurationMinutes": "{minutes} min",
+  "@bookingDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "bookingReviewStep": "Review your booking",
+  "bookingSummaryType": "Type",
+  "bookingSummaryTopic": "Topic",
+  "bookingSummaryTime": "Time",
+  "bookingSummaryNotSet": "Not specified",
+  "bookingEditCategory": "Edit category",
+  "bookingConfirm": "Confirm booking",
+  "bookingConfirmFailed": "Unable to confirm. Please try again.",
+  "bookingSuccessTitle": "Booking confirmed",
+  "bookingSuccessBody": "Reference: {referenceId}",
+  "@bookingSuccessBody": {
+    "placeholders": {
+      "referenceId": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingDone": "Done",
+  "bookingEntryTitle": "Book a consultation",
+  "bookingEntrySubtitle": "Schedule a consultation — development demo."
 }

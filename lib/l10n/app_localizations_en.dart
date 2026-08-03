@@ -555,4 +555,88 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get signUpCheckInboxAction => 'Continue to Sign In';
+
+  @override
+  String get bookingTitle => 'Book a Consultation';
+
+  @override
+  String get bookingLocalOnlyNote =>
+      'Demo mode — no consultation is actually booked or sent.';
+
+  @override
+  String get bookingCategoryStepTitle => 'Consultation type';
+
+  @override
+  String get bookingCategoryGeneral => 'General';
+
+  @override
+  String get bookingCategoryFollowUp => 'Follow-up';
+
+  @override
+  String get bookingCategoryUrgent => 'Urgent';
+
+  @override
+  String get bookingTopicLabel => 'Topic (optional)';
+
+  @override
+  String get bookingTopicPlaceholder => 'Briefly describe your question';
+
+  @override
+  String get bookingContinue => 'Continue';
+
+  @override
+  String get bookingSelectDateTimeStep => 'Select date & time';
+
+  @override
+  String get bookingSlotsEmpty => 'No times available.';
+
+  @override
+  String get bookingSlotsError => 'Unable to load available times.';
+
+  @override
+  String bookingDurationMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get bookingReviewStep => 'Review your booking';
+
+  @override
+  String get bookingSummaryType => 'Type';
+
+  @override
+  String get bookingSummaryTopic => 'Topic';
+
+  @override
+  String get bookingSummaryTime => 'Time';
+
+  @override
+  String get bookingSummaryNotSet => 'Not specified';
+
+  @override
+  String get bookingEditCategory => 'Edit category';
+
+  @override
+  String get bookingConfirm => 'Confirm booking';
+
+  @override
+  String get bookingConfirmFailed => 'Unable to confirm. Please try again.';
+
+  @override
+  String get bookingSuccessTitle => 'Booking confirmed';
+
+  @override
+  String bookingSuccessBody(String referenceId) {
+    return 'Reference: $referenceId';
+  }
+
+  @override
+  String get bookingDone => 'Done';
+
+  @override
+  String get bookingEntryTitle => 'Book a consultation';
+
+  @override
+  String get bookingEntrySubtitle =>
+      'Schedule a consultation — development demo.';
 }

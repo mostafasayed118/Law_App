@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
+import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/home/presentation/home_screen.dart';
@@ -36,6 +37,15 @@ void main() {
     await tester.pumpWidget(pumpHome(const Locale('en')));
     await tester.pumpAndSettle();
 
+    // The Phase 5 booking entry renders above the activity cards, so the
+    // activity content sits below the fold on a default test surface; scroll
+    // it into view before asserting (slivers only build visible children).
+    await tester.scrollUntilVisible(
+      find.text('Estate of H. Vance vs. City'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+
     // The hardcoded English strings must no longer be the source of these
     // labels — they now flow through AppLocalizations. Asserting the EN value
     // proves the keys resolve (regression guard for the localization fix).
@@ -50,6 +60,14 @@ void main() {
   ) async {
     await tester.pumpWidget(pumpHome(const Locale('ar')));
     await tester.pumpAndSettle();
+
+    // Same below-the-fold situation as the EN test: scroll the activity cards
+    // into view before asserting the Arabic copy.
+    await tester.scrollUntilVisible(
+      find.text('تركة هـ. فانس ضد المدينة'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
 
     // The Arabic translations must render — the original hardcoded English
     // strings were a localization-contract violation. Asserting the Arabic
@@ -67,6 +85,48 @@ void main() {
       ),
       findsWidgets,
     );
+  });
+
+  group('booking entry (Phase 5 slice 5.2)', () {
+    testWidgets('renders the entry card with the default capability map', (
+      tester,
+    ) async {
+      await tester.pumpWidget(pumpHome(const Locale('en')));
+      await tester.pumpAndSettle();
+
+      // The default roleCapabilities grants canBookConsultation to every
+      // bootstrap role, so the demo client sees the booking entry on the
+      // dashboard (nav hint only, never an authorization grant).
+      expect(find.text('Book a consultation'), findsOneWidget);
+      expect(find.textContaining('Schedule a consultation'), findsOneWidget);
+    });
+
+    testWidgets('hides the entry when the capability is not granted', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        BlocProvider<AuthCubit>.value(
+          value: authCubit,
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: HomeScreen(
+              capabilitiesForRole: <UserRole, RoleCapability>{
+                UserRole.client: const RoleCapability(
+                  canViewHome: true,
+                  canViewSettings: true,
+                  canBookConsultation: false,
+                ),
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Book a consultation'), findsNothing);
+    });
   });
 
   group('greeting fallback (D-T3 pin)', () {

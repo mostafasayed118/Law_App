@@ -21,14 +21,17 @@ void main() {
       const RoleCapability a = RoleCapability(
         canViewHome: true,
         canViewSettings: true,
+        canBookConsultation: true,
       );
       const RoleCapability b = RoleCapability(
         canViewHome: true,
         canViewSettings: true,
+        canBookConsultation: true,
       );
       const RoleCapability c = RoleCapability(
         canViewHome: true,
         canViewSettings: false,
+        canBookConsultation: false,
       );
 
       expect(a, equals(b));
@@ -56,6 +59,9 @@ void main() {
           final RoleCapability cap = roleCapabilities[role]!;
           expect(cap.canViewHome, isTrue, reason: 'role $role');
           expect(cap.canViewSettings, isTrue, reason: 'role $role');
+          // Phase 5 (D-B7 standalone): every bootstrap role also gets the
+          // booking entry in the demo capability map.
+          expect(cap.canBookConsultation, isTrue, reason: 'role $role');
         }
       },
     );

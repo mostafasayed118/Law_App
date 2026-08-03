@@ -551,4 +551,87 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get signUpCheckInboxAction => 'المتابعة إلى تسجيل الدخول';
+
+  @override
+  String get bookingTitle => 'احجز استشارة';
+
+  @override
+  String get bookingLocalOnlyNote =>
+      'وضع تجريبي — لا يتم حجز أي استشارة أو إرسالها فعليًا.';
+
+  @override
+  String get bookingCategoryStepTitle => 'نوع الاستشارة';
+
+  @override
+  String get bookingCategoryGeneral => 'عامة';
+
+  @override
+  String get bookingCategoryFollowUp => 'متابعة';
+
+  @override
+  String get bookingCategoryUrgent => 'عاجلة';
+
+  @override
+  String get bookingTopicLabel => 'الموضوع (اختياري)';
+
+  @override
+  String get bookingTopicPlaceholder => 'صف سؤالك باختصار';
+
+  @override
+  String get bookingContinue => 'متابعة';
+
+  @override
+  String get bookingSelectDateTimeStep => 'اختر التاريخ والوقت';
+
+  @override
+  String get bookingSlotsEmpty => 'لا توجد أوقات متاحة.';
+
+  @override
+  String get bookingSlotsError => 'تعذّر تحميل الأوقات المتاحة.';
+
+  @override
+  String bookingDurationMinutes(int minutes) {
+    return '$minutes دقيقة';
+  }
+
+  @override
+  String get bookingReviewStep => 'مراجعة الحجز';
+
+  @override
+  String get bookingSummaryType => 'النوع';
+
+  @override
+  String get bookingSummaryTopic => 'الموضوع';
+
+  @override
+  String get bookingSummaryTime => 'الوقت';
+
+  @override
+  String get bookingSummaryNotSet => 'غير محدد';
+
+  @override
+  String get bookingEditCategory => 'تعديل النوع';
+
+  @override
+  String get bookingConfirm => 'تأكيد الحجز';
+
+  @override
+  String get bookingConfirmFailed => 'تعذّر التأكيد. حاول مرة أخرى.';
+
+  @override
+  String get bookingSuccessTitle => 'تم تأكيد الحجز';
+
+  @override
+  String bookingSuccessBody(String referenceId) {
+    return 'المرجع: $referenceId';
+  }
+
+  @override
+  String get bookingDone => 'تم';
+
+  @override
+  String get bookingEntryTitle => 'احجز استشارة';
+
+  @override
+  String get bookingEntrySubtitle => 'جدولة استشارة — عرض تجريبي للتطوير.';
 }

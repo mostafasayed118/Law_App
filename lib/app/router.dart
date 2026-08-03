@@ -10,6 +10,7 @@ import '../features/auth/presentation/forgot_password/forgot_password_otp_screen
 import '../features/auth/presentation/forgot_password/forgot_password_reset_screen.dart';
 import '../features/auth/presentation/sign_in_screen.dart';
 import '../features/auth/presentation/sign_up_screen.dart';
+import '../features/booking/presentation/booking_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/home/presentation/settings_screen.dart';
 import '../features/notifications/presentation/notification_settings_screen.dart';
@@ -36,6 +37,7 @@ class AppRoutes {
   static const String acceptInvitation = '/accept-invitation';
   static const String profile = '/profile';
   static const String notifications = '/notifications';
+  static const String book = '/book';
 }
 
 /// Routes are navigation UX only. They do not authorize access to any future
@@ -98,7 +100,12 @@ GoRouter createAppRouter(
         GoRoute(
           path: AppRoutes.home,
           builder: (BuildContext context, GoRouterState state) =>
-              const HomeScreen(),
+              HomeScreen(capabilitiesForRole: capabilitiesForRole),
+        ),
+        GoRoute(
+          path: AppRoutes.book,
+          builder: (BuildContext context, GoRouterState state) =>
+              const BookingScreen(),
         ),
         GoRoute(
           path: AppRoutes.settings,

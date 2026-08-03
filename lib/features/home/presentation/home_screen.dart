@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:go_router/go_router.dart';
+
 import '../../../app/legalhub_theme.dart';
+import '../../../app/router.dart';
+import '../../../core/roles/user_role.dart';
 import '../../../features/auth/presentation/auth_cubit.dart' show AuthCubit;
+import '../../../features/booking/presentation/booking_entry_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/widgets.dart';
 import 'widgets/home_cards.dart';
@@ -14,7 +19,11 @@ import 'widgets/home_cards.dart';
 /// authenticated session's display name, falling back to the localized
 /// `homeFallbackName` (D-T3) when no session is present.
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({this.capabilitiesForRole = roleCapabilities, super.key});
+
+  /// Test seam mirroring the router's capability injection: home entry
+  /// visibility derives from the session role's capabilities (nav hint only).
+  final Map<UserRole, RoleCapability> capabilitiesForRole;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -34,9 +43,14 @@ class _HomeScreenState extends State<HomeScreen> {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
+    final AuthCubit authCubit = context.watch<AuthCubit>();
     final String name =
-        context.watch<AuthCubit>().state.session?.displayName ??
-        l10n.homeFallbackName;
+        authCubit.state.session?.displayName ?? l10n.homeFallbackName;
+    // UX-only projection of the active membership's role (mirrors the shell);
+    // the booking entry is a navigation hint, never an authorization grant.
+    final UserRole role =
+        authCubit.state.session?.primaryRole ?? UserRole.client;
+    final RoleCapability capabilities = widget.capabilitiesForRole[role]!;
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(
@@ -97,6 +111,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     hint: l10n.searchPlaceholder,
                     prefixIcon: Icons.search,
                   ),
+                  if (capabilities.canBookConsultation) ...[
+                    const SizedBox(height: LegalHubTheme.spaceLg),
+                    BookingEntryCard(onTap: () => context.go(AppRoutes.book)),
+                  ],
                 ]),
               ),
             ),
