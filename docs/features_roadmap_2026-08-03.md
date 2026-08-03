@@ -38,7 +38,11 @@
 > pins) — per the gate-table row below and the decision record in
 > `docs/attorney_discovery_scope_2026-08-03.md` (D-A1…D-A6 ratified, incl.
 > the D-B7 additive `attorneyId` booking hook).
-> Everything in §10 stays deferred until P0 closes.
+> Phase 7 (matter dashboard, read-first, client-only) **APPROVED 2026-08-03**
+> (scope note `docs/matter_dashboard_scope_2026-08-03.md`; D-M1…D-M7
+> ratified, incl. D-M7 active-org switcher per D-08). Implementation starts
+> with slice 7.0 behind the standard slice gate.
+> Everything in §11 stays deferred until P0 closes.
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
 >
@@ -100,11 +104,11 @@ that blocks it).
 | `accept_invitation` | ✅ `acceptInvitation` | Phase 2 (UX decision) / Phase 4 (deep link) | **R3** in the P3 spec; token-entry UX decided (accept screen) |
 | `delete_my_account` | ✅ `deleteMyAccount` | Phase 2 | D-05 requires the hard-delete action (cascade identity + memberships) |
 | `list_organizations_metadata` | ❌ | Phase 2 (owner) or Phase 3 (member-facing) | backs the active-org switcher, D-08 |
-| `read_org_audit` | ❌ | deferred (§10) | audit surfacing is P2-gated; `platform_owner_admin` self-audit rules apply |
-| `read_platform_audit` | ❌ | deferred (§10) | owner-gated; audit table never publicly readable (matrix §6) |
-| `delete_demo_account` | ❌ | deferred (§10) | `platform_owner_admin`-only; no owner admin screen until the Addendum's server-side enforcement story is complete |
-| `suspend_membership_platform` | ❌ | deferred (§10) | `platform_owner_admin`-only |
-| `reactivate_membership_platform` | ❌ | deferred (§10) | `platform_owner_admin`-only |
+| `read_org_audit` | ❌ | deferred (§11) | audit surfacing is P2-gated; `platform_owner_admin` self-audit rules apply |
+| `read_platform_audit` | ❌ | deferred (§11) | owner-gated; audit table never publicly readable (matrix §6) |
+| `delete_demo_account` | ❌ | deferred (§11) | `platform_owner_admin`-only; no owner admin screen until the Addendum's server-side enforcement story is complete |
+| `suspend_membership_platform` | ❌ | deferred (§11) | `platform_owner_admin`-only |
+| `reactivate_membership_platform` | ❌ | deferred (§11) | `platform_owner_admin`-only |
 
 ## 3. Phase 1 — P3 org & membership UI slice (next approved batch)
 
@@ -287,7 +291,34 @@ attorney messaging.
 **Exit:** four checks green; suite + README count in lockstep (the ledger
 §2d check); no push without owner approval.
 
-## 9. Sequencing & governance gate table
+## 9. Phase 7 — Matter dashboard (read-first, client-only) + org switcher
+
+**Status: APPROVED 2026-08-03** (owner ratification of D-M1…D-M7). Scope
+note `docs/matter_dashboard_scope_2026-08-03.md`. Spec basis: MVP §4
+"Case/matter dashboard & details (read-first)" + §6 remediation row 156
+(`case_management_dashboard, case_details, shared_case_workspace`); org
+switcher per D-08 (client-side UX convenience only — the server re-derives
+membership, never trusts a client-selected org id).
+
+**Gate (as designed):** scope note approval → decision-record ratification
+(D-M1…D-M7, incl. D-M7 active-org switcher) → slice 7.0 (active-org
+switcher, D-08) → slice 7.1 (`MatterGateway` seam + fake + list surface,
+read-first) → slice 7.2 (details, read-only projection) → slice 7.3 (l10n
+pins) → full B2 gate stack → owner push approval. Client-only; no server
+change, no matter actions, no messaging, no documents (rows 154/155 keep
+their §11 gates).
+
+| # | Slice | Scope | New files (sketch) | Tests |
+|---|---|---|---|---|
+| 7.0 | Active-org switcher | `ActiveOrgStore` (client-side, session-scoped, seeded from `Session.activeMembership`); switcher sheet listing `Session.memberships`; orgs hub reads the store (D-08 — the client never sends the selected org id as an authority; `list_organizations_metadata` stays unwired) | `features/orgs/presentation/active_org_store.dart` (sketch) | store seed/switch tests; switcher widget test; hub reads the store (AC-4) |
+| 7.1 | Gateway + matter list | `MatterGateway` seam + dev fake (synthetic non-PII list, D-M2/D-M4); list screen with status filter + empty state (client-side filter, D-M5); capability entry (D-M6) | `features/matters/domain/matter_gateway.dart`, `data/fake_matter_gateway.dart`, `presentation/matter_list_screen.dart` | gateway fetch shape; filter/empty widget tests (AC-1, AC-2, AC-5) |
+| 7.2 | Matter details (read-first) | Read-only projection of the synthetic matter (title/status/area/assigned attorney/date, D-M4); no action affordances (D-M1) | `presentation/matter_details_screen.dart` | field assertions + read-only line pin (AC-3) |
+| 7.3 | l10n | All new strings EN/AR/TR; no legal-advice copy (spec §6 row 152) | 3 `.arb` + generated l10n | TR/AR resolution pins (AC-6) |
+
+**Exit:** four checks green; suite + README count in lockstep (the ledger
+§2d check); no push without owner approval.
+
+## 10. Sequencing & governance gate table
 
 | Order | Phase | Depends on | Server changes? | Gate to pass | Status |
 |---|---|---|---|---|---|
@@ -297,7 +328,8 @@ attorney messaging.
 | 4 | Phase 4 — auth plumbing | — | 4.1 yes (platform config) | platform config approval → gate stack | **4.2 SHIPPED 2026-08-03 (`deb72d8`); 4.1 APPROVED + IMPLEMENTED 2026-08-03 (scope note `docs/p4_41_deeplink_recovery_scope_2026-08-03.md`); R1 = dashboard Redirect URL (owner-side)** |
 | 5 | Phase 5 — consultation booking (no live payment) | MVP spec §4; auth/org track (§§3–4); D-B7 resolved (standalone) | no | scope note → decision-record ratification → UI + routing slice → gate stack → owner push approval | **SHIPPED 2026-08-03** (`05f13c8` + `0eb7ec9` + `3bd3d29` + `d55e273`, suite 521, ledger PASS 115; pushed to origin/main) |
 | 6 | Phase 6 — attorney discovery (read-only, client-only) | MVP spec §4; D-B7 additive `attorneyId` hook; Phase 5 booking seams | no | scope note → decision-record ratification (D-A1…D-A6) → slices 6.1–6.3 → gate stack → owner push approval | **SHIPPED 2026-08-03** (`0f93042` + `7b5c589` + `d389c69`, suite 565, ledger PASS 115; pushed to origin/main) |
-| — | §10 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Deferred |
+| 7 | Phase 7 — matter dashboard (read-first, client-only) + org switcher | MVP spec §4; D-08 org semantics; Phase 6 seams (synthetic attorney roster for assignment) | no | scope note → decision-record ratification (D-M1…D-M7) → slices 7.0–7.3 → gate stack → owner push approval | **APPROVED 2026-08-03** — scope note `docs/matter_dashboard_scope_2026-08-03.md` (D-M1…D-M7 ratified); slices 7.0–7.3 pending |
+| — | §11 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Deferred |
 
 Rules that apply to every phase (definition-of-done from
 `docs/codebase_audit_plan.md`): scope/assumptions/non-goals documented ·
@@ -306,7 +338,7 @@ secrets and real data · verification commands actually run and reported
 honestly · **no commit, push, or deployment without explicit owner
 approval**.
 
-## 10. Explicitly deferred (do NOT build until P0 closes + policy tests exist)
+## 11. Explicitly deferred (do NOT build until P0 closes + policy tests exist)
 
 Per README boundary + `docs/permission_matrix.md` §4/§6: **matters,
 documents, messages, storage, realtime, audit surfacing, billing, AI**.
@@ -318,7 +350,7 @@ RPCs (`delete_demo_account`, `suspend_membership_platform`,
 `reactivate_membership_platform`) stay unwired until the Addendum's
 server-side enforcement + auditing story is complete.
 
-## 11. Ledger hooks (what to update when a phase lands)
+## 12. Ledger hooks (what to update when a phase lands)
 
 - P3 spec §1 status line → "UI slice implemented" + commit ref, and
   `docs/p0_decision_capture.md` §3 P3 row → APPROVED/executed with date.
@@ -332,3 +364,4 @@ server-side enforcement + auditing story is complete.
 - This roadmap's status header + gate table as each row advances.
 - Phase 5 landing: README test-count + implemented-foundation lines in lockstep (the ledger gate's §2d check) — booking's ~975 branch test lines count once committed; `docs/booking_scope_2026-08-03.md` decision record ratified.
 - Phase 6 landing: README test-count + implemented-foundation lines in lockstep; `docs/attorney_discovery_scope_2026-08-03.md` decision record ratified (D-A1…D-A6).
+- Phase 7 landing: README test-count + implemented-foundation lines in lockstep; `docs/matter_dashboard_scope_2026-08-03.md` decision record ratified (D-M1…D-M7); roadmap §4 slice 2.3 (org switcher) closes as slice 7.0.
