@@ -88,12 +88,21 @@ slice).
 - **R3 — invitation acceptance is deferred.** `accept_invitation(token)`
   wiring requires the token-entry UX decision and deep-link work; the
   failure kind (`invalidInvitation`) is already mapped at the gateway.
-- **D1 — recovery flow decision (2026-08-03):** the 3-step OTP-style recovery
-  UX stays as designed (B12); real GoTrue recovery uses an **email link with
-  a PKCE code**, which requires deep-link registration (platform intent
-  filters + auth callback + router handling) before it can be wired honestly.
-  Until that slice exists, recovery remains demo-gated — no half-wired
-  provider path that looks real but dead-ends.
+- **D1 — recovery flow decision (2026-08-03; REVISED and SHIPPED 2026-08-03,
+  `c2496df`):** GoTrue's link-based recovery (email-link + PKCE) still
+  requires deep-link registration (platform intent filters + auth callback +
+  router handling) and remains deferred. However, GoTrue also offers a
+  **code-based variant** — send OTP → verify OTP → change password — that
+  needs **no deep links**, and that variant is wired and shipped in three
+  explicit steps behind the `PasswordRecoveryGateway` seam (`requestCode` →
+  `verifyCode` → `reset`), with `SupabaseAuthApi.sendRecoveryOtp` /
+  `verifyRecoveryOtp` / `updatePassword` (the last also clears the provider
+  session so recovery never leaves the app authenticated), a DI flip on
+  `env.isConfigured`, screens calling the seam with loading guards and typed
+  failure snackbars, non-enumerating acknowledgement for unknown addresses,
+  and redaction-safe diagnostics (ADR-0003). The flow is never half-wired:
+  every screen action maps to a real provider call when configured. Suite
+  355, analyze clean.
 
 ## 6. Authorization
 

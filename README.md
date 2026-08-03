@@ -40,7 +40,9 @@ messaging services.
   `RecoveryRoutingContext` route `extra` (never the URL — email is PII and
   the OTP is a short-lived credential), so the reset screen builds a
   `PasswordRecoveryRequest` with real values; the OTP "Resend code" control
-  is disabled by design (§4.4 no-false-assurance).
+  re-sends through the gateway seam in configured builds — never a false
+  assurance, because env-less runs and tests use the dev fake, which
+  acknowledges without sending.
 - `SignUpRequest` pure-domain value object (features/auth/domain) with a
   redaction contract: `toRedactedMap()` is safe to embed in `AppError.context`.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction

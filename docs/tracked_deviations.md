@@ -76,6 +76,15 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
   `0d5c66d`; email/OTP threading + disabled resend `83f5bbf`). Retained as a
   historical record.
 
+> **Superseded (2026-08-03, `c2496df`):** the D-T2 resend-resolution
+> ("the control is disabled to avoid false assurance") is superseded by the
+> shipped D1-revised code-based recovery slice: "Resend code" is now a real
+> gateway call behind the `PasswordRecoveryGateway` seam (send OTP → verify
+> OTP → change password, see `docs/p3_organization_membership_spec_2026-08-03.md`
+> §5 D1 revised), so the disabled-control state no longer exists in code.
+> D-T2 itself remains RESOLVED for its sign-up wiring and email/OTP threading
+> halves; only the resend half of the resolution is superseded.
+
 ## D-T3: Hardcoded English fallback display name — **RESOLVED (2026-08-01)**
 
 - **Where:** ~~`lib/features/home/presentation/home_screen.dart` — greeting
