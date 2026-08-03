@@ -15,8 +15,13 @@ import '../../core/roles/user_role.dart';
 /// boundary.
 class FakeAuthGateway implements AuthGateway {
   Session? _session;
+  bool _recoveryPending = false;
+  // Sync delivery: events reach listeners in the caller's zone. Without it,
+  // a cubit constructed outside a `testWidgets` FakeAsync zone would receive
+  // the session on a real-zone microtask the test clock never flushes, and
+  // the widget would stay on the loading spinner forever.
   final StreamController<Session?> _changes =
-      StreamController<Session?>.broadcast();
+      StreamController<Session?>.broadcast(sync: true);
 
   /// The demo active membership, shared by the synthetic session.
   static const OrganizationMembership demoMembership = OrganizationMembership(
@@ -31,6 +36,20 @@ class FakeAuthGateway implements AuthGateway {
 
   @override
   Stream<Session?> get sessionChanges => _changes.stream;
+
+  @override
+  bool get recoveryPending => _recoveryPending;
+
+  /// Marks the demo as in a recovery session (Phase 4.1 test seam): the
+  /// demo equivalent of a PKCE session that arrived via a recovery link.
+  ///
+  /// Like the real gateway, the flag stays set while the recovery session is
+  /// current — it clears on [signOut] (the reset flow's exit), mirroring how
+  /// a provider recovery session keeps its marker until it is replaced or
+  /// signed out.
+  void markAsRecoverySession() {
+    _recoveryPending = true;
+  }
 
   @override
   Future<AuthOutcome<Session>> restore() async {
@@ -75,6 +94,7 @@ class FakeAuthGateway implements AuthGateway {
   @override
   Future<void> signOut() async {
     _session = null;
+    _recoveryPending = false;
     _changes.add(null);
   }
 

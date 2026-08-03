@@ -167,7 +167,8 @@ void main() {
 
         // Pins the seam surface: no accessToken/refreshToken can be added to
         // the snapshot without this test failing (contract §2.6 redaction).
-        expect(snapshot.props, <Object?>['u-1', 'Amira', null]);
+        // recoveredViaLink is the Phase 4.1 recovery marker, false here.
+        expect(snapshot.props, <Object?>['u-1', 'Amira', null, false]);
       },
     );
 
@@ -211,6 +212,75 @@ void main() {
       await Future<void>.delayed(Duration.zero);
 
       expect(seen.last, isNull);
+    });
+  });
+
+  group('SupabaseAuthGateway recoveryPending', () {
+    test('reflects the recovery marker of the current snapshot', () async {
+      final DateTime expiresAt = DateTime.now().add(const Duration(hours: 8));
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(
+        SupabaseAuthSnapshot(
+          userId: 'u-1',
+          displayName: 'Amira',
+          expiresAt: expiresAt,
+          recoveredViaLink: true,
+        ),
+      );
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      expect(gateway.recoveryPending, isTrue);
+
+      await gateway.restore();
+
+      expect(gateway.recoveryPending, isTrue);
+    });
+
+    test('tracks the marker across snapshot changes', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null);
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      expect(gateway.recoveryPending, isFalse);
+
+      api.emit(
+        SupabaseAuthSnapshot(
+          userId: 'u-1',
+          expiresAt: DateTime.now().add(const Duration(hours: 1)),
+          recoveredViaLink: true,
+        ),
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(gateway.recoveryPending, isTrue);
+
+      // A normal session replaces the recovery session: marker clears.
+      api.emit(
+        SupabaseAuthSnapshot(
+          userId: 'u-1',
+          expiresAt: DateTime.now().add(const Duration(hours: 1)),
+        ),
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(gateway.recoveryPending, isFalse);
+    });
+
+    test('clears the marker on sign-out', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(
+        SupabaseAuthSnapshot(
+          userId: 'u-1',
+          expiresAt: DateTime.now().add(const Duration(hours: 1)),
+          recoveredViaLink: true,
+        ),
+      );
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      await gateway.signOut();
+
+      expect(gateway.recoveryPending, isFalse);
+      expect(gateway.currentSession, isNull);
     });
   });
 

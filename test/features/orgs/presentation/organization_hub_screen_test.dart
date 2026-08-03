@@ -24,6 +24,9 @@ class _FixedAuthGateway implements AuthGateway {
   Stream<Session?> get sessionChanges => const Stream<Session?>.empty();
 
   @override
+  bool get recoveryPending => false;
+
+  @override
   Future<AuthOutcome<Session>> restore() async {
     return AuthOutcome<Session>.success(_session);
   }

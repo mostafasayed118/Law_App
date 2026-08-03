@@ -43,6 +43,15 @@ messaging services.
   re-sends through the gateway seam in configured builds — never a false
   assurance, because env-less runs and tests use the dev fake, which
   acknowledges without sending.
+- Phase 4.1 deep-link recovery (2026-08-03, the link + PKCE variant of the
+  D1-revised flow): Android `com.legalhub.app` VIEW intent filter + iOS
+  `CFBundleURLTypes` scheme, `sendRecoveryOtp` now passes
+  `emailRedirectTo: com.legalhub.app://auth/v1/callback`, and `AuthCubit`
+  subscribes to `AuthGateway.sessionChanges` so a PKCE-recovered session
+  surfaces `recoveryPending` and the router lands it on the reset step —
+  never home. Verified via router/cubit/gateway tests; the dashboard
+  Redirect URL remains an owner-side action (scope note
+  `docs/p4_41_deeplink_recovery_scope_2026-08-03.md`).
 - `SignUpRequest` pure-domain value object (features/auth/domain) with a
   redaction contract: `toRedactedMap()` is safe to embed in `AppError.context`.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
@@ -146,11 +155,12 @@ tokens never cross to presentation (contract §2.6).
   and privileged credentials belong only in controlled server/edge-function
   environments.
 - The only backend SDK imported anywhere in `lib/` is `supabase_flutter`, and
-  it is confined to one file: `lib/data/auth/supabase_auth_api_impl.dart` (the
-  GoTrue-backed adapter). Every layer above consumes the provider-neutral
-  `SupabaseAuthApi`/`AuthGateway` seams — DTOs and tokens are stripped at the
-  adapter boundary. No `firebase`, `paymob`, `http`, `dio`, `sqflite`, or
-  `hive` appears in `lib/`.
+  it is confined to two adapter files: `lib/data/auth/supabase_auth_api_impl.dart`
+  (the GoTrue-backed auth adapter) and `lib/data/orgs/supabase_org_api_impl.dart`
+  (the org RPC adapter). Every layer above consumes the provider-neutral
+  `SupabaseAuthApi`/`AuthGateway` + `SupabaseOrgApi`/`OrganizationGateway` seams —
+  DTOs and tokens are stripped at the adapter boundary. No `firebase`,
+  `paymob`, `http`, `dio`, `sqflite`, or `hive` appears in `lib/`.
 
 ## Run and verify
 

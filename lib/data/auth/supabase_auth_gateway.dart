@@ -11,10 +11,12 @@ import 'supabase_auth_api.dart';
 class SupabaseAuthGateway implements AuthGateway {
   SupabaseAuthGateway(this._api) {
     _session = _toSession(_api.currentSnapshot);
+    _recoveryPending = _api.currentSnapshot?.recoveredViaLink ?? false;
     _subscription = _api.snapshotChanges.listen((
       SupabaseAuthSnapshot? snapshot,
     ) {
       _session = _toSession(snapshot);
+      _recoveryPending = snapshot?.recoveredViaLink ?? false;
       _changes.add(_session);
     });
   }
@@ -25,12 +27,16 @@ class SupabaseAuthGateway implements AuthGateway {
   late final StreamSubscription<SupabaseAuthSnapshot?> _subscription;
 
   Session? _session;
+  bool _recoveryPending = false;
 
   @override
   Session? get currentSession => _session;
 
   @override
   Stream<Session?> get sessionChanges => _changes.stream;
+
+  @override
+  bool get recoveryPending => _recoveryPending;
 
   @override
   Future<AuthOutcome<Session>> restore() async {
@@ -49,6 +55,7 @@ class SupabaseAuthGateway implements AuthGateway {
     // Keep the gateway's own state consistent with what restore() found,
     // even when the provider stream has not re-emitted (async restore).
     _session = session;
+    _recoveryPending = snapshot.recoveredViaLink;
     return AuthOutcome<Session>.success(session);
   }
 
@@ -116,6 +123,7 @@ class SupabaseAuthGateway implements AuthGateway {
   Future<void> signOut() async {
     await _api.signOut();
     _session = null;
+    _recoveryPending = false;
     _changes.add(null);
   }
 

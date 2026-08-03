@@ -13,6 +13,7 @@ class SupabaseAuthSnapshot extends Equatable {
     required this.userId,
     this.displayName,
     this.expiresAt,
+    this.recoveredViaLink = false,
   });
 
   /// Stable provider user id (contract §3.1: never an email address).
@@ -25,8 +26,20 @@ class SupabaseAuthSnapshot extends Equatable {
   /// past value must never map to an unbounded authenticated session.
   final DateTime? expiresAt;
 
+  /// Whether this session was established by a password-recovery link
+  /// (GoTrue's `passwordRecovery` auth event, fired by the PKCE exchange) or
+  /// carries a pending recovery (`recovery_sent_at` set on the user). The
+  /// consumer surfaces it so a recovery session routes to the reset step
+  /// instead of being treated as a normal sign-in.
+  final bool recoveredViaLink;
+
   @override
-  List<Object?> get props => <Object?>[userId, displayName, expiresAt];
+  List<Object?> get props => <Object?>[
+    userId,
+    displayName,
+    expiresAt,
+    recoveredViaLink,
+  ];
 }
 
 /// Typed, provider-neutral reasons a Supabase auth call can fail.

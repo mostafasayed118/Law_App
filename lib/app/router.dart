@@ -142,6 +142,17 @@ GoRouter createAppRouter(
     if (!authenticated && !onAuthRoute && !onOnboarding) {
       return AppRoutes.signIn;
     }
+    // Phase 4.1 deep-link recovery: a recovery session (PKCE exchange of a
+    // recovery link, or a pending recovery restored from storage) must land
+    // on the reset step — never home, and it must not be bounced away from
+    // the reset step while the recovery is pending. The flag clears on
+    // sign-out, which the reset flow performs after updating the password.
+    if (authenticated && authCubit.recoveryPending) {
+      if (path != AppRoutes.forgotPasswordReset) {
+        return AppRoutes.forgotPasswordReset;
+      }
+      return null;
+    }
     if (authenticated && onAuthRoute) {
       return AppRoutes.home;
     }

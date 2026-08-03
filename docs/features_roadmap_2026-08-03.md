@@ -20,7 +20,10 @@
 > `_down.sql` drop; rehearsal r1 **PASSED** — evidence
 > `docs/p3_r1_rehearsal_evidence_r1_2026-08-03.md` — then applied to the
 > dev project on the owner's dated apply approval 2026-08-03).
-> Phase 4 remains scoped but unstarted.
+> Phase 4: 4.2 (sign-up email-verification UX) **SHIPPED 2026-08-03**
+> (`deb72d8`); 4.1 (deep-link recovery) **APPROVED + IMPLEMENTED
+> 2026-08-03** (scope note `docs/p4_41_deeplink_recovery_scope_2026-08-03.md`),
+> committed with this roadmap's gate-table row.
 > Everything in §8 stays deferred until P0 closes.
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
@@ -183,10 +186,11 @@ backout in place).
 ## 6. Phase 4 — Auth plumbing
 
 - **4.1 Deep-link recovery (original D1 half)** — the link-based + PKCE
-  variant still needs platform intent filters (Android manifest / iOS), the
-  Supabase auth callback handler, and router handling. The code-based
-  variant (`c2496df`) is shipped; this completes the story. Gate: platform
-  config review + approval (touches `android/`/`ios/`), then the gate stack.
+  variant: platform intent filters (Android manifest / iOS), the Supabase
+  auth callback/deep-link observer, and router + cubit recovery-pending
+  handling. **APPROVED + IMPLEMENTED + COMMITTED 2026-08-03** (scope note
+  `docs/p4_41_deeplink_recovery_scope_2026-08-03.md`). R1 (dashboard Redirect
+  URL) remains owner-side and is tracked as R3 in the P3 spec.
 - **4.2 Sign-up email-verification UX** — verification is enabled
   server-side; today the flow silently routes to sign-in after sign-up. A
   "check your inbox" state closes the false-assurance gap. Client-only;
@@ -199,7 +203,7 @@ backout in place).
 | 1 | Phase 1 — P3 org/membership UI | P3 spec approval | no | spec approval → slice → B2 gate stack → owner push approval | **SHIPPED 2026-08-03 (`03862ce`, suite 408, ledger PASS 115)** |
 | 2 | Phase 2 — org lifecycle wiring | Phase 1 (same seams) | no | spec-lite scope note → approval → gate stack | **SHIPPED 2026-08-03 (`68aafc6`, slices 2.1–2.4)** |
 | 3 | Phase 3 — server amendments | Phase 1/2 (surface defined) | **yes** | spec → RLS-gate review → rehearsal evidence → apply approval → apply execution → matrix addendum | **APPLIED 2026-08-03** (`docs/p3_r1_roster_rpc_design_2026-08-03.md` + matrix §2 addendum + `docs/p3_r1_rehearsal_plan_2026-08-03.md` + evidence r1 PASSED + `supabase/rpc/list_org_members_metadata.sql` + `_down.sql` drop → applied to dev project on the owner's dated apply approval) |
-| 4 | Phase 4 — auth plumbing | — | 4.1 yes (platform config) | platform config approval → gate stack | Not started |
+| 4 | Phase 4 — auth plumbing | — | 4.1 yes (platform config) | platform config approval → gate stack | **4.2 SHIPPED 2026-08-03 (`deb72d8`); 4.1 APPROVED + IMPLEMENTED 2026-08-03 (scope note `docs/p4_41_deeplink_recovery_scope_2026-08-03.md`); R1 = dashboard Redirect URL (owner-side)** |
 | — | §8 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Deferred |
 
 Rules that apply to every phase (definition-of-done from

@@ -253,6 +253,9 @@ class FailingAuthGateway implements AuthGateway {
   Stream<Session?> get sessionChanges => const Stream<Session?>.empty();
 
   @override
+  bool get recoveryPending => false;
+
+  @override
   Future<AuthOutcome<Session>> restore() async {
     return const AuthOutcome<Session>.failure(
       AuthFailure(
@@ -374,6 +377,9 @@ class ExpiredSessionGateway implements AuthGateway {
 
   @override
   Stream<Session?> get sessionChanges => const Stream<Session?>.empty();
+
+  @override
+  bool get recoveryPending => false;
 
   @override
   Future<AuthOutcome<Session>> restore() async {

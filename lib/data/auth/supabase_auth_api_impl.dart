@@ -17,7 +17,20 @@ Future<void> initializeSupabase({
 }) {
   // supabase_flutter ^2.16 renamed the param to publishableKey (the anon
   // public key); the env var keeps the dashboard's "anon public" naming.
-  return Supabase.initialize(url: url, publishableKey: anonKey);
+  //
+  // The auth options are stated explicitly (they are already the defaults)
+  // to pin the deep-link contract that Phase 4.1 depends on: PKCE flow +
+  // `detectSessionInUri: true` (the observer that turns an auth-callback
+  // URI into a session). `AuthFlowType.implicit` would be the legacy flow
+  // and must not be introduced here.
+  return Supabase.initialize(
+    url: url,
+    publishableKey: anonKey,
+    authOptions: const FlutterAuthClientOptions(
+      authFlowType: AuthFlowType.pkce,
+      detectSessionInUri: true,
+    ),
+  );
 }
 
 /// [SupabaseAuthApi] backed by the GoTrue auth client.
@@ -28,7 +41,19 @@ Future<void> initializeSupabase({
 class SupabaseAuthApiImpl implements SupabaseAuthApi {
   SupabaseAuthApiImpl(this._client) {
     _subscription = _client.onAuthStateChange.listen((AuthState state) {
-      _changes.add(_toSnapshot(state.session));
+      _changes.add(
+        _toSnapshot(
+          state.session,
+          // GoTrue fires `passwordRecovery` (not `signedIn`) when the PKCE
+          // exchange completes for a recovery link (gotrue
+          // `exchangeCodeForSession`). It is the live deep-link signal; the
+          // stored `recovery_sent_at` covers the cold-restore case where no
+          // event replays.
+          recoveredViaLink:
+              state.event == AuthChangeEvent.passwordRecovery ||
+              state.session?.user.recoverySentAt != null,
+        ),
+      );
     });
   }
 
@@ -41,6 +66,13 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
   final StreamController<SupabaseAuthSnapshot?> _changes =
       StreamController<SupabaseAuthSnapshot?>.broadcast();
   late final StreamSubscription<AuthState> _subscription;
+
+  /// The app deep-link URI the recovery email redirects to. Must match the
+  /// dashboard Redirect URL (Auth → URL Configuration) and the platform
+  /// intent filters (`com.legalhub.app` scheme in the Android manifest and
+  /// iOS Info.plist).
+  static const String _recoveryDeepLinkUri =
+      'com.legalhub.app://auth/v1/callback';
 
   @override
   SupabaseAuthSnapshot? get currentSnapshot =>
@@ -125,8 +157,16 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
   @override
   Future<void> sendRecoveryOtp({required String email}) async {
     try {
-      // No emailRedirectTo -> the provider sends a 6-digit OTP, not a link.
-      await _client.signInWithOtp(email: email, shouldCreateUser: false);
+      // Phase 4.1: the emailed recovery link is a deep link into the app
+      // (`com.legalhub.app://auth/v1/callback`, which must be registered as
+      // a Redirect URL on the Supabase dashboard). The dashboard Magic Link
+      // template also renders `{{ .Token }}`, so the 6-digit OTP keeps
+      // arriving alongside the link and the in-app OTP flow is unchanged.
+      await _client.signInWithOtp(
+        email: email,
+        shouldCreateUser: false,
+        emailRedirectTo: _recoveryDeepLinkUri,
+      );
     } on AuthException catch (e) {
       throw SupabaseAuthException(kind: _failureKindFor(e), message: e.message);
     }
@@ -169,7 +209,10 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
     await _changes.close();
   }
 
-  SupabaseAuthSnapshot? _toSnapshot(Session? session) {
+  SupabaseAuthSnapshot? _toSnapshot(
+    Session? session, {
+    bool recoveredViaLink = false,
+  }) {
     final User? user = session?.user;
     if (user == null) {
       return null;
@@ -186,6 +229,11 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
               expiresAt * Duration.millisecondsPerSecond,
               isUtc: true,
             ),
+      // Cold-restore signal: a pending recovery on the user record (the
+      // `recovery_sent_at` claim) means the session is a recovery session
+      // even when no `passwordRecovery` event replays (e.g. the app was
+      // killed between link-open and password change).
+      recoveredViaLink: recoveredViaLink || user.recoverySentAt != null,
     );
   }
 

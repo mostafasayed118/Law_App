@@ -14,6 +14,12 @@ abstract interface class AuthGateway {
   Session? get currentSession;
   Stream<Session?> get sessionChanges;
 
+  /// True while the current session is a password-recovery session
+  /// (established via a recovery link, or carrying a pending recovery
+  /// `recovery_sent_at`). The app surfaces this so a recovery session routes
+  /// to the reset step instead of being treated as a normal sign-in.
+  bool get recoveryPending;
+
   /// Contract-§5 restore: re-check the provider session. Resolves to
   /// authenticated, signed-out (no session), expired (reauthRequired), or
   /// unavailable — never a misleading empty success.

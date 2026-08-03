@@ -24,6 +24,10 @@ void main() {
     gateway = FakeAuthGateway();
     authCubit = AuthCubit(gateway, InMemoryErrorReporter());
     localeCubit = LocaleCubit(InMemoryLocaleStore());
+    // The reset step (Phase 4.1 recovery landing) resolves
+    // PasswordRecoveryGateway via the service locator when it builds its
+    // cubit; configureDependencies() registers the fake (idempotent).
+    configureDependencies();
     router = createAppRouter(authCubit);
   });
 
@@ -32,6 +36,7 @@ void main() {
     await authCubit.close();
     await localeCubit.close();
     await gateway.dispose();
+    await resetServiceLocator();
   });
 
   /// A localized harness matching the one used by [LegalHubApp] so route
@@ -112,6 +117,89 @@ void main() {
         expect(authCubit.state.status, AuthStatus.unauthenticated);
       },
     );
+  });
+
+  group('router recovery deep link (Phase 4.1)', () {
+    testWidgets('lands a recovery session on the reset step instead of home', (
+      tester,
+    ) async {
+      // The provider PKCE exchange for a recovery link fires a session
+      // with the recovery marker (supabase_flutter observer → gateway
+      // stream → cubit), exactly the path a deep link takes.
+      gateway.markAsRecoverySession();
+      await authCubit.startDemoSession();
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // The reset step renders (recovery intent), not home — the deep
+      // link must not boot as a normal authenticated session.
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        AppRoutes.forgotPasswordReset,
+      );
+      expect(authCubit.state.isAuthenticated, isTrue);
+      expect(authCubit.recoveryPending, isTrue);
+    });
+
+    testWidgets(
+      'keeps an authenticated user on the reset step while recovery is '
+      'pending (no bounce to home)',
+      (tester) async {
+        gateway.markAsRecoverySession();
+        await authCubit.startDemoSession();
+        await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+        await tester.pumpAndSettle();
+
+        // Landing on the reset route itself must not trip the
+        // authenticated-on-auth-route bounce.
+        router.go(AppRoutes.forgotPasswordReset);
+        await tester.pumpAndSettle();
+
+        expect(
+          router.routerDelegate.currentConfiguration.uri.path,
+          AppRoutes.forgotPasswordReset,
+        );
+      },
+    );
+
+    testWidgets('clears the recovery landing once the session is signed out', (
+      tester,
+    ) async {
+      gateway.markAsRecoverySession();
+      await authCubit.startDemoSession();
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // The reset flow signs out after updating the password (the
+      // provider impl clears the recovery session); the reset screen's
+      // success listener then navigates to sign-in.
+      await authCubit.signOut();
+      await tester.pumpAndSettle();
+
+      expect(authCubit.recoveryPending, isFalse);
+      expect(authCubit.state.isAuthenticated, isFalse);
+      // Without the recovery marker, the authenticated-on-auth-route
+      // bounce is gone: the router no longer forces any destination.
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        AppRoutes.forgotPasswordReset,
+      );
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        isNot(AppRoutes.home),
+      );
+    });
+
+    testWidgets('a plain (non-recovery) session still routes to home', (
+      tester,
+    ) async {
+      await authCubit.startDemoSession();
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      expect(authCubit.recoveryPending, isFalse);
+      expect(find.textContaining('Hello, Demo user'), findsOneWidget);
+    });
   });
 
   group('router onboarding bypass (1.5 pin)', () {
@@ -573,6 +661,9 @@ class RoleGateway implements AuthGateway {
 
   @override
   Stream<Session?> get sessionChanges => const Stream<Session?>.empty();
+
+  @override
+  bool get recoveryPending => false;
 
   @override
   Future<AuthOutcome<Session>> restore() async {

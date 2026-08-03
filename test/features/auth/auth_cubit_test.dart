@@ -279,6 +279,49 @@ void main() {
       ],
     );
   });
+
+  group('AuthCubit provider stream callback (Phase 4.1)', () {
+    blocTest<AuthCubit, AuthState>(
+      'applies a provider-initiated session that bypasses explicit calls',
+      setUp: () => _streamGateway = FakeAuthGateway(),
+      build: () => AuthCubit(_streamGateway, InMemoryErrorReporter()),
+      act: (AuthCubit cubit) async {
+        // The deep-link PKCE exchange never goes through signIn/restore: the
+        // session lands on the gateway stream, which the cubit now consumes.
+        await _streamGateway.startDemoSession();
+      },
+      expect: () => <dynamic>[
+        isA<AuthState>()
+            .having(
+              (AuthState s) => s.status,
+              'status',
+              AuthStatus.authenticated,
+            )
+            .having((AuthState s) => s.session?.userId, 'userId', 'demo-user'),
+      ],
+    );
+
+    test('surfaces recoveryPending for a recovery session', () async {
+      final FakeAuthGateway gateway = FakeAuthGateway();
+      final AuthCubit cubit = AuthCubit(gateway, InMemoryErrorReporter());
+      addTearDown(cubit.close);
+      addTearDown(gateway.dispose);
+
+      expect(cubit.recoveryPending, isFalse);
+
+      // The provider PKCE exchange for a recovery link fires a session
+      // carrying the recovery marker (supabase_flutter observer path).
+      gateway.markAsRecoverySession();
+      await cubit.startDemoSession();
+
+      expect(cubit.recoveryPending, isTrue);
+      expect(cubit.state.isAuthenticated, isTrue);
+
+      await cubit.signOut();
+
+      expect(cubit.recoveryPending, isFalse);
+    });
+  });
 }
 
 const AuthFailure _gatewayFailure = AuthFailure(
@@ -295,6 +338,7 @@ const AppError _gatewayAppError = AppError(
 // assert behavior without reaching into the Cubit's private fields.
 late InMemoryErrorReporter _failingReporter;
 late _CountingAuthGateway _countingAuthGateway;
+late FakeAuthGateway _streamGateway;
 
 class _NullSessionGateway implements AuthGateway {
   @override
@@ -302,6 +346,9 @@ class _NullSessionGateway implements AuthGateway {
 
   @override
   Stream<Session?> get sessionChanges => const Stream<Session?>.empty();
+
+  @override
+  bool get recoveryPending => false;
 
   @override
   Future<AuthOutcome<Session>> restore() async =>
@@ -333,6 +380,9 @@ class _PreauthenticatedGateway implements AuthGateway {
 
   @override
   Stream<Session?> get sessionChanges => const Stream<Session?>.empty();
+
+  @override
+  bool get recoveryPending => false;
 
   @override
   Future<AuthOutcome<Session>> restore() async =>
@@ -372,6 +422,9 @@ class _ExpiredSessionGateway implements AuthGateway {
   Stream<Session?> get sessionChanges => const Stream<Session?>.empty();
 
   @override
+  bool get recoveryPending => false;
+
+  @override
   Future<AuthOutcome<Session>> restore() async =>
       const AuthOutcome<Session>.failure(
         AuthFailure(kind: AuthFailureKind.sessionExpired),
@@ -403,6 +456,9 @@ class _FailingAuthGateway implements AuthGateway {
   Stream<Session?> get sessionChanges => const Stream<Session?>.empty();
 
   @override
+  bool get recoveryPending => false;
+
+  @override
   Future<AuthOutcome<Session>> restore() async =>
       AuthOutcome<Session>.failure(failure);
 
@@ -428,6 +484,9 @@ class _CountingAuthGateway implements AuthGateway {
 
   @override
   Stream<Session?> get sessionChanges => const Stream<Session?>.empty();
+
+  @override
+  bool get recoveryPending => false;
 
   @override
   Future<AuthOutcome<Session>> restore() async =>

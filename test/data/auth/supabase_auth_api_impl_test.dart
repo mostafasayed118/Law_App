@@ -25,6 +25,7 @@ User _user({
   String id = 'u-1',
   Map<String, dynamic>? userMetadata,
   String? email,
+  String? recoverySentAt,
 }) => User(
   id: id,
   appMetadata: const <String, dynamic>{},
@@ -32,6 +33,7 @@ User _user({
   aud: 'authenticated',
   createdAt: '2026-07-25T00:00:00Z',
   email: email,
+  recoverySentAt: recoverySentAt,
 );
 
 Session _session({required int exp, required User user}) => Session(
@@ -98,12 +100,15 @@ void main() {
 
       final SupabaseAuthSnapshot snapshot = (await api.restore())!;
 
-      // Exactly [userId, displayName, expiresAt] — adding accessToken or
-      // refreshToken to the seam breaks this pin (contract §2.6).
+      // Exactly [userId, displayName, expiresAt, recoveredViaLink] — adding
+      // accessToken or refreshToken to the seam breaks this pin (contract
+      // §2.6). recoveredViaLink is the Phase 4.1 recovery marker (false for
+      // a plain session).
       expect(snapshot.props, <Object?>[
         'u-1',
         'Amira Hassan',
         DateTime.fromMillisecondsSinceEpoch(exp * 1000, isUtc: true),
+        false,
       ]);
     });
 
@@ -320,7 +325,7 @@ void main() {
 
     group('recovery OTP', () {
       test(
-        'sends the OTP without creating a user or redirect target',
+        'sends the recovery email with the deep-link redirect target',
         () async {
           when(
             () => client.signInWithOtp(
@@ -332,13 +337,15 @@ void main() {
 
           await api.sendRecoveryOtp(email: 'amira@example.com');
 
-          // No redirect -> the provider mails a 6-digit code, not a link; no
-          // user may be created by a recovery request.
+          // Phase 4.1: the emailed recovery link is a deep link into the app
+          // (must match the dashboard Redirect URL); no user may be created
+          // by a recovery request. The Magic Link template still renders
+          // `{{ .Token }}`, so the 6-digit OTP arrives alongside the link.
           verify(
             () => client.signInWithOtp(
               email: 'amira@example.com',
               shouldCreateUser: false,
-              emailRedirectTo: null,
+              emailRedirectTo: 'com.legalhub.app://auth/v1/callback',
             ),
           ).called(1);
         },
@@ -395,6 +402,80 @@ void main() {
             ),
           ),
         );
+      });
+
+      group('recovery link marker', () {
+        test('marks a snapshot from a passwordRecovery event', () async {
+          const int exp = 1893456000;
+          final List<SupabaseAuthSnapshot?> seen = <SupabaseAuthSnapshot?>[];
+          final StreamSubscription<SupabaseAuthSnapshot?> subscription = api
+              .snapshotChanges
+              .listen(seen.add);
+          addTearDown(() => subscription.cancel());
+
+          events.add(
+            AuthState(
+              AuthChangeEvent.passwordRecovery,
+              _session(exp: exp, user: _user()),
+            ),
+          );
+          await Future<void>.delayed(Duration.zero);
+
+          // The PKCE exchange for a recovery link fires `passwordRecovery`
+          // (gotrue exchangeCodeForSession), not `signedIn`.
+          expect(seen.single?.recoveredViaLink, isTrue);
+        });
+
+        test('leaves the marker false for a plain signedIn event', () async {
+          const int exp = 1893456000;
+          final List<SupabaseAuthSnapshot?> seen = <SupabaseAuthSnapshot?>[];
+          final StreamSubscription<SupabaseAuthSnapshot?> subscription = api
+              .snapshotChanges
+              .listen(seen.add);
+          addTearDown(() => subscription.cancel());
+
+          events.add(
+            AuthState(
+              AuthChangeEvent.signedIn,
+              _session(exp: exp, user: _user()),
+            ),
+          );
+          await Future<void>.delayed(Duration.zero);
+
+          expect(seen.single?.recoveredViaLink, isFalse);
+        });
+
+        test(
+          'marks a cold-restored session carrying a pending recovery',
+          () async {
+            const int exp = 1893456000;
+            when(() => client.currentSession).thenReturn(
+              _session(
+                exp: exp,
+                user: _user(recoverySentAt: '2026-08-03T00:00:00Z'),
+              ),
+            );
+
+            final SupabaseAuthSnapshot? snapshot = await api.restore();
+
+            // `recovery_sent_at` on the user record covers the case where the
+            // app was killed between link-open and password change: no
+            // `passwordRecovery` event replays, but the pending recovery must
+            // still route the user to the reset step.
+            expect(snapshot?.recoveredViaLink, isTrue);
+          },
+        );
+
+        test('leaves the marker false when no recovery is pending', () async {
+          const int exp = 1893456000;
+          when(
+            () => client.currentSession,
+          ).thenReturn(_session(exp: exp, user: _user()));
+
+          final SupabaseAuthSnapshot? snapshot = await api.restore();
+
+          expect(snapshot?.recoveredViaLink, isFalse);
+        });
       });
 
       test('updates the password then clears the recovery session', () async {

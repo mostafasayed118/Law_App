@@ -82,6 +82,9 @@ class _FailingAuthGateway implements AuthGateway {
   Stream<Session?> get sessionChanges => const Stream<Session?>.empty();
 
   @override
+  bool get recoveryPending => false;
+
+  @override
   Future<AuthOutcome<Session>> restore() async =>
       AuthOutcome<Session>.failure(failure);
 
