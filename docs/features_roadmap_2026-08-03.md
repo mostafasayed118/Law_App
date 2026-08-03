@@ -52,7 +52,12 @@
 > the decision record in
 > `docs/document_vault_scope_2026-08-03.md` (D-V1…D-V6 ratified, incl. the
 > metadata-only line — no document bodies ever exist).
-> Everything in §12 stays deferred until P0 closes.
+> Phase 9 (matter-scoped messaging, thread-metadata-only, client-only)
+> **APPROVED 2026-08-03** (scope note
+> `docs/matter_messaging_scope_2026-08-03.md`; D-MSG1…D-MSG6 ratified, incl.
+> the body-less line — no message body ever exists). Implementation starts
+> with slice 9.0 behind the standard slice gate.
+> Everything in §13 stays deferred until P0 closes.
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
 >
@@ -114,11 +119,11 @@ that blocks it).
 | `accept_invitation` | ✅ `acceptInvitation` | Phase 2 (UX decision) / Phase 4 (deep link) | **R3** in the P3 spec; token-entry UX decided (accept screen) |
 | `delete_my_account` | ✅ `deleteMyAccount` | Phase 2 | D-05 requires the hard-delete action (cascade identity + memberships) |
 | `list_organizations_metadata` | ❌ | Phase 2 (owner) or Phase 3 (member-facing) | **SHIPPED via the client-side path** — the active-org switcher (Phase 7 slice 7.0, `b31bc1a`) reads `Session.memberships` + the `ActiveOrgStore` per D-08/D-M7 (server re-derives membership; never trusts a client-selected org id); the RPC stays unwired, an enrichment-only option |
-| `read_org_audit` | ❌ | deferred (§12) | audit surfacing is P2-gated; `platform_owner_admin` self-audit rules apply |
-| `read_platform_audit` | ❌ | deferred (§12) | owner-gated; audit table never publicly readable (matrix §6) |
-| `delete_demo_account` | ❌ | deferred (§12) | `platform_owner_admin`-only; no owner admin screen until the Addendum's server-side enforcement story is complete |
-| `suspend_membership_platform` | ❌ | deferred (§12) | `platform_owner_admin`-only |
-| `reactivate_membership_platform` | ❌ | deferred (§12) | `platform_owner_admin`-only |
+| `read_org_audit` | ❌ | deferred (§13) | audit surfacing is P2-gated; `platform_owner_admin` self-audit rules apply |
+| `read_platform_audit` | ❌ | deferred (§13) | owner-gated; audit table never publicly readable (matrix §6) |
+| `delete_demo_account` | ❌ | deferred (§13) | `platform_owner_admin`-only; no owner admin screen until the Addendum's server-side enforcement story is complete |
+| `suspend_membership_platform` | ❌ | deferred (§13) | `platform_owner_admin`-only |
+| `reactivate_membership_platform` | ❌ | deferred (§13) | `platform_owner_admin`-only |
 
 ## 3. Phase 1 — P3 org & membership UI slice (next approved batch)
 
@@ -325,7 +330,7 @@ switcher, D-08) → slice 7.1 (`MatterGateway` seam + fake + list surface,
 read-first) → slice 7.2 (details, read-only projection) → slice 7.3 (l10n
 pins) → full B2 gate stack → owner push approval. Client-only; no server
 change, no matter actions, no messaging, no documents (rows 154/155 keep
-their §12 gates).
+their §13 gates).
 
 | # | Slice | Scope | New files (sketch) | Tests |
 |---|---|---|---|---|
@@ -357,7 +362,7 @@ ratified). Spec basis: MVP §4
 slice 8.1 (read-first vault list + home entry) → slice 8.2 (l10n pins) →
 full B2 gate stack → owner push approval. Client-only; no server change,
 no document bodies/preview/download/upload, no e-signature, no storage or
-realtime (the §12 deferred list keeps its gate).
+realtime (the §13 deferred list keeps its gate).
 
 | # | Slice | Scope | New files (sketch) | Tests |
 |---|---|---|---|---|
@@ -368,7 +373,31 @@ realtime (the §12 deferred list keeps its gate).
 **Exit:** four checks green; suite + README count in lockstep (the ledger
 §2d check); no push without owner approval.
 
-## 11. Sequencing & governance gate table
+## 11. Phase 9 — Matter-scoped messaging (thread-metadata-only, client-only)
+
+**Status: APPROVED 2026-08-03** (owner ratification of D-MSG1…D-MSG6). Scope
+note `docs/matter_messaging_scope_2026-08-03.md`. Spec basis: MVP §4
+"Matter-scoped messaging" + §6 remediation row 154
+(`message_center, matter_discussion`).
+
+**Gate (as designed):** scope note approval → decision-record ratification
+(D-MSG1…D-MSG6) → slice 9.0 (`MessageThread` VO + `MessageGateway` seam +
+dev fake, no body field) → slice 9.1 (read-first thread list + home entry,
+no thread-open affordance) → slice 9.2 (l10n pins) → full B2 gate stack →
+owner push approval. Client-only; no server change, no message bodies, no
+send/reply/composer, no realtime/delivery/notifications, no thread-detail
+route (the §13 deferred list keeps its gate).
+
+| # | Slice | Scope | New files (sketch) | Tests |
+|---|---|---|---|---|
+| 9.0 | Gateway + thread VO | `MessageThread` VO (id/title/matterRef/participants/lastActivityAt/messageCount — **no body field**, D-MSG1) + `MessageGateway` seam + dev fake (5 deterministic synthetic non-PII thread rows, D-MSG2/D-MSG4) | `features/messaging/domain/message_thread.dart`, `domain/message_gateway.dart`, `data/fake_message_gateway.dart` | gateway fetch shape + determinism + non-PII + body-less structural pin (AC-1) |
+| 9.1 | Thread list surface | Read-first thread list (title, matter ref, participants, last-activity date, message-count chip) + empty/error states + home entry card; **no thread-open affordance, no composer, no send/reply icons** (D-MSG1); capability entry (D-MSG5) | `features/messaging/presentation/message_list_screen.dart`, `message_entry_card.dart` | list widget + body-less line pin (AC-2); empty/error (AC-3); capability gating (AC-4) |
+| 9.2 | l10n | All new strings EN/AR/TR; no send/realtime/legal-advice copy (spec §6 row 152) | 3 `.arb` + generated l10n | TR/AR resolution pins (AC-5) |
+
+**Exit:** four checks green; suite + README count in lockstep (the ledger
+§2d check); no push without owner approval.
+
+## 12. Sequencing & governance gate table
 
 | Order | Phase | Depends on | Server changes? | Gate to pass | Status |
 |---|---|---|---|---|---|
@@ -380,7 +409,8 @@ realtime (the §12 deferred list keeps its gate).
 | 6 | Phase 6 — attorney discovery (read-only, client-only) | MVP spec §4; D-B7 additive `attorneyId` hook; Phase 5 booking seams | no | scope note → decision-record ratification (D-A1…D-A6) → slices 6.1–6.3 → gate stack → owner push approval | **SHIPPED 2026-08-03** (`0f93042` + `7b5c589` + `d389c69`, suite 565, ledger PASS 115; pushed to origin/main) |
 | 7 | Phase 7 — matter dashboard (read-first, client-only) + org switcher | MVP spec §4; D-08 org semantics; Phase 6 seams (synthetic attorney roster for assignment) | no | scope note → decision-record ratification (D-M1…D-M7) → slices 7.0–7.3 → gate stack → owner push approval | **SHIPPED 2026-08-03** (`b31bc1a` + `5740594` + `82d77dc` + `c2cf3cb`, suite 605, ledger PASS 115; pushed to origin/main) |
 | 8 | Phase 8 — document vault (read-first, metadata-only, client-only) | MVP spec §4; Phase 7 seams (fake-domain pattern) | no | scope note → decision-record ratification (D-V1…D-V6) → slices 8.0–8.2 → gate stack → owner push approval | **SHIPPED 2026-08-03** (`22d63e5` + `29fd40a` + `430b62b`, suite 626, ledger PASS 115; pushed to origin/main) |
-| — | §12 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Deferred |
+| 9 | Phase 9 — matter-scoped messaging (thread-metadata-only, client-only) | MVP spec §4; Phase 8 seams (fake-domain pattern) | no | scope note → decision-record ratification (D-MSG1…D-MSG6) → slices 9.0–9.2 → gate stack → owner push approval | **APPROVED 2026-08-03** — scope note `docs/matter_messaging_scope_2026-08-03.md` (D-MSG1…D-MSG6 ratified); slices 9.0–9.2 pending |
+| — | §13 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Deferred |
 
 Rules that apply to every phase (definition-of-done from
 `docs/codebase_audit_plan.md`): scope/assumptions/non-goals documented ·
@@ -389,7 +419,7 @@ secrets and real data · verification commands actually run and reported
 honestly · **no commit, push, or deployment without explicit owner
 approval**.
 
-## 12. Explicitly deferred (do NOT build until P0 closes + policy tests exist)
+## 13. Explicitly deferred (do NOT build until P0 closes + policy tests exist)
 
 Per README boundary + `docs/permission_matrix.md` §4/§6: **matters,
 documents, messages, storage, realtime, audit surfacing, billing, AI**.
@@ -404,7 +434,7 @@ RPCs (`delete_demo_account`, `suspend_membership_platform`,
 `reactivate_membership_platform`) stay unwired until the Addendum's
 server-side enforcement + auditing story is complete.
 
-## 13. Ledger hooks (what to update when a phase lands)
+## 14. Ledger hooks (what to update when a phase lands)
 
 - P3 spec §1 status line → "UI slice implemented" + commit ref, and
   `docs/p0_decision_capture.md` §3 P3 row → APPROVED/executed with date.
@@ -419,4 +449,5 @@ server-side enforcement + auditing story is complete.
 - Phase 5 landing: README test-count + implemented-foundation lines in lockstep (the ledger gate's §2d check) — booking's ~975 branch test lines count once committed; `docs/booking_scope_2026-08-03.md` decision record ratified.
 - Phase 6 landing: README test-count + implemented-foundation lines in lockstep; `docs/attorney_discovery_scope_2026-08-03.md` decision record ratified (D-A1…D-A6).
 - Phase 7 landing: README test-count + implemented-foundation lines in lockstep; `docs/matter_dashboard_scope_2026-08-03.md` decision record ratified (D-M1…D-M7); roadmap §4 slice 2.3 (org switcher) closes as slice 7.0.
-- Phase 8 landing: README test-count + implemented-foundation lines in lockstep; `docs/document_vault_scope_2026-08-03.md` decision record ratified (D-V1…D-V6); the §12-deferred sentence gains a cross-ref note that the client-only metadata surface shipped as Phase 8 while the real data path stays deferred.
+- Phase 8 landing: README test-count + implemented-foundation lines in lockstep; `docs/document_vault_scope_2026-08-03.md` decision record ratified (D-V1…D-V6); the §13-deferred sentence gains a cross-ref note that the client-only metadata surface shipped as Phase 8 while the real data path stays deferred.
+- Phase 9 landing: README test-count + implemented-foundation lines in lockstep; `docs/matter_messaging_scope_2026-08-03.md` decision record ratified (D-MSG1…D-MSG6); the §13-deferred sentence gains a cross-ref note that the client-only thread-metadata surface shipped as Phase 9 while the real messages data path stays deferred.
