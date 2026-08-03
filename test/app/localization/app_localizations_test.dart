@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/discovery/presentation/discovery_entry_card.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/view_state_view.dart';
 
@@ -97,6 +98,129 @@ void main() {
       expect(ar.signUpCheckInboxBody, isNot(en.signUpCheckInboxBody));
       expect(tr.signUpCheckInboxTitle, isNot(en.signUpCheckInboxTitle));
     });
+
+    test('resolves the discovery keys in every locale (6.3 pin)', () {
+      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+      final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+      final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+      // Search surface (slice 6.1).
+      expect(en.discoveryTitle, 'Find an Attorney');
+      expect(ar.discoveryTitle, 'ابحث عن محامٍ');
+      expect(tr.discoveryTitle, 'Avukat Bul');
+      expect(en.discoverySearchHint, 'Search by name or practice area');
+      expect(ar.discoverySearchHint, 'ابحث بالاسم أو مجال الممارسة');
+      expect(tr.discoverySearchHint, 'İsme veya uygulama alanına göre ara');
+      expect(en.discoveryFilterAll, 'All');
+      expect(ar.discoveryFilterAll, 'الكل');
+      expect(tr.discoveryFilterAll, 'Tümü');
+      expect(en.discoveryEmpty, 'No attorneys match your search.');
+      expect(ar.discoveryEmpty, 'لا يوجد محامون يطابقون بحثك.');
+      expect(tr.discoveryEmpty, 'Aramanızla eşleşen avukat yok.');
+      expect(en.discoveryError, 'Unable to load attorneys.');
+      expect(ar.discoveryError, 'تعذّر تحميل المحامين.');
+      expect(tr.discoveryError, 'Avukatlar yüklenemedi.');
+      expect(
+        en.discoveryLocalOnlyNote,
+        'Demo mode — synthetic profiles only. No real attorneys are listed '
+        'or contacted.',
+      );
+      expect(
+        ar.discoveryLocalOnlyNote,
+        'وضع تجريبي — ملفات تعريفية اصطناعية فقط. لا يتم عرض محامين حقيقيين أو '
+        'التواصل معهم.',
+      );
+      expect(
+        tr.discoveryLocalOnlyNote,
+        'Demo modu — yalnızca sentetik profiller. Gerçek avukatlar '
+        'listelenmez veya iletişime geçilmez.',
+      );
+
+      // Home entry (slice 6.1).
+      expect(en.discoveryEntryTitle, 'Find an attorney');
+      expect(ar.discoveryEntryTitle, 'ابحث عن محامٍ');
+      expect(tr.discoveryEntryTitle, 'Bir avukat bul');
+      expect(
+        en.discoveryEntrySubtitle,
+        'Browse demo attorney profiles — development demo.',
+      );
+      expect(
+        ar.discoveryEntrySubtitle,
+        'تصفح ملفات المحامين التجريبية — عرض تجريبي للتطوير.',
+      );
+      expect(
+        tr.discoveryEntrySubtitle,
+        'Demo avukat profillerine göz atın — geliştirme demosu.',
+      );
+
+      // Profile surface + booking hook (slice 6.2).
+      expect(en.discoveryProfileTitle, 'Attorney profile');
+      expect(ar.discoveryProfileTitle, 'ملف المحامي');
+      expect(tr.discoveryProfileTitle, 'Avukat profili');
+      expect(en.discoveryProfileNotFound, 'Attorney not found.');
+      expect(ar.discoveryProfileNotFound, 'المحامي غير موجود.');
+      expect(tr.discoveryProfileNotFound, 'Avukat bulunamadı.');
+      expect(en.discoveryProfileBio, 'About');
+      expect(ar.discoveryProfileBio, 'نبذة');
+      expect(tr.discoveryProfileBio, 'Hakkında');
+      expect(en.discoveryProfileBook, 'Book with this attorney');
+      expect(ar.discoveryProfileBook, 'احجز مع هذا المحامي');
+      expect(tr.discoveryProfileBook, 'Bu avukatla rezervasyon yap');
+      expect(en.bookingSummaryAttorney, 'Attorney');
+      expect(ar.bookingSummaryAttorney, 'المحامي');
+      expect(tr.bookingSummaryAttorney, 'Avukat');
+      expect(
+        en.bookingAttorneyPrefill('Layla Mansour'),
+        'Booking with Layla Mansour',
+      );
+      expect(
+        ar.bookingAttorneyPrefill('Layla Mansour'),
+        'الحجز مع Layla Mansour',
+      );
+      expect(
+        tr.bookingAttorneyPrefill('Layla Mansour'),
+        'Layla Mansour ile rezervasyon',
+      );
+
+      // Practice-area labels reused by the discovery surfaces.
+      expect(en.areaCorporate, 'Corporate');
+      expect(ar.areaCorporate, 'شركات');
+      expect(tr.areaCorporate, 'Kurumsal');
+      expect(en.areaCivil, 'Civil');
+      expect(ar.areaCivil, 'مدني');
+      expect(tr.areaCivil, 'Hukuk');
+      expect(en.areaCriminal, 'Criminal');
+      expect(ar.areaCriminal, 'جنائي');
+      expect(tr.areaCriminal, 'Ceza');
+      expect(en.areaFamily, 'Family');
+      expect(ar.areaFamily, 'أحوال شخصية');
+      expect(tr.areaFamily, 'Aile');
+
+      // Real per-locale wording, not silent copies of EN.
+      expect(tr.discoveryTitle, isNot(en.discoveryTitle));
+      expect(ar.discoveryEmpty, isNot(en.discoveryEmpty));
+      expect(tr.discoveryProfileBook, isNot(en.discoveryProfileBook));
+      expect(
+        ar.bookingAttorneyPrefill('X'),
+        isNot(en.bookingAttorneyPrefill('X')),
+      );
+    });
+
+    test(
+      'discovery copy is local-only wording, no legal-advice claim (R3)',
+      () {
+        final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+
+        // AC-6/R3 pin (spec §6 row 152): the demo/local-only framing is
+        // literal copy, and it must not drift into legal-advice or
+        // compliance-claim territory. The exact per-locale wording is pinned
+        // in the 6.3 resolution test above; this test only guards the
+        // framing rails.
+        expect(en.discoveryEntrySubtitle, contains('demo'));
+        expect(en.discoveryEntrySubtitle, isNot(contains('legal advice')));
+        expect(en.discoveryLocalOnlyNote, isNot(contains('legal advice')));
+      },
+    );
   });
 
   group('AppLocalizations widget rendering', () {
@@ -117,6 +241,29 @@ void main() {
       // The shared ViewStateView renders the TR translation of stateLoading.
       expect(find.text('Yükleniyor'), findsOneWidget);
       expect(find.text('Loading'), findsNothing);
+    });
+
+    testWidgets('renders the discovery entry card in AR and TR, not the EN '
+        'fallback (6.3 pin)', (tester) async {
+      Future<void> pumpAt(Locale locale) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            locale: locale,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: DiscoveryEntryCard(onTap: null)),
+          ),
+        );
+        await tester.pumpAndSettle();
+      }
+
+      await pumpAt(const Locale('ar'));
+      expect(find.text('ابحث عن محامٍ'), findsOneWidget);
+      expect(find.text('Find an attorney'), findsNothing);
+
+      await pumpAt(const Locale('tr'));
+      expect(find.text('Bir avukat bul'), findsOneWidget);
+      expect(find.text('Find an attorney'), findsNothing);
     });
   });
 }
