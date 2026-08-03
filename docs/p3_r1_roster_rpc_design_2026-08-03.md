@@ -110,7 +110,7 @@ begin
     -- profiles row is missing still appears, with a static fallback name,
     -- instead of dropping the roster row)
     select m.organization_id, m.user_id, null::uuid, null::text,
-           coalesce(p.display_name, 'Unknown member'), coalesce(p.locale, 'en'),
+           coalesce(p.display_name, '(no profile)'), coalesce(p.locale, 'en'),
            m.role, m.status, m.created_at, m.updated_at
       from public.memberships m
       left join public.profiles p on p.user_id = m.user_id
@@ -150,7 +150,7 @@ Design choices embodied in the sketch:
   `'permission denied'` with no audit row, identical to every applied RPC;
   the allowed read writes one redacted audit row.
 - **Orphan-membership defense** — the member branch is a **LEFT JOIN** with
-  **COALESCE** on `profiles` (`'Unknown member'` / `'en'` fallbacks): a
+  **COALESCE** on `profiles` (`'(no profile)'` / `'en'` fallbacks): a
   membership row is never dropped from the roster over a missing profile
   row, and the fallback is a static, redaction-safe string (no uuid, no
   email — ADR-0003). The signup trigger normally guarantees the profile
@@ -258,7 +258,7 @@ owner, not a suspended/removed partner.
 | Invitation ids present | every invited row carries `invitation_id`; every member row carries NULL (R1 extension) |
 | Invited email ≠ profile data | invited rows carry `email`; display_name/locale NULL (no fabricated identity) |
 | The caller's own row | present in the roster (partner is a member) |
-| Orphan-membership defense (LEFT JOIN + COALESCE) | a membership whose `profiles` row is missing still appears, with the static fallback `'Unknown member'`/`'en'` — no row dropped, no error, no uuid/email leakage |
+| Orphan-membership defense (LEFT JOIN + COALESCE) | a membership whose `profiles` row is missing still appears, with the static fallback `'(no profile)'`/`'en'` — no row dropped, no error, no uuid/email leakage |
 
 **No policy change — the D-T6 pair (the pivotal assertion):**
 `profiles` stays own-row-only **and** the RPC returns other members' names.
