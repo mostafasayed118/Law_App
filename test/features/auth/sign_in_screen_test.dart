@@ -68,6 +68,28 @@ void main() {
     expect(authCubit.state.status, AuthStatus.unauthenticated);
   });
 
+  testWidgets('the demo shortcut starts the session without credentials '
+      '(startDemoSession path)', (tester) async {
+    await tester.pumpWidget(pumpIsolated());
+    await tester.pumpAndSettle();
+
+    // The shortcut is the OutlinedButton rendered above the Sign In
+    // button; it calls startDemoSession directly — no form validation,
+    // no credentials (the live-device walk found the form gates empty
+    // submits, so this is the credential-free demo path).
+    expect(find.text('Continue with demo session'), findsOneWidget);
+    expect(find.text('Development-only demo session'), findsOneWidget);
+    final Finder demoFinder = find.widgetWithText(
+      OutlinedButton,
+      'Continue with demo session',
+    );
+    await tester.tap(demoFinder);
+    await tester.pumpAndSettle();
+
+    expect(authCubit.state.isAuthenticated, isTrue);
+    expect(authCubit.state.session?.userId, 'demo-user');
+  });
+
   testWidgets('valid form submit starts the demo session via the cubit', (
     tester,
   ) async {

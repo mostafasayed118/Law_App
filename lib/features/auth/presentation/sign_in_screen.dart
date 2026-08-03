@@ -111,6 +111,38 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
               ),
               const SizedBox(height: LegalHubTheme.spaceXl),
+              // Development-only shortcut (mirrors the widget-test
+              // startDemoSession path): one tap enters the demo session with
+              // no credentials, matching how env-less runs and tests drive
+              // the app. The demo notice stays explicit so the shortcut
+              // never reads as a production sign-in.
+              BlocBuilder<AuthCubit, AuthState>(
+                builder: (BuildContext context, AuthState state) {
+                  final bool loading = state.status == AuthStatus.loading;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      OutlinedButton.icon(
+                        onPressed: loading
+                            ? null
+                            : () =>
+                                  context.read<AuthCubit>().startDemoSession(),
+                        icon: const Icon(Icons.science_outlined, size: 18),
+                        label: Text(l10n.continueAsDemo),
+                      ),
+                      const SizedBox(height: LegalHubTheme.spaceXs),
+                      Text(
+                        l10n.demoSessionNotice,
+                        textAlign: TextAlign.center,
+                        style: text.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: LegalHubTheme.spaceXl),
               BlocBuilder<AuthCubit, AuthState>(
                 builder: (BuildContext context, AuthState state) {
                   final bool loading = state.status == AuthStatus.loading;
