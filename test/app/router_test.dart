@@ -451,6 +451,66 @@ void main() {
     });
   });
 
+  group('matter details route (Phase 7 slice 7.2)', () {
+    testWidgets('renders the details for an authenticated demo session', (
+      tester,
+    ) async {
+      usePhoneViewport(tester);
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      router.go('/matters/matter-1');
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // The details route renders the read-only projection (AC-3), not
+      // home; the shell keeps home highlighted.
+      expect(find.text('Matter details'), findsOneWidget);
+      expect(find.text('Demo acquisition review'), findsOneWidget);
+      expect(find.text('Layla Mansour'), findsOneWidget);
+      expect(selectedIndex(tester), 0);
+    });
+
+    testWidgets('tapping a matter row opens its details (slice 7.2)', (
+      tester,
+    ) async {
+      usePhoneViewport(tester);
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      router.go(AppRoutes.matters);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // A matter row is a tap target into the details route (the slice
+      // 7.2 affordance); the details render for the tapped matter.
+      await tester.tap(find.text('Demo acquisition review'));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        AppRoutes.matterDetail('matter-1'),
+      );
+      expect(find.text('Matter details'), findsOneWidget);
+      expect(find.text('Layla Mansour'), findsOneWidget);
+    });
+
+    testWidgets('blocks unauthenticated access to the details route', (
+      tester,
+    ) async {
+      router.go('/matters/matter-1');
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Welcome Back'), findsOneWidget);
+      expect(authCubit.state.isAuthenticated, isFalse);
+    });
+  });
+
   group('organization route (1.5 pin)', () {
     testWidgets('renders the roster for an authenticated demo session', (
       tester,

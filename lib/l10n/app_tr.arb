@@ -233,5 +233,10 @@
   "matterError": "Davalar yüklenemedi.",
   "matterLocalOnlyNote": "Demo modu — yalnızca sentetik davalar. Gerçek davalar listelenmez.",
   "matterEntryTitle": "Davalarım",
-  "matterEntrySubtitle": "Demo dava dosyalarına göz atın — geliştirme demosu."
+  "matterEntrySubtitle": "Demo dava dosyalarına göz atın — geliştirme demosu.",
+  "matterDetailsTitle": "Dava detayları",
+  "matterDetailsNotFound": "Dava bulunamadı.",
+  "matterDetailsPracticeArea": "Çalışma alanı",
+  "matterDetailsAssignedAttorney": "Atanan avukat",
+  "matterDetailsCreated": "Oluşturulma"
 }

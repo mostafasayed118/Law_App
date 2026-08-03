@@ -1425,6 +1425,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Browse demo matter files — development demo.'**
   String get matterEntrySubtitle;
+
+  /// No description provided for @matterDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Matter details'**
+  String get matterDetailsTitle;
+
+  /// No description provided for @matterDetailsNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Matter not found.'**
+  String get matterDetailsNotFound;
+
+  /// No description provided for @matterDetailsPracticeArea.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice area'**
+  String get matterDetailsPracticeArea;
+
+  /// No description provided for @matterDetailsAssignedAttorney.
+  ///
+  /// In en, this message translates to:
+  /// **'Assigned attorney'**
+  String get matterDetailsAssignedAttorney;
+
+  /// No description provided for @matterDetailsCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get matterDetailsCreated;
 }
 
 class _AppLocalizationsDelegate

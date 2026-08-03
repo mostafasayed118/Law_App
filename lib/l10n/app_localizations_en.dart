@@ -717,4 +717,19 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get matterEntrySubtitle =>
       'Browse demo matter files — development demo.';
+
+  @override
+  String get matterDetailsTitle => 'Matter details';
+
+  @override
+  String get matterDetailsNotFound => 'Matter not found.';
+
+  @override
+  String get matterDetailsPracticeArea => 'Practice area';
+
+  @override
+  String get matterDetailsAssignedAttorney => 'Assigned attorney';
+
+  @override
+  String get matterDetailsCreated => 'Created';
 }

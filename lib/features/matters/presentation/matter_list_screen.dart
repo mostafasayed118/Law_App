@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../app/legalhub_theme.dart';
+import '../../../app/router.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
@@ -11,6 +13,7 @@ import '../domain/matter_gateway.dart';
 import 'matter_cubit.dart';
 import 'matter_labels.dart';
 import 'matter_state.dart';
+import 'matter_status_chip.dart';
 
 /// Matter-dashboard list surface (Phase 7, slice 7.1).
 ///
@@ -18,9 +21,8 @@ import 'matter_state.dart';
 /// seam (the dev fake in env-less runs, owner decision D-M2). The status
 /// filter is a client-side projection over that list (D-M5); no server
 /// search RPC exists. All copy is local-only — the synthetic list must never
-/// read as real cases (R1/D-M4). Slice 7.2 adds the read-only details
-/// surface, so the list rows are not tappable yet; the tile's tap
-/// affordance (and chevron) arrives with details navigation.
+/// read as real cases (R1/D-M4). Tapping a row (slice 7.2) navigates to the
+/// read-only details surface (`/matters/:id`, AC-3).
 class MatterListScreen extends StatelessWidget {
   const MatterListScreen({super.key});
 
@@ -133,7 +135,11 @@ class _ListSurfaceState extends State<_ListSurface> {
             : Column(
                 children: <Widget>[
                   for (final Matter matter in state.visibleMatters) ...<Widget>[
-                    _MatterTile(matter: matter),
+                    _MatterTile(
+                      matter: matter,
+                      onTap: () =>
+                          context.go(AppRoutes.matterDetail(matter.id)),
+                    ),
                     const SizedBox(height: LegalHubTheme.spaceSm),
                   ],
                 ],
@@ -176,9 +182,10 @@ class _StatusFilterChips extends StatelessWidget {
 }
 
 class _MatterTile extends StatelessWidget {
-  const _MatterTile({required this.matter});
+  const _MatterTile({required this.matter, required this.onTap});
 
   final Matter matter;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -194,74 +201,48 @@ class _MatterTile extends StatelessWidget {
         side: BorderSide(color: scheme.outlineVariant),
       ),
       clipBehavior: Clip.antiAlias,
-      child: Padding(
-        padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-        child: Row(
-          children: <Widget>[
-            CircleAvatar(
-              backgroundColor: scheme.primaryContainer,
-              child: Icon(
-                Icons.folder_outlined,
-                size: 20,
-                color: scheme.onPrimaryContainer,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
+          child: Row(
+            children: <Widget>[
+              CircleAvatar(
+                backgroundColor: scheme.primaryContainer,
+                child: Icon(
+                  Icons.folder_outlined,
+                  size: 20,
+                  color: scheme.onPrimaryContainer,
+                ),
               ),
-            ),
-            const SizedBox(width: LegalHubTheme.spaceMd),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    matter.title,
-                    style: text.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
+              const SizedBox(width: LegalHubTheme.spaceMd),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      matter.title,
+                      style: text.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${practiceAreaLabel(l10n, matter.practiceArea)} · ${matter.assignedAttorneyName}',
-                    style: text.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
+                    const SizedBox(height: 2),
+                    Text(
+                      '${practiceAreaLabel(l10n, matter.practiceArea)} · ${matter.assignedAttorneyName}',
+                      style: text.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: LegalHubTheme.spaceSm),
-            _MatterStatusChip(label: matterStatusLabel(l10n, matter.status)),
-          ],
+              const SizedBox(width: LegalHubTheme.spaceSm),
+              MatterStatusChip(label: matterStatusLabel(l10n, matter.status)),
+              const SizedBox(width: LegalHubTheme.spaceSm),
+              Icon(Icons.chevron_right, color: scheme.outline),
+            ],
+          ),
         ),
-      ),
-    );
-  }
-}
-
-/// Small colored chip rendering a matter's lifecycle status (the roster's
-/// private-chip pattern — feature-local, never a home import).
-class _MatterStatusChip extends StatelessWidget {
-  const _MatterStatusChip({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsetsDirectional.symmetric(
-        horizontal: LegalHubTheme.spaceSm,
-        vertical: 2,
-      ),
-      decoration: BoxDecoration(
-        color: scheme.secondaryContainer,
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusSm),
-        ),
-      ),
-      child: Text(
-        label,
-        style: Theme.of(
-          context,
-        ).textTheme.labelSmall?.copyWith(color: scheme.onSecondaryContainer),
       ),
     );
   }

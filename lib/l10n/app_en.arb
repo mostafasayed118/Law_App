@@ -247,5 +247,10 @@
   "matterError": "Unable to load matters.",
   "matterLocalOnlyNote": "Demo mode — synthetic matters only. No real cases are listed.",
   "matterEntryTitle": "My matters",
-  "matterEntrySubtitle": "Browse demo matter files — development demo."
+  "matterEntrySubtitle": "Browse demo matter files — development demo.",
+  "matterDetailsTitle": "Matter details",
+  "matterDetailsNotFound": "Matter not found.",
+  "matterDetailsPracticeArea": "Practice area",
+  "matterDetailsAssignedAttorney": "Assigned attorney",
+  "matterDetailsCreated": "Created"
 }

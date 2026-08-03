@@ -233,5 +233,10 @@
   "matterError": "تعذّر تحميل القضايا.",
   "matterLocalOnlyNote": "وضع تجريبي — قضايا اصطناعية فقط. لا يتم عرض قضايا حقيقية.",
   "matterEntryTitle": "قضاياي",
-  "matterEntrySubtitle": "تصفح ملفات القضايا التجريبية — عرض تجريبي للتطوير."
+  "matterEntrySubtitle": "تصفح ملفات القضايا التجريبية — عرض تجريبي للتطوير.",
+  "matterDetailsTitle": "تفاصيل القضية",
+  "matterDetailsNotFound": "القضية غير موجودة.",
+  "matterDetailsPracticeArea": "مجال الممارسة",
+  "matterDetailsAssignedAttorney": "المحامي المكلَّف",
+  "matterDetailsCreated": "تاريخ الإنشاء"
 }

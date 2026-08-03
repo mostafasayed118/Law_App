@@ -15,6 +15,7 @@ import '../features/discovery/presentation/attorney_profile_screen.dart';
 import '../features/discovery/presentation/attorney_search_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/home/presentation/settings_screen.dart';
+import '../features/matters/presentation/matter_details_screen.dart';
 import '../features/matters/presentation/matter_list_screen.dart';
 import '../features/notifications/presentation/notification_settings_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
@@ -44,9 +45,13 @@ class AppRoutes {
   static const String discovery = '/discovery';
   static const String discoveryProfile = '/discovery/:attorneyId';
   static const String matters = '/matters';
+  static const String matterDetails = '/matters/:matterId';
 
   /// The profile route for one attorney (path-param substitution).
   static String attorneyProfile(String attorneyId) => '/discovery/$attorneyId';
+
+  /// The details route for one matter (path-param substitution).
+  static String matterDetail(String matterId) => '/matters/$matterId';
 }
 
 /// Routes are navigation UX only. They do not authorize access to any future
@@ -132,6 +137,13 @@ GoRouter createAppRouter(
           path: AppRoutes.matters,
           builder: (BuildContext context, GoRouterState state) =>
               const MatterListScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.matterDetails,
+          builder: (BuildContext context, GoRouterState state) =>
+              MatterDetailsScreen(
+                matterId: state.pathParameters['matterId'] ?? '',
+              ),
         ),
         GoRoute(
           path: AppRoutes.settings,

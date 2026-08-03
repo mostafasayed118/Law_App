@@ -712,4 +712,19 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get matterEntrySubtitle =>
       'تصفح ملفات القضايا التجريبية — عرض تجريبي للتطوير.';
+
+  @override
+  String get matterDetailsTitle => 'تفاصيل القضية';
+
+  @override
+  String get matterDetailsNotFound => 'القضية غير موجودة.';
+
+  @override
+  String get matterDetailsPracticeArea => 'مجال الممارسة';
+
+  @override
+  String get matterDetailsAssignedAttorney => 'المحامي المكلَّف';
+
+  @override
+  String get matterDetailsCreated => 'تاريخ الإنشاء';
 }

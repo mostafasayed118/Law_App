@@ -718,4 +718,19 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get matterEntrySubtitle =>
       'Demo dava dosyalarına göz atın — geliştirme demosu.';
+
+  @override
+  String get matterDetailsTitle => 'Dava detayları';
+
+  @override
+  String get matterDetailsNotFound => 'Dava bulunamadı.';
+
+  @override
+  String get matterDetailsPracticeArea => 'Çalışma alanı';
+
+  @override
+  String get matterDetailsAssignedAttorney => 'Atanan avukat';
+
+  @override
+  String get matterDetailsCreated => 'Oluşturulma';
 }

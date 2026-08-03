@@ -42,6 +42,9 @@ void main() {
       }
       // Every row pairs the title with its practice area + assigned attorney.
       expect(find.text('Corporate · Layla Mansour'), findsOneWidget);
+      // Rows carry the details affordance (slice 7.2 navigation hint); the
+      // tap itself is exercised in router_test under the real GoRouter.
+      expect(find.byIcon(Icons.chevron_right), findsWidgets);
     });
 
     testWidgets('filters by lifecycle status via the chip (AC-2)', (
