@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/features/discovery/presentation/discovery_entry_card.dart';
+import 'package:legalhub/features/matters/presentation/matter_entry_card.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/view_state_view.dart';
 
@@ -221,6 +222,102 @@ void main() {
         expect(en.discoveryLocalOnlyNote, isNot(contains('legal advice')));
       },
     );
+
+    test('resolves the matter keys in every locale (7.3 pin)', () {
+      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+      final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+      final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+      // List surface (slice 7.1).
+      expect(en.matterTitle, 'Matters');
+      expect(ar.matterTitle, 'القضايا');
+      expect(tr.matterTitle, 'Davalar');
+      expect(en.matterFilterAll, 'All');
+      expect(ar.matterFilterAll, 'الكل');
+      expect(tr.matterFilterAll, 'Tümü');
+      expect(en.matterStatusOpen, 'Open');
+      expect(ar.matterStatusOpen, 'مفتوحة');
+      expect(tr.matterStatusOpen, 'Açık');
+      expect(en.matterStatusActive, 'Active');
+      expect(ar.matterStatusActive, 'نشطة');
+      expect(tr.matterStatusActive, 'Aktif');
+      expect(en.matterStatusClosed, 'Closed');
+      expect(ar.matterStatusClosed, 'مغلقة');
+      expect(tr.matterStatusClosed, 'Kapalı');
+      expect(en.matterEmpty, 'No matters match the filter.');
+      expect(ar.matterEmpty, 'لا توجد قضايا تطابق عامل التصفية.');
+      expect(tr.matterEmpty, 'Filtreyle eşleşen dava yok.');
+      expect(en.matterError, 'Unable to load matters.');
+      expect(ar.matterError, 'تعذّر تحميل القضايا.');
+      expect(tr.matterError, 'Davalar yüklenemedi.');
+      expect(
+        en.matterLocalOnlyNote,
+        'Demo mode — synthetic matters only. No real cases are listed.',
+      );
+      expect(
+        ar.matterLocalOnlyNote,
+        'وضع تجريبي — قضايا اصطناعية فقط. لا يتم عرض قضايا حقيقية.',
+      );
+      expect(
+        tr.matterLocalOnlyNote,
+        'Demo modu — yalnızca sentetik davalar. Gerçek davalar listelenmez.',
+      );
+
+      // Home entry (slice 7.1).
+      expect(en.matterEntryTitle, 'My matters');
+      expect(ar.matterEntryTitle, 'قضاياي');
+      expect(tr.matterEntryTitle, 'Davalarım');
+      expect(
+        en.matterEntrySubtitle,
+        'Browse demo matter files — development demo.',
+      );
+      expect(
+        ar.matterEntrySubtitle,
+        'تصفح ملفات القضايا التجريبية — عرض تجريبي للتطوير.',
+      );
+      expect(
+        tr.matterEntrySubtitle,
+        'Demo dava dosyalarına göz atın — geliştirme demosu.',
+      );
+
+      // Details surface (slice 7.2).
+      expect(en.matterDetailsTitle, 'Matter details');
+      expect(ar.matterDetailsTitle, 'تفاصيل القضية');
+      expect(tr.matterDetailsTitle, 'Dava detayları');
+      expect(en.matterDetailsNotFound, 'Matter not found.');
+      expect(ar.matterDetailsNotFound, 'القضية غير موجودة.');
+      expect(tr.matterDetailsNotFound, 'Dava bulunamadı.');
+      expect(en.matterDetailsPracticeArea, 'Practice area');
+      expect(ar.matterDetailsPracticeArea, 'مجال الممارسة');
+      expect(tr.matterDetailsPracticeArea, 'Çalışma alanı');
+      expect(en.matterDetailsAssignedAttorney, 'Assigned attorney');
+      expect(ar.matterDetailsAssignedAttorney, 'المحامي المكلَّف');
+      expect(tr.matterDetailsAssignedAttorney, 'Atanan avukat');
+      expect(en.matterDetailsCreated, 'Created');
+      expect(ar.matterDetailsCreated, 'تاريخ الإنشاء');
+      expect(tr.matterDetailsCreated, 'Oluşturulma');
+
+      // Real per-locale wording, not silent copies of EN.
+      expect(tr.matterTitle, isNot(en.matterTitle));
+      expect(ar.matterEmpty, isNot(en.matterEmpty));
+      expect(tr.matterDetailsTitle, isNot(en.matterDetailsTitle));
+      expect(ar.matterDetailsCreated, isNot(en.matterDetailsCreated));
+      expect(tr.matterLocalOnlyNote, isNot(en.matterLocalOnlyNote));
+      expect(ar.matterLocalOnlyNote, isNot(en.matterLocalOnlyNote));
+    });
+
+    test('matter copy is local-only wording, no legal-advice claim (AC-6)', () {
+      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+
+      // AC-6 pin (matter_dashboard_scope_2026-08-03.md §5 AC-6, risk R1):
+      // the demo/local-only framing is literal copy, and it must not drift
+      // into legal-advice or compliance-claim territory. The exact
+      // per-locale wording is pinned in the 7.3 resolution test above; this
+      // test only guards the framing rails.
+      expect(en.matterEntrySubtitle, contains('demo'));
+      expect(en.matterEntrySubtitle, isNot(contains('legal advice')));
+      expect(en.matterLocalOnlyNote, isNot(contains('legal advice')));
+    });
   });
 
   group('AppLocalizations widget rendering', () {
@@ -265,5 +362,31 @@ void main() {
       expect(find.text('Bir avukat bul'), findsOneWidget);
       expect(find.text('Find an attorney'), findsNothing);
     });
+
+    testWidgets(
+      'renders the matter entry card in AR and TR, not the EN fallback '
+      '(7.3 pin)',
+      (tester) async {
+        Future<void> pumpAt(Locale locale) async {
+          await tester.pumpWidget(
+            MaterialApp(
+              locale: locale,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(body: MatterEntryCard(onTap: null)),
+            ),
+          );
+          await tester.pumpAndSettle();
+        }
+
+        await pumpAt(const Locale('ar'));
+        expect(find.text('قضاياي'), findsOneWidget);
+        expect(find.text('My matters'), findsNothing);
+
+        await pumpAt(const Locale('tr'));
+        expect(find.text('Davalarım'), findsOneWidget);
+        expect(find.text('My matters'), findsNothing);
+      },
+    );
   });
 }
