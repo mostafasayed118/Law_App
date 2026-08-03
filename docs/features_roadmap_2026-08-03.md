@@ -32,10 +32,12 @@
 > unverifiable approval citations in its code comments; 60 main commits of
 > divergence), landed per the gate-table row below and the decision record
 > in `docs/booking_scope_2026-08-03.md` (D-B1…D-B7 ratified, D-B7 standalone).
-> Phase 6 (attorney discovery, read-only) is **APPROVED 2026-08-03** (scope
-> note `docs/attorney_discovery_scope_2026-08-03.md`; D-A1…D-A6 ratified,
-> incl. the D-B7 additive `attorneyId` booking hook). Implementation starts
-> with slice 6.1 behind the standard slice gate.
+> Phase 6 (attorney discovery, read-only) **IMPLEMENTED AND SHIPPED
+> 2026-08-03** (`0f93042` slice 6.1 gateway seam + search surface; `7b5c589`
+> slice 6.2 profile + book-from-profile prefill; `d389c69` slice 6.3 l10n
+> pins) — per the gate-table row below and the decision record in
+> `docs/attorney_discovery_scope_2026-08-03.md` (D-A1…D-A6 ratified, incl.
+> the D-B7 additive `attorneyId` booking hook).
 > Everything in §10 stays deferred until P0 closes.
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
@@ -255,11 +257,18 @@ owner approval.
 
 ## 8. Phase 6 — Attorney discovery (read-only, client-only)
 
-**Status: APPROVED 2026-08-03** (owner ratification of D-A1…D-A6). Scope
-note `docs/attorney_discovery_scope_2026-08-03.md`. Spec basis: MVP §4
-"Attorney discovery (read-only)" + §6 remediation row 152
-(`attorney_search, attorney_profile`; no legal-advice/compliance-claim
-copy).
+**Status: IMPLEMENTED + SHIPPED 2026-08-03** — `0f93042` (slice 6.1:
+AttorneyGateway seam + dev fake + search surface), `7b5c589` (slice 6.2:
+attorney profile + "Book with this attorney" → `/book` with optional
+`attorneyId`, the D-B7 additive slice), `d389c69` (slice 6.3: EN/AR/TR
+l10n pins, AC-6/R3). Full gate stack passed on the merged tree: format
+CLEAN, analyze clean, **565 tests pass**, ledger PASS 115. Pushed to
+`origin/main` on the owner's approval.
+
+Scope note `docs/attorney_discovery_scope_2026-08-03.md` (D-A1…D-A6
+ratified). Spec basis: MVP §4 "Attorney discovery (read-only)" + §6
+remediation row 152 (`attorney_search, attorney_profile`; no
+legal-advice/compliance-claim copy).
 
 **Gate (as designed):** scope note approval → decision-record ratification
 (D-A1…D-A6, incl. D-A3 booking integration) → slice 6.1 (AttorneyGateway
@@ -287,7 +296,7 @@ attorney messaging.
 | 3 | Phase 3 — server amendments | Phase 1/2 (surface defined) | **yes** | spec → RLS-gate review → rehearsal evidence → apply approval → apply execution → matrix addendum | **APPLIED 2026-08-03** (`docs/p3_r1_roster_rpc_design_2026-08-03.md` + matrix §2 addendum + `docs/p3_r1_rehearsal_plan_2026-08-03.md` + evidence r1 PASSED + `supabase/rpc/list_org_members_metadata.sql` + `_down.sql` drop → applied to dev project on the owner's dated apply approval) |
 | 4 | Phase 4 — auth plumbing | — | 4.1 yes (platform config) | platform config approval → gate stack | **4.2 SHIPPED 2026-08-03 (`deb72d8`); 4.1 APPROVED + IMPLEMENTED 2026-08-03 (scope note `docs/p4_41_deeplink_recovery_scope_2026-08-03.md`); R1 = dashboard Redirect URL (owner-side)** |
 | 5 | Phase 5 — consultation booking (no live payment) | MVP spec §4; auth/org track (§§3–4); D-B7 resolved (standalone) | no | scope note → decision-record ratification → UI + routing slice → gate stack → owner push approval | **SHIPPED 2026-08-03** (`05f13c8` + `0eb7ec9` + `3bd3d29` + `d55e273`, suite 521, ledger PASS 115; pushed to origin/main) |
-| 6 | Phase 6 — attorney discovery (read-only, client-only) | MVP spec §4; D-B7 additive `attorneyId` hook; Phase 5 booking seams | no | scope note → decision-record ratification (D-A1…D-A6) → slices 6.1–6.3 → gate stack → owner push approval | **APPROVED 2026-08-03** — scope note `docs/attorney_discovery_scope_2026-08-03.md` (D-A1…D-A6 ratified); slices 6.1–6.3 pending |
+| 6 | Phase 6 — attorney discovery (read-only, client-only) | MVP spec §4; D-B7 additive `attorneyId` hook; Phase 5 booking seams | no | scope note → decision-record ratification (D-A1…D-A6) → slices 6.1–6.3 → gate stack → owner push approval | **SHIPPED 2026-08-03** (`0f93042` + `7b5c589` + `d389c69`, suite 565, ledger PASS 115; pushed to origin/main) |
 | — | §10 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Deferred |
 
 Rules that apply to every phase (definition-of-done from
