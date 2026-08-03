@@ -7,6 +7,7 @@ import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
+import 'package:legalhub/features/orgs/presentation/active_org_store.dart';
 import 'package:legalhub/features/orgs/presentation/organization_hub_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
@@ -242,5 +243,12 @@ void main() {
     expect(find.text('Demo user'), findsOneWidget);
     expect(find.text('Partner'), findsOneWidget);
     expect(find.byType(DropdownButton<String>), findsOneWidget);
+
+    // AC-4 (Phase 7 slice 7.0): the switcher writes the selection into the
+    // ActiveOrgStore (D-08 — client-side context, never an authority).
+    expect(
+      serviceLocator<ActiveOrgStore>().activeOrganizationId,
+      created.valueOrNull!.id,
+    );
   });
 }

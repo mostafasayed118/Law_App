@@ -28,6 +28,7 @@ import 'package:legalhub/features/booking/domain/booking_gateway.dart';
 import 'package:legalhub/features/booking/domain/booking_prefill.dart';
 import 'package:legalhub/features/discovery/data/fake_attorney_gateway.dart';
 import 'package:legalhub/features/discovery/domain/attorney_gateway.dart';
+import 'package:legalhub/features/orgs/presentation/active_org_store.dart';
 
 /// Hand-rolled fake of the [SupabaseAuthApi] seam for the DI flip test.
 /// The real `SupabaseAuthApiImpl.bind()` needs a running `Supabase.instance`,
@@ -205,6 +206,7 @@ void main() {
       expect(serviceLocator.isRegistered<BookingGateway>(), isTrue);
       expect(serviceLocator.isRegistered<BookingPrefill>(), isTrue);
       expect(serviceLocator.isRegistered<AttorneyGateway>(), isTrue);
+      expect(serviceLocator.isRegistered<ActiveOrgStore>(), isTrue);
       expect(serviceLocator.isRegistered<AuthCubit>(), isTrue);
     });
 
@@ -247,6 +249,13 @@ void main() {
         identical(
           serviceLocator<BookingPrefill>(),
           serviceLocator<BookingPrefill>(),
+        ),
+        isTrue,
+      );
+      expect(
+        identical(
+          serviceLocator<ActiveOrgStore>(),
+          serviceLocator<ActiveOrgStore>(),
         ),
         isTrue,
       );

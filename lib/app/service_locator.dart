@@ -32,6 +32,7 @@ import '../features/discovery/domain/attorney_gateway.dart';
 import '../features/notifications/data/in_memory_notification_prefs_store.dart';
 import '../features/notifications/data/shared_preferences_notification_prefs_store.dart';
 import '../features/notifications/domain/notification_prefs_store.dart';
+import '../features/orgs/presentation/active_org_store.dart';
 import 'localization/locale_cubit.dart';
 
 /// The application's single GetIt service-locator instance.
@@ -184,6 +185,12 @@ void configureDependencies({
     serviceLocator.registerLazySingleton<AttorneyGateway>(
       FakeAttorneyGateway.new,
     );
+  }
+  if (!serviceLocator.isRegistered<ActiveOrgStore>()) {
+    // Client-side active-org context (Phase 7 D-M7/D-08): app-scoped,
+    // in-memory only, never serialized. The org hub seeds/reads it; the
+    // server re-derives membership per D-08.
+    serviceLocator.registerLazySingleton<ActiveOrgStore>(ActiveOrgStore.new);
   }
   if (!serviceLocator.isRegistered<AuthCubit>()) {
     // App-scoped because the router and all screens observe one session seam.

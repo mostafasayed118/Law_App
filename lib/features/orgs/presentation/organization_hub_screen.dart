@@ -7,17 +7,19 @@ import '../../../core/auth/session.dart';
 import '../../../core/organizations/organization_gateway.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../auth/presentation/auth_cubit.dart';
+import 'active_org_store.dart';
 import 'create_organization_screen.dart';
 import 'member_roster_screen.dart';
 import 'org_cubit.dart';
 
-/// Hub for the organization surface (P3 slice 1.5 + Phase 2 slice 2.3).
+/// Hub for the organization surface (P3 slice 1.5 + Phase 2 slice 2.3;
+/// active-org context formalized in Phase 7 slice 7.0).
 ///
-/// Resolves the active-org context from [Session.activeMembership] (or an
-/// organization created in this visit) and renders the roster when an org
-/// exists, or the create-org form when it does not. With multiple session
-/// memberships the hub offers a client-side org switcher (Phase 2 slice
-/// 2.3): the selection is a local UI context only — it is never sent
+/// Resolves the active-org context from the [ActiveOrgStore] (seeded from
+/// [Session.activeMembership] — or an organization created in this visit)
+/// and renders the roster when an org exists, or the create-org form when it
+/// does not. With multiple session memberships the hub offers a client-side
+/// org switcher: the selection is a local UI context only — it is never sent
 /// anywhere, and the server stays the membership authority (D-08). Provides
 /// the shared [OrgCubit] so create → roster shares one gateway-backed state
 /// machine; switching orgs swaps the cubit (keyed by org) so the roster
@@ -30,18 +32,36 @@ class OrganizationHubScreen extends StatefulWidget {
 }
 
 class _OrganizationHubScreenState extends State<OrganizationHubScreen> {
+  final ActiveOrgStore _activeOrgStore = serviceLocator<ActiveOrgStore>();
   String? _createdOrganizationId;
-  String? _selectedOrganizationId;
+
+  @override
+  void initState() {
+    super.initState();
+    _activeOrgStore.addListener(_onActiveOrgChanged);
+  }
+
+  @override
+  void dispose() {
+    _activeOrgStore.removeListener(_onActiveOrgChanged);
+    super.dispose();
+  }
+
+  void _onActiveOrgChanged() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     final Session? session = context.watch<AuthCubit>().state.session;
+    // The store re-seeds itself when the session identity changes (and is a
+    // no-op for the same session, preserving a user selection); calling it
+    // here keeps the hub in sync on sign-out / user switch.
+    _activeOrgStore.syncFromSession(session);
     final List<OrganizationMembership> memberships =
         session?.memberships ?? const <OrganizationMembership>[];
     final String? organizationId =
-        _createdOrganizationId ??
-        _selectedOrganizationId ??
-        session?.activeMembership?.organizationId;
+        _createdOrganizationId ?? _activeOrgStore.activeOrganizationId;
     // The switcher is a multi-org affordance only; the create-org context of
     // this visit wins over any selection (the new org is not in the session
     // yet).
@@ -63,9 +83,7 @@ class _OrganizationHubScreenState extends State<OrganizationHubScreen> {
                   _OrgSwitcher(
                     memberships: memberships,
                     selectedOrganizationId: organizationId,
-                    onChanged: (String id) {
-                      setState(() => _selectedOrganizationId = id);
-                    },
+                    onChanged: _activeOrgStore.select,
                   ),
                 Expanded(
                   child: MemberRosterScreen(organizationId: organizationId),
