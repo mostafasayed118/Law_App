@@ -366,6 +366,19 @@ class AppLocalizationsTr extends AppLocalizations {
   String get profileExpiresLabel => 'Oturum süresi';
 
   @override
+  String get deleteAccountAction => 'Hesabı sil';
+
+  @override
+  String get deleteAccountConfirmTitle => 'Hesabınız silinsin mi?';
+
+  @override
+  String get deleteAccountConfirmBody =>
+      'Bu işlem hesabınızı kalıcı olarak siler ve sizi tüm kuruluşlardan kaldırır. Geri alınamaz.';
+
+  @override
+  String get deleteAccountConfirmAction => 'Sil';
+
+  @override
   String get profileSessionExpired =>
       'Oturum süresi doldu. Lütfen tekrar giriş yapın.';
 
@@ -414,6 +427,28 @@ class AppLocalizationsTr extends AppLocalizations {
   String get rosterEmpty => 'Henüz üye yok.';
 
   @override
+  String get orgSwitcherLabel => 'Kuruluş';
+
+  @override
+  String get acceptInvitationTitle => 'Daveti kabul et';
+
+  @override
+  String get acceptInvitationBody =>
+      'Ortakınızın sizinle paylaştığı tek kullanımlık kodu yapıştırın.';
+
+  @override
+  String get acceptInvitationAction => 'Kabul et';
+
+  @override
+  String get invitationAccepted => 'Davet kabul edildi.';
+
+  @override
+  String get invitationAcceptedBody => 'Kuruluşa katıldınız.';
+
+  @override
+  String get done => 'Bitti';
+
+  @override
   String get inviteMember => 'Üye Davet Et';
 
   @override
@@ -423,10 +458,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get inviteRoleLabel => 'Rol ata';
 
   @override
-  String get inviteSendButton => 'Davetiye Gönder';
+  String get inviteTokenLabel => 'Tek kullanımlık kod';
 
   @override
-  String get inviteTokenTitle => 'Davetiye Kodu';
+  String get inviteSendButton => 'Davetiye Gönder';
 
   @override
   String inviteTokenBody(String email) {
@@ -440,6 +475,20 @@ class AppLocalizationsTr extends AppLocalizations {
   String get inviteTokenCopied => 'Kod panoya kopyalandı.';
 
   @override
+  String get actionResendInvitation => 'Daveti yeniden gönder';
+
+  @override
+  String get actionRevokeInvitation => 'Daveti iptal et';
+
+  @override
+  String get invitationRevoked => 'Davet iptal edildi.';
+
+  @override
+  String inviteTokenResentBody(String email) {
+    return '$email için yeni bir tek kullanımlık kod. Bir daha gösterilemez.';
+  }
+
+  @override
   String get memberStatusInvited => 'DAVETLİ';
 
   @override
@@ -450,9 +499,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get memberStatusRemoved => 'KALDIRILDI';
-
-  @override
-  String get actionChangeRole => 'Rolü değiştir';
 
   @override
   String get actionSuspend => 'Askıya al';

@@ -7,8 +7,10 @@ import '../../core/roles/user_role.dart';
 /// an authorization mechanism and must not be used as production authority.
 /// It mirrors the signed server semantics so the UI behaves like the real
 /// surface: org creation makes the actor its initial partner, invites reject
-/// existing members, and role changes/suspensions/removals enforce the
-/// last-active-partner guard.
+/// existing members, role changes/suspensions/removals enforce the
+/// last-active-partner guard, and invitations carry ids so Resend/Revoke
+/// target the pending row exactly like `resend_invitation` /
+/// `revoke_invitation` do server-side.
 class FakeOrganizationGateway implements OrganizationGateway {
   FakeOrganizationGateway() {
     _orgs.addAll(<String, OrganizationSummary>{
@@ -38,12 +40,19 @@ class FakeOrganizationGateway implements OrganizationGateway {
   static const String demoUserId = 'demo-user';
   static const String demoOrganizationId = 'org-demo';
 
+  /// The demo identity's email, mirroring the fake auth session's claim (the
+  /// server matches `accept_invitation` against the JWT email claim).
+  static const String demoUserEmail = 'demo@firm.com';
+
   static final DateTime _seedTime = DateTime.utc(2026, 7, 25);
 
   final Map<String, OrganizationSummary> _orgs =
       <String, OrganizationSummary>{};
   final Map<String, Map<String, OrgMember>> _members =
       <String, Map<String, OrgMember>>{};
+
+  final Map<String, _FakeInvitation> _invitations = <String, _FakeInvitation>{};
+  int _inviteCounter = 0;
 
   @override
   Future<OrgOutcome<OrganizationSummary>> createOrganization({
@@ -123,6 +132,16 @@ class FakeOrganizationGateway implements OrganizationGateway {
     // Mirrors the server's membership rows for invited identities (the real
     // surface stores the sha-256 hash only — the fake keeps the literal for
     // demo continuity, which is fine because nothing leaves the process).
+    final String token = 'demo-invite-token-${roster.length}';
+    final String invitationId = 'inv-${++_inviteCounter}';
+    _invitations[invitationId] = _FakeInvitation(
+      id: invitationId,
+      organizationId: organizationId,
+      email: key,
+      role: role,
+      status: _FakeInvitationStatus.pending,
+      token: token,
+    );
     roster[key] = OrgMember(
       organizationId: organizationId,
       userId: key,
@@ -132,12 +151,13 @@ class FakeOrganizationGateway implements OrganizationGateway {
       status: MembershipStatus.invited,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
+      invitationId: invitationId,
     );
     return OrgOutcome<InviteResult>.success(
       InviteResult(
         organizationId: organizationId,
         email: email.trim(),
-        token: 'demo-invite-token-${roster.length}',
+        token: token,
       ),
     );
   }
@@ -242,6 +262,87 @@ class FakeOrganizationGateway implements OrganizationGateway {
     return const OrgOutcome<void>.success(null);
   }
 
+  @override
+  Future<OrgOutcome<String>> resendInvitation({
+    required String invitationId,
+  }) async {
+    final _FakeInvitation? invitation = _invitations[invitationId];
+    if (invitation == null ||
+        invitation.status != _FakeInvitationStatus.pending) {
+      return const OrgOutcome<String>.failure(
+        OrgFailure(kind: OrgFailureKind.invalidInvitation),
+      );
+    }
+    final String token = 'demo-invite-token-resend-${++_inviteCounter}';
+    invitation.token = token;
+    return OrgOutcome<String>.success(token);
+  }
+
+  @override
+  Future<OrgOutcome<void>> revokeInvitation({
+    required String invitationId,
+  }) async {
+    final _FakeInvitation? invitation = _invitations[invitationId];
+    if (invitation == null ||
+        invitation.status != _FakeInvitationStatus.pending) {
+      return const OrgOutcome<void>.failure(
+        OrgFailure(kind: OrgFailureKind.invalidInvitation),
+      );
+    }
+    invitation.status = _FakeInvitationStatus.revoked;
+    // A revoked invite is no longer pending: the invited row leaves the
+    // roster on the next read (revocation is a status transition, never a
+    // DELETE — the fake's registry is the surviving audit trail).
+    _members[invitation.organizationId]?.remove(invitation.email);
+    return const OrgOutcome<void>.success(null);
+  }
+
+  @override
+  Future<OrgOutcome<void>> deleteMyAccount() async {
+    // Mirrors the server cascade: profiles/memberships of the caller vanish;
+    // organizations keep their rows with created_by/actor cleared (the fake
+    // has no cross-entity actor columns beyond the demo identity).
+    for (final Map<String, OrgMember> roster in _members.values) {
+      roster.remove(demoUserId);
+    }
+    return const OrgOutcome<void>.success(null);
+  }
+
+  @override
+  Future<OrgOutcome<String>> acceptInvitation({required String token}) async {
+    final _FakeInvitation? invitation = _invitations.values
+        .where(
+          (_FakeInvitation inv) =>
+              inv.status == _FakeInvitationStatus.pending && inv.token == token,
+        )
+        .firstOrNull;
+    // Mirrors the server's undifferentiated denial: unknown/expired tokens
+    // and email mismatches all read as "invalid invitation".
+    if (invitation == null || invitation.email != demoUserEmail.toLowerCase()) {
+      return const OrgOutcome<String>.failure(
+        OrgFailure(kind: OrgFailureKind.invalidInvitation),
+      );
+    }
+    invitation.status = _FakeInvitationStatus.accepted;
+    final Map<String, OrgMember> roster = _members[invitation.organizationId]!;
+    // The pending invited row (keyed by email) becomes the real membership
+    // with the SERVER-OWNED role from the invitation.
+    roster.remove(invitation.email);
+    roster[demoUserId] = OrgMember(
+      organizationId: invitation.organizationId,
+      userId: demoUserId,
+      displayName: 'Demo user',
+      locale: 'en',
+      role: invitation.role,
+      status: MembershipStatus.active,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+    return OrgOutcome<String>.success(
+      'membership-${invitation.organizationId}',
+    );
+  }
+
   bool _anotherActivePartnerExists(
     Map<String, OrgMember> roster,
     String userId,
@@ -278,5 +379,29 @@ class FakeOrganizationGateway implements OrganizationGateway {
     status: status ?? source.status,
     createdAt: source.createdAt,
     updatedAt: DateTime.now(),
+    invitationId: source.invitationId,
   );
+}
+
+enum _FakeInvitationStatus { pending, revoked, accepted }
+
+/// A pending invitation mirror: the literal token is kept for demo
+/// continuity (the real surface stores only the sha-256 hash — nothing
+/// leaves the process, so the literal is safe here).
+class _FakeInvitation {
+  _FakeInvitation({
+    required this.id,
+    required this.organizationId,
+    required this.email,
+    required this.role,
+    required this.status,
+    required this.token,
+  });
+
+  final String id;
+  final String organizationId;
+  final String email;
+  final UserRole role;
+  _FakeInvitationStatus status;
+  String token;
 }

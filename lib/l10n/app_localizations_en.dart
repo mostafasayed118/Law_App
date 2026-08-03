@@ -364,6 +364,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileExpiresLabel => 'Session expires';
 
   @override
+  String get deleteAccountAction => 'Delete account';
+
+  @override
+  String get deleteAccountConfirmTitle => 'Delete your account?';
+
+  @override
+  String get deleteAccountConfirmBody =>
+      'This permanently deletes your account and removes you from every organization. It cannot be undone.';
+
+  @override
+  String get deleteAccountConfirmAction => 'Delete';
+
+  @override
   String get profileSessionExpired => 'Session expired. Please sign in again.';
 
   @override
@@ -411,6 +424,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rosterEmpty => 'No members yet.';
 
   @override
+  String get orgSwitcherLabel => 'Organization';
+
+  @override
+  String get acceptInvitationTitle => 'Accept invitation';
+
+  @override
+  String get acceptInvitationBody =>
+      'Paste the one-time token your partner shared with you.';
+
+  @override
+  String get acceptInvitationAction => 'Accept';
+
+  @override
+  String get invitationAccepted => 'Invitation accepted.';
+
+  @override
+  String get invitationAcceptedBody => 'You joined the organization.';
+
+  @override
+  String get done => 'Done';
+
+  @override
   String get inviteMember => 'Invite Member';
 
   @override
@@ -420,10 +455,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inviteRoleLabel => 'Assign role';
 
   @override
-  String get inviteSendButton => 'Send Invitation';
+  String get inviteTokenLabel => 'One-time token';
 
   @override
-  String get inviteTokenTitle => 'Invitation Token';
+  String get inviteSendButton => 'Send Invitation';
 
   @override
   String inviteTokenBody(String email) {
@@ -437,6 +472,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inviteTokenCopied => 'Token copied to clipboard.';
 
   @override
+  String get actionResendInvitation => 'Resend invitation';
+
+  @override
+  String get actionRevokeInvitation => 'Revoke invitation';
+
+  @override
+  String get invitationRevoked => 'Invitation revoked.';
+
+  @override
+  String inviteTokenResentBody(String email) {
+    return 'A fresh one-time token for $email. It cannot be shown again.';
+  }
+
+  @override
   String get memberStatusInvited => 'INVITED';
 
   @override
@@ -447,9 +496,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get memberStatusRemoved => 'REMOVED';
-
-  @override
-  String get actionChangeRole => 'Change role';
 
   @override
   String get actionSuspend => 'Suspend';

@@ -772,6 +772,30 @@ abstract class AppLocalizations {
   /// **'Session expires'**
   String get profileExpiresLabel;
 
+  /// No description provided for @deleteAccountAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get deleteAccountAction;
+
+  /// No description provided for @deleteAccountConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete your account?'**
+  String get deleteAccountConfirmTitle;
+
+  /// No description provided for @deleteAccountConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This permanently deletes your account and removes you from every organization. It cannot be undone.'**
+  String get deleteAccountConfirmBody;
+
+  /// No description provided for @deleteAccountConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteAccountConfirmAction;
+
   /// No description provided for @profileSessionExpired.
   ///
   /// In en, this message translates to:
@@ -862,6 +886,48 @@ abstract class AppLocalizations {
   /// **'No members yet.'**
   String get rosterEmpty;
 
+  /// No description provided for @orgSwitcherLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Organization'**
+  String get orgSwitcherLabel;
+
+  /// No description provided for @acceptInvitationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept invitation'**
+  String get acceptInvitationTitle;
+
+  /// No description provided for @acceptInvitationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste the one-time token your partner shared with you.'**
+  String get acceptInvitationBody;
+
+  /// No description provided for @acceptInvitationAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get acceptInvitationAction;
+
+  /// No description provided for @invitationAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation accepted.'**
+  String get invitationAccepted;
+
+  /// No description provided for @invitationAcceptedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You joined the organization.'**
+  String get invitationAcceptedBody;
+
+  /// No description provided for @done.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get done;
+
   /// No description provided for @inviteMember.
   ///
   /// In en, this message translates to:
@@ -880,17 +946,17 @@ abstract class AppLocalizations {
   /// **'Assign role'**
   String get inviteRoleLabel;
 
+  /// No description provided for @inviteTokenLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'One-time token'**
+  String get inviteTokenLabel;
+
   /// No description provided for @inviteSendButton.
   ///
   /// In en, this message translates to:
   /// **'Send Invitation'**
   String get inviteSendButton;
-
-  /// No description provided for @inviteTokenTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Invitation Token'**
-  String get inviteTokenTitle;
 
   /// No description provided for @inviteTokenBody.
   ///
@@ -909,6 +975,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Token copied to clipboard.'**
   String get inviteTokenCopied;
+
+  /// No description provided for @actionResendInvitation.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend invitation'**
+  String get actionResendInvitation;
+
+  /// No description provided for @actionRevokeInvitation.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke invitation'**
+  String get actionRevokeInvitation;
+
+  /// No description provided for @invitationRevoked.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation revoked.'**
+  String get invitationRevoked;
+
+  /// No description provided for @inviteTokenResentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A fresh one-time token for {email}. It cannot be shown again.'**
+  String inviteTokenResentBody(String email);
 
   /// No description provided for @memberStatusInvited.
   ///
@@ -933,12 +1023,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'REMOVED'**
   String get memberStatusRemoved;
-
-  /// No description provided for @actionChangeRole.
-  ///
-  /// In en, this message translates to:
-  /// **'Change role'**
-  String get actionChangeRole;
 
   /// No description provided for @actionSuspend.
   ///

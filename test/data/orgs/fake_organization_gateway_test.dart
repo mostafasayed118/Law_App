@@ -157,5 +157,143 @@ void main() {
       );
       expect(member.status, MembershipStatus.active);
     });
+
+    test(
+      'invited rows carry the invitation id for lifecycle actions',
+      () async {
+        await gateway.inviteMember(
+          organizationId: FakeOrganizationGateway.demoOrganizationId,
+          email: 'new@y.test',
+          role: UserRole.attorney,
+        );
+
+        final OrgOutcome<List<OrgMember>> roster = await gateway.listMembers(
+          organizationId: FakeOrganizationGateway.demoOrganizationId,
+        );
+        final OrgMember invited = roster.valueOrNull!.firstWhere(
+          (OrgMember m) => m.userId == 'new@y.test',
+        );
+        expect(invited.invitationId, isNotNull);
+      },
+    );
+
+    test('resend rotates a pending invitation token', () async {
+      await gateway.inviteMember(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+        email: 'new@y.test',
+        role: UserRole.attorney,
+      );
+
+      final OrgOutcome<String> outcome = await gateway.resendInvitation(
+        invitationId: 'inv-1',
+      );
+
+      expect(outcome.isSuccess, isTrue);
+      expect(outcome.valueOrNull, startsWith('demo-invite-token-resend-'));
+    });
+
+    test(
+      'resend of a revoked invitation fails with invalidInvitation',
+      () async {
+        await gateway.inviteMember(
+          organizationId: FakeOrganizationGateway.demoOrganizationId,
+          email: 'new@y.test',
+          role: UserRole.attorney,
+        );
+        await gateway.revokeInvitation(invitationId: 'inv-1');
+
+        final OrgOutcome<String> outcome = await gateway.resendInvitation(
+          invitationId: 'inv-1',
+        );
+
+        expect(outcome.failureOrNull?.kind, OrgFailureKind.invalidInvitation);
+      },
+    );
+
+    test('revoke removes the pending row from the roster', () async {
+      await gateway.inviteMember(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+        email: 'new@y.test',
+        role: UserRole.attorney,
+      );
+
+      final OrgOutcome<void> outcome = await gateway.revokeInvitation(
+        invitationId: 'inv-1',
+      );
+
+      expect(outcome.isSuccess, isTrue);
+      final OrgOutcome<List<OrgMember>> roster = await gateway.listMembers(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+      );
+      expect(
+        roster.valueOrNull!.any((OrgMember m) => m.userId == 'new@y.test'),
+        isFalse,
+      );
+    });
+
+    test('deleteMyAccount cascades the demo identity memberships', () async {
+      await gateway.createOrganization(name: 'Second Firm');
+      await gateway.inviteMember(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+        email: 'new@y.test',
+        role: UserRole.attorney,
+      );
+
+      final OrgOutcome<void> outcome = await gateway.deleteMyAccount();
+
+      expect(outcome.isSuccess, isTrue);
+      final OrgOutcome<List<OrgMember>> demo = await gateway.listMembers(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+      );
+      expect(
+        demo.valueOrNull!.any(
+          (OrgMember m) => m.userId == FakeOrganizationGateway.demoUserId,
+        ),
+        isFalse,
+      );
+    });
+
+    test(
+      'acceptInvitation creates a membership with the server-owned role',
+      () async {
+        final OrgOutcome<OrganizationSummary> created = await gateway
+            .createOrganization(name: 'Second Firm');
+        final OrgOutcome<InviteResult> invite = await gateway.inviteMember(
+          organizationId: created.valueOrNull!.id,
+          email: FakeOrganizationGateway.demoUserEmail,
+          role: UserRole.attorney,
+        );
+        expect(invite.isSuccess, isTrue);
+
+        final OrgOutcome<String> accepted = await gateway.acceptInvitation(
+          token: invite.valueOrNull!.token,
+        );
+
+        expect(accepted.isSuccess, isTrue);
+        final OrgOutcome<List<OrgMember>> roster = await gateway.listMembers(
+          organizationId: created.valueOrNull!.id,
+        );
+        final OrgMember demo = roster.valueOrNull!.single;
+        expect(demo.userId, FakeOrganizationGateway.demoUserId);
+        expect(demo.role, UserRole.attorney);
+        expect(demo.status, MembershipStatus.active);
+      },
+    );
+
+    test('acceptInvitation rejects a bad token non-enumeratingly', () async {
+      final OrgOutcome<OrganizationSummary> created = await gateway
+          .createOrganization(name: 'Second Firm');
+      await gateway.inviteMember(
+        organizationId: created.valueOrNull!.id,
+        email: FakeOrganizationGateway.demoUserEmail,
+        role: UserRole.client,
+      );
+
+      final OrgOutcome<String> outcome = await gateway.acceptInvitation(
+        token: 'wrong-token',
+      );
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.invalidInvitation);
+    });
   });
 }

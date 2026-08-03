@@ -173,5 +173,69 @@ void main() {
         ),
       );
     });
+
+    test(
+      'resendInvitation sends the invitation id and returns the token',
+      () async {
+        data['resend_invitation'] = 'rotated-token';
+
+        final String token = await api.resendInvitation(invitationId: 'inv-7');
+
+        expect(token, 'rotated-token');
+        expect(calls, <String>['resend_invitation:inv-7']);
+      },
+    );
+
+    test('maps the invitation-not-found raise to invalidInvitation', () async {
+      errors['resend_invitation'] = const PostgrestException(
+        message: 'invitation not found',
+      );
+
+      await expectLater(
+        api.resendInvitation(invitationId: 'inv-7'),
+        throwsA(
+          isA<SupabaseOrgException>().having(
+            (e) => e.kind,
+            'kind',
+            SupabaseOrgFailureKind.invalidInvitation,
+          ),
+        ),
+      );
+    });
+
+    test('maps the non-pending raise to invalidInvitation', () async {
+      errors['revoke_invitation'] = const PostgrestException(
+        message: 'only pending invitations can be revoked',
+      );
+
+      await expectLater(
+        api.revokeInvitation(invitationId: 'inv-7'),
+        throwsA(
+          isA<SupabaseOrgException>().having(
+            (e) => e.kind,
+            'kind',
+            SupabaseOrgFailureKind.invalidInvitation,
+          ),
+        ),
+      );
+    });
+
+    test('deleteMyAccount calls the RPC with no params', () async {
+      await api.deleteMyAccount();
+
+      expect(calls, <String>['delete_my_account:']);
+    });
+
+    test(
+      'acceptInvitation sends the token and returns the membership id',
+      () async {
+        data['accept_invitation'] = 'membership-3';
+
+        final String id = await api.acceptInvitation(token: 'the-token');
+
+        expect(id, 'membership-3');
+        expect(calls, <String>['accept_invitation:the-token']);
+      },
+    );
   });
 }

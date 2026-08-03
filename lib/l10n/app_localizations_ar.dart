@@ -363,6 +363,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profileExpiresLabel => 'تنتهي الجلسة';
 
   @override
+  String get deleteAccountAction => 'حذف الحساب';
+
+  @override
+  String get deleteAccountConfirmTitle => 'هل تريد حذف حسابك؟';
+
+  @override
+  String get deleteAccountConfirmBody =>
+      'سيؤدي هذا إلى حذف حسابك نهائيًا وإزالتك من كل مؤسسة. لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get deleteAccountConfirmAction => 'حذف';
+
+  @override
   String get profileSessionExpired =>
       'انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.';
 
@@ -410,6 +423,28 @@ class AppLocalizationsAr extends AppLocalizations {
   String get rosterEmpty => 'لا يوجد أعضاء بعد.';
 
   @override
+  String get orgSwitcherLabel => 'المؤسسة';
+
+  @override
+  String get acceptInvitationTitle => 'قبول دعوة';
+
+  @override
+  String get acceptInvitationBody =>
+      'الصق الرمز لمرة واحدة الذي شاركه معك الشريك.';
+
+  @override
+  String get acceptInvitationAction => 'قبول';
+
+  @override
+  String get invitationAccepted => 'تم قبول الدعوة.';
+
+  @override
+  String get invitationAcceptedBody => 'انضممت إلى المؤسسة.';
+
+  @override
+  String get done => 'تم';
+
+  @override
   String get inviteMember => 'دعوة عضو';
 
   @override
@@ -419,10 +454,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get inviteRoleLabel => 'تعيين الدور';
 
   @override
-  String get inviteSendButton => 'إرسال الدعوة';
+  String get inviteTokenLabel => 'رمز لمرة واحدة';
 
   @override
-  String get inviteTokenTitle => 'رمز الدعوة';
+  String get inviteSendButton => 'إرسال الدعوة';
 
   @override
   String inviteTokenBody(String email) {
@@ -436,6 +471,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String get inviteTokenCopied => 'تم نسخ الرمز إلى الحافظة.';
 
   @override
+  String get actionResendInvitation => 'إعادة إرسال الدعوة';
+
+  @override
+  String get actionRevokeInvitation => 'إلغاء الدعوة';
+
+  @override
+  String get invitationRevoked => 'تم إلغاء الدعوة.';
+
+  @override
+  String inviteTokenResentBody(String email) {
+    return 'رمز جديد لمرة واحدة لـ $email. لا يمكن عرضه مرة أخرى.';
+  }
+
+  @override
   String get memberStatusInvited => 'مدعو';
 
   @override
@@ -446,9 +495,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get memberStatusRemoved => 'مزال';
-
-  @override
-  String get actionChangeRole => 'تغيير الدور';
 
   @override
   String get actionSuspend => 'إيقاف';

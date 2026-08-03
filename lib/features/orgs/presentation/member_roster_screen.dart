@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../app/legalhub_theme.dart';
@@ -160,6 +161,14 @@ class _MemberRosterScreenState extends State<MemberRosterScreen> {
       }
     }
     final OrgCubit cubit = context.read<OrgCubit>();
+    if (action == OrgMemberAction.resendInvitation) {
+      await _resendInvitation(cubit, member);
+      return;
+    }
+    if (action == OrgMemberAction.revokeInvitation) {
+      await _revokeInvitation(cubit, member);
+      return;
+    }
     final OrgFailureKind? kind = switch (action) {
       OrgMemberAction.changeRoleToClient => await cubit.changeMemberRole(
         organizationId: widget.organizationId,
@@ -188,6 +197,8 @@ class _MemberRosterScreenState extends State<MemberRosterScreen> {
         organizationId: widget.organizationId,
         userId: member.userId,
       ),
+      OrgMemberAction.resendInvitation ||
+      OrgMemberAction.revokeInvitation => null,
     };
     if (!mounted) {
       return;
@@ -201,6 +212,101 @@ class _MemberRosterScreenState extends State<MemberRosterScreen> {
     }
   }
 
+  /// Resends a pending invite: the fresh one-time token is shown once with a
+  /// copy affordance (out-of-band delivery — the server stores only the
+  /// sha-256 hash). Typed failures surface as localized snackbars.
+  Future<void> _resendInvitation(OrgCubit cubit, OrgMember member) async {
+    final String? invitationId = member.invitationId;
+    if (invitationId == null || !mounted) {
+      return;
+    }
+    final OrgInviteActionResult result = await cubit.resendInvitation(
+      organizationId: widget.organizationId,
+      invitationId: invitationId,
+      email: member.displayName,
+    );
+    if (!mounted) {
+      return;
+    }
+    switch (result) {
+      case OrgInviteActionSuccess(token: final String token):
+        await _showTokenDialog(token, member.displayName);
+      case OrgInviteActionFailure(kind: final OrgFailureKind? kind):
+        if (kind != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                orgErrorMessage(AppLocalizations.of(context), kind),
+              ),
+            ),
+          );
+        }
+    }
+  }
+
+  /// Revokes a pending invite; the revoked row leaves the roster on the next
+  /// refresh. Success and typed failures surface as localized snackbars.
+  Future<void> _revokeInvitation(OrgCubit cubit, OrgMember member) async {
+    final String? invitationId = member.invitationId;
+    if (invitationId == null || !mounted) {
+      return;
+    }
+    final OrgFailureKind? kind = await cubit.revokeInvitation(
+      organizationId: widget.organizationId,
+      invitationId: invitationId,
+      email: member.displayName,
+    );
+    if (!mounted) {
+      return;
+    }
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          kind == null ? l10n.invitationRevoked : orgErrorMessage(l10n, kind),
+        ),
+      ),
+    );
+  }
+
+  /// Shows a one-time token with a copy affordance. The token is presented
+  /// once and never stored client-side beyond this dialog.
+  Future<void> _showTokenDialog(String token, String email) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        title: Text(l10n.inviteMember),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Text(l10n.inviteTokenResentBody(email)),
+            const SizedBox(height: LegalHubTheme.spaceMd),
+            SelectableText(token, textAlign: TextAlign.center),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () async {
+              await Clipboard.setData(ClipboardData(text: token));
+              if (dialogContext.mounted) {
+                ScaffoldMessenger.of(
+                  dialogContext,
+                ).showSnackBar(SnackBar(content: Text(l10n.inviteTokenCopied)));
+              }
+            },
+            child: Text(l10n.inviteTokenCopy),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(l10n.back),
+          ),
+        ],
+      ),
+    );
+  }
+
   /// Prompts for confirmation before a destructive removal. Resolves to true
   /// only when the partner explicitly confirms; cancel/dismiss/back all
   /// resolve to false, and the member is left untouched.
@@ -208,20 +314,29 @@ class _MemberRosterScreenState extends State<MemberRosterScreen> {
     final AppLocalizations l10n = AppLocalizations.of(context);
     return showDialog<bool>(
       context: context,
-      builder: (BuildContext dialogContext) => AlertDialog(
-        title: Text(l10n.removeMemberConfirmTitle),
-        content: Text(l10n.removeMemberConfirmBody(member.displayName)),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(l10n.removeMemberConfirmAction),
-          ),
-        ],
-      ),
+      builder: (BuildContext dialogContext) {
+        final ColorScheme scheme = Theme.of(dialogContext).colorScheme;
+        return AlertDialog(
+          title: Text(l10n.removeMemberConfirmTitle),
+          content: Text(l10n.removeMemberConfirmBody(member.displayName)),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(l10n.cancel),
+            ),
+            // Error-tinted confirm so the destructive action reads as
+            // dangerous, distinct from any primary button (M3 pattern).
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: FilledButton.styleFrom(
+                backgroundColor: scheme.error,
+                foregroundColor: scheme.onError,
+              ),
+              child: Text(l10n.removeMemberConfirmAction),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -246,6 +361,8 @@ enum OrgMemberAction {
   suspend,
   reactivate,
   remove,
+  resendInvitation,
+  revokeInvitation,
 }
 
 /// One roster row: identity, role + status chips, and — for partners — the
@@ -326,7 +443,9 @@ class _MemberRow extends StatelessWidget {
           child: Text(l10n.rolePartner),
         ),
         // Suspension/reactivation and removal apply to members, not pending
-        // invites (revoking an invite is the Phase 2 surface).
+        // invites; invited rows get the invite lifecycle instead (Phase 2
+        // slice 2.1): resend rotates the token, revoke retires the pending
+        // invite. Both need the invitation id the read surface exposes.
         if (!invited && member.status == MembershipStatus.active)
           PopupMenuItem(
             value: OrgMemberAction.suspend,
@@ -342,6 +461,17 @@ class _MemberRow extends StatelessWidget {
             value: OrgMemberAction.remove,
             child: Text(l10n.actionRemove),
           ),
+        if (invited &&
+            member.invitationId != null) ...<PopupMenuEntry<OrgMemberAction>>[
+          PopupMenuItem(
+            value: OrgMemberAction.resendInvitation,
+            child: Text(l10n.actionResendInvitation),
+          ),
+          PopupMenuItem(
+            value: OrgMemberAction.revokeInvitation,
+            child: Text(l10n.actionRevokeInvitation),
+          ),
+        ],
       ],
     );
   }

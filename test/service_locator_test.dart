@@ -113,6 +113,20 @@ class _FakeSupabaseOrgApi implements SupabaseOrgApi {
     required String organizationId,
     required String userId,
   }) async {}
+
+  @override
+  Future<String> resendInvitation({required String invitationId}) async =>
+      'token';
+
+  @override
+  Future<void> revokeInvitation({required String invitationId}) async {}
+
+  @override
+  Future<void> deleteMyAccount() async {}
+
+  @override
+  Future<String> acceptInvitation({required String token}) async =>
+      'membership-1';
 }
 
 /// Builds a JWT-shaped string whose payload carries the given role claim.

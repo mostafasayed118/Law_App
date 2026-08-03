@@ -3,11 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 import '../../../app/legalhub_theme.dart';
+import '../../../app/service_locator.dart';
 import '../../../core/auth/auth_state.dart';
 import '../../../core/auth/session.dart';
 import '../../../core/errors/app_error.dart';
+import '../../../core/organizations/organization_gateway.dart';
 import '../../../core/state/view_state.dart';
 import '../../../features/auth/presentation/auth_cubit.dart';
+import '../../../features/orgs/presentation/org_error_messages.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/widgets.dart';
 
@@ -83,15 +86,77 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
-class _ProfileBody extends StatelessWidget {
+class _ProfileBody extends StatefulWidget {
   const _ProfileBody({required this.session});
 
   final Session session;
 
   @override
+  State<_ProfileBody> createState() => _ProfileBodyState();
+}
+
+class _ProfileBodyState extends State<_ProfileBody> {
+  bool _deleting = false;
+
+  /// Deletes the caller's identity (Phase 2 slice 2.2): a redaction-safe
+  /// confirm first, then `delete_my_account` (the only removal path — D-05)
+  /// and a session sign-out. Every failure surfaces as a localized,
+  /// non-sensitive message; the session stays alive until success.
+  Future<void> _deleteAccount() async {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        final ColorScheme scheme = Theme.of(dialogContext).colorScheme;
+        return AlertDialog(
+          title: Text(l10n.deleteAccountConfirmTitle),
+          content: Text(l10n.deleteAccountConfirmBody),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(l10n.cancel),
+            ),
+            // Error-tinted confirm so the destructive action reads as
+            // dangerous (M3 pattern), like the member-removal dialog.
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: FilledButton.styleFrom(
+                backgroundColor: scheme.error,
+                foregroundColor: scheme.onError,
+              ),
+              child: Text(l10n.deleteAccountConfirmAction),
+            ),
+          ],
+        );
+      },
+    );
+    if (confirmed != true || !mounted) {
+      return;
+    }
+    setState(() => _deleting = true);
+    final OrgOutcome<void> outcome = await serviceLocator<OrganizationGateway>()
+        .deleteMyAccount();
+    if (!mounted) {
+      return;
+    }
+    setState(() => _deleting = false);
+    switch (outcome) {
+      case OrgSuccess<void>():
+        // The identity is gone server-side; end the session so the auth
+        // gate redirects to sign-in instead of showing stale identity.
+        await context.read<AuthCubit>().signOut();
+      case OrgFailed<void>(failure: final OrgFailure failure):
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(orgErrorMessage(l10n, failure.kind))),
+        );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final DateFormat expiresFormat = DateFormat.yMMMd(l10n.localeName).add_jm();
+    final Session session = widget.session;
     return ListView(
       padding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
       children: <Widget>[
@@ -121,6 +186,29 @@ class _ProfileBody extends StatelessWidget {
           leading: const Icon(Icons.schedule_outlined),
           title: Text(expiresFormat.format(session.expiresAt)),
           subtitle: Text(l10n.profileExpiresLabel),
+        ),
+        const SizedBox(height: LegalHubTheme.spaceLg),
+        const Divider(),
+        const SizedBox(height: LegalHubTheme.spaceSm),
+        // Account deletion is irreversible and scoped out of the read-only
+        // identity surface above; the error-tinted row makes it unmistakable.
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          enabled: !_deleting,
+          leading: _deleting
+              ? const SizedBox.square(
+                  dimension: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Icon(
+                  Icons.delete_outline,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+          title: Text(
+            l10n.deleteAccountAction,
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+          onTap: _deleting ? null : _deleteAccount,
         ),
       ],
     );

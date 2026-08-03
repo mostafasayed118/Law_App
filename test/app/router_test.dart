@@ -208,6 +208,30 @@ void main() {
       expect(find.text('Welcome Back'), findsOneWidget);
       expect(authCubit.state.isAuthenticated, isFalse);
     });
+
+    testWidgets('renders the accept-invitation screen when authenticated', (
+      tester,
+    ) async {
+      await authCubit.startDemoSession();
+      router.go(AppRoutes.acceptInvitation);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Accept invitation'), findsWidgets);
+      expect(find.text('One-time token'), findsOneWidget);
+      expect(selectedIndex(tester), 1);
+    });
+
+    testWidgets('blocks unauthenticated access to the accept route', (
+      tester,
+    ) async {
+      router.go(AppRoutes.acceptInvitation);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Welcome Back'), findsOneWidget);
+      expect(authCubit.state.isAuthenticated, isFalse);
+    });
   });
 
   group('shell NavigationBar selected index', () {

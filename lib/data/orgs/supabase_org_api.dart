@@ -83,4 +83,20 @@ abstract interface class SupabaseOrgApi {
     required String organizationId,
     required String userId,
   });
+
+  /// `resend_invitation(p_invitation_id)` — rotates a PENDING invite's token
+  /// and returns the new one-time token (only its hash is stored).
+  Future<String> resendInvitation({required String invitationId});
+
+  /// `revoke_invitation(p_invitation_id)` — status-transitions a PENDING
+  /// invite to revoked (never a DELETE; the audit trail survives).
+  Future<void> revokeInvitation({required String invitationId});
+
+  /// `delete_my_account()` — hard-deletes the caller's identity (D-05; the
+  /// only removal path). Audit rows survive with the actor reference cleared.
+  Future<void> deleteMyAccount();
+
+  /// `accept_invitation(p_token)` — redeems a one-time token; the role is
+  /// server-owned from the invitation. Returns the new membership id.
+  Future<String> acceptInvitation({required String token});
 }

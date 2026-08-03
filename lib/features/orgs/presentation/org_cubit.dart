@@ -196,6 +196,48 @@ class OrgCubit extends Cubit<OrgState> {
         _gateway.removeMember(organizationId: organizationId, userId: userId),
   );
 
+  /// Rotates a PENDING invite's token (Phase 2 slice 2.1). Returns the fresh
+  /// one-time token on success (the roster is refreshed), or the typed
+  /// failure kind on failure. On failure the last good roster is restored.
+  Future<OrgInviteActionResult> resendInvitation({
+    required String organizationId,
+    required String invitationId,
+    required String email,
+  }) async {
+    final OrgState current = state;
+    if (current is! OrgRosterLoaded) {
+      return const OrgInviteActionResult.failure(null);
+    }
+    emit(OrgRosterLoaded(current.members, pendingUserId: email));
+    final OrgOutcome<String> outcome = await _gateway.resendInvitation(
+      invitationId: invitationId,
+    );
+    if (isClosed) {
+      return const OrgInviteActionResult.failure(null);
+    }
+    switch (outcome) {
+      case OrgSuccess<String>(value: final String token):
+        await loadRoster(organizationId: organizationId);
+        return OrgInviteActionResult.success(token);
+      case OrgFailed<String>(failure: final OrgFailure failure):
+        emit(OrgRosterLoaded(current.members));
+        return OrgInviteActionResult.failure(failure.kind);
+    }
+  }
+
+  /// Revokes a PENDING invite (Phase 2 slice 2.1). Returns the typed failure
+  /// kind on failure, or null on success (the roster is refreshed so the
+  /// revoked invited row leaves the pending list).
+  Future<OrgFailureKind?> revokeInvitation({
+    required String organizationId,
+    required String invitationId,
+    required String email,
+  }) => _runAction(
+    organizationId: organizationId,
+    userId: email,
+    call: () => _gateway.revokeInvitation(invitationId: invitationId),
+  );
+
   /// Runs a member action: marks the row in-flight, calls the seam, refreshes
   /// the roster on success, and restores the previous roster on failure.
   Future<OrgFailureKind?> _runAction({
@@ -226,4 +268,33 @@ class OrgCubit extends Cubit<OrgState> {
     code: 'org.${failure.kind.name}',
     userMessage: failure.message ?? 'Organization operation failed',
   );
+}
+
+/// Result of a token-returning invite action: the fresh one-time token on
+/// success (shown once, out-of-band delivery), or the typed failure kind.
+sealed class OrgInviteActionResult extends Equatable {
+  const OrgInviteActionResult();
+
+  const factory OrgInviteActionResult.success(String token) =
+      OrgInviteActionSuccess;
+  const factory OrgInviteActionResult.failure(OrgFailureKind? kind) =
+      OrgInviteActionFailure;
+}
+
+final class OrgInviteActionSuccess extends OrgInviteActionResult {
+  const OrgInviteActionSuccess(this.token);
+
+  final String token;
+
+  @override
+  List<Object?> get props => <Object?>[token];
+}
+
+final class OrgInviteActionFailure extends OrgInviteActionResult {
+  const OrgInviteActionFailure(this.kind);
+
+  final OrgFailureKind? kind;
+
+  @override
+  List<Object?> get props => <Object?>[kind];
 }

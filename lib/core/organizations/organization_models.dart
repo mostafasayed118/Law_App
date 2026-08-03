@@ -55,6 +55,11 @@ MembershipStatus? membershipStatusFromServerName(String? name) {
 /// A member of an organization as returned by the metadata read surface:
 /// identity (display name, locale) + membership metadata (role, status,
 /// timestamps) only — never matter/document/message content (contract §5.3).
+///
+/// [invitationId] is set for invited rows when the read surface exposes it
+/// (dev fake today; the member-facing roster RPC is Phase 3 R1). It stays
+/// null for real members and for surfaces that cannot expose it — the
+/// Resend/Revoke actions are disabled rather than guessing an id.
 class OrgMember extends Equatable {
   const OrgMember({
     required this.organizationId,
@@ -65,6 +70,7 @@ class OrgMember extends Equatable {
     required this.status,
     required this.createdAt,
     required this.updatedAt,
+    this.invitationId,
   });
 
   final String organizationId;
@@ -75,6 +81,9 @@ class OrgMember extends Equatable {
   final MembershipStatus status;
   final DateTime createdAt;
   final DateTime updatedAt;
+
+  /// Id of the underlying PENDING invitation for invited rows, when known.
+  final String? invitationId;
 
   bool get isActive => status == MembershipStatus.active;
 
@@ -88,6 +97,7 @@ class OrgMember extends Equatable {
     status,
     createdAt,
     updatedAt,
+    invitationId,
   ];
 }
 

@@ -8,12 +8,12 @@
 > approval: no phase below starts until its gate row is satisfied and the
 > owner records approval per `INSTRUCTIONS.md` §2.1.
 >
-> **Status: PLANNING (2026-08-03).** Phase 1 is the declared next slice
-> (P3 org/membership UI, spec already written in
-> `docs/p3_organization_membership_spec_2026-08-03.md`) — **APPROVED
-> 2026-08-03 by the owner** (recorded in `docs/p0_decision_capture.md` §3 P3
-> row); implementation in progress as slices 1.1–1.6. Phases 2–4 are scoped
-> but unstarted. Everything in §8 stays deferred until P0 closes.
+> **Status: ACTIVE (2026-08-03).** Phase 1 (P3 org/membership UI) **SHIPPED
+> 2026-08-03** (`03862ce`, suite 408, ledger PASS 115). Phase 2 (org
+> lifecycle wiring) is **APPROVED 2026-08-03** (scope note
+> `docs/p3_phase2_scope_2026-08-03.md`), implementation in progress as
+> slices 2.1–2.4. Phases 3–4 are scoped but unstarted. Everything in §8
+> stays deferred until P0 closes.
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
 >
@@ -161,8 +161,8 @@ rollback pairing (`docs/rollback_plan.md`), and — because every row below
 
 | Order | Phase | Depends on | Server changes? | Gate to pass | Status |
 |---|---|---|---|---|---|
-| 1 | Phase 1 — P3 org/membership UI | P3 spec approval | no | spec approval → slice → B2 gate stack → owner push approval | **APPROVED 2026-08-03 — implementing slices 1.1–1.6** |
-| 2 | Phase 2 — org lifecycle wiring | Phase 1 (same seams) | no | spec-lite scope note → approval → gate stack | Not started |
+| 1 | Phase 1 — P3 org/membership UI | P3 spec approval | no | spec approval → slice → B2 gate stack → owner push approval | **SHIPPED 2026-08-03 (`03862ce`, suite 408, ledger PASS 115)** |
+| 2 | Phase 2 — org lifecycle wiring | Phase 1 (same seams) | no | spec-lite scope note → approval → gate stack | **APPROVED 2026-08-03 (`docs/p3_phase2_scope_2026-08-03.md`) — implementing slices 2.1–2.4** |
 | 3 | Phase 3 — server amendments | Phase 1/2 (surface defined) | **yes** | spec → RLS-gate review → rehearsal evidence → apply approval → apply execution → matrix addendum | Not started |
 | 4 | Phase 4 — auth plumbing | — | 4.1 yes (platform config) | platform config approval → gate stack | Not started |
 | — | §8 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Deferred |

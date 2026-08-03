@@ -94,6 +94,40 @@ class _StubSupabaseOrgApi implements SupabaseOrgApi {
       throw voidError!;
     }
   }
+
+  @override
+  Future<String> resendInvitation({required String invitationId}) async {
+    calls.add('resend:$invitationId');
+    if (voidError != null) {
+      throw voidError!;
+    }
+    return 'token-resent';
+  }
+
+  @override
+  Future<void> revokeInvitation({required String invitationId}) async {
+    calls.add('revoke:$invitationId');
+    if (voidError != null) {
+      throw voidError!;
+    }
+  }
+
+  @override
+  Future<void> deleteMyAccount() async {
+    calls.add('delete-account');
+    if (voidError != null) {
+      throw voidError!;
+    }
+  }
+
+  @override
+  Future<String> acceptInvitation({required String token}) async {
+    calls.add('accept:$token');
+    if (voidError != null) {
+      throw voidError!;
+    }
+    return 'membership-1';
+  }
 }
 
 void main() {
@@ -286,6 +320,112 @@ void main() {
 
       expect(outcome.failureOrNull?.kind, OrgFailureKind.denied);
       expect(api.calls, <String>['remove:org-1:u-2']);
+    });
+  });
+
+  group('invite lifecycle (Phase 2)', () {
+    test(
+      'resendInvitation forwards the id and returns the fresh token',
+      () async {
+        final OrgOutcome<String> outcome = await gateway.resendInvitation(
+          invitationId: 'inv-7',
+        );
+
+        expect(outcome.isSuccess, isTrue);
+        expect(outcome.valueOrNull, 'token-resent');
+        expect(api.calls, <String>['resend:inv-7']);
+      },
+    );
+
+    test('resendInvitation maps invalid-invitation errors', () async {
+      api.voidError = const SupabaseOrgException(
+        kind: SupabaseOrgFailureKind.invalidInvitation,
+        message: 'invitation not found',
+      );
+
+      final OrgOutcome<String> outcome = await gateway.resendInvitation(
+        invitationId: 'inv-9',
+      );
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.invalidInvitation);
+    });
+
+    test('revokeInvitation forwards the id', () async {
+      final OrgOutcome<void> outcome = await gateway.revokeInvitation(
+        invitationId: 'inv-7',
+      );
+
+      expect(outcome.isSuccess, isTrue);
+      expect(api.calls, <String>['revoke:inv-7']);
+    });
+
+    test('revokeInvitation maps invalid-invitation errors', () async {
+      api.voidError = const SupabaseOrgException(
+        kind: SupabaseOrgFailureKind.invalidInvitation,
+        message: 'only pending invitations can be revoked',
+      );
+
+      final OrgOutcome<void> outcome = await gateway.revokeInvitation(
+        invitationId: 'inv-9',
+      );
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.invalidInvitation);
+    });
+
+    test('deleteMyAccount forwards without params', () async {
+      final OrgOutcome<void> outcome = await gateway.deleteMyAccount();
+
+      expect(outcome.isSuccess, isTrue);
+      expect(api.calls, <String>['delete-account']);
+    });
+
+    test('deleteMyAccount maps denials', () async {
+      api.voidError = const SupabaseOrgException(
+        kind: SupabaseOrgFailureKind.denied,
+        message: 'permission denied',
+      );
+
+      final OrgOutcome<void> outcome = await gateway.deleteMyAccount();
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.denied);
+    });
+
+    test(
+      'acceptInvitation trims the token and returns the membership id',
+      () async {
+        final OrgOutcome<String> outcome = await gateway.acceptInvitation(
+          token: '  the-token ',
+        );
+
+        expect(outcome.isSuccess, isTrue);
+        expect(outcome.valueOrNull, 'membership-1');
+        expect(api.calls, <String>['accept:the-token']);
+      },
+    );
+
+    test(
+      'acceptInvitation rejects a blank token without calling the seam',
+      () async {
+        final OrgOutcome<String> outcome = await gateway.acceptInvitation(
+          token: '   ',
+        );
+
+        expect(outcome.failureOrNull?.kind, OrgFailureKind.invalidInvitation);
+        expect(api.calls, isEmpty);
+      },
+    );
+
+    test('acceptInvitation maps invalid-invitation errors', () async {
+      api.voidError = const SupabaseOrgException(
+        kind: SupabaseOrgFailureKind.invalidInvitation,
+        message: 'invalid invitation',
+      );
+
+      final OrgOutcome<String> outcome = await gateway.acceptInvitation(
+        token: 'bad-token',
+      );
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.invalidInvitation);
     });
   });
 }

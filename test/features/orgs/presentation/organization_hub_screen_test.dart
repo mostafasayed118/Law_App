@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/auth/auth_gateway.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
+import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/orgs/presentation/organization_hub_screen.dart';
@@ -152,5 +153,91 @@ void main() {
     expect(find.text('Partner'), findsOneWidget);
     expect(find.text('ACTIVE'), findsOneWidget);
     expect(find.text('Create Organization'), findsNothing);
+    // A single-membership (or just-created) session offers no switcher.
+    expect(find.byType(DropdownButton<String>), findsNothing);
+  });
+
+  testWidgets('offers an org switcher only with multiple memberships', (
+    tester,
+  ) async {
+    final AuthCubit authCubit = AuthCubit(
+      _FixedAuthGateway(
+        sessionWith(
+          memberships: <OrganizationMembership>[
+            OrganizationMembership(
+              organizationId: 'org-demo',
+              organizationName: 'Demo Firm',
+              role: UserRole.partner,
+              status: MembershipStatus.active,
+            ),
+          ],
+        ),
+      ),
+      InMemoryErrorReporter(),
+    );
+    addTearDown(authCubit.close);
+    await authCubit.restore();
+
+    await tester.pumpWidget(harness(authCubit));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Demo Firm'), findsOneWidget);
+    expect(find.text('Organization'), findsNothing);
+    expect(find.byType(DropdownButton<String>), findsNothing);
+  });
+
+  testWidgets('switching the active org renders the selected roster', (
+    tester,
+  ) async {
+    // Seed the dev fake with a second org so the switched roster has data.
+    final OrganizationGateway orgGateway =
+        serviceLocator<OrganizationGateway>();
+    final OrgOutcome<OrganizationSummary> created = await orgGateway
+        .createOrganization(name: 'Second Firm');
+    final AuthCubit authCubit = AuthCubit(
+      _FixedAuthGateway(
+        sessionWith(
+          memberships: <OrganizationMembership>[
+            OrganizationMembership(
+              organizationId: 'org-demo',
+              organizationName: 'Demo Firm',
+              role: UserRole.partner,
+              status: MembershipStatus.active,
+            ),
+            OrganizationMembership(
+              organizationId: created.valueOrNull!.id,
+              organizationName: 'Second Firm',
+              role: UserRole.attorney,
+              status: MembershipStatus.active,
+            ),
+          ],
+        ),
+      ),
+      InMemoryErrorReporter(),
+    );
+    addTearDown(authCubit.close);
+    await authCubit.restore();
+
+    await tester.pumpWidget(harness(authCubit));
+    await tester.pumpAndSettle();
+
+    // The switcher strip is present and defaults to the server-derived
+    // active membership.
+    expect(find.text('Organization'), findsOneWidget);
+    expect(find.byType(DropdownButton<String>), findsOneWidget);
+    expect(find.text('Demo Firm'), findsWidgets);
+    expect(find.text('Demo user'), findsOneWidget);
+
+    await tester.tap(find.byType(DropdownButton<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Second Firm').last);
+    await tester.pumpAndSettle();
+
+    // The roster now renders the selected org's members; the selection is a
+    // local UI context only (never transmitted), and the strip stays.
+    expect(find.text('Second Firm'), findsWidgets);
+    expect(find.text('Demo user'), findsOneWidget);
+    expect(find.text('Partner'), findsOneWidget);
+    expect(find.byType(DropdownButton<String>), findsOneWidget);
   });
 }

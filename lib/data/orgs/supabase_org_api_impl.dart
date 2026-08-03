@@ -153,6 +153,58 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
     });
   }
 
+  @override
+  Future<String> resendInvitation({required String invitationId}) async {
+    try {
+      final PostgrestResponse<dynamic> response = await _rpc(
+        'resend_invitation',
+        <String, dynamic>{'p_invitation_id': invitationId},
+      );
+      final Object? token = response.data;
+      if (token is! String || token.isEmpty) {
+        throw SupabaseOrgException(
+          kind: SupabaseOrgFailureKind.unknown,
+          message: 'resend_invitation returned no token.',
+        );
+      }
+      return token;
+    } on PostgrestException catch (e) {
+      throw SupabaseOrgException(kind: _kindFor(e), message: e.message);
+    }
+  }
+
+  @override
+  Future<void> revokeInvitation({required String invitationId}) async {
+    await _runVoidRpc('revoke_invitation', <String, dynamic>{
+      'p_invitation_id': invitationId,
+    });
+  }
+
+  @override
+  Future<void> deleteMyAccount() async {
+    await _runVoidRpc('delete_my_account', const <String, dynamic>{});
+  }
+
+  @override
+  Future<String> acceptInvitation({required String token}) async {
+    try {
+      final PostgrestResponse<dynamic> response = await _rpc(
+        'accept_invitation',
+        <String, dynamic>{'p_token': token},
+      );
+      final Object? membershipId = response.data;
+      if (membershipId is! String || membershipId.isEmpty) {
+        throw SupabaseOrgException(
+          kind: SupabaseOrgFailureKind.unknown,
+          message: 'accept_invitation returned no membership id.',
+        );
+      }
+      return membershipId;
+    } on PostgrestException catch (e) {
+      throw SupabaseOrgException(kind: _kindFor(e), message: e.message);
+    }
+  }
+
   Future<void> _runVoidRpc(String function, Map<String, dynamic> params) async {
     try {
       await _rpc(function, params);
@@ -180,6 +232,13 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
       return SupabaseOrgFailureKind.invalidName;
     }
     if (message.contains('invalid invitation')) {
+      return SupabaseOrgFailureKind.invalidInvitation;
+    }
+    // Invitation-targeted RPCs use the same undifferentiated denial: an
+    // unknown id and a non-pending invite both read as "invalid invitation"
+    // (non-enumerating; matches the token surface).
+    if (message.contains('invitation not found') ||
+        message.contains('only pending invitations')) {
       return SupabaseOrgFailureKind.invalidInvitation;
     }
     return SupabaseOrgFailureKind.unknown;

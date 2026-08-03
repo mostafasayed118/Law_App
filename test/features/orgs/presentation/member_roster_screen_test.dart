@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/service_locator.dart';
@@ -381,11 +382,103 @@ void main() {
       await tester.tap(find.text('Remove'));
       await tester.pumpAndSettle();
 
+      // Destructive removal requires explicit confirmation (roadmap slice
+      // 1.4): the dialog names the target, and the action fires only on the
+      // confirm button.
+      expect(find.text('Remove member?'), findsOneWidget);
+      expect(
+        find.text('Remove attorney@firm.com from this organization?'),
+        findsOneWidget,
+      );
+      await tester.tap(find.widgetWithText(FilledButton, 'Remove'));
+      await tester.pumpAndSettle();
+
       expect(find.text('REMOVED'), findsOneWidget);
       expect(find.text('attorney@firm.com'), findsOneWidget);
     });
 
-    testWidgets('invited rows offer role changes only', (tester) async {
+    testWidgets('cancelling the remove confirmation keeps the member', (
+      tester,
+    ) async {
+      await orgGateway.inviteMember(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+        email: 'attorney@firm.com',
+        role: UserRole.attorney,
+      );
+      await orgGateway.suspendMember(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+        userId: 'attorney@firm.com',
+      );
+      await tester.pumpWidget(harness(authCubit: await partnerAuth()));
+      await tester.pumpAndSettle();
+
+      final Finder attorneyRow = find.widgetWithText(
+        ListTile,
+        'attorney@firm.com',
+      );
+      await tester.tap(
+        find.descendant(
+          of: attorneyRow,
+          matching: find.byType(PopupMenuButton<OrgMemberAction>),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Remove'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Remove member?'), findsOneWidget);
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      // The member is untouched: still suspended, not removed.
+      expect(find.text('SUSPENDED'), findsOneWidget);
+      expect(find.text('attorney@firm.com'), findsOneWidget);
+      expect(find.text('REMOVED'), findsNothing);
+    });
+
+    testWidgets('dismissing the remove dialog leaves the member untouched', (
+      tester,
+    ) async {
+      await orgGateway.inviteMember(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+        email: 'attorney@firm.com',
+        role: UserRole.attorney,
+      );
+      await orgGateway.suspendMember(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+        userId: 'attorney@firm.com',
+      );
+      await tester.pumpWidget(harness(authCubit: await partnerAuth()));
+      await tester.pumpAndSettle();
+
+      final Finder attorneyRow = find.widgetWithText(
+        ListTile,
+        'attorney@firm.com',
+      );
+      await tester.tap(
+        find.descendant(
+          of: attorneyRow,
+          matching: find.byType(PopupMenuButton<OrgMemberAction>),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Remove'));
+      await tester.pumpAndSettle();
+      expect(find.text('Remove member?'), findsOneWidget);
+
+      // Barrier dismiss pops the dialog with null; _confirmRemove's
+      // `confirmed != true` guard treats it as cancel.
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pumpAndSettle();
+
+      expect(find.text('SUSPENDED'), findsOneWidget);
+      expect(find.text('attorney@firm.com'), findsOneWidget);
+      expect(find.text('REMOVED'), findsNothing);
+    });
+
+    testWidgets('invited rows offer role changes and the invite lifecycle', (
+      tester,
+    ) async {
       await orgGateway.inviteMember(
         organizationId: FakeOrganizationGateway.demoOrganizationId,
         email: 'attorney@firm.com',
@@ -406,14 +499,130 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Lifecycle actions (suspend/remove/revoke) are Phase 2 surfaces for
-      // invited rows; only the role picker is offered while the invite is
-      // pending. `.last` disambiguates the menu item from the self-row chip.
+      // Lifecycle actions (suspend/remove/revoke) apply to members; invited
+      // rows get the invite lifecycle instead: role picker + resend + revoke.
+      // `.last` disambiguates the menu items from the self-row chip.
       expect(find.text('Suspend'), findsNothing);
       expect(find.text('Remove'), findsNothing);
       expect(find.text('Reactivate'), findsNothing);
       expect(find.text('Partner').last, findsOneWidget);
       expect(find.text('Client').last, findsOneWidget);
+      expect(find.text('Resend invitation'), findsOneWidget);
+      expect(find.text('Revoke invitation'), findsOneWidget);
+    });
+
+    testWidgets('revoking an invite removes the row and confirms', (
+      tester,
+    ) async {
+      await orgGateway.inviteMember(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+        email: 'attorney@firm.com',
+        role: UserRole.attorney,
+      );
+      await tester.pumpWidget(harness(authCubit: await partnerAuth()));
+      await tester.pumpAndSettle();
+      expect(find.text('attorney@firm.com'), findsOneWidget);
+
+      final Finder attorneyRow = find.widgetWithText(
+        ListTile,
+        'attorney@firm.com',
+      );
+      await tester.tap(
+        find.descendant(
+          of: attorneyRow,
+          matching: find.byType(PopupMenuButton<OrgMemberAction>),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Revoke invitation'));
+      await tester.pumpAndSettle();
+
+      // The revoked invite leaves the pending roster and the success
+      // confirmation surfaces.
+      expect(find.text('attorney@firm.com'), findsNothing);
+      expect(find.text('Invitation revoked.'), findsOneWidget);
+    });
+
+    testWidgets('resending an invite shows the fresh token once', (
+      tester,
+    ) async {
+      await orgGateway.inviteMember(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+        email: 'attorney@firm.com',
+        role: UserRole.attorney,
+      );
+      await tester.pumpWidget(harness(authCubit: await partnerAuth()));
+      await tester.pumpAndSettle();
+
+      final Finder attorneyRow = find.widgetWithText(
+        ListTile,
+        'attorney@firm.com',
+      );
+      await tester.tap(
+        find.descendant(
+          of: attorneyRow,
+          matching: find.byType(PopupMenuButton<OrgMemberAction>),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Resend invitation'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('demo-invite-token-resend-'), findsOneWidget);
+      expect(find.text('Copy token'), findsOneWidget);
+    });
+
+    testWidgets('resend token dialog copies the token to the clipboard', (
+      tester,
+    ) async {
+      final List<MethodCall> platformCalls = <MethodCall>[];
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (MethodCall call) async {
+          platformCalls.add(call);
+          return null;
+        },
+      );
+      addTearDown(() {
+        tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          SystemChannels.platform,
+          null,
+        );
+      });
+
+      await orgGateway.inviteMember(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+        email: 'attorney@firm.com',
+        role: UserRole.attorney,
+      );
+      await tester.pumpWidget(harness(authCubit: await partnerAuth()));
+      await tester.pumpAndSettle();
+
+      final Finder attorneyRow = find.widgetWithText(
+        ListTile,
+        'attorney@firm.com',
+      );
+      await tester.tap(
+        find.descendant(
+          of: attorneyRow,
+          matching: find.byType(PopupMenuButton<OrgMemberAction>),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Resend invitation'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Copy token'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Token copied to clipboard.'), findsOneWidget);
+      final MethodCall clipboardCall = platformCalls.singleWhere(
+        (MethodCall call) => call.method == 'Clipboard.setData',
+      );
+      expect(
+        (clipboardCall.arguments as Map<Object?, Object?>)['text'],
+        startsWith('demo-invite-token-resend-'),
+      );
     });
   });
 

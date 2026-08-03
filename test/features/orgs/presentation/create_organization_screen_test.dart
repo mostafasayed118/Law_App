@@ -72,6 +72,21 @@ class _GatedOrgGateway implements OrganizationGateway {
     required String organizationId,
     required String userId,
   }) => _inner.removeMember(organizationId: organizationId, userId: userId);
+
+  @override
+  Future<OrgOutcome<String>> resendInvitation({required String invitationId}) =>
+      _inner.resendInvitation(invitationId: invitationId);
+
+  @override
+  Future<OrgOutcome<void>> revokeInvitation({required String invitationId}) =>
+      _inner.revokeInvitation(invitationId: invitationId);
+
+  @override
+  Future<OrgOutcome<void>> deleteMyAccount() => _inner.deleteMyAccount();
+
+  @override
+  Future<OrgOutcome<String>> acceptInvitation({required String token}) =>
+      _inner.acceptInvitation(token: token);
 }
 
 /// A gateway that rejects every create call with a typed failure, to pin the

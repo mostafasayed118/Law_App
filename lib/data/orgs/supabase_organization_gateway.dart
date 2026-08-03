@@ -144,6 +144,49 @@ class SupabaseOrganizationGateway implements OrganizationGateway {
     () => _api.removeMember(organizationId: organizationId, userId: userId),
   );
 
+  @override
+  Future<OrgOutcome<String>> resendInvitation({
+    required String invitationId,
+  }) async {
+    try {
+      final String token = await _api.resendInvitation(
+        invitationId: invitationId,
+      );
+      return OrgOutcome<String>.success(token);
+    } on SupabaseOrgException catch (e) {
+      return OrgOutcome<String>.failure(
+        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+      );
+    }
+  }
+
+  @override
+  Future<OrgOutcome<void>> revokeInvitation({required String invitationId}) =>
+      _runVoid(() => _api.revokeInvitation(invitationId: invitationId));
+
+  @override
+  Future<OrgOutcome<void>> deleteMyAccount() =>
+      _runVoid(() => _api.deleteMyAccount());
+
+  @override
+  Future<OrgOutcome<String>> acceptInvitation({required String token}) async {
+    if (token.trim().isEmpty) {
+      return const OrgOutcome<String>.failure(
+        OrgFailure(kind: OrgFailureKind.invalidInvitation),
+      );
+    }
+    try {
+      final String membershipId = await _api.acceptInvitation(
+        token: token.trim(),
+      );
+      return OrgOutcome<String>.success(membershipId);
+    } on SupabaseOrgException catch (e) {
+      return OrgOutcome<String>.failure(
+        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+      );
+    }
+  }
+
   Future<OrgOutcome<void>> _runVoid(Future<void> Function() call) async {
     try {
       await call();
@@ -187,6 +230,10 @@ class SupabaseOrganizationGateway implements OrganizationGateway {
       status: status,
       createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
       updatedAt: DateTime.parse(row['updated_at'] as String).toLocal(),
+      // The platform-owner metadata surface exposes no invitation id (R1 —
+      // the member-facing roster RPC must union invitations). Null keeps the
+      // Resend/Revoke actions disabled instead of guessing an id.
+      invitationId: null,
     );
   }
 

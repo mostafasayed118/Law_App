@@ -96,7 +96,7 @@ void main() {
     await sendInvite(tester, email: 'new@firm.com', roleItem: 'Attorney');
 
     // Token view: the token text and a copy affordance; no invite form.
-    expect(find.text('demo-invite-token-2'), findsOneWidget);
+    expect(find.text('demo-invite-token-1'), findsOneWidget);
     expect(find.text('Copy token'), findsOneWidget);
     expect(find.text('Send Invitation'), findsNothing);
     // The email is echoed for confirmation without leaving the sheet.
@@ -153,7 +153,7 @@ void main() {
     );
     expect(
       (setData.arguments as Map<Object?, Object?>)['text'],
-      'demo-invite-token-2',
+      'demo-invite-token-1',
     );
     expect(find.text('Token copied to clipboard.'), findsOneWidget);
   });

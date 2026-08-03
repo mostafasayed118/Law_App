@@ -46,6 +46,17 @@ void main() {
       // Real per-locale wording, not silent copies of EN.
       expect(tr.orgErrorLastPartner, isNot(en.orgErrorLastPartner));
       expect(ar.orgErrorLastPartner, isNot(en.orgErrorLastPartner));
+      // Remove-member confirmation dialog (roadmap slice 1.4): title, confirm
+      // action, and cancel all resolve per locale.
+      expect(en.removeMemberConfirmTitle, 'Remove member?');
+      expect(ar.removeMemberConfirmTitle, 'إزالة العضو؟');
+      expect(tr.removeMemberConfirmTitle, 'Üye kaldırılsın mı?');
+      expect(en.removeMemberConfirmAction, 'Remove');
+      expect(ar.removeMemberConfirmAction, 'إزالة');
+      expect(tr.removeMemberConfirmAction, 'Kaldır');
+      expect(en.cancel, 'Cancel');
+      expect(ar.cancel, 'إلغاء');
+      expect(tr.cancel, 'İptal');
     });
   });
 

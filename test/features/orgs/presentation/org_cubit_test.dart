@@ -70,6 +70,21 @@ class _GatedOrgGateway implements OrganizationGateway {
     required String organizationId,
     required String userId,
   }) => _inner.removeMember(organizationId: organizationId, userId: userId);
+
+  @override
+  Future<OrgOutcome<String>> resendInvitation({required String invitationId}) =>
+      _inner.resendInvitation(invitationId: invitationId);
+
+  @override
+  Future<OrgOutcome<void>> revokeInvitation({required String invitationId}) =>
+      _inner.revokeInvitation(invitationId: invitationId);
+
+  @override
+  Future<OrgOutcome<void>> deleteMyAccount() => _inner.deleteMyAccount();
+
+  @override
+  Future<OrgOutcome<String>> acceptInvitation({required String token}) =>
+      _inner.acceptInvitation(token: token);
 }
 
 void main() {
@@ -329,6 +344,143 @@ void main() {
 
       expect(kind, isNull);
       expect(cubit.state, const OrgInitial());
+    });
+  });
+
+  group('OrgCubit invite lifecycle (Phase 2)', () {
+    Future<OrgCubit> cubitWithPendingInvite(
+      FakeOrganizationGateway gateway,
+    ) async {
+      await gateway.inviteMember(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+        email: 'attorney@firm.com',
+        role: UserRole.attorney,
+      );
+      final OrgCubit cubit = OrgCubit(gateway);
+      await cubit.loadRoster(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+      );
+      expect(cubit.state, isA<OrgRosterLoaded>());
+      return cubit;
+    }
+
+    OrgMember pendingMember(OrgRosterLoaded loaded) => loaded.members
+        .singleWhere((OrgMember m) => m.userId == 'attorney@firm.com');
+
+    test('resend returns the fresh token and refreshes the roster', () async {
+      final FakeOrganizationGateway gateway = FakeOrganizationGateway();
+      final OrgCubit cubit = await cubitWithPendingInvite(gateway);
+      addTearDown(cubit.close);
+
+      final OrgMember attorney = pendingMember(cubit.state as OrgRosterLoaded);
+      expect(attorney.invitationId, 'inv-1');
+
+      final OrgInviteActionResult result = await cubit.resendInvitation(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+        invitationId: attorney.invitationId!,
+        email: attorney.displayName,
+      );
+
+      final OrgInviteActionSuccess success = result as OrgInviteActionSuccess;
+      expect(success.token, startsWith('demo-invite-token-resend-'));
+      final OrgRosterLoaded loaded = cubit.state as OrgRosterLoaded;
+      expect(loaded.members, hasLength(2));
+      expect(loaded.pendingUserId, isNull);
+    });
+
+    test(
+      'resend on an unknown invitation id returns invalidInvitation',
+      () async {
+        final FakeOrganizationGateway gateway = FakeOrganizationGateway();
+        final OrgCubit cubit = await cubitWithPendingInvite(gateway);
+        addTearDown(cubit.close);
+
+        final OrgInviteActionResult result = await cubit.resendInvitation(
+          organizationId: FakeOrganizationGateway.demoOrganizationId,
+          invitationId: 'inv-unknown',
+          email: 'attorney@firm.com',
+        );
+
+        final OrgInviteActionFailure failure = result as OrgInviteActionFailure;
+        expect(failure.kind, OrgFailureKind.invalidInvitation);
+        // The last good roster is restored with no row left pending.
+        final OrgRosterLoaded loaded = cubit.state as OrgRosterLoaded;
+        expect(loaded.members, hasLength(2));
+        expect(loaded.pendingUserId, isNull);
+      },
+    );
+
+    test('resend is a no-op before the roster has loaded', () async {
+      final OrgCubit cubit = OrgCubit(FakeOrganizationGateway());
+      addTearDown(cubit.close);
+
+      final OrgInviteActionResult result = await cubit.resendInvitation(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+        invitationId: 'inv-1',
+        email: 'attorney@firm.com',
+      );
+
+      expect(result, isA<OrgInviteActionFailure>());
+      expect(cubit.state, const OrgInitial());
+    });
+
+    test('revoke refreshes the roster without the revoked row', () async {
+      final FakeOrganizationGateway gateway = FakeOrganizationGateway();
+      final OrgCubit cubit = await cubitWithPendingInvite(gateway);
+      addTearDown(cubit.close);
+
+      final OrgMember attorney = pendingMember(cubit.state as OrgRosterLoaded);
+      final OrgFailureKind? kind = await cubit.revokeInvitation(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+        invitationId: attorney.invitationId!,
+        email: attorney.displayName,
+      );
+
+      expect(kind, isNull);
+      final OrgRosterLoaded loaded = cubit.state as OrgRosterLoaded;
+      expect(loaded.members, hasLength(1));
+      expect(
+        loaded.members.any((OrgMember m) => m.userId == 'attorney@firm.com'),
+        isFalse,
+      );
+    });
+
+    test(
+      'revoke on an unknown invitation id returns invalidInvitation',
+      () async {
+        final FakeOrganizationGateway gateway = FakeOrganizationGateway();
+        final OrgCubit cubit = await cubitWithPendingInvite(gateway);
+        addTearDown(cubit.close);
+
+        final OrgFailureKind? kind = await cubit.revokeInvitation(
+          organizationId: FakeOrganizationGateway.demoOrganizationId,
+          invitationId: 'inv-unknown',
+          email: 'attorney@firm.com',
+        );
+
+        expect(kind, OrgFailureKind.invalidInvitation);
+        expect((cubit.state as OrgRosterLoaded).members, hasLength(2));
+      },
+    );
+
+    test('a revoked invitation cannot be revoked again', () async {
+      final FakeOrganizationGateway gateway = FakeOrganizationGateway();
+      final OrgCubit cubit = await cubitWithPendingInvite(gateway);
+      addTearDown(cubit.close);
+
+      final OrgMember attorney = pendingMember(cubit.state as OrgRosterLoaded);
+      await cubit.revokeInvitation(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+        invitationId: attorney.invitationId!,
+        email: attorney.displayName,
+      );
+      final OrgFailureKind? kind = await cubit.revokeInvitation(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+        invitationId: attorney.invitationId!,
+        email: attorney.displayName,
+      );
+
+      expect(kind, OrgFailureKind.invalidInvitation);
     });
   });
 }

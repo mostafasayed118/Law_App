@@ -93,7 +93,13 @@ void main() {
       await tester.pumpAndSettle();
       expect(authCubit.state.isAuthenticated, isTrue);
 
-      // Tap the "End demo session" outlined button.
+      // Tap the "End demo session" outlined button (scroll the list — the
+      // settings list grew with the Phase 2 tiles).
+      await tester.scrollUntilVisible(
+        find.text('End demo session'),
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.tap(find.text('End demo session'));
       await tester.pumpAndSettle();
 
@@ -210,6 +216,51 @@ void main() {
     // membership from the demo session routes the hub to the roster).
     expect(find.text('Demo Firm'), findsOneWidget);
     expect(find.text('Demo user'), findsOneWidget);
+  });
+
+  testWidgets('accept-invitation tile navigates to the accept screen', (
+    tester,
+  ) async {
+    await resetServiceLocator();
+    configureDependencies();
+    addTearDown(() => resetServiceLocator());
+
+    await authCubit.startDemoSession();
+
+    final GoRouter router = createAppRouter(authCubit);
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: <BlocProvider<dynamic>>[
+          BlocProvider<AuthCubit>.value(value: authCubit),
+          BlocProvider<LocaleCubit>.value(value: localeCubit),
+        ],
+        child: MaterialApp.router(
+          routerConfig: router,
+          locale: const Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    router.go(AppRoutes.settings);
+    await tester.pumpAndSettle();
+
+    // Tap the accept-invitation tile — the wiring under test (scroll the
+    // list; the settings list grew with the Phase 2 tiles).
+    await tester.scrollUntilVisible(
+      find.text('Accept invitation'),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('Accept invitation'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('One-time token'), findsOneWidget);
+    expect(find.text('Accept'), findsOneWidget);
   });
 
   testWidgets('profile tile navigates to the profile screen', (tester) async {
