@@ -24,6 +24,8 @@ import '../features/auth/data/supabase_sign_up_gateway.dart';
 import '../features/auth/domain/password_recovery_gateway.dart';
 import '../features/auth/domain/sign_up_gateway.dart';
 import '../features/auth/presentation/auth_cubit.dart';
+import '../features/booking/data/fake_booking_gateway.dart';
+import '../features/booking/domain/booking_gateway.dart';
 import '../features/notifications/data/in_memory_notification_prefs_store.dart';
 import '../features/notifications/data/shared_preferences_notification_prefs_store.dart';
 import '../features/notifications/domain/notification_prefs_store.dart';
@@ -156,6 +158,13 @@ void configureDependencies({
         FakeOrganizationGateway.new,
       );
     }
+  }
+  if (!serviceLocator.isRegistered<BookingGateway>()) {
+    // Stateless service: lazy singleton. The booking Cubit is feature-scoped
+    // and created per screen via BlocProvider, so it is NOT registered here.
+    serviceLocator.registerLazySingleton<BookingGateway>(
+      FakeBookingGateway.new,
+    );
   }
   if (!serviceLocator.isRegistered<AuthCubit>()) {
     // App-scoped because the router and all screens observe one session seam.

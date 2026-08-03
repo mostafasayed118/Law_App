@@ -23,6 +23,8 @@ import 'package:legalhub/features/auth/data/supabase_password_recovery_gateway.d
 import 'package:legalhub/features/auth/domain/password_recovery_gateway.dart';
 import 'package:legalhub/features/auth/domain/sign_up_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
+import 'package:legalhub/features/booking/data/fake_booking_gateway.dart';
+import 'package:legalhub/features/booking/domain/booking_gateway.dart';
 
 /// Hand-rolled fake of the [SupabaseAuthApi] seam for the DI flip test.
 /// The real `SupabaseAuthApiImpl.bind()` needs a running `Supabase.instance`,
@@ -181,12 +183,12 @@ void main() {
     });
   });
 
-  // The full DI graph: configureDependencies() registers nine types. The
-  // earlier group only proved SampleService. These tests pin every
-  // registration so a future refactor that drops a wiring line fails loudly
-  // instead of breaking at runtime in a screen test.
+  // The full DI graph: configureDependencies() registers every application
+  // dependency. The earlier group only proved SampleService. These tests pin
+  // each registration so a future refactor that drops a wiring line fails
+  // loudly instead of breaking at runtime in a screen test.
   group('configureDependencies full registration graph', () {
-    test('registers all eight application dependencies', () {
+    test('registers every application dependency', () {
       configureDependencies();
 
       expect(serviceLocator.isRegistered<SampleService>(), isTrue);
@@ -197,6 +199,7 @@ void main() {
       expect(serviceLocator.isRegistered<PasswordRecoveryGateway>(), isTrue);
       expect(serviceLocator.isRegistered<SignUpGateway>(), isTrue);
       expect(serviceLocator.isRegistered<OrganizationGateway>(), isTrue);
+      expect(serviceLocator.isRegistered<BookingGateway>(), isTrue);
       expect(serviceLocator.isRegistered<AuthCubit>(), isTrue);
     });
 
@@ -218,6 +221,13 @@ void main() {
         identical(
           serviceLocator<PasswordRecoveryGateway>(),
           serviceLocator<PasswordRecoveryGateway>(),
+        ),
+        isTrue,
+      );
+      expect(
+        identical(
+          serviceLocator<BookingGateway>(),
+          serviceLocator<BookingGateway>(),
         ),
         isTrue,
       );
@@ -258,6 +268,15 @@ void main() {
       // Same boundary discipline as the recovery gateway: the dev fake is the
       // registered seam and real sign-up remains a later approved slice.
       expect(serviceLocator<SignUpGateway>(), isA<FakeSignUpGateway>());
+    });
+
+    test('wires the booking gateway to the fake dev implementation', () {
+      configureDependencies();
+
+      // F2: same boundary discipline as the recovery/sign-up gateways — the
+      // dev fake is the registered seam; a real booking backend is a later
+      // approved data-layer slice (data contract deferred).
+      expect(serviceLocator<BookingGateway>(), isA<FakeBookingGateway>());
     });
 
     test('stays on the credential-free fake when no env is injected', () {
