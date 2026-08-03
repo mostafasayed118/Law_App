@@ -119,6 +119,7 @@ void main() {
                   canBookConsultation: false,
                   canViewAttorneyDiscovery: true,
                   canViewMatters: true,
+                  canViewDocuments: true,
                 ),
               },
             ),
@@ -167,6 +168,7 @@ void main() {
                   canBookConsultation: true,
                   canViewAttorneyDiscovery: false,
                   canViewMatters: false,
+                  canViewDocuments: false,
                 ),
               },
             ),
@@ -211,6 +213,7 @@ void main() {
                   canBookConsultation: true,
                   canViewAttorneyDiscovery: true,
                   canViewMatters: false,
+                  canViewDocuments: true,
                 ),
               },
             ),
@@ -220,6 +223,54 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('My matters'), findsNothing);
+    });
+  });
+
+  group('document vault entry (Phase 8 slice 8.1)', () {
+    testWidgets('renders the entry card with the default capability map', (
+      tester,
+    ) async {
+      await tester.pumpWidget(pumpHome(const Locale('en')));
+      await tester.pumpAndSettle();
+
+      // The default roleCapabilities grants canViewDocuments to every
+      // bootstrap role (D-V5), so the demo client sees the vault entry on
+      // the dashboard (nav hint only, never an authorization grant).
+      expect(find.text('Document vault'), findsOneWidget);
+      expect(
+        find.textContaining('Browse demo document metadata'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('hides the entry when the capability is not granted', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        BlocProvider<AuthCubit>.value(
+          value: authCubit,
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: HomeScreen(
+              capabilitiesForRole: <UserRole, RoleCapability>{
+                UserRole.client: const RoleCapability(
+                  canViewHome: true,
+                  canViewSettings: true,
+                  canBookConsultation: true,
+                  canViewAttorneyDiscovery: true,
+                  canViewMatters: true,
+                  canViewDocuments: false,
+                ),
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Document vault'), findsNothing);
     });
   });
 

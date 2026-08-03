@@ -733,4 +733,36 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get matterDetailsCreated => 'Oluşturulma';
+
+  @override
+  String get vaultTitle => 'Belgeler';
+
+  @override
+  String get vaultEmpty => 'Kullanılabilir belge yok.';
+
+  @override
+  String get vaultError => 'Belgeler yüklenemedi.';
+
+  @override
+  String get vaultLocalOnlyNote =>
+      'Demo modu — yalnızca sentetik belge meta verileri. Gerçek dosyalar listelenmez.';
+
+  @override
+  String get vaultEntryTitle => 'Belge kasası';
+
+  @override
+  String get vaultEntrySubtitle =>
+      'Demo belge meta verilerine göz atın — geliştirme demosu.';
+
+  @override
+  String get documentTypeContract => 'Sözleşme';
+
+  @override
+  String get documentTypeBrief => 'Özet';
+
+  @override
+  String get documentTypeEvidence => 'Kanıt';
+
+  @override
+  String get documentTypeCorrespondence => 'Yazışma';
 }

@@ -238,5 +238,15 @@
   "matterDetailsNotFound": "القضية غير موجودة.",
   "matterDetailsPracticeArea": "مجال الممارسة",
   "matterDetailsAssignedAttorney": "المحامي المكلَّف",
-  "matterDetailsCreated": "تاريخ الإنشاء"
+  "matterDetailsCreated": "تاريخ الإنشاء",
+  "vaultTitle": "المستندات",
+  "vaultEmpty": "لا توجد مستندات متاحة.",
+  "vaultError": "تعذّر تحميل المستندات.",
+  "vaultLocalOnlyNote": "وضع تجريبي — بيانات وصفية اصطناعية للمستندات فقط. لا يتم عرض ملفات حقيقية.",
+  "vaultEntryTitle": "خزنة المستندات",
+  "vaultEntrySubtitle": "تصفح البيانات الوصفية للمستندات التجريبية — عرض تجريبي للتطوير.",
+  "documentTypeContract": "عقد",
+  "documentTypeBrief": "مذكرة",
+  "documentTypeEvidence": "دليل",
+  "documentTypeCorrespondence": "مراسلات"
 }

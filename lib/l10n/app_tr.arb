@@ -238,5 +238,15 @@
   "matterDetailsNotFound": "Dava bulunamadı.",
   "matterDetailsPracticeArea": "Çalışma alanı",
   "matterDetailsAssignedAttorney": "Atanan avukat",
-  "matterDetailsCreated": "Oluşturulma"
+  "matterDetailsCreated": "Oluşturulma",
+  "vaultTitle": "Belgeler",
+  "vaultEmpty": "Kullanılabilir belge yok.",
+  "vaultError": "Belgeler yüklenemedi.",
+  "vaultLocalOnlyNote": "Demo modu — yalnızca sentetik belge meta verileri. Gerçek dosyalar listelenmez.",
+  "vaultEntryTitle": "Belge kasası",
+  "vaultEntrySubtitle": "Demo belge meta verilerine göz atın — geliştirme demosu.",
+  "documentTypeContract": "Sözleşme",
+  "documentTypeBrief": "Özet",
+  "documentTypeEvidence": "Kanıt",
+  "documentTypeCorrespondence": "Yazışma"
 }

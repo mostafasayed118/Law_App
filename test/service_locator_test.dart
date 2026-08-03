@@ -28,6 +28,8 @@ import 'package:legalhub/features/booking/domain/booking_gateway.dart';
 import 'package:legalhub/features/booking/domain/booking_prefill.dart';
 import 'package:legalhub/features/discovery/data/fake_attorney_gateway.dart';
 import 'package:legalhub/features/discovery/domain/attorney_gateway.dart';
+import 'package:legalhub/features/documents/data/fake_document_gateway.dart';
+import 'package:legalhub/features/documents/domain/document_gateway.dart';
 import 'package:legalhub/features/matters/data/fake_matter_gateway.dart';
 import 'package:legalhub/features/matters/domain/matter_gateway.dart';
 import 'package:legalhub/features/orgs/presentation/active_org_store.dart';
@@ -210,6 +212,7 @@ void main() {
       expect(serviceLocator.isRegistered<AttorneyGateway>(), isTrue);
       expect(serviceLocator.isRegistered<ActiveOrgStore>(), isTrue);
       expect(serviceLocator.isRegistered<MatterGateway>(), isTrue);
+      expect(serviceLocator.isRegistered<DocumentGateway>(), isTrue);
       expect(serviceLocator.isRegistered<AuthCubit>(), isTrue);
     });
 
@@ -317,6 +320,15 @@ void main() {
       // the dev fake is the registered seam; a real matter backend is a
       // later approved data-layer slice.
       expect(serviceLocator<MatterGateway>(), isA<FakeMatterGateway>());
+    });
+
+    test('wires the document gateway to the fake dev implementation', () {
+      configureDependencies();
+
+      // D-V2: same boundary discipline as the matter/discovery gateways —
+      // the dev fake is the registered seam; a real documents backend is a
+      // later approved data-layer slice.
+      expect(serviceLocator<DocumentGateway>(), isA<FakeDocumentGateway>());
     });
 
     test('wires the booking gateway to the fake dev implementation', () {

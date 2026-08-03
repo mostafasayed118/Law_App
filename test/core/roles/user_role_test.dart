@@ -24,6 +24,7 @@ void main() {
         canBookConsultation: true,
         canViewAttorneyDiscovery: true,
         canViewMatters: true,
+        canViewDocuments: true,
       );
       const RoleCapability b = RoleCapability(
         canViewHome: true,
@@ -31,6 +32,7 @@ void main() {
         canBookConsultation: true,
         canViewAttorneyDiscovery: true,
         canViewMatters: true,
+        canViewDocuments: true,
       );
       const RoleCapability c = RoleCapability(
         canViewHome: true,
@@ -38,6 +40,7 @@ void main() {
         canBookConsultation: false,
         canViewAttorneyDiscovery: false,
         canViewMatters: false,
+        canViewDocuments: false,
       );
 
       expect(a, equals(b));
@@ -71,6 +74,9 @@ void main() {
           // Phase 6 (D-A6): discovery is visible to every bootstrap role —
           // navigation hint only, never authorization.
           expect(cap.canViewAttorneyDiscovery, isTrue, reason: 'role $role');
+          // Phase 8 (D-V5): the vault entry is visible to every bootstrap
+          // role — navigation hint only, never authorization.
+          expect(cap.canViewDocuments, isTrue, reason: 'role $role');
         }
       },
     );

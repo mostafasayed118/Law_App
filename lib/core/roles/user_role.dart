@@ -19,6 +19,7 @@ class RoleCapability extends Equatable {
     required this.canBookConsultation,
     required this.canViewAttorneyDiscovery,
     required this.canViewMatters,
+    required this.canViewDocuments,
   });
 
   final bool canViewHome;
@@ -40,6 +41,12 @@ class RoleCapability extends Equatable {
   /// flags — matters are read-first and the list is synthetic (D-M1/D-M2).
   final bool canViewMatters;
 
+  /// Phase 8 (scope note D-V5): whether the home dashboard offers the
+  /// document-vault entry. A navigation/visibility hint only, like the
+  /// other flags — documents are read-first, metadata-only, and the list
+  /// is synthetic (D-V1/D-V2).
+  final bool canViewDocuments;
+
   @override
   List<Object?> get props => <Object?>[
     canViewHome,
@@ -47,6 +54,7 @@ class RoleCapability extends Equatable {
     canBookConsultation,
     canViewAttorneyDiscovery,
     canViewMatters,
+    canViewDocuments,
   ];
 }
 
@@ -58,6 +66,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canBookConsultation: true,
         canViewAttorneyDiscovery: true,
         canViewMatters: true,
+        canViewDocuments: true,
       ),
       UserRole.attorney: RoleCapability(
         canViewHome: true,
@@ -65,6 +74,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canBookConsultation: true,
         canViewAttorneyDiscovery: true,
         canViewMatters: true,
+        canViewDocuments: true,
       ),
       UserRole.partner: RoleCapability(
         canViewHome: true,
@@ -72,6 +82,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canBookConsultation: true,
         canViewAttorneyDiscovery: true,
         canViewMatters: true,
+        canViewDocuments: true,
       ),
       UserRole.complianceOfficer: RoleCapability(
         canViewHome: true,
@@ -79,6 +90,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canBookConsultation: true,
         canViewAttorneyDiscovery: true,
         canViewMatters: true,
+        canViewDocuments: true,
       ),
       UserRole.researchAnalyst: RoleCapability(
         canViewHome: true,
@@ -86,6 +98,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canBookConsultation: true,
         canViewAttorneyDiscovery: true,
         canViewMatters: true,
+        canViewDocuments: true,
       ),
       UserRole.admin: RoleCapability(
         canViewHome: true,
@@ -93,5 +106,6 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canBookConsultation: true,
         canViewAttorneyDiscovery: true,
         canViewMatters: true,
+        canViewDocuments: true,
       ),
     };

@@ -9,6 +9,7 @@ import '../../../core/roles/user_role.dart';
 import '../../../features/auth/presentation/auth_cubit.dart' show AuthCubit;
 import '../../../features/booking/presentation/booking_entry_card.dart';
 import '../../../features/discovery/presentation/discovery_entry_card.dart';
+import '../../../features/documents/presentation/document_entry_card.dart';
 import '../../../features/matters/presentation/matter_entry_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/widgets.dart';
@@ -126,6 +127,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (capabilities.canViewMatters) ...[
                     const SizedBox(height: LegalHubTheme.spaceMd),
                     MatterEntryCard(onTap: () => context.go(AppRoutes.matters)),
+                  ],
+                  if (capabilities.canViewDocuments) ...[
+                    const SizedBox(height: LegalHubTheme.spaceMd),
+                    DocumentEntryCard(onTap: () => context.go(AppRoutes.vault)),
                   ],
                 ]),
               ),

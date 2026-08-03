@@ -451,6 +451,40 @@ void main() {
     });
   });
 
+  group('vault route (Phase 8 slice 8.1)', () {
+    testWidgets('renders the vault list for an authenticated demo session', (
+      tester,
+    ) async {
+      // DocumentListScreen resolves DocumentGateway from the locator (the
+      // dev fake in env-less runs).
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      router.go(AppRoutes.vault);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // The /vault route renders the document list, not home; the shell
+      // keeps home highlighted.
+      expect(find.text('Documents'), findsOneWidget);
+      expect(find.text('Demo engagement letter'), findsOneWidget);
+      expect(selectedIndex(tester), 0);
+    });
+
+    testWidgets('blocks unauthenticated access to the vault route', (
+      tester,
+    ) async {
+      router.go(AppRoutes.vault);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Welcome Back'), findsOneWidget);
+      expect(authCubit.state.isAuthenticated, isFalse);
+    });
+  });
+
   group('matter details route (Phase 7 slice 7.2)', () {
     testWidgets('renders the details for an authenticated demo session', (
       tester,
@@ -699,6 +733,7 @@ void main() {
               canBookConsultation: true,
               canViewAttorneyDiscovery: true,
               canViewMatters: true,
+              canViewDocuments: true,
             ),
           },
         );
@@ -743,6 +778,7 @@ void main() {
               canBookConsultation: false,
               canViewAttorneyDiscovery: false,
               canViewMatters: false,
+              canViewDocuments: false,
             ),
           },
         );
@@ -810,6 +846,7 @@ void main() {
             canBookConsultation: false,
             canViewAttorneyDiscovery: false,
             canViewMatters: false,
+            canViewDocuments: false,
           ),
         },
       );

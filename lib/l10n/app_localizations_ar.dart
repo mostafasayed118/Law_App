@@ -727,4 +727,36 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get matterDetailsCreated => 'تاريخ الإنشاء';
+
+  @override
+  String get vaultTitle => 'المستندات';
+
+  @override
+  String get vaultEmpty => 'لا توجد مستندات متاحة.';
+
+  @override
+  String get vaultError => 'تعذّر تحميل المستندات.';
+
+  @override
+  String get vaultLocalOnlyNote =>
+      'وضع تجريبي — بيانات وصفية اصطناعية للمستندات فقط. لا يتم عرض ملفات حقيقية.';
+
+  @override
+  String get vaultEntryTitle => 'خزنة المستندات';
+
+  @override
+  String get vaultEntrySubtitle =>
+      'تصفح البيانات الوصفية للمستندات التجريبية — عرض تجريبي للتطوير.';
+
+  @override
+  String get documentTypeContract => 'عقد';
+
+  @override
+  String get documentTypeBrief => 'مذكرة';
+
+  @override
+  String get documentTypeEvidence => 'دليل';
+
+  @override
+  String get documentTypeCorrespondence => 'مراسلات';
 }

@@ -1455,6 +1455,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Created'**
   String get matterDetailsCreated;
+
+  /// No description provided for @vaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents'**
+  String get vaultTitle;
+
+  /// No description provided for @vaultEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No documents are available.'**
+  String get vaultEmpty;
+
+  /// No description provided for @vaultError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load documents.'**
+  String get vaultError;
+
+  /// No description provided for @vaultLocalOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo mode — synthetic document metadata only. No real files are listed.'**
+  String get vaultLocalOnlyNote;
+
+  /// No description provided for @vaultEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Document vault'**
+  String get vaultEntryTitle;
+
+  /// No description provided for @vaultEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse demo document metadata — development demo.'**
+  String get vaultEntrySubtitle;
+
+  /// No description provided for @documentTypeContract.
+  ///
+  /// In en, this message translates to:
+  /// **'Contract'**
+  String get documentTypeContract;
+
+  /// No description provided for @documentTypeBrief.
+  ///
+  /// In en, this message translates to:
+  /// **'Brief'**
+  String get documentTypeBrief;
+
+  /// No description provided for @documentTypeEvidence.
+  ///
+  /// In en, this message translates to:
+  /// **'Evidence'**
+  String get documentTypeEvidence;
+
+  /// No description provided for @documentTypeCorrespondence.
+  ///
+  /// In en, this message translates to:
+  /// **'Correspondence'**
+  String get documentTypeCorrespondence;
 }
 
 class _AppLocalizationsDelegate

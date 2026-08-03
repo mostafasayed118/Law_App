@@ -252,5 +252,15 @@
   "matterDetailsNotFound": "Matter not found.",
   "matterDetailsPracticeArea": "Practice area",
   "matterDetailsAssignedAttorney": "Assigned attorney",
-  "matterDetailsCreated": "Created"
+  "matterDetailsCreated": "Created",
+  "vaultTitle": "Documents",
+  "vaultEmpty": "No documents are available.",
+  "vaultError": "Unable to load documents.",
+  "vaultLocalOnlyNote": "Demo mode — synthetic document metadata only. No real files are listed.",
+  "vaultEntryTitle": "Document vault",
+  "vaultEntrySubtitle": "Browse demo document metadata — development demo.",
+  "documentTypeContract": "Contract",
+  "documentTypeBrief": "Brief",
+  "documentTypeEvidence": "Evidence",
+  "documentTypeCorrespondence": "Correspondence"
 }

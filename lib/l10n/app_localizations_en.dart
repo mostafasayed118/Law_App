@@ -732,4 +732,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get matterDetailsCreated => 'Created';
+
+  @override
+  String get vaultTitle => 'Documents';
+
+  @override
+  String get vaultEmpty => 'No documents are available.';
+
+  @override
+  String get vaultError => 'Unable to load documents.';
+
+  @override
+  String get vaultLocalOnlyNote =>
+      'Demo mode — synthetic document metadata only. No real files are listed.';
+
+  @override
+  String get vaultEntryTitle => 'Document vault';
+
+  @override
+  String get vaultEntrySubtitle =>
+      'Browse demo document metadata — development demo.';
+
+  @override
+  String get documentTypeContract => 'Contract';
+
+  @override
+  String get documentTypeBrief => 'Brief';
+
+  @override
+  String get documentTypeEvidence => 'Evidence';
+
+  @override
+  String get documentTypeCorrespondence => 'Correspondence';
 }
