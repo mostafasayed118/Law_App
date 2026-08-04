@@ -185,8 +185,8 @@ row must be denied by policy, identically to any other unauthorized role —
 this is the row's own worst-case test and must exist before P2 ships.
 
 > **§5 addendum (2026-08-05, P0-closure scope note
-> `docs/p0_closure_scope_2026-08-05.md` — DRAFT; takes effect on owner
-> ratification):** records the test contract for the §5 deny-row and the
+> `docs/p0_closure_scope_2026-08-05.md` — RATIFIED 2026-08-05):**
+> records the test contract for the §5 deny-row and the
 > per-row negative blocks, and pins the forward content-table boundary. (a)
 > The §5 "negative test required" row is satisfied by a committed policy-test
 > battery (`supabase/tests/` + `scripts/verify_policy_tests.sh`, D-P0C2) run

@@ -6,10 +6,9 @@
 > assumptions & non-goals → slices behind the full P2 discipline (spec →
 > RLS-gate review → rehearsal evidence → dated apply approval → apply with
 > rollback pairing) → acceptance criteria → risks → roadmap & ledger hooks.
-> **Status: DRAFT (2026-08-05) — prepared for owner ratification of
-> D-P0C1…D-P0C5. Nothing here is authorized to build or apply until the
-> owner ratifies the decision record and approves the slices per
-> `INSTRUCTIONS.md` §2/§3.**
+> **Status: RATIFIED (2026-08-05) — D-P0C1…D-P0C5 ratified by the Project
+> Owner; slices P0C.0–P0C.3 authorized per the gate discipline (nothing
+> applies without the owner's dated approval at each gate).**
 > **Planning owner:** `docs/features_roadmap_2026-08-03.md` §14.
 
 ---
@@ -64,15 +63,15 @@ migrations on ephemeral projects, not a durable negative-test contract.
 - `docs/adr/0007`: the P0 gate mechanics (decisions → readiness → approval
   → slice).
 
-## 2. Decision record (drafted for owner ratification)
+## 2. Decision record (ratified 2026-08-05)
 
 | # | Decision | Status |
 |---|---|---|
-| D-P0C1 | **Deny-row shape.** No matter/document/message tables exist, so the §4/§5 content-deny rows are satisfied in two parts: (a) a **negative battery over every existing grant/RPC path** proving the owner cannot exceed identity/membership metadata through any reachable surface, and (b) a **forward design pin** — every future content table ships with an explicit `platform_owner_admin → deny` RLS row and its own negative test, enforced at schema-review time (recorded in this note and the matrix addendum) | drafted 2026-08-05 |
-| D-P0C2 | **Policy-test harness.** A committed `supabase/tests/` battery + `scripts/verify_policy_tests.sh` (bash + psql, the `scripts/verify_ledger.sh` pattern), runnable against an **ephemeral rehearsal project** (the P2 pattern) built from the same migration/RPC/policy files — durable teeth for the per-row positive/negative contract | drafted 2026-08-05 |
-| D-P0C3 | **Single-account bound.** The battery includes a negative test that a second `platform_config` owner row cannot be created through any reachable path (the capability stays bound to exactly one account per the Addendum); if the battery finds a widening path, that is a P0C.2 server amendment | drafted 2026-08-05 |
-| D-P0C4 | **Audit surfacing stays RPC-only.** `read_org_audit`/`read_platform_audit` self-audit their reads; no raw `SELECT` on `audit_events` is ever granted; the battery pins the absence | drafted 2026-08-05 |
-| D-P0C5 | **The owner admin UI is NOT part of P0 closure.** It is the first §14 capability that closure unblocks (Addendum condition), gated behind its own scope note after this phase closes — no client change ships here | drafted 2026-08-05 |
+| D-P0C1 | **Deny-row shape.** No matter/document/message tables exist, so the §4/§5 content-deny rows are satisfied in two parts: (a) a **negative battery over every existing grant/RPC path** proving the owner cannot exceed identity/membership metadata through any reachable surface, and (b) a **forward design pin** — every future content table ships with an explicit `platform_owner_admin → deny` RLS row and its own negative test, enforced at schema-review time (recorded in this note and the matrix addendum) | ratified 2026-08-05 |
+| D-P0C2 | **Policy-test harness.** A committed `supabase/tests/` battery + `scripts/verify_policy_tests.sh` (bash + psql, the `scripts/verify_ledger.sh` pattern), runnable against an **ephemeral rehearsal project** (the P2 pattern) built from the same migration/RPC/policy files — durable teeth for the per-row positive/negative contract | ratified 2026-08-05 |
+| D-P0C3 | **Single-account bound.** The battery includes a negative test that a second `platform_config` owner row cannot be created through any reachable path (the capability stays bound to exactly one account per the Addendum); if the battery finds a widening path, that is a P0C.2 server amendment | ratified 2026-08-05 |
+| D-P0C4 | **Audit surfacing stays RPC-only.** `read_org_audit`/`read_platform_audit` self-audit their reads; no raw `SELECT` on `audit_events` is ever granted; the battery pins the absence | ratified 2026-08-05 |
+| D-P0C5 | **The owner admin UI is NOT part of P0 closure.** It is the first §14 capability that closure unblocks (Addendum condition), gated behind its own scope note after this phase closes — no client change ships here | ratified 2026-08-05 |
 
 ## 3. Assumptions & non-goals
 
@@ -135,7 +134,7 @@ migrations on ephemeral projects, not a durable negative-test contract.
 - `docs/p0_decision_capture.md` §3 → P4 row (security review + controlled
   rollout) becomes the next phase after closure; this note is its
   prerequisite record.
-- `docs/permission_matrix.md` → §5 addendum (2026-08-05) as drafted in §4
+- `docs/permission_matrix.md` → §5 addendum (2026-08-05) ratified in §2/§4
   P0C.0.
 - Ledger: **no Flutter test-count change** (the battery is SQL, not
   `test/`), README untouched, `verify_ledger.sh` stays PASS 115.
