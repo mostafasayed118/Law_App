@@ -184,6 +184,26 @@ matrix (a single powerful account):
 row must be denied by policy, identically to any other unauthorized role —
 this is the row's own worst-case test and must exist before P2 ships.
 
+> **§5 addendum (2026-08-05, P0-closure scope note
+> `docs/p0_closure_scope_2026-08-05.md` — DRAFT; takes effect on owner
+> ratification):** records the test contract for the §5 deny-row and the
+> per-row negative blocks, and pins the forward content-table boundary. (a)
+> The §5 "negative test required" row is satisfied by a committed policy-test
+> battery (`supabase/tests/` + `scripts/verify_policy_tests.sh`, D-P0C2) run
+> against an ephemeral rehearsal project, proving the owner cannot exceed
+> identity/membership metadata through any existing grant or RPC path. (b)
+> Because no matter/document/message tables exist, the §4 "❌ deny, always"
+> content rows are enforced as a **forward design pin**: every future content
+> table ships with an explicit `platform_owner_admin → deny` RLS row and its
+> own negative test, enforced at schema-review time (D-P0C1). (c) The owner
+> capability stays bound to exactly one account (D-P0C3): the battery includes
+> a negative test that a second `platform_config` owner row cannot be created
+> through any reachable path. (d) Audit surfacing stays RPC-only (D-P0C4):
+> `read_org_audit`/`read_platform_audit` self-audit; no raw `SELECT` on
+> `audit_events` is ever granted. This addendum widens no permission row — it
+> records the test contract and the forward boundary; the §7 dated-addendum
+> discipline is satisfied by this block.
+
 ---
 
 ## 6. Storage / realtime / audit (contract §9 storage block)
