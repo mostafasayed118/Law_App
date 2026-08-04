@@ -485,6 +485,40 @@ void main() {
     });
   });
 
+  group('messages route (Phase 9 slice 9.1)', () {
+    testWidgets('renders the thread list for an authenticated demo session', (
+      tester,
+    ) async {
+      // MessageListScreen resolves MessageGateway from the locator (the
+      // dev fake in env-less runs).
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      router.go(AppRoutes.messages);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // The /messages route renders the thread list, not home; the
+      // shell keeps home highlighted (not a settings descendant).
+      expect(find.text('Messages'), findsOneWidget);
+      expect(find.text('Demo matter updates'), findsOneWidget);
+      expect(selectedIndex(tester), 0);
+    });
+
+    testWidgets('blocks unauthenticated access to the messages route', (
+      tester,
+    ) async {
+      router.go(AppRoutes.messages);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Welcome Back'), findsOneWidget);
+      expect(authCubit.state.isAuthenticated, isFalse);
+    });
+  });
+
   group('matter details route (Phase 7 slice 7.2)', () {
     testWidgets('renders the details for an authenticated demo session', (
       tester,
@@ -734,6 +768,7 @@ void main() {
               canViewAttorneyDiscovery: true,
               canViewMatters: true,
               canViewDocuments: true,
+              canViewMessages: true,
             ),
           },
         );
@@ -779,6 +814,7 @@ void main() {
               canViewAttorneyDiscovery: false,
               canViewMatters: false,
               canViewDocuments: false,
+              canViewMessages: false,
             ),
           },
         );
@@ -847,6 +883,7 @@ void main() {
             canViewAttorneyDiscovery: false,
             canViewMatters: false,
             canViewDocuments: false,
+            canViewMessages: false,
           ),
         },
       );

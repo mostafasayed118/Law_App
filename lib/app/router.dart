@@ -18,6 +18,7 @@ import '../features/home/presentation/home_screen.dart';
 import '../features/home/presentation/settings_screen.dart';
 import '../features/matters/presentation/matter_details_screen.dart';
 import '../features/matters/presentation/matter_list_screen.dart';
+import '../features/messaging/presentation/message_list_screen.dart';
 import '../features/notifications/presentation/notification_settings_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/onboarding/presentation/onboarding_success_screen.dart';
@@ -48,6 +49,7 @@ class AppRoutes {
   static const String matters = '/matters';
   static const String matterDetails = '/matters/:matterId';
   static const String vault = '/vault';
+  static const String messages = '/messages';
 
   /// The profile route for one attorney (path-param substitution).
   static String attorneyProfile(String attorneyId) => '/discovery/$attorneyId';
@@ -151,6 +153,11 @@ GoRouter createAppRouter(
           path: AppRoutes.vault,
           builder: (BuildContext context, GoRouterState state) =>
               const DocumentListScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.messages,
+          builder: (BuildContext context, GoRouterState state) =>
+              const MessageListScreen(),
         ),
         GoRoute(
           path: AppRoutes.settings,

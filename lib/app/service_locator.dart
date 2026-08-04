@@ -33,6 +33,8 @@ import '../features/documents/data/fake_document_gateway.dart';
 import '../features/documents/domain/document_gateway.dart';
 import '../features/matters/data/fake_matter_gateway.dart';
 import '../features/matters/domain/matter_gateway.dart';
+import '../features/messaging/data/fake_message_gateway.dart';
+import '../features/messaging/domain/message_gateway.dart';
 import '../features/notifications/data/in_memory_notification_prefs_store.dart';
 import '../features/notifications/data/shared_preferences_notification_prefs_store.dart';
 import '../features/notifications/domain/notification_prefs_store.dart';
@@ -210,6 +212,15 @@ void configureDependencies({
     // data-layer slice (roadmap §12 boundary).
     serviceLocator.registerLazySingleton<DocumentGateway>(
       FakeDocumentGateway.new,
+    );
+  }
+  if (!serviceLocator.isRegistered<MessageGateway>()) {
+    // Stateless service: lazy singleton. The messaging Cubit is feature-scoped
+    // and created per screen via BlocProvider, so it is NOT registered here.
+    // Fake-domain (D-MSG2): a real messages backend is a later approved
+    // data-layer slice (roadmap §13 boundary).
+    serviceLocator.registerLazySingleton<MessageGateway>(
+      FakeMessageGateway.new,
     );
   }
   if (!serviceLocator.isRegistered<AuthCubit>()) {

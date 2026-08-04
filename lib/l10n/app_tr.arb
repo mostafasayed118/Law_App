@@ -248,5 +248,12 @@
   "documentTypeContract": "Sözleşme",
   "documentTypeBrief": "Özet",
   "documentTypeEvidence": "Kanıt",
-  "documentTypeCorrespondence": "Yazışma"
+  "documentTypeCorrespondence": "Yazışma",
+  "messagesTitle": "Mesajlar",
+  "messagesEmpty": "Kullanılabilir mesaj dizisi yok.",
+  "messagesError": "Mesaj dizileri yüklenemedi.",
+  "messagesLocalOnlyNote": "Demo modu — yalnızca sentetik dizgi meta verileri. Gerçek mesajlar listelenmez.",
+  "messagesEntryTitle": "Mesajlar",
+  "messagesEntrySubtitle": "Demo mesaj dizilerine göz atın — geliştirme demosu.",
+  "messagesMessageCount": "{count} mesaj"
 }

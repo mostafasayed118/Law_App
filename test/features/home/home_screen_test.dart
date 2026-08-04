@@ -120,6 +120,7 @@ void main() {
                   canViewAttorneyDiscovery: true,
                   canViewMatters: true,
                   canViewDocuments: true,
+                  canViewMessages: true,
                 ),
               },
             ),
@@ -169,6 +170,7 @@ void main() {
                   canViewAttorneyDiscovery: false,
                   canViewMatters: false,
                   canViewDocuments: false,
+                  canViewMessages: false,
                 ),
               },
             ),
@@ -214,6 +216,7 @@ void main() {
                   canViewAttorneyDiscovery: true,
                   canViewMatters: false,
                   canViewDocuments: true,
+                  canViewMessages: true,
                 ),
               },
             ),
@@ -262,6 +265,7 @@ void main() {
                   canViewAttorneyDiscovery: true,
                   canViewMatters: true,
                   canViewDocuments: false,
+                  canViewMessages: true,
                 ),
               },
             ),
@@ -271,6 +275,56 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Document vault'), findsNothing);
+    });
+  });
+
+  group('message entry (Phase 9 slice 9.1)', () {
+    testWidgets('renders the entry card with the default capability map', (
+      tester,
+    ) async {
+      await tester.pumpWidget(pumpHome(const Locale('en')));
+      await tester.pumpAndSettle();
+
+      // The default roleCapabilities grants canViewMessages to every
+      // bootstrap role (D-MSG5), so the demo client sees the messaging
+      // entry on the dashboard (nav hint only, never an authorization
+      // grant).
+      expect(find.text('Messages'), findsOneWidget);
+      expect(
+        find.textContaining('Browse demo message threads'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('hides the entry when the capability is not granted', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        BlocProvider<AuthCubit>.value(
+          value: authCubit,
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: HomeScreen(
+              capabilitiesForRole: <UserRole, RoleCapability>{
+                UserRole.client: const RoleCapability(
+                  canViewHome: true,
+                  canViewSettings: true,
+                  canBookConsultation: true,
+                  canViewAttorneyDiscovery: true,
+                  canViewMatters: true,
+                  canViewDocuments: true,
+                  canViewMessages: false,
+                ),
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Messages'), findsNothing);
     });
   });
 

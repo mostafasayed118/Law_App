@@ -1515,6 +1515,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Correspondence'**
   String get documentTypeCorrespondence;
+
+  /// No description provided for @messagesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages'**
+  String get messagesTitle;
+
+  /// No description provided for @messagesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No message threads are available.'**
+  String get messagesEmpty;
+
+  /// No description provided for @messagesError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load message threads.'**
+  String get messagesError;
+
+  /// No description provided for @messagesLocalOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo mode — synthetic thread metadata only. No real messages are listed.'**
+  String get messagesLocalOnlyNote;
+
+  /// No description provided for @messagesEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages'**
+  String get messagesEntryTitle;
+
+  /// No description provided for @messagesEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse demo message threads — development demo.'**
+  String get messagesEntrySubtitle;
+
+  /// No description provided for @messagesMessageCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} messages'**
+  String messagesMessageCount(Object count);
 }
 
 class _AppLocalizationsDelegate

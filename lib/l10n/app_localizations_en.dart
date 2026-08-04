@@ -764,4 +764,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get documentTypeCorrespondence => 'Correspondence';
+
+  @override
+  String get messagesTitle => 'Messages';
+
+  @override
+  String get messagesEmpty => 'No message threads are available.';
+
+  @override
+  String get messagesError => 'Unable to load message threads.';
+
+  @override
+  String get messagesLocalOnlyNote =>
+      'Demo mode — synthetic thread metadata only. No real messages are listed.';
+
+  @override
+  String get messagesEntryTitle => 'Messages';
+
+  @override
+  String get messagesEntrySubtitle =>
+      'Browse demo message threads — development demo.';
+
+  @override
+  String messagesMessageCount(Object count) {
+    return '$count messages';
+  }
 }

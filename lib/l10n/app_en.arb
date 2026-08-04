@@ -262,5 +262,12 @@
   "documentTypeContract": "Contract",
   "documentTypeBrief": "Brief",
   "documentTypeEvidence": "Evidence",
-  "documentTypeCorrespondence": "Correspondence"
+  "documentTypeCorrespondence": "Correspondence",
+  "messagesTitle": "Messages",
+  "messagesEmpty": "No message threads are available.",
+  "messagesError": "Unable to load message threads.",
+  "messagesLocalOnlyNote": "Demo mode — synthetic thread metadata only. No real messages are listed.",
+  "messagesEntryTitle": "Messages",
+  "messagesEntrySubtitle": "Browse demo message threads — development demo.",
+  "messagesMessageCount": "{count} messages"
 }

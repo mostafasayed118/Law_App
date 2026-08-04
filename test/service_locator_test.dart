@@ -32,6 +32,8 @@ import 'package:legalhub/features/documents/data/fake_document_gateway.dart';
 import 'package:legalhub/features/documents/domain/document_gateway.dart';
 import 'package:legalhub/features/matters/data/fake_matter_gateway.dart';
 import 'package:legalhub/features/matters/domain/matter_gateway.dart';
+import 'package:legalhub/features/messaging/data/fake_message_gateway.dart';
+import 'package:legalhub/features/messaging/domain/message_gateway.dart';
 import 'package:legalhub/features/orgs/presentation/active_org_store.dart';
 
 /// Hand-rolled fake of the [SupabaseAuthApi] seam for the DI flip test.
@@ -213,6 +215,7 @@ void main() {
       expect(serviceLocator.isRegistered<ActiveOrgStore>(), isTrue);
       expect(serviceLocator.isRegistered<MatterGateway>(), isTrue);
       expect(serviceLocator.isRegistered<DocumentGateway>(), isTrue);
+      expect(serviceLocator.isRegistered<MessageGateway>(), isTrue);
       expect(serviceLocator.isRegistered<AuthCubit>(), isTrue);
     });
 
@@ -329,6 +332,15 @@ void main() {
       // the dev fake is the registered seam; a real documents backend is a
       // later approved data-layer slice.
       expect(serviceLocator<DocumentGateway>(), isA<FakeDocumentGateway>());
+    });
+
+    test('wires the message gateway to the fake dev implementation', () {
+      configureDependencies();
+
+      // D-MSG2: same boundary discipline as the document/matter gateways —
+      // the dev fake is the registered seam; a real messages backend is a
+      // later approved data-layer slice.
+      expect(serviceLocator<MessageGateway>(), isA<FakeMessageGateway>());
     });
 
     test('wires the booking gateway to the fake dev implementation', () {

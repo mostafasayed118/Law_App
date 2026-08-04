@@ -20,6 +20,7 @@ class RoleCapability extends Equatable {
     required this.canViewAttorneyDiscovery,
     required this.canViewMatters,
     required this.canViewDocuments,
+    required this.canViewMessages,
   });
 
   final bool canViewHome;
@@ -47,6 +48,12 @@ class RoleCapability extends Equatable {
   /// is synthetic (D-V1/D-V2).
   final bool canViewDocuments;
 
+  /// Phase 9 (scope note D-MSG5): whether the home dashboard offers the
+  /// messaging entry. A navigation/visibility hint only, like the other
+  /// flags — messaging is read-only, thread-metadata-only, and the list
+  /// is synthetic (D-MSG1/D-MSG2).
+  final bool canViewMessages;
+
   @override
   List<Object?> get props => <Object?>[
     canViewHome,
@@ -55,6 +62,7 @@ class RoleCapability extends Equatable {
     canViewAttorneyDiscovery,
     canViewMatters,
     canViewDocuments,
+    canViewMessages,
   ];
 }
 
@@ -67,6 +75,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewAttorneyDiscovery: true,
         canViewMatters: true,
         canViewDocuments: true,
+        canViewMessages: true,
       ),
       UserRole.attorney: RoleCapability(
         canViewHome: true,
@@ -75,6 +84,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewAttorneyDiscovery: true,
         canViewMatters: true,
         canViewDocuments: true,
+        canViewMessages: true,
       ),
       UserRole.partner: RoleCapability(
         canViewHome: true,
@@ -83,6 +93,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewAttorneyDiscovery: true,
         canViewMatters: true,
         canViewDocuments: true,
+        canViewMessages: true,
       ),
       UserRole.complianceOfficer: RoleCapability(
         canViewHome: true,
@@ -91,6 +102,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewAttorneyDiscovery: true,
         canViewMatters: true,
         canViewDocuments: true,
+        canViewMessages: true,
       ),
       UserRole.researchAnalyst: RoleCapability(
         canViewHome: true,
@@ -99,6 +111,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewAttorneyDiscovery: true,
         canViewMatters: true,
         canViewDocuments: true,
+        canViewMessages: true,
       ),
       UserRole.admin: RoleCapability(
         canViewHome: true,
@@ -107,5 +120,6 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewAttorneyDiscovery: true,
         canViewMatters: true,
         canViewDocuments: true,
+        canViewMessages: true,
       ),
     };

@@ -248,5 +248,12 @@
   "documentTypeContract": "عقد",
   "documentTypeBrief": "مذكرة",
   "documentTypeEvidence": "دليل",
-  "documentTypeCorrespondence": "مراسلات"
+  "documentTypeCorrespondence": "مراسلات",
+  "messagesTitle": "الرسائل",
+  "messagesEmpty": "لا توجد محادثات متاحة.",
+  "messagesError": "تعذّر تحميل المحادثات.",
+  "messagesLocalOnlyNote": "وضع تجريبي — بيانات وصفية اصطناعية للمحادثات فقط. لا يتم عرض رسائل حقيقية.",
+  "messagesEntryTitle": "الرسائل",
+  "messagesEntrySubtitle": "تصفح محادثات تجريبية — عرض تجريبي للتطوير.",
+  "messagesMessageCount": "{count} رسائل"
 }

@@ -25,6 +25,7 @@ void main() {
         canViewAttorneyDiscovery: true,
         canViewMatters: true,
         canViewDocuments: true,
+        canViewMessages: true,
       );
       const RoleCapability b = RoleCapability(
         canViewHome: true,
@@ -33,6 +34,7 @@ void main() {
         canViewAttorneyDiscovery: true,
         canViewMatters: true,
         canViewDocuments: true,
+        canViewMessages: true,
       );
       const RoleCapability c = RoleCapability(
         canViewHome: true,
@@ -41,6 +43,7 @@ void main() {
         canViewAttorneyDiscovery: false,
         canViewMatters: false,
         canViewDocuments: false,
+        canViewMessages: false,
       );
 
       expect(a, equals(b));
@@ -77,6 +80,9 @@ void main() {
           // Phase 8 (D-V5): the vault entry is visible to every bootstrap
           // role — navigation hint only, never authorization.
           expect(cap.canViewDocuments, isTrue, reason: 'role $role');
+          // Phase 9 (D-MSG5): the messaging entry is visible to every
+          // bootstrap role — navigation hint only, never authorization.
+          expect(cap.canViewMessages, isTrue, reason: 'role $role');
         }
       },
     );

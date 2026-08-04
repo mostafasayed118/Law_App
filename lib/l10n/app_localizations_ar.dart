@@ -759,4 +759,29 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get documentTypeCorrespondence => 'مراسلات';
+
+  @override
+  String get messagesTitle => 'الرسائل';
+
+  @override
+  String get messagesEmpty => 'لا توجد محادثات متاحة.';
+
+  @override
+  String get messagesError => 'تعذّر تحميل المحادثات.';
+
+  @override
+  String get messagesLocalOnlyNote =>
+      'وضع تجريبي — بيانات وصفية اصطناعية للمحادثات فقط. لا يتم عرض رسائل حقيقية.';
+
+  @override
+  String get messagesEntryTitle => 'الرسائل';
+
+  @override
+  String get messagesEntrySubtitle =>
+      'تصفح محادثات تجريبية — عرض تجريبي للتطوير.';
+
+  @override
+  String messagesMessageCount(Object count) {
+    return '$count رسائل';
+  }
 }

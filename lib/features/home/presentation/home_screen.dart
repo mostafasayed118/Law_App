@@ -11,6 +11,7 @@ import '../../../features/booking/presentation/booking_entry_card.dart';
 import '../../../features/discovery/presentation/discovery_entry_card.dart';
 import '../../../features/documents/presentation/document_entry_card.dart';
 import '../../../features/matters/presentation/matter_entry_card.dart';
+import '../../../features/messaging/presentation/message_entry_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/widgets.dart';
 import 'widgets/home_cards.dart';
@@ -131,6 +132,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (capabilities.canViewDocuments) ...[
                     const SizedBox(height: LegalHubTheme.spaceMd),
                     DocumentEntryCard(onTap: () => context.go(AppRoutes.vault)),
+                  ],
+                  if (capabilities.canViewMessages) ...[
+                    const SizedBox(height: LegalHubTheme.spaceMd),
+                    MessageEntryCard(
+                      onTap: () => context.go(AppRoutes.messages),
+                    ),
                   ],
                 ]),
               ),

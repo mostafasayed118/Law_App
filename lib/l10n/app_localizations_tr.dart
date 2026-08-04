@@ -765,4 +765,29 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get documentTypeCorrespondence => 'Yazışma';
+
+  @override
+  String get messagesTitle => 'Mesajlar';
+
+  @override
+  String get messagesEmpty => 'Kullanılabilir mesaj dizisi yok.';
+
+  @override
+  String get messagesError => 'Mesaj dizileri yüklenemedi.';
+
+  @override
+  String get messagesLocalOnlyNote =>
+      'Demo modu — yalnızca sentetik dizgi meta verileri. Gerçek mesajlar listelenmez.';
+
+  @override
+  String get messagesEntryTitle => 'Mesajlar';
+
+  @override
+  String get messagesEntrySubtitle =>
+      'Demo mesaj dizilerine göz atın — geliştirme demosu.';
+
+  @override
+  String messagesMessageCount(Object count) {
+    return '$count mesaj';
+  }
 }
