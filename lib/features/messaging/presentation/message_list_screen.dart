@@ -1,42 +1,73 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../app/legalhub_theme.dart';
+import '../../../app/router.dart';
 import '../../../app/service_locator.dart';
+import '../../../core/roles/user_role.dart';
 import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../matters/domain/matter.dart';
+import '../../matters/domain/matter_gateway.dart';
+import '../../matters/domain/matter_title_resolver.dart';
+import '../../matters/presentation/matter_cubit.dart';
+import '../../matters/presentation/matter_link_chip.dart';
+import '../../matters/presentation/matter_state.dart';
 import '../domain/message_gateway.dart';
 import '../domain/message_thread.dart';
 import 'message_count_chip.dart';
 import 'message_cubit.dart';
 import 'message_state.dart';
 
-/// Thread-list surface (Phase 9, slice 9.1).
+/// Thread-list surface (Phase 9, slice 9.1; Phase 12, slice 12.1).
 ///
 /// A `/messages` route that loads the thread-metadata list from the
 /// [MessageGateway] seam (the dev fake in env-less runs, owner decision
 /// D-MSG2). **Thread metadata only** — rows render the five D-MSG4 fields
 /// (title, matter reference, participants, last-activity date, message
 /// count) and nothing else: no message body, no preview, no send/reply, no
-/// thread-open affordance, and no detail route (D-MSG1/D-MSG3). Rows are
-/// deliberately NOT tap targets. All copy is local-only — the synthetic list
-/// must never read as real case communications (R1/D-MSG4).
+/// thread-open affordance (D-MSG1/D-MSG3). Phase 12 adds the **reverse
+/// cross-link** (D-C1): a row whose `matterRef` resolves to a known
+/// synthetic matter renders the compact "View matter" chip — the only tap
+/// target in the list (D-C2), gated by the `canViewMatters` nav hint
+/// (D-C4). Resolution is title-keyed and client-side against the loaded
+/// synthetic matter list (D-C3, the D-M5 discipline in reverse); rows whose
+/// `matterRef` does not resolve stay metadata-only. All copy is local-only —
+/// the synthetic list must never read as real case communications (R1/D-MSG4).
 class MessageListScreen extends StatelessWidget {
-  const MessageListScreen({super.key});
+  const MessageListScreen({required this.capabilities, super.key});
+
+  /// UX-only capability projection for the reverse cross-link (D-C4): the
+  /// "View matter" chip renders only under [RoleCapability.canViewMatters].
+  /// Navigation hint only — never authorization (the D-W5 posture).
+  final RoleCapability capabilities;
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<MessageCubit>(
-      create: (BuildContext context) =>
-          MessageCubit(serviceLocator<MessageGateway>()),
-      child: const _ListSurface(),
+    return MultiBlocProvider(
+      providers: <BlocProvider<dynamic>>[
+        BlocProvider<MessageCubit>(
+          create: (BuildContext context) =>
+              MessageCubit(serviceLocator<MessageGateway>()),
+        ),
+        // Loads the synthetic matter list alongside the threads so each
+        // row's matterRef can be resolved client-side (D-C3).
+        BlocProvider<MatterCubit>(
+          create: (BuildContext context) =>
+              MatterCubit(serviceLocator<MatterGateway>()),
+        ),
+      ],
+      child: _ListSurface(capabilities: capabilities),
     );
   }
 }
 
 class _ListSurface extends StatefulWidget {
-  const _ListSurface();
+  const _ListSurface({required this.capabilities});
+
+  final RoleCapability capabilities;
 
   @override
   State<_ListSurface> createState() => _ListSurfaceState();
@@ -46,15 +77,16 @@ class _ListSurfaceState extends State<_ListSurface> {
   @override
   void initState() {
     super.initState();
-    // Load the synthetic metadata list on open (matches the vault/matter
-    // pattern): the cubit's initial state is already loading, and the fake
-    // resolves immediately, so the first frame settles straight into the
-    // list.
+    // Load both synthetic lists on open (matches the discovery/matter
+    // pattern): the cubits' initial states are already loading, and the
+    // fakes resolve immediately, so the first frame settles straight into
+    // the list.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
         return;
       }
       context.read<MessageCubit>().load();
+      context.read<MatterCubit>().load();
     });
   }
 
@@ -68,20 +100,40 @@ class _ListSurfaceState extends State<_ListSurface> {
       body: SafeArea(
         child: BlocBuilder<MessageCubit, MessageState>(
           builder: (BuildContext context, MessageState state) {
-            return ListView(
-              padding: const EdgeInsetsDirectional.all(
-                LegalHubTheme.marginMobile,
-              ),
-              children: <Widget>[
-                _resultsView(context, state, l10n, text, scheme),
-                const SizedBox(height: LegalHubTheme.spaceLg),
-                Text(
-                  l10n.messagesLocalOnlyNote,
-                  style: text.bodySmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
+            return BlocBuilder<MatterCubit, MatterState>(
+              builder: (BuildContext context, MatterState matterState) {
+                // The loaded matter list feeds the title-keyed resolution
+                // (D-C3); empty until the matter list loads, so tiles render
+                // without a chip until then (the fakes resolve immediately).
+                // Deliberate degradation: if the matter load ever fails, the
+                // messages list still renders its threads and the reverse
+                // link simply disappears — a nav hint, not a second error
+                // state.
+                final List<Matter> matters = switch (matterState.matters) {
+                  ViewSuccess<List<Matter>>(data: final List<Matter> list) =>
+                    list,
+                  ViewLoading() ||
+                  ViewEmpty() ||
+                  ViewError() ||
+                  ViewOffline() ||
+                  ViewUnauthorized() => const <Matter>[],
+                };
+                return ListView(
+                  padding: const EdgeInsetsDirectional.all(
+                    LegalHubTheme.marginMobile,
                   ),
-                ),
-              ],
+                  children: <Widget>[
+                    _resultsView(context, state, matters, l10n, text, scheme),
+                    const SizedBox(height: LegalHubTheme.spaceLg),
+                    Text(
+                      l10n.messagesLocalOnlyNote,
+                      style: text.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                );
+              },
             );
           },
         ),
@@ -92,6 +144,7 @@ class _ListSurfaceState extends State<_ListSurface> {
   Widget _resultsView(
     BuildContext context,
     MessageState state,
+    List<Matter> matters,
     AppLocalizations l10n,
     TextTheme text,
     ColorScheme scheme,
@@ -135,23 +188,54 @@ class _ListSurfaceState extends State<_ListSurface> {
             : Column(
                 children: <Widget>[
                   for (final MessageThread thread in threads) ...<Widget>[
-                    _MessageThreadTile(thread: thread),
+                    _MessageThreadTile(
+                      thread: thread,
+                      onViewMatter: _matterTap(context, thread, matters),
+                    ),
                     const SizedBox(height: LegalHubTheme.spaceSm),
                   ],
                 ],
               ),
     };
   }
+
+  /// The reverse cross-link target for a row, or null when the row renders
+  /// no affordance: the `matterRef` must resolve to a known synthetic matter
+  /// (D-C3) AND the `canViewMatters` nav hint must be granted (D-C4).
+  VoidCallback? _matterTap(
+    BuildContext context,
+    MessageThread thread,
+    List<Matter> matters,
+  ) {
+    if (!widget.capabilities.canViewMatters) {
+      return null;
+    }
+    final Matter? matter = resolveMatterByTitle(matters, thread.matterRef);
+    if (matter == null) {
+      return null;
+    }
+    return () => context.go(AppRoutes.matterDetail(matter.id));
+  }
 }
 
-/// A read-only metadata row. Carries **no onTap, no InkWell, no chevron,
-/// and no trailing action** — there is no thread-detail route and rows must
-/// not read as tappable (D-MSG1/D-MSG3 body-less line). The AC-2 pin asserts
-/// these absences structurally.
+/// A read-only metadata row. Carries **no onTap on the row body, no chevron,
+/// and no trailing action other than the Phase 12 "View matter" chip** — the
+/// thread list's body-less line (D-MSG1/D-MSG3) now allows exactly one tap
+/// target per resolved row: the compact `MatterLinkChip`, which is the ONLY
+/// InkWell in the list (D-C2). The AC-2 pin asserts these absences
+/// structurally.
 class _MessageThreadTile extends StatelessWidget {
-  const _MessageThreadTile({required this.thread});
+  const _MessageThreadTile({required this.thread, required this.onViewMatter});
 
   final MessageThread thread;
+
+  /// The reverse cross-link tap, or null when the row renders no chip
+  /// (unresolved `matterRef` or the nav hint not granted, D-C2/D-C4).
+  ///
+  /// Null-checked with a `case` pattern below: public final fields do not
+  /// promote in Dart 3.2, so a plain `!= null` check would not narrow the
+  /// type here.
+  final VoidCallback? onViewMatter;
 
   @override
   Widget build(BuildContext context) {
@@ -208,6 +292,10 @@ class _MessageThreadTile extends StatelessWidget {
             MessageCountChip(
               label: l10n.messagesMessageCount(thread.messageCount),
             ),
+            if (onViewMatter case final VoidCallback tap) ...<Widget>[
+              const SizedBox(width: LegalHubTheme.spaceSm),
+              MatterLinkChip(onTap: tap),
+            ],
           ],
         ),
       ),

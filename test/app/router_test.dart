@@ -584,6 +584,73 @@ void main() {
       expect(find.text('Welcome Back'), findsOneWidget);
       expect(authCubit.state.isAuthenticated, isFalse);
     });
+
+    testWidgets('tapping a resolved thread-row View matter chip opens its '
+        'matter (12.1 AC-2)', (tester) async {
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      router.go(AppRoutes.messages);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // The reverse cross-link (Phase 12 D-C1): the first thread row's
+      // matterRef resolves to 'Demo acquisition review' (thread-1 →
+      // matter-1), so its View matter chip navigates to the existing
+      // read-only details route.
+      await tester.tap(find.text('View matter').first);
+      await tester.pumpAndSettle();
+
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        AppRoutes.matterDetail('matter-1'),
+      );
+      expect(find.text('Matter details'), findsOneWidget);
+    });
+
+    testWidgets(
+      'renders no View matter chip when canViewMatters is not granted (12.1 '
+      'AC-4)',
+      (tester) async {
+        // A capability projection without canViewMatters (D-C4): the
+        // messages list still renders its threads, but every reverse
+        // cross-link chip is hidden — navigation hints only, never
+        // authorization.
+        final GoRouter restrictedRouter = createAppRouter(
+          authCubit,
+          capabilitiesForRole: <UserRole, RoleCapability>{
+            UserRole.client: const RoleCapability(
+              canViewHome: true,
+              canViewSettings: true,
+              canBookConsultation: true,
+              canViewAttorneyDiscovery: true,
+              canViewMatters: false,
+              canViewDocuments: true,
+              canViewMessages: true,
+            ),
+          },
+        );
+        addTearDown(restrictedRouter.dispose);
+        await resetServiceLocator();
+        configureDependencies();
+        addTearDown(() => resetServiceLocator());
+
+        await authCubit.startDemoSession();
+        restrictedRouter.go(AppRoutes.messages);
+        await tester.pumpWidget(
+          harness(
+            child: const SizedBox.shrink(),
+            routerOverride: restrictedRouter,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Demo matter updates'), findsOneWidget);
+        expect(find.byType(MatterLinkChip), findsNothing);
+      },
+    );
   });
 
   group('search route (Phase 11 slice 11.1)', () {

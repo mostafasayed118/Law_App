@@ -176,8 +176,14 @@ GoRouter createAppRouter(
         ),
         GoRoute(
           path: AppRoutes.messages,
-          builder: (BuildContext context, GoRouterState state) =>
-              const MessageListScreen(),
+          builder: (BuildContext context, GoRouterState state) {
+            // UX-only projection of the active membership's role (mirrors
+            // the shell); the reverse cross-link chip is a navigation hint,
+            // never an authorization grant (D-C4).
+            final UserRole role =
+                authCubit.state.session?.primaryRole ?? UserRole.client;
+            return MessageListScreen(capabilities: capabilitiesForRole[role]!);
+          },
         ),
         GoRoute(
           path: AppRoutes.search,
