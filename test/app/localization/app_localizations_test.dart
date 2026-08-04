@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/features/discovery/presentation/discovery_entry_card.dart';
 import 'package:legalhub/features/matters/presentation/matter_entry_card.dart';
+import 'package:legalhub/features/messaging/presentation/message_count_chip.dart';
+import 'package:legalhub/features/messaging/presentation/message_entry_card.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/view_state_view.dart';
 
@@ -407,6 +409,83 @@ void main() {
         expect(en.vaultLocalOnlyNote, isNot(contains('e-signature')));
       },
     );
+
+    test('resolves the messaging keys in every locale (9.2 pin)', () {
+      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+      final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+      final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+      // Thread-list surface (slice 9.1).
+      expect(en.messagesTitle, 'Messages');
+      expect(ar.messagesTitle, 'الرسائل');
+      expect(tr.messagesTitle, 'Mesajlar');
+      expect(en.messagesEmpty, 'No message threads are available.');
+      expect(ar.messagesEmpty, 'لا توجد محادثات متاحة.');
+      expect(tr.messagesEmpty, 'Kullanılabilir mesaj dizisi yok.');
+      expect(en.messagesError, 'Unable to load message threads.');
+      expect(ar.messagesError, 'تعذّر تحميل المحادثات.');
+      expect(tr.messagesError, 'Mesaj dizileri yüklenemedi.');
+      expect(
+        en.messagesLocalOnlyNote,
+        'Demo mode — synthetic thread metadata only. No real messages are listed.',
+      );
+      expect(
+        ar.messagesLocalOnlyNote,
+        'وضع تجريبي — بيانات وصفية اصطناعية للمحادثات فقط. لا يتم عرض رسائل حقيقية.',
+      );
+      expect(
+        tr.messagesLocalOnlyNote,
+        'Demo modu — yalnızca sentetik dizgi meta verileri. Gerçek mesajlar listelenmez.',
+      );
+
+      // Home entry (slice 9.1).
+      expect(en.messagesEntryTitle, 'Messages');
+      expect(ar.messagesEntryTitle, 'الرسائل');
+      expect(tr.messagesEntryTitle, 'Mesajlar');
+      expect(
+        en.messagesEntrySubtitle,
+        'Browse demo message threads — development demo.',
+      );
+      expect(
+        ar.messagesEntrySubtitle,
+        'تصفح محادثات تجريبية — عرض تجريبي للتطوير.',
+      );
+      expect(
+        tr.messagesEntrySubtitle,
+        'Demo mesaj dizilerine göz atın — geliştirme demosu.',
+      );
+
+      // Message-count chip label (slice 9.1) — a count, never content.
+      expect(en.messagesMessageCount(12), '12 messages');
+      expect(ar.messagesMessageCount(12), '12 رسائل');
+      expect(tr.messagesMessageCount(12), '12 mesaj');
+
+      // Real per-locale wording, not silent copies of EN.
+      expect(tr.messagesTitle, isNot(en.messagesTitle));
+      expect(ar.messagesEmpty, isNot(en.messagesEmpty));
+      expect(tr.messagesEntryTitle, isNot(en.messagesEntryTitle));
+      expect(ar.messagesLocalOnlyNote, isNot(en.messagesLocalOnlyNote));
+      expect(ar.messagesMessageCount(12), isNot(en.messagesMessageCount(12)));
+    });
+
+    test('messaging copy is local-only wording, no send/realtime/legal-advice '
+        'claim (AC-5)', () {
+      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+
+      // AC-5 pin (matter_messaging_scope_2026-08-03.md §5 AC-5, risk R1):
+      // the demo/local-only framing is literal copy, and it must not drift
+      // into legal-advice, send, or realtime/delivery-claim territory. The
+      // exact per-locale wording is pinned in the 9.2 resolution test
+      // above; this test only guards the framing rails.
+      expect(en.messagesEntrySubtitle, contains('demo'));
+      expect(en.messagesEntrySubtitle, isNot(contains('legal advice')));
+      expect(en.messagesLocalOnlyNote, isNot(contains('legal advice')));
+      expect(en.messagesEntrySubtitle, isNot(contains('send')));
+      expect(en.messagesLocalOnlyNote, isNot(contains('send')));
+      expect(en.messagesEntrySubtitle, isNot(contains('realtime')));
+      expect(en.messagesLocalOnlyNote, isNot(contains('realtime')));
+      expect(en.messagesLocalOnlyNote, isNot(contains('delivery')));
+    });
   });
 
   group('AppLocalizations widget rendering', () {
@@ -475,6 +554,65 @@ void main() {
         await pumpAt(const Locale('tr'));
         expect(find.text('Davalarım'), findsOneWidget);
         expect(find.text('My matters'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'renders the message entry card in AR and TR, not the EN fallback '
+      '(9.2 pin)',
+      (tester) async {
+        Future<void> pumpAt(Locale locale) async {
+          await tester.pumpWidget(
+            MaterialApp(
+              locale: locale,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(body: MessageEntryCard(onTap: null)),
+            ),
+          );
+          await tester.pumpAndSettle();
+        }
+
+        await pumpAt(const Locale('ar'));
+        expect(find.text('الرسائل'), findsOneWidget);
+        expect(find.text('Messages'), findsNothing);
+
+        await pumpAt(const Locale('tr'));
+        expect(find.text('Mesajlar'), findsOneWidget);
+        expect(find.text('Messages'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'renders the message count chip with the AR and TR label, not the EN '
+      'fallback (9.2 pin)',
+      (tester) async {
+        Future<void> pumpAt(Locale locale, String label) async {
+          await tester.pumpWidget(
+            MaterialApp(
+              locale: locale,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(body: MessageCountChip(label: label)),
+            ),
+          );
+          await tester.pumpAndSettle();
+        }
+
+        final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+        final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+        final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+        await pumpAt(const Locale('ar'), ar.messagesMessageCount(5));
+        expect(find.text('5 رسائل'), findsOneWidget);
+        expect(find.text('5 messages'), findsNothing);
+
+        await pumpAt(const Locale('tr'), tr.messagesMessageCount(5));
+        expect(find.text('5 mesaj'), findsOneWidget);
+        expect(find.text('5 messages'), findsNothing);
+
+        // Sanity: the EN label itself resolves (used by the list tiles).
+        expect(en.messagesMessageCount(5), '5 messages');
       },
     );
   });
