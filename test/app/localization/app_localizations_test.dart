@@ -641,6 +641,23 @@ void main() {
       expect(en.searchLocalOnlyNote, isNot(contains('realtime')));
       expect(en.searchLocalOnlyNote, isNot(contains('delivery')));
     });
+
+    test('resolves the viewMatter key in every locale (12.2 pin)', () {
+      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+      final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+      final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+      // Reverse cross-link affordance copy (slices 12.0/12.1, D-C2): the
+      // compact "View matter" chip label on resolved vault and messages
+      // rows. Shipped with 12.0 (16e9b67), consumed by 12.1 (69622ce).
+      expect(en.viewMatter, 'View matter');
+      expect(ar.viewMatter, 'عرض القضية');
+      expect(tr.viewMatter, 'Davayı görüntüle');
+
+      // Real per-locale wording, not silent copies of EN.
+      expect(tr.viewMatter, isNot(en.viewMatter));
+      expect(ar.viewMatter, isNot(en.viewMatter));
+    });
   });
 
   group('AppLocalizations widget rendering', () {
