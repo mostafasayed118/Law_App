@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/features/discovery/presentation/discovery_entry_card.dart';
+import 'package:legalhub/features/matters/presentation/matter_documents_section.dart';
 import 'package:legalhub/features/matters/presentation/matter_entry_card.dart';
+import 'package:legalhub/features/matters/presentation/matter_messages_section.dart';
 import 'package:legalhub/features/messaging/presentation/message_count_chip.dart';
 import 'package:legalhub/features/messaging/presentation/message_entry_card.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
@@ -486,6 +489,80 @@ void main() {
       expect(en.messagesLocalOnlyNote, isNot(contains('realtime')));
       expect(en.messagesLocalOnlyNote, isNot(contains('delivery')));
     });
+
+    test('resolves the workspace keys in every locale (10.2 pin)', () {
+      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+      final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+      final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+      // Workspace section titles + per-matter empty copy (slice 10.1).
+      expect(en.matterWorkspaceDocumentsTitle, 'Documents');
+      expect(ar.matterWorkspaceDocumentsTitle, 'المستندات');
+      expect(tr.matterWorkspaceDocumentsTitle, 'Belgeler');
+      expect(en.matterWorkspaceMessagesTitle, 'Messages');
+      expect(ar.matterWorkspaceMessagesTitle, 'الرسائل');
+      expect(tr.matterWorkspaceMessagesTitle, 'Mesajlar');
+      expect(
+        en.matterWorkspaceDocumentsEmpty,
+        'No documents are available for this matter.',
+      );
+      expect(
+        ar.matterWorkspaceDocumentsEmpty,
+        'لا توجد مستندات متاحة لهذه القضية.',
+      );
+      expect(
+        tr.matterWorkspaceDocumentsEmpty,
+        'Bu dava için kullanılabilir belge yok.',
+      );
+      expect(
+        en.matterWorkspaceMessagesEmpty,
+        'No message threads are available for this matter.',
+      );
+      expect(
+        ar.matterWorkspaceMessagesEmpty,
+        'لا توجد محادثات متاحة لهذه القضية.',
+      );
+      expect(
+        tr.matterWorkspaceMessagesEmpty,
+        'Bu dava için kullanılabilir mesaj dizisi yok.',
+      );
+
+      // Real per-locale wording, not silent copies of EN.
+      expect(
+        tr.matterWorkspaceDocumentsEmpty,
+        isNot(en.matterWorkspaceDocumentsEmpty),
+      );
+      expect(
+        ar.matterWorkspaceMessagesEmpty,
+        isNot(en.matterWorkspaceMessagesEmpty),
+      );
+      expect(
+        ar.matterWorkspaceDocumentsTitle,
+        isNot(en.matterWorkspaceDocumentsTitle),
+      );
+      expect(
+        tr.matterWorkspaceMessagesTitle,
+        isNot(en.matterWorkspaceMessagesTitle),
+      );
+    });
+
+    test('workspace copy is local-only wording, no legal-advice/realtime/send '
+        'claim (AC-5)', () {
+      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+
+      // AC-5 pin (matter_workspace_scope_2026-08-04.md §5 AC-5, risk R1):
+      // the per-matter copy is empty-state wording over the synthetic
+      // lists, and it must not drift into legal-advice, e-signature,
+      // send, or realtime/delivery-claim territory. The exact per-locale
+      // wording is pinned in the 10.2 resolution test above; this test
+      // only guards the framing rails.
+      expect(en.matterWorkspaceDocumentsEmpty, isNot(contains('legal advice')));
+      expect(en.matterWorkspaceDocumentsEmpty, isNot(contains('e-signature')));
+      expect(en.matterWorkspaceMessagesEmpty, isNot(contains('legal advice')));
+      expect(en.matterWorkspaceMessagesEmpty, isNot(contains('send')));
+      expect(en.matterWorkspaceMessagesEmpty, isNot(contains('realtime')));
+      expect(en.matterWorkspaceMessagesEmpty, isNot(contains('delivery')));
+    });
   });
 
   group('AppLocalizations widget rendering', () {
@@ -613,6 +690,91 @@ void main() {
 
         // Sanity: the EN label itself resolves (used by the list tiles).
         expect(en.messagesMessageCount(5), '5 messages');
+      },
+    );
+
+    testWidgets(
+      'renders the matter documents section empty copy in AR and TR, not '
+      'the EN fallback (10.2 pin)',
+      (tester) async {
+        configureDependencies();
+        addTearDown(resetServiceLocator);
+
+        Future<void> pumpAt(Locale locale) async {
+          await tester.pumpWidget(
+            MaterialApp(
+              locale: locale,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                // An unmatched matterRef filters the synthetic list to the
+                // per-matter empty state (D-W2: every known matter owns at
+                // least one document, so only an unknown ref can empty it).
+                body: const MatterDocumentsSection(matterRef: 'no-such-matter'),
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+        }
+
+        await pumpAt(const Locale('ar'));
+        expect(find.text('لا توجد مستندات متاحة لهذه القضية.'), findsOneWidget);
+        expect(
+          find.text('No documents are available for this matter.'),
+          findsNothing,
+        );
+
+        await pumpAt(const Locale('tr'));
+        expect(
+          find.text('Bu dava için kullanılabilir belge yok.'),
+          findsOneWidget,
+        );
+        expect(
+          find.text('No documents are available for this matter.'),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets(
+      'renders the matter messages section empty copy in AR and TR, not '
+      'the EN fallback (10.2 pin)',
+      (tester) async {
+        configureDependencies();
+        addTearDown(resetServiceLocator);
+
+        Future<void> pumpAt(Locale locale) async {
+          await tester.pumpWidget(
+            MaterialApp(
+              locale: locale,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                // An unmatched matterRef filters the synthetic list to the
+                // per-matter empty state.
+                body: const MatterMessagesSection(matterRef: 'no-such-matter'),
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+        }
+
+        await pumpAt(const Locale('ar'));
+        expect(find.text('لا توجد محادثات متاحة لهذه القضية.'), findsOneWidget);
+        expect(
+          find.text('No message threads are available for this matter.'),
+          findsNothing,
+        );
+
+        await pumpAt(const Locale('tr'));
+        expect(
+          find.text('Bu dava için kullanılabilir mesaj dizisi yok.'),
+          findsOneWidget,
+        );
+        expect(
+          find.text('No message threads are available for this matter.'),
+          findsNothing,
+        );
       },
     );
   });
