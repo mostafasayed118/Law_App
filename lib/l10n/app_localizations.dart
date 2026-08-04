@@ -1558,6 +1558,36 @@ abstract class AppLocalizations {
   /// **'{count} messages'**
   String messagesMessageCount(Object count);
 
+  /// No description provided for @searchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get searchTitle;
+
+  /// No description provided for @searchNoQuery.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a search term to find demo matters, documents, messages, or attorneys.'**
+  String get searchNoQuery;
+
+  /// No description provided for @searchEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No results match your search.'**
+  String get searchEmpty;
+
+  /// No description provided for @searchError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to run the search.'**
+  String get searchError;
+
+  /// No description provided for @searchLocalOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo mode — results come from synthetic lists only. No real data is searched.'**
+  String get searchLocalOnlyNote;
+
   /// No description provided for @matterWorkspaceDocumentsTitle.
   ///
   /// In en, this message translates to:

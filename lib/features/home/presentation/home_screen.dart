@@ -114,6 +114,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     controller: _searchController,
                     hint: l10n.searchPlaceholder,
                     prefixIcon: Icons.search,
+                    textInputAction: TextInputAction.search,
+                    // Phase 11 wiring (D-S4): submitting the field opens the
+                    // unified search surface; a blank submission stays put.
+                    onSubmitted: (String value) {
+                      final String query = value.trim();
+                      if (query.isEmpty) {
+                        return;
+                      }
+                      context.go(AppRoutes.searchQuery(query));
+                    },
                   ),
                   if (capabilities.canBookConsultation) ...[
                     const SizedBox(height: LegalHubTheme.spaceLg),

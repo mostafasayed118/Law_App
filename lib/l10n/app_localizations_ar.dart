@@ -786,6 +786,23 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get searchTitle => 'بحث';
+
+  @override
+  String get searchNoQuery =>
+      'اكتب كلمة بحث للعثور على القضايا أو المستندات أو الرسائل أو المحامين التجريبية.';
+
+  @override
+  String get searchEmpty => 'لا توجد نتائج مطابقة لبحثك.';
+
+  @override
+  String get searchError => 'تعذّر تشغيل البحث.';
+
+  @override
+  String get searchLocalOnlyNote =>
+      'وضع تجريبي — النتائج من قوائم اصطناعية فقط. لا يتم البحث في أي بيانات حقيقية.';
+
+  @override
   String get matterWorkspaceDocumentsTitle => 'المستندات';
 
   @override

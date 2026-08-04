@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/features/discovery/presentation/discovery_entry_card.dart';
 import 'package:legalhub/features/matters/presentation/matter_documents_section.dart';
@@ -8,6 +9,7 @@ import 'package:legalhub/features/matters/presentation/matter_entry_card.dart';
 import 'package:legalhub/features/matters/presentation/matter_messages_section.dart';
 import 'package:legalhub/features/messaging/presentation/message_count_chip.dart';
 import 'package:legalhub/features/messaging/presentation/message_entry_card.dart';
+import 'package:legalhub/features/search/presentation/search_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/view_state_view.dart';
 
@@ -563,6 +565,82 @@ void main() {
       expect(en.matterWorkspaceMessagesEmpty, isNot(contains('realtime')));
       expect(en.matterWorkspaceMessagesEmpty, isNot(contains('delivery')));
     });
+
+    test('resolves the search keys in every locale (11.2 pin)', () {
+      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+      final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+      final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+      // Search surface (slice 11.1). The placeholder predates this phase and
+      // is reused verbatim (D-S6).
+      expect(en.searchPlaceholder, 'Find a lawyer or legal topic...');
+      expect(ar.searchPlaceholder, 'ابحث عن محامٍ أو موضوع قانوني...');
+      expect(tr.searchPlaceholder, 'Avukat veya hukuki konu bulun...');
+      expect(en.searchTitle, 'Search');
+      expect(ar.searchTitle, 'بحث');
+      expect(tr.searchTitle, 'Ara');
+      expect(
+        en.searchNoQuery,
+        'Type a search term to find demo matters, documents, messages, or '
+        'attorneys.',
+      );
+      expect(
+        ar.searchNoQuery,
+        'اكتب كلمة بحث للعثور على القضايا أو المستندات أو الرسائل أو '
+        'المحامين التجريبية.',
+      );
+      expect(
+        tr.searchNoQuery,
+        'Demo konular, belgeler, mesajlar veya avukatlar bulmak için bir '
+        'arama terimi yazın.',
+      );
+      expect(en.searchEmpty, 'No results match your search.');
+      expect(ar.searchEmpty, 'لا توجد نتائج مطابقة لبحثك.');
+      expect(tr.searchEmpty, 'Aramanızla eşleşen sonuç yok.');
+      expect(en.searchError, 'Unable to run the search.');
+      expect(ar.searchError, 'تعذّر تشغيل البحث.');
+      expect(tr.searchError, 'Arama çalıştırılamadı.');
+      expect(
+        en.searchLocalOnlyNote,
+        'Demo mode — results come from synthetic lists only. No real data is '
+        'searched.',
+      );
+      expect(
+        ar.searchLocalOnlyNote,
+        'وضع تجريبي — النتائج من قوائم اصطناعية فقط. لا يتم البحث في أي '
+        'بيانات حقيقية.',
+      );
+      expect(
+        tr.searchLocalOnlyNote,
+        'Demo modu — sonuçlar yalnızca sentetik listelerden gelir. Gerçek '
+        'veri aranmaz.',
+      );
+
+      // Real per-locale wording, not silent copies of EN.
+      expect(tr.searchTitle, isNot(en.searchTitle));
+      expect(ar.searchEmpty, isNot(en.searchEmpty));
+      expect(tr.searchError, isNot(en.searchError));
+      expect(ar.searchLocalOnlyNote, isNot(en.searchLocalOnlyNote));
+      expect(tr.searchNoQuery, isNot(en.searchNoQuery));
+    });
+
+    test('search copy is local-only wording, no legal-advice/send/realtime '
+        'claim (AC-5)', () {
+      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+
+      // AC-5 pin (unified_search_scope_2026-08-04.md §5 AC-5, risk R1):
+      // the demo/local-only framing is literal copy, and it must not drift
+      // into legal-advice, send, or realtime/delivery-claim territory. The
+      // exact per-locale wording is pinned in the 11.2 resolution test
+      // above; this test only guards the framing rails.
+      expect(en.searchNoQuery, contains('demo'));
+      expect(en.searchLocalOnlyNote, contains('synthetic'));
+      expect(en.searchNoQuery, isNot(contains('legal advice')));
+      expect(en.searchLocalOnlyNote, isNot(contains('legal advice')));
+      expect(en.searchLocalOnlyNote, isNot(contains('send')));
+      expect(en.searchLocalOnlyNote, isNot(contains('realtime')));
+      expect(en.searchLocalOnlyNote, isNot(contains('delivery')));
+    });
   });
 
   group('AppLocalizations widget rendering', () {
@@ -775,6 +853,39 @@ void main() {
           find.text('No message threads are available for this matter.'),
           findsNothing,
         );
+      },
+    );
+
+    testWidgets(
+      'renders the search empty copy in AR and TR, not the EN fallback '
+      '(11.2 pin)',
+      (tester) async {
+        configureDependencies();
+        addTearDown(resetServiceLocator);
+
+        Future<void> pumpAt(Locale locale) async {
+          await tester.pumpWidget(
+            MaterialApp(
+              locale: locale,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: SearchScreen(
+                capabilities: roleCapabilities[UserRole.client]!,
+                // A query with no matches lands on the localized empty state.
+                initialQuery: 'zzz',
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+        }
+
+        await pumpAt(const Locale('ar'));
+        expect(find.text('لا توجد نتائج مطابقة لبحثك.'), findsOneWidget);
+        expect(find.text('No results match your search.'), findsNothing);
+
+        await pumpAt(const Locale('tr'));
+        expect(find.text('Aramanızla eşleşen sonuç yok.'), findsOneWidget);
+        expect(find.text('No results match your search.'), findsNothing);
       },
     );
   });

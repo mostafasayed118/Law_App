@@ -25,6 +25,8 @@ class LegalHubTextField extends StatelessWidget {
     this.validator,
     this.textAlign,
     this.style,
+    this.onChanged,
+    this.onSubmitted,
     super.key,
   });
 
@@ -45,6 +47,12 @@ class LegalHubTextField extends StatelessWidget {
   final TextAlign? textAlign;
   final TextStyle? style;
 
+  /// Optional live-edit callback (e.g. client-side filtering).
+  final ValueChanged<String>? onChanged;
+
+  /// Optional submit callback (e.g. navigation on the keyboard action).
+  final ValueChanged<String>? onSubmitted;
+
   @override
   Widget build(BuildContext context) {
     final field = TextFormField(
@@ -57,6 +65,8 @@ class LegalHubTextField extends StatelessWidget {
       validator: validator,
       textAlign: textAlign ?? TextAlign.start,
       style: style,
+      onChanged: onChanged,
+      onFieldSubmitted: onSubmitted,
       decoration: InputDecoration(
         hintText: hint,
         prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 20) : null,

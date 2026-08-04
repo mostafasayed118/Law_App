@@ -791,6 +791,23 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get searchTitle => 'Search';
+
+  @override
+  String get searchNoQuery =>
+      'Type a search term to find demo matters, documents, messages, or attorneys.';
+
+  @override
+  String get searchEmpty => 'No results match your search.';
+
+  @override
+  String get searchError => 'Unable to run the search.';
+
+  @override
+  String get searchLocalOnlyNote =>
+      'Demo mode — results come from synthetic lists only. No real data is searched.';
+
+  @override
   String get matterWorkspaceDocumentsTitle => 'Documents';
 
   @override

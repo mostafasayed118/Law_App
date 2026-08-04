@@ -519,6 +519,165 @@ void main() {
     });
   });
 
+  group('search route (Phase 11 slice 11.1)', () {
+    testWidgets('renders the search surface seeded from the q param', (
+      tester,
+    ) async {
+      // SearchScreen resolves the four gateways from the locator (the dev
+      // fakes in env-less runs).
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      router.go(AppRoutes.searchQuery('Demo'));
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // The /search route renders the grouped results, not home; the shell
+      // keeps home highlighted (not a settings descendant).
+      expect(find.text('Search'), findsOneWidget);
+      expect(find.text('Demo acquisition review'), findsOneWidget);
+      expect(find.text('Demo engagement letter'), findsOneWidget);
+      expect(selectedIndex(tester), 0);
+    });
+
+    testWidgets('tapping a matter row opens its details (AC-3)', (
+      tester,
+    ) async {
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      router.go(AppRoutes.searchQuery('Demo'));
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // A matter result row navigates to the existing read-only details
+      // route (D-S3).
+      await tester.tap(find.text('Demo acquisition review'));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        AppRoutes.matterDetail('matter-1'),
+      );
+      expect(find.text('Matter details'), findsOneWidget);
+    });
+
+    testWidgets('tapping a document row opens the vault (AC-3)', (
+      tester,
+    ) async {
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      router.go(AppRoutes.searchQuery('engagement'));
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // A document result row navigates to the existing read-only vault
+      // route (D-S3) — no document detail route exists.
+      await tester.tap(find.text('Demo engagement letter'));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        AppRoutes.vault,
+      );
+    });
+
+    testWidgets('tapping a thread row opens the messages route (AC-3)', (
+      tester,
+    ) async {
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      router.go(AppRoutes.searchQuery('updates'));
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // A thread result row navigates to the existing read-only messages
+      // route (D-S3) — no thread-open affordance exists anywhere.
+      await tester.tap(find.text('Demo matter updates'));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        AppRoutes.messages,
+      );
+    });
+
+    testWidgets('tapping an attorney row opens its profile (AC-3)', (
+      tester,
+    ) async {
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      router.go(AppRoutes.searchQuery('Layla'));
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // An attorney result row navigates to the existing read-only profile
+      // route (D-S3).
+      await tester.tap(find.text('Layla Mansour'));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        AppRoutes.attorneyProfile('atty-1'),
+      );
+      expect(find.text('Attorney profile'), findsOneWidget);
+    });
+
+    testWidgets('home search field submit navigates to /search?q=… (AC-5)', (
+      tester,
+    ) async {
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // The inert home field is now wired: submit opens the unified search
+      // surface with the query (D-S4).
+      await tester.enterText(find.byType(TextField), 'Demo');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pumpAndSettle();
+
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        AppRoutes.search,
+      );
+      expect(
+        router.routerDelegate.currentConfiguration.uri.queryParameters['q'],
+        'Demo',
+      );
+      // The search surface seeds and renders the grouped results.
+      expect(find.text('Search'), findsOneWidget);
+      expect(find.text('Demo acquisition review'), findsOneWidget);
+    });
+
+    testWidgets('blocks unauthenticated access to the search route', (
+      tester,
+    ) async {
+      router.go(AppRoutes.search);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Welcome Back'), findsOneWidget);
+      expect(authCubit.state.isAuthenticated, isFalse);
+    });
+  });
+
   group('matter details route (Phase 7 slice 7.2)', () {
     testWidgets('renders the details for an authenticated demo session', (
       tester,

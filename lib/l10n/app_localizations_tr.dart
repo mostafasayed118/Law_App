@@ -792,6 +792,23 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get searchTitle => 'Ara';
+
+  @override
+  String get searchNoQuery =>
+      'Demo konular, belgeler, mesajlar veya avukatlar bulmak için bir arama terimi yazın.';
+
+  @override
+  String get searchEmpty => 'Aramanızla eşleşen sonuç yok.';
+
+  @override
+  String get searchError => 'Arama çalıştırılamadı.';
+
+  @override
+  String get searchLocalOnlyNote =>
+      'Demo modu — sonuçlar yalnızca sentetik listelerden gelir. Gerçek veri aranmaz.';
+
+  @override
   String get matterWorkspaceDocumentsTitle => 'Belgeler';
 
   @override

@@ -25,6 +25,7 @@ import '../features/onboarding/presentation/onboarding_success_screen.dart';
 import '../features/orgs/presentation/accept_invitation_screen.dart';
 import '../features/orgs/presentation/organization_hub_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
+import '../features/search/presentation/search_screen.dart';
 import '../l10n/app_localizations.dart';
 
 class AppRoutes {
@@ -50,12 +51,18 @@ class AppRoutes {
   static const String matterDetails = '/matters/:matterId';
   static const String vault = '/vault';
   static const String messages = '/messages';
+  static const String search = '/search';
 
   /// The profile route for one attorney (path-param substitution).
   static String attorneyProfile(String attorneyId) => '/discovery/$attorneyId';
 
   /// The details route for one matter (path-param substitution).
   static String matterDetail(String matterId) => '/matters/$matterId';
+
+  /// The search route with its `q` query param (URL-encoded; `?q=` never
+  /// carries real data — local-only demo queries, D-S5).
+  static String searchQuery(String query) =>
+      '$search?q=${Uri.encodeQueryComponent(query)}';
 }
 
 /// Routes are navigation UX only. They do not authorize access to any future
@@ -165,6 +172,20 @@ GoRouter createAppRouter(
           path: AppRoutes.messages,
           builder: (BuildContext context, GoRouterState state) =>
               const MessageListScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.search,
+          builder: (BuildContext context, GoRouterState state) {
+            // UX-only projection of the active membership's role (mirrors
+            // the shell); group visibility is a navigation hint, never an
+            // authorization grant (D-S2/D-W5).
+            final UserRole role =
+                authCubit.state.session?.primaryRole ?? UserRole.client;
+            return SearchScreen(
+              initialQuery: state.uri.queryParameters['q'] ?? '',
+              capabilities: capabilitiesForRole[role]!,
+            );
+          },
         ),
         GoRoute(
           path: AppRoutes.settings,
