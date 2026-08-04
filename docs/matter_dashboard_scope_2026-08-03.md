@@ -43,7 +43,11 @@
 
 - No matter messaging, no document upload/preview, no availability, no
   billing, no realtime from any matter surface — those are separate MVP rows
-  (spec §6 rows 154/155) with their own §14 gates.
+  (spec §6 rows 154/155) with their own §14 gates. The
+  messaging/documents-from-matter line is no longer a non-goal: the
+  per-matter read-first views shipped as Phase 10 (client-side over the
+  synthetic lists, per `docs/matter_workspace_scope_2026-08-04.md`);
+  upload/preview/availability/billing/realtime stay deferred.
 - The demo session carries one active membership (`org-demo`); the switcher
   renders that membership and pins the *shape* (multi-org is a D-08
   contract, not a demo fixture).

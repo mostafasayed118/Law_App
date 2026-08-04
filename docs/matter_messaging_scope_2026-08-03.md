@@ -53,7 +53,8 @@
 - The messaging surface is a standalone read-first list (like the matter
   dashboard and vault); it does not hook into the matter details screen in
   this phase (a per-matter thread cross-link is future work, not scoped
-  here).
+  here; it shipped as Phase 10 — the matter details screen renders the
+  matter's threads inline per `docs/matter_workspace_scope_2026-08-04.md`).
 - The demo session renders the fixed synthetic thread list; there is no
   free-text search in this phase (client-side list only).
 

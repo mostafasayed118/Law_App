@@ -45,7 +45,9 @@
   (spec §6 rows 154/155) with their own §14 gates.
 - The vault is a standalone read-first surface (like the matter dashboard);
   it does not hook into the matter details screen in this phase (a
-  per-matter vault cross-link is future work, not scoped here).
+  per-matter vault cross-link is future work, not scoped here; it shipped
+  as Phase 10 — the matter details screen renders the matter's documents
+  inline per `docs/matter_workspace_scope_2026-08-04.md`).
 - The demo session renders the fixed synthetic metadata list; there is no
   free-text search in this phase (client-side list only, mirroring the
   matter dashboard's status-filter posture).
