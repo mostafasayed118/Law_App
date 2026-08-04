@@ -352,7 +352,7 @@ void main() {
       expect(gateway.currentSession, isNull);
     });
 
-    test('maps rateLimited to providerUnavailable', () async {
+    test('maps rateLimited to rateLimited', () async {
       final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null);
       api.signInError = const SupabaseAuthException(
         kind: SupabaseAuthFailureKind.rateLimited,
@@ -365,7 +365,7 @@ void main() {
         password: 'any-pass',
       );
 
-      expect(outcome.failureOrNull?.kind, AuthFailureKind.providerUnavailable);
+      expect(outcome.failureOrNull?.kind, AuthFailureKind.rateLimited);
     });
 
     test('resolves an expired sign-in snapshot to sessionExpired', () async {

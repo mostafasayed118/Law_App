@@ -135,6 +135,9 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
       return SupabaseAuthFailureKind.rateLimited;
     }
     final String message = e.message.toLowerCase();
+    if (message.contains('email not confirmed')) {
+      return SupabaseAuthFailureKind.emailNotConfirmed;
+    }
     if (message.contains('invalid login credentials') ||
         message.contains('token has expired') ||
         message.contains('token is invalid') ||

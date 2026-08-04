@@ -24,6 +24,10 @@ class SupabaseSignUpGateway implements SignUpGateway {
         email: request.email,
         password: request.password,
         metadata: <String, String>{
+          // display_name is what the applied handle_new_user trigger reads
+          // (02_rls_functions.sql:77) so the profile row carries the real
+          // name; full_name/phone stay for client-side display resolution.
+          'display_name': request.name,
           'full_name': request.name,
           'phone': request.phone,
         },
@@ -51,6 +55,7 @@ class SupabaseSignUpGateway implements SignUpGateway {
         'Too many attempts. Please wait and try again.',
       SupabaseAuthFailureKind.userDisabled => 'This account has been disabled.',
       SupabaseAuthFailureKind.invalidCredentials ||
+      SupabaseAuthFailureKind.emailNotConfirmed ||
       SupabaseAuthFailureKind.unknown =>
         'Sign-up failed. Please check your details and try again.',
     };

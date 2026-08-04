@@ -94,6 +94,7 @@ void main() {
         expect(api.lastEmail, 'amira@example.com');
         expect(api.lastPassword, 'secret-pass');
         expect(api.lastMetadata, <String, String>{
+          'display_name': 'Amira Hassan',
           'full_name': 'Amira Hassan',
           'phone': '+201000000000',
         });

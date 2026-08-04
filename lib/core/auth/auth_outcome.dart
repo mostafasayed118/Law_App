@@ -11,6 +11,12 @@ enum AuthFailureKind {
   /// The provided credentials were rejected.
   invalidCredentials,
 
+  /// The account exists but email confirmation is pending.
+  emailNotConfirmed,
+
+  /// The provider rate-limited the operation.
+  rateLimited,
+
   /// The account is disabled.
   userDisabled,
 

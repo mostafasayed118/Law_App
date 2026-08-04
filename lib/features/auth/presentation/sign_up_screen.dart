@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../app/router.dart';
 import '../../../app/service_locator.dart';
+import '../../../core/errors/app_error.dart';
 import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/forms/validators.dart';
@@ -176,7 +177,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         bottom: LegalHubTheme.spaceMd,
                       ),
                       child: ViewStateView<void>(
-                        state: state,
+                        state: _localizeSignUpError(state, l10n),
                         onRetry: () =>
                             context.read<SignUpCubit>().resetToEmpty(),
                       ),
@@ -216,6 +217,35 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ],
       ),
     );
+  }
+
+  /// Re-wraps a sign-up [ViewError] with the localized user message (plan
+  /// §4 l10n: EN/AR/TR + RTL), mirroring the P3.1 branch's code-to-l10n
+  /// mapping. The gateway's typed code is preserved for diagnostics; the
+  /// display copy is always localized.
+  ViewState<void> _localizeSignUpError(
+    ViewState<void> state,
+    AppLocalizations l10n,
+  ) {
+    if (state is ViewError<void>) {
+      final String message = switch (state.error.code) {
+        'emailInUse' => l10n.signUpErrorEmailInUse,
+        'rateLimited' => l10n.signUpErrorRateLimited,
+        'providerUnavailable' => l10n.signUpErrorServiceUnavailable,
+        _ => l10n.signUpErrorGeneric,
+      };
+      return ViewError<void>(
+        AppError(
+          code: state.error.code,
+          userMessage: message,
+          // Preserve the redacted diagnostic context (ADR-0003) and any
+          // technical message so diagnostics stay intact.
+          technicalMessage: state.error.technicalMessage,
+          context: state.error.context,
+        ),
+      );
+    }
+    return state;
   }
 
   void _submit(BuildContext context) {

@@ -95,6 +95,8 @@ void main() {
         AuthFailureKind.signedOut,
         AuthFailureKind.sessionExpired,
         AuthFailureKind.invalidCredentials,
+        AuthFailureKind.emailNotConfirmed,
+        AuthFailureKind.rateLimited,
         AuthFailureKind.userDisabled,
         AuthFailureKind.membershipDenied,
         AuthFailureKind.providerUnavailable,
