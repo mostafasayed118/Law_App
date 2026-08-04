@@ -10,7 +10,7 @@
 - Basis: `docs/legalhub_specification.md` §4 MVP bullet **"Matter-scoped
   messaging"** and §6 remediation row 154 (`message_center,
   matter_discussion`).
-- §12 boundary: `docs/features_roadmap_2026-08-03.md` §12 ("Explicitly
+- §14 boundary: `docs/features_roadmap_2026-08-03.md` §14 ("Explicitly
   deferred") defers **messages** (with matters/documents/storage/realtime/
   audit/billing/AI) until P0 closes + policy tests exist;
   `docs/permission_matrix.md` §4 guards matter/document/message access with
@@ -21,7 +21,7 @@
   (matrix §4). This phase ships a **client-only fake-domain surface that
   carries message-thread metadata only — no message bodies exist anywhere**,
   so the matrix's body-reading row is never exercised; the real messages
-  data path (table + RLS + storage + realtime) stays §12-deferred and
+  data path (table + RLS + storage + realtime) stays §14-deferred and
   untouched.
 - Precedent: Phase 5 (`docs/booking_scope_2026-08-03.md` D-B3 fake-domain),
   Phase 6 (`docs/attorney_discovery_scope_2026-08-03.md` D-A2 fake gateway
@@ -39,7 +39,7 @@
 |---|---|---|
 | D-MSG1 | The messaging surface is **read-only and thread-metadata-only**: threads render as a list of metadata rows (thread title, matter reference, participants, last-activity date, message count). **The `MessageThread` VO has no body field — no message body ever exists** (structural, mirroring D-V1). No thread-open affordance, no preview, no send, no reply, no composer, no attachments, no delivery, no notifications, no realtime | **ratified 2026-08-03** |
 | D-MSG2 | **Fake-domain**: synthetic thread metadata via a `MessageGateway` seam + dev fake (the D-B3 / D-A2 / D-M2 / D-V2 pattern). No backend, no schema/RLS/policy, no matrix addendum (no server change) | **ratified 2026-08-03** |
-| D-MSG3 | **§12 boundary**: this phase is client-only demo surface. The real messages data path (table, RLS, storage, realtime) stays deferred per roadmap §12; nothing here grants or implies server-side message access. The matrix §4 "Read a document/message body" row stays untouched **because no message body ever exists in this phase** — even opening a thread would read as message access, so there is no thread-detail route at all | **ratified 2026-08-03** |
+| D-MSG3 | **§14 boundary**: this phase is client-only demo surface. The real messages data path (table, RLS, storage, realtime) stays deferred per roadmap §14; nothing here grants or implies server-side message access. The matrix §4 "Read a document/message body" row stays untouched **because no message body ever exists in this phase** — even opening a thread would read as message access, so there is no thread-detail route at all | **ratified 2026-08-03** |
 | D-MSG4 | Thread metadata carries **synthetic, non-PII data only**: stable synthetic id, generic demo thread title, matter reference (synthetic matter id/title), participant names (generic demo names), last-activity date, message count. No client names, no message text, no real-looking case references (R1 is the heaviest here — thread titles must never read as real case communications) | **ratified 2026-08-03** |
 | D-MSG5 | Role gating: messaging entry visible to every bootstrap role via `RoleCapability.canViewMessages` (navigation hint only, never authorization — same posture as `canViewDocuments` / `canViewMatters`) | **ratified 2026-08-03** |
 | D-MSG6 | No send/reply/composer affordances and no realtime/delivery/notification copy anywhere (spec §6 row 152 discipline); the local-only demo note marks every thread row as synthetic (R1) | **ratified 2026-08-03** |
@@ -48,7 +48,7 @@
 
 - No message bodies, no thread detail/open route, no send/reply/composer,
   no realtime/delivery/notifications, no attachments — those are separate
-  future work that stays behind the §12 gate (the matrix's body-reading row
+  future work that stays behind the §14 gate (the matrix's body-reading row
   is the most-guarded content line in the contract).
 - The messaging surface is a standalone read-first list (like the matter
   dashboard and vault); it does not hook into the matter details screen in
@@ -90,8 +90,8 @@
 - **R2 — body-less line:** no message text, thread-open, composer, or
   send/reply affordance may ever render (D-MSG1); the matrix §4
   body-reading row is never exercised.
-- **R3 — §12 boundary:** the client-only surface must not imply server
-  message access or delivery; the deferral text in roadmap §12 is
+- **R3 — §14 boundary:** the client-only surface must not imply server
+  message access or delivery; the deferral text in roadmap §14 is
   preserved, and the matrix's "Read a document/message body — deny unless
   separately assigned" invariant is untouched.
 - **R4 — scope creep:** no send/reply/composer, no thread detail route, no

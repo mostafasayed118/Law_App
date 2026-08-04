@@ -9,7 +9,7 @@
 
 - Basis: `docs/legalhub_specification.md` §4 MVP bullet **"Document vault
   (scoped, no e-signature)"** and §6 remediation row 155 (`document_vault`).
-- §12 boundary: `docs/features_roadmap_2026-08-03.md` §12 ("Explicitly
+- §14 boundary: `docs/features_roadmap_2026-08-03.md` §14 ("Explicitly
   deferred") defers **documents** (with matters/messages/storage/realtime/
   audit/billing/AI) until P0 closes + policy tests exist;
   `docs/permission_matrix.md` §4 guards matter/document access with the
@@ -18,7 +18,7 @@
   matter access" invariant. This phase ships a **client-only fake-domain
   surface that carries document metadata only — no bodies exist anywhere**,
   so the matrix's body-reading row is never exercised; the real documents
-  data path (table + RLS + storage + realtime) stays §12-deferred and
+  data path (table + RLS + storage + realtime) stays §14-deferred and
   untouched.
 - Precedent: Phase 5 (`docs/booking_scope_2026-08-03.md` D-B3 fake-domain),
   Phase 6 (`docs/attorney_discovery_scope_2026-08-03.md` D-A2 fake gateway
@@ -33,7 +33,7 @@
 |---|---|---|
 | D-V1 | The vault is **read-first and metadata-only**: documents render as a list of metadata rows (title, document type, created date). **No bodies, no preview, no download, no upload, no e-signature, no storage semantics** — nothing renders document content | **ratified 2026-08-03** |
 | D-V2 | **Fake-domain**: synthetic document metadata via a `DocumentGateway` seam + dev fake (the Phase 5 D-B3 / Phase 6 D-A2 / Phase 7 D-M2 pattern). No backend, no schema/RLS/policy, no matrix addendum (no server change) | **ratified 2026-08-03** |
-| D-V3 | **§12 boundary**: this phase is client-only demo surface. The real documents data path (table, RLS, storage, realtime) stays deferred per roadmap §12; nothing here grants or implies server-side document access. The matrix §4 "Read a document/message body" row stays untouched because no document body ever exists in this phase | **ratified 2026-08-03** |
+| D-V3 | **§14 boundary**: this phase is client-only demo surface. The real documents data path (table, RLS, storage, realtime) stays deferred per roadmap §14; nothing here grants or implies server-side document access. The matrix §4 "Read a document/message body" row stays untouched because no document body ever exists in this phase | **ratified 2026-08-03** |
 | D-V4 | Document metadata carries **synthetic, non-PII data only**: stable synthetic id, generic demo title, document type (contract / brief / evidence / correspondence chip), created date. No client names, no content, no body text, no real-looking case or file references | **ratified 2026-08-03** |
 | D-V5 | Role gating: vault entry visible to every bootstrap role via `RoleCapability.canViewDocuments` (navigation hint only, never authorization — same posture as `canViewMatters` / `canViewAttorneyDiscovery`) | **ratified 2026-08-03** |
 | D-V6 | No e-signature / legal-advice / compliance-claim copy anywhere (spec §6 row 152 discipline); the local-only demo note marks every document row as synthetic (R1) | **ratified 2026-08-03** |
@@ -42,7 +42,7 @@
 
 - No document upload/preview/download, no e-signature, no storage/realtime,
   no matter-scoped messaging from the vault — those are separate MVP rows
-  (spec §6 rows 154/155) with their own §12 gates.
+  (spec §6 rows 154/155) with their own §14 gates.
 - The vault is a standalone read-first surface (like the matter dashboard);
   it does not hook into the matter details screen in this phase (a
   per-matter vault cross-link is future work, not scoped here).
@@ -77,8 +77,8 @@
   real files (local-only note + generic demo wording, D-V4).
 - **R2 — metadata-only line:** no body/preview/download/upload affordance may
   ever render (D-V1); the matrix §4 body-reading row is never exercised.
-- **R3 — §12 boundary:** the client-only surface must not imply server
-  document access; the deferral text in roadmap §12 is preserved, and the
+- **R3 — §14 boundary:** the client-only surface must not imply server
+  document access; the deferral text in roadmap §14 is preserved, and the
   matrix's "Read a document/message body — deny unless separately assigned"
   invariant is untouched.
 - **R4 — scope creep:** no e-signature, storage/realtime, upload, or
