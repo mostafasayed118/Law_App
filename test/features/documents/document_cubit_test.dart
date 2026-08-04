@@ -107,12 +107,14 @@ final List<Document> _documents = <Document>[
   Document(
     id: 'doc-1',
     title: 'Demo engagement letter',
+    matterRef: 'Demo acquisition review',
     type: DocumentType.contract,
     createdAt: DateTime.utc(2026, 7, 10),
   ),
   Document(
     id: 'doc-2',
     title: 'Sample matter brief — demo',
+    matterRef: 'Commercial lease consultation',
     type: DocumentType.brief,
     createdAt: DateTime.utc(2026, 7, 15),
   ),

@@ -8,7 +8,8 @@ import '../domain/document_gateway.dart';
 /// No real backend, no storage, no document bodies, no e-signature (owner
 /// decisions D-V1/D-V2/D-V4): [fetchDocuments] returns the same
 /// deterministic list on every call. Documents carry id / generic demo
-/// title / document type / created date only — **no body, no content, no
+/// title / matter reference (one of the known synthetic matter titles,
+/// D-W2) / document type / created date only — **no body, no content, no
 /// size, no download URL, no client or real-looking file references
 /// (D-V4)**, and titles are static demo copy that must never read as a real
 /// file (R1). The list resolves immediately (no artificial delay) so
@@ -19,30 +20,35 @@ class FakeDocumentGateway implements DocumentGateway {
     Document(
       id: 'doc-1',
       title: 'Demo engagement letter',
+      matterRef: 'Demo acquisition review',
       type: DocumentType.contract,
       createdAt: DateTime.utc(2026, 7, 10),
     ),
     Document(
       id: 'doc-2',
       title: 'Sample matter brief — demo',
+      matterRef: 'Commercial lease consultation',
       type: DocumentType.brief,
       createdAt: DateTime.utc(2026, 7, 15),
     ),
     Document(
       id: 'doc-3',
       title: 'Demo evidence index',
+      matterRef: 'Procedural review matter',
       type: DocumentType.evidence,
       createdAt: DateTime.utc(2026, 7, 19),
     ),
     Document(
       id: 'doc-4',
       title: 'Correspondence log — demo',
+      matterRef: 'Family status consultation',
       type: DocumentType.correspondence,
       createdAt: DateTime.utc(2026, 7, 22),
     ),
     Document(
       id: 'doc-5',
       title: 'Demo settlement draft',
+      matterRef: 'Startup formation advisory',
       type: DocumentType.contract,
       createdAt: DateTime.utc(2026, 7, 26),
     ),
