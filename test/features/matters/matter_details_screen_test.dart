@@ -4,10 +4,15 @@ import 'package:intl/intl.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/features/documents/domain/document.dart';
+import 'package:legalhub/features/documents/domain/document_gateway.dart';
 import 'package:legalhub/features/matters/data/fake_matter_gateway.dart';
 import 'package:legalhub/features/matters/domain/matter.dart';
 import 'package:legalhub/features/matters/domain/matter_gateway.dart';
 import 'package:legalhub/features/matters/presentation/matter_details_screen.dart';
+import 'package:legalhub/features/messaging/domain/message_gateway.dart';
+import 'package:legalhub/features/messaging/domain/message_thread.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
 void main() {
@@ -31,7 +36,10 @@ void main() {
         locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: MatterDetailsScreen(matterId: matterId),
+        home: MatterDetailsScreen(
+          matterId: matterId,
+          capabilities: roleCapabilities[UserRole.client]!,
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -94,6 +102,109 @@ void main() {
       expect(find.textContaining('synthetic matters only'), findsOneWidget);
     });
 
+    testWidgets(
+      'workspace sections render only this matter’s documents and threads '
+      '(Phase 10 AC-1)',
+      (tester) async {
+        await pumpDetails(tester, 'matter-1');
+
+        // Section headers render (D-W1).
+        expect(find.text('Documents'), findsOneWidget);
+        expect(find.text('Messages'), findsOneWidget);
+
+        // matter-1 owns doc-1 + thread-1 only — the per-matter filter is a
+        // client-side view over the fake lists (D-M5/D-W1/D-W2).
+        expect(find.text('Demo engagement letter'), findsOneWidget);
+        expect(find.text('Demo matter updates'), findsOneWidget);
+        expect(find.text('Sample matter brief — demo'), findsNothing);
+        expect(find.text('Consultation follow-up — demo'), findsNothing);
+      },
+    );
+
+    testWidgets('workspace sections stay body-less — no preview, send, or row '
+        'affordance (Phase 10 AC-2)', (tester) async {
+      await pumpDetails(tester, 'matter-1');
+
+      // D-W4 body-less/read-only line: no content affordances anywhere on
+      // the surface, and no row is a tap target (no chevron, no InkWell
+      // inside the details list — contrast the matter list rows).
+      expect(find.byIcon(Icons.preview), findsNothing);
+      expect(find.byIcon(Icons.download), findsNothing);
+      expect(find.byIcon(Icons.send), findsNothing);
+      expect(find.byIcon(Icons.reply), findsNothing);
+      expect(find.byIcon(Icons.chevron_right), findsNothing);
+      expect(
+        find.descendant(
+          of: find.byType(ListView),
+          matching: find.byType(InkWell),
+        ),
+        findsNothing,
+      );
+    });
+
+    testWidgets('an empty per-matter subset renders the localized empty copy '
+        '(Phase 10 AC-3)', (tester) async {
+      // Stub gateways returning empty lists, registered before
+      // configureDependencies so the fake registrations are skipped.
+      await resetServiceLocator();
+      serviceLocator.registerLazySingleton<DocumentGateway>(
+        _EmptyDocumentGateway.new,
+      );
+      serviceLocator.registerLazySingleton<MessageGateway>(
+        _EmptyMessageGateway.new,
+      );
+
+      await pumpDetails(tester, 'matter-1');
+
+      expect(
+        find.text('No documents are available for this matter.'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('No message threads are available for this matter.'),
+        findsOneWidget,
+      );
+      expect(find.text('Demo engagement letter'), findsNothing);
+      expect(find.text('Demo matter updates'), findsNothing);
+    });
+
+    testWidgets(
+      'workspace sections honor the capability flags (Phase 10 AC-4)',
+      (tester) async {
+        configureDependencies();
+        tester.view.physicalSize = const Size(800, 1600);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        await tester.pumpWidget(
+          MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: MatterDetailsScreen(
+              matterId: 'matter-1',
+              capabilities: const RoleCapability(
+                canViewHome: true,
+                canViewSettings: true,
+                canBookConsultation: true,
+                canViewAttorneyDiscovery: true,
+                canViewMatters: true,
+                canViewDocuments: false,
+                canViewMessages: false,
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Both sections are hidden when their capability flags are not
+        // granted (nav hints only, D-W5); the projection still renders.
+        expect(find.text('Documents'), findsNothing);
+        expect(find.text('Messages'), findsNothing);
+        expect(find.text('Demo acquisition review'), findsOneWidget);
+      },
+    );
+
     testWidgets('a load failure renders the error state and retry reloads', (
       tester,
     ) async {
@@ -117,6 +228,22 @@ void main() {
       expect(find.text('Unable to load matters.'), findsNothing);
     });
   });
+}
+
+/// Gateway stub that yields an empty document list (workspace empty pin).
+class _EmptyDocumentGateway implements DocumentGateway {
+  @override
+  Future<Result<List<Document>>> fetchDocuments() async {
+    return Result<List<Document>>.success(const <Document>[]);
+  }
+}
+
+/// Gateway stub that yields an empty thread list (workspace empty pin).
+class _EmptyMessageGateway implements MessageGateway {
+  @override
+  Future<Result<List<MessageThread>>> fetchThreads() async {
+    return Result<List<MessageThread>>.success(const <MessageThread>[]);
+  }
 }
 
 /// Gateway stub that fails once then succeeds (retry round-trip pin).

@@ -1557,6 +1557,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} messages'**
   String messagesMessageCount(Object count);
+
+  /// No description provided for @matterWorkspaceDocumentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents'**
+  String get matterWorkspaceDocumentsTitle;
+
+  /// No description provided for @matterWorkspaceDocumentsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No documents are available for this matter.'**
+  String get matterWorkspaceDocumentsEmpty;
+
+  /// No description provided for @matterWorkspaceMessagesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages'**
+  String get matterWorkspaceMessagesTitle;
+
+  /// No description provided for @matterWorkspaceMessagesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No message threads are available for this matter.'**
+  String get matterWorkspaceMessagesEmpty;
 }
 
 class _AppLocalizationsDelegate

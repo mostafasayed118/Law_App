@@ -255,5 +255,9 @@
   "messagesLocalOnlyNote": "وضع تجريبي — بيانات وصفية اصطناعية للمحادثات فقط. لا يتم عرض رسائل حقيقية.",
   "messagesEntryTitle": "الرسائل",
   "messagesEntrySubtitle": "تصفح محادثات تجريبية — عرض تجريبي للتطوير.",
-  "messagesMessageCount": "{count} رسائل"
+  "messagesMessageCount": "{count} رسائل",
+  "matterWorkspaceDocumentsTitle": "المستندات",
+  "matterWorkspaceDocumentsEmpty": "لا توجد مستندات متاحة لهذه القضية.",
+  "matterWorkspaceMessagesTitle": "الرسائل",
+  "matterWorkspaceMessagesEmpty": "لا توجد محادثات متاحة لهذه القضية."
 }

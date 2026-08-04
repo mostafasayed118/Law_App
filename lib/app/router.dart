@@ -144,10 +144,17 @@ GoRouter createAppRouter(
         ),
         GoRoute(
           path: AppRoutes.matterDetails,
-          builder: (BuildContext context, GoRouterState state) =>
-              MatterDetailsScreen(
-                matterId: state.pathParameters['matterId'] ?? '',
-              ),
+          builder: (BuildContext context, GoRouterState state) {
+            // UX-only projection of the active membership's role (mirrors
+            // the shell); the workspace sections are navigation hints, never
+            // authorization grants (D-W5).
+            final UserRole role =
+                authCubit.state.session?.primaryRole ?? UserRole.client;
+            return MatterDetailsScreen(
+              matterId: state.pathParameters['matterId'] ?? '',
+              capabilities: capabilitiesForRole[role]!,
+            );
+          },
         ),
         GoRoute(
           path: AppRoutes.vault,

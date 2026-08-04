@@ -269,5 +269,9 @@
   "messagesLocalOnlyNote": "Demo mode — synthetic thread metadata only. No real messages are listed.",
   "messagesEntryTitle": "Messages",
   "messagesEntrySubtitle": "Browse demo message threads — development demo.",
-  "messagesMessageCount": "{count} messages"
+  "messagesMessageCount": "{count} messages",
+  "matterWorkspaceDocumentsTitle": "Documents",
+  "matterWorkspaceDocumentsEmpty": "No documents are available for this matter.",
+  "matterWorkspaceMessagesTitle": "Messages",
+  "matterWorkspaceMessagesEmpty": "No message threads are available for this matter."
 }

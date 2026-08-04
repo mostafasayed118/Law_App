@@ -789,4 +789,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String messagesMessageCount(Object count) {
     return '$count messages';
   }
+
+  @override
+  String get matterWorkspaceDocumentsTitle => 'Documents';
+
+  @override
+  String get matterWorkspaceDocumentsEmpty =>
+      'No documents are available for this matter.';
+
+  @override
+  String get matterWorkspaceMessagesTitle => 'Messages';
+
+  @override
+  String get matterWorkspaceMessagesEmpty =>
+      'No message threads are available for this matter.';
 }

@@ -790,4 +790,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String messagesMessageCount(Object count) {
     return '$count mesaj';
   }
+
+  @override
+  String get matterWorkspaceDocumentsTitle => 'Belgeler';
+
+  @override
+  String get matterWorkspaceDocumentsEmpty =>
+      'Bu dava için kullanılabilir belge yok.';
+
+  @override
+  String get matterWorkspaceMessagesTitle => 'Mesajlar';
+
+  @override
+  String get matterWorkspaceMessagesEmpty =>
+      'Bu dava için kullanılabilir mesaj dizisi yok.';
 }

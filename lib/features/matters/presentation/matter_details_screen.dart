@@ -4,13 +4,16 @@ import 'package:intl/intl.dart';
 
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
+import '../../../core/roles/user_role.dart';
 import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/widgets.dart';
 import '../domain/matter.dart';
 import '../domain/matter_gateway.dart';
 import 'matter_cubit.dart';
+import 'matter_documents_section.dart';
 import 'matter_labels.dart';
+import 'matter_messages_section.dart';
 import 'matter_state.dart';
 import 'matter_status_chip.dart';
 
@@ -23,26 +26,39 @@ import 'matter_status_chip.dart';
 /// D-M1): title, status chip, practice area, assigned attorney, created
 /// date, and the local-only demo note (R1). There are **no action buttons**
 /// anywhere on the surface — create/edit/close/upload are outside the
-/// read-first line and stay deferred (§11).
+/// read-first line and stay deferred (§14). Phase 10 adds the per-matter
+/// workspace sections (Documents + Messages, D-W1), each gated by its
+/// capability flag (D-W5).
 class MatterDetailsScreen extends StatelessWidget {
-  const MatterDetailsScreen({required this.matterId, super.key});
+  const MatterDetailsScreen({
+    required this.matterId,
+    required this.capabilities,
+    super.key,
+  });
 
   final String matterId;
+
+  /// UX-only capability projection for the workspace sections (D-W5): the
+  /// Documents section renders only under [RoleCapability.canViewDocuments]
+  /// and the Messages section under [RoleCapability.canViewMessages].
+  /// Navigation hints only — never authorization.
+  final RoleCapability capabilities;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<MatterCubit>(
       create: (BuildContext context) =>
           MatterCubit(serviceLocator<MatterGateway>()),
-      child: _DetailsSurface(matterId: matterId),
+      child: _DetailsSurface(matterId: matterId, capabilities: capabilities),
     );
   }
 }
 
 class _DetailsSurface extends StatefulWidget {
-  const _DetailsSurface({required this.matterId});
+  const _DetailsSurface({required this.matterId, required this.capabilities});
 
   final String matterId;
+  final RoleCapability capabilities;
 
   @override
   State<_DetailsSurface> createState() => _DetailsSurfaceState();
@@ -170,6 +186,24 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
           value: createdFormat.format(matter.createdAt),
         ),
         const SizedBox(height: LegalHubTheme.spaceLg),
+        if (widget.capabilities.canViewDocuments) ...<Widget>[
+          Text(
+            l10n.matterWorkspaceDocumentsTitle,
+            style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: LegalHubTheme.spaceSm),
+          MatterDocumentsSection(matterRef: matter.title),
+          const SizedBox(height: LegalHubTheme.spaceXl),
+        ],
+        if (widget.capabilities.canViewMessages) ...<Widget>[
+          Text(
+            l10n.matterWorkspaceMessagesTitle,
+            style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: LegalHubTheme.spaceSm),
+          MatterMessagesSection(matterRef: matter.title),
+          const SizedBox(height: LegalHubTheme.spaceXl),
+        ],
         Text(
           l10n.matterLocalOnlyNote,
           style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),

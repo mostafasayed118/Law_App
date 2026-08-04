@@ -784,4 +784,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String messagesMessageCount(Object count) {
     return '$count رسائل';
   }
+
+  @override
+  String get matterWorkspaceDocumentsTitle => 'المستندات';
+
+  @override
+  String get matterWorkspaceDocumentsEmpty =>
+      'لا توجد مستندات متاحة لهذه القضية.';
+
+  @override
+  String get matterWorkspaceMessagesTitle => 'الرسائل';
+
+  @override
+  String get matterWorkspaceMessagesEmpty =>
+      'لا توجد محادثات متاحة لهذه القضية.';
 }

@@ -255,5 +255,9 @@
   "messagesLocalOnlyNote": "Demo modu — yalnızca sentetik dizgi meta verileri. Gerçek mesajlar listelenmez.",
   "messagesEntryTitle": "Mesajlar",
   "messagesEntrySubtitle": "Demo mesaj dizilerine göz atın — geliştirme demosu.",
-  "messagesMessageCount": "{count} mesaj"
+  "messagesMessageCount": "{count} mesaj",
+  "matterWorkspaceDocumentsTitle": "Belgeler",
+  "matterWorkspaceDocumentsEmpty": "Bu dava için kullanılabilir belge yok.",
+  "matterWorkspaceMessagesTitle": "Mesajlar",
+  "matterWorkspaceMessagesEmpty": "Bu dava için kullanılabilir mesaj dizisi yok."
 }
