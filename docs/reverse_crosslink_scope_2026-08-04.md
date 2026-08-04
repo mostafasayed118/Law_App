@@ -4,8 +4,8 @@
 > Phase 8/9/10/11 pattern): provenance → decision record → assumptions &
 > non-goals → slices behind the standard slice gate → acceptance criteria →
 > risks → roadmap & ledger hooks. **Status: RATIFIED (2026-08-05) — D-C1…D-C6 ratified + the roadmap
-> Phase 12 row added (slice 12.0 shipped `16e9b67` 2026-08-05; slices
-> 12.1–12.2 pending per §4).**
+> Phase 12 row added (slices 12.0–12.2 all SHIPPED 2026-08-05: 12.0
+> `16e9b67`, 12.1 `69622ce`, 12.2 `cd5c903`).**
 > **Planning owner:** `docs/features_roadmap_2026-08-03.md` — this phase is
 > **Phase 12** of that roadmap, the owning planning document for feature
 > sequencing.

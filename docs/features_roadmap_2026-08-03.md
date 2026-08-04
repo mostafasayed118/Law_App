@@ -79,7 +79,11 @@
 > `viewMatter` EN/AR/TR; suite 701 / README 698; ledger PASS 115; pushed
 > to `origin/main`); slice 12.1 (messages reverse link) SHIPPED 2026-08-05
 > (`69622ce`, suite 705/README 702, committed; push awaits owner approval);
-> slice 12.2 (l10n) pending per the scope note
+> slice 12.2 (l10n) SHIPPED 2026-08-05 (`cd5c903`: the AC-5
+> per-locale resolution pin for `viewMatter` in
+> `app_localizations_test.dart` — exact EN/AR/TR copy +
+> no-silent-EN-copy asserts; suite 706/README 703; committed; push
+> awaits owner approval), closing Phase 12
 > `docs/reverse_crosslink_scope_2026-08-04.md`
 > (D-C1…D-C6 ratified 2026-08-05).
 > Everything in §14 stays deferred until P0 closes.
@@ -500,7 +504,7 @@ deferred list keeps its gate).
 
 ## 12b. Phase 12 — Reverse cross-link (read-first, client-only)
 
-**Status: IN PROGRESS — slice 12.0 SHIPPED 2026-08-05** — `16e9b67` (slice
+**Status: IMPLEMENTED — slices 12.0–12.2 SHIPPED 2026-08-05** — `16e9b67` (slice
 12.0: `MatterTitleResolver` title-keyed client-side resolve (D-M5
 discipline) + `MatterLinkChip` "View matter" affordance on vault document
 rows — the ONLY tap target in the list (D-C2) — gated by the
@@ -531,7 +535,7 @@ relaxation.
 |---|---|---|---|---|
 | 12.0 | Vault reverse link | **SHIPPED 2026-08-05** (`16e9b67`): shared title-keyed resolver + document-row "View matter" chip; D-V1 pin re-scoped (D-C2); router passes capability projection (D-C4) | `features/matters/domain/matter_title_resolver.dart`, `features/matters/presentation/matter_link_chip.dart` (+ `document_list_screen.dart`, `router.dart`, l10n) | router navigation pin (AC-1); re-scoped absence pins (AC-3); capability gating (AC-4) |
 | 12.1 | Messages reverse link | **SHIPPED 2026-08-05** (`69622ce`): thread-row "View matter" chip on `MessageListScreen`; D-MSG3 pin re-scoped (D-C2); router passes capability projection (D-C4) | `message_list_screen.dart`, `router.dart` | messages widget tests + router pin (AC-2); gating (AC-4) |
-| 12.2 | l10n | EN/AR/TR for the affordance copy + any empty/edge copy; local-only framing (D-C6) | 3 `.arb` + generated l10n | TR/AR resolution pins (AC-5) |
+| 12.2 | l10n | **SHIPPED 2026-08-05** (`cd5c903`): the AC-5 per-locale resolution pin — `viewMatter` exact copy EN/AR/TR + no-silent-EN-copy asserts (`viewMatter` itself shipped with 12.0) | `app_localizations_test.dart` (+ README count 702→703) | per-locale resolution pins (AC-5) |
 
 **Exit:** four checks green; suite + README count in lockstep (the ledger
 §2d check); no push without owner approval.
@@ -551,7 +555,7 @@ relaxation.
 | 9 | Phase 9 — matter-scoped messaging (thread-metadata-only, client-only) | MVP spec §4; Phase 8 seams (fake-domain pattern) | no | scope note → decision-record ratification (D-MSG1…D-MSG6) → slices 9.0–9.2 → gate stack → owner push approval | **SHIPPED 2026-08-04** (`b0de147` + `64e6b51` + slice 9.2 l10n pins, suite 649, ledger PASS 115; pushed to origin/main) |
 | 10 | Phase 10 — matter workspace (read-first, client-only) | MVP spec §4; Phase 7/8/9 seams (details screen + fake-domain pattern) | no | scope note → decision-record ratification (D-W1…D-W6) → slices 10.0–10.2 → gate stack → owner push approval | **SHIPPED 2026-08-04** (`90465df` + `31f0624` + slice 10.2 l10n pins, suite 659, ledger PASS 115; pushed to origin/main) |
 | 11 | Phase 11 — unified search (read-first, client-only, aggregating) | MVP spec §4; Phase 6–10 seams (four fake-domain gateway seams + inert home search field) | no | scope note → decision-record ratification (D-S1…D-S6) → slices 11.0–11.2 → gate stack → owner push approval | **SHIPPED 2026-08-04** (`7c8ead8`, slices 11.0–11.2, suite 691, ledger PASS 115; pushed to origin/main) |
-| 12 | Phase 12 — reverse cross-link (client-only) | MVP §4 read-first; Phase 10 `matterRef` seam + Phase 7 details route | no | scope note → decision-record ratification (D-C1…D-C6) → slices 12.0–12.2 → gate stack → owner push approval | **IN PROGRESS — slices 12.0–12.1 SHIPPED 2026-08-05** (`16e9b67` pushed, suite 701/README 698; `69622ce` committed, suite 705/README 702; ledger PASS 115); slice 12.2 pending |
+| 12 | Phase 12 — reverse cross-link (client-only) | MVP §4 read-first; Phase 10 `matterRef` seam + Phase 7 details route | no | scope note → decision-record ratification (D-C1…D-C6) → slices 12.0–12.2 → gate stack → owner push approval | **IMPLEMENTED + SHIPPED 2026-08-05** — 12.0 `16e9b67` (pushed, suite 701/README 698); 12.1 `69622ce` + 12.2 `cd5c903` (committed, suite 706/README 703); ledger PASS 115; push of 12.1/12.2 awaits owner approval |
 | — | §14 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Deferred |
 
 Rules that apply to every phase (definition-of-done from
