@@ -368,6 +368,22 @@ void main() {
       expect(outcome.failureOrNull?.kind, AuthFailureKind.rateLimited);
     });
 
+    test('maps emailNotConfirmed to emailNotConfirmed', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null);
+      api.signInError = const SupabaseAuthException(
+        kind: SupabaseAuthFailureKind.emailNotConfirmed,
+      );
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      final AuthOutcome<Session> outcome = await gateway.signIn(
+        email: 'amira@example.com',
+        password: 'any-pass',
+      );
+
+      expect(outcome.failureOrNull?.kind, AuthFailureKind.emailNotConfirmed);
+    });
+
     test('resolves an expired sign-in snapshot to sessionExpired', () async {
       final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null);
       api.signInResult = SupabaseAuthSnapshot(
