@@ -3,9 +3,10 @@
 > **Record type:** Spec-lite scope note required by the Phase 11 gate (the
 > Phase 8/9/10 pattern): provenance → decision record → assumptions &
 > non-goals → slices behind the standard slice gate → acceptance criteria →
-> risks → roadmap & ledger hooks. **Status: RATIFIED (2026-08-04).**
-> D-S1…D-S6 ratified 2026-08-04 and slices 11.0–11.2 built (suite 691;
-> exit gate + owner push approval pending per `INSTRUCTIONS.md` §2.1).
+> risks → roadmap & ledger hooks. **Status: RATIFIED + SHIPPED (2026-08-04).**
+> D-S1…D-S6 ratified 2026-08-04; slices 11.0–11.2 built and the landing
+> commit `7c8ead8` pushed to `origin/main` on the owner's dated push
+> approval — phase closed 2026-08-04.
 > **Planning owner:** `docs/features_roadmap_2026-08-03.md` — this phase is
 > **Phase 11** of that roadmap, the owning planning document for feature
 > sequencing.
@@ -159,5 +160,6 @@ four checks green (`bash scripts/verify_ledger.sh` + `dart format
 --output=none --set-exit-if-changed .` + `flutter analyze` + `flutter test`)
 → suite/README count in lockstep → owner push approval.~~ **Landing state
 2026-08-04:** D-S1…D-S6 ratified, slices 11.0–11.2 built, `flutter analyze`
-clean + `dart format` clean + **691 tests pass** (README/ledger sync and
-owner push approval still pending — the phase is not yet closed).
+clean + `dart format` clean + **691 tests pass** + ledger PASS 115, README
+synced — the landing commit `7c8ead8` was pushed to `origin/main` on the
+owner's dated push approval. **Phase closed 2026-08-04.**

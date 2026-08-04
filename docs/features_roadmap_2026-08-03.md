@@ -65,13 +65,13 @@
 > `docs/matter_workspace_scope_2026-08-04.md` (D-W1…D-W6 ratified, incl.
 > the per-matter `Document.matterRef` association).
 > Phase 11 (unified search, read-first, client-only, aggregating)
-> **IMPLEMENTED 2026-08-04** (slice 11.0 `SearchResults`/`SearchState`/
-> `SearchCubit` composing the four gateway seams; slice 11.1 `/search?q=…`
-> route + capability-gated grouped surface + home search-field wiring;
-> slice 11.2 l10n pins) — per the scope note
+> **IMPLEMENTED AND SHIPPED 2026-08-04** (`7c8ead8`: slice 11.0
+> `SearchResults`/`SearchState`/`SearchCubit` composing the four gateway
+> seams; slice 11.1 `/search?q=…` route + capability-gated grouped surface
+> + home search-field wiring; slice 11.2 l10n pins) — per the scope note
 > `docs/unified_search_scope_2026-08-04.md` (D-S1…D-S6 ratified, incl. the
 > client-side aggregation over the Phase 6–10 gateway seams; suite 691;
-> push pending owner approval).
+> pushed to `origin/main`).
 > Everything in §14 stays deferred until P0 closes.
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
@@ -452,16 +452,17 @@ keeps its gate).
 
 ## 12a. Phase 11 — Unified search (read-first, client-only, aggregating)
 
-**Status: IMPLEMENTED 2026-08-04** — slice 11.0 (`SearchResults` grouping
-VO + `SearchState` on the shared `ViewState` vocabulary + `SearchCubit`
-composing the four gateway seams in parallel with case-insensitive D-S1
-filtering, AC-1), slice 11.1 (`/search?q=…` route + capability-gated grouped
-surface + home search-field wiring, D-S2/D-S3/D-S4/D-S5, AC-2/AC-3/AC-5),
-slice 11.2 (EN/AR/TR l10n resolution pins + local-only framing rails,
-AC-5). Full gate stack: format CLEAN, analyze clean, **691 tests pass**
-(executed suite count; the ledger/README reconcile the declaration count,
-which catches up when the phase's test files are staged at landing — push
-pending owner approval). Scope note
+**Status: IMPLEMENTED + SHIPPED 2026-08-04** — slice 11.0 (`SearchResults`
+grouping VO + `SearchState` on the shared `ViewState` vocabulary +
+`SearchCubit` composing the four gateway seams in parallel with
+case-insensitive D-S1 filtering, AC-1), slice 11.1 (`/search?q=…` route +
+capability-gated grouped surface + home search-field wiring,
+D-S2/D-S3/D-S4/D-S5, AC-2/AC-3/AC-5), slice 11.2 (EN/AR/TR l10n
+resolution pins + local-only framing rails, AC-5). Full gate stack: format
+CLEAN, analyze clean, **691 tests pass** (executed suite count; the
+ledger/README reconcile the declaration count), ledger PASS 115 — landing
+commit `7c8ead8` pushed to `origin/main` on the owner's dated push approval
+2026-08-04. Scope note
 `docs/unified_search_scope_2026-08-04.md` (D-S1…D-S6 ratified). Spec basis:
 MVP §4 read-first surfaces; the home search field was an inert affordance
 (controller + `searchPlaceholder` key with no submit handler) and the four
@@ -499,7 +500,7 @@ deferred list keeps its gate).
 | 8 | Phase 8 — document vault (read-first, metadata-only, client-only) | MVP spec §4; Phase 7 seams (fake-domain pattern) | no | scope note → decision-record ratification (D-V1…D-V6) → slices 8.0–8.2 → gate stack → owner push approval | **SHIPPED 2026-08-03** (`22d63e5` + `29fd40a` + `430b62b`, suite 626, ledger PASS 115; pushed to origin/main) |
 | 9 | Phase 9 — matter-scoped messaging (thread-metadata-only, client-only) | MVP spec §4; Phase 8 seams (fake-domain pattern) | no | scope note → decision-record ratification (D-MSG1…D-MSG6) → slices 9.0–9.2 → gate stack → owner push approval | **SHIPPED 2026-08-04** (`b0de147` + `64e6b51` + slice 9.2 l10n pins, suite 649, ledger PASS 115; push pending owner approval) |
 | 10 | Phase 10 — matter workspace (read-first, client-only) | MVP spec §4; Phase 7/8/9 seams (details screen + fake-domain pattern) | no | scope note → decision-record ratification (D-W1…D-W6) → slices 10.0–10.2 → gate stack → owner push approval | **SHIPPED 2026-08-04** (`90465df` + `31f0624` + slice 10.2 l10n pins, suite 659, ledger PASS 115; push pending owner approval) |
-| 11 | Phase 11 — unified search (read-first, client-only, aggregating) | MVP spec §4; Phase 6–10 seams (four fake-domain gateway seams + inert home search field) | no | scope note → decision-record ratification (D-S1…D-S6) → slices 11.0–11.2 → gate stack → owner push approval | **IMPLEMENTED 2026-08-04** (slices 11.0–11.2, suite 691; push pending owner approval) |
+| 11 | Phase 11 — unified search (read-first, client-only, aggregating) | MVP spec §4; Phase 6–10 seams (four fake-domain gateway seams + inert home search field) | no | scope note → decision-record ratification (D-S1…D-S6) → slices 11.0–11.2 → gate stack → owner push approval | **SHIPPED 2026-08-04** (`7c8ead8`, slices 11.0–11.2, suite 691, ledger PASS 115; pushed to origin/main) |
 | — | §14 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Deferred |
 
 Rules that apply to every phase (definition-of-done from
