@@ -72,6 +72,14 @@
 > `docs/unified_search_scope_2026-08-04.md` (D-S1…D-S6 ratified, incl. the
 > client-side aggregation over the Phase 6–10 gateway seams; suite 691;
 > pushed to `origin/main`).
+> Phase 12 (reverse cross-link, read-first, client-only) **slice 12.0
+> SHIPPED 2026-08-05** (`16e9b67`: vault rows' "View matter" chip — the
+> only tap target in the list, D-C2 — via the title-keyed client-side
+> resolver, D-C1/D-C3, gated by the `canViewMatters` nav hint, D-C4; l10n
+> `viewMatter` EN/AR/TR; suite 701 / README 698; ledger PASS 115; pushed
+> to `origin/main`); slices 12.1–12.2 (messages reverse link + l10n)
+> pending per the scope note `docs/reverse_crosslink_scope_2026-08-04.md`
+> (D-C1…D-C6 ratified 2026-08-05).
 > Everything in §14 stays deferred until P0 closes.
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
@@ -184,10 +192,12 @@ rehearsed, and applied (`3704a1d`).
   Owner path: `list_organizations_metadata` (still unwired — enrichment-only;
   the client reads `Session.memberships`, and the server re-derives
   membership per D-08 — never trusts a client-selected org id).
-- **2.4 Invitation acceptance (R3)** — `accept_invitation(token)` is already
-  failure-mapped (`invalidInvitation`). Needs the **token-entry UX decision**
-  (paste-screen vs. deep link). Recommendation: paste-screen in Phase 2;
-  deep-link variant moves to Phase 4 with the platform intent-filter work.
+- **2.4 Invitation acceptance (R3)** — **SHIPPED 2026-08-03** as part of
+  `68aafc6` (slices 2.1–2.4): the token-entry **paste screen** decision was
+  taken and built — `accept_invitation_screen.dart` + `/accept-invitation`
+  route + settings entry, wired through `OrganizationGateway.acceptInvitation`
+  (`invalidInvitation` mapped). The deep-link variant remains Phase 4
+  follow-up if approved.
 
 ## 5. Phase 3 — Requires server amendments (spec → rehearsal → apply)
 
@@ -486,6 +496,40 @@ deferred list keeps its gate).
 **Exit:** four checks green; suite + README count in lockstep (the ledger
 §2d check); no push without owner approval.
 
+## 12b. Phase 12 — Reverse cross-link (read-first, client-only)
+
+**Status: IN PROGRESS — slice 12.0 SHIPPED 2026-08-05** — `16e9b67` (slice
+12.0: `MatterTitleResolver` title-keyed client-side resolve (D-M5
+discipline) + `MatterLinkChip` "View matter" affordance on vault document
+rows — the ONLY tap target in the list (D-C2) — gated by the
+`canViewMatters` nav hint (D-C4); the router passes the capability
+projection to the `/vault` builder; the D-V1 pin in
+`document_list_screen_test.dart` re-scoped as a deliberate edit; EN/AR/TR
+`viewMatter` key + regenerated localizations). Full gate stack: format
+CLEAN, analyze clean, **701 tests pass** (README/ledger reconcile 698
+declarations), ledger PASS 115 — landing commit `16e9b67` pushed to
+`origin/main` on the owner's dated push approval 2026-08-05. Scope note
+`docs/reverse_crosslink_scope_2026-08-04.md` (D-C1…D-C6 ratified
+2026-08-05). Spec basis: MVP §4 "Case/matter dashboard & details
+(read-first)"; the Phase 11 deferral's "future phase" is this phase
+(`docs/unified_search_scope_2026-08-04.md` §3/R4).
+
+**Gate (as designed):** scope note approval → decision-record ratification
+(D-C1…D-C6) → slice 12.0 (vault reverse link) → slice 12.1 (messages
+reverse link, D-MSG3 pin re-scope) → slice 12.2 (l10n) → full B2 gate
+stack → owner push approval. Client-only; no server change, no new RPC,
+no matrix addendum (the matrix's body-read row stays untouched), no §14
+relaxation.
+
+| # | Slice | Scope | New files (sketch) | Tests |
+|---|---|---|---|---|
+| 12.0 | Vault reverse link | **SHIPPED 2026-08-05** (`16e9b67`): shared title-keyed resolver + document-row "View matter" chip; D-V1 pin re-scoped (D-C2); router passes capability projection (D-C4) | `features/matters/domain/matter_title_resolver.dart`, `features/matters/presentation/matter_link_chip.dart` (+ `document_list_screen.dart`, `router.dart`, l10n) | router navigation pin (AC-1); re-scoped absence pins (AC-3); capability gating (AC-4) |
+| 12.1 | Messages reverse link | Same resolver + thread-row "View matter" affordance on `MessageListScreen`; D-MSG3 pin re-scoped; router passes capability projection to the messages builder | `features/messaging/presentation/` row-affordance widget | messages widget tests + router pin (AC-2); gating (AC-4) |
+| 12.2 | l10n | EN/AR/TR for the affordance copy + any empty/edge copy; local-only framing (D-C6) | 3 `.arb` + generated l10n | TR/AR resolution pins (AC-5) |
+
+**Exit:** four checks green; suite + README count in lockstep (the ledger
+§2d check); no push without owner approval.
+
 ## 13. Sequencing & governance gate table
 
 | Order | Phase | Depends on | Server changes? | Gate to pass | Status |
@@ -501,6 +545,7 @@ deferred list keeps its gate).
 | 9 | Phase 9 — matter-scoped messaging (thread-metadata-only, client-only) | MVP spec §4; Phase 8 seams (fake-domain pattern) | no | scope note → decision-record ratification (D-MSG1…D-MSG6) → slices 9.0–9.2 → gate stack → owner push approval | **SHIPPED 2026-08-04** (`b0de147` + `64e6b51` + slice 9.2 l10n pins, suite 649, ledger PASS 115; pushed to origin/main) |
 | 10 | Phase 10 — matter workspace (read-first, client-only) | MVP spec §4; Phase 7/8/9 seams (details screen + fake-domain pattern) | no | scope note → decision-record ratification (D-W1…D-W6) → slices 10.0–10.2 → gate stack → owner push approval | **SHIPPED 2026-08-04** (`90465df` + `31f0624` + slice 10.2 l10n pins, suite 659, ledger PASS 115; pushed to origin/main) |
 | 11 | Phase 11 — unified search (read-first, client-only, aggregating) | MVP spec §4; Phase 6–10 seams (four fake-domain gateway seams + inert home search field) | no | scope note → decision-record ratification (D-S1…D-S6) → slices 11.0–11.2 → gate stack → owner push approval | **SHIPPED 2026-08-04** (`7c8ead8`, slices 11.0–11.2, suite 691, ledger PASS 115; pushed to origin/main) |
+| 12 | Phase 12 — reverse cross-link (client-only) | MVP §4 read-first; Phase 10 `matterRef` seam + Phase 7 details route | no | scope note → decision-record ratification (D-C1…D-C6) → slices 12.0–12.2 → gate stack → owner push approval | **IN PROGRESS — slice 12.0 SHIPPED 2026-08-05** (`16e9b67`, suite 701/README 698, ledger PASS 115; pushed to origin/main); slices 12.1–12.2 pending |
 | — | §14 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Deferred |
 
 Rules that apply to every phase (definition-of-done from
@@ -525,6 +570,9 @@ per-matter view shipped as Phase 10 (slices 10.0–10.2,
 synthetic lists — the real matters/documents/messages data paths stay
 deferred here with the rest. The client-only unified-search surface shipped
 as Phase 11 (slices 11.0–11.2) is a client-side aggregation over the same
+synthetic lists — the real matters/documents/messages data paths stay
+deferred here with the rest. The client-only reverse cross-link shipped as
+Phase 12 slice 12.0 (`16e9b67`) is a navigation hint between the same
 synthetic lists — the real matters/documents/messages data paths stay
 deferred here with the rest. The
 matrix requires the `platform_owner_admin` deny-row test and per-row
@@ -554,3 +602,4 @@ server-side enforcement + auditing story is complete.
 - Phase 9 landing: README test-count + implemented-foundation lines in lockstep; `docs/matter_messaging_scope_2026-08-03.md` decision record ratified (D-MSG1…D-MSG6); the §14-deferred sentence gains a cross-ref note that the client-only thread-metadata surface shipped as Phase 9 while the real messages data path stays deferred.
 - Phase 10 landing: README test-count + implemented-foundation lines in lockstep; `docs/matter_workspace_scope_2026-08-04.md` decision record ratified (D-W1…D-W6); the §14-deferred sentence gains a cross-ref note that the client-only per-matter view shipped as Phase 10 while the real data paths stay deferred.
 - Phase 11 landing: README test-count + implemented-foundation lines in lockstep; `docs/unified_search_scope_2026-08-04.md` decision record ratified (D-S1…D-S6); the §14-deferred sentence gains a cross-ref note that the client-only unified-search surface shipped as Phase 11 while the real data paths stay deferred.
+- Phase 12 landing: README test-count + implemented-foundation lines in lockstep; `docs/reverse_crosslink_scope_2026-08-04.md` decision record ratified (D-C1…D-C6); the §14-deferred sentence gains a cross-ref note that the client-only reverse cross-link shipped as Phase 12 slice 12.0 while the real data paths stay deferred.

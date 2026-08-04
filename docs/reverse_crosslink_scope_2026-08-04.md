@@ -3,10 +3,9 @@
 > **Record type:** Spec-lite scope note required by the Phase 12 gate (the
 > Phase 8/9/10/11 pattern): provenance → decision record → assumptions &
 > non-goals → slices behind the standard slice gate → acceptance criteria →
-> risks → roadmap & ledger hooks. **Status: DRAFT (2026-08-04) — prepared
-> for owner ratification of D-C1…D-C6 + the roadmap Phase 12 row. Nothing
-> here is authorized to build until the owner ratifies the decision record
-> and approves the roadmap row per `INSTRUCTIONS.md` §2.1.**
+> risks → roadmap & ledger hooks. **Status: RATIFIED (2026-08-05) — D-C1…D-C6 ratified + the roadmap
+> Phase 12 row added (slice 12.0 shipped `16e9b67` 2026-08-05; slices
+> 12.1–12.2 pending per §4).**
 > **Planning owner:** `docs/features_roadmap_2026-08-03.md` — this phase is
 > **Phase 12** of that roadmap, the owning planning document for feature
 > sequencing.
@@ -71,16 +70,16 @@ the destination route already exists and is read-only.
   adds **no new identity or server surface** — it resolves a title the fakes
   already share and reuses a route that already exists.
 
-## 2. Decision record (drafted for owner ratification)
+## 2. Decision record (ratified 2026-08-05)
 
 | # | Decision | Status |
 |---|---|---|
-| D-C1 | The reverse cross-link is a **client-side navigation hint** from vault document rows and messages thread rows to the existing matter details route `/matters/:matterId`, built on the Phase 10 `matterRef` association. **No new route, no new gateway method, no RPC, no server change** | drafted 2026-08-04 |
-| D-C2 | **The D-V1 / D-MSG3 "rows are not tap targets" pins are deliberately revisited** (the Phase 11 deferral named this phase): a row whose `matterRef` resolves to a known synthetic matter renders a **trailing "View matter" affordance — the only tap target in the list** (a compact chip/link with l10n copy + a distinct icon; **not** `chevron_right`, `download`, `visibility`, or `open_in_new`, and no Preview/Download text, so the Phase 8/9 AC-2 absence lists stay meaningful). A row whose `matterRef` does not resolve renders **no affordance** and stays metadata-only. The pins are **re-scoped, not deleted**: the no-chevron line holds everywhere, and the only `InkWell` in the list lives inside a resolved row's chip | drafted 2026-08-04 |
-| D-C3 | Resolution is **title-keyed and client-side** (D-M5): load the synthetic matter list through `MatterGateway.fetchMatters()` and match `matterRef == matter.title` to obtain the destination `matterId`. No per-id fetch, no filter RPC, and the association stays keyed on the shared synthetic titles (D-W2) — it cannot imply server-side scoping | drafted 2026-08-04 |
-| D-C4 | Capability gating **reuses** `canViewMatters` (the destination is a matter surface; navigation hint only, never authorization — the D-W5 posture). The router passes the role-capability projection to the vault and messages builders (the Phase 11 search-route pattern), and the affordance renders only when the capability is granted | drafted 2026-08-04 |
-| D-C5 | The cross-link is **read-only navigation only**: the destination is the existing read-only matter details surface (title, status, practice area, assigned attorney, created date, capability-gated workspace sections). No document preview/download, no thread-open, no composer, no send/reply — the body-less AC-2 lines of Phases 8/9 hold everywhere except for the added affordance itself | drafted 2026-08-04 |
-| D-C6 | All new strings resolve in EN/AR/TR; the affordance copy stays generic demo wording and the list surfaces keep their local-only notes (R1, D-S5 posture) | drafted 2026-08-04 |
+| D-C1 | The reverse cross-link is a **client-side navigation hint** from vault document rows and messages thread rows to the existing matter details route `/matters/:matterId`, built on the Phase 10 `matterRef` association. **No new route, no new gateway method, no RPC, no server change** | ratified 2026-08-05 |
+| D-C2 | **The D-V1 / D-MSG3 "rows are not tap targets" pins are deliberately revisited** (the Phase 11 deferral named this phase): a row whose `matterRef` resolves to a known synthetic matter renders a **trailing "View matter" affordance — the only tap target in the list** (a compact chip/link with l10n copy + a distinct icon; **not** `chevron_right`, `download`, `visibility`, or `open_in_new`, and no Preview/Download text, so the Phase 8/9 AC-2 absence lists stay meaningful). A row whose `matterRef` does not resolve renders **no affordance** and stays metadata-only. The pins are **re-scoped, not deleted**: the no-chevron line holds everywhere, and the only `InkWell` in the list lives inside a resolved row's chip | ratified 2026-08-05 |
+| D-C3 | Resolution is **title-keyed and client-side** (D-M5): load the synthetic matter list through `MatterGateway.fetchMatters()` and match `matterRef == matter.title` to obtain the destination `matterId`. No per-id fetch, no filter RPC, and the association stays keyed on the shared synthetic titles (D-W2) — it cannot imply server-side scoping | ratified 2026-08-05 |
+| D-C4 | Capability gating **reuses** `canViewMatters` (the destination is a matter surface; navigation hint only, never authorization — the D-W5 posture). The router passes the role-capability projection to the vault and messages builders (the Phase 11 search-route pattern), and the affordance renders only when the capability is granted | ratified 2026-08-05 |
+| D-C5 | The cross-link is **read-only navigation only**: the destination is the existing read-only matter details surface (title, status, practice area, assigned attorney, created date, capability-gated workspace sections). No document preview/download, no thread-open, no composer, no send/reply — the body-less AC-2 lines of Phases 8/9 hold everywhere except for the added affordance itself | ratified 2026-08-05 |
+| D-C6 | All new strings resolve in EN/AR/TR; the affordance copy stays generic demo wording and the list surfaces keep their local-only notes (R1, D-S5 posture) | ratified 2026-08-05 |
 
 ## 3. Assumptions & non-goals
 
@@ -151,7 +150,7 @@ the destination route already exists and is read-only.
   narrows rather than deletes the guarantee (the D-W2 "deliberate edit"
   discipline) so the metadata-only line survives review.
 
-## 7. Roadmap & ledger hooks (drafted for ratification)
+## 7. Roadmap & ledger hooks (ratified 2026-08-05)
 
 - Roadmap header status line + a new **Phase 12** section (gate line +
   slices 12.0–12.2 table + exit) + gate-table row 12 + the §14 cross-ref
