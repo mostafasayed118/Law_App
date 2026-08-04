@@ -3,18 +3,27 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/features/documents/data/fake_document_gateway.dart';
 import 'package:legalhub/features/documents/domain/document.dart';
 import 'package:legalhub/features/documents/domain/document_gateway.dart';
 import 'package:legalhub/features/documents/presentation/document_list_screen.dart';
+import 'package:legalhub/features/matters/presentation/matter_link_chip.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
 void main() {
   tearDown(resetServiceLocator);
 
-  Future<void> pumpVault(WidgetTester tester) async {
-    // DocumentListScreen resolves DocumentGateway from the locator (the dev
-    // fake in env-less runs).
+  Future<void> pumpVault(
+    WidgetTester tester, {
+    RoleCapability? capabilities,
+  }) async {
+    // Default to the client's real capability map (the D-C4 posture: the
+    // chip renders under canViewMatters, true for every bootstrap role).
+    final RoleCapability effectiveCapabilities =
+        capabilities ?? roleCapabilities[UserRole.client]!;
+    // DocumentListScreen resolves DocumentGateway/MatterGateway from the
+    // locator (the dev fakes in env-less runs).
     configureDependencies();
     // A tall surface so the full synthetic list builds inside the ListView.
     tester.view.physicalSize = const Size(800, 1600);
@@ -25,7 +34,7 @@ void main() {
       MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: const DocumentListScreen(),
+        home: DocumentListScreen(capabilities: effectiveCapabilities),
       ),
     );
     await tester.pumpAndSettle();
@@ -71,17 +80,25 @@ void main() {
       expect(find.textContaining('Preview'), findsNothing);
       expect(find.textContaining('Download'), findsNothing);
 
-      // Rows are not tap targets: no chevron (contrast the matter list,
-      // where every row carries the details affordance) and no InkWell
-      // anywhere in the list (D-V1 — there is no details route).
+      // D-V1 re-scoped by Phase 12 D-C2: rows still carry no chevron (contrast
+      // the matter list, where every row carries the details affordance), and
+      // the ONLY InkWell in the list lives inside a resolved row's "View
+      // matter" chip — the reverse cross-link affordance. Unresolved rows
+      // keep no tap target at all.
       expect(find.byIcon(Icons.chevron_right), findsNothing);
-      expect(
-        find.descendant(
-          of: find.byType(ListView),
-          matching: find.byType(InkWell),
-        ),
-        findsNothing,
+      final Finder listInkWells = find.descendant(
+        of: find.byType(ListView),
+        matching: find.byType(InkWell),
       );
+      final Finder chipInkWells = find.descendant(
+        of: find.byType(MatterLinkChip),
+        matching: find.byType(InkWell),
+      );
+      // Every synthetic document's matterRef resolves to a known matter, so
+      // every row carries exactly one chip — and no other InkWell exists in
+      // the list (the chip is the only tap target, D-C2).
+      expect(chipInkWells, findsNWidgets(5));
+      expect(listInkWells.evaluate().length, chipInkWells.evaluate().length);
 
       // The vault carries the metadata-only, local-only note (R1/D-V1).
       expect(
@@ -89,6 +106,67 @@ void main() {
         findsOneWidget,
       );
     });
+
+    testWidgets(
+      'a resolved row renders the View matter chip; an unresolved matterRef '
+      'renders none (D-C2/D-C3)',
+      (tester) async {
+        // Gateway stub whose only document carries an unknown matterRef (not
+        // one of the 5 known synthetic matter titles) — registered before
+        // configureDependencies so the fake registration is skipped.
+        await resetServiceLocator();
+        serviceLocator.registerLazySingleton<DocumentGateway>(
+          _UnresolvedRefDocumentGateway.new,
+        );
+
+        await pumpVault(tester);
+
+        // The row renders its metadata but NO chip: the title-keyed
+        // resolution found no matter (D-C3), so the row is not a tap target.
+        expect(find.text('Unlinked demo file'), findsOneWidget);
+        expect(find.byType(MatterLinkChip), findsNothing);
+        expect(
+          find.descendant(
+            of: find.byType(ListView),
+            matching: find.byType(InkWell),
+          ),
+          findsNothing,
+        );
+        expect(find.byIcon(Icons.chevron_right), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'the View matter chip is gated by canViewMatters — no chip without the '
+      'nav hint (D-C4)',
+      (tester) async {
+        // A capability projection without canViewMatters: every document row
+        // still resolves, but the reverse cross-link must not render (the
+        // D-W5 posture — navigation hints only).
+        await pumpVault(
+          tester,
+          capabilities: const RoleCapability(
+            canViewHome: true,
+            canViewSettings: true,
+            canBookConsultation: true,
+            canViewAttorneyDiscovery: true,
+            canViewMatters: false,
+            canViewDocuments: true,
+            canViewMessages: true,
+          ),
+        );
+
+        expect(find.text('Demo engagement letter'), findsOneWidget);
+        expect(find.byType(MatterLinkChip), findsNothing);
+        expect(
+          find.descendant(
+            of: find.byType(ListView),
+            matching: find.byType(InkWell),
+          ),
+          findsNothing,
+        );
+      },
+    );
 
     testWidgets(
       'an empty result set renders the localized empty state (AC-2)',
@@ -114,5 +192,23 @@ class _EmptyDocumentGateway implements DocumentGateway {
   @override
   Future<Result<List<Document>>> fetchDocuments() async {
     return Result<List<Document>>.success(const <Document>[]);
+  }
+}
+
+/// Gateway stub whose single document carries an UNKNOWN matterRef — the
+/// D-C3 unresolved-row case (no synthetic matter title matches, so the row
+/// must render no reverse cross-link chip).
+class _UnresolvedRefDocumentGateway implements DocumentGateway {
+  @override
+  Future<Result<List<Document>>> fetchDocuments() async {
+    return Result<List<Document>>.success(<Document>[
+      Document(
+        id: 'doc-x',
+        title: 'Unlinked demo file',
+        matterRef: 'No such synthetic matter',
+        type: DocumentType.contract,
+        createdAt: DateTime.utc(2026, 7, 1),
+      ),
+    ]);
   }
 }

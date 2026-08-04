@@ -757,6 +757,9 @@ class AppLocalizationsAr extends AppLocalizations {
       'وضع تجريبي — بيانات وصفية اصطناعية للمستندات فقط. لا يتم عرض ملفات حقيقية.';
 
   @override
+  String get viewMatter => 'عرض القضية';
+
+  @override
   String get vaultEntryTitle => 'خزنة المستندات';
 
   @override

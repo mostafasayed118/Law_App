@@ -762,6 +762,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Demo mode — synthetic document metadata only. No real files are listed.';
 
   @override
+  String get viewMatter => 'View matter';
+
+  @override
   String get vaultEntryTitle => 'Document vault';
 
   @override

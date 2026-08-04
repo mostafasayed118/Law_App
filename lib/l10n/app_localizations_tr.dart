@@ -763,6 +763,9 @@ class AppLocalizationsTr extends AppLocalizations {
       'Demo modu — yalnızca sentetik belge meta verileri. Gerçek dosyalar listelenmez.';
 
   @override
+  String get viewMatter => 'Davayı görüntüle';
+
+  @override
   String get vaultEntryTitle => 'Belge kasası';
 
   @override

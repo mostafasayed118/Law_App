@@ -261,6 +261,7 @@
   "vaultEmpty": "No documents are available.",
   "vaultError": "Unable to load documents.",
   "vaultLocalOnlyNote": "Demo mode — synthetic document metadata only. No real files are listed.",
+  "viewMatter": "View matter",
   "vaultEntryTitle": "Document vault",
   "vaultEntrySubtitle": "Browse demo document metadata — development demo.",
   "documentTypeContract": "Contract",

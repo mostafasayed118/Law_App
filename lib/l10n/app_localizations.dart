@@ -1504,6 +1504,12 @@ abstract class AppLocalizations {
   /// **'Demo mode — synthetic document metadata only. No real files are listed.'**
   String get vaultLocalOnlyNote;
 
+  /// No description provided for @viewMatter.
+  ///
+  /// In en, this message translates to:
+  /// **'View matter'**
+  String get viewMatter;
+
   /// No description provided for @vaultEntryTitle.
   ///
   /// In en, this message translates to:

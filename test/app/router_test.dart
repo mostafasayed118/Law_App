@@ -12,6 +12,7 @@ import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/local/in_memory_locale_store.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
+import 'package:legalhub/features/matters/presentation/matter_link_chip.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
 void main() {
@@ -472,6 +473,72 @@ void main() {
       expect(find.text('Demo engagement letter'), findsOneWidget);
       expect(selectedIndex(tester), 0);
     });
+
+    testWidgets('tapping a resolved row View matter chip opens its matter '
+        '(12.0 AC-1)', (tester) async {
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      router.go(AppRoutes.vault);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // The reverse cross-link (Phase 12 D-C1): the first vault row's
+      // matterRef resolves to 'Demo acquisition review' (doc-1 → matter-1),
+      // so its View matter chip navigates to the existing read-only details
+      // route.
+      await tester.tap(find.text('View matter').first);
+      await tester.pumpAndSettle();
+
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        AppRoutes.matterDetail('matter-1'),
+      );
+      expect(find.text('Matter details'), findsOneWidget);
+    });
+
+    testWidgets(
+      'renders no View matter chip when canViewMatters is not granted (12.0 '
+      'AC-4)',
+      (tester) async {
+        // A capability projection without canViewMatters (D-C4): the vault
+        // still renders its documents, but every reverse cross-link chip is
+        // hidden — navigation hints only, never authorization.
+        final GoRouter restrictedRouter = createAppRouter(
+          authCubit,
+          capabilitiesForRole: <UserRole, RoleCapability>{
+            UserRole.client: const RoleCapability(
+              canViewHome: true,
+              canViewSettings: true,
+              canBookConsultation: true,
+              canViewAttorneyDiscovery: true,
+              canViewMatters: false,
+              canViewDocuments: true,
+              canViewMessages: true,
+            ),
+          },
+        );
+        addTearDown(restrictedRouter.dispose);
+        await resetServiceLocator();
+        configureDependencies();
+        addTearDown(() => resetServiceLocator());
+
+        await authCubit.startDemoSession();
+        restrictedRouter.go(AppRoutes.vault);
+        await tester.pumpWidget(
+          harness(
+            child: const SizedBox.shrink(),
+            routerOverride: restrictedRouter,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Demo engagement letter'), findsOneWidget);
+        expect(find.byType(MatterLinkChip), findsNothing);
+      },
+    );
 
     testWidgets('blocks unauthenticated access to the vault route', (
       tester,
