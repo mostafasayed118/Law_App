@@ -3,6 +3,7 @@
 | Script | What it verifies | When to run |
 |---|---|---|
 | `verify_ledger.sh` | Governance-ledger integrity (below) | **Before committing any `docs/` amendment** that touches the audit plan or Gate 3 reconciliation; wired into CI as a cheap static gate (`ci.yml` on every push/PR) plus a **nightly teeth-prover** (`ledger-selftest.yml`, 02:00 UTC + `workflow_dispatch`) |
+| `verify_policy_tests.sh` | P0-closure policy battery (below) | Against an **ephemeral rehearsal project only**, before any P0-close decision; `--check` is static and runs anywhere |
 
 ## `verify_ledger.sh`
 
@@ -113,6 +114,50 @@ not uncommitted working-tree edits.
 - The selftest's drift injections mutate the *scratch* worktree only; the
   repo working tree is never touched. The suite-claim drift is injected via a
   tampered script copy (the claim lives in the battery, not the docs).
+
+## `verify_policy_tests.sh`
+
+The P0-closure policy battery runner (`supabase/tests/` + this script,
+D-P0C2). Mirrors `verify_ledger.sh`'s structure: named `[OK]`/`[XX]`
+checks, a summary line, and a `RESULT: PASS|FAIL` verdict with exit codes.
+
+```bash
+SUPABASE_TEST_DB_URL=postgresql://postgres:***@host:5432/postgres scripts/verify_policy_tests.sh
+scripts/verify_policy_tests.sh --apply   # build an ephemeral project from the committed supabase/ files
+scripts/verify_policy_tests.sh --check   # static validation, no database
+```
+
+### What it checks
+
+1. **Structural + grant pins** — the six tables exist with RLS enabled; the
+   narrow SELECT grants (audit_events/platform_config deliberately absent);
+   the R-4 policy-helper EXECUTE grants present while `write_audit`,
+   `is_platform_owner`, `active_membership`, `expire_stale_invitations`,
+   `handle_new_user` stay denied; the full 18-RPC EXECUTE surface;
+   zero policies on audit_events/platform_config (D-P0C4); the D-P0C1(b)
+   forward pin (no matter/document/message tables).
+2. **Behavior battery** — `00_fixtures.sql` then `01/02/03` per-matrix-block
+   SQL files (matrix §2/§3/§5, D-P0C1(a)/D-P0C3/D-P0C4), each check a DO
+   block that raises `POLICY-BATTERY FAIL <id>: <detail>` on violation.
+
+### Dev-project guard
+
+`SUPABASE_TEST_DB_URL` hosts containing the known live-dev-project ref
+(`eutmvevpskerzpqmwplv`, the DO-NOT-TOUCH project) are hard-refused: the
+battery fixtures `DELETE` from `auth.users`/`platform_config`, so a typo’d
+URL would be destructive. `ALLOW_DEV_PROJECT=1` overrides for an explicit,
+read-only owner sweep.
+
+### Honest limitations
+
+- Requires a database for the real run; the battery is only as trustworthy
+  as the ephemeral project it runs against — the evidence record must cite
+  the committed refs it was built from (R2).
+- `--check` validates file structure and fixture-UUID consistency; it does
+  not execute SQL.
+- Provider-level flows and storage/realtime rows stay out of scope (P2 r5
+  methodology); content-table deny rows are the forward pin (D-P0C1b), not
+  executable tests — those tables do not exist yet.
 
 ## CI wiring
 

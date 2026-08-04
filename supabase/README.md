@@ -103,6 +103,56 @@ confirmed-empty baseline) before anything is applied to the shared dev
 project (contract §11-P2 exit, rollback_plan §2). Any matrix negative row
 starting to pass = immediate revert, never fix-forward (rollback_plan §5).
 
+## Policy-test battery (P0-closure slice P0C.1, D-P0C2)
+
+The committed battery under `tests/` + `scripts/verify_policy_tests.sh`
+provides the durable, re-runnable positive/negative policy tests that the
+permission matrix (contract §9) and the P0-closure scope note
+(`docs/p0_closure_scope_2026-08-05.md`, RATIFIED 2026-08-05) require —
+the P2 r1–r5 rehearsals proved specific migrations on ephemeral projects;
+this battery hardens that pattern into a committed artifact.
+
+| Path | Proves |
+|---|---|
+| `tests/00_fixtures.sql` | Deterministic, idempotent seed: owner + 6 synthetic users (fixed UUIDs), org-a/org-b, 5 memberships (incl. a suspended partner and an orphan-profile member), 1 pending invite, the `platform_config` owner row |
+| `tests/01_identity_session.sql` | Matrix §2 rows: own-profile SELECT/UPDATE positive + negative, D-T6 pair (partner raw profile read → 0 rows), `list_org_members_metadata` positive (roster + pending invites, no token material) + non-partner/cross-org/suspended/owner negatives, orphan-membership fallback pair, anon denials |
+| `tests/02_organization_membership.sql` | Matrix §3 rows: roster positives + cross-org/suspended negatives, invite/resend/revoke/change-role/suspend/reactivate/remove positives (in-transaction, rolled back) + non-partner/cross-org negatives, the 2026-08-03 hardening guards (last-partner lockout, existing-member invite refusal, self-removal refusal), `create_organization`, and the owner-denied-on-partner-RPC rows |
+| `tests/03_platform_owner_boundary.sql` | Matrix §5 + D-P0C1(a) deny-rows (owner's direct surface = own profile only; audit/platform_config/helpers all denied; no partner/org RPC accepts the owner) + D-P0C3 single-account bound (privileged PK collision + client grant absence) + D-P0C4 audit RPC-only (self-audited reads, append-only, RPC-only grant absence) |
+
+### Running the battery
+
+The battery runs against an **ephemeral rehearsal project only** — never the
+live dev project (`DO-NOT-TOUCH`). The harness **hard-refuses** any URL whose
+host contains the known dev-project ref (`eutmvevpskerzpqmwplv`);
+`ALLOW_DEV_PROJECT=1` is the explicit owner override. Requires the PostgreSQL
+client (`psql`)
+and the project's postgres connection string (the fixtures seed
+`auth.users` + `platform_config`, which no client role may do).
+
+```bash
+# 1. Create the throwaway project (supabase CLI or dashboard), then:
+SUPABASE_TEST_DB_URL=postgresql://postgres:***@host:5432/postgres scripts/verify_policy_tests.sh --apply   # build from the committed files
+SUPABASE_TEST_DB_URL=postgresql://postgres:***@host:5432/postgres scripts/verify_policy_tests.sh           # run the full battery
+scripts/verify_policy_tests.sh --check        # static validation, no database
+```
+
+- `--apply` applies `migrations/01`, `02`, `policies/*.sql`, `rpc/*.sql` in
+  the apply order above. **`03_platform_config_seed.sql` is NOT applied**:
+  its owner token is an apply-time substitution placeholder for the dev
+  project; the battery seeds its own fixture owner row and proves the
+  single-account bound (D-P0C3) instead.
+- The battery exercises every matrix §2/§3/§5 row with ≥1 positive + ≥1
+  negative check (contract §9), plus the D-P0C1(a) deny-rows and the
+  D-P0C4 audit pins.
+- **Out of battery scope (recorded, not skipped):** provider-level flows
+  (signup/sign-in/reset, GoTrue email triggers) stay out of SQL rehearsal
+  scope per the P2 r5 methodology; storage/realtime buckets remain Q4
+  deferrals. The D-P0C1(b) content-table forward pin is asserted
+  structurally (no matter/document/message tables exist) and enforced at
+  schema-review time per the matrix §5 addendum.
+- Record the run as rehearsal evidence (the P0C.3 close decision consumes
+  it), then delete the throwaway project.
+
 ## What this directory does NOT authorize
 
 - No Supabase change beyond the reviewed + applied slice (Up 1–5, executed
