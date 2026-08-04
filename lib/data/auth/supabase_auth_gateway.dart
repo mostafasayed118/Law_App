@@ -98,8 +98,10 @@ class SupabaseAuthGateway implements AuthGateway {
     return switch (kind) {
       SupabaseAuthFailureKind.invalidCredentials =>
         AuthFailureKind.invalidCredentials,
+      SupabaseAuthFailureKind.emailNotConfirmed =>
+        AuthFailureKind.emailNotConfirmed,
       SupabaseAuthFailureKind.userDisabled => AuthFailureKind.userDisabled,
-      SupabaseAuthFailureKind.rateLimited ||
+      SupabaseAuthFailureKind.rateLimited => AuthFailureKind.rateLimited,
       SupabaseAuthFailureKind.unknown => AuthFailureKind.providerUnavailable,
       // Unreachable on the sign-in path (sign-up surfaces it); kept
       // exhaustive so a future kind addition fails loudly.

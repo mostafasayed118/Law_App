@@ -164,6 +164,8 @@ class AuthCubit extends Cubit<AuthState> {
       case AuthFailureKind.sessionExpired:
         emit(const AuthState(status: AuthStatus.reauthRequired));
       case AuthFailureKind.invalidCredentials ||
+          AuthFailureKind.emailNotConfirmed ||
+          AuthFailureKind.rateLimited ||
           AuthFailureKind.userDisabled ||
           AuthFailureKind.membershipDenied ||
           AuthFailureKind.providerUnavailable ||

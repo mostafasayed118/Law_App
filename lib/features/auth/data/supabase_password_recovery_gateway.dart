@@ -98,6 +98,7 @@ class SupabasePasswordRecoveryGateway implements PasswordRecoveryGateway {
       SupabaseAuthFailureKind.rateLimited =>
         'Too many attempts. Please wait and try again.',
       SupabaseAuthFailureKind.invalidCredentials ||
+      SupabaseAuthFailureKind.emailNotConfirmed ||
       SupabaseAuthFailureKind.emailInUse ||
       SupabaseAuthFailureKind.userDisabled ||
       SupabaseAuthFailureKind.unknown =>
@@ -111,6 +112,7 @@ class SupabasePasswordRecoveryGateway implements PasswordRecoveryGateway {
         'Too many attempts. Please wait and try again.',
       SupabaseAuthFailureKind.invalidCredentials =>
         'That code is incorrect or has expired. Please try again.',
+      SupabaseAuthFailureKind.emailNotConfirmed ||
       SupabaseAuthFailureKind.emailInUse ||
       SupabaseAuthFailureKind.userDisabled ||
       SupabaseAuthFailureKind.unknown =>
@@ -124,6 +126,7 @@ class SupabasePasswordRecoveryGateway implements PasswordRecoveryGateway {
         'Too many attempts. Please wait and try again.',
       SupabaseAuthFailureKind.invalidCredentials =>
         'Your verification has expired. Please start over.',
+      SupabaseAuthFailureKind.emailNotConfirmed ||
       SupabaseAuthFailureKind.emailInUse ||
       SupabaseAuthFailureKind.userDisabled ||
       SupabaseAuthFailureKind.unknown =>

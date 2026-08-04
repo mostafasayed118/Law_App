@@ -47,6 +47,9 @@ enum SupabaseAuthFailureKind {
   /// The supplied credentials were rejected by the provider.
   invalidCredentials,
 
+  /// The account exists but email confirmation is pending.
+  emailNotConfirmed,
+
   /// The email already has a registered account.
   emailInUse,
 

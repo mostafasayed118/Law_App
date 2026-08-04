@@ -216,8 +216,9 @@ void main() {
       button.onPressed!();
       await tester.pumpAndSettle();
 
-      // The error surface from ViewStateView carries the AppError userMessage.
-      expect(find.text('Sign up failed'), findsOneWidget);
+      // The error surface from ViewStateView carries the localized generic
+      // message (P3.1 port: codes map to l10n, never raw gateway English).
+      expect(find.text('Sign up failed. Please try again.'), findsOneWidget);
       // A retry affordance is rendered by ViewStateView on error.
       expect(find.text('Retry'), findsOneWidget);
     },

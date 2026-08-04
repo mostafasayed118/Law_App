@@ -135,6 +135,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get createAccount => 'أنشئ حسابًا';
 
   @override
+  String get signUpErrorEmailInUse =>
+      'يوجد حساب بهذا البريد الإلكتروني بالفعل.';
+
+  @override
+  String get signUpErrorRateLimited =>
+      'محاولات كثيرة جدًا. يرجى المحاولة لاحقًا.';
+
+  @override
+  String get signUpErrorServiceUnavailable =>
+      'خدمة إنشاء الحساب غير متاحة مؤقتًا. يرجى المحاولة لاحقًا.';
+
+  @override
+  String get signUpErrorGeneric => 'فشل إنشاء الحساب. يرجى المحاولة لاحقًا.';
+
+  @override
   String get signUpTitle => 'إنشاء حساب';
 
   @override

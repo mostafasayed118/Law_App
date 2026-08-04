@@ -135,6 +135,21 @@ class AppLocalizationsTr extends AppLocalizations {
   String get createAccount => 'Hesap oluşturun';
 
   @override
+  String get signUpErrorEmailInUse => 'Bu e-posta ile zaten bir hesap mevcut.';
+
+  @override
+  String get signUpErrorRateLimited =>
+      'Çok fazla deneme yapıldı. Lütfen daha sonra tekrar deneyin.';
+
+  @override
+  String get signUpErrorServiceUnavailable =>
+      'Kayıt hizmeti şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.';
+
+  @override
+  String get signUpErrorGeneric =>
+      'Kayıt başarısız oldu. Lütfen tekrar deneyin.';
+
+  @override
   String get signUpTitle => 'Hesap Oluştur';
 
   @override

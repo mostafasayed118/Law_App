@@ -346,6 +346,30 @@ abstract class AppLocalizations {
   /// **'Create an account'**
   String get createAccount;
 
+  /// No description provided for @signUpErrorEmailInUse.
+  ///
+  /// In en, this message translates to:
+  /// **'An account with this email already exists.'**
+  String get signUpErrorEmailInUse;
+
+  /// No description provided for @signUpErrorRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Please try again later.'**
+  String get signUpErrorRateLimited;
+
+  /// No description provided for @signUpErrorServiceUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-up is temporarily unavailable. Please try again.'**
+  String get signUpErrorServiceUnavailable;
+
+  /// No description provided for @signUpErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign up failed. Please try again.'**
+  String get signUpErrorGeneric;
+
   /// No description provided for @signUpTitle.
   ///
   /// In en, this message translates to:

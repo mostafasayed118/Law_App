@@ -135,6 +135,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createAccount => 'Create an account';
 
   @override
+  String get signUpErrorEmailInUse =>
+      'An account with this email already exists.';
+
+  @override
+  String get signUpErrorRateLimited =>
+      'Too many attempts. Please try again later.';
+
+  @override
+  String get signUpErrorServiceUnavailable =>
+      'Sign-up is temporarily unavailable. Please try again.';
+
+  @override
+  String get signUpErrorGeneric => 'Sign up failed. Please try again.';
+
+  @override
   String get signUpTitle => 'Create Account';
 
   @override

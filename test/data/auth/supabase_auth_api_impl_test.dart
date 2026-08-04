@@ -236,6 +236,34 @@ void main() {
       );
     });
 
+    test(
+      'maps an email-not-confirmed rejection to emailNotConfirmed',
+      () async {
+        when(
+          () => client.signInWithPassword(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+          ),
+        ).thenThrow(
+          const AuthException('Email not confirmed', statusCode: '400'),
+        );
+
+        await expectLater(
+          api.signInWithPassword(
+            email: 'amira@example.com',
+            password: 'secret-pass',
+          ),
+          throwsA(
+            isA<SupabaseAuthException>().having(
+              (SupabaseAuthException e) => e.kind,
+              'kind',
+              SupabaseAuthFailureKind.emailNotConfirmed,
+            ),
+          ),
+        );
+      },
+    );
+
     test('creates the account with metadata via the provider client', () async {
       when(
         () => client.signUp(
