@@ -102,7 +102,7 @@ distinctly from generic errors.
 |---|---|
 | Applied dev project (`eutmvevpskerzpqmwplv`) | ✅ Up 1–5 GREEN — the 17 RPCs + policies + trigger are live |
 | `.env` (URL + **anon** key, git-ignored) | ✅ owner-held; anon-key guard must stay in front of any provider wiring |
-| P2 §4.5 **provider loop** (post-apply) | ✅ **P2 closed 2026-08-03; loop DEFERRED as documented residual risk** — not executed (no signup/email/confirm against the dev project); see `docs/p2_close_decision_2026-08-03.md`. P3 end-to-end verification runs against the applied schema with the provider loop deferred to P3, not re-opened as a P2 prerequisite |
+| P2 §4.5 **provider loop** (post-apply) | ✅ **P2 closed 2026-08-03; loop DEFERRED as documented residual risk** — not executed (no signup/email/confirm against the dev project); see `docs/p2_close_decision_2026-08-03.md`. P3 end-to-end verification runs against the applied schema with the provider loop deferred to P3, not re-opened as a P2 prerequisite. **RATIFIED 2026-08-05 (D-45.1):** completion plan in `docs/p2_provider_loop_decision_2026-08-05.md` — Phase 1 ephemeral rehearsal loop (zero external effect) first, Phase 2 dev-project smoke under a dated apply-approval once a controlled inbox exists |
 | Provider behaviors observed at apply | email confirmation **enabled** (signup → pending state); sign-in returns `invalid_credentials` for unknown users; reset returns generic `200 {}` — P3 must handle each distinctly |
 
 ---
@@ -391,6 +391,9 @@ staging; no real client/legal data.
 - **P2 closed (2026-08-03, owner decision):** §4.5 provider loop **deferred**,
   not executed — `docs/p2_close_decision_2026-08-03.md`. This plan's end-to-end
   verification (§3) runs against the applied schema with the loop deferred to a
-  controlled-inbox exercise; it is not a P2-open prerequisite (§3).
+  controlled-inbox exercise; it is not a P2-open prerequisite (§3). **RATIFIED
+  2026-08-05 (D-45.1):** the loop-completion plan is `docs/p2_provider_loop_decision_2026-08-05.md`
+  — Phase 1 ephemeral rehearsal loop first, Phase 2 dev-project smoke under a
+  dated apply-approval once a controlled inbox exists.
 - The D-T6-resolution forward hook (partner member display names) is tracked
   here (§13 Q1), not silently resolved inside this slice.

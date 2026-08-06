@@ -9,16 +9,16 @@
 > (`docs/p0_decision_capture.md` "How to use this document";
 > `docs/p2_apply_approval_2026-08-01.md` shape).
 >
-> **Status: DRAFT — decision OPEN; recommendation D-45.1 proposed, NOT yet
-> ratified.** Per `docs/p0_decision_capture.md`, a decision without an owner
-> and a date is not a decision — this record proposes the decision frame and
-> the recommended path; the owner's dated ratification closes it (see §8).
-> Drafting this record changes nothing: **no dev-project action, no email
-> send, no signup/confirm — zero external effect** (INSTRUCTIONS.md §1.3 #5,
-> §5).
+> **Status: RATIFIED (2026-08-05) — D-45.1 adopted.** Per
+> `docs/p0_decision_capture.md`, a decision is a decision only with an owner
+> and a date — recorded here. Ratification is a **decision-level act only**:
+> it changes nothing on the dev project (no email send, no signup/confirm —
+> zero external effect, INSTRUCTIONS.md §1.3 #5, §5); it authorizes the
+> **plan** in §5/§8, with every execution phase still gated per §7.
 >
-> **Owner:** Project Owner (github.com/mostafasayed118).
-> **Decided on:** OPEN (pending owner ratification).
+> **Owner:** Project Owner (github.com/mostafasayed118) — ratification
+> recorded via the pair-programming session on 2026-08-05.
+> **Decided on:** 2026-08-05.
 >
 > **Blocks slice:** the P3 **end-to-end verification** (`docs/p3_auth_org_ux_plan.md`
 > §3/§11) — the loop is re-attempted "only if a controlled inbox exists"
@@ -94,11 +94,18 @@ re-closed).
 | **B. Ephemeral rehearsal loop (P2 pattern) + local mail catcher** | Build a **throwaway** project from the committed `supabase/` files (migrations/policies/RPCs — the P0C.1 harness already can run SQL; add a `verify_provider_loop.sh` companion), with a **local/dev mail catcher** (e.g. a Mailpit-style inbox or the Supabase local stack) receiving the confirmation email — no real SMTP send | **Zero** — everything on the ephemeral environment; no email leaves the machine | The loop mechanics end-to-end against the **committed slice** (mirrors P2 r1–r4 rehearsals); exercises the typed gateway mapping + recovery flow against a real GoTrue | Does **not** test the dev project's *specific* config (email templates, rate limits, hosting defaults); needs Docker/psql infra — **infra-blocked on this machine today** (same constraint recorded in `docs/p0c1_verification_evidence_2026-08-05.md` §3) |
 | **C. Formal re-close (decision-level, no run)** | Record that the loop stays an **accepted residual risk** for the P3.2+ milestone, with the typed/fake suite + endpoint-live evidence (§1) as the standing assurance; re-open only when a controlled inbox is approved | None | Nothing new — codifies the status quo with a dated owner decision | Leaves the provider surface unverified indefinitely; the P3.1 client wiring remains exercised only against fakes/typed seams |
 
-## 5. Recommendation (D-45.1 — proposed)
+## 5. Decision (D-45.1 — RATIFIED 2026-08-05)
 
-**Recommended: Option B first, then Option A as the acceptance run —
-mirroring the P2 two-phase pattern (rehearsal → apply approval → apply
-execution).**
+**Decision (one line):** adopt the two-phase completion plan — **Phase 1:
+ephemeral rehearsal loop on Docker-capable infra (zero external effect) to
+prove loop mechanics + P3.1 client wiring against a real GoTrue; Phase 2:
+dev-project smoke under a dated apply-approval, only once a controlled
+inbox exists** (the P3 §11 condition); **Option C is the recorded fallback**
+if Phase 1 infra stays unavailable for a defined window.
+
+**Rationale (as drafted): Option B first, then Option A as the acceptance
+run — mirroring the P2 two-phase pattern (rehearsal → apply approval →
+apply execution).**
 
 - **Phase 1 (ephemeral, zero external effect):** complete the provider loop
   on a throwaway project built from the committed `supabase/` files with a
@@ -144,9 +151,7 @@ Rehearse first (P2's never-fix-forward discipline), then apply.
 
 ## 8. Next steps (owner actions)
 
-1. **Ratify D-45.1** (or amend the recommendation) with a dated one-line
-   decision — flipping this record's Status to RATIFIED with a Decision +
-   Decided-on.
+1. ✅ **Ratify D-45.1** — **DONE 2026-08-05** (this record, §5).
 2. **Phase 1:** schedule the ephemeral rehearsal loop on Docker-capable
    infra; record evidence in a dated file (the P0C.1 evidence format).
 3. **Phase 2:** approve a controlled inbox; give the dated apply-approval;
@@ -157,10 +162,10 @@ Rehearse first (P2's never-fix-forward discipline), then apply.
 
 ## 9. Ledger
 
-- Docs-only draft: no `lib/`/`test/` change (README count untouched;
-  `scripts/verify_ledger.sh` unaffected).
-- On ratification, the P3 plan's §3/§11 forward-hook rows and the P2 close
-  decision's residual-risk line can be pointed at this record (dated
-  follow-up, same batch or immediate).
-- Nothing pushed; `main` remains 15 commits ahead of `origin/main` at draft
-  time (the P3.1 merge + docs records, all local).
+- **Ratified 2026-08-05** — docs-only: no `lib/`/`test/` change (README
+  count untouched; `scripts/verify_ledger.sh` unaffected).
+- The P3 plan's §3/§11 forward-hook rows are pointed at this record in the
+  same batch (the ratification commit); the P2 close decision's residual-risk
+  line already forwards here by reference (§2/§3 wording unchanged).
+- Nothing pushed; `main` remains 16 commits ahead of `origin/main` at
+  ratification time (the P3.1 merge + docs records, all local).
