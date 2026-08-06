@@ -7,14 +7,19 @@ import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/auth/auth_gateway.dart';
 import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
+import 'package:legalhub/core/organizations/membership_repository.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/sample_service.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/auth/supabase_auth_api.dart';
 import 'package:legalhub/data/auth/supabase_auth_gateway.dart';
 import 'package:legalhub/data/auth/supabase_env.dart';
+import 'package:legalhub/data/local/in_memory_org_selection_store.dart';
 import 'package:legalhub/data/local/locale_store.dart';
+import 'package:legalhub/data/local/org_selection_store.dart';
+import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
+import 'package:legalhub/data/orgs/supabase_membership_repository.dart';
 import 'package:legalhub/data/orgs/supabase_org_api.dart';
 import 'package:legalhub/data/orgs/supabase_organization_gateway.dart';
 import 'package:legalhub/features/auth/data/fake_password_recovery_gateway.dart';
@@ -215,6 +220,8 @@ void main() {
       expect(serviceLocator.isRegistered<PasswordRecoveryGateway>(), isTrue);
       expect(serviceLocator.isRegistered<SignUpGateway>(), isTrue);
       expect(serviceLocator.isRegistered<OrganizationGateway>(), isTrue);
+      expect(serviceLocator.isRegistered<MembershipRepository>(), isTrue);
+      expect(serviceLocator.isRegistered<OrgSelectionStore>(), isTrue);
       expect(serviceLocator.isRegistered<BookingGateway>(), isTrue);
       expect(serviceLocator.isRegistered<BookingPrefill>(), isTrue);
       expect(serviceLocator.isRegistered<AttorneyGateway>(), isTrue);
@@ -393,6 +400,46 @@ void main() {
         serviceLocator<OrganizationGateway>(),
         isA<SupabaseOrganizationGateway>(),
       );
+    });
+
+    test('wires the membership repository to the fake dev implementation', () {
+      configureDependencies();
+
+      // Same boundary discipline as the organization gateway: the dev fake is
+      // the registered seam until the configured-env flip takes over.
+      expect(
+        serviceLocator<MembershipRepository>(),
+        isA<FakeMembershipRepository>(),
+      );
+    });
+
+    test('flips MembershipRepository when env carries an anon key', () {
+      configureDependencies(
+        supabaseEnv: SupabaseEnv(
+          url: 'https://example.supabase.co',
+          anonKey: _anonJwt(),
+        ),
+        // The real bind() needs a running Supabase.instance; tests inject
+        // the seam instead (the flip's test seam, not production code).
+        supabaseOrgApiFactory: _FakeSupabaseOrgApi.new,
+      );
+
+      expect(
+        serviceLocator<MembershipRepository>(),
+        isA<SupabaseMembershipRepository>(),
+      );
+    });
+
+    test('resolves OrgSelectionStore and wires ActiveOrgStore to it', () {
+      configureDependencies();
+
+      // In unconfigured builds the in-memory fallback is the registered seam
+      // (LocaleStore pattern); ActiveOrgStore must resolve through it.
+      expect(
+        serviceLocator<OrgSelectionStore>(),
+        isA<InMemoryOrgSelectionStore>(),
+      );
+      expect(serviceLocator<ActiveOrgStore>().activeOrganizationId, isNull);
     });
 
     test('flips to SupabaseAuthGateway when env carries an anon key', () {

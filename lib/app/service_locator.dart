@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/auth/auth_gateway.dart';
 import '../core/observability/error_reporter.dart';
+import '../core/organizations/membership_repository.dart';
 import '../core/organizations/organization_gateway.dart';
 import '../core/sample_service.dart';
 import '../data/auth/fake_auth_gateway.dart';
@@ -11,9 +12,14 @@ import '../data/auth/supabase_auth_api_impl.dart';
 import '../data/auth/supabase_auth_gateway.dart';
 import '../data/auth/supabase_env.dart';
 import '../data/local/in_memory_locale_store.dart';
+import '../data/local/in_memory_org_selection_store.dart';
 import '../data/local/locale_store.dart';
+import '../data/local/org_selection_store.dart';
 import '../data/local/shared_preferences_locale_store.dart';
+import '../data/local/shared_preferences_org_selection_store.dart';
+import '../data/orgs/fake_membership_repository.dart';
 import '../data/orgs/fake_organization_gateway.dart';
+import '../data/orgs/supabase_membership_repository.dart';
 import '../data/orgs/supabase_org_api.dart';
 import '../data/orgs/supabase_org_api_impl.dart';
 import '../data/orgs/supabase_organization_gateway.dart';
@@ -112,6 +118,15 @@ void configureDependencies({
           : SharedPreferencesNotificationPrefsStore(preferences),
     );
   }
+  if (!serviceLocator.isRegistered<OrgSelectionStore>()) {
+    // Device-local active-org selection (P3.2 D-P32.2): the LocaleStore
+    // pattern — SharedPreferences when available, in-memory otherwise.
+    serviceLocator.registerLazySingleton<OrgSelectionStore>(
+      () => preferences == null
+          ? InMemoryOrgSelectionStore()
+          : SharedPreferencesOrgSelectionStore(preferences),
+    );
+  }
   if (!serviceLocator.isRegistered<LocaleCubit>()) {
     // App-scoped because MaterialApp and routing share the selected locale.
     serviceLocator.registerLazySingleton<LocaleCubit>(
@@ -169,6 +184,23 @@ void configureDependencies({
       );
     }
   }
+  if (!serviceLocator.isRegistered<MembershipRepository>()) {
+    // Like OrganizationGateway, the flip swaps the dev fake for the
+    // Supabase-backed implementation when the build is configured (Batch 3.3
+    // env pattern). P3.2 membership hydration reads the RLS-scoped SELECT
+    // surface; the fake mirrors the demo session's membership.
+    if (env.isConfigured) {
+      serviceLocator.registerLazySingleton<MembershipRepository>(
+        () => SupabaseMembershipRepository(
+          (supabaseOrgApiFactory ?? SupabaseOrgApiImpl.bind)(),
+        ),
+      );
+    } else {
+      serviceLocator.registerLazySingleton<MembershipRepository>(
+        FakeMembershipRepository.new,
+      );
+    }
+  }
   if (!serviceLocator.isRegistered<BookingGateway>()) {
     // Stateless service: lazy singleton. The booking Cubit is feature-scoped
     // and created per screen via BlocProvider, so it is NOT registered here.
@@ -193,10 +225,13 @@ void configureDependencies({
     );
   }
   if (!serviceLocator.isRegistered<ActiveOrgStore>()) {
-    // Client-side active-org context (Phase 7 D-M7/D-08): app-scoped,
-    // in-memory only, never serialized. The org hub seeds/reads it; the
-    // server re-derives membership per D-08.
-    serviceLocator.registerLazySingleton<ActiveOrgStore>(ActiveOrgStore.new);
+    // Client-side active-org context (Phase 7 D-M7/D-08; P3.2 D-P32.2):
+    // app-scoped, persisted on-device only via OrgSelectionStore (prefs
+    // seam, LocaleStore pattern). The org hub seeds/reads it; the server
+    // re-derives membership per D-08.
+    serviceLocator.registerLazySingleton<ActiveOrgStore>(
+      () => ActiveOrgStore(serviceLocator<OrgSelectionStore>()),
+    );
   }
   if (!serviceLocator.isRegistered<MatterGateway>()) {
     // Stateless service: lazy singleton. The matter Cubit is feature-scoped
