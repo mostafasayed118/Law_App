@@ -19,7 +19,14 @@ class OrganizationMembership extends Equatable {
   });
 
   final String organizationId;
-  final String organizationName;
+
+  /// The organization's display name, when resolvable.
+  ///
+  /// P3.2 name-resolution note (plan §6): the `organizations` SELECT is
+  /// active-member-only, so the name resolves for **active** memberships but
+  /// is null for suspended/removed ones (their own membership row is visible
+  /// while the org row is not). Presentation tolerates the null name.
+  final String? organizationName;
   final UserRole role;
   final MembershipStatus status;
 

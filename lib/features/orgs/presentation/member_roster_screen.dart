@@ -346,6 +346,8 @@ class _MemberRosterScreenState extends State<MemberRosterScreen> {
     }
     for (final OrganizationMembership membership in session.memberships) {
       if (membership.organizationId == organizationId) {
+        // Null org name (suspended/removed membership) → the AppBar already
+        // falls back to the localized roster title.
         return membership.organizationName;
       }
     }

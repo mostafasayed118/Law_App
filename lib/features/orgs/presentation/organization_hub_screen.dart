@@ -138,7 +138,12 @@ class _OrgSwitcher extends StatelessWidget {
                     DropdownMenuItem<String>(
                       value: membership.organizationId,
                       child: Text(
-                        membership.organizationName,
+                        // P3.2 name-resolution note: a suspended/removed
+                        // membership's org name is not resolvable — fall
+                        // back to the org id so the switcher still labels
+                        // the row honestly.
+                        membership.organizationName ??
+                            membership.organizationId,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
