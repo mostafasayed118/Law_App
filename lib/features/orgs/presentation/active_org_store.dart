@@ -19,9 +19,12 @@ import '../../../data/local/org_selection_store.dart';
 ///
 /// Persistence semantics (D-P32.2):
 /// - **Restore:** the persisted id is read once at construction and applied
-///   only when the next seeded session still holds a membership for it —
-///   the session is the membership authority, so a stale or foreign
-///   selection is never applied.
+///   only when the seeded session still holds a membership for it — the
+///   session is the membership authority, so a stale or foreign selection is
+///   never applied. The read may resolve before or after the first seed
+///   (cold start: the hub seeds in the same build pass the store is
+///   constructed); both orderings apply the value exactly once for the
+///   current user.
 /// - **Persist:** `select` writes the id best-effort; a write failure logs
 ///   loudly and never breaks the in-memory selection.
 /// - **Seed guard unchanged:** [syncFromSession] keys on the session
@@ -38,6 +41,7 @@ class ActiveOrgStore extends ChangeNotifier {
 
   String? _activeOrganizationId;
   String? _seededUserId;
+  List<OrganizationMembership>? _seededMemberships;
   String? _restoredOrganizationId;
 
   /// The locally selected organization id (null before any session exists).
@@ -45,13 +49,13 @@ class ActiveOrgStore extends ChangeNotifier {
 
   /// Reads the persisted selection once, at construction.
   ///
-  /// The value is cached, not applied directly: it is consumed by the next
-  /// [syncFromSession] seed, which validates it against the session's
-  /// memberships (D-08 — the session is the membership authority). If the
-  /// read races a seed that already consumed an earlier value, the late
-  /// value is simply held for the next identity change, where the same
-  /// validation applies. A read failure logs loudly and is treated as "no
-  /// persisted selection".
+  /// Validated application (D-08 — the session is the membership authority):
+  /// if a session is already seeded when the read resolves (the cold-start
+  /// ordering where the hub seeded during the same build pass), the value is
+  /// applied now when that session still holds the membership; otherwise it
+  /// is cached for the next [syncFromSession] identity change, which applies
+  /// the same validation. Either way the value is applied at most once. A
+  /// read failure logs loudly and is treated as "no persisted selection".
   Future<void> _restoreSelection() async {
     String? restored;
     try {
@@ -60,6 +64,15 @@ class ActiveOrgStore extends ChangeNotifier {
       debugPrint('ActiveOrgStore: failed to read persisted selection: $error');
     }
     if (restored == null) {
+      return;
+    }
+    final List<OrganizationMembership>? seededMemberships = _seededMemberships;
+    if (seededMemberships != null &&
+        seededMemberships.any(
+          (OrganizationMembership m) => m.organizationId == restored,
+        )) {
+      _activeOrganizationId = restored;
+      notifyListeners();
       return;
     }
     _restoredOrganizationId = restored;
@@ -80,10 +93,17 @@ class ActiveOrgStore extends ChangeNotifier {
       return;
     }
     _seededUserId = userId;
+    _seededMemberships = session?.memberships;
+    if (session == null) {
+      // Sign-out: clear the context but never discard a cached, not-yet-
+      // applied restore — the next real-user seed re-validates it, so a
+      // same-user sign-out → sign-in keeps the persisted selection.
+      _activeOrganizationId = null;
+      return;
+    }
     final String? restored = _restoredOrganizationId;
     _restoredOrganizationId = null;
-    final List<OrganizationMembership> memberships =
-        session?.memberships ?? const <OrganizationMembership>[];
+    final List<OrganizationMembership> memberships = session.memberships;
     final bool restoredIsValid =
         restored != null &&
         memberships.any(
@@ -91,7 +111,7 @@ class ActiveOrgStore extends ChangeNotifier {
         );
     _activeOrganizationId = restoredIsValid
         ? restored
-        : session?.activeMembership?.organizationId;
+        : session.activeMembership?.organizationId;
   }
 
   /// Switches the locally selected organization (D-08: client-side only —

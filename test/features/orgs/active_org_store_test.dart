@@ -224,6 +224,51 @@ void main() {
       expect(store.activeOrganizationId, 'org-a');
     });
 
+    test('applies a persisted selection when the read resolves late', () async {
+      final InMemoryOrgSelectionStore prefs = InMemoryOrgSelectionStore();
+      await prefs.write('org-b');
+      final ActiveOrgStore store = ActiveOrgStore(prefs);
+
+      // The cold-start ordering: the hub seeds during the same build pass
+      // the store is constructed, before the constructor-fired read resolves.
+      store.syncFromSession(
+        sessionWith(<OrganizationMembership>[
+          membership('org-a'),
+          membership('org-b'),
+        ]),
+      );
+      expect(store.activeOrganizationId, 'org-a');
+
+      // The read resolves → the persisted selection is applied for this user.
+      await pumpEventQueue();
+      expect(store.activeOrganizationId, 'org-b');
+    });
+
+    test('a sign-out does not discard a restore that resolves later', () async {
+      final InMemoryOrgSelectionStore prefs = InMemoryOrgSelectionStore();
+      await prefs.write('org-b');
+      final ActiveOrgStore store = ActiveOrgStore(prefs);
+
+      // Seed and sign out before the constructor-fired read resolves.
+      store.syncFromSession(
+        sessionWith(<OrganizationMembership>[membership('org-a')]),
+      );
+      store.syncFromSession(null);
+      expect(store.activeOrganizationId, isNull);
+
+      // The read resolves after sign-out → cached, not discarded…
+      await pumpEventQueue();
+
+      // …and the same user's re-sign-in re-validates and applies it.
+      store.syncFromSession(
+        sessionWith(<OrganizationMembership>[
+          membership('org-a'),
+          membership('org-b'),
+        ]),
+      );
+      expect(store.activeOrganizationId, 'org-b');
+    });
+
     test('a write failure does not break the in-memory selection', () async {
       final _FlakyOrgSelectionStore prefs = _FlakyOrgSelectionStore(
         failWrite: true,
