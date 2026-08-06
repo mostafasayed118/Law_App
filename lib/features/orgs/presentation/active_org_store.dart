@@ -32,6 +32,11 @@ import '../../../data/local/org_selection_store.dart';
 ///   not re-seed — a deliberate choice (a user selection must survive);
 ///   consumers that need the membership re-derived should watch the session
 ///   themselves.
+/// - **Pre-seed selection (P3.4):** the accept flow can select before the
+///   hub ever seeds this session; that explicit selection is kept by the
+///   first seed when the session still holds the membership (same
+///   validated-application rule as the restore) and consumed by it — never
+///   carried into a different identity.
 class ActiveOrgStore extends ChangeNotifier {
   ActiveOrgStore(this._orgSelectionStore) {
     _restoreSelection();
@@ -43,6 +48,18 @@ class ActiveOrgStore extends ChangeNotifier {
   String? _seededUserId;
   List<OrganizationMembership>? _seededMemberships;
   String? _restoredOrganizationId;
+
+  /// True while the current in-memory selection was made explicitly in this
+  /// session ([select]) rather than applied from the persisted restore (P3.4
+  /// review fix).
+  ///
+  /// The seed branch keeps an in-memory selection only when this flag is set:
+  /// the accept flow can select before the hub ever seeds, and that selection
+  /// must survive the first seed (it is membership-backed from the hydrated
+  /// session). A restore-applied value is deliberately NOT carried across an
+  /// identity change ("applied once per restore"), so the two are
+  /// distinguished instead of conflating them.
+  bool _selectionMadeThisSession = false;
 
   /// The locally selected organization id (null before any session exists).
   String? get activeOrganizationId => _activeOrganizationId;
@@ -95,21 +112,40 @@ class ActiveOrgStore extends ChangeNotifier {
     _seededUserId = userId;
     _seededMemberships = session?.memberships;
     if (session == null) {
-      // Sign-out: clear the context but never discard a cached, not-yet-
-      // applied restore — the next real-user seed re-validates it, so a
-      // same-user sign-out → sign-in keeps the persisted selection.
+      // Sign-out: clear the context (and the this-session selection intent)
+      // but never discard a cached, not-yet-applied restore — the next
+      // real-user seed re-validates it, so a same-user sign-out → sign-in
+      // keeps the persisted selection.
       _activeOrganizationId = null;
+      _selectionMadeThisSession = false;
       return;
     }
+    final List<OrganizationMembership> memberships = session.memberships;
+    // P3.4 review fix: an explicit selection made this session (the accept
+    // flow can select before the hub ever seeds) is the freshest intent —
+    // keep it when the new session still holds that membership, using the
+    // same validated-application rule as the restore. It is consumed by this
+    // seed (flag reset): a selection from a previous session is never
+    // carried into a different identity.
+    final String? current = _selectionMadeThisSession
+        ? _activeOrganizationId
+        : null;
     final String? restored = _restoredOrganizationId;
     _restoredOrganizationId = null;
-    final List<OrganizationMembership> memberships = session.memberships;
+    _selectionMadeThisSession = false;
+    final bool currentIsValid =
+        current != null &&
+        memberships.any(
+          (OrganizationMembership m) => m.organizationId == current,
+        );
     final bool restoredIsValid =
         restored != null &&
         memberships.any(
           (OrganizationMembership m) => m.organizationId == restored,
         );
-    _activeOrganizationId = restoredIsValid
+    _activeOrganizationId = currentIsValid
+        ? current
+        : restoredIsValid
         ? restored
         : session.activeMembership?.organizationId;
   }
@@ -122,6 +158,7 @@ class ActiveOrgStore extends ChangeNotifier {
       return;
     }
     _activeOrganizationId = organizationId;
+    _selectionMadeThisSession = true;
     notifyListeners();
     unawaited(_persistSelection(organizationId));
   }

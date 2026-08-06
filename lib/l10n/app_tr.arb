@@ -122,7 +122,7 @@
   "deleteAccountAction": "Hesabı sil",
   "deleteAccountConfirmTitle": "Hesabınız silinsin mi?",
   "deleteAccountConfirmBody": "Bu işlem hesabınızı kalıcı olarak siler ve sizi tüm kuruluşlardan kaldırır. Geri alınamaz.",
-  "deleteAccountAuditNote": "Etkinliğinize ilişkin denetim kayıtları, yasanın gerektirdiği şekilde saklanır.",
+  "deleteAccountAuditNote": "Verileriniz silinir; etkinliğinize ilişkin denetim kayıtları saklanır.",
   "deleteAccountConfirmAction": "Sil",
   "profileSessionExpired": "Oturum süresi doldu. Lütfen tekrar giriş yapın.",
   "notificationsTitle": "Bildirimler",

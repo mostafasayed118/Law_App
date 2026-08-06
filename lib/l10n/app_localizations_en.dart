@@ -394,7 +394,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteAccountAuditNote =>
-      'Audit records of your activity are retained as required by law.';
+      'Your data is deleted; audit records of your activity are retained.';
 
   @override
   String get deleteAccountConfirmAction => 'Delete';

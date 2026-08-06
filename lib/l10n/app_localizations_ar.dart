@@ -393,7 +393,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get deleteAccountAuditNote =>
-      'تُحتفظ بسجلات التدقيق الخاصة بنشاطك وفقًا لما يقتضيه القانون.';
+      'تُحذف بياناتك، مع الإبقاء على سجلات التدقيق الخاصة بنشاطك.';
 
   @override
   String get deleteAccountConfirmAction => 'حذف';

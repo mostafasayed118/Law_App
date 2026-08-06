@@ -396,7 +396,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get deleteAccountAuditNote =>
-      'Etkinliğinize ilişkin denetim kayıtları, yasanın gerektirdiği şekilde saklanır.';
+      'Verileriniz silinir; etkinliğinize ilişkin denetim kayıtları saklanır.';
 
   @override
   String get deleteAccountConfirmAction => 'Sil';

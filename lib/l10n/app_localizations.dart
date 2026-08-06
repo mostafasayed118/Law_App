@@ -823,7 +823,7 @@ abstract class AppLocalizations {
   /// No description provided for @deleteAccountAuditNote.
   ///
   /// In en, this message translates to:
-  /// **'Audit records of your activity are retained as required by law.'**
+  /// **'Your data is deleted; audit records of your activity are retained.'**
   String get deleteAccountAuditNote;
 
   /// No description provided for @deleteAccountConfirmAction.

@@ -101,7 +101,7 @@ void main() {
     // by law, never promised as data recovery.
     expect(
       find.text(
-        'Audit records of your activity are retained as required by law.',
+        'Your data is deleted; audit records of your activity are retained.',
       ),
       findsOneWidget,
     );
@@ -125,9 +125,7 @@ void main() {
 
     expect(find.text('هل تريد حذف حسابك؟'), findsOneWidget);
     expect(
-      find.text(
-        'تُحتفظ بسجلات التدقيق الخاصة بنشاطك وفقًا لما يقتضيه القانون.',
-      ),
+      find.text('تُحذف بياناتك، مع الإبقاء على سجلات التدقيق الخاصة بنشاطك.'),
       findsOneWidget,
     );
     // The dialog actions also resolve in AR; cancel keeps the session.

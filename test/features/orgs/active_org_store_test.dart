@@ -99,6 +99,60 @@ void main() {
       expect(store.activeOrganizationId, 'org-b');
     });
 
+    test('a selection made before the first seed survives that seed '
+        '(P3.4 accept flow)', () {
+      final ActiveOrgStore store = storeWith();
+
+      // The accept screen selects before the hub ever seeds this session.
+      store.select('org-b');
+      expect(store.activeOrganizationId, 'org-b');
+
+      store.syncFromSession(
+        sessionWith(<OrganizationMembership>[
+          membership('org-a'),
+          membership('org-b'),
+        ]),
+      );
+
+      // The membership-backed selection wins over the session default.
+      expect(store.activeOrganizationId, 'org-b');
+    });
+
+    test('a pre-seed selection the session does not hold falls back', () {
+      final ActiveOrgStore store = storeWith();
+
+      store.select('org-x');
+      store.syncFromSession(
+        sessionWith(<OrganizationMembership>[membership('org-a')]),
+      );
+
+      // Foreign selection is never applied — the session is the authority.
+      expect(store.activeOrganizationId, 'org-a');
+    });
+
+    test('a pre-seed selection does not carry into a different user', () {
+      final ActiveOrgStore store = storeWith();
+
+      store.select('org-b');
+      store.syncFromSession(
+        sessionWith(<OrganizationMembership>[
+          membership('org-a'),
+          membership('org-b'),
+        ]),
+      );
+      expect(store.activeOrganizationId, 'org-b');
+
+      store.syncFromSession(
+        sessionWith(<OrganizationMembership>[
+          membership('org-c'),
+        ], userId: 'user-2'),
+      );
+
+      // The accept selection is consumed by the first seed — a different
+      // identity re-derives from its own session.
+      expect(store.activeOrganizationId, 'org-c');
+    });
+
     test('re-seeds when the session identity changes (new user)', () {
       final ActiveOrgStore store = storeWith();
       store.syncFromSession(

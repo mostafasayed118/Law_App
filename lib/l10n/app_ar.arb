@@ -122,7 +122,7 @@
   "deleteAccountAction": "حذف الحساب",
   "deleteAccountConfirmTitle": "هل تريد حذف حسابك؟",
   "deleteAccountConfirmBody": "سيؤدي هذا إلى حذف حسابك نهائيًا وإزالتك من كل مؤسسة. لا يمكن التراجع عن هذا الإجراء.",
-  "deleteAccountAuditNote": "تُحتفظ بسجلات التدقيق الخاصة بنشاطك وفقًا لما يقتضيه القانون.",
+  "deleteAccountAuditNote": "تُحذف بياناتك، مع الإبقاء على سجلات التدقيق الخاصة بنشاطك.",
   "deleteAccountConfirmAction": "حذف",
   "profileSessionExpired": "انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.",
   "notificationsTitle": "الإشعارات",
