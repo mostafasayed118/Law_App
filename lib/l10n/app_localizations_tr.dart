@@ -544,6 +544,29 @@ class AppLocalizationsTr extends AppLocalizations {
   String get removeMemberConfirmAction => 'Kaldır';
 
   @override
+  String get platformAdminTitle => 'Platform yöneticisi';
+
+  @override
+  String get platformAdminOrganizations => 'Kuruluşlar';
+
+  @override
+  String get platformAdminMembers => 'Üyeler';
+
+  @override
+  String get platformAdminDeleteDemo => 'Demo hesabını sil';
+
+  @override
+  String get platformAdminDeleteConfirmTitle => 'Demo hesabı silinsin mi?';
+
+  @override
+  String platformAdminDeleteConfirmBody(String name) {
+    return '$name için demo hesabı silinsin mi? Bu geri alınamaz.';
+  }
+
+  @override
+  String get platformAdminDeleteConfirmAction => 'Sil';
+
+  @override
   String get orgErrorDenied => 'Bu işlemi yapma izniniz yok.';
 
   @override

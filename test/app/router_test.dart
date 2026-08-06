@@ -1285,6 +1285,51 @@ void main() {
         expect(find.text('Language'), findsWidgets);
       },
     );
+
+    testWidgets('drives settings → platform admin through the settings tile', (
+      tester,
+    ) async {
+      // PlatformAdminScreen resolves its cubit from the locator's registered
+      // fake gateway (owner demo identity), so the metadata sections render.
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // 1. Authenticated redirect lands on /home; open /settings via the
+      //    bottom NavigationBar (the shell's tap target, not router.go).
+      await tester.tap(find.byIcon(Icons.settings_outlined));
+      await tester.pumpAndSettle();
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        AppRoutes.settings,
+      );
+
+      // 2. The platform-admin tile (below the fold in the settings ListView)
+      //    → the admin screen renders its sections.
+      await tester.scrollUntilVisible(
+        find.text('Platform admin'),
+        200,
+        scrollable: find.byType(Scrollable),
+      );
+      await tester.tap(find.text('Platform admin'));
+      await tester.pumpAndSettle();
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        AppRoutes.platformAdmin,
+      );
+      expect(find.text('Organizations'), findsOneWidget);
+      expect(find.text('Demo Firm'), findsOneWidget);
+      expect(find.text('Members'), findsOneWidget);
+      // The settings destination stays highlighted on the descendant route.
+      expect(
+        tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex,
+        1,
+      );
+    });
   });
 }
 

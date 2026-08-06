@@ -91,6 +91,16 @@ class SettingsScreen extends StatelessWidget {
             title: Text(l10n.acceptInvitationTitle),
             onTap: () => context.go(AppRoutes.acceptInvitation),
           ),
+          const SizedBox(height: LegalHubTheme.spaceSm),
+          // Platform-admin entry (P3.5): a navigation hint for any
+          // authenticated user — the owner-only RPCs gate server-side, and a
+          // non-owner sees the distinct denied state, never empty success.
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.admin_panel_settings_outlined),
+            title: Text(l10n.platformAdminTitle),
+            onTap: () => context.go(AppRoutes.platformAdmin),
+          ),
           const SizedBox(height: LegalHubTheme.spaceXl),
           OutlinedButton.icon(
             onPressed: () => context.read<AuthCubit>().signOut(),

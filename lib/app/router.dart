@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/roles/user_role.dart';
+import '../features/admin/presentation/platform_admin_screen.dart';
 import '../features/auth/presentation/auth_cubit.dart';
 import '../features/auth/presentation/forgot_password/forgot_password_email_screen.dart';
 import '../features/auth/presentation/forgot_password/forgot_password_otp_screen.dart';
@@ -44,6 +45,7 @@ class AppRoutes {
   static const String acceptInvitation = '/accept-invitation';
   static const String profile = '/profile';
   static const String notifications = '/notifications';
+  static const String platformAdmin = '/platform-admin';
   static const String book = '/book';
   static const String discovery = '/discovery';
   static const String discoveryProfile = '/discovery/:attorneyId';
@@ -224,6 +226,11 @@ GoRouter createAppRouter(
           builder: (BuildContext context, GoRouterState state) =>
               const NotificationSettingsScreen(),
         ),
+        GoRoute(
+          path: AppRoutes.platformAdmin,
+          builder: (BuildContext context, GoRouterState state) =>
+              const PlatformAdminScreen(),
+        ),
       ],
     ),
   ],
@@ -331,7 +338,8 @@ class _AppShell extends StatelessWidget {
         location == AppRoutes.profile ||
         location == AppRoutes.notifications ||
         location == AppRoutes.organizations ||
-        location == AppRoutes.acceptInvitation;
+        location == AppRoutes.acceptInvitation ||
+        location == AppRoutes.platformAdmin;
     final String targetRoute = onSettingsSurface
         ? AppRoutes.settings
         : AppRoutes.home;

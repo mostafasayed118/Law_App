@@ -540,6 +540,29 @@ class AppLocalizationsAr extends AppLocalizations {
   String get removeMemberConfirmAction => 'إزالة';
 
   @override
+  String get platformAdminTitle => 'إدارة المنصة';
+
+  @override
+  String get platformAdminOrganizations => 'المؤسسات';
+
+  @override
+  String get platformAdminMembers => 'الأعضاء';
+
+  @override
+  String get platformAdminDeleteDemo => 'حذف حساب تجريبي';
+
+  @override
+  String get platformAdminDeleteConfirmTitle => 'حذف الحساب التجريبي؟';
+
+  @override
+  String platformAdminDeleteConfirmBody(String name) {
+    return 'حذف الحساب التجريبي لـ $name؟ لا يمكن التراجع عن هذا.';
+  }
+
+  @override
+  String get platformAdminDeleteConfirmAction => 'حذف';
+
+  @override
   String get orgErrorDenied => 'ليس لديك صلاحية تنفيذ هذا الإجراء.';
 
   @override

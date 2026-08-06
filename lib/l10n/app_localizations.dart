@@ -1096,6 +1096,48 @@ abstract class AppLocalizations {
   /// **'Remove'**
   String get removeMemberConfirmAction;
 
+  /// No description provided for @platformAdminTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Platform admin'**
+  String get platformAdminTitle;
+
+  /// No description provided for @platformAdminOrganizations.
+  ///
+  /// In en, this message translates to:
+  /// **'Organizations'**
+  String get platformAdminOrganizations;
+
+  /// No description provided for @platformAdminMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'Members'**
+  String get platformAdminMembers;
+
+  /// No description provided for @platformAdminDeleteDemo.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete demo account'**
+  String get platformAdminDeleteDemo;
+
+  /// No description provided for @platformAdminDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete demo account?'**
+  String get platformAdminDeleteConfirmTitle;
+
+  /// No description provided for @platformAdminDeleteConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the demo account for {name}? This cannot be undone.'**
+  String platformAdminDeleteConfirmBody(String name);
+
+  /// No description provided for @platformAdminDeleteConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get platformAdminDeleteConfirmAction;
+
   /// No description provided for @orgErrorDenied.
   ///
   /// In en, this message translates to:
