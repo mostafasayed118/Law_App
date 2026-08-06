@@ -1033,11 +1033,30 @@ void main() {
           AppRoutes.signIn,
         );
         expect(find.text('Welcome Back'), findsOneWidget);
-        // The token is buffered in-memory for the signed-in visit, not lost
-        // (cold-start / signed-out race, D-P41.4).
+        // The token is buffered in-memory, not lost (cold-start / signed-out
+        // race, D-P41.4).
         expect(
-          serviceLocator<PendingAcceptInviteStore>().takePendingToken(),
-          'pending-token',
+          serviceLocator<PendingAcceptInviteStore>().hasPendingToken,
+          isTrue,
+        );
+
+        // A later signed-in visit consummates the D-P41.4 promise: the
+        // buffered token pre-fills the accept surface and is consumed.
+        await authCubit.startDemoSession();
+        router.go(AppRoutes.acceptInvitation);
+        await tester.pumpAndSettle();
+
+        expect(
+          router.routerDelegate.currentConfiguration.uri.path,
+          AppRoutes.acceptInvitation,
+        );
+        final TextField field = tester.widget<TextField>(
+          find.byType(TextField),
+        );
+        expect(field.controller!.text, 'pending-token');
+        expect(
+          serviceLocator<PendingAcceptInviteStore>().hasPendingToken,
+          isFalse,
         );
       },
     );
