@@ -705,6 +705,50 @@ void main() {
     );
 
     blocTest<AuthCubit, AuthState>(
+      'an explicit re-auth during a pending hydrate owns the emission '
+      '(same-user refresh never clobbers — review fix)',
+      setUp: () => _stagedHydrationRepository = _StagedHydrationRepository(),
+      build: () => AuthCubit(
+        _PreauthenticatedGateway(demoSession()),
+        InMemoryErrorReporter(),
+        _stagedHydrationRepository,
+      ),
+      act: (AuthCubit cubit) async {
+        // hydrate() blocks on call 1; an explicit restore() then runs its
+        // own (fresher) hydration and completes. The refresh resolves after
+        // and must NOT override the explicit op's emission.
+        final Future<void> refresh = cubit.hydrate();
+        await cubit.restore();
+        _stagedHydrationRepository.release();
+        await refresh;
+      },
+      expect: () => <dynamic>[
+        const AuthState(status: AuthStatus.restoring),
+        isA<AuthState>()
+            .having(
+              (AuthState s) => s.status,
+              'status',
+              AuthStatus.authenticated,
+            )
+            .having(
+              (AuthState s) =>
+                  s.session?.memberships.single.organizationId,
+              'memberships org',
+              'org-fresh',
+            ),
+      ],
+      verify: (AuthCubit cubit) {
+        expect(_stagedHydrationRepository.calls, 2);
+        // The late-resolving stale refresh (org-stale) never replaced the
+        // explicit op's fresh hydration.
+        expect(
+          cubit.state.session?.memberships.single.organizationId,
+          'org-fresh',
+        );
+      },
+    );
+
+    blocTest<AuthCubit, AuthState>(
       'a failed refresh reports through the diagnostic channel and keeps the '
       'last-known-good state',
       setUp: () {
@@ -750,6 +794,7 @@ late _CountingAuthGateway _countingAuthGateway;
 late FakeAuthGateway _streamGateway;
 late _HydrationRepository _hydrationRepository;
 late _BlockingHydrationRepository _blockingHydrationRepository;
+late _StagedHydrationRepository _stagedHydrationRepository;
 
 class _NullSessionGateway implements AuthGateway {
   @override
@@ -915,6 +960,43 @@ class _BlockingHydrationRepository implements MembershipRepository {
     calls += 1;
     await _gate.future;
     return result;
+  }
+}
+
+/// A hydration stub whose FIRST read blocks until [release] (the pending
+/// [AuthCubit.hydrate]) and whose second read (an explicit op's hydration)
+/// answers instantly with a distinct membership — pinning that a same-user
+/// explicit re-auth during a pending refresh owns the emission (review fix).
+class _StagedHydrationRepository implements MembershipRepository {
+  final Completer<void> _gate = Completer<void>();
+  int calls = 0;
+
+  void release() => _gate.complete();
+
+  @override
+  Future<MembershipHydrationResult> loadMemberships({
+    required String userId,
+  }) async {
+    calls += 1;
+    if (calls == 1) {
+      await _gate.future;
+      return const HydrationSucceeded(<OrganizationMembership>[
+        OrganizationMembership(
+          organizationId: 'org-stale',
+          organizationName: 'Stale Firm',
+          role: UserRole.partner,
+          status: MembershipStatus.active,
+        ),
+      ]);
+    }
+    return const HydrationSucceeded(<OrganizationMembership>[
+      OrganizationMembership(
+        organizationId: 'org-fresh',
+        organizationName: 'Fresh Firm',
+        role: UserRole.partner,
+        status: MembershipStatus.active,
+      ),
+    ]);
   }
 }
 

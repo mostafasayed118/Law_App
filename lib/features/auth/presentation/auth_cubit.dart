@@ -49,6 +49,17 @@ class AuthCubit extends Cubit<AuthState> {
   /// first one owns the emission.
   bool _hydrationInFlight = false;
 
+  /// Bumped whenever an explicit authenticated operation runs its hydration
+  /// or a sign-out completes (P3.3 Slice A review fix).
+  ///
+  /// [hydrate] captures the epoch when it starts and applies its refresh
+  /// only if the epoch is unchanged: an explicit op that started (or
+  /// completed) while the refresh was awaiting owns the emission — its
+  /// hydration is fresher, so a same-user re-auth must never be clobbered by
+  /// the late-resolving refresh. The provider stream path does not bump it
+  /// (it never hydrates; a refresh enriching a stream session is desirable).
+  int _hydrationEpoch = 0;
+
   /// True while the current session is a password-recovery session (Phase
   /// 4.1 deep-link variant). Mirrors the gateway's provider-derived signal
   /// (GoTrue `passwordRecovery` event or a pending `recovery_sent_at`), so
@@ -152,6 +163,7 @@ class AuthCubit extends Cubit<AuthState> {
       return;
     }
     _hydrationInFlight = true;
+    final int epoch = _hydrationEpoch;
     try {
       final MembershipHydrationResult result = await _membershipRepository
           .loadMemberships(userId: current.userId);
@@ -159,6 +171,12 @@ class AuthCubit extends Cubit<AuthState> {
         case HydrationSucceeded(
           :final List<OrganizationMembership> memberships,
         ):
+          // An explicit op that started (or completed) while this refresh
+          // was awaiting owns the emission — its hydration is fresher, so a
+          // same-user re-auth is never clobbered by the stale refresh.
+          if (epoch != _hydrationEpoch) {
+            return;
+          }
           final Session? now = state.session;
           if (now == null || now.userId != current.userId || now.isExpired) {
             return;
@@ -202,6 +220,9 @@ class AuthCubit extends Cubit<AuthState> {
   /// session is [hydrate] (P3.3) — presentation calls it after an org
   /// mutation; the next explicit auth op re-hydrates as well.
   Future<void> _applyAuthenticatedSession(Session session) async {
+    // This explicit hydration is fresher than any in-flight [hydrate]
+    // refresh (Slice A review fix — see [_hydrationEpoch]).
+    _hydrationEpoch += 1;
     if (session.isExpired) {
       emit(const AuthState(status: AuthStatus.reauthRequired));
       return;
@@ -332,6 +353,10 @@ class AuthCubit extends Cubit<AuthState> {
     _explicitOperationInFlight = true;
     try {
       await _gateway.signOut();
+      // Invalidate any in-flight [hydrate] refresh (Slice A review fix): a
+      // refresh that resolves after sign-out must not re-emit authenticated
+      // for the signed-out session.
+      _hydrationEpoch += 1;
       // The gateway stream already emitted null (and the listener mapped it);
       // this explicit emission only matters when the gateway is silent, so it
       // is deduped against the current state.

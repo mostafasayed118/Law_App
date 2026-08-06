@@ -5,11 +5,15 @@ import 'fake_organization_gateway.dart';
 
 /// Development-only membership hydration implementation.
 ///
-/// Mirrors the demo session's membership (`FakeAuthGateway.demoMembership`:
-/// org-demo / Demo Firm / partner / active) so env-less runs and tests
-/// hydrate the same memberships the demo session carries. This is a seam for
-/// presentation tests and env-less runs — it is not an authorization
-/// mechanism and must not be used as production authority.
+/// Unbound, it mirrors the demo session's membership
+/// (`FakeAuthGateway.demoMembership`: org-demo / Demo Firm / partner /
+/// active) so env-less runs and tests hydrate the same memberships the demo
+/// session carries. When bound to a [FakeOrganizationGateway] (P3.3 Slice B)
+/// it derives the demo user's live memberships instead — orgs created during
+/// the run join the hydrated session, so the bound surface can exceed the
+/// static demo session. This is a seam for presentation tests and env-less
+/// runs; it is not an authorization mechanism and must not be used as
+/// production authority.
 class FakeMembershipRepository implements MembershipRepository {
   FakeMembershipRepository({this.organizationGateway});
 
