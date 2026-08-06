@@ -13,6 +13,7 @@ import '../../domain/password_recovery_gateway.dart';
 import '../../domain/password_recovery_request.dart';
 import '../password_recovery_cubit.dart';
 import '../widgets/auth_buttons.dart';
+import 'recovery_error_localizer.dart';
 import 'recovery_routing_context.dart';
 
 /// Step 3 — set a new password and confirm it.
@@ -130,7 +131,7 @@ class _ForgotPasswordResetScreenState extends State<ForgotPasswordResetScreen> {
                                   bottom: LegalHubTheme.spaceMd,
                                 ),
                                 child: ViewStateView<void>(
-                                  state: state,
+                                  state: localizeRecoveryError(state, l10n),
                                   onRetry: () => context
                                       .read<PasswordRecoveryCubit>()
                                       .resetToEmpty(),

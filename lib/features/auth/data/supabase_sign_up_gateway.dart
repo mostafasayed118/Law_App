@@ -4,14 +4,17 @@ import '../../../data/auth/supabase_auth_api.dart';
 import '../domain/sign_up_gateway.dart';
 import '../domain/sign_up_request.dart';
 
-/// Real sign-up backed by the Supabase provider via the [SupabaseAuthApi]
-/// seam — the only provider-touching file. Registered instead of
-/// [FakeSignUpGateway] when the build is configured with a Supabase URL +
-/// anon key (`--dart-define-from-file=.env`).
+/// [SignUpGateway] backed by the DTO-free [SupabaseAuthApi] seam (P3.1).
 ///
-/// Privacy contract: on failure the [AppError] context is built from
-/// [SignUpRequest.toRedactedMap], so the password, email, and phone never
-/// reach diagnostics in clear text (ADR-0003).
+/// Every provider response is mapped strictly below the [SupabaseAuthApi]
+/// seam; this gateway only re-shapes typed results into [Result]. The
+/// redaction contract (ADR-0003) is preserved: failure contexts are built
+/// from [SignUpRequest.toRedactedMap], never from raw provider data.
+///
+/// Email confirmation is enabled on the dev project, so a successful sign-up
+/// resolves to the pending-verification state (no session). The screen renders
+/// that as the "check your email" success state — the gateway does not mint a
+/// session the user did not verify.
 class SupabaseSignUpGateway implements SignUpGateway {
   SupabaseSignUpGateway(this._api);
 
@@ -19,45 +22,51 @@ class SupabaseSignUpGateway implements SignUpGateway {
 
   @override
   Future<Result<void>> submit(SignUpRequest request) async {
-    try {
-      await _api.signUp(
-        email: request.email,
-        password: request.password,
-        metadata: <String, String>{
-          // display_name is what the applied handle_new_user trigger reads
-          // (02_rls_functions.sql:77) so the profile row carries the real
-          // name; full_name/phone stay for client-side display resolution.
-          'display_name': request.name,
-          'full_name': request.name,
-          'phone': request.phone,
-        },
-      );
-      return const Result<void>.success(null);
-    } on SupabaseAuthException catch (e) {
-      return Result<void>.failure(
-        AppError(
-          code: e.kind.name,
-          userMessage: _messageFor(e),
-          context: request.toRedactedMap(),
-        ),
-      );
+    final SupabaseSignUpResult result = await _api.signUp(
+      email: request.email,
+      password: request.password,
+      displayName: request.name,
+    );
+    switch (result) {
+      case SupabaseSignUpPending():
+        // Email confirmation is enabled (apply evidence §6): pending IS the
+        // success state — the screen shows the "check your email" notice.
+        return const Result<void>.success(null);
+      case SupabaseSignUpAuthenticated():
+        return const Result<void>.success(null);
+      case SupabaseSignUpFailed(failure: final SupabaseAuthFailure failure):
+        return Result<void>.failure(_toAppError(request, failure));
     }
   }
 
-  /// Locale-agnostic safe fallback text; the code is the stable key for a
-  /// future localized mapping. Precedent: AuthCubit._handleFailure uses
-  /// English fallbacks for the same reason.
-  String _messageFor(SupabaseAuthException e) {
-    return switch (e.kind) {
-      SupabaseAuthFailureKind.emailInUse =>
-        'An account with this email already exists. Try signing in.',
-      SupabaseAuthFailureKind.rateLimited =>
-        'Too many attempts. Please wait and try again.',
-      SupabaseAuthFailureKind.userDisabled => 'This account has been disabled.',
-      SupabaseAuthFailureKind.invalidCredentials ||
-      SupabaseAuthFailureKind.emailNotConfirmed ||
-      SupabaseAuthFailureKind.unknown =>
-        'Sign-up failed. Please check your details and try again.',
-    };
+  AppError _toAppError(SignUpRequest request, SupabaseAuthFailure failure) {
+    return AppError(
+      code: _codeFor(failure.kind),
+      userMessage: _messageFor(failure.kind),
+      // ADR-0003: the diagnostic context is the redacted map, never raw data.
+      context: request.toRedactedMap(),
+    );
   }
+
+  String _codeFor(SupabaseAuthFailureKind kind) => switch (kind) {
+    SupabaseAuthFailureKind.invalidCredentials => 'invalidCredentials',
+    SupabaseAuthFailureKind.emailNotConfirmed => 'emailNotConfirmed',
+    SupabaseAuthFailureKind.emailInUse => 'emailInUse',
+    SupabaseAuthFailureKind.userDisabled => 'userDisabled',
+    SupabaseAuthFailureKind.rateLimited => 'rateLimited',
+    SupabaseAuthFailureKind.providerUnavailable => 'providerUnavailable',
+    SupabaseAuthFailureKind.unknown => 'unknown',
+  };
+
+  String _messageFor(SupabaseAuthFailureKind kind) => switch (kind) {
+    SupabaseAuthFailureKind.invalidCredentials => 'Sign up failed',
+    SupabaseAuthFailureKind.emailNotConfirmed => 'Please check your email',
+    SupabaseAuthFailureKind.emailInUse =>
+      'An account with this email already exists',
+    SupabaseAuthFailureKind.userDisabled => 'This account is disabled',
+    SupabaseAuthFailureKind.rateLimited => 'Too many attempts, try again later',
+    SupabaseAuthFailureKind.providerUnavailable =>
+      'Sign up is temporarily unavailable',
+    SupabaseAuthFailureKind.unknown => 'Sign up failed',
+  };
 }

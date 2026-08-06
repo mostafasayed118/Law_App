@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/router.dart';
+import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
@@ -16,11 +17,16 @@ void main() {
   setUp(() {
     gateway = FakeAuthGateway();
     authCubit = AuthCubit(gateway, InMemoryErrorReporter());
+    // The forgot-password link test navigates to the recovery email screen,
+    // which builds a PasswordRecoveryCubit from the DI-registered dev fake
+    // (P3.1). configureDependencies() is idempotent and registers the fake.
+    configureDependencies();
   });
 
   tearDown(() async {
     await authCubit.close();
     await gateway.dispose();
+    await resetServiceLocator();
   });
 
   // The sign-in screen pumps SignInScreen directly (no router) for the

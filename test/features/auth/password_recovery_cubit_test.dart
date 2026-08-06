@@ -89,6 +89,48 @@ void main() {
         const ViewSuccess<void>(null),
       ],
     );
+
+    blocTest<PasswordRecoveryCubit, ViewState<void>>(
+      'sendCode emits [loading, success] when the gateway succeeds (P3.1)',
+      build: () => PasswordRecoveryCubit(_AlwaysSucceedsGateway()),
+      act: (PasswordRecoveryCubit cubit) => cubit.sendCode('amira@example.com'),
+      expect: () => <ViewState<void>>[
+        const ViewLoading<void>(),
+        const ViewSuccess<void>(null),
+      ],
+    );
+
+    blocTest<PasswordRecoveryCubit, ViewState<void>>(
+      'sendCode emits [loading, error] when the gateway fails (P3.1)',
+      build: () => PasswordRecoveryCubit(_AlwaysFailsGateway(_failure)),
+      act: (PasswordRecoveryCubit cubit) => cubit.sendCode('amira@example.com'),
+      expect: () => <ViewState<void>>[
+        const ViewLoading<void>(),
+        ViewError<void>(_failure),
+      ],
+    );
+
+    blocTest<PasswordRecoveryCubit, ViewState<void>>(
+      'verifyCode emits [loading, success] when the gateway succeeds (P3.1)',
+      build: () => PasswordRecoveryCubit(_AlwaysSucceedsGateway()),
+      act: (PasswordRecoveryCubit cubit) =>
+          cubit.verifyCode(email: 'amira@example.com', code: '123456'),
+      expect: () => <ViewState<void>>[
+        const ViewLoading<void>(),
+        const ViewSuccess<void>(null),
+      ],
+    );
+
+    blocTest<PasswordRecoveryCubit, ViewState<void>>(
+      'verifyCode emits [loading, error] when the gateway fails (P3.1)',
+      build: () => PasswordRecoveryCubit(_AlwaysFailsGateway(_failure)),
+      act: (PasswordRecoveryCubit cubit) =>
+          cubit.verifyCode(email: 'amira@example.com', code: '000000'),
+      expect: () => <ViewState<void>>[
+        const ViewLoading<void>(),
+        ViewError<void>(_failure),
+      ],
+    );
   });
 }
 
@@ -110,14 +152,19 @@ late _CountingGateway _countingGateway;
 
 class _AlwaysSucceedsGateway implements PasswordRecoveryGateway {
   @override
-  Future<Result<void>> requestCode({required String email}) async =>
-      const Result<void>.success(null);
+  Future<Result<void>> sendCode(String email) async {
+    await Future<void>.delayed(const Duration(milliseconds: 5));
+    return Result<void>.success(null);
+  }
 
   @override
   Future<Result<void>> verifyCode({
     required String email,
-    required String otp,
-  }) async => const Result<void>.success(null);
+    required String code,
+  }) async {
+    await Future<void>.delayed(const Duration(milliseconds: 5));
+    return Result<void>.success(null);
+  }
 
   @override
   Future<Result<void>> reset(PasswordRecoveryRequest request) async {
@@ -132,14 +179,19 @@ class _AlwaysFailsGateway implements PasswordRecoveryGateway {
   final AppError error;
 
   @override
-  Future<Result<void>> requestCode({required String email}) async =>
-      const Result<void>.success(null);
+  Future<Result<void>> sendCode(String email) async {
+    await Future<void>.delayed(const Duration(milliseconds: 5));
+    return Result<void>.failure(error);
+  }
 
   @override
   Future<Result<void>> verifyCode({
     required String email,
-    required String otp,
-  }) async => const Result<void>.success(null);
+    required String code,
+  }) async {
+    await Future<void>.delayed(const Duration(milliseconds: 5));
+    return Result<void>.failure(error);
+  }
 
   @override
   Future<Result<void>> reset(PasswordRecoveryRequest request) async {
@@ -149,17 +201,24 @@ class _AlwaysFailsGateway implements PasswordRecoveryGateway {
 }
 
 class _CountingGateway implements PasswordRecoveryGateway {
+  int calls = 0;
+
   @override
-  Future<Result<void>> requestCode({required String email}) async =>
-      const Result<void>.success(null);
+  Future<Result<void>> sendCode(String email) async {
+    calls += 1;
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    return Result<void>.success(null);
+  }
 
   @override
   Future<Result<void>> verifyCode({
     required String email,
-    required String otp,
-  }) async => const Result<void>.success(null);
-
-  int calls = 0;
+    required String code,
+  }) async {
+    calls += 1;
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    return Result<void>.success(null);
+  }
 
   @override
   Future<Result<void>> reset(PasswordRecoveryRequest request) async {

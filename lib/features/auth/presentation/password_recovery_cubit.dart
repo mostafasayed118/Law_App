@@ -21,6 +21,56 @@ class PasswordRecoveryCubit extends Cubit<ViewState<void>> {
 
   final PasswordRecoveryGateway _gateway;
 
+  /// Step 1 — request a recovery code (P3.1). Generic non-enumerating
+  /// acknowledgement; never reveals whether the account exists.
+  ///
+  /// Guards against concurrent sends only: the OTP step's wired "Resend"
+  /// action stays on-screen after a successful resend, so a repeated send
+  /// must remain possible (unlike [submit]/[verifyCode], which navigate away
+  /// on success and may keep the success guard).
+  Future<void> sendCode(String email) async {
+    if (state is ViewLoading<void>) {
+      return;
+    }
+    emit(const ViewLoading<void>());
+    final Result<void> result = await _gateway.sendCode(email);
+    if (!isClosed) {
+      switch (result) {
+        case Success<void>():
+          emit(const ViewSuccess<void>(null));
+        case Failure<void>(error: final error):
+          emit(ViewError<void>(error));
+      }
+    }
+  }
+
+  /// Step 2 — verify the emailed code (P3.1). One generic denial covers
+  /// wrong/expired/revoked codes (non-enumerating).
+  ///
+  /// Guards against concurrent sends only, mirroring [sendCode]: a successful
+  /// OTP resend leaves the state in `ViewSuccess` while the user stays on the
+  /// step, so a later verify must remain possible. Only [submit] keeps the
+  /// success guard because it navigates away on success.
+  Future<void> verifyCode({required String email, required String code}) async {
+    if (state is ViewLoading<void>) {
+      return;
+    }
+    emit(const ViewLoading<void>());
+    final Result<void> result = await _gateway.verifyCode(
+      email: email,
+      code: code,
+    );
+    if (!isClosed) {
+      switch (result) {
+        case Success<void>():
+          emit(const ViewSuccess<void>(null));
+        case Failure<void>(error: final error):
+          emit(ViewError<void>(error));
+      }
+    }
+  }
+
+  /// Step 3 — set the new password.
   Future<void> submit(PasswordRecoveryRequest request) async {
     // Guard against duplicate submissions: ignore a submit while one is in
     // flight or already succeeded. A retry re-enters from the error state.

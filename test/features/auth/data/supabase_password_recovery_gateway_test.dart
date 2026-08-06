@@ -6,22 +6,21 @@ import 'package:legalhub/data/auth/supabase_auth_api.dart';
 import 'package:legalhub/features/auth/data/supabase_password_recovery_gateway.dart';
 import 'package:legalhub/features/auth/domain/password_recovery_request.dart';
 
-/// Hand-rolled fake of the [SupabaseAuthApi] seam (codebase convention: fakes
-/// over mocks for the auth boundary). Controls each recovery outcome per
-/// test; no GoTrue types appear anywhere in the gateway tests.
-class _FakeSupabaseAuthApi implements SupabaseAuthApi {
+/// Hand-rolled fake of the [SupabaseAuthApi] seam for the recovery-gateway
+/// tests. Each step resolves through the configurable [result]; remaining
+/// methods are inert stubs (codebase convention: fakes over mocks at the auth
+/// boundary).
+class _FakeAuthApi implements SupabaseAuthApi {
+  _FakeAuthApi(this.result);
+
+  final SupabaseAuthResult result;
+
+  String? capturedEmail;
+  String? capturedCode;
+  String? capturedNewPassword;
+
   final StreamController<SupabaseAuthSnapshot?> _changes =
       StreamController<SupabaseAuthSnapshot?>.broadcast();
-
-  SupabaseAuthException? sendError;
-  SupabaseAuthException? verifyError;
-  SupabaseAuthException? updateError;
-  int sendCalls = 0;
-  int verifyCalls = 0;
-  int updateCalls = 0;
-  String? lastEmail;
-  String? lastToken;
-  String? lastPassword;
 
   @override
   SupabaseAuthSnapshot? get currentSnapshot => null;
@@ -33,259 +32,157 @@ class _FakeSupabaseAuthApi implements SupabaseAuthApi {
   Future<SupabaseAuthSnapshot?> restore() async => null;
 
   @override
-  Future<SupabaseAuthSnapshot?> signInWithPassword({
+  Future<SupabaseAuthResult> signInWithPassword({
     required String email,
     required String password,
-  }) async => null;
+  }) async => const SupabaseAuthFailed(
+    SupabaseAuthFailure(kind: SupabaseAuthFailureKind.unknown),
+  );
 
   @override
-  Future<void> signUp({
+  Future<SupabaseSignUpResult> signUp({
     required String email,
     required String password,
-    required Map<String, String> metadata,
-  }) async {}
+    required String displayName,
+  }) async => const SupabaseSignUpFailed(
+    SupabaseAuthFailure(kind: SupabaseAuthFailureKind.unknown),
+  );
+
+  @override
+  Future<SupabaseAuthResult> resetPasswordForEmail(String email) async {
+    capturedEmail = email;
+    return result;
+  }
+
+  @override
+  Future<SupabaseAuthResult> verifyOtp({
+    required String email,
+    required String code,
+  }) async {
+    capturedEmail = email;
+    capturedCode = code;
+    return result;
+  }
+
+  @override
+  Future<SupabaseAuthResult> updateUserPassword(String newPassword) async {
+    capturedNewPassword = newPassword;
+    return result;
+  }
 
   @override
   Future<void> signOut() async {}
-
-  @override
-  Future<void> sendRecoveryOtp({required String email}) async {
-    sendCalls++;
-    lastEmail = email;
-    final SupabaseAuthException? error = sendError;
-    if (error != null) {
-      throw error;
-    }
-  }
-
-  @override
-  Future<void> verifyRecoveryOtp({
-    required String email,
-    required String token,
-  }) async {
-    verifyCalls++;
-    lastEmail = email;
-    lastToken = token;
-    final SupabaseAuthException? error = verifyError;
-    if (error != null) {
-      throw error;
-    }
-  }
-
-  @override
-  Future<void> updatePassword({required String newPassword}) async {
-    updateCalls++;
-    lastPassword = newPassword;
-    final SupabaseAuthException? error = updateError;
-    if (error != null) {
-      throw error;
-    }
-  }
 
   @override
   Future<void> dispose() async => _changes.close();
 }
 
 void main() {
-  final PasswordRecoveryRequest request = PasswordRecoveryRequest.fromRaw(
-    email: 'amira@example.com',
-    otp: '123456',
-    newPassword: 'new-secret-pass',
-  );
-
-  group('SupabasePasswordRecoveryGateway.requestCode', () {
-    test('sends the recovery OTP for the email on success', () async {
-      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi();
-      final SupabasePasswordRecoveryGateway gateway =
-          SupabasePasswordRecoveryGateway(api);
-      addTearDown(api.dispose);
-
-      final Result<void> outcome = await gateway.requestCode(
-        email: 'amira@example.com',
-      );
-
-      expect(outcome.isSuccess, isTrue);
-      expect(api.sendCalls, 1);
-      expect(api.lastEmail, 'amira@example.com');
-    });
-
+  group('SupabasePasswordRecoveryGateway', () {
     test(
-      'treats the signups-for-otp rejection as a non-enumerating success ack',
+      'sendCode delegates the email and maps success to a generic success',
       () async {
-        final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi()
-          ..sendError = const SupabaseAuthException(
-            kind: SupabaseAuthFailureKind.unknown,
-            message: 'Signups not allowed for otp',
-          );
+        final _FakeAuthApi api = _FakeAuthApi(const SupabaseAuthSuccess(null));
         final SupabasePasswordRecoveryGateway gateway =
             SupabasePasswordRecoveryGateway(api);
-        addTearDown(api.dispose);
 
-        final Result<void> outcome = await gateway.requestCode(
-          email: 'nobody@example.com',
-        );
+        final Result<void> result = await gateway.sendCode('amira@example.com');
 
-        // An unknown address must never reveal that no account exists.
-        expect(outcome.isSuccess, isTrue);
+        expect(result.isSuccess, isTrue);
+        expect(api.capturedEmail, 'amira@example.com');
       },
     );
 
     test(
-      'maps rateLimited to a failure with the wait-and-retry message',
+      'sendCode maps every failure to one generic denial (non-enumerating)',
       () async {
-        final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi()
-          ..sendError = const SupabaseAuthException(
-            kind: SupabaseAuthFailureKind.rateLimited,
-          );
+        final _FakeAuthApi api = _FakeAuthApi(
+          const SupabaseAuthFailed(
+            SupabaseAuthFailure(kind: SupabaseAuthFailureKind.unknown),
+          ),
+        );
         final SupabasePasswordRecoveryGateway gateway =
             SupabasePasswordRecoveryGateway(api);
-        addTearDown(api.dispose);
 
-        final Result<void> outcome = await gateway.requestCode(
+        final Result<void> result = await gateway.sendCode('amira@example.com');
+
+        // The provider failure is never echoed: a wrong/expired/revoked code
+        // and an unknown account all resolve to the same generic denial (plan
+        // §7 — no enumeration).
+        expect(result.errorOrNull?.code, 'recovery_failed');
+      },
+    );
+
+    test('verifyCode delegates email and code', () async {
+      final _FakeAuthApi api = _FakeAuthApi(const SupabaseAuthSuccess(null));
+      final SupabasePasswordRecoveryGateway gateway =
+          SupabasePasswordRecoveryGateway(api);
+
+      final Result<void> result = await gateway.verifyCode(
+        email: 'amira@example.com',
+        code: '123456',
+      );
+
+      expect(result.isSuccess, isTrue);
+      expect(api.capturedEmail, 'amira@example.com');
+      expect(api.capturedCode, '123456');
+    });
+
+    test(
+      'verifyCode maps a wrong-code failure to the generic denial',
+      () async {
+        final _FakeAuthApi api = _FakeAuthApi(
+          const SupabaseAuthFailed(
+            SupabaseAuthFailure(kind: SupabaseAuthFailureKind.unknown),
+          ),
+        );
+        final SupabasePasswordRecoveryGateway gateway =
+            SupabasePasswordRecoveryGateway(api);
+
+        final Result<void> result = await gateway.verifyCode(
           email: 'amira@example.com',
+          code: '000000',
         );
 
-        expect(outcome.isSuccess, isFalse);
-        expect(outcome.errorOrNull?.code, 'rateLimited');
-        expect(
-          outcome.errorOrNull?.userMessage,
-          'Too many attempts. Please wait and try again.',
-        );
+        expect(result.errorOrNull?.code, 'recovery_failed');
       },
     );
 
-    test('the failure context is redacted (email never leaks)', () async {
-      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi()
-        ..sendError = const SupabaseAuthException(
-          kind: SupabaseAuthFailureKind.unknown,
-          message: 'boom',
-        );
+    test('reset delegates the new password to updateUserPassword', () async {
+      final _FakeAuthApi api = _FakeAuthApi(const SupabaseAuthSuccess(null));
       final SupabasePasswordRecoveryGateway gateway =
           SupabasePasswordRecoveryGateway(api);
-      addTearDown(api.dispose);
 
-      final Result<void> outcome = await gateway.requestCode(
-        email: 'amira@example.com',
-      );
-
-      expect(outcome.errorOrNull!.context['email'], '[REDACTED]');
-    });
-  });
-
-  group('SupabasePasswordRecoveryGateway.verifyCode', () {
-    test('verifies the emailed code with email and OTP on success', () async {
-      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi();
-      final SupabasePasswordRecoveryGateway gateway =
-          SupabasePasswordRecoveryGateway(api);
-      addTearDown(api.dispose);
-
-      final Result<void> outcome = await gateway.verifyCode(
-        email: 'amira@example.com',
-        otp: '123456',
-      );
-
-      expect(outcome.isSuccess, isTrue);
-      expect(api.verifyCalls, 1);
-      expect(api.lastEmail, 'amira@example.com');
-      expect(api.lastToken, '123456');
-    });
-
-    test(
-      'maps invalidCredentials to the incorrect-or-expired message',
-      () async {
-        final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi()
-          ..verifyError = const SupabaseAuthException(
-            kind: SupabaseAuthFailureKind.invalidCredentials,
-            message: 'Token has expired or is invalid',
-          );
-        final SupabasePasswordRecoveryGateway gateway =
-            SupabasePasswordRecoveryGateway(api);
-        addTearDown(api.dispose);
-
-        final Result<void> outcome = await gateway.verifyCode(
+      final Result<void> result = await gateway.reset(
+        const PasswordRecoveryRequest(
           email: 'amira@example.com',
-          otp: '000000',
-        );
-
-        expect(outcome.isSuccess, isFalse);
-        expect(
-          outcome.errorOrNull?.userMessage,
-          'That code is incorrect or has expired. Please try again.',
-        );
-      },
-    );
-
-    test('the failure context redacts email and OTP', () async {
-      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi()
-        ..verifyError = const SupabaseAuthException(
-          kind: SupabaseAuthFailureKind.unknown,
-          message: 'boom',
-        );
-      final SupabasePasswordRecoveryGateway gateway =
-          SupabasePasswordRecoveryGateway(api);
-      addTearDown(api.dispose);
-
-      final Result<void> outcome = await gateway.verifyCode(
-        email: 'amira@example.com',
-        otp: '123456',
+          otp: '123456',
+          newPassword: 'new-password-1',
+        ),
       );
 
-      expect(outcome.errorOrNull!.context['email'], '[REDACTED]');
-      expect(outcome.errorOrNull!.context['otp'], '[REDACTED]');
-    });
-  });
-
-  group('SupabasePasswordRecoveryGateway.reset', () {
-    test('updates the password on success', () async {
-      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi();
-      final SupabasePasswordRecoveryGateway gateway =
-          SupabasePasswordRecoveryGateway(api);
-      addTearDown(api.dispose);
-
-      final Result<void> outcome = await gateway.reset(request);
-
-      expect(outcome.isSuccess, isTrue);
-      expect(api.updateCalls, 1);
-      expect(api.lastPassword, 'new-secret-pass');
+      expect(result.isSuccess, isTrue);
+      expect(api.capturedNewPassword, 'new-password-1');
     });
 
-    test(
-      'maps invalidCredentials to the verification-expired message',
-      () async {
-        final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi()
-          ..updateError = const SupabaseAuthException(
-            kind: SupabaseAuthFailureKind.invalidCredentials,
-          );
-        final SupabasePasswordRecoveryGateway gateway =
-            SupabasePasswordRecoveryGateway(api);
-        addTearDown(api.dispose);
-
-        final Result<void> outcome = await gateway.reset(request);
-
-        expect(outcome.isSuccess, isFalse);
-        expect(
-          outcome.errorOrNull?.userMessage,
-          'Your verification has expired. Please start over.',
-        );
-      },
-    );
-
-    test('the failure context is the redacted request map', () async {
-      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi()
-        ..updateError = const SupabaseAuthException(
-          kind: SupabaseAuthFailureKind.unknown,
-          message: 'boom',
-        );
+    test('reset maps a failure to the generic denial', () async {
+      final _FakeAuthApi api = _FakeAuthApi(
+        const SupabaseAuthFailed(
+          SupabaseAuthFailure(kind: SupabaseAuthFailureKind.rateLimited),
+        ),
+      );
       final SupabasePasswordRecoveryGateway gateway =
           SupabasePasswordRecoveryGateway(api);
-      addTearDown(api.dispose);
 
-      final Result<void> outcome = await gateway.reset(request);
+      final Result<void> result = await gateway.reset(
+        const PasswordRecoveryRequest(
+          email: 'amira@example.com',
+          otp: '123456',
+          newPassword: 'new-password-1',
+        ),
+      );
 
-      final Map<String, Object?> context = outcome.errorOrNull!.context;
-      expect(context['email'], '[REDACTED]');
-      expect(context['otp'], '[REDACTED]');
-      expect(context['newPassword'], '[REDACTED]');
+      expect(result.errorOrNull?.code, 'recovery_failed');
     });
   });
 }

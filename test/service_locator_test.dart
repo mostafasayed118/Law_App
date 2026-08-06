@@ -53,32 +53,34 @@ class _FakeSupabaseAuthApi implements SupabaseAuthApi {
   Future<SupabaseAuthSnapshot?> restore() async => null;
 
   @override
-  Future<SupabaseAuthSnapshot?> signInWithPassword({
+  Future<SupabaseAuthResult> signInWithPassword({
     required String email,
     required String password,
-  }) async => null;
+  }) async => const SupabaseAuthSuccess(null);
 
   @override
-  Future<void> signUp({
+  Future<SupabaseSignUpResult> signUp({
     required String email,
     required String password,
-    required Map<String, String> metadata,
-  }) async {}
+    required String displayName,
+  }) async => const SupabaseSignUpPending();
+
+  @override
+  Future<SupabaseAuthResult> resetPasswordForEmail(String email) async =>
+      const SupabaseAuthSuccess(null);
+
+  @override
+  Future<SupabaseAuthResult> verifyOtp({
+    required String email,
+    required String code,
+  }) async => const SupabaseAuthSuccess(null);
+
+  @override
+  Future<SupabaseAuthResult> updateUserPassword(String newPassword) async =>
+      const SupabaseAuthSuccess(null);
 
   @override
   Future<void> signOut() async {}
-
-  @override
-  Future<void> sendRecoveryOtp({required String email}) async {}
-
-  @override
-  Future<void> verifyRecoveryOtp({
-    required String email,
-    required String token,
-  }) async {}
-
-  @override
-  Future<void> updatePassword({required String newPassword}) async {}
 
   @override
   Future<void> dispose() async => _changes.close();

@@ -11,20 +11,27 @@ import '../domain/password_recovery_request.dart';
 /// persisted here; diagnostics should use [PasswordRecoveryRequest.toRedactedMap].
 class FakePasswordRecoveryGateway implements PasswordRecoveryGateway {
   @override
-  Future<Result<void>> requestCode({required String email}) async =>
-      const Result<void>.success(null);
+  Future<Result<void>> sendCode(String email) async {
+    // Simulate the async work without touching any backend. The email is
+    // intentionally unused: the dev fake never reveals whether an account
+    // exists (same non-enumerating contract as the real gateway).
+    return Result<void>.success(null);
+  }
 
   @override
   Future<Result<void>> verifyCode({
     required String email,
-    required String otp,
-  }) async => const Result<void>.success(null);
+    required String code,
+  }) async {
+    // Any code is accepted locally; wrong/expired handling is a real-backend
+    // behavior. The code is never logged or persisted.
+    return Result<void>.success(null);
+  }
 
   @override
   Future<Result<void>> reset(PasswordRecoveryRequest request) async {
     // Simulate the async work without touching any backend. The request is
-    // intentionally unused: real recovery is provider-backed in configured
-    // builds (SupabasePasswordRecoveryGateway).
+    // intentionally unused: real recovery is a later, approved data-layer slice.
     return Result<void>.success(null);
   }
 }
