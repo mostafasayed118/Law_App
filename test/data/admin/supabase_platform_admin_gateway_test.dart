@@ -260,7 +260,8 @@ void main() {
           userId: '   ',
         );
 
-        expect(outcome.failureOrNull?.kind, OrgFailureKind.denied);
+        // Missing input is not a permission denial: honest `unknown`.
+        expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
         expect(api.calls, isEmpty);
       },
     );

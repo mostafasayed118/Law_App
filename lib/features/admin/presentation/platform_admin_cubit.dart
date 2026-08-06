@@ -134,7 +134,6 @@ class PlatformAdminCubit extends Cubit<PlatformAdminState> {
     required String organizationId,
     required String userId,
   }) => _runAction(
-    organizationId: organizationId,
     userId: userId,
     call: () => _gateway.suspendMembership(
       organizationId: organizationId,
@@ -147,7 +146,6 @@ class PlatformAdminCubit extends Cubit<PlatformAdminState> {
     required String organizationId,
     required String userId,
   }) => _runAction(
-    organizationId: organizationId,
     userId: userId,
     call: () => _gateway.reactivateMembership(
       organizationId: organizationId,
@@ -160,7 +158,6 @@ class PlatformAdminCubit extends Cubit<PlatformAdminState> {
   /// failure, or null on success (lists reload; the deleted row leaves).
   Future<OrgFailureKind?> deleteDemoAccount({required String userId}) =>
       _runAction(
-        organizationId: '',
         userId: userId,
         call: () => _gateway.deleteDemoAccount(userId: userId),
       );
@@ -168,7 +165,6 @@ class PlatformAdminCubit extends Cubit<PlatformAdminState> {
   /// Runs an action: marks the member row in-flight, calls the seam, reloads
   /// both lists on success, and restores the previous lists on failure.
   Future<OrgFailureKind?> _runAction({
-    required String organizationId,
     required String userId,
     required Future<OrgOutcome<void>> Function() call,
   }) async {

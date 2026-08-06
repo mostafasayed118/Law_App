@@ -14,6 +14,12 @@ import '../orgs/fake_organization_gateway.dart';
 /// D-P33.2 one-instance DI pattern), so orgs created during an env-less run
 /// appear in the admin lists. `deleteDemoAccount` refuses the demo identity,
 /// mirroring the RPC's never-self guard (`cannot delete your own account`).
+///
+/// Known dev-only divergence (documented, not fixed): suspend/reactivate
+/// delegate to the org fake, which enforces the last-active-partner guard —
+/// `suspend_membership_platform` has no such guard server-side. Stricter
+/// than the server is safe for a seam (it never over-grants), but a test
+/// pinning "platform may suspend the last partner" would need the real RPC.
 class FakePlatformAdminGateway implements PlatformAdminGateway {
   FakePlatformAdminGateway({
     FakeOrganizationGateway? organizationGateway,

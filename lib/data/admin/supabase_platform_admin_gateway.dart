@@ -77,9 +77,11 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
   @override
   Future<OrgOutcome<void>> deleteDemoAccount({required String userId}) async {
     if (userId.trim().isEmpty) {
+      // Missing input, not a permission denial: honest `unknown` (same
+      // convention as the org surface's blank-email guard).
       return const OrgOutcome<void>.failure(
         OrgFailure(
-          kind: OrgFailureKind.denied,
+          kind: OrgFailureKind.unknown,
           message: 'User id is required.',
         ),
       );
