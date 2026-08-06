@@ -8,23 +8,34 @@ void main() {
     late List<String> calls;
     late Map<String, Object?> data;
     late Map<String, PostgrestException> errors;
+    late Map<String, List<Map<String, dynamic>>> tableData;
+    late Map<String, PostgrestException> tableErrors;
     late SupabaseOrgApiImpl api;
 
     setUp(() {
       calls = <String>[];
       data = <String, Object?>{};
       errors = <String, PostgrestException>{};
-      api = SupabaseOrgApiImpl((
-        String function,
-        Map<String, dynamic> params,
-      ) async {
-        calls.add('$function:${params.values.join(',')}');
-        final PostgrestException? error = errors[function];
-        if (error != null) {
-          throw error;
-        }
-        return PostgrestResponse<dynamic>(data: data[function], count: 0);
-      });
+      tableData = <String, List<Map<String, dynamic>>>{};
+      tableErrors = <String, PostgrestException>{};
+      api = SupabaseOrgApiImpl(
+        (String function, Map<String, dynamic> params) async {
+          calls.add('$function:${params.values.join(',')}');
+          final PostgrestException? error = errors[function];
+          if (error != null) {
+            throw error;
+          }
+          return PostgrestResponse<dynamic>(data: data[function], count: 0);
+        },
+        (String table, String columns) async {
+          calls.add('$table:$columns');
+          final PostgrestException? error = tableErrors[table];
+          if (error != null) {
+            throw error;
+          }
+          return tableData[table] ?? const <Map<String, dynamic>>[];
+        },
+      );
     });
 
     test(
@@ -155,6 +166,44 @@ void main() {
 
       expect(rows, hasLength(1));
       expect(calls, <String>['list_org_members_metadata:org-1']);
+    });
+
+    test(
+      'listMyMemberships selects memberships with the org name embed',
+      () async {
+        tableData['memberships'] = <Map<String, dynamic>>[
+          <String, dynamic>{
+            'organization_id': 'org-1',
+            'role': 'partner',
+            'status': 'active',
+            'organizations': <String, dynamic>{'name': 'Demo Firm'},
+          },
+        ];
+
+        final List<Map<String, dynamic>> rows = await api.listMyMemberships();
+
+        expect(rows, hasLength(1));
+        expect(calls, <String>[
+          'memberships:organization_id, role, status, organizations(name)',
+        ]);
+      },
+    );
+
+    test('listMyMemberships maps a table denial', () async {
+      tableErrors['memberships'] = const PostgrestException(
+        message: 'permission denied',
+      );
+
+      await expectLater(
+        api.listMyMemberships(),
+        throwsA(
+          isA<SupabaseOrgException>().having(
+            (e) => e.kind,
+            'kind',
+            SupabaseOrgFailureKind.denied,
+          ),
+        ),
+      );
     });
 
     test('maps a roster denial to the denied kind', () async {

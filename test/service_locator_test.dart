@@ -97,6 +97,10 @@ class _FakeSupabaseOrgApi implements SupabaseOrgApi {
   }) async => <Map<String, dynamic>>[];
 
   @override
+  Future<List<Map<String, dynamic>>> listMyMemberships() async =>
+      <Map<String, dynamic>>[];
+
+  @override
   Future<String> inviteMember({
     required String organizationId,
     required String email,
