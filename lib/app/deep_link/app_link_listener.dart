@@ -40,12 +40,16 @@ class AppLinkListener {
 
   StreamSubscription<Uri>? _subscription;
 
-  /// Begins listening: consumes the cold-start link first (the plugin holds
-  /// it until requested), then subscribes to warm-start URIs.
+  /// Begins listening: subscribes to warm-start URIs *first*, then consumes
+  /// the cold-start link (the plugin holds it until requested). This is the
+  /// app_links-documented order — subscribing after `await getInitialLink`
+  /// would drop a warm URI arriving in that window (broadcast stream, no
+  /// replay) and, worse, never subscribe at all if the initial-link fetch
+  /// threw. The two channels never overlap, so no link is double-processed.
   Future<void> start() async {
+    _subscription = _links.onUri.listen(_handle);
     final Uri? initial = await _links.getInitialLink();
     _handle(initial);
-    _subscription = _links.onUri.listen(_handle);
   }
 
   void _handle(Uri? uri) {
