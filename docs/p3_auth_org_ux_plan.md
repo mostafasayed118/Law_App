@@ -40,8 +40,8 @@ session-lifecycle states (expiry → re-auth, denial, offline, retry).
 | P2 apply executed (dev project) | `docs/p2_apply_execution_2026-08-01.md` (`3bcd968`) | ✅ Up 1–5 GREEN; **P2 closed 2026-08-03** — §4.5 provider loop DEFERRED (not executed; see `docs/p2_close_decision_2026-08-03.md`) (§3) |
 | Client bootstrap (B1–B13) | current `lib/` + `test/` | ✅ Scaffolded auth/onboarding/home/settings on fakes |
 | **P3 plan (this document)** | this document (`275724e` — approval recorded; draft `3bcd7b0`) | ✅ **APPROVED 2026-08-02** — Project Owner (ledger §14) |
-| P3 implementation | `lib/`, `test/` (code only — no schema/RLS changes) | ⏳ not started — gated on per-step commit/approval discipline (INSTRUCTIONS.md §3) |
-| P3 verification | widget/integration tests EN/AR/TR + RTL + expiry + denial (contract §11-P3 exit) | ⏳ blocked on implementation |
+| P3 implementation (P3.1 — real auth wiring) | `lib/`, `test/` (code only — no schema/RLS changes) | **P3.1 SHIPPED 2026-08-05** (`2e18b24` merge, suite 717, ledger PASS 115; evidence `docs/p3_1_completion_evidence_2026-08-05.md`); **P3.2–P3.5 ⏳ not started** |
+| P3 verification (P3.1) | widget/integration tests EN/AR/TR + RTL + expiry + denial (contract §11-P3 exit) | **P3.1 VERIFIED 2026-08-05** — suite 717 incl. EN/AR/TR + RTL + denial (evidence §2/§4); P3.2–P3.5 pending; live dev-project E2E owner-side (evidence §3) |
 
 **Exit criteria (contract §11-P3):** widget/integration tests cover
 EN/AR/TR, RTL, session expiry, and permission-denied behavior; navigation
