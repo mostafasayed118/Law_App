@@ -4,12 +4,16 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/localization/locale_cubit.dart';
 import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/admin/platform_admin_gateway.dart';
 import 'package:legalhub/core/auth/auth_gateway.dart';
 import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/core/organizations/membership_repository.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/sample_service.dart';
+import 'package:legalhub/data/admin/fake_platform_admin_gateway.dart';
+import 'package:legalhub/data/admin/supabase_platform_admin_api.dart';
+import 'package:legalhub/data/admin/supabase_platform_admin_gateway.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/auth/supabase_auth_api.dart';
 import 'package:legalhub/data/auth/supabase_auth_gateway.dart';
@@ -152,6 +156,33 @@ class _FakeSupabaseOrgApi implements SupabaseOrgApi {
       'membership-1';
 }
 
+/// Hand-rolled fake of the [SupabasePlatformAdminApi] seam for the DI flip
+/// test (same discipline as [_FakeSupabaseOrgApi]).
+class _FakeSupabasePlatformAdminApi implements SupabasePlatformAdminApi {
+  @override
+  Future<List<Map<String, dynamic>>> listOrganizations() async =>
+      <Map<String, dynamic>>[];
+
+  @override
+  Future<List<Map<String, dynamic>>> listMembers() async =>
+      <Map<String, dynamic>>[];
+
+  @override
+  Future<void> suspendMembership({
+    required String organizationId,
+    required String userId,
+  }) async {}
+
+  @override
+  Future<void> reactivateMembership({
+    required String organizationId,
+    required String userId,
+  }) async {}
+
+  @override
+  Future<void> deleteDemoAccount({required String userId}) async {}
+}
+
 /// Builds a JWT-shaped string whose payload carries the given role claim.
 /// Matches the base64url convention used by the supabase adapter tests.
 String _jwtWithRole(String role) {
@@ -221,6 +252,7 @@ void main() {
       expect(serviceLocator.isRegistered<SignUpGateway>(), isTrue);
       expect(serviceLocator.isRegistered<OrganizationGateway>(), isTrue);
       expect(serviceLocator.isRegistered<MembershipRepository>(), isTrue);
+      expect(serviceLocator.isRegistered<PlatformAdminGateway>(), isTrue);
       expect(serviceLocator.isRegistered<OrgSelectionStore>(), isTrue);
       expect(serviceLocator.isRegistered<BookingGateway>(), isTrue);
       expect(serviceLocator.isRegistered<BookingPrefill>(), isTrue);
@@ -438,6 +470,54 @@ void main() {
         memberships.map((OrganizationMembership m) => m.organizationId),
         <String>['org-demo', 'org-2'],
       );
+    });
+
+    test('wires the platform-admin gateway to the fake dev implementation', () {
+      configureDependencies();
+
+      // Same boundary discipline as the organization gateway: the dev fake is
+      // the registered seam until the configured-env flip takes over.
+      expect(
+        serviceLocator<PlatformAdminGateway>(),
+        isA<FakePlatformAdminGateway>(),
+      );
+    });
+
+    test('flips PlatformAdminGateway when env carries an anon key', () {
+      configureDependencies(
+        supabaseEnv: SupabaseEnv(
+          url: 'https://example.supabase.co',
+          anonKey: _anonJwt(),
+        ),
+        // The real bind() needs a running Supabase.instance; tests inject
+        // the seam instead (the flip's test seam, not production code).
+        supabasePlatformAdminApiFactory: _FakeSupabasePlatformAdminApi.new,
+      );
+
+      expect(
+        serviceLocator<PlatformAdminGateway>(),
+        isA<SupabasePlatformAdminGateway>(),
+      );
+    });
+
+    test('binds the fake platform-admin gateway to the fake org gateway '
+        '(one org state per env-less run, P3.5 Slice B)', () async {
+      configureDependencies();
+
+      final FakeOrganizationGateway orgGateway =
+          serviceLocator<OrganizationGateway>() as FakeOrganizationGateway;
+      await orgGateway.createOrganization(name: 'Second Firm');
+
+      final PlatformAdminGateway admin = serviceLocator<PlatformAdminGateway>();
+      final OrgOutcome<List<OrganizationSummary>> outcome = await admin
+          .listOrganizations();
+
+      // The org created through the resolved OrganizationGateway appears in
+      // the resolved platform-admin gateway's listing — they share one fake
+      // org instance, so env-less org mutations reach the admin surface.
+      expect(outcome.isSuccess, isTrue);
+      expect(outcome.valueOrNull, hasLength(2));
+      expect(outcome.valueOrNull!.last.name, 'Second Firm');
     });
 
     test('flips MembershipRepository when env carries an anon key', () {

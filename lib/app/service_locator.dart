@@ -1,11 +1,16 @@
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../core/admin/platform_admin_gateway.dart';
 import '../core/auth/auth_gateway.dart';
 import '../core/observability/error_reporter.dart';
 import '../core/organizations/membership_repository.dart';
 import '../core/organizations/organization_gateway.dart';
 import '../core/sample_service.dart';
+import '../data/admin/fake_platform_admin_gateway.dart';
+import '../data/admin/supabase_platform_admin_api.dart';
+import '../data/admin/supabase_platform_admin_api_impl.dart';
+import '../data/admin/supabase_platform_admin_gateway.dart';
 import '../data/auth/fake_auth_gateway.dart';
 import '../data/auth/supabase_auth_api.dart';
 import '../data/auth/supabase_auth_api_impl.dart';
@@ -70,6 +75,7 @@ void configureDependencies({
   SupabaseEnv? supabaseEnv,
   SupabaseAuthApi Function()? supabaseAuthApiFactory,
   SupabaseOrgApi Function()? supabaseOrgApiFactory,
+  SupabasePlatformAdminApi Function()? supabasePlatformAdminApiFactory,
 }) {
   // Lazy singleton: stateless service, created on first resolution.
   // Per §4.5, stateless services/repositories register as lazy singletons.
@@ -211,6 +217,30 @@ void configureDependencies({
       // is non-null exactly on this unconfigured path.
       serviceLocator.registerLazySingleton<MembershipRepository>(
         () => FakeMembershipRepository(organizationGateway: fakeOrgGateway),
+      );
+    }
+  }
+  if (!serviceLocator.isRegistered<PlatformAdminGateway>()) {
+    // Like OrganizationGateway, the flip swaps the dev fake for the
+    // Supabase-backed implementation when the build is configured (Batch 3.3
+    // env pattern). P3.5 platform-admin consumes the owner-only metadata
+    // RPCs; the fake mirrors the owner gate server-side (denied, never
+    // empty-success) and derives state from the SAME fake org gateway
+    // instance below (D-P33.2), so env-less org mutations appear in the
+    // admin lists.
+    if (env.isConfigured) {
+      serviceLocator.registerLazySingleton<PlatformAdminGateway>(
+        () => SupabasePlatformAdminGateway(
+          (supabasePlatformAdminApiFactory ??
+              SupabasePlatformAdminApiImpl.bind)(),
+        ),
+      );
+    } else {
+      // `fakeOrgGateway` is non-null exactly on this unconfigured path (set
+      // by the OrganizationGateway registration above), so the admin fake
+      // shares the same org state instance.
+      serviceLocator.registerLazySingleton<PlatformAdminGateway>(
+        () => FakePlatformAdminGateway(organizationGateway: fakeOrgGateway),
       );
     }
   }
