@@ -494,6 +494,35 @@ void main() {
     );
 
     blocTest<AuthCubit, AuthState>(
+      'a throwing hydration diagnostic reporter never strands the session',
+      setUp: () => _hydrationRepository = _HydrationRepository(
+        result: const HydrationFailed(
+          MembershipHydrationFailureKind.providerUnavailable,
+        ),
+      ),
+      build: () => AuthCubit(
+        _NullSessionGateway(),
+        _ThrowingErrorReporter(),
+        _hydrationRepository,
+      ),
+      act: (AuthCubit cubit) => cubit.startDemoSession(),
+      expect: () => <dynamic>[
+        const AuthState(status: AuthStatus.loading),
+        isA<AuthState>()
+            .having(
+              (AuthState s) => s.status,
+              'status',
+              AuthStatus.authenticated,
+            )
+            .having(
+              (AuthState s) => s.session?.memberships,
+              'memberships',
+              isEmpty,
+            ),
+      ],
+    );
+
+    blocTest<AuthCubit, AuthState>(
       'never hydrates an expired session (AC-3 — reauth, not hydration)',
       setUp: () => _hydrationRepository = _HydrationRepository(),
       build: () => AuthCubit(
@@ -666,6 +695,15 @@ class _FailingAuthGateway implements AuthGateway {
 
   @override
   Future<void> signOut() async {}
+}
+
+/// A reporter whose `report` always throws, pinning that diagnostics never
+/// gate the authenticated emission (Task 8 review fix).
+class _ThrowingErrorReporter implements ErrorReporter {
+  @override
+  Future<void> report(AppError error) async {
+    throw StateError('reporter boom');
+  }
 }
 
 /// Configurable membership-hydration stub for the Task 8 cubit tests:

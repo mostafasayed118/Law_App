@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/auth/auth_gateway.dart';
@@ -134,6 +135,11 @@ class AuthCubit extends Cubit<AuthState> {
   /// invalidated) but is surfaced through the diagnostic channel (Task 8
   /// review inputs). Expiry is honored before hydration (AC-3): an expired
   /// session re-authenticates and is never hydrated.
+  ///
+  /// Known limitation (recorded): there is no first-class `hydrate()` retry
+  /// seam for an already-authenticated session — the next explicit auth op
+  /// re-hydrates; retry UI is a screen concern (scope §6). The provider
+  /// stream path (Phase 4.1 deep-link) maps without hydration by design.
   Future<void> _applyAuthenticatedSession(Session session) async {
     if (session.isExpired) {
       emit(const AuthState(status: AuthStatus.reauthRequired));
@@ -150,9 +156,11 @@ class AuthCubit extends Cubit<AuthState> {
           ),
         );
       case HydrationFailed(:final MembershipHydrationFailureKind kind):
-        await _reportHydrationFailure(kind);
         // Honest empty — never a fabricated membership; the session stays
-        // authenticated with the gateway snapshot's memberships.
+        // authenticated with the gateway snapshot's memberships. The
+        // diagnostic report must never gate this emission (a throwing
+        // reporter must not strand the session in loading), so the state is
+        // emitted first and the report is best-effort.
         _emitIfChanged(
           AuthState(
             status: AuthStatus.authenticated,
@@ -162,6 +170,7 @@ class AuthCubit extends Cubit<AuthState> {
             ),
           ),
         );
+        await _reportHydrationFailure(kind);
     }
   }
 
@@ -179,18 +188,24 @@ class AuthCubit extends Cubit<AuthState> {
   );
 
   /// Diagnostic-channel report (Task 8 review input 2 — the ErrorReporter
-  /// seam instead of repository debugPrint). Non-fatal by contract: the
-  /// authenticated session is emitted regardless.
+  /// seam instead of repository debugPrint). Best-effort by contract: the
+  /// authenticated session is emitted before this runs, and a throwing
+  /// reporter must never surface as a failure, so the report is wrapped.
   Future<void> _reportHydrationFailure(
     MembershipHydrationFailureKind kind,
   ) async {
-    await _reporter.report(
-      AppError(
-        code: 'membershipHydrationFailed',
-        userMessage: 'Organization memberships could not be loaded.',
-        context: <String, Object?>{'kind': kind.name},
-      ),
-    );
+    try {
+      await _reporter.report(
+        AppError(
+          code: 'membershipHydrationFailed',
+          userMessage: 'Organization memberships could not be loaded.',
+          context: <String, Object?>{'kind': kind.name},
+        ),
+      );
+    } catch (error) {
+      // Diagnostics must not break the already-emitted authenticated state.
+      debugPrint('AuthCubit: hydration diagnostic report failed: $error');
+    }
   }
 
   /// Emits [next] only when it actually differs from the current state.
