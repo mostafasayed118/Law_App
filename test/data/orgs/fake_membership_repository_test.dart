@@ -3,6 +3,7 @@ import 'package:legalhub/core/auth/session.dart';
 import 'package:legalhub/core/organizations/membership_repository.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/orgs/fake_membership_repository.dart';
+import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 
 void main() {
   group('FakeMembershipRepository', () {
@@ -39,6 +40,29 @@ void main() {
           status: MembershipStatus.active,
         ),
       );
+    });
+
+    test('derives memberships from a bound fake org gateway (P3.3)', () async {
+      final FakeOrganizationGateway gateway = FakeOrganizationGateway();
+      await gateway.createOrganization(name: 'Second Firm');
+      final FakeMembershipRepository repository = FakeMembershipRepository(
+        organizationGateway: gateway,
+      );
+
+      final MembershipHydrationResult result = await repository.loadMemberships(
+        userId: 'demo-user',
+      );
+
+      expect(result, isA<HydrationSucceeded>());
+      final List<OrganizationMembership> memberships =
+          (result as HydrationSucceeded).memberships;
+      expect(memberships, hasLength(2));
+      expect(
+        memberships.map((OrganizationMembership m) => m.organizationId),
+        <String>['org-demo', 'org-2'],
+      );
+      expect(memberships.last.organizationName, 'Second Firm');
+      expect(memberships.last.isActive, isTrue);
     });
   });
 }

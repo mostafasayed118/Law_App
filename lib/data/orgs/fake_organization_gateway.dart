@@ -1,3 +1,4 @@
+import '../../core/auth/session.dart';
 import '../../core/organizations/organization_gateway.dart';
 import '../../core/roles/user_role.dart';
 
@@ -341,6 +342,36 @@ class FakeOrganizationGateway implements OrganizationGateway {
     return OrgOutcome<String>.success(
       'membership-${invitation.organizationId}',
     );
+  }
+
+  /// Derives the demo user's current memberships from this fake's internal
+  /// state (P3.3 Slice B).
+  ///
+  /// Reads every roster for the demo identity — mirroring the RLS-scoped
+  /// memberships SELECT, which returns the caller's own rows across
+  /// organizations regardless of status — and resolves each org's display
+  /// name from the registry. [FakeMembershipRepository] reads this when
+  /// bound to the same instance, so an org created during an env-less run
+  /// joins the hydrated session without a static re-seed. This is a seam
+  /// for tests and env-less runs; it is not an authorization mechanism.
+  List<OrganizationMembership> demoUserMemberships() {
+    final List<OrganizationMembership> memberships = <OrganizationMembership>[];
+    for (final MapEntry<String, Map<String, OrgMember>> entry
+        in _members.entries) {
+      final OrgMember? me = entry.value[demoUserId];
+      if (me == null) {
+        continue;
+      }
+      memberships.add(
+        OrganizationMembership(
+          organizationId: entry.key,
+          organizationName: _orgs[entry.key]?.name,
+          role: me.role,
+          status: me.status,
+        ),
+      );
+    }
+    return memberships;
   }
 
   bool _anotherActivePartnerExists(

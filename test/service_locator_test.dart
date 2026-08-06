@@ -413,6 +413,33 @@ void main() {
       );
     });
 
+    test('binds the fake membership repository to the fake org gateway '
+        '(one org state per env-less run, P3.3 Slice B)', () async {
+      configureDependencies();
+
+      final FakeOrganizationGateway orgGateway =
+          serviceLocator<OrganizationGateway>() as FakeOrganizationGateway;
+      await orgGateway.createOrganization(name: 'Second Firm');
+
+      final MembershipRepository repository =
+          serviceLocator<MembershipRepository>();
+      final MembershipHydrationResult result = await repository.loadMemberships(
+        userId: 'demo-user',
+      );
+
+      // The org created through the resolved OrganizationGateway appears in
+      // the resolved MembershipRepository's hydration — they share one fake
+      // instance, so env-less org mutations join the hydrated session.
+      expect(result, isA<HydrationSucceeded>());
+      final List<OrganizationMembership> memberships =
+          (result as HydrationSucceeded).memberships;
+      expect(memberships, hasLength(2));
+      expect(
+        memberships.map((OrganizationMembership m) => m.organizationId),
+        <String>['org-demo', 'org-2'],
+      );
+    });
+
     test('flips MembershipRepository when env carries an anon key', () {
       configureDependencies(
         supabaseEnv: SupabaseEnv(

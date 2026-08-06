@@ -76,6 +76,12 @@ void configureDependencies({
   // App-scoped Cubits below are also lazy singletons because the router and
   // root MaterialApp must observe the same session and locale instances.
   final SupabaseEnv env = supabaseEnv ?? SupabaseEnv.fromEnvironment();
+
+  // P3.3 Slice B: the unconfigured org fakes share ONE instance so org
+  // mutations in env-less runs join the hydrated session (the membership
+  // repository derives from the gateway's live roster). Null on the
+  // configured path, where the Supabase-backed pair is registered instead.
+  FakeOrganizationGateway? fakeOrgGateway;
   if (!serviceLocator.isRegistered<SampleService>()) {
     serviceLocator.registerLazySingleton<SampleService>(SampleServiceImpl.new);
   }
@@ -179,8 +185,11 @@ void configureDependencies({
         ),
       );
     } else {
+      // P3.3 Slice B: keep a handle on the fake so the unconfigured
+      // membership repository below can bind to the same instance.
+      fakeOrgGateway = FakeOrganizationGateway();
       serviceLocator.registerLazySingleton<OrganizationGateway>(
-        FakeOrganizationGateway.new,
+        () => fakeOrgGateway!,
       );
     }
   }
@@ -196,8 +205,12 @@ void configureDependencies({
         ),
       );
     } else {
+      // P3.3 Slice B: derive from the SAME fake org gateway instance the
+      // unconfigured OrganizationGateway resolves to, so orgs created in an
+      // env-less run join the hydrated session (D-P33.2). `fakeOrgGateway`
+      // is non-null exactly on this unconfigured path.
       serviceLocator.registerLazySingleton<MembershipRepository>(
-        FakeMembershipRepository.new,
+        () => FakeMembershipRepository(organizationGateway: fakeOrgGateway),
       );
     }
   }

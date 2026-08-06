@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:legalhub/core/auth/session.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
@@ -294,6 +295,37 @@ void main() {
       );
 
       expect(outcome.failureOrNull?.kind, OrgFailureKind.invalidInvitation);
+    });
+
+    test('demoUserMemberships derives the seeded demo membership', () {
+      final List<OrganizationMembership> memberships = gateway
+          .demoUserMemberships();
+
+      expect(memberships, hasLength(1));
+      final OrganizationMembership membership = memberships.single;
+      expect(
+        membership.organizationId,
+        FakeOrganizationGateway.demoOrganizationId,
+      );
+      expect(membership.organizationName, 'Demo Firm');
+      expect(membership.role, UserRole.partner);
+      expect(membership.status, MembershipStatus.active);
+    });
+
+    test('a created org joins the derived memberships (P3.3)', () async {
+      await gateway.createOrganization(name: 'Second Firm');
+
+      final List<OrganizationMembership> memberships = gateway
+          .demoUserMemberships();
+
+      expect(memberships, hasLength(2));
+      expect(
+        memberships.map((OrganizationMembership m) => m.organizationId),
+        <String>['org-demo', 'org-2'],
+      );
+      expect(memberships.last.organizationName, 'Second Firm');
+      expect(memberships.last.role, UserRole.partner);
+      expect(memberships.last.isActive, isTrue);
     });
   });
 }
