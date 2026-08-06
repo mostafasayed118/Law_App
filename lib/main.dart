@@ -1,7 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'app/deep_link/app_link_listener.dart';
+import 'app/deep_link/app_link_parser.dart';
+import 'app/deep_link/app_links_adapter.dart';
+import 'app/deep_link/pending_accept_invite_store.dart';
 import 'app/legalhub_theme.dart';
 import 'app/localization/locale_cubit.dart';
 import 'app/router.dart';
@@ -35,13 +42,25 @@ Future<void> main() async {
   // misleading default. Harmless with the fake (resolves to signed-out);
   // meaningful once a real provider gateway is configured (Batch 3.3).
   await authCubit.restore();
-  runApp(
-    LegalHubApp(
-      router: createAppRouter(authCubit),
-      authCubit: authCubit,
-      localeCubit: localeCubit,
-    ),
+  final GoRouter router = createAppRouter(authCubit);
+  // Phase 4.1 completion (D-P34.2 hook): the app-level deep-link listener
+  // bridges OS intents — an accept-invitation share link buffers its
+  // one-time token (in-memory only) and opens the accept surface. Recovery
+  // /auth-callback URIs are deliberately untouched: supabase_flutter's
+  // `detectSessionInUri` observer owns them (docs/p4_1_deeplink_recovery
+  // _plan_2026-08-07.md D-P41.2).
+  final AppLinkListener appLinkListener = AppLinkListener(
+    AppLinksPluginSource(),
+    const AppLinkParser(),
+    serviceLocator<PendingAcceptInviteStore>(),
+    () => router.go(AppRoutes.acceptInvitation),
   );
+  runApp(
+    LegalHubApp(router: router, authCubit: authCubit, localeCubit: localeCubit),
+  );
+  // Start after runApp so the router is attached; the plugin holds the
+  // cold-start link until requested, so nothing is missed.
+  unawaited(appLinkListener.start());
 }
 
 class LegalHubApp extends StatelessWidget {

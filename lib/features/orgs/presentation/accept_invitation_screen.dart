@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../app/deep_link/pending_accept_invite_store.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/auth/session.dart';
@@ -33,6 +34,21 @@ class _AcceptInvitationScreenState extends State<AcceptInvitationScreen> {
   bool _accepting = false;
   OrgFailureKind? _failure;
   bool _accepted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Phase 4.1 D-P34.2: a deep-linked accept-invitation share link buffers
+    // its one-time token in the pending store (cold start / signed-out
+    // arrivals). Consume-and-clear it here so the paste screen is
+    // pre-filled; the user still taps Accept, exactly like a pasted token
+    // (never an auto-submit).
+    final String? pendingToken = serviceLocator<PendingAcceptInviteStore>()
+        .takePendingToken();
+    if (pendingToken != null) {
+      _token.text = pendingToken;
+    }
+  }
 
   @override
   void dispose() {
