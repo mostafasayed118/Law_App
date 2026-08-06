@@ -85,15 +85,15 @@ void main() {
   });
 
   testWidgets(
-    'a valid token re-hydrates the session and switches to the new org',    (tester) async {
+    'a valid token re-hydrates the session and switches to the new org',
+    (tester) async {
       // An established session holding only the seeded demo org FIRST — the
       // DI-bound hydration derives from the shared fake gateway, so creating
       // the org before the session would already include it.
       await authCubit.startDemoSession();
       expect(authCubit.state.session?.memberships, hasLength(1));
 
-      final OrganizationGateway gateway =
-          serviceLocator<OrganizationGateway>();
+      final OrganizationGateway gateway = serviceLocator<OrganizationGateway>();
       final OrgOutcome<OrganizationSummary> created = await gateway
           .createOrganization(name: 'Second Firm');
       final OrgOutcome<InviteResult> invite = await gateway.inviteMember(
