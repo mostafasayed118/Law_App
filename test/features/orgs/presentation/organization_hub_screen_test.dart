@@ -64,6 +64,32 @@ class _MatchingHydrationRepository implements MembershipRepository {
   }) async => HydrationSucceeded(memberships);
 }
 
+/// Answers honestly-empty on the first read (restore) and the created org's
+/// membership on the second (the P3.3 Slice C hydrate the hub fires after
+/// create-org success) — pinning that the created org joins the session
+/// without re-authenticating.
+class _SequencedHydrationRepository implements MembershipRepository {
+  int calls = 0;
+
+  @override
+  Future<MembershipHydrationResult> loadMemberships({
+    required String userId,
+  }) async {
+    calls += 1;
+    if (calls == 1) {
+      return const HydrationSucceeded(<OrganizationMembership>[]);
+    }
+    return const HydrationSucceeded(<OrganizationMembership>[
+      OrganizationMembership(
+        organizationId: 'org-2',
+        organizationName: 'Nova Legal',
+        role: UserRole.partner,
+        status: MembershipStatus.active,
+      ),
+    ]);
+  }
+}
+
 Session sessionWith({List<OrganizationMembership> memberships = const []}) =>
     Session(
       userId: 'user-1',
@@ -139,6 +165,48 @@ void main() {
 
     // The hub routes straight to the roster for the active membership.
     expect(find.text('Demo Firm'), findsOneWidget);
+    expect(find.text('Demo user'), findsOneWidget);
+    expect(find.text('Create Organization'), findsNothing);
+  });
+
+  testWidgets('creating an organization refreshes the session membership (P3.3 '
+      'Slice C — hub hydrate trigger)', (tester) async {
+    final _SequencedHydrationRepository repository =
+        _SequencedHydrationRepository();
+    final AuthCubit authCubit = AuthCubit(
+      _FixedAuthGateway(sessionWith()),
+      InMemoryErrorReporter(),
+      repository,
+    );
+    addTearDown(authCubit.close);
+    await authCubit.restore();
+
+    await tester.pumpWidget(harness(authCubit));
+    await tester.pumpAndSettle();
+    expect(find.text('Create Organization'), findsWidgets);
+    expect(authCubit.state.session?.memberships, isEmpty);
+
+    await tester.enterText(find.byType(TextFormField), 'Nova Legal');
+    await tester.ensureVisible(
+      find.widgetWithText(ElevatedButton, 'Create Organization'),
+    );
+    await tester.tap(
+      find.widgetWithText(ElevatedButton, 'Create Organization'),
+    );
+    await tester.pumpAndSettle();
+
+    // The hub's hydrate() trigger refreshed the session: the created org
+    // now appears in Session.memberships (the repository was consulted a
+    // second time), so the roster AppBar resolves its name instead of the
+    // fallback title.
+    expect(authCubit.state.session?.memberships, hasLength(1));
+    expect(
+      authCubit.state.session?.memberships.single.organizationName,
+      'Nova Legal',
+    );
+    expect(repository.calls, 2);
+    expect(find.text('Nova Legal'), findsWidgets);
+    expect(find.text('Members'), findsNothing);
     expect(find.text('Demo user'), findsOneWidget);
     expect(find.text('Create Organization'), findsNothing);
   });

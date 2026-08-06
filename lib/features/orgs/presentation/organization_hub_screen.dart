@@ -23,7 +23,9 @@ import 'org_cubit.dart';
 /// anywhere, and the server stays the membership authority (D-08). Provides
 /// the shared [OrgCubit] so create → roster shares one gateway-backed state
 /// machine; switching orgs swaps the cubit (keyed by org) so the roster
-/// always loads the selected org fresh.
+/// always loads the selected org fresh. Creating an organization triggers a
+/// background membership refresh (P3.3 Slice C — [AuthCubit.hydrate]) so
+/// the new membership joins [Session.memberships] without re-authenticating.
 class OrganizationHubScreen extends StatefulWidget {
   const OrganizationHubScreen({super.key});
 
@@ -75,6 +77,15 @@ class _OrganizationHubScreenState extends State<OrganizationHubScreen> {
           ? CreateOrganizationScreen(
               onCreated: (OrganizationSummary organization) {
                 setState(() => _createdOrganizationId = organization.id);
+                // P3.3 Slice C: the created org is not in the session yet —
+                // kick a background membership refresh so
+                // Session.memberships (and the roster title / switcher)
+                // reflect it without re-authenticating. Best-effort: the
+                // this-visit override keeps the hub on the new roster either
+                // way; a failed refresh keeps the last-known-good session and
+                // is surfaced through the diagnostic channel (never an
+                // invalidation).
+                context.read<AuthCubit>().hydrate();
               },
             )
           : Column(
