@@ -395,6 +395,10 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu işlem hesabınızı kalıcı olarak siler ve sizi tüm kuruluşlardan kaldırır. Geri alınamaz.';
 
   @override
+  String get deleteAccountAuditNote =>
+      'Etkinliğinize ilişkin denetim kayıtları, yasanın gerektirdiği şekilde saklanır.';
+
+  @override
   String get deleteAccountConfirmAction => 'Sil';
 
   @override

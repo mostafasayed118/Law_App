@@ -393,6 +393,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'This permanently deletes your account and removes you from every organization. It cannot be undone.';
 
   @override
+  String get deleteAccountAuditNote =>
+      'Audit records of your activity are retained as required by law.';
+
+  @override
   String get deleteAccountConfirmAction => 'Delete';
 
   @override

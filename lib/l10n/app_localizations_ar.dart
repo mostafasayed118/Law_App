@@ -392,6 +392,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'سيؤدي هذا إلى حذف حسابك نهائيًا وإزالتك من كل مؤسسة. لا يمكن التراجع عن هذا الإجراء.';
 
   @override
+  String get deleteAccountAuditNote =>
+      'تُحتفظ بسجلات التدقيق الخاصة بنشاطك وفقًا لما يقتضيه القانون.';
+
+  @override
   String get deleteAccountConfirmAction => 'حذف';
 
   @override

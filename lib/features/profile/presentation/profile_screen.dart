@@ -110,7 +110,22 @@ class _ProfileBodyState extends State<_ProfileBody> {
         final ColorScheme scheme = Theme.of(dialogContext).colorScheme;
         return AlertDialog(
           title: Text(l10n.deleteAccountConfirmTitle),
-          content: Text(l10n.deleteAccountConfirmBody),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(l10n.deleteAccountConfirmBody),
+              const SizedBox(height: LegalHubTheme.spaceSm),
+              // P3.4: audit-survives semantics stated in copy — retained by
+              // law, never promised as data recovery.
+              Text(
+                l10n.deleteAccountAuditNote,
+                style: Theme.of(
+                  dialogContext,
+                ).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+              ),
+            ],
+          ),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),

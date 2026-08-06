@@ -122,6 +122,7 @@
   "deleteAccountAction": "Delete account",
   "deleteAccountConfirmTitle": "Delete your account?",
   "deleteAccountConfirmBody": "This permanently deletes your account and removes you from every organization. It cannot be undone.",
+  "deleteAccountAuditNote": "Audit records of your activity are retained as required by law.",
   "deleteAccountConfirmAction": "Delete",
   "profileSessionExpired": "Session expired. Please sign in again.",
   "notificationsTitle": "Notifications",

@@ -97,11 +97,42 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Delete your account?'), findsOneWidget);
+    // P3.4: the audit-survives note is stated in the confirm copy — retained
+    // by law, never promised as data recovery.
+    expect(
+      find.text(
+        'Audit records of your activity are retained as required by law.',
+      ),
+      findsOneWidget,
+    );
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
 
     // The session is untouched: identity still renders.
     expect(find.text('Demo user'), findsOneWidget);
+    expect(authCubit.state.status, AuthStatus.authenticated);
+  });
+
+  testWidgets('delete confirm resolves Arabic copy incl. the audit note', (
+    tester,
+  ) async {
+    await authCubit.startDemoSession();
+
+    await tester.pumpWidget(pumpScreen(locale: const Locale('ar')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('حذف الحساب'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('هل تريد حذف حسابك؟'), findsOneWidget);
+    expect(
+      find.text(
+        'تُحتفظ بسجلات التدقيق الخاصة بنشاطك وفقًا لما يقتضيه القانون.',
+      ),
+      findsOneWidget,
+    );
+    // The dialog actions also resolve in AR; cancel keeps the session.
+    await tester.tap(find.text('إلغاء'));
+    await tester.pumpAndSettle();
     expect(authCubit.state.status, AuthStatus.authenticated);
   });
 

@@ -820,6 +820,12 @@ abstract class AppLocalizations {
   /// **'This permanently deletes your account and removes you from every organization. It cannot be undone.'**
   String get deleteAccountConfirmBody;
 
+  /// No description provided for @deleteAccountAuditNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit records of your activity are retained as required by law.'**
+  String get deleteAccountAuditNote;
+
   /// No description provided for @deleteAccountConfirmAction.
   ///
   /// In en, this message translates to:
