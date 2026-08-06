@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
+import '../../../core/auth/session.dart';
 import '../../../core/organizations/organization_gateway.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../auth/presentation/auth_cubit.dart';
+import 'active_org_store.dart';
 import 'org_error_messages.dart';
 
-/// Invitation acceptance screen (Phase 2 slice 2.4, R3).
+/// Invitation acceptance screen (Phase 2 slice 2.4, R3; P3.4 handoff).
 ///
 /// Token-entry UX decision (scope note §1): a paste-screen in Phase 2; the
-/// deep-link variant moves to Phase 4 with the platform intent-filter work.
-/// The role is server-owned from the invitation — the client never chooses
-/// one; bad tokens surface the localized, non-enumerating
-/// `invalidInvitation` message.
+/// deep-link variant moves to Phase 4 with the platform intent-filter work
+/// (P3.4 D-P34.2 — recorded forward hook; paste is the P3.4 acceptance
+/// surface). The role is server-owned from the invitation — the client never
+/// chooses one; bad tokens surface the localized, non-enumerating
+/// `invalidInvitation` message. On success the accepted membership is not in
+/// the session yet, so the screen re-hydrates ([AuthCubit.hydrate] — the
+/// P3.3 D-P33.3 seam) and switches the local active-org context to the new
+/// organization (D-08 client-side context, membership-backed).
 class AcceptInvitationScreen extends StatefulWidget {
   const AcceptInvitationScreen({super.key});
 
@@ -37,6 +45,9 @@ class _AcceptInvitationScreenState extends State<AcceptInvitationScreen> {
     if (token.isEmpty || _accepting) {
       return;
     }
+    // Read before any await so the accepted handoff can re-hydrate without
+    // using the BuildContext across an async gap.
+    final AuthCubit auth = context.read<AuthCubit>();
     setState(() {
       _accepting = true;
       _failure = null;
@@ -57,6 +68,44 @@ class _AcceptInvitationScreenState extends State<AcceptInvitationScreen> {
           _failure = failure.kind;
       }
     });
+    if (_accepted) {
+      // P3.4 D-P33.3 handoff — best-effort; the accepted state is already
+      // shown and never blocked by the refresh.
+      await _refreshMembershipAndSwitch(auth);
+    }
+  }
+
+  /// Post-accept handoff (P3.4): re-hydrates so the accepted membership
+  /// joins [Session.memberships], then switches the local active-org context
+  /// to the newly-joined organization so the hub lands on it.
+  ///
+  /// The new org is derived from the hydrated-session diff (the membership
+  /// that was not present before the accept) — the session is the membership
+  /// authority (D-08), so the derived id is membership-backed before it is
+  /// selected. Best-effort by design: a failed refresh keeps the
+  /// last-known-good session (reported through the cubit's diagnostic
+  /// channel); if the new org cannot be resolved, the switch is skipped and
+  /// the membership still arrives on the next auth op.
+  Future<void> _refreshMembershipAndSwitch(AuthCubit auth) async {
+    final List<String> knownOrganizationIds = <String>[
+      for (final OrganizationMembership membership
+          in auth.state.session?.memberships ??
+              const <OrganizationMembership>[])
+        membership.organizationId,
+    ];
+    await auth.hydrate();
+    String? joinedOrganizationId;
+    for (final OrganizationMembership membership
+        in auth.state.session?.memberships ??
+            const <OrganizationMembership>[]) {
+      if (!knownOrganizationIds.contains(membership.organizationId)) {
+        joinedOrganizationId = membership.organizationId;
+        break;
+      }
+    }
+    if (joinedOrganizationId != null) {
+      serviceLocator<ActiveOrgStore>().select(joinedOrganizationId);
+    }
   }
 
   @override
