@@ -18,10 +18,9 @@ import 'package:legalhub/l10n/app_localizations.dart';
 // placeholders). These tests pump the whole flow through the router with a
 // capturing gateway so the asserted object is the one the screen built.
 //
-// Also pins the real resend wiring (2026-08-03, D1 revised): the OTP "Resend"
-// control repeats the step-1 code request through the gateway and carries the
-// plain "Resend Code" label, because a real provider path exists in
-// configured builds and the dev fake acknowledges sends.
+// P3.1 wires the OTP "Resend" control to the recovery gateway: it re-sends
+// to the threaded email with a generic acknowledgement (non-enumerating) and
+// stays on the step, and a successful resend never blocks a later verify.
 void main() {
   late FakeAuthGateway authGateway;
   late AuthCubit authCubit;
@@ -105,8 +104,43 @@ void main() {
     },
   );
 
+  testWidgets('the OTP resend control re-sends the code to the same email', (
+    tester,
+  ) async {
+    final _CapturingRecoveryGateway gateway = _CapturingRecoveryGateway();
+    await serviceLocator.reset();
+    serviceLocator.registerSingleton<PasswordRecoveryGateway>(gateway);
+
+    await tester.pumpWidget(pumpRouter());
+    await tester.pumpAndSettle();
+
+    // Advance to the OTP step by submitting a valid email.
+    await tester.enterText(
+      find.byType(TextFormField).first,
+      'amira@example.com',
+    );
+    await tester.pump();
+    tester
+        .widget<ElevatedButton>(find.byType(ElevatedButton).first)
+        .onPressed!();
+    await tester.pumpAndSettle();
+
+    // P3.1: the resend control is wired to the gateway. Tapping it calls
+    // sendCode with the same email that was threaded from step 1.
+    final TextButton resend = tester.widget<TextButton>(
+      find.byType(TextButton).last,
+    );
+    expect(resend.onPressed, isNotNull);
+    resend.onPressed!();
+    await tester.pumpAndSettle();
+
+    expect(gateway.sentCodeEmail, 'amira@example.com');
+    // Still on the OTP step: a resend must not advance the flow.
+    expect(find.text('Verify Email'), findsOneWidget);
+  });
+
   testWidgets(
-    'the OTP resend control repeats the step-1 request for the same email',
+    'a resend does not block a later verify (P3.1 guard regression pin)',
     (tester) async {
       final _CapturingRecoveryGateway gateway = _CapturingRecoveryGateway();
       await serviceLocator.reset();
@@ -126,48 +160,53 @@ void main() {
           .onPressed!();
       await tester.pumpAndSettle();
 
-      // The resend control is enabled and carries the plain "Resend Code"
-      // label — a real provider path exists, so it is never a false
-      // assurance (2026-08-03, D1 revised).
+      // Resend once; the cubit lands in ViewSuccess while staying on the
+      // step. The next verify must still run (only submit keeps a success
+      // guard — it navigates away; verify mirrors sendCode's loading-only
+      // guard).
       final TextButton resend = tester.widget<TextButton>(
         find.byType(TextButton).last,
       );
-      expect(resend.onPressed, isNotNull);
-      expect(find.text('Resend Code'), findsOneWidget);
-
-      // Tapping resend repeats the step-1 request with the threaded email and
-      // shows the code-sent acknowledgement.
       resend.onPressed!();
       await tester.pumpAndSettle();
-      expect(gateway.requestedEmails, <String>[
-        'amira@example.com',
-        'amira@example.com',
-      ]);
-      expect(
-        find.text('Verification code sent to your inbox.'),
-        findsOneWidget,
-      );
+
+      // Enter the 6 digits and verify → routes to reset despite the prior
+      // resend success.
+      for (int i = 0; i < 6; i++) {
+        await tester.enterText(find.byType(TextField).at(i), '$i');
+        await tester.pump();
+      }
+      tester
+          .widget<ElevatedButton>(find.byType(ElevatedButton).first)
+          .onPressed!();
+      await tester.pumpAndSettle();
+
+      expect(gateway.verifiedEmail, 'amira@example.com');
+      expect(gateway.verifiedCode, '012345');
+      expect(find.text('Reset Password'), findsWidgets);
     },
   );
 }
 
 class _CapturingRecoveryGateway implements PasswordRecoveryGateway {
   PasswordRecoveryRequest? received;
-  final List<String> requestedEmails = <String>[];
-  final List<String> verifiedEmails = <String>[];
+  String? sentCodeEmail;
+  String? verifiedEmail;
+  String? verifiedCode;
 
   @override
-  Future<Result<void>> requestCode({required String email}) async {
-    requestedEmails.add(email);
+  Future<Result<void>> sendCode(String email) async {
+    sentCodeEmail = email;
     return Result<void>.success(null);
   }
 
   @override
   Future<Result<void>> verifyCode({
     required String email,
-    required String otp,
+    required String code,
   }) async {
-    verifiedEmails.add(email);
+    verifiedEmail = email;
+    verifiedCode = code;
     return Result<void>.success(null);
   }
 

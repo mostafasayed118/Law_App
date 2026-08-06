@@ -6,20 +6,20 @@ import 'package:legalhub/data/auth/supabase_auth_api.dart';
 import 'package:legalhub/features/auth/data/supabase_sign_up_gateway.dart';
 import 'package:legalhub/features/auth/domain/sign_up_request.dart';
 
-/// Hand-rolled fake of the [SupabaseAuthApi] seam (codebase convention:
-/// fakes over mocks for the auth boundary). Controls the sign-up outcome per
-/// test; no GoTrue types appear anywhere in the gateway tests.
-class _FakeSupabaseAuthApi implements SupabaseAuthApi {
-  _FakeSupabaseAuthApi({this.signUpError});
+/// Hand-rolled fake of the [SupabaseAuthApi] seam for the sign-up gateway
+/// tests. Only the [signUp] path is exercised; the remaining methods are
+/// inert stubs (codebase convention: fakes over mocks at the auth boundary).
+class _FakeAuthApi implements SupabaseAuthApi {
+  _FakeAuthApi(this.signUpResult);
+
+  final SupabaseSignUpResult signUpResult;
+
+  String? capturedEmail;
+  String? capturedPassword;
+  String? capturedDisplayName;
 
   final StreamController<SupabaseAuthSnapshot?> _changes =
       StreamController<SupabaseAuthSnapshot?>.broadcast();
-
-  SupabaseAuthException? signUpError;
-  int signUpCalls = 0;
-  String? lastEmail;
-  String? lastPassword;
-  Map<String, String>? lastMetadata;
 
   @override
   SupabaseAuthSnapshot? get currentSnapshot => null;
@@ -31,138 +31,123 @@ class _FakeSupabaseAuthApi implements SupabaseAuthApi {
   Future<SupabaseAuthSnapshot?> restore() async => null;
 
   @override
-  Future<SupabaseAuthSnapshot?> signInWithPassword({
+  Future<SupabaseAuthResult> signInWithPassword({
     required String email,
     required String password,
-  }) async => null;
+  }) async => const SupabaseAuthFailed(
+    SupabaseAuthFailure(kind: SupabaseAuthFailureKind.unknown),
+  );
 
   @override
-  Future<void> signUp({
+  Future<SupabaseSignUpResult> signUp({
     required String email,
     required String password,
-    required Map<String, String> metadata,
+    required String displayName,
   }) async {
-    signUpCalls++;
-    lastEmail = email;
-    lastPassword = password;
-    lastMetadata = metadata;
-    final SupabaseAuthException? error = signUpError;
-    if (error != null) {
-      throw error;
-    }
+    capturedEmail = email;
+    capturedPassword = password;
+    capturedDisplayName = displayName;
+    return signUpResult;
   }
 
   @override
-  Future<void> signOut() async {}
+  Future<SupabaseAuthResult> resetPasswordForEmail(String email) async =>
+      const SupabaseAuthSuccess(null);
 
   @override
-  Future<void> sendRecoveryOtp({required String email}) async {}
-
-  @override
-  Future<void> verifyRecoveryOtp({
+  Future<SupabaseAuthResult> verifyOtp({
     required String email,
-    required String token,
-  }) async {}
+    required String code,
+  }) async => const SupabaseAuthSuccess(null);
 
   @override
-  Future<void> updatePassword({required String newPassword}) async {}
+  Future<SupabaseAuthResult> updateUserPassword(String newPassword) async =>
+      const SupabaseAuthSuccess(null);
+
+  @override
+  Future<void> signOut() async {}
 
   @override
   Future<void> dispose() async => _changes.close();
 }
 
 void main() {
-  final SignUpRequest request = SignUpRequest.fromRaw(
+  const SignUpRequest request = SignUpRequest(
     name: 'Amira Hassan',
     email: 'amira@example.com',
-    password: 'secret-pass',
-    phone: '+201000000000',
+    phone: '+201234567890',
+    password: 'super-secret-123',
   );
 
-  group('SupabaseSignUpGateway.submit', () {
-    test(
-      'creates the account with full_name/phone metadata on success',
-      () async {
-        final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi();
-        final SupabaseSignUpGateway gateway = SupabaseSignUpGateway(api);
-        addTearDown(api.dispose);
-
-        final Result<void> outcome = await gateway.submit(request);
-
-        expect(outcome.isSuccess, isTrue);
-        expect(api.signUpCalls, 1);
-        expect(api.lastEmail, 'amira@example.com');
-        expect(api.lastPassword, 'secret-pass');
-        expect(api.lastMetadata, <String, String>{
-          'display_name': 'Amira Hassan',
-          'full_name': 'Amira Hassan',
-          'phone': '+201000000000',
-        });
-      },
-    );
-
-    test('maps emailInUse to a failure carrying the stable code', () async {
-      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(
-        signUpError: const SupabaseAuthException(
-          kind: SupabaseAuthFailureKind.emailInUse,
-          message: 'User already registered',
-        ),
-      );
+  group('SupabaseSignUpGateway', () {
+    test('maps pending email confirmation to the success state', () async {
+      final _FakeAuthApi api = _FakeAuthApi(const SupabaseSignUpPending());
       final SupabaseSignUpGateway gateway = SupabaseSignUpGateway(api);
-      addTearDown(api.dispose);
 
-      final Result<void> outcome = await gateway.submit(request);
+      final Result<void> result = await gateway.submit(request);
 
-      expect(outcome.isSuccess, isFalse);
-      expect(outcome.errorOrNull?.code, 'emailInUse');
-      expect(
-        outcome.errorOrNull?.userMessage,
-        'An account with this email already exists. Try signing in.',
-      );
+      expect(result.isSuccess, isTrue);
+      // The display name travels as raw_user_meta_data.display_name so the
+      // applied handle_new_user trigger creates the profile with the real
+      // name (plan §4).
+      expect(api.capturedEmail, 'amira@example.com');
+      expect(api.capturedPassword, 'super-secret-123');
+      expect(api.capturedDisplayName, 'Amira Hassan');
     });
 
     test(
-      'maps rateLimited to a failure with the wait-and-retry message',
+      'maps an immediate authenticated session to the success state',
       () async {
-        final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(
-          signUpError: const SupabaseAuthException(
-            kind: SupabaseAuthFailureKind.rateLimited,
+        final _FakeAuthApi api = _FakeAuthApi(
+          SupabaseSignUpAuthenticated(
+            const SupabaseAuthSnapshot(userId: 'u-1', displayName: 'Amira'),
           ),
         );
         final SupabaseSignUpGateway gateway = SupabaseSignUpGateway(api);
-        addTearDown(api.dispose);
 
-        final Result<void> outcome = await gateway.submit(request);
+        final Result<void> result = await gateway.submit(request);
 
-        expect(outcome.errorOrNull?.code, 'rateLimited');
-        expect(
-          outcome.errorOrNull?.userMessage,
-          'Too many attempts. Please wait and try again.',
-        );
+        expect(result.isSuccess, isTrue);
       },
     );
 
     test(
-      'the failure context is the redacted map (password never leaks)',
+      'maps email-in-use to a typed AppError with the redacted context',
       () async {
-        final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(
-          signUpError: const SupabaseAuthException(
-            kind: SupabaseAuthFailureKind.unknown,
-            message: 'boom',
+        final _FakeAuthApi api = _FakeAuthApi(
+          const SupabaseSignUpFailed(
+            SupabaseAuthFailure(
+              kind: SupabaseAuthFailureKind.emailInUse,
+              message: 'User already registered',
+            ),
           ),
         );
         final SupabaseSignUpGateway gateway = SupabaseSignUpGateway(api);
-        addTearDown(api.dispose);
 
-        final Result<void> outcome = await gateway.submit(request);
+        final Result<void> result = await gateway.submit(request);
 
-        final Map<String, Object?> context = outcome.errorOrNull!.context;
-        // Privacy contract (ADR-0003): no clear-text credential in diagnostics.
-        expect(context['password'], '[REDACTED]');
-        expect(context['email'], '[REDACTED]');
-        expect(context['phone'], '[REDACTED]');
-        expect(context['name'], 'Amira Hassan');
+        expect(result.isSuccess, isFalse);
+        // ADR-0003: the failure context is the redacted request map, never raw
+        // credentials.
+        expect(result.errorOrNull?.code, 'emailInUse');
+        expect(result.errorOrNull?.context['password'], '[REDACTED]');
+        expect(result.errorOrNull?.context['email'], '[REDACTED]');
       },
     );
+
+    test('maps a provider-unavailable failure to the typed AppError', () async {
+      final _FakeAuthApi api = _FakeAuthApi(
+        const SupabaseSignUpFailed(
+          SupabaseAuthFailure(
+            kind: SupabaseAuthFailureKind.providerUnavailable,
+          ),
+        ),
+      );
+      final SupabaseSignUpGateway gateway = SupabaseSignUpGateway(api);
+
+      final Result<void> result = await gateway.submit(request);
+
+      expect(result.errorOrNull?.code, 'providerUnavailable');
+    });
   });
 }

@@ -658,6 +658,32 @@ void main() {
       expect(tr.viewMatter, isNot(en.viewMatter));
       expect(ar.viewMatter, isNot(en.viewMatter));
     });
+
+    test('resolves the recovery error key in every locale (P3.1 pin)', () {
+      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+      final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+      final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+      // The one generic, non-enumerating recovery denial (plan §7): every
+      // recovery failure renders this localized notice, so the copy is
+      // pinned per locale and must never be a silent EN copy.
+      expect(
+        en.recoveryErrorNotice,
+        "We couldn't complete that request. Please try again.",
+      );
+      expect(
+        ar.recoveryErrorNotice,
+        'تعذر إكمال هذا الطلب. يرجى المحاولة مرة أخرى.',
+      );
+      expect(
+        tr.recoveryErrorNotice,
+        'Bu istek tamamlanamadı. Lütfen tekrar deneyin.',
+      );
+
+      // Real per-locale wording, not silent copies of EN.
+      expect(tr.recoveryErrorNotice, isNot(en.recoveryErrorNotice));
+      expect(ar.recoveryErrorNotice, isNot(en.recoveryErrorNotice));
+    });
   });
 
   group('AppLocalizations widget rendering', () {

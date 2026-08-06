@@ -64,49 +64,55 @@ class SupabaseAuthGateway implements AuthGateway {
     required String email,
     required String password,
   }) async {
-    try {
-      final SupabaseAuthSnapshot? snapshot = await _api.signInWithPassword(
-        email: email,
-        password: password,
-      );
-      if (snapshot == null) {
-        return const AuthOutcome<Session>.failure(
-          AuthFailure(
-            kind: AuthFailureKind.unknown,
-            message: 'Sign-in returned no session.',
-          ),
-        );
-      }
-      final Session session = _toSession(snapshot)!;
-      if (session.isExpired) {
-        return const AuthOutcome<Session>.failure(
-          AuthFailure(kind: AuthFailureKind.sessionExpired),
-        );
-      }
-      _session = session;
-      return AuthOutcome<Session>.success(session);
-    } on SupabaseAuthException catch (e) {
-      // Provider-neutral mapping: the typed kind and a non-sensitive message
-      // leave the seam; the GoTrue exception never does (contract §5).
-      return AuthOutcome<Session>.failure(
-        AuthFailure(kind: _mapFailureKind(e.kind), message: e.message),
-      );
+    final SupabaseAuthResult result = await _api.signInWithPassword(
+      email: email,
+      password: password,
+    );
+    switch (result) {
+      case SupabaseAuthSuccess(snapshot: final SupabaseAuthSnapshot? snapshot):
+        if (snapshot == null) {
+          return const AuthOutcome<Session>.failure(
+            AuthFailure(kind: AuthFailureKind.signedOut),
+          );
+        }
+        final Session? session = _toSession(snapshot);
+        if (session == null) {
+          return const AuthOutcome<Session>.failure(
+            AuthFailure(kind: AuthFailureKind.signedOut),
+          );
+        }
+        if (session.isExpired) {
+          return const AuthOutcome<Session>.failure(
+            AuthFailure(kind: AuthFailureKind.sessionExpired),
+          );
+        }
+        _session = session;
+        _changes.add(session);
+        return AuthOutcome<Session>.success(session);
+      case SupabaseAuthFailed(failure: final SupabaseAuthFailure failure):
+        return AuthOutcome<Session>.failure(_mapFailure(failure));
     }
   }
 
-  AuthFailureKind _mapFailureKind(SupabaseAuthFailureKind kind) {
-    return switch (kind) {
+  /// Maps the DTO-free API failure to the domain [AuthFailure] vocabulary.
+  /// [SupabaseAuthFailureKind.emailInUse] cannot occur on sign-in; it is
+  /// mapped defensively to [AuthFailureKind.invalidCredentials]. An unknown
+  /// provider failure surfaces as provider-unavailable (the established
+  /// sign-in error surface).
+  AuthFailure _mapFailure(SupabaseAuthFailure failure) {
+    final AuthFailureKind kind = switch (failure.kind) {
       SupabaseAuthFailureKind.invalidCredentials =>
         AuthFailureKind.invalidCredentials,
       SupabaseAuthFailureKind.emailNotConfirmed =>
         AuthFailureKind.emailNotConfirmed,
       SupabaseAuthFailureKind.userDisabled => AuthFailureKind.userDisabled,
       SupabaseAuthFailureKind.rateLimited => AuthFailureKind.rateLimited,
+      SupabaseAuthFailureKind.emailInUse => AuthFailureKind.invalidCredentials,
+      SupabaseAuthFailureKind.providerUnavailable =>
+        AuthFailureKind.providerUnavailable,
       SupabaseAuthFailureKind.unknown => AuthFailureKind.providerUnavailable,
-      // Unreachable on the sign-in path (sign-up surfaces it); kept
-      // exhaustive so a future kind addition fails loudly.
-      SupabaseAuthFailureKind.emailInUse => AuthFailureKind.unknown,
     };
+    return AuthFailure(kind: kind, message: failure.message);
   }
 
   @override

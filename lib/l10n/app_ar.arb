@@ -58,6 +58,7 @@
   "signInLink": "تسجيل الدخول",
   "recoverPasswordTitle": "استعادة كلمة المرور",
   "recoverPasswordBody": "أدخل بريدك الإلكتروني المسجّل لتصلك رمز التحقق.",
+  "recoveryErrorNotice": "تعذر إكمال هذا الطلب. يرجى المحاولة مرة أخرى.",
   "sendCodeButton": "إرسال الرمز",
   "backToSignIn": "العودة لتسجيل الدخول",
   "codeSentNotice": "أُرسل رمز التحقق إلى بريدك الوارد.",

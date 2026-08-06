@@ -38,6 +38,8 @@ Future<void> initializeSupabase({
 /// This is the **only** file that imports provider types. It maps
 /// [Session] → [SupabaseAuthSnapshot], deliberately dropping access tokens,
 /// refresh tokens, and provider objects at the seam (contract §5, §2.6).
+/// Every provider call resolves to a typed [SupabaseAuthResult] /
+/// [SupabaseSignUpResult]; a GoTrue [AuthException] never crosses this seam.
 class SupabaseAuthApiImpl implements SupabaseAuthApi {
   SupabaseAuthApiImpl(this._client) {
     _subscription = _client.onAuthStateChange.listen((AuthState state) {
@@ -63,16 +65,17 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
       SupabaseAuthApiImpl(Supabase.instance.client.auth);
 
   final GoTrueClient _client;
-  final StreamController<SupabaseAuthSnapshot?> _changes =
-      StreamController<SupabaseAuthSnapshot?>.broadcast();
-  late final StreamSubscription<AuthState> _subscription;
 
-  /// The app deep-link URI the recovery email redirects to. Must match the
-  /// dashboard Redirect URL (Auth → URL Configuration) and the platform
-  /// intent filters (`com.legalhub.app` scheme in the Android manifest and
+  /// The app's registered deep-link URI (Phase 4.1): the recovery email's
+  /// link target. Must match the Android/iOS intent filters
+  /// (`com.legalhub.app` scheme in the Android manifest and
   /// iOS Info.plist).
   static const String _recoveryDeepLinkUri =
       'com.legalhub.app://auth/v1/callback';
+
+  final StreamController<SupabaseAuthSnapshot?> _changes =
+      StreamController<SupabaseAuthSnapshot?>.broadcast();
+  late final StreamSubscription<AuthState> _subscription;
 
   @override
   SupabaseAuthSnapshot? get currentSnapshot =>
@@ -86,7 +89,7 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
       _toSnapshot(_client.currentSession);
 
   @override
-  Future<SupabaseAuthSnapshot?> signInWithPassword({
+  Future<SupabaseAuthResult> signInWithPassword({
     required String email,
     required String password,
   }) async {
@@ -95,40 +98,163 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
         email: email,
         password: password,
       );
-      return _toSnapshot(response.session);
-    } on AuthException catch (e) {
-      // Provider errors are mapped here so no consumer above the seam ever
-      // sees a GoTrue exception (contract §5, §2.6).
-      throw SupabaseAuthException(kind: _failureKindFor(e), message: e.message);
+      return SupabaseAuthSuccess(_toSnapshot(response.session));
+    } on AuthException catch (error) {
+      return SupabaseAuthFailed(
+        SupabaseAuthFailure(
+          kind: _failureKindFor(error),
+          message: error.message,
+        ),
+      );
+    } on Object {
+      return const SupabaseAuthFailed(
+        SupabaseAuthFailure(kind: SupabaseAuthFailureKind.providerUnavailable),
+      );
     }
   }
 
   @override
-  Future<void> signUp({
+  Future<SupabaseSignUpResult> signUp({
     required String email,
     required String password,
-    required Map<String, String> metadata,
+    required String displayName,
   }) async {
     try {
-      // GoTrue stores non-reserved keys as raw user_metadata; full_name and
-      // phone are the display-name sources read by _displayNameFrom.
-      await _client.signUp(
+      final AuthResponse response = await _client.signUp(
         email: email,
         password: password,
+        // The applied handle_new_user trigger reads raw_user_meta_data
+        // .display_name to create the profile row, falling back to the full
+        // email (02_rls_functions.sql). Send the real name so rosters and
+        // greetings resolve it (plan §4); full_name/name mirror it for the
+        // client-side session display-name resolution.
         data: <String, dynamic>{
-          for (final MapEntry<String, String> entry in metadata.entries)
-            entry.key: entry.value,
+          'display_name': displayName,
+          'full_name': displayName,
+          'name': displayName,
         },
       );
-    } on AuthException catch (e) {
-      throw SupabaseAuthException(kind: _failureKindFor(e), message: e.message);
+      final Session? session = response.session;
+      final SupabaseAuthSnapshot? snapshot = _toSnapshot(session);
+      if (snapshot == null) {
+        // Email confirmation is enabled on the dev project: sign-up ends in
+        // the pending state — no session is minted until the email confirms.
+        return const SupabaseSignUpPending();
+      }
+      return SupabaseSignUpAuthenticated(snapshot);
+    } on AuthException catch (error) {
+      return SupabaseSignUpFailed(
+        SupabaseAuthFailure(
+          kind: _failureKindFor(error),
+          message: error.message,
+        ),
+      );
+    } on Object {
+      return const SupabaseSignUpFailed(
+        SupabaseAuthFailure(kind: SupabaseAuthFailureKind.providerUnavailable),
+      );
     }
   }
 
-  /// Maps a GoTrue [AuthException] to the provider-neutral failure kind.
-  /// Status codes and message fragments are the stable GoTrue surface;
-  /// everything else is [SupabaseAuthFailureKind.unknown] with the message
-  /// preserved for diagnostics.
+  @override
+  Future<SupabaseAuthResult> resetPasswordForEmail(String email) async {
+    try {
+      // Phase 4.1: the emailed recovery link is a deep link into the app
+      // (`com.legalhub.app://auth/v1/callback`, which must be registered as
+      // a Redirect URL on the Supabase dashboard). The dashboard Magic Link
+      // template also renders `{{ .Token }}`, so the 6-digit OTP keeps
+      // arriving alongside the link and the in-app OTP flow is unchanged
+      // (D1 revised, verified live 2026-08-03).
+      await _client.signInWithOtp(
+        email: email,
+        shouldCreateUser: false,
+        emailRedirectTo: _recoveryDeepLinkUri,
+      );
+      // Success carries no session; the provider acknowledges generically
+      // (non-enumerating — the client must not reveal whether the account
+      // exists).
+      return const SupabaseAuthSuccess(null);
+    } on AuthException catch (error) {
+      return SupabaseAuthFailed(
+        SupabaseAuthFailure(
+          kind: _failureKindFor(error),
+          message: error.message,
+        ),
+      );
+    } on Object {
+      return const SupabaseAuthFailed(
+        SupabaseAuthFailure(kind: SupabaseAuthFailureKind.providerUnavailable),
+      );
+    }
+  }
+
+  @override
+  Future<SupabaseAuthResult> verifyOtp({
+    required String email,
+    required String code,
+  }) async {
+    try {
+      // Email OTPs are verified with the magiclink type (the provider's
+      // "email" OTP path); the dart client's OtpType enum has no 'email'
+      // member, and the live provider accepts magiclink for these codes
+      // (verified live 2026-08-03).
+      final AuthResponse response = await _client.verifyOTP(
+        email: email,
+        token: code,
+        type: OtpType.magiclink,
+      );
+      // A recovery session is minted on success; the reset step reuses it.
+      return SupabaseAuthSuccess(_toSnapshot(response.session));
+    } on AuthException catch (error) {
+      return SupabaseAuthFailed(
+        SupabaseAuthFailure(
+          kind: _failureKindFor(error),
+          message: error.message,
+        ),
+      );
+    } on Object {
+      return const SupabaseAuthFailed(
+        SupabaseAuthFailure(kind: SupabaseAuthFailureKind.providerUnavailable),
+      );
+    }
+  }
+
+  @override
+  Future<SupabaseAuthResult> updateUserPassword(String newPassword) async {
+    try {
+      await _client.updateUser(UserAttributes(password: newPassword));
+      // Recovery must not leave the app authenticated on the next launch:
+      // the verify session is a means to an end, not a sign-in.
+      await _client.signOut();
+      return const SupabaseAuthSuccess(null);
+    } on AuthException catch (error) {
+      return SupabaseAuthFailed(
+        SupabaseAuthFailure(
+          kind: _failureKindFor(error),
+          message: error.message,
+        ),
+      );
+    } on Object {
+      return const SupabaseAuthFailed(
+        SupabaseAuthFailure(kind: SupabaseAuthFailureKind.providerUnavailable),
+      );
+    }
+  }
+
+  @override
+  Future<void> signOut() => _client.signOut();
+
+  @override
+  Future<void> dispose() async {
+    await _subscription.cancel();
+    await _changes.close();
+  }
+
+  /// Maps a GoTrue [AuthException] to the DTO-free [SupabaseAuthFailureKind]
+  /// vocabulary, strictly below the seam. Status codes and message fragments
+  /// are the stable GoTrue surface; everything else is
+  /// [SupabaseAuthFailureKind.unknown] with the message preserved for
+  /// diagnostics.
   SupabaseAuthFailureKind _failureKindFor(AuthException e) {
     // GoTrue reports the status code as a String (gotrue >= 2.26).
     if (e.statusCode == '429') {
@@ -152,64 +278,6 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
       return SupabaseAuthFailureKind.userDisabled;
     }
     return SupabaseAuthFailureKind.unknown;
-  }
-
-  @override
-  Future<void> signOut() => _client.signOut();
-
-  @override
-  Future<void> sendRecoveryOtp({required String email}) async {
-    try {
-      // Phase 4.1: the emailed recovery link is a deep link into the app
-      // (`com.legalhub.app://auth/v1/callback`, which must be registered as
-      // a Redirect URL on the Supabase dashboard). The dashboard Magic Link
-      // template also renders `{{ .Token }}`, so the 6-digit OTP keeps
-      // arriving alongside the link and the in-app OTP flow is unchanged.
-      await _client.signInWithOtp(
-        email: email,
-        shouldCreateUser: false,
-        emailRedirectTo: _recoveryDeepLinkUri,
-      );
-    } on AuthException catch (e) {
-      throw SupabaseAuthException(kind: _failureKindFor(e), message: e.message);
-    }
-  }
-
-  @override
-  Future<void> verifyRecoveryOtp({
-    required String email,
-    required String token,
-  }) async {
-    try {
-      // Email OTPs are verified with the magiclink type (the provider's
-      // "email" OTP path); the dart client's OtpType enum has no 'email'
-      // member, and the live provider accepts magiclink for these codes.
-      await _client.verifyOTP(
-        email: email,
-        token: token,
-        type: OtpType.magiclink,
-      );
-    } on AuthException catch (e) {
-      throw SupabaseAuthException(kind: _failureKindFor(e), message: e.message);
-    }
-  }
-
-  @override
-  Future<void> updatePassword({required String newPassword}) async {
-    try {
-      await _client.updateUser(UserAttributes(password: newPassword));
-      // Recovery must not leave the app authenticated on the next launch:
-      // the verify session is a means to an end, not a sign-in.
-      await _client.signOut();
-    } on AuthException catch (e) {
-      throw SupabaseAuthException(kind: _failureKindFor(e), message: e.message);
-    }
-  }
-
-  @override
-  Future<void> dispose() async {
-    await _subscription.cancel();
-    await _changes.close();
   }
 
   SupabaseAuthSnapshot? _toSnapshot(

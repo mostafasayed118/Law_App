@@ -56,9 +56,13 @@ void main() {
       button.onPressed!();
       await tester.pumpAndSettle();
 
-      // ViewStateView renders the AppError.userMessage as the error label.
-      // The failing gateway's user message is the destination proof.
-      expect(find.text('Recovery failed'), findsOneWidget);
+      // ViewStateView renders the localized recovery denial as the error
+      // label (P3.1 l10n: every recovery failure resolves to one generic
+      // message, plan §7). The failing gateway's typed code still drives it.
+      expect(
+        find.text('We couldn\'t complete that request. Please try again.'),
+        findsOneWidget,
+      );
       // The shared retry affordance (localized "Retry") confirms ViewStateView
       // is the renderer, not a hand-rolled error widget.
       expect(find.text('Retry'), findsOneWidget);
@@ -68,14 +72,21 @@ void main() {
 
 class _FailingRecoveryGateway implements PasswordRecoveryGateway {
   @override
-  Future<Result<void>> requestCode({required String email}) async =>
-      const Result<void>.success(null);
+  Future<Result<void>> sendCode(String email) async {
+    return Result<void>.failure(
+      const AppError(code: 'recovery_failed', userMessage: 'Recovery failed'),
+    );
+  }
 
   @override
   Future<Result<void>> verifyCode({
     required String email,
-    required String otp,
-  }) async => const Result<void>.success(null);
+    required String code,
+  }) async {
+    return Result<void>.failure(
+      const AppError(code: 'recovery_failed', userMessage: 'Recovery failed'),
+    );
+  }
 
   @override
   Future<Result<void>> reset(PasswordRecoveryRequest request) async {

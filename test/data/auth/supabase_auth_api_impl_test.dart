@@ -44,6 +44,13 @@ Session _session({required int exp, required User user}) => Session(
 );
 
 void main() {
+  // Non-nullable parameter types on the GoTrue seam need registered fallback
+  // values before `any`/`captureAny` matchers can be used (mocktail).
+  setUpAll(() {
+    registerFallbackValue(UserAttributes());
+    registerFallbackValue(OtpType.magiclink);
+  });
+
   group('SupabaseAuthApiImpl', () {
     late _MockGoTrueClient client;
     late StreamController<AuthState> events;
@@ -54,10 +61,6 @@ void main() {
       events = StreamController<AuthState>.broadcast();
       when(() => client.onAuthStateChange).thenAnswer((_) => events.stream);
       when(() => client.currentSession).thenReturn(null);
-      // mocktail cannot synthesize enum/class instances for `any()` matchers;
-      // the fallbacks are dummy values that are never interacted with.
-      registerFallbackValue(OtpType.magiclink);
-      registerFallbackValue(UserAttributes());
       api = SupabaseAuthApiImpl(client);
       addTearDown(() async {
         await events.close();
@@ -102,8 +105,8 @@ void main() {
 
       // Exactly [userId, displayName, expiresAt, recoveredViaLink] — adding
       // accessToken or refreshToken to the seam breaks this pin (contract
-      // §2.6). recoveredViaLink is the Phase 4.1 recovery marker (false for
-      // a plain session).
+      // §2.6). recoveredViaLink is the Phase 4.1 recovery marker (false for a
+      // normal sign-in snapshot).
       expect(snapshot.props, <Object?>[
         'u-1',
         'Amira Hassan',
@@ -142,185 +145,6 @@ void main() {
       verify(() => client.signOut()).called(1);
     });
 
-    test(
-      'signs in with the credentials and maps the session to a snapshot',
-      () async {
-        const int exp = 1893456000; // 2030-01-01 UTC
-        when(
-          () => client.signInWithPassword(
-            email: any(named: 'email'),
-            password: any(named: 'password'),
-          ),
-        ).thenAnswer(
-          (_) async => AuthResponse(
-            session: _session(
-              exp: exp,
-              user: _user(
-                userMetadata: const <String, dynamic>{
-                  'full_name': 'Amira Hassan',
-                },
-              ),
-            ),
-          ),
-        );
-
-        final SupabaseAuthSnapshot? snapshot = await api.signInWithPassword(
-          email: 'amira@example.com',
-          password: 'secret-pass',
-        );
-
-        verify(
-          () => client.signInWithPassword(
-            email: 'amira@example.com',
-            password: 'secret-pass',
-          ),
-        ).called(1);
-        expect(snapshot?.userId, 'u-1');
-        expect(snapshot?.displayName, 'Amira Hassan');
-      },
-    );
-
-    test('maps invalid-credentials rejection to a typed exception', () async {
-      when(
-        () => client.signInWithPassword(
-          email: any(named: 'email'),
-          password: any(named: 'password'),
-        ),
-      ).thenThrow(
-        const AuthException('Invalid login credentials', statusCode: '400'),
-      );
-
-      await expectLater(
-        api.signInWithPassword(
-          email: 'amira@example.com',
-          password: 'wrong-pass',
-        ),
-        throwsA(
-          isA<SupabaseAuthException>()
-              .having(
-                (SupabaseAuthException e) => e.kind,
-                'kind',
-                SupabaseAuthFailureKind.invalidCredentials,
-              )
-              .having(
-                (SupabaseAuthException e) => e.message,
-                'message',
-                'Invalid login credentials',
-              ),
-        ),
-      );
-    });
-
-    test('maps a rate-limited rejection to rateLimited', () async {
-      when(
-        () => client.signInWithPassword(
-          email: any(named: 'email'),
-          password: any(named: 'password'),
-        ),
-      ).thenThrow(
-        const AuthException('Rate limit exceeded', statusCode: '429'),
-      );
-
-      await expectLater(
-        api.signInWithPassword(
-          email: 'amira@example.com',
-          password: 'secret-pass',
-        ),
-        throwsA(
-          isA<SupabaseAuthException>().having(
-            (SupabaseAuthException e) => e.kind,
-            'kind',
-            SupabaseAuthFailureKind.rateLimited,
-          ),
-        ),
-      );
-    });
-
-    test(
-      'maps an email-not-confirmed rejection to emailNotConfirmed',
-      () async {
-        when(
-          () => client.signInWithPassword(
-            email: any(named: 'email'),
-            password: any(named: 'password'),
-          ),
-        ).thenThrow(
-          const AuthException('Email not confirmed', statusCode: '400'),
-        );
-
-        await expectLater(
-          api.signInWithPassword(
-            email: 'amira@example.com',
-            password: 'secret-pass',
-          ),
-          throwsA(
-            isA<SupabaseAuthException>().having(
-              (SupabaseAuthException e) => e.kind,
-              'kind',
-              SupabaseAuthFailureKind.emailNotConfirmed,
-            ),
-          ),
-        );
-      },
-    );
-
-    test('creates the account with metadata via the provider client', () async {
-      when(
-        () => client.signUp(
-          email: any(named: 'email'),
-          password: any(named: 'password'),
-          data: any(named: 'data'),
-        ),
-      ).thenAnswer(
-        (_) async => AuthResponse(
-          user: _user(
-            userMetadata: const <String, dynamic>{'full_name': 'Amira'},
-          ),
-        ),
-      );
-
-      await api.signUp(
-        email: 'amira@example.com',
-        password: 'secret-pass',
-        metadata: const <String, String>{'full_name': 'Amira'},
-      );
-
-      verify(
-        () => client.signUp(
-          email: 'amira@example.com',
-          password: 'secret-pass',
-          data: const <String, dynamic>{'full_name': 'Amira'},
-        ),
-      ).called(1);
-    });
-
-    test('maps a duplicate-email sign-up to a typed exception', () async {
-      when(
-        () => client.signUp(
-          email: any(named: 'email'),
-          password: any(named: 'password'),
-          data: any(named: 'data'),
-        ),
-      ).thenThrow(
-        const AuthException('User already registered', statusCode: '422'),
-      );
-
-      await expectLater(
-        api.signUp(
-          email: 'amira@example.com',
-          password: 'secret-pass',
-          metadata: const <String, String>{'full_name': 'Amira'},
-        ),
-        throwsA(
-          isA<SupabaseAuthException>().having(
-            (SupabaseAuthException e) => e.kind,
-            'kind',
-            SupabaseAuthFailureKind.emailInUse,
-          ),
-        ),
-      );
-    });
-
     test('forwards provider auth-state changes as snapshots', () async {
       const int exp = 1893456000;
       final List<SupabaseAuthSnapshot?> seen = <SupabaseAuthSnapshot?>[];
@@ -351,177 +175,476 @@ void main() {
       expect(seen.last, isNull);
     });
 
-    group('recovery OTP', () {
-      test(
-        'sends the recovery email with the deep-link redirect target',
-        () async {
-          when(
-            () => client.signInWithOtp(
-              email: any(named: 'email'),
-              shouldCreateUser: any(named: 'shouldCreateUser'),
-              emailRedirectTo: any(named: 'emailRedirectTo'),
+    group('recoveredViaLink (Phase 4.1)', () {
+      test('marks a snapshot from a passwordRecovery event', () async {
+        const int exp = 1893456000;
+        final List<SupabaseAuthSnapshot?> seen = <SupabaseAuthSnapshot?>[];
+        final StreamSubscription<SupabaseAuthSnapshot?> subscription = api
+            .snapshotChanges
+            .listen(seen.add);
+        addTearDown(() => subscription.cancel());
+
+        events.add(
+          AuthState(
+            AuthChangeEvent.passwordRecovery,
+            _session(exp: exp, user: _user()),
+          ),
+        );
+        await Future<void>.delayed(Duration.zero);
+
+        // The PKCE exchange for a recovery link fires `passwordRecovery`
+        // (gotrue exchangeCodeForSession) — the live deep-link signal.
+        expect(seen.single?.recoveredViaLink, isTrue);
+      });
+
+      test('leaves the marker false for a normal signed-in event', () async {
+        const int exp = 1893456000;
+        final List<SupabaseAuthSnapshot?> seen = <SupabaseAuthSnapshot?>[];
+        final StreamSubscription<SupabaseAuthSnapshot?> subscription = api
+            .snapshotChanges
+            .listen(seen.add);
+        addTearDown(() => subscription.cancel());
+
+        events.add(
+          AuthState(
+            AuthChangeEvent.signedIn,
+            _session(exp: exp, user: _user()),
+          ),
+        );
+        await Future<void>.delayed(Duration.zero);
+
+        expect(seen.single?.recoveredViaLink, isFalse);
+      });
+
+      test('marks a cold-restored session via recovery_sent_at', () async {
+        const int exp = 1893456000;
+        // No `passwordRecovery` event replays (cold restore), but the user
+        // record still carries a pending recovery marker.
+        when(() => client.currentSession).thenReturn(
+          _session(
+            exp: exp,
+            user: _user(recoverySentAt: '2026-08-03T00:00:00Z'),
+          ),
+        );
+
+        final SupabaseAuthSnapshot? snapshot = await api.restore();
+
+        expect(snapshot?.recoveredViaLink, isTrue);
+      });
+
+      test('leaves the marker false without a recovery signal', () async {
+        const int exp = 1893456000;
+        when(
+          () => client.currentSession,
+        ).thenReturn(_session(exp: exp, user: _user()));
+
+        final SupabaseAuthSnapshot? snapshot = await api.restore();
+
+        expect(snapshot?.recoveredViaLink, isFalse);
+      });
+    });
+
+    group('signInWithPassword (P3.1)', () {
+      test('maps a provider session to a token-free snapshot', () async {
+        const int exp = 1893456000;
+        when(
+          () => client.signInWithPassword(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+          ),
+        ).thenAnswer(
+          (_) async => AuthResponse(
+            session: _session(
+              exp: exp,
+              user: _user(
+                userMetadata: const <String, dynamic>{
+                  'full_name': 'Amira Hassan',
+                },
+              ),
             ),
-          ).thenAnswer((_) async {});
+          ),
+        );
 
-          await api.sendRecoveryOtp(email: 'amira@example.com');
+        final SupabaseAuthResult result = await api.signInWithPassword(
+          email: 'amira@example.com',
+          password: 'any-password',
+        );
 
-          // Phase 4.1: the emailed recovery link is a deep link into the app
-          // (must match the dashboard Redirect URL); no user may be created
-          // by a recovery request. The Magic Link template still renders
-          // `{{ .Token }}`, so the 6-digit OTP arrives alongside the link.
+        expect(result, isA<SupabaseAuthSuccess>());
+        final SupabaseAuthSnapshot? snapshot =
+            (result as SupabaseAuthSuccess).snapshot;
+        expect(snapshot?.userId, 'u-1');
+        expect(snapshot?.displayName, 'Amira Hassan');
+        expect(
+          snapshot?.expiresAt,
+          DateTime.fromMillisecondsSinceEpoch(exp * 1000, isUtc: true),
+        );
+        verify(
+          () => client.signInWithPassword(
+            email: 'amira@example.com',
+            password: 'any-password',
+          ),
+        ).called(1);
+      });
+
+      test('maps invalid-credentials to the typed failure', () async {
+        when(
+          () => client.signInWithPassword(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+          ),
+        ).thenThrow(const AuthException('Invalid login credentials'));
+
+        final SupabaseAuthResult result = await api.signInWithPassword(
+          email: 'amira@example.com',
+          password: 'wrong-password',
+        );
+
+        expect(result, isA<SupabaseAuthFailed>());
+        final SupabaseAuthFailure failure =
+            (result as SupabaseAuthFailed).failure;
+        expect(failure.kind, SupabaseAuthFailureKind.invalidCredentials);
+        expect(failure.message, 'Invalid login credentials');
+      });
+
+      test('maps email-not-confirmed to the typed failure', () async {
+        when(
+          () => client.signInWithPassword(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+          ),
+        ).thenThrow(const AuthException('Email not confirmed'));
+
+        final SupabaseAuthResult result = await api.signInWithPassword(
+          email: 'amira@example.com',
+          password: 'any-password',
+        );
+
+        expect(
+          (result as SupabaseAuthFailed).failure.kind,
+          SupabaseAuthFailureKind.emailNotConfirmed,
+        );
+      });
+
+      test('maps a 429 status to the rate-limited failure', () async {
+        when(
+          () => client.signInWithPassword(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+          ),
+        ).thenThrow(
+          const AuthException('Rate limit exceeded', statusCode: '429'),
+        );
+
+        final SupabaseAuthResult result = await api.signInWithPassword(
+          email: 'amira@example.com',
+          password: 'any-password',
+        );
+
+        expect(
+          (result as SupabaseAuthFailed).failure.kind,
+          SupabaseAuthFailureKind.rateLimited,
+        );
+      });
+
+      test('maps a disabled account to the userDisabled failure', () async {
+        when(
+          () => client.signInWithPassword(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+          ),
+        ).thenThrow(const AuthException('User is disabled'));
+
+        final SupabaseAuthResult result = await api.signInWithPassword(
+          email: 'amira@example.com',
+          password: 'any-password',
+        );
+
+        expect(
+          (result as SupabaseAuthFailed).failure.kind,
+          SupabaseAuthFailureKind.userDisabled,
+        );
+      });
+
+      test('maps an unknown provider error to the unknown failure', () async {
+        when(
+          () => client.signInWithPassword(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+          ),
+        ).thenThrow(const AuthException('Something unexpected'));
+
+        final SupabaseAuthResult result = await api.signInWithPassword(
+          email: 'amira@example.com',
+          password: 'any-password',
+        );
+
+        expect(
+          (result as SupabaseAuthFailed).failure.kind,
+          SupabaseAuthFailureKind.unknown,
+        );
+      });
+
+      test('maps a non-AuthException to provider-unavailable', () async {
+        when(
+          () => client.signInWithPassword(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+          ),
+        ).thenThrow(StateError('network down'));
+
+        final SupabaseAuthResult result = await api.signInWithPassword(
+          email: 'amira@example.com',
+          password: 'any-password',
+        );
+
+        expect(
+          (result as SupabaseAuthFailed).failure.kind,
+          SupabaseAuthFailureKind.providerUnavailable,
+        );
+      });
+    });
+
+    group('signUp (P3.1)', () {
+      test('resolves to pending when email confirmation is required', () async {
+        when(
+          () => client.signUp(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+            data: any(named: 'data'),
+          ),
+        ).thenAnswer((_) async => AuthResponse(session: null));
+
+        final SupabaseSignUpResult result = await api.signUp(
+          email: 'amira@example.com',
+          password: 'any-password',
+          displayName: 'Amira Hassan',
+        );
+
+        expect(result, isA<SupabaseSignUpPending>());
+        // The display name travels as raw_user_meta_data.display_name so the
+        // applied handle_new_user trigger creates the profile row with it.
+        verify(
+          () => client.signUp(
+            email: 'amira@example.com',
+            password: 'any-password',
+            data: <String, dynamic>{
+              'display_name': 'Amira Hassan',
+              'full_name': 'Amira Hassan',
+              'name': 'Amira Hassan',
+            },
+          ),
+        ).called(1);
+      });
+
+      test('resolves to authenticated when a session is minted', () async {
+        const int exp = 1893456000;
+        when(
+          () => client.signUp(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+            data: any(named: 'data'),
+          ),
+        ).thenAnswer(
+          (_) async => AuthResponse(
+            session: _session(
+              exp: exp,
+              user: _user(
+                userMetadata: const <String, dynamic>{
+                  'full_name': 'Amira Hassan',
+                },
+              ),
+            ),
+          ),
+        );
+
+        final SupabaseSignUpResult result = await api.signUp(
+          email: 'amira@example.com',
+          password: 'any-password',
+          displayName: 'Amira Hassan',
+        );
+
+        expect(result, isA<SupabaseSignUpAuthenticated>());
+        expect((result as SupabaseSignUpAuthenticated).snapshot.userId, 'u-1');
+      });
+
+      test('maps an already-registered email to the typed failure', () async {
+        when(
+          () => client.signUp(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+            data: any(named: 'data'),
+          ),
+        ).thenThrow(const AuthException('User already registered'));
+
+        final SupabaseSignUpResult result = await api.signUp(
+          email: 'amira@example.com',
+          password: 'any-password',
+          displayName: 'Amira Hassan',
+        );
+
+        expect(
+          (result as SupabaseSignUpFailed).failure.kind,
+          SupabaseAuthFailureKind.emailInUse,
+        );
+      });
+    });
+
+    group('resetPasswordForEmail (P3.1)', () {
+      test('delegates via signInWithOtp with the Phase 4.1 deep-link redirect '
+          'and resolves to a generic success with no snapshot', () async {
+        when(
+          () => client.signInWithOtp(
+            email: any(named: 'email'),
+            shouldCreateUser: any(named: 'shouldCreateUser'),
+            emailRedirectTo: any(named: 'emailRedirectTo'),
+          ),
+        ).thenAnswer((_) async => AuthResponse(session: null));
+
+        final SupabaseAuthResult result = await api.resetPasswordForEmail(
+          'amira@example.com',
+        );
+
+        expect(result, isA<SupabaseAuthSuccess>());
+        expect((result as SupabaseAuthSuccess).snapshot, isNull);
+        verify(
+          () => client.signInWithOtp(
+            email: 'amira@example.com',
+            shouldCreateUser: false,
+            // Phase 4.1: the recovery email's link is the app deep link
+            // (never a browser URL), so the PKCE exchange lands in-app.
+            emailRedirectTo: 'com.legalhub.app://auth/v1/callback',
+          ),
+        ).called(1);
+      });
+
+      test('maps a provider failure to the typed failure', () async {
+        when(
+          () => client.signInWithOtp(
+            email: any(named: 'email'),
+            shouldCreateUser: any(named: 'shouldCreateUser'),
+            emailRedirectTo: any(named: 'emailRedirectTo'),
+          ),
+        ).thenThrow(const AuthException('Email not confirmed'));
+
+        final SupabaseAuthResult result = await api.resetPasswordForEmail(
+          'amira@example.com',
+        );
+
+        expect(
+          (result as SupabaseAuthFailed).failure.kind,
+          SupabaseAuthFailureKind.emailNotConfirmed,
+        );
+      });
+    });
+
+    group('verifyOtp (P3.1)', () {
+      test(
+        'delegates with the magiclink OTP type and maps the minted session',
+        () async {
+          const int exp = 1893456000;
+          when(
+            () => client.verifyOTP(
+              email: any(named: 'email'),
+              token: any(named: 'token'),
+              type: any(named: 'type'),
+            ),
+          ).thenAnswer(
+            (_) async => AuthResponse(
+              session: _session(
+                exp: exp,
+                user: _user(
+                  userMetadata: const <String, dynamic>{
+                    'full_name': 'Amira Hassan',
+                  },
+                ),
+              ),
+            ),
+          );
+
+          final SupabaseAuthResult result = await api.verifyOtp(
+            email: 'amira@example.com',
+            code: '123456',
+          );
+
+          expect(result, isA<SupabaseAuthSuccess>());
+          expect((result as SupabaseAuthSuccess).snapshot?.userId, 'u-1');
           verify(
-            () => client.signInWithOtp(
+            () => client.verifyOTP(
               email: 'amira@example.com',
-              shouldCreateUser: false,
-              emailRedirectTo: 'com.legalhub.app://auth/v1/callback',
+              token: '123456',
+              // The dart client has no 'email' OtpType; the provider accepts
+              // magiclink for the code-based recovery emails (D1 revised,
+              // verified live 2026-08-03).
+              type: OtpType.magiclink,
             ),
           ).called(1);
         },
       );
 
-      test('verifies the emailed code via the magiclink OTP path', () async {
+      test('maps a wrong-code provider error to the typed failure', () async {
         when(
           () => client.verifyOTP(
             email: any(named: 'email'),
             token: any(named: 'token'),
             type: any(named: 'type'),
           ),
-        ).thenAnswer(
-          (_) async => AuthResponse(user: _user(email: 'amira@example.com')),
-        );
+        ).thenThrow(const AuthException('Invalid OTP'));
 
-        await api.verifyRecoveryOtp(
+        final SupabaseAuthResult result = await api.verifyOtp(
           email: 'amira@example.com',
-          token: '123456',
+          code: '000000',
         );
 
-        // The dart client has no 'email' OtpType; the provider accepts
-        // magiclink for email OTP codes (verified live, 2026-08-03).
-        verify(
-          () => client.verifyOTP(
-            email: 'amira@example.com',
-            token: '123456',
-            type: OtpType.magiclink,
-          ),
-        ).called(1);
-      });
-
-      test('maps a wrong or expired code to invalidCredentials', () async {
-        when(
-          () => client.verifyOTP(
-            email: any(named: 'email'),
-            token: any(named: 'token'),
-            type: any(named: 'type'),
-          ),
-        ).thenThrow(
-          const AuthException(
-            'Token has expired or is invalid',
-            statusCode: '403',
-          ),
-        );
-
-        await expectLater(
-          api.verifyRecoveryOtp(email: 'amira@example.com', token: '000000'),
-          throwsA(
-            isA<SupabaseAuthException>().having(
-              (SupabaseAuthException e) => e.kind,
-              'kind',
-              SupabaseAuthFailureKind.invalidCredentials,
-            ),
-          ),
+        expect(
+          (result as SupabaseAuthFailed).failure.kind,
+          SupabaseAuthFailureKind.unknown,
         );
       });
+    });
 
-      group('recovery link marker', () {
-        test('marks a snapshot from a passwordRecovery event', () async {
-          const int exp = 1893456000;
-          final List<SupabaseAuthSnapshot?> seen = <SupabaseAuthSnapshot?>[];
-          final StreamSubscription<SupabaseAuthSnapshot?> subscription = api
-              .snapshotChanges
-              .listen(seen.add);
-          addTearDown(() => subscription.cancel());
-
-          events.add(
-            AuthState(
-              AuthChangeEvent.passwordRecovery,
-              _session(exp: exp, user: _user()),
-            ),
+    group('updateUserPassword (P3.1)', () {
+      test(
+        'delegates the new password to updateUser, signs out, and succeeds',
+        () async {
+          when(() => client.updateUser(captureAny())).thenAnswer(
+            (_) async => UserResponse.fromJson(<String, dynamic>{'id': 'u-1'}),
           );
-          await Future<void>.delayed(Duration.zero);
+          when(() => client.signOut()).thenAnswer((_) async {});
 
-          // The PKCE exchange for a recovery link fires `passwordRecovery`
-          // (gotrue exchangeCodeForSession), not `signedIn`.
-          expect(seen.single?.recoveredViaLink, isTrue);
-        });
-
-        test('leaves the marker false for a plain signedIn event', () async {
-          const int exp = 1893456000;
-          final List<SupabaseAuthSnapshot?> seen = <SupabaseAuthSnapshot?>[];
-          final StreamSubscription<SupabaseAuthSnapshot?> subscription = api
-              .snapshotChanges
-              .listen(seen.add);
-          addTearDown(() => subscription.cancel());
-
-          events.add(
-            AuthState(
-              AuthChangeEvent.signedIn,
-              _session(exp: exp, user: _user()),
-            ),
+          final SupabaseAuthResult result = await api.updateUserPassword(
+            'new-password-1',
           );
-          await Future<void>.delayed(Duration.zero);
 
-          expect(seen.single?.recoveredViaLink, isFalse);
-        });
+          expect(result, isA<SupabaseAuthSuccess>());
+          expect((result as SupabaseAuthSuccess).snapshot, isNull);
+          final List<dynamic> captured = verify(
+            () => client.updateUser(captureAny()),
+          ).captured;
+          expect(captured.single, isA<UserAttributes>());
+          expect(
+            (captured.single as UserAttributes).password,
+            'new-password-1',
+          );
+          // Recovery must not leave the app authenticated on the next
+          // launch: the verify session is a means to an end (4.1 discipline).
+          verify(() => client.signOut()).called(1);
+        },
+      );
 
-        test(
-          'marks a cold-restored session carrying a pending recovery',
-          () async {
-            const int exp = 1893456000;
-            when(() => client.currentSession).thenReturn(
-              _session(
-                exp: exp,
-                user: _user(recoverySentAt: '2026-08-03T00:00:00Z'),
-              ),
-            );
-
-            final SupabaseAuthSnapshot? snapshot = await api.restore();
-
-            // `recovery_sent_at` on the user record covers the case where the
-            // app was killed between link-open and password change: no
-            // `passwordRecovery` event replays, but the pending recovery must
-            // still route the user to the reset step.
-            expect(snapshot?.recoveredViaLink, isTrue);
-          },
+      test('maps a provider failure to the typed failure', () async {
+        when(() => client.updateUser(any())).thenThrow(
+          const AuthException('Rate limit exceeded', statusCode: '429'),
         );
 
-        test('leaves the marker false when no recovery is pending', () async {
-          const int exp = 1893456000;
-          when(
-            () => client.currentSession,
-          ).thenReturn(_session(exp: exp, user: _user()));
-
-          final SupabaseAuthSnapshot? snapshot = await api.restore();
-
-          expect(snapshot?.recoveredViaLink, isFalse);
-        });
-      });
-
-      test('updates the password then clears the recovery session', () async {
-        when(() => client.updateUser(any())).thenAnswer(
-          (_) async => UserResponse.fromJson(<String, dynamic>{
-            'id': 'u-1',
-            'aud': 'authenticated',
-            'email': 'amira@example.com',
-            'created_at': '2026-07-25T00:00:00Z',
-          }),
+        final SupabaseAuthResult result = await api.updateUserPassword(
+          'new-password-1',
         );
-        when(() => client.signOut()).thenAnswer((_) async {});
 
-        await api.updatePassword(newPassword: 'new-secret-pass');
-
-        verify(() => client.updateUser(any())).called(1);
-        // Recovery must not leave the app authenticated on next launch.
-        verify(() => client.signOut()).called(1);
+        expect(
+          (result as SupabaseAuthFailed).failure.kind,
+          SupabaseAuthFailureKind.rateLimited,
+        );
       });
     });
   });

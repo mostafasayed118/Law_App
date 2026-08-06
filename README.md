@@ -57,7 +57,7 @@ messaging services.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (703 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (714 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), Redactor (password/OTP/email/Bearer redaction
   with leak guards), DI registration graph, validators, router redirect logic
@@ -92,7 +92,7 @@ messaging services.
   in-memory locale store, and the onboarding-success screen. Batch 5 added
   the 800×600 onboarding no-overflow test and the EN/AR/TR localized-fallback
   assertions.
-- Coverage: **703 tests** (2026-08-04); `flutter analyze` and the format gate
+- Coverage: **714 tests** (2026-08-05); `flutter analyze` and the format gate
   clean. The coverage-gap list from the codebase audit (cubit emission
   streams, shared widgets, screen negative paths, router bypass, TR locale,
   reset success path) was closed by Batch 1 of
@@ -107,7 +107,16 @@ messaging services.
   (send OTP → verify OTP → change password, no deep links needed), flipped DI
   on `env.isConfigured`, wired the email/OTP/resend screens to the gateway
   with non-enumerating acknowledgement, and pinned it with gateway, API-seam,
-  screen, and DI-flip tests.
+  screen, and DI-flip tests. **P3.1 completion (2026-08-05):** the auth data
+  layer moved to typed sealed results on the `SupabaseAuthApi` seam
+  (`SupabaseAuthResult`/`SupabaseSignUpResult` — GoTrue exceptions never
+  cross it), both gateways re-shape typed results into `Result`, and the
+  recovery flow renders **one localized, non-enumerating denial** in
+  EN/AR/TR (`recoveryErrorNotice` + `recovery_error_localizer.dart`) via the
+  `PasswordRecoveryCubit`-wired email/OTP/reset screens. Phase 4.1 deep-link
+  recovery (PKCE init, `emailRedirectTo`, `recoveredViaLink` routing,
+  post-recovery sign-out) is preserved and re-pinned across the seam,
+  gateway, and cubit tests.
 - Tracked deviations: D-T1 (OnboardingScreen desktop overflow) and D-T3 (the
   hardcoded `'Jonathan'` fallback) were **resolved by Batch 5** — the carousel
   page now scrolls at compact heights and the no-session greeting fallback is

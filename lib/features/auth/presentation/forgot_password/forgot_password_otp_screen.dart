@@ -1,28 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/legalhub_theme.dart';
 import '../../../../app/router.dart';
 import '../../../../app/service_locator.dart';
-import '../../../../core/errors/app_error.dart';
-import '../../../../core/errors/result.dart';
+import '../../../../core/state/view_state.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/widgets/widgets.dart';
 import '../../domain/password_recovery_gateway.dart';
+import '../password_recovery_cubit.dart';
 import 'otp_field_row.dart';
+import 'recovery_error_localizer.dart';
 import 'recovery_routing_context.dart';
+
+/// Which action initiated the current recovery operation on this screen, so
+/// the success listener can distinguish "verify → advance" from "resend →
+/// stay with a generic ack".
+enum _OtpAction { verify, resend }
 
 /// Step 2 — enter the 6-digit verification code.
 ///
-/// Reads the email threaded from step 1 via [RecoveryRoutingContext] (GoRouter
-/// `extra`). "Verify & Continue" calls the [PasswordRecoveryGateway] seam: in
-/// configured builds the Supabase-backed implementation really verifies the
-/// emailed code (2026-08-03, D1 revised); only a correct, unexpired code
-/// advances to the reset step. On success the email and the entered code are
-/// threaded onward via [RecoveryRoutingContext] so [PasswordRecoveryRequest]
-/// is built with real values, not placeholders.
+/// P3.1 wires both actions through [PasswordRecoveryCubit]:
+/// - "Verify & Continue" calls [PasswordRecoveryCubit.verifyCode]; success
+///   threads email + OTP onward to the reset step.
+/// - "Resend code" calls [PasswordRecoveryCubit.sendCode]; success stays on
+///   this screen with the generic acknowledgement.
 ///
-/// "Resend code" repeats the step-1 request for the same email.
+/// Responses are generic and non-enumerating (plan §7): a wrong/expired/revoked
+/// code renders one generic denial, never a per-failure hint.
 class ForgotPasswordOtpScreen extends StatefulWidget {
   const ForgotPasswordOtpScreen({super.key});
 
@@ -34,8 +40,7 @@ class ForgotPasswordOtpScreen extends StatefulWidget {
 class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
   final ValueNotifier<bool> _complete = ValueNotifier<bool>(false);
   final GlobalKey<OtpFieldRowState> _otpKey = GlobalKey<OtpFieldRowState>();
-  bool _verifying = false;
-  bool _resending = false;
+  _OtpAction _lastAction = _OtpAction.verify;
 
   @override
   void dispose() {
@@ -57,119 +62,145 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
-    return AuthScaffold(
-      leading: IconButton(
-        icon: const DirectionalIcon(
-          icon: Icons.arrow_back,
-          mirroredIcon: Icons.arrow_forward,
-        ),
-        onPressed: () => context.go(AppRoutes.forgotPassword),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Text(
-            l10n.verifyEmailTitle,
-            textAlign: TextAlign.center,
-            style: text.displaySmall,
-          ),
-          const SizedBox(height: LegalHubTheme.spaceSm),
-          Text(
-            l10n.verifyEmailBody,
-            textAlign: TextAlign.center,
-            style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-          ),
-          const SizedBox(height: LegalHubTheme.spaceXl * 1.5),
-          OtpFieldRow(key: _otpKey, completionNotifier: _complete),
-          const SizedBox(height: LegalHubTheme.spaceXl * 1.5),
-          ValueListenableBuilder<bool>(
-            valueListenable: _complete,
-            builder: (BuildContext context, bool complete, Widget? _) {
-              return ElevatedButton(
-                onPressed: complete && !_verifying ? _verify : null,
-                child: _verifying
-                    ? const SizedBox.square(
-                        dimension: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(l10n.verifyAndContinueButton),
-              );
-            },
-          ),
-          const SizedBox(height: LegalHubTheme.spaceLg),
-          // Real resend: repeats the step-1 request for the threaded email
-          // (2026-08-03, D1 revised).
-          Center(
-            child: TextButton(
-              onPressed: _resending ? null : _resend,
-              child: Text(
-                _resending ? l10n.resendCodeUnavailable : l10n.resendCode,
+    final RecoveryRoutingContext incoming = _contextFrom(
+      GoRouterState.of(context),
+    );
+    return BlocProvider<PasswordRecoveryCubit>(
+      create: (_) =>
+          PasswordRecoveryCubit(serviceLocator<PasswordRecoveryGateway>()),
+      child: BlocListener<PasswordRecoveryCubit, ViewState<void>>(
+        listenWhen: (ViewState<void> previous, ViewState<void> current) =>
+            current is ViewSuccess<void> && previous is! ViewSuccess<void>,
+        listener: (BuildContext context, ViewState<void> state) {
+          if (_lastAction == _OtpAction.verify) {
+            // Verified: thread email + OTP onward. In-memory `extra` only —
+            // the OTP is a short-lived credential and must not appear in the
+            // URL.
+            context.go(
+              AppRoutes.forgotPasswordReset,
+              extra: RecoveryRoutingContext(
+                email: incoming.email,
+                otp: _otpKey.currentState?.code ?? '',
               ),
+            );
+          } else {
+            // Resend: generic acknowledgement; stay on this screen.
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(AppLocalizations.of(context).codeSentNotice),
+              ),
+            );
+          }
+        },
+        child: AuthScaffold(
+          leading: IconButton(
+            icon: const DirectionalIcon(
+              icon: Icons.arrow_back,
+              mirroredIcon: Icons.arrow_forward,
             ),
+            onPressed: () => context.go(AppRoutes.forgotPassword),
           ),
-          const SizedBox(height: LegalHubTheme.spaceMd),
-          Center(
-            child: Text(
-              l10n.resendHelp,
-              textAlign: TextAlign.center,
-              style: text.bodySmall,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Text(
+                l10n.verifyEmailTitle,
+                textAlign: TextAlign.center,
+                style: text.displaySmall,
+              ),
+              const SizedBox(height: LegalHubTheme.spaceSm),
+              Text(
+                l10n.verifyEmailBody,
+                textAlign: TextAlign.center,
+                style: text.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: LegalHubTheme.spaceXl * 1.5),
+              OtpFieldRow(key: _otpKey, completionNotifier: _complete),
+              const SizedBox(height: LegalHubTheme.spaceXl * 1.5),
+              ValueListenableBuilder<bool>(
+                valueListenable: _complete,
+                builder: (BuildContext context, bool complete, Widget? _) {
+                  return BlocBuilder<PasswordRecoveryCubit, ViewState<void>>(
+                    builder: (BuildContext context, ViewState<void> state) {
+                      final bool loading = state is ViewLoading<void>;
+                      final bool error = state is ViewError<void>;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          if (error)
+                            Padding(
+                              padding: const EdgeInsetsDirectional.only(
+                                bottom: LegalHubTheme.spaceMd,
+                              ),
+                              child: ViewStateView<void>(
+                                state: localizeRecoveryError(state, l10n),
+                                onRetry: () => context
+                                    .read<PasswordRecoveryCubit>()
+                                    .resetToEmpty(),
+                              ),
+                            ),
+                          ElevatedButton(
+                            onPressed: (complete && !loading)
+                                ? () => _verify(context, incoming)
+                                : null,
+                            child: loading
+                                ? const SizedBox.square(
+                                    dimension: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Text(l10n.verifyAndContinueButton),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
+              const SizedBox(height: LegalHubTheme.spaceLg),
+              // P3.1: the resend action is wired to sendCode (the single place
+              // the plan reserved for it). Generic acknowledgement only.
+              // Builder scopes the context below the [BlocProvider] so
+              // `_resend` can resolve the cubit (the State's own context
+              // sits above it).
+              Center(
+                child: Builder(
+                  builder: (BuildContext builderContext) => TextButton(
+                    onPressed: () => _resend(builderContext, incoming),
+                    child: Text(l10n.resendCode),
+                  ),
+                ),
+              ),
+              const SizedBox(height: LegalHubTheme.spaceMd),
+              Center(
+                child: Text(
+                  l10n.resendHelp,
+                  textAlign: TextAlign.center,
+                  style: text.bodySmall,
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Future<void> _verify() async {
-    final RecoveryRoutingContext incoming = _contextFrom(
-      GoRouterState.of(context),
+  /// [context] must be a builder context below the [BlocProvider] so the
+  /// [PasswordRecoveryCubit] resolves (the State's own context sits above it).
+  void _verify(BuildContext context, RecoveryRoutingContext incoming) {
+    _lastAction = _OtpAction.verify;
+    context.read<PasswordRecoveryCubit>().verifyCode(
+      email: incoming.email,
+      code: _otpKey.currentState?.code ?? '',
     );
-    final String otp = _otpKey.currentState?.code ?? '';
-    setState(() => _verifying = true);
-    final Result<void> result = await serviceLocator<PasswordRecoveryGateway>()
-        .verifyCode(email: incoming.email, otp: otp);
-    if (!mounted) {
-      return;
-    }
-    setState(() => _verifying = false);
-    switch (result) {
-      case Success<void>():
-        // Thread both the email from step 1 and the verified OTP to the reset
-        // step. In-memory `extra` only — the OTP is a short-lived credential
-        // and must not appear in the URL.
-        context.go(
-          AppRoutes.forgotPasswordReset,
-          extra: RecoveryRoutingContext(email: incoming.email, otp: otp),
-        );
-        return;
-      case Failure<void>(error: final AppError error):
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(error.userMessage)));
-    }
   }
 
-  Future<void> _resend() async {
-    final RecoveryRoutingContext incoming = _contextFrom(
-      GoRouterState.of(context),
-    );
-    setState(() => _resending = true);
-    final Result<void> result = await serviceLocator<PasswordRecoveryGateway>()
-        .requestCode(email: incoming.email);
-    if (!mounted) {
-      return;
-    }
-    setState(() => _resending = false);
-    switch (result) {
-      case Success<void>():
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context).codeSentNotice)),
-        );
-        return;
-      case Failure<void>(error: final AppError error):
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(error.userMessage)));
-    }
+  void _resend(BuildContext context, RecoveryRoutingContext incoming) {
+    _lastAction = _OtpAction.resend;
+    context.read<PasswordRecoveryCubit>().sendCode(incoming.email);
   }
 }

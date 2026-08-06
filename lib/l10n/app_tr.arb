@@ -58,6 +58,7 @@
   "signInLink": "Giriş Yap",
   "recoverPasswordTitle": "Parola Kurtarma",
   "recoverPasswordBody": "Doğrulama kodu almak için kayıtlı e-posta adresinizi girin.",
+  "recoveryErrorNotice": "Bu istek tamamlanamadı. Lütfen tekrar deneyin.",
   "sendCodeButton": "Kod Gönder",
   "backToSignIn": "Girişe Dön",
   "codeSentNotice": "Doğrulama kodu gelen kutunuza gönderildi.",
