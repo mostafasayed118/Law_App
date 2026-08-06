@@ -541,6 +541,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get removeMemberConfirmAction => 'Remove';
 
   @override
+  String get platformAdminTitle => 'Platform admin';
+
+  @override
+  String get platformAdminOrganizations => 'Organizations';
+
+  @override
+  String get platformAdminMembers => 'Members';
+
+  @override
+  String get platformAdminDeleteDemo => 'Delete demo account';
+
+  @override
+  String get platformAdminDeleteConfirmTitle => 'Delete demo account?';
+
+  @override
+  String platformAdminDeleteConfirmBody(String name) {
+    return 'Delete the demo account for $name? This cannot be undone.';
+  }
+
+  @override
+  String get platformAdminDeleteConfirmAction => 'Delete';
+
+  @override
   String get orgErrorDenied =>
       'You don\'t have permission to perform this action.';
 
