@@ -344,6 +344,39 @@ class FakeOrganizationGateway implements OrganizationGateway {
     );
   }
 
+  /// Metadata-only cross-org listing (P3.5): every organization in the
+  /// registry — the mirror of `list_organizations_metadata`. Metadata only,
+  /// never content.
+  List<OrganizationSummary> allOrganizations() =>
+      _orgs.values.toList(growable: false);
+
+  /// Metadata-only cross-org member listing (P3.5): every membership across
+  /// orgs as [OrgMember] rows — the mirror of `list_members_metadata`. The
+  /// real RPC joins `profiles`, so invited rows (no profile yet) never
+  /// appear; the fake excludes rows carrying an [OrgMember.invitationId].
+  List<OrgMember> allMembers() {
+    final List<OrgMember> members = <OrgMember>[];
+    for (final Map<String, OrgMember> roster in _members.values) {
+      for (final OrgMember member in roster.values) {
+        if (member.invitationId != null) {
+          continue;
+        }
+        members.add(member);
+      }
+    }
+    return members;
+  }
+
+  /// Mirrors `delete_demo_account`'s cascade (P3.5): removes [userId] from
+  /// every roster (profiles/memberships cascade server-side; audit rows
+  /// survive). Never invoked with the demo identity by the platform fake
+  /// (the RPC refuses `auth.uid()`).
+  void deleteAccount(String userId) {
+    for (final Map<String, OrgMember> roster in _members.values) {
+      roster.remove(userId);
+    }
+  }
+
   /// Derives the demo user's current memberships from this fake's internal
   /// state (P3.3 Slice B).
   ///
