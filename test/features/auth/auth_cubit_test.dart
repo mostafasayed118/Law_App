@@ -731,8 +731,7 @@ void main() {
               AuthStatus.authenticated,
             )
             .having(
-              (AuthState s) =>
-                  s.session?.memberships.single.organizationId,
+              (AuthState s) => s.session?.memberships.single.organizationId,
               'memberships org',
               'org-fresh',
             ),
