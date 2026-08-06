@@ -448,6 +448,12 @@ abstract class AppLocalizations {
   /// **'Enter your registered email address to receive a verification code.'**
   String get recoverPasswordBody;
 
+  /// No description provided for @recoveryErrorNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t complete that request. Please try again.'**
+  String get recoveryErrorNotice;
+
   /// No description provided for @sendCodeButton.
   ///
   /// In en, this message translates to:

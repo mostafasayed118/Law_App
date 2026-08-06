@@ -58,6 +58,7 @@
   "signInLink": "Sign In",
   "recoverPasswordTitle": "Recover Password",
   "recoverPasswordBody": "Enter your registered email address to receive a verification code.",
+  "recoveryErrorNotice": "We couldn't complete that request. Please try again.",
   "sendCodeButton": "Send Code",
   "backToSignIn": "Back to Sign In",
   "codeSentNotice": "Verification code sent to your inbox.",

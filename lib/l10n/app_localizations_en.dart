@@ -191,6 +191,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enter your registered email address to receive a verification code.';
 
   @override
+  String get recoveryErrorNotice =>
+      'We couldn\'t complete that request. Please try again.';
+
+  @override
   String get sendCodeButton => 'Send Code';
 
   @override

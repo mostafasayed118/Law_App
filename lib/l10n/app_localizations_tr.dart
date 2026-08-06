@@ -192,6 +192,10 @@ class AppLocalizationsTr extends AppLocalizations {
       'Doğrulama kodu almak için kayıtlı e-posta adresinizi girin.';
 
   @override
+  String get recoveryErrorNotice =>
+      'Bu istek tamamlanamadı. Lütfen tekrar deneyin.';
+
+  @override
   String get sendCodeButton => 'Kod Gönder';
 
   @override

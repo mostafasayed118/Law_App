@@ -190,6 +190,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'أدخل بريدك الإلكتروني المسجّل لتصلك رمز التحقق.';
 
   @override
+  String get recoveryErrorNotice =>
+      'تعذر إكمال هذا الطلب. يرجى المحاولة مرة أخرى.';
+
+  @override
   String get sendCodeButton => 'إرسال الرمز';
 
   @override
