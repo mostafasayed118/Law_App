@@ -50,6 +50,7 @@ import '../features/notifications/data/in_memory_notification_prefs_store.dart';
 import '../features/notifications/data/shared_preferences_notification_prefs_store.dart';
 import '../features/notifications/domain/notification_prefs_store.dart';
 import '../features/orgs/presentation/active_org_store.dart';
+import 'deep_link/pending_accept_invite_store.dart';
 import 'localization/locale_cubit.dart';
 
 /// The application's single GetIt service-locator instance.
@@ -249,6 +250,15 @@ void configureDependencies({
     // and created per screen via BlocProvider, so it is NOT registered here.
     serviceLocator.registerLazySingleton<BookingGateway>(
       FakeBookingGateway.new,
+    );
+  }
+  if (!serviceLocator.isRegistered<PendingAcceptInviteStore>()) {
+    // Transient app-scoped holder (Phase 4.1 D-P34.2): buffers a
+    // deep-linked one-time accept token until the accept screen consumes it
+    // (cold-start / signed-out arrivals). BookingPrefill precedent — never
+    // serialized, consumed-and-cleared.
+    serviceLocator.registerLazySingleton<PendingAcceptInviteStore>(
+      PendingAcceptInviteStore.new,
     );
   }
   if (!serviceLocator.isRegistered<BookingPrefill>()) {
