@@ -4,8 +4,10 @@ import 'package:legalhub/core/auth/auth_gateway.dart';
 import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
+import 'package:legalhub/core/organizations/membership_repository.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
+import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 
 /// A fixed contract-§5 session used by the synthetic fakes so expected states
@@ -17,7 +19,7 @@ Session demoSession() => Session(
     OrganizationMembership(
       organizationId: 'org-demo',
       organizationName: 'Demo Firm',
-      role: UserRole.client,
+      role: UserRole.partner,
       status: MembershipStatus.active,
     ),
   ],
@@ -30,6 +32,7 @@ void main() {
       final AuthCubit cubit = AuthCubit(
         _NullSessionGateway(),
         InMemoryErrorReporter(),
+        FakeMembershipRepository(),
       );
       addTearDown(cubit.close);
 
@@ -42,6 +45,7 @@ void main() {
       final AuthCubit cubit = AuthCubit(
         _PreauthenticatedGateway(session),
         InMemoryErrorReporter(),
+        FakeMembershipRepository(),
       );
       addTearDown(cubit.close);
 
@@ -54,6 +58,7 @@ void main() {
       final AuthCubit cubit = AuthCubit(
         _ExpiredSessionGateway(),
         InMemoryErrorReporter(),
+        FakeMembershipRepository(),
       );
       addTearDown(
         cubit.close,
@@ -68,7 +73,11 @@ void main() {
     blocTest<AuthCubit, AuthState>(
       'emits [loading, authenticated] with the contract-§5 demo session '
       'without collecting credentials',
-      build: () => AuthCubit(FakeAuthGateway(), InMemoryErrorReporter()),
+      build: () => AuthCubit(
+        FakeAuthGateway(),
+        InMemoryErrorReporter(),
+        FakeMembershipRepository(),
+      ),
       act: (AuthCubit cubit) => cubit.startDemoSession(),
       expect: () => <dynamic>[
         const AuthState(status: AuthStatus.loading),
@@ -87,7 +96,7 @@ void main() {
             .having(
               (AuthState s) => s.session?.primaryRole,
               'primaryRole',
-              UserRole.client,
+              UserRole.partner,
             )
             .having(
               (AuthState s) => s.session?.activeMembership?.organizationId,
@@ -106,8 +115,11 @@ void main() {
       'emits [loading, error] and reports the typed failure when the gateway '
       'fails',
       setUp: () => _failingReporter = InMemoryErrorReporter(),
-      build: () =>
-          AuthCubit(_FailingAuthGateway(_gatewayFailure), _failingReporter),
+      build: () => AuthCubit(
+        _FailingAuthGateway(_gatewayFailure),
+        _failingReporter,
+        FakeMembershipRepository(),
+      ),
       act: (AuthCubit cubit) => cubit.startDemoSession(),
       expect: () => <AuthState>[
         const AuthState(status: AuthStatus.loading),
@@ -124,7 +136,11 @@ void main() {
     blocTest<AuthCubit, AuthState>(
       'ignores a duplicate startDemoSession while one is in flight',
       setUp: () => _countingAuthGateway = _CountingAuthGateway(),
-      build: () => AuthCubit(_countingAuthGateway, InMemoryErrorReporter()),
+      build: () => AuthCubit(
+        _countingAuthGateway,
+        InMemoryErrorReporter(),
+        FakeMembershipRepository(),
+      ),
       act: (AuthCubit cubit) async {
         // Fire two startDemoSession calls back-to-back without awaiting
         // between them. The guard at auth_cubit.dart must keep the second
@@ -146,7 +162,11 @@ void main() {
   group('AuthCubit signIn (contract §5 credential path)', () {
     blocTest<AuthCubit, AuthState>(
       'emits [loading, authenticated] with the demo session on the dev fake',
-      build: () => AuthCubit(FakeAuthGateway(), InMemoryErrorReporter()),
+      build: () => AuthCubit(
+        FakeAuthGateway(),
+        InMemoryErrorReporter(),
+        FakeMembershipRepository(),
+      ),
       act: (AuthCubit cubit) =>
           cubit.signIn(email: 'amira@example.com', password: 'any-password'),
       expect: () => <dynamic>[
@@ -161,7 +181,7 @@ void main() {
             .having(
               (AuthState s) => s.session?.primaryRole,
               'primaryRole',
-              UserRole.client,
+              UserRole.partner,
             ),
       ],
     );
@@ -170,8 +190,11 @@ void main() {
       'emits [loading, error] and reports the typed failure when credentials '
       'are rejected',
       setUp: () => _failingReporter = InMemoryErrorReporter(),
-      build: () =>
-          AuthCubit(_FailingAuthGateway(_gatewayFailure), _failingReporter),
+      build: () => AuthCubit(
+        _FailingAuthGateway(_gatewayFailure),
+        _failingReporter,
+        FakeMembershipRepository(),
+      ),
       act: (AuthCubit cubit) =>
           cubit.signIn(email: 'amira@example.com', password: 'wrong-password'),
       expect: () => <AuthState>[
@@ -187,7 +210,11 @@ void main() {
     blocTest<AuthCubit, AuthState>(
       'ignores a duplicate signIn while one is in flight',
       setUp: () => _countingAuthGateway = _CountingAuthGateway(),
-      build: () => AuthCubit(_countingAuthGateway, InMemoryErrorReporter()),
+      build: () => AuthCubit(
+        _countingAuthGateway,
+        InMemoryErrorReporter(),
+        FakeMembershipRepository(),
+      ),
       act: (AuthCubit cubit) async {
         final Future<void> first = cubit.signIn(
           email: 'amira@example.com',
@@ -212,7 +239,11 @@ void main() {
   group('AuthCubit restore (contract §5)', () {
     blocTest<AuthCubit, AuthState>(
       'emits [restoring, unauthenticated] when there is no session',
-      build: () => AuthCubit(_NullSessionGateway(), InMemoryErrorReporter()),
+      build: () => AuthCubit(
+        _NullSessionGateway(),
+        InMemoryErrorReporter(),
+        FakeMembershipRepository(),
+      ),
       act: (AuthCubit cubit) => cubit.restore(),
       expect: () => <AuthState>[
         const AuthState(status: AuthStatus.restoring),
@@ -225,6 +256,7 @@ void main() {
       build: () => AuthCubit(
         _PreauthenticatedGateway(demoSession()),
         InMemoryErrorReporter(),
+        FakeMembershipRepository(),
       ),
       act: (AuthCubit cubit) => cubit.restore(),
       expect: () => <AuthState>[
@@ -236,7 +268,11 @@ void main() {
     blocTest<AuthCubit, AuthState>(
       'emits [restoring, reauthRequired] for an expired session instead of a '
       'misleading authenticated state',
-      build: () => AuthCubit(_ExpiredSessionGateway(), InMemoryErrorReporter()),
+      build: () => AuthCubit(
+        _ExpiredSessionGateway(),
+        InMemoryErrorReporter(),
+        FakeMembershipRepository(),
+      ),
       act: (AuthCubit cubit) => cubit.restore(),
       expect: () => <AuthState>[
         const AuthState(status: AuthStatus.restoring),
@@ -249,6 +285,7 @@ void main() {
       build: () => AuthCubit(
         _FailingAuthGateway(_gatewayFailure),
         InMemoryErrorReporter(),
+        FakeMembershipRepository(),
       ),
       act: (AuthCubit cubit) => cubit.restore(),
       expect: () => <AuthState>[
@@ -261,7 +298,11 @@ void main() {
   group('AuthCubit signOut', () {
     blocTest<AuthCubit, AuthState>(
       'emits unauthenticated after an established session',
-      build: () => AuthCubit(FakeAuthGateway(), InMemoryErrorReporter()),
+      build: () => AuthCubit(
+        FakeAuthGateway(),
+        InMemoryErrorReporter(),
+        FakeMembershipRepository(),
+      ),
       act: (AuthCubit cubit) async {
         await cubit.startDemoSession();
         await cubit.signOut();
@@ -284,7 +325,11 @@ void main() {
     blocTest<AuthCubit, AuthState>(
       'applies a provider-initiated session that bypasses explicit calls',
       setUp: () => _streamGateway = FakeAuthGateway(),
-      build: () => AuthCubit(_streamGateway, InMemoryErrorReporter()),
+      build: () => AuthCubit(
+        _streamGateway,
+        InMemoryErrorReporter(),
+        FakeMembershipRepository(),
+      ),
       act: (AuthCubit cubit) async {
         // The deep-link PKCE exchange never goes through signIn/restore: the
         // session lands on the gateway stream, which the cubit now consumes.
@@ -303,7 +348,11 @@ void main() {
 
     test('surfaces recoveryPending for a recovery session', () async {
       final FakeAuthGateway gateway = FakeAuthGateway();
-      final AuthCubit cubit = AuthCubit(gateway, InMemoryErrorReporter());
+      final AuthCubit cubit = AuthCubit(
+        gateway,
+        InMemoryErrorReporter(),
+        FakeMembershipRepository(),
+      );
       addTearDown(cubit.close);
       addTearDown(gateway.dispose);
 
@@ -322,6 +371,148 @@ void main() {
       expect(cubit.recoveryPending, isFalse);
     });
   });
+
+  group('AuthCubit membership hydration (P3.2 Task 8)', () {
+    blocTest<AuthCubit, AuthState>(
+      'hydrates memberships after a successful sign-in (loading held until '
+      'hydration resolves)',
+      setUp: () => _hydrationRepository = _HydrationRepository(
+        result: const HydrationSucceeded(<OrganizationMembership>[
+          OrganizationMembership(
+            organizationId: 'org-a',
+            organizationName: 'Firm A',
+            role: UserRole.partner,
+            status: MembershipStatus.active,
+          ),
+          OrganizationMembership(
+            organizationId: 'org-b',
+            organizationName: 'Firm B',
+            role: UserRole.attorney,
+            status: MembershipStatus.active,
+          ),
+        ]),
+      ),
+      build: () => AuthCubit(
+        _NullSessionGateway(),
+        InMemoryErrorReporter(),
+        _hydrationRepository,
+      ),
+      act: (AuthCubit cubit) => cubit.startDemoSession(),
+      expect: () => <dynamic>[
+        const AuthState(status: AuthStatus.loading),
+        isA<AuthState>()
+            .having(
+              (AuthState s) => s.status,
+              'status',
+              AuthStatus.authenticated,
+            )
+            .having(
+              (AuthState s) => s.session?.memberships.length,
+              'hydrated memberships',
+              2,
+            )
+            .having(
+              (AuthState s) => s.session?.primaryRole,
+              'primaryRole',
+              UserRole.partner,
+            ),
+      ],
+      verify: (_) {
+        // The repository is consulted exactly once, for the caller's id.
+        expect(_hydrationRepository.calls, 1);
+        expect(_hydrationRepository.userIds, <String>['demo-user']);
+      },
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'keeps the honest empty when the provider reports no memberships',
+      setUp: () => _hydrationRepository = _HydrationRepository(
+        result: const HydrationSucceeded(<OrganizationMembership>[]),
+      ),
+      build: () => AuthCubit(
+        _NullSessionGateway(),
+        InMemoryErrorReporter(),
+        _hydrationRepository,
+      ),
+      act: (AuthCubit cubit) => cubit.startDemoSession(),
+      expect: () => <dynamic>[
+        const AuthState(status: AuthStatus.loading),
+        isA<AuthState>()
+            .having(
+              (AuthState s) => s.status,
+              'status',
+              AuthStatus.authenticated,
+            )
+            .having(
+              (AuthState s) => s.session?.memberships,
+              'memberships',
+              isEmpty,
+            ),
+      ],
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'reports a hydration failure but keeps the session authenticated',
+      setUp: () {
+        _failingReporter = InMemoryErrorReporter();
+        _hydrationRepository = _HydrationRepository(
+          result: const HydrationFailed(
+            MembershipHydrationFailureKind.providerUnavailable,
+          ),
+        );
+      },
+      build: () => AuthCubit(
+        _NullSessionGateway(),
+        _failingReporter,
+        _hydrationRepository,
+      ),
+      act: (AuthCubit cubit) => cubit.startDemoSession(),
+      expect: () => <dynamic>[
+        const AuthState(status: AuthStatus.loading),
+        isA<AuthState>()
+            .having(
+              (AuthState s) => s.status,
+              'status',
+              AuthStatus.authenticated,
+            )
+            .having(
+              (AuthState s) => s.session?.memberships,
+              'memberships',
+              isEmpty,
+            ),
+      ],
+      verify: (_) {
+        // Diagnostic channel (Task 8 review input 2): the typed failure is
+        // reported exactly once, never thrown, never a session
+        // invalidation.
+        expect(_failingReporter.reports, hasLength(1));
+        expect(
+          _failingReporter.reports.single['code'],
+          'membershipHydrationFailed',
+        );
+      },
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'never hydrates an expired session (AC-3 — reauth, not hydration)',
+      setUp: () => _hydrationRepository = _HydrationRepository(),
+      build: () => AuthCubit(
+        _ExpiredSessionGateway(),
+        InMemoryErrorReporter(),
+        _hydrationRepository,
+      ),
+      act: (AuthCubit cubit) => cubit.restore(),
+      expect: () => <AuthState>[
+        const AuthState(status: AuthStatus.restoring),
+        const AuthState(status: AuthStatus.reauthRequired),
+      ],
+      verify: (_) {
+        // Expiry is honored before hydration (AC-3): the repository is
+        // never consulted for an expired session.
+        expect(_hydrationRepository.calls, 0);
+      },
+    );
+  });
 }
 
 const AuthFailure _gatewayFailure = AuthFailure(
@@ -339,6 +530,7 @@ const AppError _gatewayAppError = AppError(
 late InMemoryErrorReporter _failingReporter;
 late _CountingAuthGateway _countingAuthGateway;
 late FakeAuthGateway _streamGateway;
+late _HydrationRepository _hydrationRepository;
 
 class _NullSessionGateway implements AuthGateway {
   @override
@@ -411,7 +603,7 @@ class _ExpiredSessionGateway implements AuthGateway {
       OrganizationMembership(
         organizationId: 'org-demo',
         organizationName: 'Demo Firm',
-        role: UserRole.client,
+        role: UserRole.partner,
         status: MembershipStatus.active,
       ),
     ],
@@ -474,6 +666,27 @@ class _FailingAuthGateway implements AuthGateway {
 
   @override
   Future<void> signOut() async {}
+}
+
+/// Configurable membership-hydration stub for the Task 8 cubit tests:
+/// records calls/userIds and returns a canned typed result.
+class _HydrationRepository implements MembershipRepository {
+  _HydrationRepository({
+    this.result = const HydrationSucceeded(<OrganizationMembership>[]),
+  });
+
+  MembershipHydrationResult result;
+  int calls = 0;
+  final List<String> userIds = <String>[];
+
+  @override
+  Future<MembershipHydrationResult> loadMemberships({
+    required String userId,
+  }) async {
+    calls += 1;
+    userIds.add(userId);
+    return result;
+  }
 }
 
 class _CountingAuthGateway implements AuthGateway {

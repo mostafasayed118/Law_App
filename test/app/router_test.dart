@@ -11,6 +11,7 @@ import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/local/in_memory_locale_store.dart';
+import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/matters/presentation/matter_link_chip.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
@@ -23,7 +24,11 @@ void main() {
 
   setUp(() {
     gateway = FakeAuthGateway();
-    authCubit = AuthCubit(gateway, InMemoryErrorReporter());
+    authCubit = AuthCubit(
+      gateway,
+      InMemoryErrorReporter(),
+      FakeMembershipRepository(),
+    );
     localeCubit = LocaleCubit(InMemoryLocaleStore());
     // The reset step (Phase 4.1 recovery landing) resolves
     // PasswordRecoveryGateway via the service locator when it builds its
@@ -509,7 +514,9 @@ void main() {
         final GoRouter restrictedRouter = createAppRouter(
           authCubit,
           capabilitiesForRole: <UserRole, RoleCapability>{
-            UserRole.client: const RoleCapability(
+            // The demo identity is the org-creating partner (P3.2 Task 8
+            // reconciliation), so the restricted map keys the demo role.
+            UserRole.partner: const RoleCapability(
               canViewHome: true,
               canViewSettings: true,
               canBookConsultation: true,
@@ -621,7 +628,9 @@ void main() {
         final GoRouter restrictedRouter = createAppRouter(
           authCubit,
           capabilitiesForRole: <UserRole, RoleCapability>{
-            UserRole.client: const RoleCapability(
+            // The demo identity is the org-creating partner (P3.2 Task 8
+            // reconciliation), so the restricted map keys the demo role.
+            UserRole.partner: const RoleCapability(
               canViewHome: true,
               canViewSettings: true,
               canBookConsultation: true,
@@ -1003,6 +1012,7 @@ void main() {
           final AuthCubit roleCubit = AuthCubit(
             RoleGateway(sessionForRole(role)),
             InMemoryErrorReporter(),
+            FakeMembershipRepository(),
           );
           addTearDown(roleCubit.close);
           final GoRouter roleRouter = createAppRouter(roleCubit);
@@ -1049,6 +1059,7 @@ void main() {
         final AuthCubit restrictedCubit = AuthCubit(
           RoleGateway(sessionForRole(UserRole.client)),
           InMemoryErrorReporter(),
+          FakeMembershipRepository(),
         );
         addTearDown(restrictedCubit.close);
         final GoRouter restrictedRouter = createAppRouter(
@@ -1095,6 +1106,7 @@ void main() {
         final AuthCubit restrictedCubit = AuthCubit(
           RoleGateway(sessionForRole(UserRole.attorney)),
           InMemoryErrorReporter(),
+          FakeMembershipRepository(),
         );
         addTearDown(restrictedCubit.close);
         final GoRouter restrictedRouter = createAppRouter(
@@ -1164,6 +1176,7 @@ void main() {
       final AuthCubit emptyCubit = AuthCubit(
         RoleGateway(sessionForRole(UserRole.admin)),
         InMemoryErrorReporter(),
+        FakeMembershipRepository(),
       );
       addTearDown(emptyCubit.close);
       final GoRouter emptyRouter = createAppRouter(

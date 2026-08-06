@@ -6,9 +6,10 @@ import '../../../core/auth/auth_gateway.dart';
 import '../../../core/auth/auth_state.dart';
 import '../../../core/errors/app_error.dart';
 import '../../../core/observability/error_reporter.dart';
+import '../../../core/organizations/membership_repository.dart';
 
 class AuthCubit extends Cubit<AuthState> {
-  AuthCubit(this._gateway, this._reporter)
+  AuthCubit(this._gateway, this._reporter, this._membershipRepository)
     : super(_initialState(_gateway.currentSession)) {
     // The provider callback handler (Phase 4.1): a session that arrives
     // through the gateway's stream — e.g. the PKCE exchange of a recovery
@@ -19,6 +20,11 @@ class AuthCubit extends Cubit<AuthState> {
 
   final AuthGateway _gateway;
   final ErrorReporter _reporter;
+
+  /// RLS-scoped membership source for [Session.memberships] hydration
+  /// (P3.2): called on every explicit authenticated outcome, never on a
+  /// failure, never on an expired session (AC-3).
+  final MembershipRepository _membershipRepository;
   late final StreamSubscription<Session?> _sessionSubscription;
 
   /// True while an explicit operation ([restore], [signIn], [startDemoSession],
@@ -112,12 +118,79 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> _applySessionOutcome(AuthOutcome<Session> outcome) async {
     switch (outcome) {
       case AuthSuccess<Session>(value: final Session session):
-        _emitIfChanged(
-          AuthState(status: AuthStatus.authenticated, session: session),
-        );
+        await _applyAuthenticatedSession(session);
       case AuthFailed<Session>(failure: final AuthFailure failure):
         await _handleFailure(failure);
     }
+  }
+
+  /// Contract-§5 authenticated mapping + P3.2 membership hydration.
+  ///
+  /// The loading/restoring status is held until hydration resolves (scope
+  /// §7 mitigation — no intermediate authenticated-with-empty render).
+  /// Hydration is best-effort enrichment of an already-authenticated
+  /// session: a provider-reported empty list stays the honest `[]` (plan
+  /// §6), and a failed read still authenticates the session (it is never
+  /// invalidated) but is surfaced through the diagnostic channel (Task 8
+  /// review inputs). Expiry is honored before hydration (AC-3): an expired
+  /// session re-authenticates and is never hydrated.
+  Future<void> _applyAuthenticatedSession(Session session) async {
+    if (session.isExpired) {
+      emit(const AuthState(status: AuthStatus.reauthRequired));
+      return;
+    }
+    final MembershipHydrationResult result = await _membershipRepository
+        .loadMemberships(userId: session.userId);
+    switch (result) {
+      case HydrationSucceeded(:final List<OrganizationMembership> memberships):
+        _emitIfChanged(
+          AuthState(
+            status: AuthStatus.authenticated,
+            session: _withMemberships(session, memberships),
+          ),
+        );
+      case HydrationFailed(:final MembershipHydrationFailureKind kind):
+        await _reportHydrationFailure(kind);
+        // Honest empty — never a fabricated membership; the session stays
+        // authenticated with the gateway snapshot's memberships.
+        _emitIfChanged(
+          AuthState(
+            status: AuthStatus.authenticated,
+            session: _withMemberships(
+              session,
+              const <OrganizationMembership>[],
+            ),
+          ),
+        );
+    }
+  }
+
+  /// Rebuilds [session] with the hydrated memberships (identity, display
+  /// name, and expiry are carried unchanged — only the RLS-scoped
+  /// membership view is refreshed).
+  Session _withMemberships(
+    Session session,
+    List<OrganizationMembership> memberships,
+  ) => Session(
+    userId: session.userId,
+    displayName: session.displayName,
+    memberships: memberships,
+    expiresAt: session.expiresAt,
+  );
+
+  /// Diagnostic-channel report (Task 8 review input 2 — the ErrorReporter
+  /// seam instead of repository debugPrint). Non-fatal by contract: the
+  /// authenticated session is emitted regardless.
+  Future<void> _reportHydrationFailure(
+    MembershipHydrationFailureKind kind,
+  ) async {
+    await _reporter.report(
+      AppError(
+        code: 'membershipHydrationFailed',
+        userMessage: 'Organization memberships could not be loaded.',
+        context: <String, Object?>{'kind': kind.name},
+      ),
+    );
   }
 
   /// Emits [next] only when it actually differs from the current state.

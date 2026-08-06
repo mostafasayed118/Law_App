@@ -9,6 +9,7 @@ import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/local/in_memory_locale_store.dart';
+import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/home/presentation/settings_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
@@ -25,7 +26,11 @@ void main() {
 
   setUp(() async {
     gateway = FakeAuthGateway();
-    authCubit = AuthCubit(gateway, InMemoryErrorReporter());
+    authCubit = AuthCubit(
+      gateway,
+      InMemoryErrorReporter(),
+      FakeMembershipRepository(),
+    );
     localeCubit = LocaleCubit(InMemoryLocaleStore());
     await localeCubit.load();
   });
@@ -64,7 +69,7 @@ void main() {
   });
 
   testWidgets(
-    'shows the demo-session notice and the client role when authenticated',
+    'shows the demo-session notice and the partner role when authenticated',
     (tester) async {
       await tester.pumpWidget(pumpScreen());
       await tester.pumpAndSettle();
@@ -77,8 +82,9 @@ void main() {
       expect(authCubit.state.isAuthenticated, isTrue);
       // The demo-session notice is the subtitle of the role ListTile.
       expect(find.text('Development-only demo session'), findsOneWidget);
-      // The client role label is rendered from _roleLabel.
-      expect(find.text('Client'), findsOneWidget);
+      // The partner role label is rendered from _roleLabel (P3.2 Task 8
+      // reconciliation — the demo identity is the org-creating partner).
+      expect(find.text('Partner'), findsOneWidget);
     },
   );
 

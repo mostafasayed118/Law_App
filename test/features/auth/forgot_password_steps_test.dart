@@ -6,6 +6,7 @@ import 'package:legalhub/app/router.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
+import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/auth/presentation/forgot_password/recovery_routing_context.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
@@ -30,7 +31,11 @@ void main() {
     await resetServiceLocator();
     configureDependencies();
     gateway = FakeAuthGateway();
-    authCubit = AuthCubit(gateway, InMemoryErrorReporter());
+    authCubit = AuthCubit(
+      gateway,
+      InMemoryErrorReporter(),
+      FakeMembershipRepository(),
+    );
   });
 
   tearDown(() async {

@@ -6,6 +6,7 @@ import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
+import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/auth/presentation/sign_in_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
@@ -16,7 +17,11 @@ void main() {
 
   setUp(() {
     gateway = FakeAuthGateway();
-    authCubit = AuthCubit(gateway, InMemoryErrorReporter());
+    authCubit = AuthCubit(
+      gateway,
+      InMemoryErrorReporter(),
+      FakeMembershipRepository(),
+    );
     // The forgot-password link test navigates to the recovery email screen,
     // which builds a PasswordRecoveryCubit from the DI-registered dev fake
     // (P3.1). configureDependencies() is idempotent and registers the fake.

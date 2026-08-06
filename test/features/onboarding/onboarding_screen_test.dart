@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:legalhub/app/router.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
+import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
@@ -15,7 +16,11 @@ void main() {
 
   setUp(() {
     gateway = FakeAuthGateway();
-    authCubit = AuthCubit(gateway, InMemoryErrorReporter());
+    authCubit = AuthCubit(
+      gateway,
+      InMemoryErrorReporter(),
+      FakeMembershipRepository(),
+    );
   });
 
   tearDown(() async {

@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/auth/auth_gateway.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
+import 'package:legalhub/core/organizations/membership_repository.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
@@ -50,6 +51,20 @@ class _RoleAuthGateway implements AuthGateway {
 
   @override
   Future<void> signOut() async {}
+}
+
+/// Hydration repository mirroring the role session (P3.2 Task 8):
+/// `restore()` replaces [Session.memberships] with the repository result, so
+/// the partner/client pin must answer with exactly the session's memberships.
+class _MatchingHydrationRepository implements MembershipRepository {
+  _MatchingHydrationRepository(this.memberships);
+
+  final List<OrganizationMembership> memberships;
+
+  @override
+  Future<MembershipHydrationResult> loadMemberships({
+    required String userId,
+  }) async => HydrationSucceeded(memberships);
 }
 
 Session sessionFor(UserRole role) => Session(
@@ -108,9 +123,11 @@ void main() {
   }
 
   Future<AuthCubit> partnerAuth() async {
+    final Session session = sessionFor(UserRole.partner);
     final AuthCubit auth = AuthCubit(
-      _RoleAuthGateway(sessionFor(UserRole.partner)),
+      _RoleAuthGateway(session),
       InMemoryErrorReporter(),
+      _MatchingHydrationRepository(session.memberships),
     );
     addTearDown(auth.close);
     await auth.restore();
@@ -118,9 +135,11 @@ void main() {
   }
 
   Future<AuthCubit> clientAuth() async {
+    final Session session = sessionFor(UserRole.client);
     final AuthCubit auth = AuthCubit(
-      _RoleAuthGateway(sessionFor(UserRole.client)),
+      _RoleAuthGateway(session),
       InMemoryErrorReporter(),
+      _MatchingHydrationRepository(session.memberships),
     );
     addTearDown(auth.close);
     await auth.restore();

@@ -146,8 +146,10 @@ class SupabaseAuthGateway implements AuthGateway {
     return Session(
       userId: snapshot.userId,
       displayName: snapshot.displayName ?? 'User',
-      // The dev project has zero tables; organization memberships load is a
-      // later data slice. Empty is honest, not a placeholder.
+      // The sync snapshot keeps memberships empty **by design** (P3.2):
+      // hydration is orchestrated above this seam (AuthCubit →
+      // MembershipRepository → listMyMemberships, RLS-scoped). The empty
+      // list is the honest pre-hydration state, not a placeholder.
       memberships: const <OrganizationMembership>[],
       expiresAt: expiresAt,
     );

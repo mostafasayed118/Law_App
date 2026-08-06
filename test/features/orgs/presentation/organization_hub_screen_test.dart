@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/auth/auth_gateway.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
+import 'package:legalhub/core/organizations/membership_repository.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
@@ -49,6 +50,20 @@ class _FixedAuthGateway implements AuthGateway {
   Future<void> signOut() async {}
 }
 
+/// Hydration repository mirroring the test's own session (P3.2 Task 8):
+/// hydration replaces [Session.memberships] with the repository result, so
+/// a custom-session test must answer with exactly those memberships.
+class _MatchingHydrationRepository implements MembershipRepository {
+  _MatchingHydrationRepository(this.memberships);
+
+  final List<OrganizationMembership> memberships;
+
+  @override
+  Future<MembershipHydrationResult> loadMemberships({
+    required String userId,
+  }) async => HydrationSucceeded(memberships);
+}
+
 Session sessionWith({List<OrganizationMembership> memberships = const []}) =>
     Session(
       userId: 'user-1',
@@ -79,13 +94,18 @@ void main() {
     );
   }
 
+  /// Builds the cubit with a repository that answers the session's own
+  /// memberships, so `restore()` hydration keeps the pinned surface.
+  AuthCubit hubCubit(Session session) => AuthCubit(
+    _FixedAuthGateway(session),
+    InMemoryErrorReporter(),
+    _MatchingHydrationRepository(session.memberships),
+  );
+
   testWidgets('shows the create-org form when there is no active membership', (
     tester,
   ) async {
-    final AuthCubit authCubit = AuthCubit(
-      _FixedAuthGateway(sessionWith()),
-      InMemoryErrorReporter(),
-    );
+    final AuthCubit authCubit = hubCubit(sessionWith());
     addTearDown(authCubit.close);
     await authCubit.restore();
 
@@ -99,20 +119,17 @@ void main() {
   testWidgets('renders the roster when the session has an active membership', (
     tester,
   ) async {
-    final AuthCubit authCubit = AuthCubit(
-      _FixedAuthGateway(
-        sessionWith(
-          memberships: <OrganizationMembership>[
-            OrganizationMembership(
-              organizationId: 'org-demo',
-              organizationName: 'Demo Firm',
-              role: UserRole.partner,
-              status: MembershipStatus.active,
-            ),
-          ],
-        ),
+    final AuthCubit authCubit = hubCubit(
+      sessionWith(
+        memberships: <OrganizationMembership>[
+          OrganizationMembership(
+            organizationId: 'org-demo',
+            organizationName: 'Demo Firm',
+            role: UserRole.partner,
+            status: MembershipStatus.active,
+          ),
+        ],
       ),
-      InMemoryErrorReporter(),
     );
     addTearDown(authCubit.close);
     await authCubit.restore();
@@ -129,10 +146,7 @@ void main() {
   testWidgets('creating an organization from the hub switches to the roster', (
     tester,
   ) async {
-    final AuthCubit authCubit = AuthCubit(
-      _FixedAuthGateway(sessionWith()),
-      InMemoryErrorReporter(),
-    );
+    final AuthCubit authCubit = hubCubit(sessionWith());
     addTearDown(authCubit.close);
     await authCubit.restore();
 
@@ -164,20 +178,17 @@ void main() {
   testWidgets('offers an org switcher only with multiple memberships', (
     tester,
   ) async {
-    final AuthCubit authCubit = AuthCubit(
-      _FixedAuthGateway(
-        sessionWith(
-          memberships: <OrganizationMembership>[
-            OrganizationMembership(
-              organizationId: 'org-demo',
-              organizationName: 'Demo Firm',
-              role: UserRole.partner,
-              status: MembershipStatus.active,
-            ),
-          ],
-        ),
+    final AuthCubit authCubit = hubCubit(
+      sessionWith(
+        memberships: <OrganizationMembership>[
+          OrganizationMembership(
+            organizationId: 'org-demo',
+            organizationName: 'Demo Firm',
+            role: UserRole.partner,
+            status: MembershipStatus.active,
+          ),
+        ],
       ),
-      InMemoryErrorReporter(),
     );
     addTearDown(authCubit.close);
     await authCubit.restore();
@@ -198,26 +209,23 @@ void main() {
         serviceLocator<OrganizationGateway>();
     final OrgOutcome<OrganizationSummary> created = await orgGateway
         .createOrganization(name: 'Second Firm');
-    final AuthCubit authCubit = AuthCubit(
-      _FixedAuthGateway(
-        sessionWith(
-          memberships: <OrganizationMembership>[
-            OrganizationMembership(
-              organizationId: 'org-demo',
-              organizationName: 'Demo Firm',
-              role: UserRole.partner,
-              status: MembershipStatus.active,
-            ),
-            OrganizationMembership(
-              organizationId: created.valueOrNull!.id,
-              organizationName: 'Second Firm',
-              role: UserRole.attorney,
-              status: MembershipStatus.active,
-            ),
-          ],
-        ),
+    final AuthCubit authCubit = hubCubit(
+      sessionWith(
+        memberships: <OrganizationMembership>[
+          OrganizationMembership(
+            organizationId: 'org-demo',
+            organizationName: 'Demo Firm',
+            role: UserRole.partner,
+            status: MembershipStatus.active,
+          ),
+          OrganizationMembership(
+            organizationId: created.valueOrNull!.id,
+            organizationName: 'Second Firm',
+            role: UserRole.attorney,
+            status: MembershipStatus.active,
+          ),
+        ],
       ),
-      InMemoryErrorReporter(),
     );
     addTearDown(authCubit.close);
     await authCubit.restore();

@@ -9,6 +9,7 @@ import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
+import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/profile/presentation/profile_screen.dart';
@@ -34,7 +35,11 @@ void main() {
     serviceLocator.registerLazySingleton<OrganizationGateway>(() => orgGateway);
     configureDependencies();
     gateway = FakeAuthGateway();
-    authCubit = AuthCubit(gateway, InMemoryErrorReporter());
+    authCubit = AuthCubit(
+      gateway,
+      InMemoryErrorReporter(),
+      FakeMembershipRepository(),
+    );
   });
 
   tearDown(() async {
@@ -72,7 +77,7 @@ void main() {
     expect(find.text('Profile'), findsOneWidget);
     expect(find.text('Demo user'), findsOneWidget);
     expect(find.text('demo-user'), findsOneWidget);
-    expect(find.text('Client'), findsOneWidget);
+    expect(find.text('Partner'), findsOneWidget);
     expect(find.text(expectedExpiry), findsOneWidget);
     expect(find.text('Name'), findsOneWidget);
     expect(find.text('Account ID'), findsOneWidget);
@@ -158,6 +163,7 @@ void main() {
     final AuthCubit failingCubit = AuthCubit(
       failingGateway,
       InMemoryErrorReporter(),
+      FakeMembershipRepository(),
     );
     addTearDown(failingCubit.close);
 
@@ -197,6 +203,7 @@ void main() {
       final AuthCubit expiredCubit = AuthCubit(
         expiredGateway,
         InMemoryErrorReporter(),
+        FakeMembershipRepository(),
       );
       addTearDown(expiredCubit.close);
 
@@ -237,7 +244,7 @@ void main() {
 
     expect(find.text('الملف'), findsOneWidget);
     expect(find.text('الاسم'), findsOneWidget);
-    expect(find.text('العميل'), findsOneWidget);
+    expect(find.text('الشريك'), findsOneWidget);
     expect(find.text('Demo user'), findsOneWidget);
   });
 }

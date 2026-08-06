@@ -6,6 +6,7 @@ import 'package:legalhub/app/router.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/local/in_memory_locale_store.dart';
+import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/main.dart';
 
@@ -15,7 +16,11 @@ void main() {
   late GoRouter router;
 
   setUp(() {
-    authCubit = AuthCubit(FakeAuthGateway(), InMemoryErrorReporter());
+    authCubit = AuthCubit(
+      FakeAuthGateway(),
+      InMemoryErrorReporter(),
+      FakeMembershipRepository(),
+    );
     localeCubit = LocaleCubit(InMemoryLocaleStore());
     router = createAppRouter(authCubit);
   });
