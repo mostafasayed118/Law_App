@@ -24,10 +24,15 @@ class FakeAuthGateway implements AuthGateway {
       StreamController<Session?>.broadcast(sync: true);
 
   /// The demo active membership, shared by the synthetic session.
+  ///
+  /// Role is **partner** — reconciled (P3.2 Task 8) with
+  /// `FakeOrganizationGateway`'s roster seed, which makes the demo user the
+  /// org creator (initial partner), so the hub capability surface agrees
+  /// with the session.
   static const OrganizationMembership demoMembership = OrganizationMembership(
     organizationId: 'org-demo',
     organizationName: 'Demo Firm',
-    role: UserRole.client,
+    role: UserRole.partner,
     status: MembershipStatus.active,
   );
 

@@ -15,13 +15,17 @@ import 'supabase_org_api.dart';
 /// never projected as a capability the client does not understand), and a
 /// null org name (suspended/removed membership) is tolerated per the plan
 /// §6 name-resolution note. No DTOs or tokens cross this boundary.
+///
+/// A provider read failure is a typed [HydrationFailed] (never a fabricated
+/// membership, never a session invalidation) so the cubit seam can surface
+/// offline/denied through the diagnostic channel (Task 8 review input 1).
 class SupabaseMembershipRepository implements MembershipRepository {
   SupabaseMembershipRepository(this._api);
 
   final SupabaseOrgApi _api;
 
   @override
-  Future<List<OrganizationMembership>> loadMemberships({
+  Future<MembershipHydrationResult> loadMemberships({
     required String userId,
   }) async {
     try {
@@ -34,17 +38,23 @@ class SupabaseMembershipRepository implements MembershipRepository {
           memberships.add(membership);
         }
       }
-      return memberships;
+      return HydrationSucceeded(memberships);
     } on SupabaseOrgException catch (e) {
-      // Hydration is best-effort enrichment of an already-authenticated
-      // session (contract §5): a read failure resolves to the honest empty
-      // list, never a fabricated membership and never a session
-      // invalidation. Loud for diagnostics; the screen surfaces offline/
-      // retry independently.
-      debugPrint('membership hydration failed: ${e.kind.name}: ${e.message}');
-      return const <OrganizationMembership>[];
+      return HydrationFailed(_mapFailureKind(e.kind));
     }
   }
+
+  /// Maps the provider seam's failure vocabulary to the hydration outcome.
+  /// RPC-only kinds (duplicateMember/lastPartner/invalidName/
+  /// invalidInvitation) cannot occur on the memberships SELECT and fall
+  /// through to [MembershipHydrationFailureKind.unknown].
+  MembershipHydrationFailureKind _mapFailureKind(SupabaseOrgFailureKind kind) =>
+      switch (kind) {
+        SupabaseOrgFailureKind.denied => MembershipHydrationFailureKind.denied,
+        SupabaseOrgFailureKind.providerUnavailable =>
+          MembershipHydrationFailureKind.providerUnavailable,
+        _ => MembershipHydrationFailureKind.unknown,
+      };
 
   /// Maps one raw membership row, or null when the row cannot be projected
   /// safely (unknown role/status per D-P32.1, or a missing organization id).

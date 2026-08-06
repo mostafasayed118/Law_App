@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/auth/session.dart';
+import 'package:legalhub/core/organizations/membership_repository.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/orgs/supabase_membership_repository.dart';
 import 'package:legalhub/data/orgs/supabase_org_api.dart';
@@ -99,14 +100,22 @@ void main() {
       'organizations': <String, dynamic>{'name': organizationName},
   };
 
+  /// Unwraps a succeeded hydration for the row-mapping assertions.
+  Future<List<OrganizationMembership>> loadSucceeded() async {
+    final MembershipHydrationResult result = await repository.loadMemberships(
+      userId: 'u-1',
+    );
+    expect(result, isA<HydrationSucceeded>());
+    return (result as HydrationSucceeded).memberships;
+  }
+
   group('SupabaseMembershipRepository.loadMemberships', () {
     test('maps active rows with the embedded org name', () async {
       api.rows = <Map<String, dynamic>>[
         activeRow(organizationId: 'org-1', organizationName: 'Demo Firm'),
       ];
 
-      final List<OrganizationMembership> memberships = await repository
-          .loadMemberships(userId: 'u-1');
+      final List<OrganizationMembership> memberships = await loadSucceeded();
 
       expect(memberships, hasLength(1));
       final OrganizationMembership membership = memberships.single;
@@ -128,8 +137,7 @@ void main() {
         ),
       ];
 
-      final List<OrganizationMembership> memberships = await repository
-          .loadMemberships(userId: 'u-1');
+      final List<OrganizationMembership> memberships = await loadSucceeded();
 
       expect(memberships, hasLength(1));
       final OrganizationMembership membership = memberships.single;
@@ -145,8 +153,7 @@ void main() {
         activeRow(organizationId: 'org-2', organizationName: 'Second Firm'),
       ];
 
-      final List<OrganizationMembership> memberships = await repository
-          .loadMemberships(userId: 'u-1');
+      final List<OrganizationMembership> memberships = await loadSucceeded();
 
       // Only the well-understood row survives; the unknown-role row must not
       // project any capability hint.
@@ -160,8 +167,7 @@ void main() {
         activeRow(organizationId: 'org-2', organizationName: 'Second Firm'),
       ];
 
-      final List<OrganizationMembership> memberships = await repository
-          .loadMemberships(userId: 'u-1');
+      final List<OrganizationMembership> memberships = await loadSucceeded();
 
       expect(memberships, hasLength(1));
       expect(memberships.single.organizationId, 'org-2');
@@ -176,31 +182,52 @@ void main() {
         },
       ];
 
-      final List<OrganizationMembership> memberships = await repository
-          .loadMemberships(userId: 'u-1');
+      final List<OrganizationMembership> memberships = await loadSucceeded();
 
       expect(memberships, isEmpty);
     });
 
-    test('provider read failure resolves to the honest empty list', () async {
+    test('provider read failure is a typed HydrationFailed (Task 8)', () async {
       api.error = const SupabaseOrgException(
         kind: SupabaseOrgFailureKind.providerUnavailable,
         message: 'offline',
       );
 
-      final List<OrganizationMembership> memberships = await repository
-          .loadMemberships(userId: 'u-1');
+      final MembershipHydrationResult result = await repository.loadMemberships(
+        userId: 'u-1',
+      );
 
-      // Best-effort hydration: never a fabricated membership, never a
-      // session invalidation — the honest empty case.
-      expect(memberships, isEmpty);
+      // The typed outcome lets the cubit seam distinguish failure from the
+      // honest empty — never a fabricated membership, never a session
+      // invalidation.
+      expect(result, isA<HydrationFailed>());
+      expect(
+        (result as HydrationFailed).kind,
+        MembershipHydrationFailureKind.providerUnavailable,
+      );
     });
 
-    test('provider reports no memberships → honest empty', () async {
+    test('a denied read maps to the denied failure kind', () async {
+      api.error = const SupabaseOrgException(
+        kind: SupabaseOrgFailureKind.denied,
+        message: 'forbidden',
+      );
+
+      final MembershipHydrationResult result = await repository.loadMemberships(
+        userId: 'u-1',
+      );
+
+      expect(result, isA<HydrationFailed>());
+      expect(
+        (result as HydrationFailed).kind,
+        MembershipHydrationFailureKind.denied,
+      );
+    });
+
+    test('provider reports no memberships → honest empty succeeded', () async {
       api.rows = const <Map<String, dynamic>>[];
 
-      final List<OrganizationMembership> memberships = await repository
-          .loadMemberships(userId: 'u-1');
+      final List<OrganizationMembership> memberships = await loadSucceeded();
 
       expect(memberships, isEmpty);
     });
