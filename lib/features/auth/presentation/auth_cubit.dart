@@ -24,7 +24,8 @@ class AuthCubit extends Cubit<AuthState> {
 
   /// RLS-scoped membership source for [Session.memberships] hydration
   /// (P3.2): called on every explicit authenticated outcome, never on a
-  /// failure, never on an expired session (AC-3).
+  /// failure, never on an expired session (AC-3), and by [hydrate] for
+  /// background refreshes (P3.3 Slice A).
   final MembershipRepository _membershipRepository;
   late final StreamSubscription<Session?> _sessionSubscription;
 
@@ -39,6 +40,14 @@ class AuthCubit extends Cubit<AuthState> {
   /// therefore only applies provider-initiated changes (the deep-link PKCE
   /// exchange), which never go through an explicit call.
   bool _explicitOperationInFlight = false;
+
+  /// True while a background [hydrate] refresh is awaiting the repository.
+  ///
+  /// Distinct from [_explicitOperationInFlight]: hydrate must not suppress
+  /// the provider stream listener (a provider-initiated session must still
+  /// land mid-refresh), but concurrent hydrate calls must not stack — the
+  /// first one owns the emission.
+  bool _hydrationInFlight = false;
 
   /// True while the current session is a password-recovery session (Phase
   /// 4.1 deep-link variant). Mirrors the gateway's provider-derived signal
@@ -116,6 +125,58 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+  /// Public membership re-hydration seam (P3.3 Slice A) — the recorded Task 8
+  /// retry/refresh hook for an already-authenticated session.
+  ///
+  /// Resolves the Task 8 "no first-class `hydrate()` retry seam" limitation:
+  /// after an org mutation (create/invite/accept), presentation calls this so
+  /// the freshly mutated membership joins [Session.memberships] without
+  /// re-authenticating. It is a **background refresh**: the current
+  /// authenticated state is held (no loading/restoring flash — scope §7) and
+  /// only re-emitted when the hydrated memberships actually change
+  /// ([_emitIfChanged] dedupe).
+  ///
+  /// No-ops when: the session is absent or expired (nothing to refresh), an
+  /// explicit operation owns the emission, or another hydrate is in flight
+  /// (first-call-wins). A failure leaves the last-known-good state untouched
+  /// and is surfaced through the diagnostic channel (never invalidating the
+  /// session). The sign-out guard applies the refresh only when the state is
+  /// still authenticated for the same user — a session that changed or
+  /// disappeared mid-refresh is never clobbered.
+  Future<void> hydrate() async {
+    final Session? current = state.session;
+    if (current == null ||
+        current.isExpired ||
+        _explicitOperationInFlight ||
+        _hydrationInFlight) {
+      return;
+    }
+    _hydrationInFlight = true;
+    try {
+      final MembershipHydrationResult result = await _membershipRepository
+          .loadMemberships(userId: current.userId);
+      switch (result) {
+        case HydrationSucceeded(
+          :final List<OrganizationMembership> memberships,
+        ):
+          final Session? now = state.session;
+          if (now == null || now.userId != current.userId || now.isExpired) {
+            return;
+          }
+          _emitIfChanged(
+            AuthState(
+              status: AuthStatus.authenticated,
+              session: _withMemberships(now, memberships),
+            ),
+          );
+        case HydrationFailed(:final MembershipHydrationFailureKind kind):
+          await _reportHydrationFailure(kind);
+      }
+    } finally {
+      _hydrationInFlight = false;
+    }
+  }
+
   Future<void> _applySessionOutcome(AuthOutcome<Session> outcome) async {
     switch (outcome) {
       case AuthSuccess<Session>(value: final Session session):
@@ -136,10 +197,10 @@ class AuthCubit extends Cubit<AuthState> {
   /// review inputs). Expiry is honored before hydration (AC-3): an expired
   /// session re-authenticates and is never hydrated.
   ///
-  /// Known limitation (recorded): there is no first-class `hydrate()` retry
-  /// seam for an already-authenticated session — the next explicit auth op
-  /// re-hydrates; retry UI is a screen concern (scope §6). The provider
-  /// stream path (Phase 4.1 deep-link) maps without hydration by design.
+  /// The provider stream path (Phase 4.1 deep-link) maps without hydration
+  /// by design. The first-class refresh seam for an already-authenticated
+  /// session is [hydrate] (P3.3) — presentation calls it after an org
+  /// mutation; the next explicit auth op re-hydrates as well.
   Future<void> _applyAuthenticatedSession(Session session) async {
     if (session.isExpired) {
       emit(const AuthState(status: AuthStatus.reauthRequired));

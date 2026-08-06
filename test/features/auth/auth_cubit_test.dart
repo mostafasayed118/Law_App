@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/auth/auth_gateway.dart';
@@ -542,6 +544,193 @@ void main() {
       },
     );
   });
+
+  group('AuthCubit hydrate (P3.3 Slice A)', () {
+    blocTest<AuthCubit, AuthState>(
+      'enriches an authenticated session without a loading flash',
+      setUp: () => _hydrationRepository = _HydrationRepository(
+        result: const HydrationSucceeded(<OrganizationMembership>[
+          OrganizationMembership(
+            organizationId: 'org-a',
+            organizationName: 'Firm A',
+            role: UserRole.partner,
+            status: MembershipStatus.active,
+          ),
+          OrganizationMembership(
+            organizationId: 'org-b',
+            organizationName: 'Firm B',
+            role: UserRole.attorney,
+            status: MembershipStatus.active,
+          ),
+        ]),
+      ),
+      build: () => AuthCubit(
+        _PreauthenticatedGateway(demoSession()),
+        InMemoryErrorReporter(),
+        _hydrationRepository,
+      ),
+      act: (AuthCubit cubit) => cubit.hydrate(),
+      expect: () => <dynamic>[
+        // Exactly one emission — the enriched authenticated state. No
+        // loading/restoring flash (scope §7 background refresh).
+        isA<AuthState>()
+            .having(
+              (AuthState s) => s.status,
+              'status',
+              AuthStatus.authenticated,
+            )
+            .having(
+              (AuthState s) => s.session?.memberships.length,
+              'hydrated memberships',
+              2,
+            ),
+      ],
+      verify: (_) {
+        expect(_hydrationRepository.calls, 1);
+        expect(_hydrationRepository.userIds, <String>['demo-user']);
+      },
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'is a no-op when there is no authenticated session',
+      setUp: () => _hydrationRepository = _HydrationRepository(),
+      build: () => AuthCubit(
+        _NullSessionGateway(),
+        InMemoryErrorReporter(),
+        _hydrationRepository,
+      ),
+      act: (AuthCubit cubit) => cubit.hydrate(),
+      expect: () => <AuthState>[],
+      verify: (_) {
+        expect(_hydrationRepository.calls, 0);
+      },
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'is a no-op while an explicit operation owns the emission',
+      setUp: () => _hydrationRepository = _HydrationRepository(),
+      build: () => AuthCubit(
+        _CountingAuthGateway(),
+        InMemoryErrorReporter(),
+        _hydrationRepository,
+      ),
+      act: (AuthCubit cubit) async {
+        final Future<void> signIn = cubit.signIn(
+          email: 'amira@example.com',
+          password: 'any-password',
+        );
+        // hydrate() runs while signIn is in flight and must not stack a
+        // second repository call.
+        await cubit.hydrate();
+        await signIn;
+      },
+      expect: () => <dynamic>[
+        const AuthState(status: AuthStatus.loading),
+        isA<AuthState>().having(
+          (AuthState s) => s.status,
+          'status',
+          AuthStatus.authenticated,
+        ),
+      ],
+      verify: (_) {
+        // Only the sign-in's own hydration consults the repository.
+        expect(_hydrationRepository.calls, 1);
+      },
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'dedupes concurrent hydrate calls — the first owns the emission',
+      setUp: () => _hydrationRepository = _HydrationRepository(
+        result: const HydrationSucceeded(<OrganizationMembership>[
+          OrganizationMembership(
+            organizationId: 'org-a',
+            organizationName: 'Firm A',
+            role: UserRole.partner,
+            status: MembershipStatus.active,
+          ),
+        ]),
+      ),
+      build: () => AuthCubit(
+        _PreauthenticatedGateway(demoSession()),
+        InMemoryErrorReporter(),
+        _hydrationRepository,
+      ),
+      act: (AuthCubit cubit) async {
+        await Future.wait<void>(<Future<void>>[
+          cubit.hydrate(),
+          cubit.hydrate(),
+        ]);
+      },
+      expect: () => <dynamic>[
+        isA<AuthState>().having(
+          (AuthState s) => s.session?.memberships.length,
+          'hydrated memberships',
+          1,
+        ),
+      ],
+      verify: (_) {
+        expect(_hydrationRepository.calls, 1);
+      },
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'a sign-out during hydration never re-emits authenticated',
+      setUp: () => _blockingHydrationRepository = _BlockingHydrationRepository(
+        const HydrationSucceeded(<OrganizationMembership>[
+          OrganizationMembership(
+            organizationId: 'org-a',
+            organizationName: 'Firm A',
+            role: UserRole.partner,
+            status: MembershipStatus.active,
+          ),
+        ]),
+      ),
+      build: () => AuthCubit(
+        _PreauthenticatedGateway(demoSession()),
+        InMemoryErrorReporter(),
+        _blockingHydrationRepository,
+      ),
+      act: (AuthCubit cubit) async {
+        final Future<void> refresh = cubit.hydrate();
+        await cubit.signOut();
+        _blockingHydrationRepository.release();
+        await refresh;
+      },
+      expect: () => <AuthState>[
+        const AuthState(status: AuthStatus.unauthenticated),
+      ],
+      verify: (_) {
+        expect(_blockingHydrationRepository.calls, 1);
+      },
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'a failed refresh reports through the diagnostic channel and keeps the '
+      'last-known-good state',
+      setUp: () {
+        _failingReporter = InMemoryErrorReporter();
+        _hydrationRepository = _HydrationRepository(
+          result: const HydrationFailed(MembershipHydrationFailureKind.denied),
+        );
+      },
+      build: () => AuthCubit(
+        _PreauthenticatedGateway(demoSession()),
+        _failingReporter,
+        _hydrationRepository,
+      ),
+      act: (AuthCubit cubit) => cubit.hydrate(),
+      expect: () => <AuthState>[],
+      verify: (_) {
+        // The session stays on its last-known-good memberships (no state
+        // change); the typed failure is reported exactly once.
+        expect(_failingReporter.reports, hasLength(1));
+        expect(
+          _failingReporter.reports.single['code'],
+          'membershipHydrationFailed',
+        );
+      },
+    );
+  });
 }
 
 const AuthFailure _gatewayFailure = AuthFailure(
@@ -560,6 +749,7 @@ late InMemoryErrorReporter _failingReporter;
 late _CountingAuthGateway _countingAuthGateway;
 late FakeAuthGateway _streamGateway;
 late _HydrationRepository _hydrationRepository;
+late _BlockingHydrationRepository _blockingHydrationRepository;
 
 class _NullSessionGateway implements AuthGateway {
   @override
@@ -703,6 +893,28 @@ class _ThrowingErrorReporter implements ErrorReporter {
   @override
   Future<void> report(AppError error) async {
     throw StateError('reporter boom');
+  }
+}
+
+/// A membership-hydration stub that blocks until [release], pinning the
+/// sign-out-during-hydration guard (P3.3 Slice A): the refresh resolves
+/// after sign-out and must not re-emit authenticated.
+class _BlockingHydrationRepository implements MembershipRepository {
+  _BlockingHydrationRepository(this.result);
+
+  final MembershipHydrationResult result;
+  final Completer<void> _gate = Completer<void>();
+  int calls = 0;
+
+  void release() => _gate.complete();
+
+  @override
+  Future<MembershipHydrationResult> loadMemberships({
+    required String userId,
+  }) async {
+    calls += 1;
+    await _gate.future;
+    return result;
   }
 }
 
