@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../app/deep_link/app_link_parser.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/organizations/organization_gateway.dart';
@@ -171,6 +172,12 @@ class _InviteMemberSheetState extends State<InviteMemberSheet> {
           ),
         ),
         const SizedBox(height: LegalHubTheme.spaceMd),
+        FilledButton.icon(
+          onPressed: () => _copyShareLink(invite.token),
+          icon: const Icon(Icons.link_outlined, size: 18),
+          label: Text(l10n.inviteShareLink),
+        ),
+        const SizedBox(height: LegalHubTheme.spaceSm),
         OutlinedButton.icon(
           onPressed: () => _copyToken(invite.token),
           icon: const Icon(Icons.copy_outlined, size: 18),
@@ -218,6 +225,26 @@ class _InviteMemberSheetState extends State<InviteMemberSheet> {
     }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(AppLocalizations.of(context).inviteTokenCopied)),
+    );
+  }
+
+  /// Copies the full accept-deep-link URI for [token] to the clipboard
+  /// (D-P34.2 produce side). The link is built on-demand via
+  /// [AppLinkParser.acceptInviteUri] from the same scheme/host constants the
+  /// consume side classifies with, so every produced link round-trips through
+  /// `parse` as an `AcceptInviteIntent` with the identical token. The token
+  /// itself is never stored or logged beyond the sheet's existing one-shot
+  /// `_invite` state.
+  Future<void> _copyShareLink(String token) async {
+    final Uri link = AppLinkParser.acceptInviteUri(token);
+    await Clipboard.setData(ClipboardData(text: link.toString()));
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppLocalizations.of(context).inviteShareLinkCopied),
+      ),
     );
   }
 }
