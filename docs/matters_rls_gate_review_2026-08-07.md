@@ -79,12 +79,18 @@ realtime; seeding (apply-time, T5, owner-approved with cleanup).
    A profiles join in a plain select is **blocked by own-row profiles RLS**
    (D-T6) — no join, no profiles widening (D-MR4).
 4. **Q4 — `platform_owner_admin` and oversight rows: RESOLVED.** The
-   policy contains no owner carve-out: the assignment gate returns false
-   for owner accounts (never assigned), so the matrix's "deny, always"
-   row holds by construction and is pinned in the battery. Partner/owner
-   "policy-approved oversight / policy-review scope" rows are **NOT
-   granted** in this slice (D-MR5 — the oversight mechanism is undefined
-   and deliberately deferred).
+   policy contains no owner carve-out — the matrix's "deny, always" row
+   holds as an **operational invariant, not a policy guarantee**: owner
+   accounts are never assigned on matters (fixtures + ops never create
+   that state), so the assignment gate denies them; the battery pins the
+   unassigned-owner deny row. **Recorded residual:** if an owner account
+   were ever assigned (e.g. as an attorney on a matter), this policy
+   WOULD grant — enforcing the categorical deny would require an
+   `is_platform_owner()` exclusion (and its EXECUTE grant to
+   `authenticated`, widening the PostgREST surface the design avoided);
+   that exclusion is deferred with the owner-oversight mechanism (D-MR5).
+   Partner/owner "policy-approved oversight / policy-review scope" rows
+   are **NOT granted** in this slice.
 5. **Q5 — No direct table mutation: RESOLVED.** The only grant is
    `select` on `public.matters` to `authenticated` (mirrors
    `organizations`/`memberships` in 01_org_schema); no INSERT/UPDATE/
@@ -105,6 +111,11 @@ Positive (each grants exactly one row):
 
 Negative (deny rows, `03_platform_owner_boundary` style):
 - active org member, **no assignment** → denied (org-role-alone row);
+- `practice_area` **CHECK** row: an insert with an unmapped value
+  (`'tax'`) fails the CHECK — the schema is the mapping contract;
+- **owner-assigned residual (Q4):** fixtures never assign the owner; a
+  battery note records that the policy would grant an owner who is
+  assigned, and the unassigned-owner deny row stays pinned;
 - **cross-org**: user assigned on an org-a matter, queried as org-b member
   → denied (membership is of the matter's own org);
 - **suspended** membership in the matter's org → denied (the
@@ -126,6 +137,10 @@ Negative (deny rows, `03_platform_owner_boundary` style):
 `assigned_client_id uuid fk auth.users on delete set null` ·
 `assigned_attorney_id uuid fk auth.users on delete set null` ·
 `created_at timestamptz not null default now()` ·
+`practice_area` carries a `CHECK` against the client `PracticeArea` set
+(`corporate|civil|criminal|family`) — the schema is the mapping contract, so
+no write path can ever insert a value the client cannot map (status, by
+contrast, is a real `matter_status` enum) ·
 `updated_at timestamptz not null default now()`.
 Indexes: `(organization_id, status)`; partial `assigned_client_id` /
 `assigned_attorney_id` (the two RLS lookup shapes). RLS enabled;

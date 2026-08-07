@@ -21,7 +21,8 @@ create table public.matters (
   id                   uuid primary key default gen_random_uuid(),
   organization_id      uuid not null references public.organizations (id) on delete cascade,
   title                text not null,       -- generic demo/real title; never PII by convention (D-M4)
-  practice_area        text not null,       -- client PracticeArea enum-name: corporate|civil|criminal|family (D-MR3)
+  practice_area        text not null
+    check (practice_area in ('corporate', 'civil', 'criminal', 'family')),  -- client PracticeArea enum-name (D-MR3); CHECK = mapping contract
   status               public.matter_status not null default 'open',
   assigned_client_id   uuid references auth.users (id) on delete set null,
   assigned_attorney_id uuid references auth.users (id) on delete set null,
