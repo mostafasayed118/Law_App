@@ -360,6 +360,10 @@ structural_pins() {
   # SELECT on storage.objects to anon + authenticated by default (verified
   # live via a read-only probe on the dev project, 2026-08-08) — the RLS
   # policy is the gate; the battery asserts the behavior on both layers.
+  # WATCH-ITEM (T4): the "exactly one" pin assumes the rehearsal host ships
+  # zero DEFAULT storage policies (the 0 baseline was probed on the hosted
+  # dev project, not the local supabase start schema) — verify the
+  # rehearsal host's storage-policy baseline is 0 before --apply.
   expect_eq "matter-files bucket present" \
     "$(run_sql "select count(*) from storage.buckets where id = 'matter-files';")" "1"
   expect_eq "files_storage_select policy on storage.objects present" \

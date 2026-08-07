@@ -333,11 +333,13 @@ end $$;
 
 -- CHECK 07.09 — NEG (unauthenticated): public.files holds NO grant (the
 -- 01-pattern default-deny revoke in 07_storage.sql), so a raw read is
--- denied at the privilege layer. storage.objects DOES hold the platform
--- SELECT grant for anon (verified live via a read-only probe on 2026-08-08),
--- so the anon read succeeds at the privilege layer but the RLS policy must
--- deny it (auth.uid() is null -> the policy arms are false -> 0 rows) —
--- double-denied in the aggregate, on both layers.
+-- denied at the privilege layer. On storage.objects the outcome depends on
+-- the storage schema version: the HOSTED dev project grants anon SELECT
+-- (verified live via a read-only probe on 2026-08-08 — then RLS must deny,
+-- auth.uid() null -> the policy arms are false -> 0 rows), while older
+-- local storage schemas revoke anon entirely (insufficient_privilege).
+-- BOTH outcomes are "unauthenticated denied" and each is accepted below;
+-- the rehearsal host's exact posture is T4-verified, not assumed.
 set role anon;
 do $$
 declare
@@ -349,9 +351,13 @@ begin
   exception when insufficient_privilege then
     null; -- expected: no grant
   end;
-  select count(*) into v_objs from storage.objects where bucket_id = 'matter-files';
-  if v_objs <> 0 then
-    raise exception 'POLICY-BATTERY FAIL 07.09b: anon read % objects via RLS, want 0', v_objs;
-  end if;
+  begin
+    select count(*) into v_objs from storage.objects where bucket_id = 'matter-files';
+    if v_objs <> 0 then
+      raise exception 'POLICY-BATTERY FAIL 07.09b: anon read % objects via RLS, want 0', v_objs;
+    end if;
+  exception when insufficient_privilege then
+    null; -- also a deny (older storage schemas revoke anon on storage.objects)
+  end;
 end $$;
 set role authenticated;
