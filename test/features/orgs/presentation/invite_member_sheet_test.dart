@@ -86,6 +86,7 @@ void main() {
 
     expect(find.text('Enter a valid email address.'), findsOneWidget);
     expect(find.text('Copy token'), findsNothing);
+    expect(find.text('Copy invite link'), findsNothing);
   });
 
   testWidgets('mints an invite and shows the one-time token once', (
@@ -157,6 +158,100 @@ void main() {
     );
     expect(find.text('Token copied to clipboard.'), findsOneWidget);
   });
+
+  testWidgets('copying the invite link writes the full deep-link URI', (
+    tester,
+  ) async {
+    final List<MethodCall> platformCalls = <MethodCall>[];
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (MethodCall call) async {
+        platformCalls.add(call);
+        return null;
+      },
+    );
+    addTearDown(() {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      );
+    });
+
+    await openSheet(tester);
+    await sendInvite(tester, email: 'new@firm.com');
+
+    await tester.tap(find.text('Copy invite link'));
+    await tester.pump();
+
+    final MethodCall setData = platformCalls.firstWhere(
+      (MethodCall call) => call.method == 'Clipboard.setData',
+    );
+    expect(
+      (setData.arguments as Map<Object?, Object?>)['text'],
+      // The full accept-deep-link URI, built from the parser's own
+      // scheme/host constants — not the bare token (D-IS2/§5 data flow).
+      'com.legalhub.app://accept-invite?token=demo-invite-token-1',
+    );
+    expect(find.text('Invite link copied to clipboard.'), findsOneWidget);
+  });
+
+  testWidgets(
+    'link and token buttons copy distinct payloads with distinct snackbars',
+    (tester) async {
+      final List<MethodCall> platformCalls = <MethodCall>[];
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (MethodCall call) async {
+          platformCalls.add(call);
+          return null;
+        },
+      );
+      addTearDown(() {
+        tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          SystemChannels.platform,
+          null,
+        );
+      });
+
+      await openSheet(tester);
+      await sendInvite(tester, email: 'new@firm.com');
+
+      // Link button first.
+      await tester.tap(find.text('Copy invite link'));
+      await tester.pump();
+      expect(
+        (platformCalls
+                .firstWhere(
+                  (MethodCall call) => call.method == 'Clipboard.setData',
+                )
+                .arguments
+            as Map<Object?, Object?>)['text'],
+        'com.legalhub.app://accept-invite?token=demo-invite-token-1',
+      );
+      expect(find.text('Invite link copied to clipboard.'), findsOneWidget);
+
+      // Clear the first snackbar so the queued token snackbar can surface
+      // (ScaffoldMessenger queues rather than stacks); settle so the exit
+      // animation completes before the second tap.
+      tester
+          .state<ScaffoldMessengerState>(find.byType(ScaffoldMessenger))
+          .clearSnackBars();
+      await tester.pumpAndSettle();
+
+      // The bare-token copy is untouched (regression): same seam, bare token.
+      await tester.tap(find.text('Copy token'));
+      await tester.pump();
+      final List<MethodCall> setDataCalls = platformCalls
+          .where((MethodCall call) => call.method == 'Clipboard.setData')
+          .toList();
+      expect(setDataCalls.length, 2);
+      expect(
+        (setDataCalls.last.arguments as Map<Object?, Object?>)['text'],
+        'demo-invite-token-1',
+      );
+      expect(find.text('Token copied to clipboard.'), findsOneWidget);
+    },
+  );
 
   testWidgets('dismissing after delivery resolves the sheet with true', (
     tester,

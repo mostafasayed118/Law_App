@@ -61,6 +61,28 @@ class AppLinkParser {
   static const String authCallbackHost = 'auth';
   static const String authCallbackPathPrefix = '/v1/callback';
 
+  /// Builds an accept-invitation share link carrying [token]:
+  /// `com.legalhub.app://accept-invite?token=<one-time-token>`.
+  ///
+  /// The produce side of the D-P34.2 deep link, mirroring the consume-side
+  /// guarantees: the token is trimmed, and a blank token is rejected (an
+  /// accept link without its one-time token is not actionable). The token
+  /// is embedded on-demand and must never be persisted or logged (contract
+  /// §8). The URI uses [Uri.queryParameters] so any token character is
+  /// encoded; round-trips: `parse(acceptInviteUri(t))` is
+  /// `AcceptInviteIntent(t)`.
+  static Uri acceptInviteUri(String token) {
+    final String trimmed = token.trim();
+    if (trimmed.isEmpty) {
+      throw ArgumentError.value(token, 'token', 'must be a non-empty token');
+    }
+    return Uri(
+      scheme: appScheme,
+      host: acceptInviteHost,
+      queryParameters: <String, String>{'token': trimmed},
+    );
+  }
+
   AppLinkIntent parse(Uri uri) {
     if (uri.scheme != appScheme) {
       return const NoAppLinkIntent();

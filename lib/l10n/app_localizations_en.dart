@@ -495,6 +495,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inviteTokenCopied => 'Token copied to clipboard.';
 
   @override
+  String get inviteShareLink => 'Copy invite link';
+
+  @override
+  String get inviteShareLinkCopied => 'Invite link copied to clipboard.';
+
+  @override
   String get actionResendInvitation => 'Resend invitation';
 
   @override

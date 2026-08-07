@@ -155,6 +155,8 @@
   "@inviteTokenBody": {"placeholders": {"email": {"type": "String"}}},
   "inviteTokenCopy": "Copy token",
   "inviteTokenCopied": "Token copied to clipboard.",
+  "inviteShareLink": "Copy invite link",
+  "inviteShareLinkCopied": "Invite link copied to clipboard.",
   "actionResendInvitation": "Resend invitation",
   "actionRevokeInvitation": "Revoke invitation",
   "invitationRevoked": "Invitation revoked.",

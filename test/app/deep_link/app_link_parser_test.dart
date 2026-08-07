@@ -70,4 +70,43 @@ void main() {
       expect(intent, isA<NoAppLinkIntent>());
     });
   });
+
+  group('AppLinkParser.acceptInviteUri (produce side)', () {
+    test('builds the canonical accept-invite share link', () {
+      expect(
+        AppLinkParser.acceptInviteUri('token-1'),
+        Uri.parse('com.legalhub.app://accept-invite?token=token-1'),
+      );
+    });
+
+    test('round-trips: parse(acceptInviteUri(t)) is AcceptInviteIntent(t)', () {
+      final AppLinkIntent intent = const AppLinkParser().parse(
+        AppLinkParser.acceptInviteUri('t-42'),
+      );
+
+      expect(intent, isA<AcceptInviteIntent>());
+      expect((intent as AcceptInviteIntent).token, 't-42');
+    });
+
+    test('encodes token characters via the query, then round-trips', () {
+      const String token = 'a&b c=12';
+      final AppLinkIntent intent = const AppLinkParser().parse(
+        AppLinkParser.acceptInviteUri(token),
+      );
+
+      expect(intent, isA<AcceptInviteIntent>());
+      expect((intent as AcceptInviteIntent).token, token);
+    });
+
+    test('trims accidental whitespace before building the link', () {
+      expect(
+        AppLinkParser.acceptInviteUri('  token-1  '),
+        Uri.parse('com.legalhub.app://accept-invite?token=token-1'),
+      );
+    });
+
+    test('rejects a blank token (an accept link needs its token)', () {
+      expect(() => AppLinkParser.acceptInviteUri('   '), throwsArgumentError);
+    });
+  });
 }
