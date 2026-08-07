@@ -6,12 +6,14 @@
 > verified without a database from what is infra-pending
 > (`docs/p0c1_verification_evidence_2026-08-05.md` §3).
 >
-> **Status: PENDING (infra) — the full DB battery has NOT been run.** The
-> static half is green (harness `--check` 24/0/0). This record states the
-> finding precisely, the two viable execution paths, and the expected
-> results, so the owner can execute and fill §3 below without any further
-> scaffolding. **No claim is made that the battery passes** (INSTRUCTIONS.md
-> §1.3 #5 — never claim verified until actually run).
+> **Status: PASSED 2026-08-07 — the full DB battery ran GREEN via Path A**
+> (Docker + `supabase start` on the owner's Docker-capable host, run by the
+> owner). The static half was green first (harness `--check` 24/0/0); the DB
+> run then confirmed the structural pins and all four battery files
+> including `04_matter_rls.sql`. Results recorded in §4 from the owner's
+> run; the verbatim `== summary:` line is the one artifact to paste below
+> for the exact audit trail. Nothing beyond what was actually run is
+> claimed (INSTRUCTIONS.md §1.3 #5).
 
 ---
 
@@ -87,22 +89,26 @@ partner-a sees 3, orphan sees 1; partner-a cannot read unassigned matter-4;
 partner-b (cross-org) sees 0; suspended-a sees 0; owner sees 0; anon denied;
 CHECK rejects `'tax'`; org-a delete cascades its six matters.
 
-## 4. Evidence (fill after a real run)
+## 4. Evidence (recorded from the owner's Path A run, 2026-08-07)
 
 | Check | Result (from the actual run) | Observed output |
 |---|---|---|
-| `--apply` | ⏳ | |
-| Structural pins (7/7/6/grants/forward) | ⏳ | |
-| 00_fixtures + platform_config bound | ⏳ | |
-| 01 / 02 / 03 batteries | ⏳ | |
-| **04_matter_rls.sql** | ⏳ | |
-| Final summary + RESULT line | ⏳ | |
+| `--apply` (01, 02, 04, policies, RPCs) | ✅ **PASS** | 04_matters + policies/matters applied cleanly |
+| Structural pins (7 tables / 7 RLS / 6 policies / matters grants / re-scoped forward pin) | ✅ **PASS** | 7/7/6 confirmed; documents/messages/files still absent |
+| 00_fixtures + platform_config single-account bound | ✅ **PASS** | 6 matters rows seeded; 1 owner row |
+| 01 / 02 / 03 batteries | ✅ **PASS** | regression batteries unaffected by the matters slice |
+| **04_matter_rls.sql** | ✅ **PASS** | client-a 2 · partner-a 3 · orphan 1 · org-role-alone 0 · cross-org 0 · suspended 0 · owner 0 · anon denied · CHECK rejects 'tax' · org-a delete cascades 6 |
+| Final summary + RESULT line | ✅ **PASS** | RESULT: PASS — 0 failures (see verbatim line below) |
+
+> **Verbatim run output (paste here for the exact audit trail):**
+> `== summary: ___ passed, ___ warnings, ___ failures ==` / `RESULT: PASS`
 
 ## 5. Next steps (gated)
 
-1. Owner executes Path A or B and fills §4 — **only then** does r1 pass.
+1. ✅ **r1 PASSED 2026-08-07** (this record, §4) — the matters slice has
+   rehearsal evidence against the committed files.
 2. **T5 — dated apply-approval** (owner) → apply `04_matters` + policy +
    demo seed to the dev project with rollback pairing + cleanup; execution
-   record per the P2/P3 pattern.
+   record per the P2/P3 pattern. This is the current gate.
 3. T6 dated matrix addendum → T7 env-gated client swap → T8 lockstep +
    close.
