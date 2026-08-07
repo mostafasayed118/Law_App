@@ -38,6 +38,14 @@ class SupabaseMatterApiImpl implements SupabaseMatterApi {
       );
     } on PostgrestException catch (e) {
       throw SupabaseMatterException(kind: _kindFor(e), message: e.message);
+    } on Object {
+      // A non-Postgrest provider failure (network/transport) is a typed
+      // unavailable, never a raw exception across the seam (the auth impl's
+      // defensive-catch precedent).
+      throw const SupabaseMatterException(
+        kind: SupabaseMatterFailureKind.providerUnavailable,
+        message: 'Provider unavailable.',
+      );
     }
   }
 

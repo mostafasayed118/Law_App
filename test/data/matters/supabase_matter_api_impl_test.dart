@@ -8,14 +8,20 @@ void main() {
     late List<String> calls;
     late Map<String, List<Map<String, dynamic>>> tableData;
     late Map<String, PostgrestException> tableErrors;
+    late Map<String, Object> objectErrors;
     late SupabaseMatterApiImpl api;
 
     setUp(() {
       calls = <String>[];
       tableData = <String, List<Map<String, dynamic>>>{};
       tableErrors = <String, PostgrestException>{};
+      objectErrors = <String, Object>{};
       api = SupabaseMatterApiImpl((String table, String columns) async {
         calls.add('$table:$columns');
+        final Object? objectError = objectErrors[table];
+        if (objectError != null) {
+          throw objectError;
+        }
         final PostgrestException? error = tableErrors[table];
         if (error != null) {
           throw error;
@@ -89,5 +95,26 @@ void main() {
         ),
       );
     });
+
+    test(
+      'fetchMatters maps a non-Postgrest failure to providerUnavailable',
+      () async {
+        // A transport/network failure is not a PostgrestException; the impl
+        // must map it to the typed unavailable kind, never leak a raw
+        // exception across the seam (auth-impl defensive-catch precedent).
+        objectErrors['matters'] = Exception('network down');
+
+        await expectLater(
+          api.fetchMatters(),
+          throwsA(
+            isA<SupabaseMatterException>().having(
+              (e) => e.kind,
+              'kind',
+              SupabaseMatterFailureKind.providerUnavailable,
+            ),
+          ),
+        );
+      },
+    );
   });
 }

@@ -84,16 +84,22 @@ class SupabaseMatterGateway implements MatterGateway {
         // Roster unavailable for this org: id fallback, keep the rest.
         continue;
       }
-      for (final OrgMember member
-          in outcome.valueOrNull ?? const <OrgMember>[]) {
+      // On the success branch the value is never null (the failure branch
+      // already continued).
+      for (final OrgMember member in outcome.valueOrNull!) {
         names[member.userId] = member.displayName;
       }
     }
     return names;
   }
 
-  String _organizationIdOf(Map<String, dynamic> row) =>
-      row['organization_id'] as String;
+  String _organizationIdOf(Map<String, dynamic> row) {
+    final Object? organizationId = row['organization_id'];
+    if (organizationId is! String || organizationId.isEmpty) {
+      throw FormatException('Matter row has no organization id');
+    }
+    return organizationId;
+  }
 
   /// Maps one raw matter row to the [Matter] VO.
   ///
@@ -104,11 +110,22 @@ class SupabaseMatterGateway implements MatterGateway {
     Map<String, dynamic> row,
     Map<String, String> displayNames,
   ) {
-    final String id = row['id'] as String;
+    final Object? id = row['id'];
+    if (id is! String || id.isEmpty) {
+      throw FormatException('Matter row has no id');
+    }
     final Object? title = row['title'];
     if (title is! String || title.isEmpty) {
       throw FormatException('Matter row has no title');
     }
+    final Object? createdAt = row['created_at'];
+    if (createdAt is! String || createdAt.isEmpty) {
+      throw FormatException('Matter row has no created_at');
+    }
+    // Every `as` cast below is guarded above (id/title/created_at) or is a
+    // nullable id (assigned_attorney_id), so a malformed row surfaces as a
+    // typed FormatException → AppError, never a raw TypeError across the
+    // boundary.
     final String? attorneyId = row['assigned_attorney_id'] as String?;
     final String attorneyName = attorneyId == null
         ? unassignedAttorneyName
@@ -121,7 +138,7 @@ class SupabaseMatterGateway implements MatterGateway {
       ),
       status: _statusFromServerName(row['status'] as String?),
       assignedAttorneyName: attorneyName,
-      createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
+      createdAt: DateTime.parse(createdAt).toLocal(),
     );
   }
 

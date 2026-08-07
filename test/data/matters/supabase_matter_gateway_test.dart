@@ -14,11 +14,9 @@ import 'package:legalhub/features/matters/domain/matter.dart';
 class _StubSupabaseMatterApi implements SupabaseMatterApi {
   List<Map<String, dynamic>> rows = <Map<String, dynamic>>[];
   SupabaseMatterException? error;
-  int calls = 0;
 
   @override
   Future<List<Map<String, dynamic>>> fetchMatters() async {
-    calls += 1;
     if (error != null) {
       throw error!;
     }
@@ -27,10 +25,12 @@ class _StubSupabaseMatterApi implements SupabaseMatterApi {
 }
 
 /// Hand-rolled fake of the [OrganizationGateway] roster seam for name
-/// resolution: answers `listMembers` with a canned outcome and records the
-/// requested organization ids.
+/// resolution: answers `listMembers` per organization id (falling back to a
+/// single canned outcome, then denied) and records the requested org ids.
 class _StubOrganizationGateway implements OrganizationGateway {
   OrgOutcome<List<OrgMember>>? listMembersResult;
+  Map<String, OrgOutcome<List<OrgMember>>> perOrgResults =
+      <String, OrgOutcome<List<OrgMember>>>{};
   final List<String> rosterCalls = <String>[];
 
   @override
@@ -38,6 +38,10 @@ class _StubOrganizationGateway implements OrganizationGateway {
     required String organizationId,
   }) async {
     rosterCalls.add(organizationId);
+    final OrgOutcome<List<OrgMember>>? perOrg = perOrgResults[organizationId];
+    if (perOrg != null) {
+      return perOrg;
+    }
     return listMembersResult ??
         const OrgOutcome<List<OrgMember>>.failure(
           OrgFailure(kind: OrgFailureKind.denied),
@@ -218,18 +222,31 @@ void main() {
       expect(orgGateway.rosterCalls, <String>['org-1']);
     });
 
-    test('asks the roster once per distinct organization', () async {
+    test('asks the roster once per org and merges names (D-MR4)', () async {
       api.rows = <Map<String, dynamic>>[
         _row(id: 'm-1', organizationId: 'org-1', attorneyId: 'a-1'),
         _row(id: 'm-2', organizationId: 'org-2', attorneyId: 'a-2'),
         _row(id: 'm-3', organizationId: 'org-1', attorneyId: 'a-1'),
       ];
+      orgGateway.perOrgResults = <String, OrgOutcome<List<OrgMember>>>{
+        'org-1': OrgOutcome<List<OrgMember>>.success(<OrgMember>[
+          _member('a-1', 'Layla Mansour'),
+        ]),
+        'org-2': OrgOutcome<List<OrgMember>>.success(<OrgMember>[
+          _member('a-2', 'Omar Farouk'),
+        ]),
+      };
 
       final List<Matter> matters = (await gateway.fetchMatters()).valueOrNull!;
 
+      // One roster call per distinct org, never per row.
       expect(orgGateway.rosterCalls.toSet(), <String>{'org-1', 'org-2'});
       expect(orgGateway.rosterCalls, hasLength(2));
+      // Names merge across both orgs onto the right rows.
       expect(matters, hasLength(3));
+      expect(matters[0].assignedAttorneyName, 'Layla Mansour');
+      expect(matters[1].assignedAttorneyName, 'Omar Farouk');
+      expect(matters[2].assignedAttorneyName, 'Layla Mansour');
     });
 
     test('falls back to the raw id when the id is not on the roster', () async {
@@ -331,15 +348,16 @@ void main() {
           kind: SupabaseMatterFailureKind.unknown,
           message: 'provider hiccup',
         );
-        api.rows = <Map<String, dynamic>>[_row(title: 'Sensitive case title')];
 
         final Result<List<Matter>> result = await gateway.fetchMatters();
 
         final AppError error = result.errorOrNull!;
         expect(error.code, 'matter_read_failed');
-        // The error never carries row content (redaction-safe context).
+        // The failure path never touches row content (the seam throws
+        // before mapping runs) and the AppError context stays empty by
+        // construction — only the provider's own message crosses as the
+        // technical message.
         expect(error.technicalMessage, 'provider hiccup');
-        expect(error.toString(), isNot(contains('Sensitive')));
         expect(error.context, isEmpty);
       },
     );
