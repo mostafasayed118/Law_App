@@ -153,25 +153,25 @@ realtime / e-signature (stays deferred); audit wiring for document reads
 
 ## 8. Acceptance criteria
 
-- [ ] A document (metadata) is readable iff the reader is an active member
+- [x] A document (metadata) is readable iff the reader is an active member
       of its org **and** assigned (client or attorney) on its matter (RLS
       + battery, matrix §4 line 143/148).
-- [ ] Org-role-alone, cross-org, unassigned, unauthenticated, and
+- [x] Org-role-alone, cross-org, unassigned, unauthenticated, and
       `platform_owner_admin` reads are denied (battery, 03-style deny rows;
       the owner row holds as the operational invariant — never assigned).
-- [ ] Battery green via `verify_policy_tests.sh`; rehearsal r-series passed
+- [x] Battery green via `verify_policy_tests.sh`; rehearsal r-series passed
       with evidence before any apply (owner's Docker host, matters r1
       precedent).
-- [ ] Apply executed only under the owner's dated apply-approval, with
+- [x] Apply executed only under the owner's dated apply-approval, with
       `_down.sql` rollback pairing and demo-row cleanup discipline (demo
       document ids reference the **applied** demo matter ids, resolved at
       apply time).
-- [ ] Client swap is env-gated; env-less runs and the full Flutter suite
+- [x] Client swap is env-gated; env-less runs and the full Flutter suite
       are unchanged (fake); `Document` VO and presentation untouched.
-- [ ] Dated matrix addendum (§7) precedes the client surface shipping;
+- [x] Dated matrix addendum (§7) precedes the client surface shipping;
       roadmap §14 gains the second per-feature flip; README count in
       lockstep; ledger PASS.
-- [ ] Full gate on every client slice: format clean · analyze clean ·
+- [x] Full gate on every client slice: format clean · analyze clean ·
       suite green · ledger PASS — nothing pushed.
 
 ## 9. Risks / open questions
@@ -210,18 +210,18 @@ Each task is independently committable with the stated verification; the
 apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
 **no dev-project change until T5**.
 
-- [ ] **1. Scope note + RLS-gate design addendum** — touches: this document
+- [x] **1. Scope note + RLS-gate design addendum** (DONE `77f14fb`) — touches: this document
   + a `documents` §8-style review (`docs/documents_rls_gate_review_2026-08-07.md`,
   the Q1–Q6 pattern answered for documents: matter-scoped assignment
   model, the exists-subquery policy, negative cases, rollback pairing,
   seed plan) — done when: docs committed, ledger sweep green (no
   dev-project contact).
-- [ ] **2. Schema artifacts (rehearsal-ready, NOT applied)** — touches:
+- [x] **2. Schema artifacts (rehearsal-ready, NOT applied)** (DONE `f8cc6c6`/`7c8ab79`) — touches:
   `supabase/migrations/05_documents.sql` (+ `05_documents.down.sql`),
   `supabase/policies/documents.sql` — done when: DDL matches
   D-DR1/D-DR3 (matter FK + org column + `document_type` CHECK, metadata
   only), `_down.sql` is a clean inverse, committed.
-- [ ] **3. Policy battery** — touches: `supabase/tests/05_document_rls.sql`
+- [x] **3. Policy battery** (DONE `b5bf0b2`) — touches: `supabase/tests/05_document_rls.sql`
   (new document fixture rows referencing the six fixture matters go in
   `supabase/tests/00_fixtures.sql`, the matters precedent) +
   `scripts/verify_policy_tests.sh` — **four sites**: battery file list,
@@ -232,18 +232,18 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   documents grant/anon rows) — done when: battery runs green against a
   Postgres (owner's Docker host or CI) with the §4 deny rows incl. the
   org-mismatch row; committed.
-- [ ] **4. Ephemeral rehearsal (r-series)** — touches: evidence record
+- [x] **4. Ephemeral rehearsal (r-series)** (DONE `a115e99`/`7f9e89a`/`b1fe823` — r1 PASSED)  — touches: evidence record
   `docs/documents_rehearsal_evidence_r1_<date>.md` — done when: the loop
   (migrate → policy → battery → read-as-roles) passes on throwaway infra
   with zero dev-project contact; **owner-side / CI runner** (matters r1
   Path A precedent).
-- [ ] **5. Dated apply-approval → apply** — touches: dev project
+- [x] **5. Dated apply-approval → apply** (DONE `388e31d`/`f500095`/`c1fcebd` — APPLIED + verified on the dev project) — touches: dev project
   (migrations + policies + demo seed), `docs/documents_apply_approval_<date>.md`
   + `docs/documents_apply_execution_<date>.md` — done when: the owner's
   dated approval exists, apply executed with `_down.sql` pairing + cleanup
   discipline (demo ids reference the applied demo matter ids), observed
   output recorded verbatim.
-- [ ] **6. Matrix addendum (dated)** — touches: `docs/permission_matrix.md`
+- [x] **6. Matrix addendum (dated)** (DONE `b9b95f9`/`4ae04d9`) — touches: `docs/permission_matrix.md`
   §4 — adds the **"View a document (metadata)"** row (client/attorney
   cells SHIP behind `documents_select_assigned`; partner/
   `compliance_officer` "deny unless separately assigned" cells stay
@@ -251,14 +251,14 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   row keeps its §14 deferral** (no body column, D-V1) — done when:
   addendum committed **before** the client surface ships, ledger sweep
   green.
-- [ ] **7. Client swap (env-gated)** — touches:
+- [x] **7. Client swap (env-gated)** (DONE `9b42a84`/`cb682ca` — suite 897) — touches:
   `lib/data/documents/supabase_document_api.dart` +
   `supabase_document_api_impl.dart` + `supabase_document_gateway.dart`,
   `lib/app/service_locator.dart`, tests (mapping, matterRef embed +
   fallback, failure mapping, DI pins) — done when: format clean · analyze
   clean · suite green (fake unchanged) · ledger PASS; VO/presentation
   untouched.
-- [ ] **8. Lockstep + evidence + close** — touches: README test count,
+- [x] **8. Lockstep + evidence + close** (DONE this commit) — touches: README test count,
   roadmap §14 second per-feature flip + gate-table row, completion
   evidence `docs/documents_real_data_completion_evidence_<date>.md`,
   dated close decision — done when: all docs sweep green, full gate re-run
