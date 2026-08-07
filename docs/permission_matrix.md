@@ -166,8 +166,9 @@ here as a standalone checklist because it is the highest-risk row in this
 matrix (a single powerful account):
 
 - ✅ May: list orgs, list members + their identity/membership metadata
-  (name, email, role, status, timestamps), suspend/reactivate a membership,
-  delete a demo account.
+  (display name, role, status, timestamps — **no email**; the owner
+  `list_members_metadata` RPC returns identity + membership metadata
+  only), suspend/reactivate a membership, delete a demo account.
 - ❌ May never: read matter/document/message content, impersonate another
   user's session, edit or delete an audit record, act on any table other
   than identity/membership metadata.
@@ -175,9 +176,13 @@ matrix (a single powerful account):
   `platform_owner_admin` actor reference — **it is not exempt from
   auditing just because it's the owner's own account.**
 - Enforced server-side only (RLS/RPC); a client-side "isOwner" flag is a UX
-  affordance, never the authorization boundary. No owner admin screen ships
-  until the Addendum's server-side enforcement + auditing story is complete —
-  deferred in the planning roadmap (`docs/features_roadmap_2026-08-03.md` §8).
+  affordance, never the authorization boundary. **The platform-admin screen
+  SHIPPED 2026-08-05** (P3.5, `47f777b`) behind the enforcement contract
+  recorded in the §5 addendum below — the policy-test battery (D-P0C2), the
+  single-owner binding (D-P0C3), and audit-RPC-only surfacing (D-P0C4); the
+  owner capability stays server-gated (`is_platform_owner()`), so the
+  earlier deferral of these five owner RPCs in the planning roadmap §14 no
+  longer applies (roadmap §2 reconciled 2026-08-07).
 
 **Negative test required:** an authenticated session bearing the
 `platform_owner_admin` capability but attempting to read a document/message
