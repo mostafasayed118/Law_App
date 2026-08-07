@@ -159,25 +159,25 @@ send/reply/attachment actions (read-only, D-MSG1 discipline); file storage
 
 ## 8. Acceptance criteria
 
-- [ ] A message thread (metadata) is readable iff the reader is an active
+- [x] A message thread (metadata) is readable iff the reader is an active
       member of its org **and** assigned (client or attorney) on its matter
       (RLS + battery, matrix §4 line 143/148).
-- [ ] Org-role-alone, cross-org, unassigned, unauthenticated, and
+- [x] Org-role-alone, cross-org, unassigned, unauthenticated, and
       `platform_owner_admin` reads are denied (battery, 03-style deny rows;
       the owner row holds as the operational invariant — never assigned).
-- [ ] Battery green via `verify_policy_tests.sh`; rehearsal r-series passed
+- [x] Battery green via `verify_policy_tests.sh`; rehearsal r-series passed
       with evidence before any apply (owner's Docker host, matters/documents
       r1 precedent).
-- [ ] Apply executed only under the owner's dated apply-approval, with
+- [x] Apply executed only under the owner's dated apply-approval, with
       `_down.sql` rollback pairing and demo-row cleanup discipline (demo
       thread ids reference the **applied** demo matter ids, resolved at
       apply time).
-- [ ] Client swap is env-gated; env-less runs and the full Flutter suite
+- [x] Client swap is env-gated; env-less runs and the full Flutter suite
       are unchanged (fake); `MessageThread` VO and presentation untouched.
-- [ ] Dated matrix addendum (§7) precedes the client surface shipping;
+- [x] Dated matrix addendum (§7) precedes the client surface shipping;
       roadmap §14 gains the third per-feature flip; README count in
       lockstep; ledger PASS.
-- [ ] Full gate on every client slice: format clean · analyze clean ·
+- [x] Full gate on every client slice: format clean · analyze clean ·
       suite green · ledger PASS — nothing pushed.
 
 ## 9. Risks / open questions
@@ -215,19 +215,21 @@ Each task is independently committable with the stated verification; the
 apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
 **no dev-project change until T5**.
 
-- [ ] **1. Scope note + RLS-gate design addendum** — touches: this document
+- [x] **1. Scope note + RLS-gate design addendum** — touches: this document
   + a `messages` §8-style review (`docs/messages_rls_gate_review_2026-08-07.md`,
   the Q1–Q6 pattern answered for messages: matter-scoped assignment model,
   the exists-subquery policy, the participants-as-names decision (D-MSR3),
   negative cases, rollback pairing, seed plan) — done when: docs committed,
-  ledger sweep green (no dev-project contact).
-- [ ] **2. Schema artifacts (rehearsal-ready, NOT applied)** — touches:
+  ledger sweep green (no dev-project contact). — **DONE `443f42e`** (+ the
+  org-mismatch non-vacuity nit `ab41c83`).
+- [x] **2. Schema artifacts (rehearsal-ready, NOT applied)** — touches:
   `supabase/migrations/06_message_threads.sql` (+ `06_message_threads.down.sql`),
   `supabase/policies/message_threads.sql` — done when: DDL matches
   D-MSR1/D-MSR3 (matter FK + org column + `participants text[]` +
   `message_count` CHECK, metadata only, no body column), `_down.sql` is a
-  clean inverse, committed.
-- [ ] **3. Policy battery** — touches: `supabase/tests/06_message_rls.sql`
+  clean inverse, committed. — **DONE `5a506ca`** (NOT applied at commit;
+  applied later under the T5 approval).
+- [x] **3. Policy battery** — touches: `supabase/tests/06_message_rls.sql`
   (new thread fixture rows referencing the six fixture matters go in
   `supabase/tests/00_fixtures.sql`, the documents precedent) +
   `scripts/verify_policy_tests.sh` — **four sites**: battery file list, run
@@ -241,12 +243,17 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   reset-ordering + sanity pin** (`delete from public.message_threads;`
   before `matters`; 6-thread pin) — the documents T3 sites as baseline —
   done when: battery runs green against a Postgres (owner's Docker host or
-  CI) with the §4 deny rows incl. the org-mismatch row; committed.
-- [ ] **4. Ephemeral rehearsal (r-series)** — touches: evidence record
+  CI) with the §4 deny rows incl. the org-mismatch row; committed. —
+  **DONE `0ed14c7`** (+ README-battery + quoted-participants nits
+  `4905697`); static `--check` **37/0/0**; the live battery ran green in T4
+  (r1 PASSED).
+- [x] **4. Ephemeral rehearsal (r-series)** — touches: evidence record
   `docs/messages_rehearsal_evidence_r1_<date>.md` — done when: the loop
   (migrate → policy → battery → read-as-roles) passes on throwaway infra
   with zero dev-project contact; **owner-side / CI runner** (matters/
-  documents r1 Path A precedent).
+  documents r1 Path A precedent). — **DONE `a37c6dc`** — r1 **PASSED
+  2026-08-07** (owner's Path A Docker run; 9 tables / 9 RLS / 8 policies
+  live pins; 06 battery 11 checks green).
 - [x] **5. Dated apply-approval → apply** — touches: dev project
   (migrations + policies + demo seed), `docs/messages_apply_approval_<date>.md`
   + `docs/messages_apply_execution_<date>.md` — done when: the owner's
@@ -258,22 +265,27 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   `docs/messages_apply_execution_2026-08-07.md` — baseline probe →
   06_message_threads → policy → demo seed → post-apply smoke all verified;
   rollback pairing standing by).
-- [ ] **6. Matrix addendum (dated)** — touches: `docs/permission_matrix.md`
+- [x] **6. Matrix addendum (dated)** — touches: `docs/permission_matrix.md`
   §4 — adds the **"View a message thread (metadata)"** row (client/attorney
   cells SHIP behind `message_threads_select_assigned`; partner/
   `compliance_officer` "deny unless separately assigned" cells stay
   ungranted; `platform_owner_admin` deny always) and records the **body row
   keeps its §14 deferral** (no body column, D-MSG1) — done when: addendum
-  committed **before** the client surface ships, ledger sweep green.
-- [ ] **7. Client swap (env-gated)** — touches:
+  committed **before** the client surface ships, ledger sweep green. —
+  **DONE `d5ac001`** (before T7's client swap).
+- [x] **7. Client swap (env-gated)** — touches:
   `lib/data/messaging/supabase_message_api.dart` +
   `supabase_message_api_impl.dart` + `supabase_message_gateway.dart`,
   `lib/app/service_locator.dart`, tests (mapping incl. participants text[]
   and message_count, matterRef embed + fallback, failure mapping incl.
   `providerUnavailable`, DI pins) — done when: format clean · analyze clean
   · suite green (fake unchanged) · ledger PASS; VO/presentation untouched.
-- [ ] **8. Lockstep + evidence + close** — touches: README test count,
+  — **DONE `7168f38`** (+24 tests; the `providerUnavailable` mapping was
+  tested from the start — the documents T7 lesson pre-built).
+- [x] **8. Lockstep + evidence + close** — touches: README test count,
   roadmap §14 third per-feature flip + gate-table row, completion evidence
   `docs/messages_real_data_completion_evidence_<date>.md`, dated close
   decision — done when: all docs sweep green, full gate re-run on the
-  committed state, close decision recorded.
+  committed state, close decision recorded. — **DONE this commit** (README
+  918; roadmap §14 third flip + §13 row; evidence record; dated close
+  decision).

@@ -593,7 +593,7 @@ relaxation.
 | 10 | Phase 10 — matter workspace (read-first, client-only) | MVP spec §4; Phase 7/8/9 seams (details screen + fake-domain pattern) | no | scope note → decision-record ratification (D-W1…D-W6) → slices 10.0–10.2 → gate stack → owner push approval | **SHIPPED 2026-08-04** (`90465df` + `31f0624` + slice 10.2 l10n pins, suite 659, ledger PASS 115; pushed to origin/main) |
 | 11 | Phase 11 — unified search (read-first, client-only, aggregating) | MVP spec §4; Phase 6–10 seams (four fake-domain gateway seams + inert home search field) | no | scope note → decision-record ratification (D-S1…D-S6) → slices 11.0–11.2 → gate stack → owner push approval | **SHIPPED 2026-08-04** (`7c8ead8`, slices 11.0–11.2, suite 691, ledger PASS 115; pushed to origin/main) |
 | 12 | Phase 12 — reverse cross-link (client-only) | MVP §4 read-first; Phase 10 `matterRef` seam + Phase 7 details route | no | scope note → decision-record ratification (D-C1…D-C6) → slices 12.0–12.2 → gate stack → owner push approval | **IMPLEMENTED + SHIPPED 2026-08-05** — 12.0 `16e9b67` (pushed, suite 701/README 698); 12.1 `69622ce` + 12.2 `cd5c903` (committed, suite 706/README 703); ledger PASS 115; push of 12.1/12.2 awaits owner approval |
-| — | §14 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Per-feature un-deferrals — **matters read (first), SHIPPED 2026-08-07** (real-matters read slice: RLS design → battery → rehearsal r1 → dated apply-approval → apply → matrix addendum → env-gated client swap; plan `docs/matters_real_data_plan_2026-08-07.md`, evidence `docs/matters_real_data_completion_evidence_2026-08-07.md`; docs + database commits `bf27f84`..`41577a0`, suite 877, ledger PASS 115; **documents read is the second per-feature un-deferral, SHIPPED 2026-08-07** (real-documents read slice: RLS design → battery → rehearsal r1 → dated apply-approval → apply → matrix addendum → env-gated client swap; plan `docs/documents_real_data_plan_2026-08-07.md`, evidence `docs/documents_real_data_completion_evidence_2026-08-07.md`; commits `77f14fb`..`cb682ca`, suite 897, ledger PASS 115; messages/storage/realtime/audit/billing/AI stay deferred, each a separate per-feature un-deferral) |
+| — | §14 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Per-feature un-deferrals — **matters read (first), SHIPPED 2026-08-07** (real-matters read slice: RLS design → battery → rehearsal r1 → dated apply-approval → apply → matrix addendum → env-gated client swap; plan `docs/matters_real_data_plan_2026-08-07.md`, evidence `docs/matters_real_data_completion_evidence_2026-08-07.md`; docs + database commits `bf27f84`..`41577a0`, suite 877, ledger PASS 115; **documents read is the second per-feature un-deferral, SHIPPED 2026-08-07** (real-documents read slice: RLS design → battery → rehearsal r1 → dated apply-approval → apply → matrix addendum → env-gated client swap; plan `docs/documents_real_data_plan_2026-08-07.md`, evidence `docs/documents_real_data_completion_evidence_2026-08-07.md`; commits `77f14fb`..`cb682ca`, suite 897, ledger PASS 115; **messages read is the third per-feature un-deferral, SHIPPED 2026-08-07** (real-messages read slice: RLS design → battery → rehearsal r1 → dated apply-approval → apply → matrix addendum → env-gated client swap; plan `docs/messages_real_data_plan_2026-08-07.md`, evidence `docs/messages_real_data_completion_evidence_2026-08-07.md`; commits `443f42e`..`7168f38`, suite 921/README 918, ledger PASS 115; storage/realtime/audit/billing/AI stay deferred, each a separate per-feature un-deferral) |
 
 Rules that apply to every phase (definition-of-done from
 `docs/codebase_audit_plan.md`): scope/assumptions/non-goals documented ·
@@ -606,8 +606,8 @@ approval**.
 
 Per README boundary + `docs/permission_matrix.md` §4/§6, the originally
 deferred capabilities are: **matters, documents, messages, storage,
-realtime, audit surfacing, billing, AI** (matters + documents now
-un-deferred — see the flip notes below).
+realtime, audit surfacing, billing, AI** (matters, documents + messages
+now un-deferred — see the flip notes below).
 The **real matters data path is the first per-feature un-deferral —
 SHIPPED 2026-08-07 (read slice)** under this gate: RLS-gate design review
 (`docs/matters_rls_gate_review_2026-08-07.md`), rehearsal-ready artifacts
@@ -627,23 +627,36 @@ eleven checks green incl. the org-mismatch row), rehearsal r1 PASSED
 project (table + `documents_select_assigned` + demo seed referencing the
 applied demo matter ids, rollback pairing standing by), dated matrix §4
 addendum, and the env-gated client swap (`SupabaseDocumentGateway` behind
+`env.isConfigured`; VO/presentation untouched). The **real messages data
+path is the third per-feature un-deferral — SHIPPED 2026-08-07 (read
+slice)** under this gate: RLS-gate design review
+(`docs/messages_rls_gate_review_2026-08-07.md`), rehearsal-ready artifacts
+(`supabase/migrations/06_message_threads.sql` +
+`policies/message_threads.sql`), policy battery
+(`supabase/tests/06_message_rls.sql`, eleven checks green incl. the
+non-vacuous org-mismatch row), rehearsal r1 PASSED (ephemeral, owner's
+host), dated apply-approval + execution on the dev project (table +
+`message_threads_select_assigned` + demo seed referencing the applied
+demo matter ids, rollback pairing standing by), dated matrix §4
+addendum, and the env-gated client swap (`SupabaseMessageGateway` behind
 `env.isConfigured`; VO/presentation untouched). The remaining deferred
-paths each keep this same per-feature discipline: messages, storage,
-realtime, audit surfacing, billing, AI.
+paths each keep this same per-feature discipline: storage, realtime,
+audit surfacing, billing, AI.
 The client-only document-metadata surface shipped as Phase 8 (slices
 8.0–8.2, `22d63e5`/`29fd40a`/`430b62b`) carries no real document data —
 the real documents read path is the second per-feature un-deferral
 (SHIPPED 2026-08-07 — see the flip note above). The
 client-only thread-metadata surface shipped as Phase 9 (slices 9.0–9.2,
 `b0de147`/`64e6b51`/`f02bb1c`) carries no real message data — the real
-messages data path stays deferred here with the rest. The client-only
-per-matter view shipped as Phase 10 (slices 10.0–10.2,
+messages data path is the third per-feature un-deferral (SHIPPED
+2026-08-07 — see the flip note above). The client-only per-matter view
+shipped as Phase 10 (slices 10.0–10.2,
 `90465df`/`31f0624`/`93c2e28`) is a client-side view over the same
-synthetic lists —the real messages data path stays deferred here with the rest (the real matters and documents read paths are the first two per-feature un-deferrals — see the flip notes above). The client-only unified-search surface shipped
+synthetic lists —the real matters, documents and messages read paths are the first three per-feature un-deferrals (see the flip notes above); message bodies, individual messages, storage and realtime stay deferred. The client-only unified-search surface shipped
 as Phase 11 (slices 11.0–11.2) is a client-side aggregation over the same
-synthetic lists —the real messages data path stays deferred here with the rest (the real matters and documents read paths are the first two per-feature un-deferrals — see the flip notes above). The client-only reverse cross-link shipped as
+synthetic lists —the real matters, documents and messages read paths are the first three per-feature un-deferrals (see the flip notes above); message bodies, individual messages, storage and realtime stay deferred. The client-only reverse cross-link shipped as
 Phase 12 slice 12.0 (`16e9b67`) is a navigation hint between the same
-synthetic lists —the real messages data path stays deferred here with the rest (the real matters and documents read paths are the first two per-feature un-deferrals — see the flip notes above). The
+synthetic lists —the real matters, documents and messages read paths are the first three per-feature un-deferrals (see the flip notes above); message bodies, individual messages, storage and realtime stay deferred. The
 matrix requires the `platform_owner_admin` deny-row test and per-row
 negative policy tests **before any of these ship**, and an org role alone
 never grants matter access. The audit RPCs exist (`read_org_audit`,
