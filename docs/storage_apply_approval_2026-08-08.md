@@ -11,15 +11,22 @@
 > rehearsed slice to the shared dev project, with the rollback pairing
 > standing by.
 >
-> **Status: DRAFT — NOT YET SIGNED.** The r1 rehearsal
-> (`docs/storage_rehearsal_evidence_r1_2026-08-08.md`) is ⏳ **PENDING**
-> (plan T4, owner's Docker host, matters/documents/messages r1 Path A
-> precedent — a first attempt on this machine failed for environmental
-> reasons recorded in the rehearsal record §2: no Docker Desktop, no host
-> `psql`, and a PowerShell env-var syntax error; **no harness execution
-> occurred**). The static half is green (harness `--check` **331/0/0**, T3
-> `47150be`). §6 is genuinely unsigned; this record authorizes nothing
-> until the two preconditions (r1 PASSED + dated sign-off) both hold.
+> **Status: APPLY APPROVED (2026-08-08).** The owner's dated sign-off in §6
+> (recorded from the pair-programming session, the documents/messages
+> precedent) authorizes the §3 up sequence against the shared dev project
+> (`eutmvevpskerzpqmwplv`, `eu-central-1`) per the §4 execution conditions,
+> with the rollback pairing standing by. **Execution is HELD pending the r1
+> rehearsal evidence**: the owner asserts r1 PASSED, but the rehearsal
+> record (`docs/storage_rehearsal_evidence_r1_2026-08-08.md`) is still ⏳
+> PENDING (no observed run output in the repo) — per §4 condition 1 +
+> `rollback_plan.md` §2, the apply runs only after the r1 evidence lands.
+> The read-only baseline probes (2026-08-08) confirm the dev project is in
+> the exact pre-apply state (§4.1): `files` 0 · bucket 0 · public policies
+> 8 · storage policies 0 · the four demo matter ids resolve (org
+> `ef43087b-adf4-4480-9bb2-28c26f46ec71`), and the T4 watch-items resolve:
+> `storage.buckets.type` is NOT NULL **with default
+> `'STANDARD'::storage.buckettype`** — the bare `(id, name, public)` insert
+> is valid — and `storage.foldername` exists.
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
 >
@@ -42,9 +49,9 @@
 | Schema artifacts (rehearsal-ready) | `supabase/migrations/07_storage.sql` + `07_storage.down.sql` (`87b6ef5` + watch-item `0bc21ed`) | ✅ Committed — NOT applied |
 | Policy artifacts | `supabase/policies/files.sql` + `supabase/policies/storage_objects.sql` (`87b6ef5`) | ✅ Committed — NOT applied |
 | Policy battery + harness | `supabase/tests/07_storage_rls.sql`, `00_fixtures.sql`, `scripts/verify_policy_tests.sh` (`47150be`, `83b406c`) | ✅ Committed; static `--check` PASS **331/0/0** |
-| **Ephemeral rehearsal (r1)** | `docs/storage_rehearsal_evidence_r1_2026-08-08.md` | ⏳ **PENDING** — owner's Docker host (Path A); the failed-attempt finding (no Docker/psql here) recorded in its §2 |
-| **Apply approval (this record)** | this document | ⏳ **DRAFT** — awaiting the owner's dated sign-off (§6), which is valid only once r1 is PASSED |
-| Apply execution (dev project) | `docs/storage_apply_execution_2026-08-08.md` | ⏳ Not yet — a separate slice after §6 |
+| **Ephemeral rehearsal (r1)** | `docs/storage_rehearsal_evidence_r1_2026-08-08.md` | ⏳ **PENDING** — owner's Docker host (Path A); the failed-attempt finding (no Docker/psql here) recorded in its §2. The owner asserts PASSED; **no observed output in the repo yet — the apply execution is held on this** (§4.1, rollback_plan §2) |
+| **Apply approval (this record)** | this document | ✅ **APPROVED 2026-08-08** (owner's dated sign-off, §6 — recorded from the session; r1 asserted PASSED, evidence pending — execution held) |
+| Apply execution (dev project) | `docs/storage_apply_execution_2026-08-08.md` | ⏳ Held — pending the r1 evidence landing in the rehearsal record; the read-only baseline (§4.1) is already verified |
 
 ## 2. Gate criteria — what the r1 rehearsal must prove
 
@@ -193,30 +200,37 @@ By signing below, the Project Owner authorizes the §3 apply against the
 shared dev project (`eutmvevpskerzpqmwplv`), subject to the §4 execution
 conditions and the §5 exclusions, with the rollback pairing standing by.
 **Signature is valid only once the r1 rehearsal reports PASSED** (plan T4 —
-currently ⏳ PENDING; evidence
-`docs/storage_rehearsal_evidence_r1_2026-08-08.md`).
+the owner asserts it is; the evidence record
+`docs/storage_rehearsal_evidence_r1_2026-08-08.md` is still ⏳ PENDING and
+must fill + flip before the execution slice runs).
 
-- **Project Owner:** github.com/mostafasayed118 — **date:** *(to be
-  recorded on signature)* — **approval wording:** *(to be recorded on
-  signature)*
+- **Project Owner:** github.com/mostafasayed118 — **date: 2026-08-08**
+  — **approval wording (recorded from the pair-programming session, the
+  documents/messages precedent):** "Apply approved — storage read slice
+  (07_storage + policies/files + policies/storage_objects + demo
+  files/objects referencing the applied demo matter ids), per this record
+  §3–§5, with the §4 guardrails and rollback pairing."
 
-> **Not yet signed (DRAFT).** The date + wording are recorded at signature
-> time from the pair-programming session (the matters/documents/messages
-> precedent); the execution record
-> (`docs/storage_apply_execution_2026-08-08.md`) then captures the actual
-> run; on success, plan T6 (dated matrix §4 + §6 addendum) and T7 (client
-> swap) follow.
+> **Signed 2026-08-08** (wording recorded from the session). The execution
+> record (`docs/storage_apply_execution_2026-08-08.md`) captures the actual
+> run — **held until the r1 evidence lands (⏳ PENDING — §4 condition 1 +
+> rollback_plan §2)**; on success, plan T6 (dated matrix §4 + §6 addendum)
+> and T7 (client swap) follow.## 7. Ledger
 
-## 7. Ledger
-
-- This session: docs-only — the review (T1), artifacts (T2), battery +
-  harness (T3), the rehearsal record skeleton (T4, ⏳ PENDING) and this
-  approval record (⏳ DRAFT) — **no `lib/`/`test/` change, no README-count
-  change, no dev-project change** (read-only information_schema /
-  has_table_privilege probes only,  2026-08-08); `verify_ledger.sh` PASS
-  115; nothing pushed; branch `feat/storage-real-read` @ `15bb744` (this
-  commit — the T3-end state `83b406c` predates it).
-- The plan's T5 row is annotated once this record flips to APPLY APPROVED
-  (dated), then the execution record flips to APPLIED after the actual
-  run; T6/T7/T8 follow with the roadmap §14/§13 + README/ledger lockstep
-  on the merged tree.
+- Approved 2026-08-08: this record's status is ✅ **APPLY APPROVED**
+  (dated sign-off, §6 — recorded from the session); the plan's T5 row is
+  annotated.
+- The read-only baseline (§4.1) verified 2026-08-08: `files` 0 · bucket 0
+  · public policies **8** (→ 9) · storage policies **0** (→ 1) · the four
+  demo matter ids resolve (org `ef43087b-adf4-4480-9bb2-28c26f46ec71`) ·
+  `storage.buckets.type` NOT NULL **with default** (the bare insert is
+  valid) · `storage.foldername` present.
+- **Execution HELD** on the r1 evidence (rehearsal record ⏳ PENDING — §4
+  condition 1 + rollback_plan §2): the up sequence runs only after the r1
+  record fills + flips to PASSED; the execution record then flips to
+  APPLIED, and T6/T7/T8 follow with the roadmap §14/§13 + README/ledger
+  lockstep on the merged tree.
+- This session: docs-only — **no `lib/`/`test/` change, no README-count
+  change, no dev-project change** (read-only probes only, 2026-08-08);
+  `verify_ledger.sh` PASS 115; nothing pushed; branch
+  `feat/storage-real-read` @ `41ce8ec` (+ this commit).
