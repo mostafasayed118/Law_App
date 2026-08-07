@@ -213,8 +213,9 @@ currently ⏳ PENDING; evidence
   harness (T3), the rehearsal record skeleton (T4, ⏳ PENDING) and this
   approval record (⏳ DRAFT) — **no `lib/`/`test/` change, no README-count
   change, no dev-project change** (read-only information_schema /
-  has_table_privilege probes only, 2026-08-08); `verify_ledger.sh` PASS
-  115; nothing pushed; branch `feat/storage-real-read` @ `83b406c`.
+  has_table_privilege probes only,  2026-08-08); `verify_ledger.sh` PASS
+  115; nothing pushed; branch `feat/storage-real-read` @ `15bb744` (this
+  commit — the T3-end state `83b406c` predates it).
 - The plan's T5 row is annotated once this record flips to APPLY APPROVED
   (dated), then the execution record flips to APPLIED after the actual
   run; T6/T7/T8 follow with the roadmap §14/§13 + README/ledger lockstep
