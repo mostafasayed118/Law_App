@@ -33,7 +33,7 @@
 Branch `feat/documents-real-read` @ `b5bf0b2` (T1–T3, nothing applied,
 nothing pushed). No dev-project contact of any kind.
 
-## 2. Infra finding (re-verified 2026-08-07 — why the run is PENDING)
+## 2. Infra finding (re-verified 2026-08-07 — why the run is owner-side)
 
 - **No `psql`, no `docker`, no `podman`, no `colima`** on this machine; WSL
   has no `docker` binary either (re-verified at T4 start — the same
@@ -108,7 +108,9 @@ dropping a matter cascades its documents.
 | Final summary + RESULT line | ✅ **PASS** | RESULT: PASS — 0 failures (see verbatim line below) |
 
 > **Verbatim run output (as pasted by the owner; numeric counts were not
-> captured — the check rows + RESULT line above are the audit trail):**
+> captured — the check rows + RESULT line above are the audit trail; the
+> row values are the battery's asserted outcomes — `RESULT: PASS` with 0
+> failures means each assertion matched):**
 > `== summary: ___ passed, ___ warnings, ___ failures ==` / `RESULT: PASS`
 
 ## 5. Next steps (gated)

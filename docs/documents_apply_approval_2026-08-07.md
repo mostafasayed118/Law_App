@@ -50,7 +50,7 @@ must verify — mirroring the matters r1 five:
 | # | Criterion | r1 evidence to capture | Verdict |
 |---|---|---|---|
 | 1 | `--apply` builds the slice cleanly (01, 02, 04, **05**, policies, RPCs) — `05_documents.sql` + `policies/documents.sql` applied on top of the already-applied `matters` table | rehearsal §4 | ✅ **PASSED 2026-08-07** |
-| 2 | Structural pins hold on the applied posture | rehearsal §4: **8 tables / 7 RLS / 7 policies** / documents SELECT grant + anon absence / **no body or content column** (metadata-only, D-V1) / matters + its policies still present | ✅ **PASSED 2026-08-07** |
+| 2 | Structural pins hold on the applied posture | rehearsal §4: **8 tables / 8 RLS / 7 policies** / documents SELECT grant + anon absence / **no body or content column** (metadata-only, D-V1) / matters + its policies still present | ✅ **PASSED 2026-08-07** |
 | 3 | 00/01/02/03/**04** regression batteries unaffected | rehearsal §4: fixtures + single-account bound + 01/02/03 + the six-matter battery all PASS | ✅ **PASSED 2026-08-07** |
 | 4 | `documents_select_assigned` enforces the matrix §4 contract | rehearsal §4: client-a 2 · partner-a 3 · orphan 1 · org-role-alone 0 · **org-mismatch 0** · cross-org 0 · suspended 0 · owner 0 · anon denied | ✅ **PASSED 2026-08-07** |
 | 5 | Mapping contract + teardown safety | rehearsal §4: `document_type` CHECK rejects `'tax'` · matter-delete cascades its documents (FK on delete cascade) | ✅ **PASSED 2026-08-07** |
