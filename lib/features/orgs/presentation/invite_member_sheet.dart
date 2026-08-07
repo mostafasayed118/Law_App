@@ -184,7 +184,7 @@ class _InviteMemberSheetState extends State<InviteMemberSheet> {
           label: Text(l10n.inviteTokenCopy),
         ),
         const SizedBox(height: LegalHubTheme.spaceSm),
-        FilledButton(
+        OutlinedButton(
           onPressed: () => Navigator.of(context).pop(true),
           child: Text(l10n.back),
         ),

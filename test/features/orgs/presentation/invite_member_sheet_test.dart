@@ -86,6 +86,7 @@ void main() {
 
     expect(find.text('Enter a valid email address.'), findsOneWidget);
     expect(find.text('Copy token'), findsNothing);
+    expect(find.text('Copy invite link'), findsNothing);
   });
 
   testWidgets('mints an invite and shows the one-time token once', (
@@ -230,11 +231,12 @@ void main() {
       expect(find.text('Invite link copied to clipboard.'), findsOneWidget);
 
       // Clear the first snackbar so the queued token snackbar can surface
-      // (ScaffoldMessenger queues rather than stacks).
+      // (ScaffoldMessenger queues rather than stacks); settle so the exit
+      // animation completes before the second tap.
       tester
           .state<ScaffoldMessengerState>(find.byType(ScaffoldMessenger))
           .clearSnackBars();
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       // The bare-token copy is untouched (regression): same seam, bare token.
       await tester.tap(find.text('Copy token'));
