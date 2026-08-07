@@ -21,6 +21,7 @@ class RoleCapability extends Equatable {
     required this.canViewMatters,
     required this.canViewDocuments,
     required this.canViewMessages,
+    required this.canViewFiles,
   });
 
   final bool canViewHome;
@@ -54,6 +55,12 @@ class RoleCapability extends Equatable {
   /// is synthetic (D-MSG1/D-MSG2).
   final bool canViewMessages;
 
+  /// Storage slice (D-STR7): whether the matter details surface offers the
+  /// per-matter Files section. A navigation/visibility hint only, like the
+  /// other flags — files are read-only, metadata-only, and the list is
+  /// synthetic in env-less runs (D-STR3/D-STR9).
+  final bool canViewFiles;
+
   @override
   List<Object?> get props => <Object?>[
     canViewHome,
@@ -63,6 +70,7 @@ class RoleCapability extends Equatable {
     canViewMatters,
     canViewDocuments,
     canViewMessages,
+    canViewFiles,
   ];
 }
 
@@ -76,6 +84,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewMatters: true,
         canViewDocuments: true,
         canViewMessages: true,
+        canViewFiles: true,
       ),
       UserRole.attorney: RoleCapability(
         canViewHome: true,
@@ -85,6 +94,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewMatters: true,
         canViewDocuments: true,
         canViewMessages: true,
+        canViewFiles: true,
       ),
       UserRole.partner: RoleCapability(
         canViewHome: true,
@@ -94,6 +104,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewMatters: true,
         canViewDocuments: true,
         canViewMessages: true,
+        canViewFiles: true,
       ),
       UserRole.complianceOfficer: RoleCapability(
         canViewHome: true,
@@ -103,6 +114,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewMatters: true,
         canViewDocuments: true,
         canViewMessages: true,
+        canViewFiles: true,
       ),
       UserRole.researchAnalyst: RoleCapability(
         canViewHome: true,
@@ -112,6 +124,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewMatters: true,
         canViewDocuments: true,
         canViewMessages: true,
+        canViewFiles: true,
       ),
       UserRole.admin: RoleCapability(
         canViewHome: true,
@@ -121,5 +134,6 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewMatters: true,
         canViewDocuments: true,
         canViewMessages: true,
+        canViewFiles: true,
       ),
     };

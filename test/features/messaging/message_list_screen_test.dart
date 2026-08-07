@@ -180,6 +180,7 @@ void main() {
               canViewMatters: false,
               canViewDocuments: true,
               canViewMessages: true,
+              canViewFiles: true,
             ),
           );
 

@@ -37,6 +37,9 @@ import '../data/orgs/supabase_membership_repository.dart';
 import '../data/orgs/supabase_org_api.dart';
 import '../data/orgs/supabase_org_api_impl.dart';
 import '../data/orgs/supabase_organization_gateway.dart';
+import '../data/storage/supabase_storage_api.dart';
+import '../data/storage/supabase_storage_api_impl.dart';
+import '../data/storage/supabase_storage_gateway.dart';
 import '../features/auth/data/fake_password_recovery_gateway.dart';
 import '../features/auth/data/fake_sign_up_gateway.dart';
 import '../features/auth/data/supabase_password_recovery_gateway.dart';
@@ -59,6 +62,8 @@ import '../features/notifications/data/in_memory_notification_prefs_store.dart';
 import '../features/notifications/data/shared_preferences_notification_prefs_store.dart';
 import '../features/notifications/domain/notification_prefs_store.dart';
 import '../features/orgs/presentation/active_org_store.dart';
+import '../features/storage/data/fake_storage_gateway.dart';
+import '../features/storage/domain/storage_gateway.dart';
 import 'deep_link/pending_accept_invite_store.dart';
 import 'localization/locale_cubit.dart';
 
@@ -89,6 +94,7 @@ void configureDependencies({
   SupabaseMatterApi Function()? supabaseMatterApiFactory,
   SupabaseDocumentApi Function()? supabaseDocumentApiFactory,
   SupabaseMessageApi Function()? supabaseMessageApiFactory,
+  SupabaseStorageApi Function()? supabaseStorageApiFactory,
 }) {
   // Lazy singleton: stateless service, created on first resolution.
   // Per §4.5, stateless services/repositories register as lazy singletons.
@@ -359,6 +365,27 @@ void configureDependencies({
     } else {
       serviceLocator.registerLazySingleton<MessageGateway>(
         FakeMessageGateway.new,
+      );
+    }
+  }
+  if (!serviceLocator.isRegistered<StorageGateway>()) {
+    // Stateless service: lazy singleton. The storage Cubit is feature-scoped
+    // and created per section via BlocProvider, so it is NOT registered here.
+    // Like MessageGateway, the flip swaps the dev fake for the
+    // Supabase-backed implementation when the build is configured (Batch 3.3
+    // env pattern). The real path reads the applied `files` table through
+    // the RLS-scoped SELECT (plan D-STR1/D-STR7) and resolves matterRef via
+    // the embedded matters(title) select (D-STR5); env-less runs and ALL
+    // tests keep the fake.
+    if (env.isConfigured) {
+      serviceLocator.registerLazySingleton<StorageGateway>(
+        () => SupabaseStorageGateway(
+          (supabaseStorageApiFactory ?? SupabaseStorageApiImpl.bind)(),
+        ),
+      );
+    } else {
+      serviceLocator.registerLazySingleton<StorageGateway>(
+        FakeStorageGateway.new,
       );
     }
   }

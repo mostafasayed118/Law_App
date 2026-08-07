@@ -870,4 +870,13 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get matterWorkspaceMessagesEmpty =>
       'لا توجد محادثات متاحة لهذه القضية.';
+
+  @override
+  String get matterWorkspaceFilesTitle => 'الملفات';
+
+  @override
+  String get matterWorkspaceFilesEmpty => 'لا توجد ملفات متاحة لهذه القضية.';
+
+  @override
+  String get filesError => 'تعذّر تحميل الملفات.';
 }

@@ -26,6 +26,7 @@ void main() {
         canViewMatters: true,
         canViewDocuments: true,
         canViewMessages: true,
+        canViewFiles: true,
       );
       const RoleCapability b = RoleCapability(
         canViewHome: true,
@@ -35,6 +36,7 @@ void main() {
         canViewMatters: true,
         canViewDocuments: true,
         canViewMessages: true,
+        canViewFiles: true,
       );
       const RoleCapability c = RoleCapability(
         canViewHome: true,
@@ -44,6 +46,7 @@ void main() {
         canViewMatters: false,
         canViewDocuments: false,
         canViewMessages: false,
+        canViewFiles: false,
       );
 
       expect(a, equals(b));
@@ -83,6 +86,10 @@ void main() {
           // Phase 9 (D-MSG5): the messaging entry is visible to every
           // bootstrap role — navigation hint only, never authorization.
           expect(cap.canViewMessages, isTrue, reason: 'role $role');
+          // Storage slice (D-STR7): the per-matter Files section is visible
+          // to every bootstrap role — navigation hint only, never
+          // authorization (the RLS gate is server-side).
+          expect(cap.canViewFiles, isTrue, reason: 'role $role');
         }
       },
     );

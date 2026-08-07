@@ -295,5 +295,8 @@
   "matterWorkspaceDocumentsTitle": "Documents",
   "matterWorkspaceDocumentsEmpty": "No documents are available for this matter.",
   "matterWorkspaceMessagesTitle": "Messages",
-  "matterWorkspaceMessagesEmpty": "No message threads are available for this matter."
+  "matterWorkspaceMessagesEmpty": "No message threads are available for this matter.",
+  "matterWorkspaceFilesTitle": "Files",
+  "matterWorkspaceFilesEmpty": "No files are available for this matter.",
+  "filesError": "Unable to load files."
 }

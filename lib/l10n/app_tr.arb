@@ -281,5 +281,8 @@
   "matterWorkspaceDocumentsTitle": "Belgeler",
   "matterWorkspaceDocumentsEmpty": "Bu dava için kullanılabilir belge yok.",
   "matterWorkspaceMessagesTitle": "Mesajlar",
-  "matterWorkspaceMessagesEmpty": "Bu dava için kullanılabilir mesaj dizisi yok."
+  "matterWorkspaceMessagesEmpty": "Bu dava için kullanılabilir mesaj dizisi yok.",
+  "matterWorkspaceFilesTitle": "Dosyalar",
+  "matterWorkspaceFilesEmpty": "Bu dava için kullanılabilir dosya yok.",
+  "filesError": "Dosyalar yüklenemedi."
 }

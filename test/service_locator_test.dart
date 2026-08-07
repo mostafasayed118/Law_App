@@ -33,6 +33,8 @@ import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/data/orgs/supabase_membership_repository.dart';
 import 'package:legalhub/data/orgs/supabase_org_api.dart';
 import 'package:legalhub/data/orgs/supabase_organization_gateway.dart';
+import 'package:legalhub/data/storage/supabase_storage_api.dart';
+import 'package:legalhub/data/storage/supabase_storage_gateway.dart';
 import 'package:legalhub/features/auth/data/fake_password_recovery_gateway.dart';
 import 'package:legalhub/features/auth/data/fake_sign_up_gateway.dart';
 import 'package:legalhub/features/auth/data/supabase_password_recovery_gateway.dart';
@@ -51,6 +53,8 @@ import 'package:legalhub/features/matters/domain/matter_gateway.dart';
 import 'package:legalhub/features/messaging/data/fake_message_gateway.dart';
 import 'package:legalhub/features/messaging/domain/message_gateway.dart';
 import 'package:legalhub/features/orgs/presentation/active_org_store.dart';
+import 'package:legalhub/features/storage/data/fake_storage_gateway.dart';
+import 'package:legalhub/features/storage/domain/storage_gateway.dart';
 
 /// Hand-rolled fake of the [SupabaseAuthApi] seam for the DI flip test.
 /// The real `SupabaseAuthApiImpl.bind()` needs a running `Supabase.instance`,
@@ -214,6 +218,14 @@ class _FakeSupabaseMessageApi implements SupabaseMessageApi {
       <Map<String, dynamic>>[];
 }
 
+/// Hand-rolled fake of the [SupabaseStorageApi] seam for the DI flip test
+/// (same discipline as [_FakeSupabaseMessageApi]).
+class _FakeSupabaseStorageApi implements SupabaseStorageApi {
+  @override
+  Future<List<Map<String, dynamic>>> fetchFiles() async =>
+      <Map<String, dynamic>>[];
+}
+
 /// Builds a JWT-shaped string whose payload carries the given role claim.
 /// Matches the base64url convention used by the supabase adapter tests.
 String _jwtWithRole(String role) {
@@ -293,6 +305,7 @@ void main() {
       expect(serviceLocator.isRegistered<MatterGateway>(), isTrue);
       expect(serviceLocator.isRegistered<DocumentGateway>(), isTrue);
       expect(serviceLocator.isRegistered<MessageGateway>(), isTrue);
+      expect(serviceLocator.isRegistered<StorageGateway>(), isTrue);
       expect(serviceLocator.isRegistered<AuthCubit>(), isTrue);
     });
 
@@ -467,6 +480,29 @@ void main() {
       );
 
       expect(serviceLocator<MessageGateway>(), isA<SupabaseMessageGateway>());
+    });
+
+    test('wires the storage gateway to the fake dev implementation', () {
+      configureDependencies();
+
+      // D-STR7: same boundary discipline as the message/document gateways —
+      // the dev fake is the registered seam; the env-gated real swap (plan
+      // T7) only takes over in configured builds.
+      expect(serviceLocator<StorageGateway>(), isA<FakeStorageGateway>());
+    });
+
+    test('flips StorageGateway when env carries an anon key (plan T7)', () {
+      configureDependencies(
+        supabaseEnv: SupabaseEnv(
+          url: 'https://example.supabase.co',
+          anonKey: _anonJwt(),
+        ),
+        // The real bind() needs a running Supabase.instance; tests inject
+        // the seam instead (the flip's test seam, not production code).
+        supabaseStorageApiFactory: _FakeSupabaseStorageApi.new,
+      );
+
+      expect(serviceLocator<StorageGateway>(), isA<SupabaseStorageGateway>());
     });
 
     test('wires the booking gateway to the fake dev implementation', () {

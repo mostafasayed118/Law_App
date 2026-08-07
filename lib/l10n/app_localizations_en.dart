@@ -875,4 +875,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get matterWorkspaceMessagesEmpty =>
       'No message threads are available for this matter.';
+
+  @override
+  String get matterWorkspaceFilesTitle => 'Files';
+
+  @override
+  String get matterWorkspaceFilesEmpty =>
+      'No files are available for this matter.';
+
+  @override
+  String get filesError => 'Unable to load files.';
 }

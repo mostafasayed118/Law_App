@@ -12,6 +12,7 @@ import '../domain/matter.dart';
 import '../domain/matter_gateway.dart';
 import 'matter_cubit.dart';
 import 'matter_documents_section.dart';
+import 'matter_files_section.dart';
 import 'matter_labels.dart';
 import 'matter_messages_section.dart';
 import 'matter_state.dart';
@@ -193,6 +194,15 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
           ),
           const SizedBox(height: LegalHubTheme.spaceSm),
           MatterDocumentsSection(matterRef: matter.title),
+          const SizedBox(height: LegalHubTheme.spaceXl),
+        ],
+        if (widget.capabilities.canViewFiles) ...<Widget>[
+          Text(
+            l10n.matterWorkspaceFilesTitle,
+            style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: LegalHubTheme.spaceSm),
+          MatterFilesSection(matterRef: matter.title),
           const SizedBox(height: LegalHubTheme.spaceXl),
         ],
         if (widget.capabilities.canViewMessages) ...<Widget>[

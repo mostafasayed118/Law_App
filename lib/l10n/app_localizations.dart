@@ -1707,6 +1707,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No message threads are available for this matter.'**
   String get matterWorkspaceMessagesEmpty;
+
+  /// No description provided for @matterWorkspaceFilesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Files'**
+  String get matterWorkspaceFilesTitle;
+
+  /// No description provided for @matterWorkspaceFilesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No files are available for this matter.'**
+  String get matterWorkspaceFilesEmpty;
+
+  /// No description provided for @filesError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load files.'**
+  String get filesError;
 }
 
 class _AppLocalizationsDelegate

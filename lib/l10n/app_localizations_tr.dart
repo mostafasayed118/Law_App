@@ -876,4 +876,14 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get matterWorkspaceMessagesEmpty =>
       'Bu dava için kullanılabilir mesaj dizisi yok.';
+
+  @override
+  String get matterWorkspaceFilesTitle => 'Dosyalar';
+
+  @override
+  String get matterWorkspaceFilesEmpty =>
+      'Bu dava için kullanılabilir dosya yok.';
+
+  @override
+  String get filesError => 'Dosyalar yüklenemedi.';
 }

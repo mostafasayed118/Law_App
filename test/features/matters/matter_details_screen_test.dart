@@ -13,6 +13,8 @@ import 'package:legalhub/features/matters/domain/matter_gateway.dart';
 import 'package:legalhub/features/matters/presentation/matter_details_screen.dart';
 import 'package:legalhub/features/messaging/domain/message_gateway.dart';
 import 'package:legalhub/features/messaging/domain/message_thread.dart';
+import 'package:legalhub/features/storage/domain/file_metadata.dart';
+import 'package:legalhub/features/storage/domain/storage_gateway.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
 void main() {
@@ -103,20 +105,28 @@ void main() {
     });
 
     testWidgets(
-      'workspace sections render only this matter’s documents and threads '
-      '(Phase 10 AC-1)',
+      'workspace sections render only this matter’s documents, files, and '
+      'threads (Phase 10 AC-1; storage D-STR7)',
       (tester) async {
         await pumpDetails(tester, 'matter-1');
 
         // Section headers render (D-W1).
         expect(find.text('Documents'), findsOneWidget);
+        expect(find.text('Files'), findsOneWidget);
         expect(find.text('Messages'), findsOneWidget);
 
-        // matter-1 owns doc-1 + thread-1 only — the per-matter filter is a
-        // client-side view over the fake lists (D-M5/D-W1/D-W2).
+        // matter-1 owns doc-1 + file-1 + thread-1 only — the per-matter
+        // filter is a client-side view over the fake lists
+        // (D-M5/D-W1/D-W2/D-STR5).
         expect(find.text('Demo engagement letter'), findsOneWidget);
+        expect(find.text('Demo retainer scan'), findsOneWidget);
+        // The file row's secondary line is the byte-size label (245760 bytes
+        // → exactly '240 KB') — the KB branch of the formatter, pinned
+        // through the widget (D-STR3 metadata surface).
+        expect(find.text('240 KB'), findsOneWidget);
         expect(find.text('Demo matter updates'), findsOneWidget);
         expect(find.text('Sample matter brief — demo'), findsNothing);
+        expect(find.text('Demo lease annex'), findsNothing);
         expect(find.text('Consultation follow-up — demo'), findsNothing);
       },
     );
@@ -153,6 +163,9 @@ void main() {
       serviceLocator.registerLazySingleton<MessageGateway>(
         _EmptyMessageGateway.new,
       );
+      serviceLocator.registerLazySingleton<StorageGateway>(
+        _EmptyStorageGateway.new,
+      );
 
       await pumpDetails(tester, 'matter-1');
 
@@ -161,10 +174,15 @@ void main() {
         findsOneWidget,
       );
       expect(
+        find.text('No files are available for this matter.'),
+        findsOneWidget,
+      );
+      expect(
         find.text('No message threads are available for this matter.'),
         findsOneWidget,
       );
       expect(find.text('Demo engagement letter'), findsNothing);
+      expect(find.text('Demo retainer scan'), findsNothing);
       expect(find.text('Demo matter updates'), findsNothing);
     });
 
@@ -191,15 +209,17 @@ void main() {
                 canViewMatters: true,
                 canViewDocuments: false,
                 canViewMessages: false,
+                canViewFiles: false,
               ),
             ),
           ),
         );
         await tester.pumpAndSettle();
 
-        // Both sections are hidden when their capability flags are not
+        // All three sections are hidden when their capability flags are not
         // granted (nav hints only, D-W5); the projection still renders.
         expect(find.text('Documents'), findsNothing);
+        expect(find.text('Files'), findsNothing);
         expect(find.text('Messages'), findsNothing);
         expect(find.text('Demo acquisition review'), findsOneWidget);
       },
@@ -243,6 +263,14 @@ class _EmptyMessageGateway implements MessageGateway {
   @override
   Future<Result<List<MessageThread>>> fetchThreads() async {
     return Result<List<MessageThread>>.success(const <MessageThread>[]);
+  }
+}
+
+/// Gateway stub that yields an empty file list (workspace empty pin).
+class _EmptyStorageGateway implements StorageGateway {
+  @override
+  Future<Result<List<FileMetadata>>> fetchFiles() async {
+    return Result<List<FileMetadata>>.success(const <FileMetadata>[]);
   }
 }
 
