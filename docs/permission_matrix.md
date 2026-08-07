@@ -273,6 +273,69 @@ there.
 > the apply execution 2026-08-07 (`a14650d`)**, and the client surface
 > (plan T7) ships next.
 
+> **§4 addendum (2026-08-08, real-storage read slice — plan
+> `docs/storage_real_data_plan_2026-08-08.md`, fourth §14 un-deferral):**
+> a **new "View a matter file (metadata)" row is added** — the **client /
+> attorney cells SHIP**, granted server-side by `files_select_assigned`
+> (`supabase/policies/files.sql`) on the `public.files` metadata table and
+> by `files_storage_select` (`supabase/policies/storage_objects.sql`) on
+> `storage.objects` (the private `matter-files` bucket — the byte-level
+> read), policy-tested by `supabase/tests/07_storage_rls.sql` (22 check
+> blocks; static battery `--check` **331/0/0**; the live battery is the
+> r1 rehearsal, ⏳ evidence pending). The grant is exactly: an **active
+> member of the file's org** who is the assigned **client** or the assigned
+> **attorney** on the file's matter — files are **matter-scoped content**
+> (line 143/148; §6 storage rows). Deny rows now each have a battery
+> check, on **BOTH layers** (`public.files` metadata + `storage.objects`
+> bytes, path-encoded `{org}/{matter}/{filename}`):
+> - **org role alone** (no matter assignment) → deny, every role;
+> - **org-mismatch** (file row org ≠ its matter's org; object **path org
+>   segment** ≠ its matter's org) → deny, every role — the load-bearing
+>   D-STR2 clause (a file/object is never readable when its matter is
+>   not, line 143/148), NON-VACUOUS on both layers (07.01 counts prove an
+>   assigned reader reads org-a files/objects generally, so the 07.05
+>   deny is the clause);
+> - **cross-org** (assigned on an org-a matter, org-b member only) → deny;
+> - **suspended membership** in the file's org → deny — the
+>   `is_active_member` arm is load-bearing on the objects layer too
+>   (fixture matter 6 assigns `suspended-a`; without it the bytes would
+>   leak);
+> - **unauthenticated** → deny (files: no grant; objects: RLS-0, either
+>   storage-schema posture accepted);
+> - **`platform_owner_admin`** → deny, always (owner accounts are never
+>   assigned — an operational invariant, not a policy guarantee; recorded
+>   residual in `docs/storage_rls_gate_review_2026-08-08.md` Q4).
+> The battery also pins the schema contract + teardown safety: the
+> `size_bytes` CHECK rejects a negative size and the matter-delete FK
+> cascade removes a matter's files rows (07.10/07.11), and the **matrix §6
+> "Download a private object via a guessed path" row is now enforced** —
+> the guessed-path object (unknown matter id) is denied for every role,
+> non-vacuous (07.12). **Not granted by this addendum:** the partner /
+> `compliance_officer` "deny unless separately assigned" cells stay
+> **ungranted** (the oversight mechanism is undefined, D-STR6 — future
+> work, mirroring D-MR5/D-DR5/D-MSR5); **the "Read a document/message
+> body" row keeps its §14 deferral** — `public.files` is metadata-only,
+> **no content/body/url column exists** (D-STR3; bytes live only in
+> `storage.objects`), and the forward pin now narrows to `('messages')`
+> (file storage shipped as the fourth un-deferral; individual message
+> rows/bodies still deferred). **Basis:** §14 gate-lift (P0 closure
+> RATIFIED + policy battery shipped) + three shipped precedents · RLS-gate
+> review (`6f52930` + nits `0d7bdca`) · artifacts (`87b6ef5` + `0bc21ed`)
+> · battery + harness (`47150be` + `83b406c`, static `--check` 331/0/0) ·
+> r1 **⏳ PENDING** (owner asserts PASSED on the Docker host; the evidence
+> record `docs/storage_rehearsal_evidence_r1_2026-08-08.md` is not yet
+> filled — no observed output in the repo) · apply-approval **APPLY
+> APPROVED 2026-08-08** (`docs/storage_apply_approval_2026-08-08.md`
+> `91c49ce`; §6 dated sign-off) · apply execution **⏳ HELD** (per §4.1 +
+> rollback_plan §2, on the r1 evidence; the read-only baseline is verified:
+> files 0 · bucket 0 · public policies 8→9 · storage policies 0→1 · the
+> four demo matter ids resolve under org `ef43087b-adf4-4480-9bb2-28c26f46ec71`
+> · `storage.buckets.type` NOT NULL **with default** — the bare
+> `(id, name, public)` insert is valid · `storage.foldername` present).
+> Per §7 this extends, not replaces, and widens no other row; **takes
+> effect on the apply execution (pending)** — the client surface (plan
+> T7, env-gated, D-STR7) ships only after the apply lands.
+
 ---
 
 ## 5. `platform_owner_admin` — explicit boundary (contract §2 #2, #4)
@@ -337,6 +400,32 @@ this is the row's own worst-case test and must exist before P2 ships.
 | Realtime subscription for an org/matter the session no longer has access to | No events delivered |
 | Membership or sensitive-access change | Produces an attributable, redacted audit record (no credentials/content) |
 | Read the audit table | Scope-checked per reader's role; audit table is never publicly readable, and `platform_owner_admin` reading it is itself an audited action |
+
+> **§6 addendum (2026-08-08, real-storage read slice — plan
+> `docs/storage_real_data_plan_2026-08-08.md`, fourth §14 un-deferral):**
+> the first two rows of this block are **enforced by the committed
+> policies + battery (effective on the apply execution — pending)** — the
+> P2 r4 Q4 deferral's "zero buckets" posture is superseded by this slice,
+> not deferred recordings:
+> - **"Download a private object via a guessed path → Denied"** is
+>   enforced by `files_storage_select` on `storage.objects` (the
+>   path-org/matter gate; a guessed/mismatched path denies for every role
+>   — battery 07.12, non-vacuous) **and** by `files_select_assigned` on
+>   the metadata table — the storage rows now have positive + negative
+>   tests (contract §9).
+> - **"Reuse a stale signed URL after membership removal → Denied"** is
+>   enforced **at generation**: the storage API's signed-URL creation is
+>   itself RLS-gated (a removed member cannot mint one), and issued URLs
+>   are TTL-bound — **recorded honestly as such, not as instant
+>   mid-flight revocation** (an already-issued signed URL stays valid
+>   until its TTL expires; the mechanism is documented in
+>   `docs/storage_rls_gate_review_2026-08-08.md` D-STR4/§4 — recorded
+>   there as a future-facing negative (the P2 r4 Q4-deferral convention),
+>   not asserted as a battery check row).
+> The remaining §6 rows (realtime delivery, audit) are unchanged. Per §7
+> this extends, not replaces, and widens no other row; in effect on the
+> apply execution (pending — r1 evidence ⏳, apply ⏳ HELD, approval ✅
+> APPLY APPROVED 2026-08-08 `91c49ce`).
 
 ---
 

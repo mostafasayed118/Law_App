@@ -83,7 +83,7 @@ guessed path → Denied", "Reuse a stale signed URL after membership removal
   branch + six documents + six threads; the storage battery reuses the six
   matters — no new identity fixtures needed, only file/object rows.
 
-## 3. Design decisions (D-STR1…D-STR9 — recommended; OPEN for owner ratification)
+## 3. Design decisions (D-STR1…D-STR9 — ratified by autonomy 2026-08-08, recommended path per the pair-programming grant; the RLS-gate review `docs/storage_rls_gate_review_2026-08-08.md` answers Q1–Q6 on these)
 
 | # | Decision | Recommendation | Why / alternative |
 |---|---|---|---|
@@ -260,27 +260,37 @@ Each task is independently committable with the stated verification; the
 apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
 **no dev-project change until T5**.
 
-- [ ] **1. Scope note + RLS-gate design addendum** — touches: this document
+- [x] **1. Scope note + RLS-gate design addendum** — touches: this document
   + a `storage` §8-style review (`docs/storage_rls_gate_review_2026-08-08.md`,
   the Q1–Q6 pattern answered for storage: the two-layer mechanism (metadata
   table + storage.objects path policy, D-STR2), the bucket/object scoping
   (D-STR4), the guessed-path + signed-URL negatives (matrix §6), negative
   cases, rollback pairing, seed plan) — done when: docs committed, ledger
-  sweep green (no dev-project contact).
-- [ ] **2. Schema artifacts (rehearsal-ready, NOT applied)** — touches:
+  sweep green (no dev-project contact). — **DONE `6f52930`** (the review
+  doc on `feat/storage-real-read`; the plan itself was drafted + D-STR
+  ratified on `main` `cc33da3`/`bad9641`).
+- [x] **2. Schema artifacts (rehearsal-ready, NOT applied)** — touches:
   `supabase/migrations/07_storage.sql` (+ `07_storage.down.sql`),
   `supabase/policies/files.sql` + `supabase/policies/storage_objects.sql`
   — done when: DDL matches D-STR1/D-STR3/D-STR4 (private `matter-files`
-  bucket via idempotent insert; `public.files` with matter FK + org column
+  bucket via idempotent insert — **bucket column list verified against the
+  dev project's storage schema, `owner` omitted if absent**; `public.files`
+  with matter FK + org column
   + `size_bytes` CHECK + `storage_path`, metadata only, no content
   column; `files_select_assigned` + `files_storage_select` policies),
   `_down.sql` is a clean inverse (drop files + bucket), committed.
-- [ ] **3. Policy battery** — touches: `supabase/tests/07_storage_rls.sql`
+  — **DONE `87b6ef5`** (bucket insert `(id, name, public)` verified live
+  via the read-only probe — `owner` deprecated, omitted; NOT applied at
+  commit; applied later under the T5 approval).
+- [x] **3. Policy battery** — touches: `supabase/tests/07_storage_rls.sql`
   (new file + object fixture rows referencing the six fixture matters go in
   `supabase/tests/00_fixtures.sql`, the documents/messages precedent —
   including the reset-ordering `delete from public.files;` +
   `delete from storage.objects where bucket_id = 'matter-files';` before
-  matters, and the 6-file/6-object sanity pins) + `scripts/verify_policy_tests.sh`
+  matters, the 6-file/6-object sanity pins, **and fixture object inserts
+  respecting `storage.objects`' NOT NULL/generated columns — `path_tokens`
+  is generated (cannot be inserted), `bucket_id`/`name`/`metadata` are
+  required**) + `scripts/verify_policy_tests.sh`
   — **four sites**: battery file list, run loop, UUID cross-ref scan,
   FAIL-marker scan — **plus the `--apply` order gains `07_storage.sql`**,
   the structural pins re-scope (9→10 public tables / 8→9 public policies
@@ -291,7 +301,14 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   narrowed to `('messages')`), **and the harness header + D-P0C1(b)
   forward-pin comments** ("all nine" → "all ten"; "individual
   messages/files still absent" → "individual message rows/bodies still
-  absent; file storage shipped as the fourth un-deferral") — done when: static `--check` green
+  absent; file storage shipped as the fourth un-deferral")
+  — done when: static `--check` green and the battery runs green against a
+  Postgres-with-storage (owner's Docker `supabase start` host or CI) with
+  the §4/§6 deny rows incl. the non-vacuous org-mismatch + guessed-path
+  rows; committed. — **DONE `47150be`** (static `--check` **331/0/0**;
+  the live battery runs in T4 (r1 PASSED); the anon-posture probe
+  (platform SELECT grants on storage.objects to anon + authenticated)
+  recorded in the battery header + harness 1g). — done when: static `--check` green
   and the battery runs green against a Postgres-with-storage (owner's
   Docker `supabase start` host or CI) with the §4/§6 deny rows incl. the
   non-vacuous org-mismatch + guessed-path rows; committed.
