@@ -118,6 +118,9 @@ this battery hardens that pattern into a committed artifact.
 | `tests/01_identity_session.sql` | Matrix §2 rows: own-profile SELECT/UPDATE positive + negative, D-T6 pair (partner raw profile read → 0 rows), `list_org_members_metadata` positive (roster + pending invites, no token material) + non-partner/cross-org/suspended/owner negatives, orphan-membership fallback pair, anon denials |
 | `tests/02_organization_membership.sql` | Matrix §3 rows: roster positives + cross-org/suspended negatives, invite/resend/revoke/change-role/suspend/reactivate/remove positives (in-transaction, rolled back) + non-partner/cross-org negatives, the 2026-08-03 hardening guards (last-partner lockout, existing-member invite refusal, self-removal refusal), `create_organization`, and the owner-denied-on-partner-RPC rows |
 | `tests/03_platform_owner_boundary.sql` | Matrix §5 + D-P0C1(a) deny-rows (owner's direct surface = own profile only; audit/platform_config/helpers all denied; no partner/org RPC accepts the owner) + D-P0C3 single-account bound (privileged PK collision + client grant absence) + D-P0C4 audit RPC-only (self-audited reads, append-only, RPC-only grant absence) |
+| `tests/04_matter_rls.sql` | Matrix §4 matter rows — the first §14 un-deferral (assigned client/attorney positives + org-role-alone / cross-org / suspended / owner / anon denies + the practice_area CHECK + org-delete cascade) |
+| `tests/05_document_rls.sql` | Matrix §4 document rows — the second §14 un-deferral (matter-scoped assignment positives + org-role-alone / org-mismatch / cross-org / suspended / owner / anon denies + the document_type CHECK + matter-delete cascade) |
+| `tests/06_message_rls.sql` | Matrix §4 message rows — the third §14 un-deferral (matter-scoped assignment positives + org-role-alone / org-mismatch / cross-org / suspended / owner / anon denies + the message_count CHECK + matter-delete cascade) |
 
 ### Running the battery
 
@@ -136,11 +139,13 @@ SUPABASE_TEST_DB_URL=postgresql://postgres:***@host:5432/postgres scripts/verify
 scripts/verify_policy_tests.sh --check        # static validation, no database
 ```
 
-- `--apply` applies `migrations/01`, `02`, `policies/*.sql`, `rpc/*.sql` in
-  the apply order above. **`03_platform_config_seed.sql` is NOT applied**:
-  its owner token is an apply-time substitution placeholder for the dev
-  project; the battery seeds its own fixture owner row and proves the
-  single-account bound (D-P0C3) instead.
+- `--apply` applies `migrations/01`, `02`, `04_matters.sql`,
+  `05_documents.sql`, `06_message_threads.sql` (the three §14 un-deferral
+  slices), `policies/*.sql`, `rpc/*.sql` in the apply order above.
+  **`03_platform_config_seed.sql` is NOT applied**: its owner token is an
+  apply-time substitution placeholder for the dev project; the battery seeds
+  its own fixture owner row and proves the single-account bound (D-P0C3)
+  instead.
 - The battery exercises every matrix §2/§3/§5 row with ≥1 positive + ≥1
   negative check (contract §9), plus the D-P0C1(a) deny-rows and the
   D-P0C4 audit pins.
@@ -148,8 +153,9 @@ scripts/verify_policy_tests.sh --check        # static validation, no database
   (signup/sign-in/reset, GoTrue email triggers) stay out of SQL rehearsal
   scope per the P2 r5 methodology; storage/realtime buckets remain Q4
   deferrals. The D-P0C1(b) content-table forward pin is asserted
-  structurally (no matter/document/message tables exist) and enforced at
-  schema-review time per the matrix §5 addendum.
+  structurally (matters, documents + message_threads exist as the first
+  three §14 un-deferrals; individual message rows/bodies + files are still
+  absent) and enforced at schema-review time per the matrix §5 addendum.
 - Record the run as rehearsal evidence (the P0C.3 close decision consumes
   it), then delete the throwaway project.
 

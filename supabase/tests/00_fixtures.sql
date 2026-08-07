@@ -26,6 +26,7 @@
 -- ============================================================================
 
 -- ---- 0. Reset (dependency-safe delete order: children before parents) ----
+delete from public.message_threads;
 delete from public.documents;
 delete from public.matters;
 delete from public.memberships;
@@ -196,5 +197,45 @@ begin
   select count(*) into v_cnt from public.documents;
   if v_cnt <> 6 then
     raise exception 'FIXTURE ERROR: documents must hold 6 rows, got %', v_cnt;
+  end if;
+end $$;
+
+-- ---- 9. Message threads (real-messages slice — the 06_message_rls.sql battery) ------
+-- Six threads, each referencing one of the six fixture matters (the
+-- assignment source of truth) — exercising every policy branch of
+-- message_threads_select_assigned (docs/messages_rls_gate_review_2026-08-07.md
+-- §4): the counts the battery asserts are client-a (assigned on matters 1,2)
+-- sees the threads on matters 1,2 = 2; partner-a (assigned attorney on matters
+-- 1,2,3) sees 3; orphan (matter 4) sees 1. Participants are GENERIC demo
+-- display names only (D-MSR3/D-MSG4) — never an identity/availability claim,
+-- no real PII by convention; message_count is the client
+-- MessageThread.messageCount mapping contract.
+insert into public.message_threads
+  (id, organization_id, matter_id, title, participants, message_count, created_at, updated_at)
+values
+  ('60000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000001', 'Thread 1', '{Demo client,Demo attorney}', 1, now(), now()),
+  ('60000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000002', 'Thread 2', '{Demo client,Demo attorney}', 2, now(), now()),
+  ('60000000-0000-4000-8000-000000000003', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000003', 'Thread 3', '{Demo attorney}',             3, now(), now()),
+  ('60000000-0000-4000-8000-000000000004', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000004', 'Thread 4', '{Demo client}',                4, now(), now()),
+  ('60000000-0000-4000-8000-000000000005', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000005', 'Thread 5', '{Demo partner}',               5, now(), now()),
+  ('60000000-0000-4000-8000-000000000006', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000006', 'Thread 6', '{Demo counsel}',               6, now(), now());
+
+-- Reserved throwaway ids used by 06_message_rls.sql (deliberately NEVER
+-- seeded): 60000000-0000-4000-8000-00000000ffff (the message_count
+-- CHECK-violation insert — fails before any row exists) and the org-mismatch
+-- pair 40000000-0000-4000-8000-00000000fffd (temp org-b matter) +
+-- 60000000-0000-4000-8000-00000000fffe (its org-mismatched thread). Listed
+-- here so the harness's static fixture cross-ref resolves them.
+
+-- Sanity: exactly six threads seeded (the 06 count expectations depend on
+-- it; the org-mismatch temp rows are rolled back inside the battery and
+-- never reach the seeded baseline).
+do $$
+declare
+  v_cnt bigint;
+begin
+  select count(*) into v_cnt from public.message_threads;
+  if v_cnt <> 6 then
+    raise exception 'FIXTURE ERROR: message_threads must hold 6 rows, got %', v_cnt;
   end if;
 end $$;
