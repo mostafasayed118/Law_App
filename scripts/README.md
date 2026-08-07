@@ -3,7 +3,7 @@
 | Script | What it verifies | When to run |
 |---|---|---|
 | `verify_ledger.sh` | Governance-ledger integrity (below) | **Before committing any `docs/` amendment** that touches the audit plan or Gate 3 reconciliation; wired into CI as a cheap static gate (`ci.yml` on every push/PR) plus a **nightly teeth-prover** (`ledger-selftest.yml`, 02:00 UTC + `workflow_dispatch`) |
-| `verify_policy_tests.sh` | P0-closure policy battery (below) | Against an **ephemeral rehearsal project only**, before any P0-close decision; `--check` is static and runs anywhere |
+| `verify_policy_tests.sh` | P0-closure policy battery (below) | Against an **ephemeral rehearsal project only**, before any P0-close decision; `--check` is static and runs anywhere, and is wired into `ci.yml` as a DB-free gate on every push/PR |
 
 ## `verify_ledger.sh`
 
@@ -168,6 +168,12 @@ read-only owner sweep.
 - **`ci.yml`** runs `scripts/verify_ledger.sh` (the plain battery, no
   `--selftest`) on every push to `main` and PR targeting `main` — the
   committed-ledger gate on the exact pushed bytes.
+- **`ci.yml`** also runs `scripts/verify_policy_tests.sh --check` (the
+  DB-free static mode) on every push to `main` and PR targeting `main` —
+  the policy battery's structural gate on the exact pushed bytes (battery
+  file presence, fixture-UUID resolution, FAIL-marker coverage, harness
+  self-syntax). The **live** battery stays the owner-side ephemeral-rehearsal
+  gate: no database is provisioned in CI.
 - **`ledger-selftest.yml`** runs `scripts/verify_ledger.sh --selftest`
   nightly (02:00 UTC, default branch) and on demand via `workflow_dispatch`.
   It proves the battery still detects all six drift classes on the runner,

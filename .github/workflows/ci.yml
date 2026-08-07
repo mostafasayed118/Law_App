@@ -2,10 +2,15 @@
 # Bootstrap specification §7 (row B2) + §3.11: run `dart format` (check),
 # `flutter analyze`, and `flutter test` on pushes to main and pull requests
 # targeting main.
-# Plus a repo-local static gate (scripts/verify_ledger.sh, beyond B2): fails if
-# the governance ledger cites an unresolvable/dangling hash, misses a byte-exact
-# content marker, or drifts a recorded suite count. Needs only bash + git, so it
-# runs before the Flutter toolchain to fail fast.
+# Plus two repo-local static gates (beyond B2), each needing only bash + git
+# so they run before the Flutter toolchain to fail fast:
+#  - the governance ledger (scripts/verify_ledger.sh): fails if it cites an
+#    unresolvable/dangling hash, misses a byte-exact content marker, or drifts
+#    a recorded suite count;
+#  - the policy-battery static check (scripts/verify_policy_tests.sh --check,
+#    the P0C.1 gate's DB-free structural mode): battery file presence, every
+#    fixture UUID resolving in 00_fixtures.sql, every check block carrying the
+#    FAIL marker, harness self-syntax + doc hooks.
 # No build, deploy, publish, signing, or release steps are authorized at B2.
 name: CI
 
@@ -49,6 +54,16 @@ jobs:
         # drifted. No Flutter needed — kept before toolchain setup to fail
         # fast and cheap.
         run: bash scripts/verify_ledger.sh
+
+      - name: Verify policy battery (static --check)
+        # Static validation of the P0-closure policy battery (scripts/README.md
+        # — the P0C.1 gate, D-P0C2): battery file presence, every fixture UUID
+        # resolving in 00_fixtures.sql, every check block carrying the FAIL
+        # marker, and the harness self-syntax + doc hooks. DB-free (no database
+        # is provisioned in CI; the live battery stays the owner-side ephemeral
+        # rehearsal gate), so it runs before the toolchain to fail fast and
+        # cheap, like the ledger step above.
+        run: bash scripts/verify_policy_tests.sh --check
 
       # Pinned to the Flutter SDK version declared in pubspec.yaml (3.44.4,
       # which ships Dart 3.12.2). Keeping CI on the same toolchain as the
