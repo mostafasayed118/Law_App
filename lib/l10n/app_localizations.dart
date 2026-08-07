@@ -1012,6 +1012,18 @@ abstract class AppLocalizations {
   /// **'Token copied to clipboard.'**
   String get inviteTokenCopied;
 
+  /// No description provided for @inviteShareLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy invite link'**
+  String get inviteShareLink;
+
+  /// No description provided for @inviteShareLinkCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite link copied to clipboard.'**
+  String get inviteShareLinkCopied;
+
   /// No description provided for @actionResendInvitation.
   ///
   /// In en, this message translates to:

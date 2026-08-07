@@ -155,6 +155,8 @@
   "@inviteTokenBody": {"placeholders": {"email": {"type": "String"}}},
   "inviteTokenCopy": "Kodu kopyala",
   "inviteTokenCopied": "Kod panoya kopyalandı.",
+  "inviteShareLink": "Davet bağlantısını kopyala",
+  "inviteShareLinkCopied": "Davet bağlantısı panoya kopyalandı.",
   "actionResendInvitation": "Daveti yeniden gönder",
   "actionRevokeInvitation": "Daveti iptal et",
   "invitationRevoked": "Davet iptal edildi.",

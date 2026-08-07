@@ -498,6 +498,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get inviteTokenCopied => 'Kod panoya kopyalandı.';
 
   @override
+  String get inviteShareLink => 'Davet bağlantısını kopyala';
+
+  @override
+  String get inviteShareLinkCopied => 'Davet bağlantısı panoya kopyalandı.';
+
+  @override
   String get actionResendInvitation => 'Daveti yeniden gönder';
 
   @override

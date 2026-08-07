@@ -494,6 +494,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get inviteTokenCopied => 'تم نسخ الرمز إلى الحافظة.';
 
   @override
+  String get inviteShareLink => 'نسخ رابط الدعوة';
+
+  @override
+  String get inviteShareLinkCopied => 'تم نسخ رابط الدعوة إلى الحافظة.';
+
+  @override
   String get actionResendInvitation => 'إعادة إرسال الدعوة';
 
   @override

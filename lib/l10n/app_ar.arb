@@ -155,6 +155,8 @@
   "@inviteTokenBody": {"placeholders": {"email": {"type": "String"}}},
   "inviteTokenCopy": "نسخ الرمز",
   "inviteTokenCopied": "تم نسخ الرمز إلى الحافظة.",
+  "inviteShareLink": "نسخ رابط الدعوة",
+  "inviteShareLinkCopied": "تم نسخ رابط الدعوة إلى الحافظة.",
   "actionResendInvitation": "إعادة إرسال الدعوة",
   "actionRevokeInvitation": "إلغاء الدعوة",
   "invitationRevoked": "تم إلغاء الدعوة.",
