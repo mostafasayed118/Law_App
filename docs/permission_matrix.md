@@ -403,8 +403,10 @@ this is the row's own worst-case test and must exist before P2 ships.
 
 > **§6 addendum (2026-08-08, real-storage read slice — plan
 > `docs/storage_real_data_plan_2026-08-08.md`, fourth §14 un-deferral):**
-> the first two rows of this block are now **enforced** (the P2 r4 Q4
-> deferral — "zero buckets" — is consummated), not deferred recordings:
+> the first two rows of this block are **enforced by the committed
+> policies + battery (effective on the apply execution — pending)** — the
+> P2 r4 Q4 deferral's "zero buckets" posture is superseded by this slice,
+> not deferred recordings:
 > - **"Download a private object via a guessed path → Denied"** is
 >   enforced by `files_storage_select` on `storage.objects` (the
 >   path-org/matter gate; a guessed/mismatched path denies for every role
@@ -417,8 +419,9 @@ this is the row's own worst-case test and must exist before P2 ships.
 >   are TTL-bound — **recorded honestly as such, not as instant
 >   mid-flight revocation** (an already-issued signed URL stays valid
 >   until its TTL expires; the mechanism is documented in
->   `docs/storage_rls_gate_review_2026-08-08.md` D-STR4 and noted as a
->   RECORDED row in the battery — the P2 r4 Q4-deferral convention).
+>   `docs/storage_rls_gate_review_2026-08-08.md` D-STR4/§4 — recorded
+>   there as a future-facing negative (the P2 r4 Q4-deferral convention),
+>   not asserted as a battery check row).
 > The remaining §6 rows (realtime delivery, audit) are unchanged. Per §7
 > this extends, not replaces, and widens no other row; in effect on the
 > apply execution (pending — r1 evidence ⏳, apply ⏳ HELD, approval ✅
