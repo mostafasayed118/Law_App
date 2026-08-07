@@ -121,6 +121,7 @@ this battery hardens that pattern into a committed artifact.
 | `tests/04_matter_rls.sql` | Matrix §4 matter rows — the first §14 un-deferral (assigned client/attorney positives + org-role-alone / cross-org / suspended / owner / anon denies + the practice_area CHECK + org-delete cascade) |
 | `tests/05_document_rls.sql` | Matrix §4 document rows — the second §14 un-deferral (matter-scoped assignment positives + org-role-alone / org-mismatch / cross-org / suspended / owner / anon denies + the document_type CHECK + matter-delete cascade) |
 | `tests/06_message_rls.sql` | Matrix §4 message rows — the third §14 un-deferral (matter-scoped assignment positives + org-role-alone / org-mismatch / cross-org / suspended / owner / anon denies + the message_count CHECK + matter-delete cascade) |
+| `tests/07_storage_rls.sql` | Matrix §4/§6 file rows — the fourth §14 un-deferral (BOTH-layer positives on `public.files` + `storage.objects` + org-role-alone / org-mismatch / cross-org / suspended / owner / anon denies + the guessed-path object row (matrix §6) + the size_bytes CHECK + matter-delete cascade) |
 
 ### Running the battery
 
@@ -140,8 +141,10 @@ scripts/verify_policy_tests.sh --check        # static validation, no database
 ```
 
 - `--apply` applies `migrations/01`, `02`, `04_matters.sql`,
-  `05_documents.sql`, `06_message_threads.sql` (the three §14 un-deferral
-  slices), `policies/*.sql`, `rpc/*.sql` in the apply order above.
+  `05_documents.sql`, `06_message_threads.sql`, `07_storage.sql` (the four
+  §14 un-deferral slices — `07_storage.sql` requires the platform storage
+  schema, present on the rehearsal host), `policies/*.sql`, `rpc/*.sql` in
+  the apply order above.
   **`03_platform_config_seed.sql` is NOT applied**: its owner token is an
   apply-time substitution placeholder for the dev project; the battery seeds
   its own fixture owner row and proves the single-account bound (D-P0C3)
@@ -151,11 +154,12 @@ scripts/verify_policy_tests.sh --check        # static validation, no database
   D-P0C4 audit pins.
 - **Out of battery scope (recorded, not skipped):** provider-level flows
   (signup/sign-in/reset, GoTrue email triggers) stay out of SQL rehearsal
-  scope per the P2 r5 methodology; storage/realtime buckets remain Q4
-  deferrals. The D-P0C1(b) content-table forward pin is asserted
-  structurally (matters, documents + message_threads exist as the first
-  three §14 un-deferrals; individual message rows/bodies + files are still
-  absent) and enforced at schema-review time per the matrix §5 addendum.
+  scope per the P2 r5 methodology; realtime buckets remain Q4 deferrals
+  (the storage Q4 deferral is consummated — the fourth §14 un-deferral).
+  The D-P0C1(b) content-table forward pin is asserted structurally
+  (matters, documents, message_threads + files exist as the first four §14
+  un-deferrals; individual message rows/bodies still absent) and enforced
+  at schema-review time per the matrix §5 addendum.
 - Record the run as rehearsal evidence (the P0C.3 close decision consumes
   it), then delete the throwaway project.
 

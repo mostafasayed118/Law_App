@@ -26,6 +26,10 @@
 -- ============================================================================
 
 -- ---- 0. Reset (dependency-safe delete order: children before parents) ----
+-- storage.objects rows are independent of the public tables (no FK) but
+-- must be cleared before re-seed so the objects-layer counts are exact.
+delete from storage.objects where bucket_id = 'matter-files';
+delete from public.files;
 delete from public.message_threads;
 delete from public.documents;
 delete from public.matters;
@@ -237,5 +241,79 @@ begin
   select count(*) into v_cnt from public.message_threads;
   if v_cnt <> 6 then
     raise exception 'FIXTURE ERROR: message_threads must hold 6 rows, got %', v_cnt;
+  end if;
+end $$;
+
+-- ---- 10. Files (real-storage slice — the 07_storage_rls.sql battery) ------
+-- Six file METADATA rows, each referencing one of the six fixture matters
+-- (the assignment source of truth) — exercising every policy branch of
+-- files_select_assigned (docs/storage_rls_gate_review_2026-08-08.md §4):
+-- the counts the battery asserts are client-a (assigned on matters 1,2)
+-- sees the files on matters 1,2 = 2; partner-a (assigned attorney on
+-- matters 1,2,3) sees 3; orphan (matter 4) sees 1. storage_path is the
+-- SINGLE source of truth linking the row to its storage object (D-STR3):
+-- `{org_id}/{matter_id}/{filename}` in canonical lowercase hyphenated
+-- uuid::text (review §5 pin) — it MUST equal the object's `name` in the
+-- objects fixture below so the follow-up download(storage_path) resolves.
+insert into public.files
+  (id, organization_id, matter_id, name, mime_type, size_bytes, storage_path, created_at, updated_at)
+values
+  ('70000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000001', 'file-1.pdf', 'application/pdf', 1024, '20000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001/file-1.pdf', now(), now()),
+  ('70000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000002', 'file-2.pdf', 'application/pdf', 2048, '20000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000002/file-2.pdf', now(), now()),
+  ('70000000-0000-4000-8000-000000000003', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000003', 'file-3.pdf', 'application/pdf', 3072, '20000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000003/file-3.pdf', now(), now()),
+  ('70000000-0000-4000-8000-000000000004', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000004', 'file-4.pdf', 'application/pdf', 4096, '20000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000004/file-4.pdf', now(), now()),
+  ('70000000-0000-4000-8000-000000000005', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000005', 'file-5.pdf', 'application/pdf', 5120, '20000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000005/file-5.pdf', now(), now()),
+  ('70000000-0000-4000-8000-000000000006', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000006', 'file-6.pdf', 'application/pdf', 6144, '20000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000006/file-6.pdf', now(), now());
+
+-- ---- 11. Storage objects (real-storage slice — the 07_storage_rls.sql battery) ------
+-- Six objects in the `matter-files` bucket, one per fixture matter, with
+-- `name` = the file's storage_path (the D-STR4 path encoding). The insert
+-- provides ONLY the columns the platform schema accepts (verified live via
+-- a read-only information_schema probe on 2026-08-08): id, bucket_id,
+-- name, metadata — every column is nullable in this version, and
+-- `path_tokens` is a generated column (cannot be inserted; computed from
+-- name). The storage.objects RLS policy (files_storage_select) parses the
+-- path segments, so the org/matter encoding here is what the battery
+-- asserts on the objects layer.
+insert into storage.objects (id, bucket_id, name, metadata, created_at, updated_at)
+values
+  ('80000000-0000-4000-8000-000000000001', 'matter-files', '20000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000001/file-1.pdf', '{"size":1024,"mimetype":"application/pdf"}', now(), now()),
+  ('80000000-0000-4000-8000-000000000002', 'matter-files', '20000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000002/file-2.pdf', '{"size":2048,"mimetype":"application/pdf"}', now(), now()),
+  ('80000000-0000-4000-8000-000000000003', 'matter-files', '20000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000003/file-3.pdf', '{"size":3072,"mimetype":"application/pdf"}', now(), now()),
+  ('80000000-0000-4000-8000-000000000004', 'matter-files', '20000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000004/file-4.pdf', '{"size":4096,"mimetype":"application/pdf"}', now(), now()),
+  ('80000000-0000-4000-8000-000000000005', 'matter-files', '20000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000005/file-5.pdf', '{"size":5120,"mimetype":"application/pdf"}', now(), now()),
+  ('80000000-0000-4000-8000-000000000006', 'matter-files', '20000000-0000-4000-8000-000000000001/40000000-0000-4000-8000-000000000006/file-6.pdf', '{"size":6144,"mimetype":"application/pdf"}', now(), now());
+
+-- Reserved throwaway ids used by 07_storage_rls.sql (deliberately NEVER
+-- seeded): 70000000-0000-4000-8000-00000000ffff (the size_bytes
+-- CHECK-violation file insert — fails before any row exists); the
+-- org-mismatch trio 40000000-0000-4000-8000-00000000fffc (temp org-b
+-- matter) + 70000000-0000-4000-8000-00000000fffe (its org-mismatched
+-- file) + 80000000-0000-4000-8000-00000000fffd (its org-mismatched
+-- object); 80000000-0000-4000-8000-00000000fffe (the guessed-path
+-- object — matrix §6 row 1, unknown matter id, never a real matter); and
+-- the guessed path's nonexistent matter id 99999999-9999-4999-8999-999999999999
+-- (deliberately NOT a fixture — the point is that no matter has it). Listed
+-- here so the harness's static fixture cross-ref resolves them.
+
+-- Sanity: exactly six files + six matter-files objects + the bucket seeded
+-- (the 07 count expectations depend on it; the org-mismatch + guessed-path
+-- temp rows are rolled back inside the battery and never reach the seeded
+-- baseline).
+do $$
+declare
+  v_files bigint; v_objs bigint; v_buckets bigint;
+begin
+  select count(*) into v_files from public.files;
+  if v_files <> 6 then
+    raise exception 'FIXTURE ERROR: files must hold 6 rows, got %', v_files;
+  end if;
+  select count(*) into v_objs from storage.objects where bucket_id = 'matter-files';
+  if v_objs <> 6 then
+    raise exception 'FIXTURE ERROR: matter-files must hold 6 objects, got %', v_objs;
+  end if;
+  select count(*) into v_buckets from storage.buckets where id = 'matter-files';
+  if v_buckets <> 1 then
+    raise exception 'FIXTURE ERROR: matter-files bucket must exist (07_storage.sql), got %', v_buckets;
   end if;
 end $$;
