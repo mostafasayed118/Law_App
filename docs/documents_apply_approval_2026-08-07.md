@@ -9,12 +9,13 @@
 > owner's explicit authorization to apply the reviewed + rehearsed slice to
 > the shared dev project, with the rollback pairing standing by.
 >
-> **Status: DRAFT (2026-08-07) — r1 precondition met.** Awaiting the single
-> remaining precondition before the owner's dated sign-off flips this to
-> APPLY APPROVED: the owner's dated sign-off in §6. The **ephemeral
-> rehearsal r1** (`docs/documents_rehearsal_evidence_r1_2026-08-07.md`)
-> reported **PASSED 2026-08-07** (plan T4, owner's Docker host, matters r1
-> Path A precedent — §4 evidence).
+> **Status: APPLY APPROVED (2026-08-07).** The owner's dated sign-off in §6
+> authorizes the §3 up sequence against the shared dev project
+> (`eutmvevpskerzpqmwplv`, `eu-central-1`) per the §4 execution conditions,
+> with the rollback pairing standing by. The ephemeral rehearsal r1
+> (`docs/documents_rehearsal_evidence_r1_2026-08-07.md`) reported **PASSED
+> 2026-08-07** (plan T4, owner's Docker host, matters r1 Path A precedent —
+> §4 evidence). Nothing beyond the §3 scope; the §5 exclusions hold.
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
 >
@@ -38,8 +39,8 @@
 | Policy artifact | `supabase/policies/documents.sql` (`f8cc6c6`) | ✅ Committed — NOT applied |
 | Policy battery + harness | `supabase/tests/05_document_rls.sql`, `00_fixtures.sql`, `scripts/verify_policy_tests.sh` (`b5bf0b2`) | ✅ Committed; static `--check` PASS 31/0/0 |
 | **Ephemeral rehearsal (r1)** | `docs/documents_rehearsal_evidence_r1_2026-08-07.md` | ✅ **PASSED 2026-08-07** — owner's Path A run (§4 evidence) |
-| **Apply approval (this record)** | this document | ⏳ **DRAFT** — awaits r1 PASSED + owner's dated sign-off (§6) |
-| Apply execution (dev project) | `docs/documents_apply_execution_2026-08-07.md` (pending) | ⏳ Pending — runs only after this record is APPLY APPROVED |
+| **Apply approval (this record)** | this document | ✅ **APPROVED 2026-08-07** (owner's dated sign-off, §6) |
+| Apply execution (dev project) | `docs/documents_apply_execution_2026-08-07.md` | ⏳ Execution — runs under this APPROVED record (§4 guardrails) |
 
 ## 2. Gate criteria — what the r1 rehearsal must prove
 
@@ -146,13 +147,13 @@ conditions and the §5 exclusions, with the rollback pairing standing by.
 Signature is valid — the r1 rehearsal reported PASSED on 2026-08-07
 (plan T4; evidence §4, criteria §2 all green).
 
-- **Project Owner:** github.com/mostafasayed118 — **date: \_\_\_\_** —
-  **approval wording (recorded from the pair-programming session):**
+- **Project Owner:** github.com/mostafasayed118 — **date: 2026-08-07**
+  — **approval wording (recorded from the pair-programming session):**
   "Apply approved — documents read slice (05_documents + policy + demo
   seed referencing the applied demo matter ids), per this record §3–§5,
   with the §4 guardrails and rollback pairing."
 
-> **Signed \_\_\_\_\_\_\_\_.** The execution record
+> **Signed 2026-08-07.** The execution record
 > (`docs/documents_apply_execution_2026-08-07.md`) captures the actual run;
 > on success, plan T7 (client swap) follows (T6 — the dated matrix §4
 > addendum for the "View a document (metadata)" row — is a separate commit).
