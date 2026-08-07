@@ -114,10 +114,11 @@ roles) per §4 condition 5, and the execution evidence record
 3. **Rollback pairing standing by (rollback_plan §1/§5):**
    `06_message_threads.down.sql` (`drop table public.message_threads` — the
    policy dies with its table) + a targeted delete of the seeded demo rows
-   is ready before step 1; **any** trigger condition (a matrix negative row
-   starts passing, cross-tenant data visible, a demo row lands on a real
-   matter/account, a non-generic participant name appears) = immediate
-   revert, never fix-forward.
+   (+ `git revert` of the policy commit per the RLS-gate review §6
+   convention) is ready before step 1; **any** trigger condition (a matrix
+   negative row starts passing, cross-tenant data visible, a demo row lands
+   on a real matter/account, a non-generic participant name appears) =
+   immediate revert, never fix-forward.
 4. **Per-step verification:** after each of the three steps, probe the
    applied state (table exists → policy present → seed rows scoped
    correctly: right org, right matter, generic participants) with the
