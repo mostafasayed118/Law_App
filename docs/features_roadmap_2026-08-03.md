@@ -153,16 +153,18 @@ policy tests before it is exposed here.
 ## 2. Unwired-RPC inventory (client surface vs. committed server RPCs)
 
 `supabase/rpc/` ships 17 applied P2 RPCs plus the applied Phase 3 R1
-`list_org_members_metadata` (18 total, §5); the client `SupabaseOrgApi` seam
-maps **11** (`listMembers` routes to the R1 member-facing RPC). The remaining
-7 are committed and rehearsed server-side but
-have no Flutter surface. Each row names the owning phase below (or the gate
-that blocks it).
+`list_org_members_metadata` (18 total, §5); **16 of 18 have a client
+surface** — `SupabaseOrgApi` maps 11 (`listMembers` routes to the R1
+member-facing RPC) and `SupabasePlatformAdminApi` (P3.5, `47f777b`) maps
+the five owner-only RPCs. The remaining 2 (`read_org_audit`,
+`read_platform_audit`) are committed and rehearsed server-side but have no
+Flutter surface (§14 audit surfacing, P2-gated). Each row names the owning
+phase below (or the gate that blocks it).
 
 | RPC (`supabase/rpc/`) | Wired in client today? | Owning phase | Notes |
 |---|---|---|---|
 | `create_organization` | ✅ `createOrganization` | — | shipped |
-| `list_members_metadata` | — | owner surface (unused in app UI) | platform-owner-only; the app roster uses the R1 RPC below |
+| `list_members_metadata` | ✅ `listMembers` | P3.5 owner surface (`47f777b`) | platform-owner-only; the app roster uses the R1 RPC below; the platform-admin screen consumes this RPC |
 | `list_org_members_metadata` | ✅ `listMembers` | Phase 3 (R1, applied) | **member-facing roster** — partner-scoped (design §8 client slice) |
 | `invite_member` | ✅ `inviteMember` | — | shipped |
 | `change_member_role` | ✅ `changeMemberRole` | — | shipped |
@@ -171,14 +173,14 @@ that blocks it).
 | `remove_membership` | ✅ `removeMember` | — | shipped |
 | `resend_invitation` | ✅ `resendInvitation` | Phase 2 | partner-only per D-10a / matrix §3; `invalidInvitation` kind already mapped |
 | `revoke_invitation` | ✅ `revokeInvitation` | Phase 2 | partner-only per D-10a / matrix §3 |
-| `accept_invitation` | ✅ `acceptInvitation` | Phase 2 (UX decision) / Phase 4 (deep link) | **R3** in the P3 spec; token-entry UX decided (accept screen) |
+| `accept_invitation` | ✅ `acceptInvitation` | Phase 2 (UX decision) / Phase 4 (deep link) | **R3** in the P3 spec; token-entry UX decided (accept screen); the deep-link variant is **SHIPPED** (Phase 4.1 D-P34.2, 2026-08-07) |
 | `delete_my_account` | ✅ `deleteMyAccount` | Phase 2 | D-05 requires the hard-delete action (cascade identity + memberships) |
-| `list_organizations_metadata` | ❌ | Phase 2 (owner) or Phase 3 (member-facing) | **SHIPPED via the client-side path** — the active-org switcher (Phase 7 slice 7.0, `b31bc1a`) reads `Session.memberships` + the `ActiveOrgStore` per D-08/D-M7 (server re-derives membership; never trusts a client-selected org id); the RPC stays unwired, an enrichment-only option |
+| `list_organizations_metadata` | ✅ `listOrganizations` | P3.5 owner surface (`47f777b`) | **also SHIPPED via the client-side path** — the active-org switcher (Phase 7 slice 7.0, `b31bc1a`) reads `Session.memberships` + the `ActiveOrgStore` per D-08/D-M7 (server re-derives membership; never trusts a client-selected org id); the RPC now feeds the platform-admin orgs list |
 | `read_org_audit` | ❌ | deferred (§14) | audit surfacing is P2-gated; `platform_owner_admin` self-audit rules apply |
 | `read_platform_audit` | ❌ | deferred (§14) | owner-gated; audit table never publicly readable (matrix §6) |
-| `delete_demo_account` | ❌ | deferred (§14) | `platform_owner_admin`-only; no owner admin screen until the Addendum's server-side enforcement story is complete |
-| `suspend_membership_platform` | ❌ | deferred (§14) | `platform_owner_admin`-only |
-| `reactivate_membership_platform` | ❌ | deferred (§14) | `platform_owner_admin`-only |
+| `delete_demo_account` | ✅ `deleteDemoAccount` | P3.5 owner surface (`47f777b`) | `platform_owner_admin`-only; the platform-admin screen deletes demo accounts (never self); the server raise `cannot delete your own account` maps to a typed denial |
+| `suspend_membership_platform` | ✅ `suspendMembership` | P3.5 owner surface (`47f777b`) | `platform_owner_admin`-only; platform-admin suspend toggle |
+| `reactivate_membership_platform` | ✅ `reactivateMembership` | P3.5 owner surface (`47f777b`) | `platform_owner_admin`-only; platform-admin reactivate toggle |
 
 ## 3. Phase 1 — P3 org & membership UI slice (next approved batch)
 
@@ -221,9 +223,10 @@ rehearsed, and applied (`3704a1d`).
   action with redaction-safe confirm; fake mirrors cascade. Matrix §2 row.
 - **2.3 Active-org switcher** — **SHIPPED as Phase 7 slice 7.0** (`b31bc1a`,
   `ActiveOrgStore` + switcher sheet listing `Session.memberships`, D-08/D-M7).
-  Owner path: `list_organizations_metadata` (still unwired — enrichment-only;
-  the client reads `Session.memberships`, and the server re-derives
-  membership per D-08 — never trusts a client-selected org id).
+  Owner path: `list_organizations_metadata` (now also the platform-admin
+  orgs list, P3.5 `47f777b`; the switcher itself still reads
+  `Session.memberships`, and the server re-derives membership per D-08 —
+  never trusts a client-selected org id).
 - **2.4 Invitation acceptance (R3)** — **SHIPPED 2026-08-03** as part of
   `68aafc6` (slices 2.1–2.4): the token-entry **paste screen** decision was
   taken and built — `accept_invitation_screen.dart` + `/accept-invitation`
@@ -291,7 +294,8 @@ backout in place).
 - **4.2 Sign-up email-verification UX** — verification is enabled
   server-side; today the flow silently routes to sign-in after sign-up. A
   "check your inbox" state closes the false-assurance gap. Client-only;
-  standard slice gate.
+  standard slice gate. **SHIPPED 2026-08-03** (`deb72d8`; header status
+  line + gate-table row 4).
 
 ## 7. Phase 5 — Consultation booking (MVP, no live payment)
 
@@ -623,8 +627,10 @@ negative policy tests **before any of these ship**, and an org role alone
 never grants matter access. The audit RPCs exist (`read_org_audit`,
 `read_platform_audit`) but surfacing them is P2-gated; the owner-only admin
 RPCs (`delete_demo_account`, `suspend_membership_platform`,
-`reactivate_membership_platform`) stay unwired until the Addendum's
-server-side enforcement + auditing story is complete.
+`reactivate_membership_platform`) shipped a client surface in P3.5
+(`47f777b`, the platform-admin screen; matrix §5 addendum) — the real
+enforcement + auditing of those actions remains server-side per the
+permission matrix.
 
 ## 15. Ledger hooks (what to update when a phase lands)
 
