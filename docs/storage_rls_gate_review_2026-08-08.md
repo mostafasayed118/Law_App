@@ -152,8 +152,8 @@ assigned matters, one file + one object per fixture matter — the documents
 - row-count pins prove no blanket-org bleed (same count shape as the
   matters 2/3/1, documents 2/3/1 and messages 2/3/1 batteries).
 
-Negative (deny rows, `03_platform_owner_boundary` style, **each asserted
-on both the `public.files` layer and the `storage.objects` layer**):
+Negative (deny rows, `03_platform_owner_boundary` style, **each deny row
+asserted on both the `public.files` layer and the `storage.objects` layer**):
 - active org member, **no matter assignment** → denied (org-role-alone);
 - **org-mismatch (D-STR2 invariant):** a file row whose `organization_id`
   ≠ its matter's org denies, and an object whose **path org segment** ≠
@@ -204,13 +204,15 @@ now()` · `updated_at timestamptz not null default now()`. Indexes:
 RLS enabled; `revoke all … from anon, authenticated`; `grant select … to
 authenticated` only (Q5). **No content/body/url column** (D-V1).
 
-Bucket + objects (D-STR4): `insert into storage.buckets (id, name, public,
-file_size_limit, allowed_mime_types, owner) values ('matter-files',
+Bucket + objects (D-STR4): `insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types, owner) values ('matter-files',
 'matter-files', false, …) on conflict (id) do nothing` — **private**, so
-no anonymous public read; objects at `{org_id}/{matter_id}/{filename}`;
-`files_storage_select` on `storage.objects` as Q2. Storage API client
-reads (`storage.from('matter-files').download(storage_path)`) are
-authenticated + RLS-scoped (follow-up slice, D-STR9).
+no anonymous public read; **the column list is verified against the dev
+project's storage schema at T2** (`owner` may not exist in current
+versions and is omitted if absent — the sketch is not a column contract);
+objects at `{org_id}/{matter_id}/{filename}`; `files_storage_select` on
+`storage.objects` as Q2. Storage API client reads
+(`storage.from('matter-files').download(storage_path)`) are authenticated
++ RLS-scoped (follow-up slice, D-STR9).
 
 ## 6. Rollback pairing (never-fix-forward)
 

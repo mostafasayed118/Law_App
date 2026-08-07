@@ -273,7 +273,9 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   `supabase/migrations/07_storage.sql` (+ `07_storage.down.sql`),
   `supabase/policies/files.sql` + `supabase/policies/storage_objects.sql`
   — done when: DDL matches D-STR1/D-STR3/D-STR4 (private `matter-files`
-  bucket via idempotent insert; `public.files` with matter FK + org column
+  bucket via idempotent insert — **bucket column list verified against the
+  dev project's storage schema, `owner` omitted if absent**; `public.files`
+  with matter FK + org column
   + `size_bytes` CHECK + `storage_path`, metadata only, no content
   column; `files_select_assigned` + `files_storage_select` policies),
   `_down.sql` is a clean inverse (drop files + bucket), committed.
@@ -282,7 +284,10 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   `supabase/tests/00_fixtures.sql`, the documents/messages precedent —
   including the reset-ordering `delete from public.files;` +
   `delete from storage.objects where bucket_id = 'matter-files';` before
-  matters, and the 6-file/6-object sanity pins) + `scripts/verify_policy_tests.sh`
+  matters, the 6-file/6-object sanity pins, **and fixture object inserts
+  respecting `storage.objects`' NOT NULL/generated columns — `path_tokens`
+  is generated (cannot be inserted), `bucket_id`/`name`/`metadata` are
+  required**) + `scripts/verify_policy_tests.sh`
   — **four sites**: battery file list, run loop, UUID cross-ref scan,
   FAIL-marker scan — **plus the `--apply` order gains `07_storage.sql`**,
   the structural pins re-scope (9→10 public tables / 8→9 public policies
