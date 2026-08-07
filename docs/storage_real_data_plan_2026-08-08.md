@@ -83,7 +83,7 @@ guessed path → Denied", "Reuse a stale signed URL after membership removal
   branch + six documents + six threads; the storage battery reuses the six
   matters — no new identity fixtures needed, only file/object rows.
 
-## 3. Design decisions (D-STR1…D-STR9 — recommended; OPEN for owner ratification)
+## 3. Design decisions (D-STR1…D-STR9 — ratified by autonomy 2026-08-08, recommended path per the pair-programming grant; the RLS-gate review `docs/storage_rls_gate_review_2026-08-08.md` answers Q1–Q6 on these)
 
 | # | Decision | Recommendation | Why / alternative |
 |---|---|---|---|
@@ -260,13 +260,15 @@ Each task is independently committable with the stated verification; the
 apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
 **no dev-project change until T5**.
 
-- [ ] **1. Scope note + RLS-gate design addendum** — touches: this document
+- [x] **1. Scope note + RLS-gate design addendum** — touches: this document
   + a `storage` §8-style review (`docs/storage_rls_gate_review_2026-08-08.md`,
   the Q1–Q6 pattern answered for storage: the two-layer mechanism (metadata
   table + storage.objects path policy, D-STR2), the bucket/object scoping
   (D-STR4), the guessed-path + signed-URL negatives (matrix §6), negative
   cases, rollback pairing, seed plan) — done when: docs committed, ledger
-  sweep green (no dev-project contact).
+  sweep green (no dev-project contact). — **DONE `6f52930`** (the review
+  doc on `feat/storage-real-read`; the plan itself was drafted + D-STR
+  ratified on `main` `cc33da3`/`bad9641`).
 - [ ] **2. Schema artifacts (rehearsal-ready, NOT applied)** — touches:
   `supabase/migrations/07_storage.sql` (+ `07_storage.down.sql`),
   `supabase/policies/files.sql` + `supabase/policies/storage_objects.sql`
