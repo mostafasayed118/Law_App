@@ -26,6 +26,7 @@
 -- ============================================================================
 
 -- ---- 0. Reset (dependency-safe delete order: children before parents) ----
+delete from public.matters;
 delete from public.memberships;
 delete from public.invitations;
 delete from public.organizations;
@@ -122,5 +123,39 @@ begin
   select count(*) into v_b from public.memberships where organization_id = '20000000-0000-4000-8000-000000000002';
   if v_a <> 4 or v_b <> 1 then
     raise exception 'FIXTURE ERROR: org-a must hold 4 memberships and org-b 1, got %/%', v_a, v_b;
+  end if;
+end $$;
+
+-- ---- 7. Matters (real-matters slice — the 04_matter_rls.sql battery) ------
+-- Six matters exercising every policy branch of matters_select_assigned
+-- (docs/matters_rls_gate_review_2026-08-07.md §4): assigned client, assigned
+-- attorney, attorney-only assignment, unassigned-to-partner org-a row,
+-- cross-org assignment (partner-b assigned on an org-a matter while a member
+-- of org-b only), and stale-access assignment (suspended-a). All practice
+-- areas come from the client PracticeArea set (the CHECK contract).
+insert into public.matters
+  (id, organization_id, title, practice_area, status, assigned_client_id, assigned_attorney_id, created_at, updated_at)
+values
+  ('40000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', 'Matter 1', 'corporate', 'active', '10000000-0000-4000-8000-000000000003', '10000000-0000-4000-8000-000000000002', now(), now()),
+  ('40000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000001', 'Matter 2', 'civil',     'open',    '10000000-0000-4000-8000-000000000003', '10000000-0000-4000-8000-000000000002', now(), now()),
+  ('40000000-0000-4000-8000-000000000003', '20000000-0000-4000-8000-000000000001', 'Matter 3', 'criminal',  'closed',  null,                                         '10000000-0000-4000-8000-000000000002', now(), now()),
+  ('40000000-0000-4000-8000-000000000004', '20000000-0000-4000-8000-000000000001', 'Matter 4', 'family',    'open',    '10000000-0000-4000-8000-000000000007', null,                                         now(), now()),
+  ('40000000-0000-4000-8000-000000000005', '20000000-0000-4000-8000-000000000001', 'Matter 5', 'corporate', 'active',  null,                                         '10000000-0000-4000-8000-000000000004', now(), now()),
+  ('40000000-0000-4000-8000-000000000006', '20000000-0000-4000-8000-000000000001', 'Matter 6', 'civil',     'open',    null,                                         '10000000-0000-4000-8000-000000000005', now(), now());
+
+-- Reserved throwaway id used by 04_matter_rls.sql CHECK 04.09 for the
+-- practice_area CHECK-violation insert: deliberately NEVER seeded (the
+-- 'tax' insert fails the CHECK before any row exists). Listed here so the
+-- harness's static fixture cross-ref resolves it.
+--   reserved: 40000000-0000-4000-8000-00000000ffff
+
+-- Sanity: exactly six matters seeded (the 04 count expectations depend on it).
+do $$
+declare
+  v_cnt bigint;
+begin
+  select count(*) into v_cnt from public.matters;
+  if v_cnt <> 6 then
+    raise exception 'FIXTURE ERROR: matters must hold 6 rows, got %', v_cnt;
   end if;
 end $$;
