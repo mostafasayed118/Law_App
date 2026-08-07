@@ -252,7 +252,11 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   + `docs/messages_apply_execution_<date>.md` — done when: the owner's
   dated approval exists, apply executed with `_down.sql` pairing + cleanup
   discipline (demo thread ids reference the applied demo matter ids),
-  observed output recorded verbatim.
+  observed output recorded verbatim. — **2026-08-07 status:** approval
+  **APPLY APPROVED** (`docs/messages_apply_approval_2026-08-07.md` §6,
+  owner's dated sign-off); execution **PENDING** owner-side run (no CLI
+  link/token on the dev machine at execution time; runbook + expected
+  outcomes in the execution record).
 - [ ] **6. Matrix addendum (dated)** — touches: `docs/permission_matrix.md`
   §4 — adds the **"View a message thread (metadata)"** row (client/attorney
   cells SHIP behind `message_threads_select_assigned`; partner/

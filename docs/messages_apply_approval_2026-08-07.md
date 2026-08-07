@@ -10,14 +10,13 @@
 > rehearsed slice to the shared dev project, with the rollback pairing
 > standing by.
 >
-> **Status: ⏳ DRAFT — ready for the owner's dated sign-off (§6).** The
-> ephemeral rehearsal r1 (`docs/messages_rehearsal_evidence_r1_2026-08-07.md`)
-> reported **PASSED 2026-08-07** (plan T4, owner's Docker host, matters r1
-> Path A precedent — §4 evidence, commit `a37c6dc`). On signature this
-> record becomes APPLY APPROVED (dated) and authorizes the §3 up sequence
-> against the shared dev project (`eutmvevpskerzpqmwplv`, `eu-central-1`)
-> per the §4 execution conditions, with the rollback pairing standing by.
-> Nothing beyond the §3 scope; the §5 exclusions hold.
+> **Status: APPLY APPROVED (2026-08-07).** The owner's dated sign-off in §6
+> authorizes the §3 up sequence against the shared dev project
+> (`eutmvevpskerzpqmwplv`, `eu-central-1`) per the §4 execution conditions,
+> with the rollback pairing standing by. The ephemeral rehearsal r1
+> (`docs/messages_rehearsal_evidence_r1_2026-08-07.md`) reported **PASSED
+> 2026-08-07** (plan T4, owner's Docker host, matters r1 Path A precedent —
+> §4 evidence). Nothing beyond the §3 scope; the §5 exclusions hold.
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
 >
@@ -41,8 +40,8 @@
 | Policy artifact | `supabase/policies/message_threads.sql` (`5a506ca`) | ✅ Committed — NOT applied |
 | Policy battery + harness | `supabase/tests/06_message_rls.sql`, `00_fixtures.sql`, `scripts/verify_policy_tests.sh` (`0ed14c7`, `4905697`) | ✅ Committed; static `--check` PASS 37/0/0 |
 | **Ephemeral rehearsal (r1)** | `docs/messages_rehearsal_evidence_r1_2026-08-07.md` (`a37c6dc`) | ✅ **PASSED 2026-08-07** — owner's Path A run (§4 evidence) |
-| **Apply approval (this record)** | this document | ⏳ **DRAFT** — awaiting the owner's dated sign-off (§6) |
-| Apply execution (dev project) | `docs/messages_apply_execution_2026-08-07.md` | ⏳ Not yet — only after §6 |
+| **Apply approval (this record)** | this document | ✅ **APPROVED 2026-08-07** (owner's dated sign-off, §6) |
+| Apply execution (dev project) | `docs/messages_apply_execution_2026-08-07.md` | ⏳ **Pending** — owner-side run (no CLI link/token on the dev machine at execution time); runbook + expected outcomes in the execution record |
 
 ## 2. Gate criteria — what the r1 rehearsal must prove
 
@@ -161,14 +160,13 @@ conditions and the §5 exclusions, with the rollback pairing standing by.
 Signature is valid — the r1 rehearsal reported PASSED on 2026-08-07
 (plan T4; evidence §4, criteria §2 all green).
 
-- **Project Owner:** github.com/mostafasayed118 — **date: ____________**
-  — **approval wording (to be recorded on signature):**
+- **Project Owner:** github.com/mostafasayed118 — **date: 2026-08-07**
+  — **approval wording (recorded from the pair-programming session):**
   "Apply approved — messages read slice (06_message_threads + policy +
   demo seed referencing the applied demo matter ids), per this record
   §3–§5, with the §4 guardrails and rollback pairing."
 
-> **Not yet signed (DRAFT).** On signature, the status flips to APPLY
-> APPROVED (dated) and the execution record
+> **Signed 2026-08-07.** The execution record
 > (`docs/messages_apply_execution_2026-08-07.md`) captures the actual run;
 > on success, plan T7 (client swap) follows (T6 — the dated matrix §4
 > addendum for the "View a message thread (metadata)" row — is a separate
@@ -176,9 +174,10 @@ Signature is valid — the r1 rehearsal reported PASSED on 2026-08-07
 
 ## 7. Ledger
 
-- On signature: this record's status flips ⏳ DRAFT → ✅ APPLY APPROVED
-  (dated); the plan's T5 row updates.
-- On apply success: the execution record (`docs/messages_apply_execution_2026-08-07.md`)
-  is written from the actual run, T6 (matrix addendum) and T7 (client swap)
+- Signed 2026-08-07: this record's status is ✅ APPLY APPROVED (dated); the
+  plan's T5 row annotated.
+- On apply execution: the execution record (`docs/messages_apply_execution_2026-08-07.md`)
+  is written from the actual run (owner-side — no CLI link/token on the
+  dev machine at execution time), T6 (matrix addendum) and T7 (client swap)
   follow, and the roadmap §14/§13 + README/ledger lockstep is re-run on the
   merged tree (T8).
