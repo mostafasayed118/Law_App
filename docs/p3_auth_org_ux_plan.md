@@ -382,9 +382,13 @@ staging; no real client/legal data.
    or a separate email-delivery slice later? **RESOLVED (partial,
    2026-08-07):** the one-shot token ships with a copy affordance (P3.3
    paste surface) and the accept deep-link **consume** side shipped as
-   Phase 4.1 D-P34.2; the invite-side **share-link generation**
-   (`com.legalhub.app://accept-invite?token=…` produced at invite time) is
-   **NOT built** — recorded as a small client-only follow-up slice; email
+   Phase 4.1 D-P34.2; the invite-side **share-link generation** shipped as
+   the follow-up slice (`b73add5` `AppLinkParser.acceptInviteUri` builder +
+   localized copy keys, `2296e05`/`dcfb84b` "Copy invite link" button on
+   the invite-success sheet) — `acceptInviteUri` produces
+   `com.legalhub.app://accept-invite?token=…` from the same scheme/host
+   constants the consume side classifies with, so every produced link
+   round-trips as an `AcceptInviteIntent` with the identical token; email
    delivery stays out of scope.
 3. **Active-org persistence.** Persist the selected org in
    `SharedPreferences` (default) vs session-only? (Either is fine — it is
