@@ -156,6 +156,35 @@ there.
   change leaves an audit record; stale client capability state is never
   authoritative.
 
+> **§4 addendum (2026-08-07, real-matters read slice — plan
+> `docs/matters_real_data_plan_2026-08-07.md`, first §14 un-deferral):** the
+> **"View a matter" row's client/attorney cells now SHIP** — granted
+> server-side by `matters_select_assigned`
+> (`supabase/policies/matters.sql`) and policy-tested by
+> `supabase/tests/04_matter_rls.sql` (rehearsal r1 **PASSED 2026-08-07**,
+> evidence `docs/matters_rehearsal_evidence_r1_2026-08-07.md`; static
+> battery `--check` 24/0/0). The grant is exactly: an **active member of
+> the matter's org** who is the assigned **client** or the assigned
+> **attorney**. Deny rows now each have a battery check:
+> - **org role alone** (no assignment) → deny, every role;
+> - **cross-org** (assigned on an org-a matter, org-b member only) → deny;
+> - **suspended membership** in the matter's org → deny;
+> - **unauthenticated** → deny;
+> - **`platform_owner_admin`** → deny, always (owner accounts are never
+>   assigned — an operational invariant, not a policy guarantee; recorded
+>   residual in `docs/matters_rls_gate_review_2026-08-07.md` Q4).
+> **Not granted by this addendum:** the partner "org policy-approved
+> oversight only, not blanket" and `compliance_officer` "policy-review
+> scope only" cells — the oversight mechanism is undefined (D-MR5) and
+> stays future work; "Read a document/message body" stays §14-deferred
+> (documents/messages tables still absent — the forward pin was re-scoped
+> to documents/messages/files). **Basis:** §14 gate-lift (P0 closure
+> RATIFIED + policy battery shipped) · r1 PASS (`ea3a15d`) · apply-approval
+> DRAFT (`docs/matters_apply_approval_2026-08-07.md`, §6 signature
+> pending). Per §7 this extends, not replaces, and widens no other row;
+> effective on apply execution, and the client surface (plan T7) ships only
+> after the apply lands.
+
 ---
 
 ## 5. `platform_owner_admin` — explicit boundary (contract §2 #2, #4)
