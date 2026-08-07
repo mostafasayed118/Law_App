@@ -16,7 +16,11 @@
 #      seed) then 01_identity_session.sql (matrix §2), 02_organization_
 #      membership.sql (matrix §3 + 2026-08-03 hardening guards),
 #      03_platform_owner_boundary.sql (matrix §5 + D-P0C1(a) deny-rows +
-#      D-P0C3 single-account bound + D-P0C4 audit RPC-only). Every matrix
+#      D-P0C3 single-account bound + D-P0C4 audit RPC-only),
+#      04_matter_rls.sql (matrix §4 matter rows — the real-matters read
+#      path, the first §14 un-deferral: assigned client/attorney positives +
+#      org-role-alone / cross-org / suspended / owner / anon denies + the
+#      practice_area CHECK + org-delete cascade). Every matrix
 #      row has ≥1 positive + ≥1 negative check (contract §9).
 #
 # The harness NEVER runs against the live dev project — only against a
@@ -74,6 +78,7 @@ BATTERY_FILES=(
   "01_identity_session.sql"
   "02_organization_membership.sql"
   "03_platform_owner_boundary.sql"
+  "04_matter_rls.sql"
 )
 
 usage() {
@@ -98,7 +103,7 @@ static_check() {
   local uuids_from ref uuids_found
   uuids_from=$(grep -hoE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' \
       "$TESTS_DIR/01_identity_session.sql" "$TESTS_DIR/02_organization_membership.sql" \
-      "$TESTS_DIR/03_platform_owner_boundary.sql" | sort -u)
+      "$TESTS_DIR/03_platform_owner_boundary.sql" "$TESTS_DIR/04_matter_rls.sql" | sort -u)
   for ref in $uuids_from; do
     if grep -q "$ref" "$TESTS_DIR/00_fixtures.sql"; then
       ok "fixture UUID $ref resolves in 00_fixtures.sql"
@@ -109,7 +114,7 @@ static_check() {
 
   note "static check: every battery check block carries the FAIL marker"
   local file blocks
-  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql; do
+  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql; do
     blocks=$(grep -c 'POLICY-BATTERY FAIL' "$TESTS_DIR/$f")
     if [ "$blocks" -ge 10 ]; then
       ok "$f: $blocks named check blocks"
@@ -195,10 +200,10 @@ expect_tf() { # $1 label, $2 actual ('t'/'f')
 
 structural_pins() {
   note "--- 1a. Tables + RLS ---"
-  expect_eq "six public tables present" \
-    "$(run_sql "select count(*) from pg_tables where schemaname='public' and tablename in ('profiles','organizations','memberships','invitations','audit_events','platform_config');")" "6"
-  expect_eq "RLS enabled on all six" \
-    "$(run_sql "select count(*) from pg_tables where schemaname='public' and tablename in ('profiles','organizations','memberships','invitations','audit_events','platform_config') and rowsecurity;")" "6"
+  expect_eq "seven public tables present" \
+    "$(run_sql "select count(*) from pg_tables where schemaname='public' and tablename in ('profiles','organizations','memberships','invitations','audit_events','platform_config','matters');")" "7"
+  expect_eq "RLS enabled on all seven" \
+    "$(run_sql "select count(*) from pg_tables where schemaname='public' and tablename in ('profiles','organizations','memberships','invitations','audit_events','platform_config','matters') and rowsecurity;")" "7"
 
   note "--- 1b. Narrow SELECT grants (01_org_schema.sql) ---"
   expect_tf "authenticated SELECT on profiles" \
@@ -219,6 +224,10 @@ structural_pins() {
     "$(run_sql "select has_table_privilege('anon','public.memberships','SELECT');")" "f"
   expect_eq "anon SELECT on audit_events ABSENT" \
     "$(run_sql "select has_table_privilege('anon','public.audit_events','SELECT');")" "f"
+  expect_tf "authenticated SELECT on matters (04_matters.sql)" \
+    "$(run_sql "select has_table_privilege('authenticated','public.matters','SELECT');")"
+  expect_eq "anon SELECT on matters ABSENT (default-deny)" \
+    "$(run_sql "select has_table_privilege('anon','public.matters','SELECT');")" "f"
 
   note "--- 1c. Function EXECUTE surface (02_rls_functions.sql R-3/R-4) ---"
   expect_tf "policy helper is_active_member granted (R-4)" \
@@ -271,12 +280,18 @@ structural_pins() {
     "$(run_sql "select count(*) from pg_policies where schemaname='public' and tablename='audit_events';")" "0"
   expect_eq "zero policies on platform_config" \
     "$(run_sql "select count(*) from pg_policies where schemaname='public' and tablename='platform_config';")" "0"
-  expect_eq "exactly five policies across the client tables" \
-    "$(run_sql "select count(*) from pg_policies where schemaname='public';")" "5"
+  expect_eq "exactly six policies across the client tables" \
+    "$(run_sql "select count(*) from pg_policies where schemaname='public';")" "6"
 
-  note "--- 1f. D-P0C1(b) forward pin: no matter/document/message tables ---"
-  expect_eq "no content tables exist today (forward pin baseline)" \
-    "$(run_sql "select count(*) from information_schema.tables where table_schema='public' and table_name in ('matters','documents','messages','files','matter_documents','matter_messages');")" "0"
+  note "--- 1f. Forward pin re-scoped (2026-08-07): matters is the FIRST §14 un-deferral ---"
+  # D-P0C1(b) originally pinned 'no matter/document/message tables exist'. The
+  # real-matters read slice (docs/matters_real_data_plan_2026-08-07.md) ships
+  # the matters table + matters_select_assigned policy first; the pin is
+  # re-scoped to the remaining content tables, which must still be ABSENT.
+  expect_eq "matters present (first un-deferral)" \
+    "$(run_sql "select count(*) from information_schema.tables where table_schema='public' and table_name = 'matters';")" "1"
+  expect_eq "documents/messages/files STILL absent (forward pin baseline)" \
+    "$(run_sql "select count(*) from information_schema.tables where table_schema='public' and table_name in ('documents','messages','files','matter_documents','matter_messages');")" "0"
 }
 
 # ---------------------------------------------------------------------------
@@ -296,7 +311,7 @@ run_battery() {
   expect_eq "exactly one platform_config row after fixtures" \
     "$(run_sql "select count(*) from public.platform_config;")" "1"
 
-  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql; do
+  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql; do
     note "--- 2c. Battery file: $f ---"
     out=$(psql "$SUPABASE_TEST_DB_URL" -X -q -v ON_ERROR_STOP=1 -f "$TESTS_DIR/$f" 2>&1)
     rc=$?
