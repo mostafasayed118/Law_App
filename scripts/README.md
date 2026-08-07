@@ -135,10 +135,14 @@ scripts/verify_policy_tests.sh --check   # static validation, no database
    `is_platform_owner`, `active_membership`, `expire_stale_invitations`,
    `handle_new_user` stay denied; the full 18-RPC EXECUTE surface;
    zero policies on audit_events/platform_config (D-P0C4); the D-P0C1(b)
-   forward pin (no matter/document/message tables).
-2. **Behavior battery** — `00_fixtures.sql` then `01/02/03` per-matrix-block
-   SQL files (matrix §2/§3/§5, D-P0C1(a)/D-P0C3/D-P0C4), each check a DO
-   block that raises `POLICY-BATTERY FAIL <id>: <detail>` on violation.
+   forward pin (matters, documents + message_threads shipped as the first
+   three §14 un-deferrals; individual message rows/bodies + files still
+   absent).
+2. **Behavior battery** — `00_fixtures.sql` then the per-matrix-block SQL
+   files `01/02/03` (matrix §2/§3/§5, D-P0C1(a)/D-P0C3/D-P0C4) + the three
+   §14 un-deferral batteries `04_matter_rls.sql` / `05_document_rls.sql` /
+   `06_message_rls.sql` (matrix §4 rows), each check a DO block that raises
+   `POLICY-BATTERY FAIL <id>: <detail>` on violation.
 
 ### Dev-project guard
 
