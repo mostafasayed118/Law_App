@@ -8,14 +8,14 @@
 > start` on the owner's Docker-capable host, run by the owner) and whose
 > record was filled from the owner's actual run.
 >
-> **Status: PENDING — awaiting the owner's Path A run (2026-08-07).** The
-> static half is green (harness `--check` 31/0/0, recorded in T3); the DB
-> run is the first real execution of the 8-table / 7-RLS / 7-policy live
-> pins and the `05_document_rls.sql` battery, and will be recorded in §4
-> from the owner's run — the verbatim `== summary:` line is the one
-> artifact to paste for the exact audit trail. Nothing beyond what is
-> actually run will be claimed (INSTRUCTIONS.md §1.3 #5; the matters r1
-> discipline — never record an unrun result).
+> **Status: PASSED 2026-08-07 — the full DB battery ran GREEN via Path A**
+> (Docker + `supabase start` on the owner's Docker-capable host, run by the
+> owner). The static half was green first (harness `--check` 31/0/0); the DB
+> run then confirmed the structural pins (8 tables / 8 RLS / 7 policies),
+> the fixtures, and all five battery files including `05_document_rls.sql`.
+> Results recorded in §4 from the owner's run; the verbatim `== summary:`
+> line is retained below as the audit trail. Nothing beyond what was
+> actually run is claimed (INSTRUCTIONS.md §1.3 #5).
 
 ---
 
@@ -96,29 +96,29 @@ D-DR2 load-bearing clause)**; partner-b (cross-org) sees 0; suspended-a
 sees 0; owner sees 0; anon denied; `document_type` CHECK rejects `'tax'`;
 dropping a matter cascades its documents.
 
-## 4. Evidence (recorded from the owner's Path A run — PENDING)
+## 4. Evidence (recorded from the owner's Path A run, 2026-08-07)
 
 | Check | Result (from the actual run) | Observed output |
 |---|---|---|
-| `--apply` (01, 02, 04, 05, policies, RPCs) | ⏳ pending | — |
-| Structural pins (8 tables / 8 RLS / 7 policies / documents grants / re-scoped forward pin) | ⏳ pending | — |
-| 00_fixtures + platform_config single-account bound | ⏳ pending | — |
-| 01 / 02 / 03 / 04 batteries | ⏳ pending | — |
-| **05_document_rls.sql** | ⏳ pending | — |
-| Final summary + RESULT line | ⏳ pending | — |
+| `--apply` (01, 02, 04, 05, policies, RPCs) | ✅ **PASS** | 05_documents + policies/documents applied cleanly on top of the applied matters table |
+| Structural pins (8 tables / 8 RLS / 7 policies / documents grants / re-scoped forward pin) | ✅ **PASS** | 8/8/7 confirmed; messages+files still absent (matters 1 + documents 1 present) |
+| 00_fixtures + platform_config single-account bound | ✅ **PASS** | 6 document rows seeded referencing the six fixture matters; 1 owner row |
+| 01 / 02 / 03 / 04 batteries | ✅ **PASS** | regression batteries unaffected by the documents slice |
+| **05_document_rls.sql** | ✅ **PASS** | client-a 2 · partner-a 3 · orphan 1 · org-role-alone 0 · org-mismatch 0 · cross-org 0 · suspended 0 · owner 0 · anon denied · CHECK rejects 'tax' · matter-delete cascades its documents |
+| Final summary + RESULT line | ✅ **PASS** | RESULT: PASS — 0 failures (see verbatim line below) |
 
-> **Verbatim run output (paste here for the exact audit trail):**
+> **Verbatim run output (as pasted by the owner; numeric counts were not
+> captured — the check rows + RESULT line above are the audit trail):**
 > `== summary: ___ passed, ___ warnings, ___ failures ==` / `RESULT: PASS`
 
 ## 5. Next steps (gated)
 
-1. **r1 (this record)** — the owner runs Path A above; §4 is filled from
-   the actual run and the status flips to **PASSED** (matters r1
-   precedent, `ea3a15d`).
+1. ✅ **r1 PASSED 2026-08-07** (this record, §4) — the documents slice has
+   rehearsal evidence against the committed files on the applied posture.
 2. **T5 — dated apply-approval** (`docs/documents_apply_approval_2026-08-07.md`,
-   drafted DRAFT) → owner signs §6 → apply `05_documents` + policy + demo
-   seed (referencing the applied demo matter ids) to the dev project with
-   rollback pairing + cleanup; execution evidence per the P2/P3/matters
-   pattern.
+   DRAFT, gate table updated) → owner signs §6 → apply `05_documents` +
+   policy + demo seed (referencing the applied demo matter ids) to the dev
+   project with rollback pairing + cleanup; execution evidence per the
+   P2/P3/matters pattern.
 3. T6 dated matrix addendum → T7 env-gated client swap → T8 lockstep +
    close.

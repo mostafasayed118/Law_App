@@ -9,11 +9,12 @@
 > owner's explicit authorization to apply the reviewed + rehearsed slice to
 > the shared dev project, with the rollback pairing standing by.
 >
-> **Status: DRAFT (2026-08-07).** Awaiting two preconditions before the
-> owner's dated sign-off flips this to APPLY APPROVED: (a) the **ephemeral
-> rehearsal r1** (`docs/documents_rehearsal_evidence_r1_2026-08-07.md`) must
-> report PASSED (plan T4, owner's Docker host, matters r1 Path A precedent),
-> and (b) the owner's dated sign-off in §6.
+> **Status: DRAFT (2026-08-07) — r1 precondition met.** Awaiting the single
+> remaining precondition before the owner's dated sign-off flips this to
+> APPLY APPROVED: the owner's dated sign-off in §6. The **ephemeral
+> rehearsal r1** (`docs/documents_rehearsal_evidence_r1_2026-08-07.md`)
+> reported **PASSED 2026-08-07** (plan T4, owner's Docker host, matters r1
+> Path A precedent — §4 evidence).
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
 >
@@ -36,7 +37,7 @@
 | Schema artifacts (rehearsal-ready) | `supabase/migrations/05_documents.sql` + `05_documents.down.sql` (`f8cc6c6`, `7c8ab79`) | ✅ Committed — NOT applied |
 | Policy artifact | `supabase/policies/documents.sql` (`f8cc6c6`) | ✅ Committed — NOT applied |
 | Policy battery + harness | `supabase/tests/05_document_rls.sql`, `00_fixtures.sql`, `scripts/verify_policy_tests.sh` (`b5bf0b2`) | ✅ Committed; static `--check` PASS 31/0/0 |
-| **Ephemeral rehearsal (r1)** | `docs/documents_rehearsal_evidence_r1_2026-08-07.md` (pending) | ⏳ **Pending** — owner's Docker host (matters r1 Path A precedent) |
+| **Ephemeral rehearsal (r1)** | `docs/documents_rehearsal_evidence_r1_2026-08-07.md` | ✅ **PASSED 2026-08-07** — owner's Path A run (§4 evidence) |
 | **Apply approval (this record)** | this document | ⏳ **DRAFT** — awaits r1 PASSED + owner's dated sign-off (§6) |
 | Apply execution (dev project) | `docs/documents_apply_execution_2026-08-07.md` (pending) | ⏳ Pending — runs only after this record is APPLY APPROVED |
 
@@ -48,16 +49,15 @@ must verify — mirroring the matters r1 five:
 
 | # | Criterion | r1 evidence to capture | Verdict |
 |---|---|---|---|
-| 1 | `--apply` builds the slice cleanly (01, 02, 04, **05**, policies, RPCs) — `05_documents.sql` + `policies/documents.sql` applied on top of the already-applied `matters` table | rehearsal §4 | ⏳ pending |
-| 2 | Structural pins hold on the applied posture | rehearsal §4: **8 tables / 7 RLS / 7 policies** / documents SELECT grant + anon absence / **no body or content column** (metadata-only, D-V1) / matters + its policies still present | ⏳ pending |
-| 3 | 00/01/02/03/**04** regression batteries unaffected | rehearsal §4: fixtures + single-account bound + 01/02/03 + the six-matter battery all PASS | ⏳ pending |
-| 4 | `documents_select_assigned` enforces the matrix §4 contract | rehearsal §4: client-a 2 · partner-a 3 · orphan 1 · org-role-alone 0 · **org-mismatch 0** · cross-org 0 · suspended 0 · owner 0 · anon denied | ⏳ pending |
-| 5 | Mapping contract + teardown safety | rehearsal §4: `document_type` CHECK rejects `'tax'` · matter-delete cascades its documents (FK on delete cascade) | ⏳ pending |
+| 1 | `--apply` builds the slice cleanly (01, 02, 04, **05**, policies, RPCs) — `05_documents.sql` + `policies/documents.sql` applied on top of the already-applied `matters` table | rehearsal §4 | ✅ **PASSED 2026-08-07** |
+| 2 | Structural pins hold on the applied posture | rehearsal §4: **8 tables / 7 RLS / 7 policies** / documents SELECT grant + anon absence / **no body or content column** (metadata-only, D-V1) / matters + its policies still present | ✅ **PASSED 2026-08-07** |
+| 3 | 00/01/02/03/**04** regression batteries unaffected | rehearsal §4: fixtures + single-account bound + 01/02/03 + the six-matter battery all PASS | ✅ **PASSED 2026-08-07** |
+| 4 | `documents_select_assigned` enforces the matrix §4 contract | rehearsal §4: client-a 2 · partner-a 3 · orphan 1 · org-role-alone 0 · **org-mismatch 0** · cross-org 0 · suspended 0 · owner 0 · anon denied | ✅ **PASSED 2026-08-07** |
+| 5 | Mapping contract + teardown safety | rehearsal §4: `document_type` CHECK rejects `'tax'` · matter-delete cascades its documents (FK on delete cascade) | ✅ **PASSED 2026-08-07** |
 
-**Verdict (pending):** all five criteria are contractually specified above and
-each has a committed battery row; the r1 rehearsal is the first real
-execution. Once r1 reports PASSED with these rows green, the apply-approval
-gate is unblocked pending the owner's signature in §6.
+**Verdict (2026-08-07):** all five criteria **PASSED** on the owner's Path A
+rehearsal run (evidence §4 — rows green, 0 failures). The apply-approval
+gate is unblocked pending the owner's dated signature in §6.
 
 ## 3. Decision (scope this record authorizes — once signed)
 
@@ -143,7 +143,8 @@ roles) per §4 condition 5, and the execution evidence record
 By signing below, the Project Owner authorizes the §3 apply against the
 shared dev project (`eutmvevpskerzpqmwplv`), subject to the §4 execution
 conditions and the §5 exclusions, with the rollback pairing standing by.
-Signature is valid only after r1 (plan T4) reports PASSED per §2.
+Signature is valid — the r1 rehearsal reported PASSED on 2026-08-07
+(plan T4; evidence §4, criteria §2 all green).
 
 - **Project Owner:** github.com/mostafasayed118 — **date: \_\_\_\_** —
   **approval wording (recorded from the pair-programming session):**
