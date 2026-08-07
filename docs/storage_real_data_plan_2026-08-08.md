@@ -192,6 +192,12 @@ follow-up); realtime file events; audit surfacing for storage reads (stays
 
 ## 8. Acceptance criteria
 
+> **Per-row AC status is recorded in the completion evidence
+> (`docs/storage_real_data_completion_evidence_2026-08-08.md` §4)**: the
+> server rows (metadata/bytes/deny/battery/apply) are PARTIAL or HELD on
+> the r1 rehearsal evidence (T4) — nothing applied to the dev project yet;
+> the client rows (surface, addendum-lockstep, gate) are VERIFIED.
+
 - [ ] A file's **metadata** is readable iff the reader is an active member
       of its org **and** assigned (client or attorney) on its matter (RLS
       + battery, matrix §4 line 143/148).
@@ -254,7 +260,8 @@ follow-up); realtime file events; audit surfacing for storage reads (stays
 
 # Tasks: Real Storage (Read) Data Path
 
-Branch: `feat/storage-real-read`
+Branch: `feat/storage-real-read` (merged into `main` at `0b81297`; T7/T8
+landed on `main`).
 
 Each task is independently committable with the stated verification; the
 apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
@@ -317,7 +324,11 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   (migrate → policies → battery → read-as-roles on **both layers**) passes
   on throwaway infra with zero dev-project contact; **owner-side / CI
   runner** (matters/documents/messages r1 Path A precedent; the `supabase
-  start` host provides the storage schema).
+  start` host provides the storage schema). — **⏳ PENDING** (owner-side
+  run; the failed-attempt finding — no Docker/psql on this machine and a
+  PowerShell env-var syntax error, no harness execution — is recorded in
+  the evidence record, which stays ⏳ PENDING and uncommitted until real
+  output lands).
 - [ ] **5. Dated apply-approval → apply** — touches: dev project
   (07_storage migration + both policies + demo file rows + demo objects),
   `docs/storage_apply_approval_<date>.md` + `docs/storage_apply_execution_<date>.md`
@@ -325,8 +336,14 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   `_down.sql` pairing + cleanup discipline (baseline probe: files absent,
   bucket absent, policies 8→9 public + storage.objects 0→1; demo rows +
   objects reference the applied demo matter ids), observed output recorded
-  verbatim.
-- [ ] **6. Matrix addendum (dated)** — touches: `docs/permission_matrix.md`
+  verbatim. — **approval APPLY APPROVED 2026-08-08** (`91c49ce`, §6 dated
+  sign-off; the read-only baseline probes verified: files 0, bucket 0,
+  public policies 8→9, storage policies 0→1, the four demo matter ids
+  resolve under org `ef43087b-…`, `storage.buckets.type` NOT NULL with
+  default, `storage.foldername` present); **execution ⏳ HELD on the r1
+  evidence (T4)** — nothing applied; the execution-record skeleton
+  `docs/storage_apply_execution_2026-08-08.md` is drafted, uncommitted.
+- [x] **6. Matrix addendum (dated)** — touches: `docs/permission_matrix.md`
   §4 + §6 — adds the **"View a matter file (metadata)"** row (client/
   attorney cells SHIP behind `files_select_assigned`; partner/
   `compliance_officer` "deny unless separately assigned" cells stay
@@ -334,8 +351,10 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   rows to enforced (guessed-path download denied — battery-proven; stale
   signed URL — policy-at-generation + TTL, caveat recorded) — done when:
   addendum committed **before** the client surface ships, ledger sweep
-  green.
-- [ ] **7. Client swap (env-gated, NEW surface)** — touches:
+  green. — **DONE `d456f8e` + nits `92c72e8`** (placed chronologically
+  after the messages addendum; §6 lead-in honest — effective on the apply
+  execution, never present-tense over-claim).
+- [x] **7. Client swap (env-gated, NEW surface)** — touches:
   `lib/features/storage/domain/file_metadata.dart` + `storage_gateway.dart`
   + `data/fake_storage_gateway.dart`, `lib/data/storage/supabase_storage_api.dart`
   + impl + `supabase_storage_gateway.dart`, `lib/app/service_locator.dart`,
@@ -344,9 +363,15 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   size_bytes/mime/storage_path, matterRef embed + fallback, failure
   mapping incl. `providerUnavailable`, DI pins, section widget) — done
   when: format clean · analyze clean · suite green (fake unchanged) ·
-  ledger PASS; no shipped VO/presentation changed.
-- [ ] **8. Lockstep + evidence + close** — touches: README test count,
+  ledger PASS; no shipped VO/presentation changed. — **DONE `704f212`**
+  (suite 953 runtime / README 950 declaration, ledger PASS 115, full gate
+  green; `RoleCapability.canViewFiles` added as the D-W5 nav hint; no
+  shipped VO/presentation changed).
+- [x] **8. Lockstep + evidence + close** — touches: README test count,
   roadmap §14 fourth per-feature flip + gate-table row, completion evidence
   `docs/storage_real_data_completion_evidence_<date>.md`, dated close
   decision — done when: all docs sweep green, full gate re-run on the
-  committed state, close decision recorded.
+  committed state, close decision recorded. — **DONE (this commit)** —
+  README 950 (declaration, in ledger lockstep), roadmap §14 fourth
+  per-feature flip + §13 gate-table row (with the r1/apply hold recorded
+  honestly), this evidence record, dated close decision §9.
