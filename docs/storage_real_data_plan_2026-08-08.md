@@ -269,7 +269,7 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   sweep green (no dev-project contact). — **DONE `6f52930`** (the review
   doc on `feat/storage-real-read`; the plan itself was drafted + D-STR
   ratified on `main` `cc33da3`/`bad9641`).
-- [ ] **2. Schema artifacts (rehearsal-ready, NOT applied)** — touches:
+- [x] **2. Schema artifacts (rehearsal-ready, NOT applied)** — touches:
   `supabase/migrations/07_storage.sql` (+ `07_storage.down.sql`),
   `supabase/policies/files.sql` + `supabase/policies/storage_objects.sql`
   — done when: DDL matches D-STR1/D-STR3/D-STR4 (private `matter-files`
@@ -279,6 +279,9 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   + `size_bytes` CHECK + `storage_path`, metadata only, no content
   column; `files_select_assigned` + `files_storage_select` policies),
   `_down.sql` is a clean inverse (drop files + bucket), committed.
+  — **DONE `87b6ef5`** (bucket insert `(id, name, public)` verified live
+  via the read-only probe — `owner` deprecated, omitted; NOT applied at
+  commit; applied later under the T5 approval).
 - [ ] **3. Policy battery** — touches: `supabase/tests/07_storage_rls.sql`
   (new file + object fixture rows referencing the six fixture matters go in
   `supabase/tests/00_fixtures.sql`, the documents/messages precedent —
