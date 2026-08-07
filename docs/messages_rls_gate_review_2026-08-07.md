@@ -142,6 +142,9 @@ Negative (deny rows, `03_platform_owner_boundary` style):
 - active org member, **no matter assignment** → denied (org-role-alone);
 - **org-mismatch (D-MSR2 invariant):** a thread whose `organization_id`
   ≠ its matter's org denies for **every** role (the load-bearing clause);
+  the fixture must be **non-vacuous** — the reader is an active member of
+  the thread's org AND assigned on the temp (different-org) matter, so only
+  the clause denies (the documents T3 lesson, pre-empted);
 - **cross-org**: partner-b assigned on an org-a matter, member of org-b
   only → denied (`is_active_member` of the thread's org fails);
 - **suspended** membership in the thread's org → denied;
