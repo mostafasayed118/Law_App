@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:legalhub/app/deep_link/pending_accept_invite_store.dart';
 import 'package:legalhub/app/localization/locale_cubit.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/admin/platform_admin_gateway.dart';
@@ -256,6 +257,7 @@ void main() {
       expect(serviceLocator.isRegistered<OrgSelectionStore>(), isTrue);
       expect(serviceLocator.isRegistered<BookingGateway>(), isTrue);
       expect(serviceLocator.isRegistered<BookingPrefill>(), isTrue);
+      expect(serviceLocator.isRegistered<PendingAcceptInviteStore>(), isTrue);
       expect(serviceLocator.isRegistered<AttorneyGateway>(), isTrue);
       expect(serviceLocator.isRegistered<ActiveOrgStore>(), isTrue);
       expect(serviceLocator.isRegistered<MatterGateway>(), isTrue);
@@ -303,6 +305,13 @@ void main() {
         identical(
           serviceLocator<BookingPrefill>(),
           serviceLocator<BookingPrefill>(),
+        ),
+        isTrue,
+      );
+      expect(
+        identical(
+          serviceLocator<PendingAcceptInviteStore>(),
+          serviceLocator<PendingAcceptInviteStore>(),
         ),
         isTrue,
       );

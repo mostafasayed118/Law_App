@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:legalhub/app/deep_link/pending_accept_invite_store.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/auth/auth_gateway.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
@@ -157,5 +158,66 @@ void main() {
 
     expect(find.text('Invitation accepted.'), findsNothing);
     expect(find.text('The invitation is invalid or expired.'), findsNothing);
+  });
+
+  group('deep-link pre-fill (Phase 4.1 D-P34.2)', () {
+    testWidgets('a pending deep-linked token pre-fills and clears the store', (
+      tester,
+    ) async {
+      serviceLocator<PendingAcceptInviteStore>().setPendingToken(
+        'deep-link-token',
+      );
+
+      await tester.pumpWidget(harness());
+
+      final TextField field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.controller!.text, 'deep-link-token');
+      // Consumed-and-cleared: the one-time token must not re-deliver on a
+      // later screen visit.
+      expect(
+        serviceLocator<PendingAcceptInviteStore>().hasPendingToken,
+        isFalse,
+      );
+    });
+
+    testWidgets('a deep-linked token never auto-submits and is usable', (
+      tester,
+    ) async {
+      final OrganizationGateway gateway = serviceLocator<OrganizationGateway>();
+      final OrgOutcome<OrganizationSummary> created = await gateway
+          .createOrganization(name: 'Second Firm');
+      final OrgOutcome<InviteResult> invite = await gateway.inviteMember(
+        organizationId: created.valueOrNull!.id,
+        email: FakeOrganizationGateway.demoUserEmail,
+        role: UserRole.attorney,
+      );
+      expect(invite.isSuccess, isTrue);
+      serviceLocator<PendingAcceptInviteStore>().setPendingToken(
+        invite.valueOrNull!.token,
+      );
+
+      await tester.pumpWidget(harness());
+      await tester.pumpAndSettle();
+
+      // Pre-filled but NOT accepted: the user stays in control (same as a
+      // pasted token).
+      final TextField field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.controller!.text, invite.valueOrNull!.token);
+      expect(find.text('Invitation accepted.'), findsNothing);
+
+      // Tapping Accept completes the flow with the pre-filled token.
+      await tester.tap(find.text('Accept'));
+      await tester.pumpAndSettle();
+      expect(find.text('Invitation accepted.'), findsOneWidget);
+    });
+
+    testWidgets('an empty store keeps the paste flow unchanged', (
+      tester,
+    ) async {
+      await tester.pumpWidget(harness());
+
+      final TextField field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.controller!.text, isEmpty);
+    });
   });
 }

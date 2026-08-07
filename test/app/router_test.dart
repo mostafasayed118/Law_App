@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:legalhub/app/deep_link/app_link_listener.dart';
+import 'package:legalhub/app/deep_link/app_link_parser.dart';
+import 'package:legalhub/app/deep_link/app_link_source.dart';
+import 'package:legalhub/app/deep_link/pending_accept_invite_store.dart';
 import 'package:legalhub/app/localization/locale_cubit.dart';
 import 'package:legalhub/app/router.dart';
 import 'package:legalhub/app/service_locator.dart';
@@ -943,6 +947,121 @@ void main() {
     });
   });
 
+  group('router accept-invitation deep link (Phase 4.1 Task 5)', () {
+    // The D-P34.2 hook, wired end-to-end: the AppLinkListener consumes the
+    // cold-start accept-invitation share link (stub AppLinkSource stands in
+    // for the app_links plugin), buffers its one-time token in the locator's
+    // PendingAcceptInviteStore, and drives the real router to the accept
+    // surface — whose initState consume-and-clear pre-fills the paste field
+    // (never auto-submits). Recovery URIs are untouched by this listener,
+    // which is pinned in the listener's own unit tests.
+    testWidgets(
+      'a cold-start accept link opens the accept screen pre-filled and '
+      'consumes the token',
+      (tester) async {
+        await resetServiceLocator();
+        configureDependencies();
+        addTearDown(() => resetServiceLocator());
+
+        await authCubit.startDemoSession();
+        await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+        await tester.pumpAndSettle();
+
+        final AppLinkListener listener = AppLinkListener(
+          _StubAppLinkSource(
+            initialLink: Uri.parse(
+              'com.legalhub.app://accept-invite?token=one-time-token',
+            ),
+          ),
+          const AppLinkParser(),
+          serviceLocator<PendingAcceptInviteStore>(),
+          () => router.go(AppRoutes.acceptInvitation),
+        );
+        addTearDown(listener.dispose);
+        await listener.start();
+        await tester.pumpAndSettle();
+
+        // The listener drove the real router onto the accept surface.
+        expect(
+          router.routerDelegate.currentConfiguration.uri.path,
+          AppRoutes.acceptInvitation,
+        );
+        // The paste field is pre-filled with the one-time token (D-P41.3:
+        // pre-fill, never auto-submit — no accepted confirmation).
+        final TextField field = tester.widget<TextField>(
+          find.byType(TextField),
+        );
+        expect(field.controller!.text, 'one-time-token');
+        expect(find.text('Invitation accepted.'), findsNothing);
+        // Consumed-and-cleared: the token is single-delivery.
+        expect(
+          serviceLocator<PendingAcceptInviteStore>().hasPendingToken,
+          isFalse,
+        );
+      },
+    );
+
+    testWidgets(
+      'a cold-start accept link while signed out bounces to sign-in and '
+      'keeps the token pending (D-P41.4)',
+      (tester) async {
+        await resetServiceLocator();
+        configureDependencies();
+        addTearDown(() => resetServiceLocator());
+
+        await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+        await tester.pumpAndSettle();
+
+        final AppLinkListener listener = AppLinkListener(
+          _StubAppLinkSource(
+            initialLink: Uri.parse(
+              'com.legalhub.app://accept-invite?token=pending-token',
+            ),
+          ),
+          const AppLinkParser(),
+          serviceLocator<PendingAcceptInviteStore>(),
+          () => router.go(AppRoutes.acceptInvitation),
+        );
+        addTearDown(listener.dispose);
+        await listener.start();
+        await tester.pumpAndSettle();
+
+        // The accept route sits behind the auth gate: the redirect bounces
+        // to sign-in, never exposing the paste surface signed out.
+        expect(
+          router.routerDelegate.currentConfiguration.uri.path,
+          AppRoutes.signIn,
+        );
+        expect(find.text('Welcome Back'), findsOneWidget);
+        // The token is buffered in-memory, not lost (cold-start / signed-out
+        // race, D-P41.4).
+        expect(
+          serviceLocator<PendingAcceptInviteStore>().hasPendingToken,
+          isTrue,
+        );
+
+        // A later signed-in visit consummates the D-P41.4 promise: the
+        // buffered token pre-fills the accept surface and is consumed.
+        await authCubit.startDemoSession();
+        router.go(AppRoutes.acceptInvitation);
+        await tester.pumpAndSettle();
+
+        expect(
+          router.routerDelegate.currentConfiguration.uri.path,
+          AppRoutes.acceptInvitation,
+        );
+        final TextField field = tester.widget<TextField>(
+          find.byType(TextField),
+        );
+        expect(field.controller!.text, 'pending-token');
+        expect(
+          serviceLocator<PendingAcceptInviteStore>().hasPendingToken,
+          isFalse,
+        );
+      },
+    );
+  });
+
   group('shell NavigationBar selected index', () {
     testWidgets('highlights home on /home', (tester) async {
       await authCubit.startDemoSession();
@@ -1370,6 +1489,22 @@ class RoleGateway implements AuthGateway {
 
   @override
   Future<void> signOut() async {}
+}
+
+/// Test-only [AppLinkSource] with a fixed cold-start link, so the Phase 4.1
+/// accept-invitation deep-link pin drives the real router + listener without
+/// the app_links plugin. No warm-start emission: the listener's unit tests
+/// cover the stream path.
+class _StubAppLinkSource implements AppLinkSource {
+  _StubAppLinkSource({required this.initialLink});
+
+  final Uri? initialLink;
+
+  @override
+  Future<Uri?> getInitialLink() async => initialLink;
+
+  @override
+  Stream<Uri> get onUri => const Stream<Uri>.empty();
 }
 
 /// Builds a session whose active membership carries [role], so the shell's
