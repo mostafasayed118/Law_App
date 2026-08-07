@@ -16,6 +16,9 @@ import '../data/auth/supabase_auth_api.dart';
 import '../data/auth/supabase_auth_api_impl.dart';
 import '../data/auth/supabase_auth_gateway.dart';
 import '../data/auth/supabase_env.dart';
+import '../data/documents/supabase_document_api.dart';
+import '../data/documents/supabase_document_api_impl.dart';
+import '../data/documents/supabase_document_gateway.dart';
 import '../data/local/in_memory_locale_store.dart';
 import '../data/local/in_memory_org_selection_store.dart';
 import '../data/local/locale_store.dart';
@@ -81,6 +84,7 @@ void configureDependencies({
   SupabaseOrgApi Function()? supabaseOrgApiFactory,
   SupabasePlatformAdminApi Function()? supabasePlatformAdminApiFactory,
   SupabaseMatterApi Function()? supabaseMatterApiFactory,
+  SupabaseDocumentApi Function()? supabaseDocumentApiFactory,
 }) {
   // Lazy singleton: stateless service, created on first resolution.
   // Per §4.5, stateless services/repositories register as lazy singletons.
@@ -315,11 +319,23 @@ void configureDependencies({
   if (!serviceLocator.isRegistered<DocumentGateway>()) {
     // Stateless service: lazy singleton. The vault Cubit is feature-scoped
     // and created per screen via BlocProvider, so it is NOT registered here.
-    // Fake-domain (D-V2): a real documents backend is a later approved
-    // data-layer slice (roadmap §12 boundary).
-    serviceLocator.registerLazySingleton<DocumentGateway>(
-      FakeDocumentGateway.new,
-    );
+    // Like MatterGateway, the flip swaps the dev fake for the
+    // Supabase-backed implementation when the build is configured (Batch 3.3
+    // env pattern). The real path reads the applied `documents` table through
+    // the RLS-scoped SELECT (plan D-DR1/D-DR7) and resolves matterRef via the
+    // embedded matters(title) select (D-DR4); env-less runs and ALL tests
+    // keep the fake.
+    if (env.isConfigured) {
+      serviceLocator.registerLazySingleton<DocumentGateway>(
+        () => SupabaseDocumentGateway(
+          (supabaseDocumentApiFactory ?? SupabaseDocumentApiImpl.bind)(),
+        ),
+      );
+    } else {
+      serviceLocator.registerLazySingleton<DocumentGateway>(
+        FakeDocumentGateway.new,
+      );
+    }
   }
   if (!serviceLocator.isRegistered<MessageGateway>()) {
     // Stateless service: lazy singleton. The messaging Cubit is feature-scoped
