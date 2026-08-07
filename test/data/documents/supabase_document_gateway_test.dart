@@ -226,5 +226,18 @@ void main() {
         expect(error.context, isEmpty);
       },
     );
+
+    test('maps an unavailable read to the unavailable AppError code', () async {
+      api.error = const SupabaseDocumentException(
+        kind: SupabaseDocumentFailureKind.providerUnavailable,
+        message: 'Provider unavailable.',
+      );
+
+      final Result<List<Document>> result = await gateway.fetchDocuments();
+
+      final AppError error = result.errorOrNull!;
+      expect(error.code, 'document_read_unavailable');
+      expect(error.technicalMessage, 'Provider unavailable.');
+    });
   });
 }

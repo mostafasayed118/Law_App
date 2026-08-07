@@ -78,7 +78,12 @@ class SupabaseDocumentGateway implements DocumentGateway {
       // absent embed falls back to the raw matter id, never a fabricated
       // title (the listMyMemberships null-embed pattern).
       matterRef: _matterRefFromRow(row, matterId),
-      type: _typeFromServerName(row['document_type'] as String?),
+      // Guarded, never a bare cast: a present-but-non-string value (beyond
+      // schema drift) would otherwise surface as a raw TypeError instead of
+      // the typed FormatException the fetch catches.
+      type: _typeFromServerName(
+        row['document_type'] is String ? row['document_type'] as String : null,
+      ),
       createdAt: DateTime.parse(createdAt).toLocal(),
     );
   }
