@@ -35,7 +35,7 @@
 | Policy battery + harness | `supabase/tests/04_matter_rls.sql`, `00_fixtures.sql`, `scripts/verify_policy_tests.sh` (`736e433`, `a08ef99`) | ✅ Committed; static `--check` PASS 24/0/0 |
 | **Ephemeral rehearsal (r1)** | `docs/matters_rehearsal_evidence_r1_2026-08-07.md` (`ea3a15d`) | ✅ **Executed — PASSED 2026-08-07** (Path A, owner's Docker host; all ten 04 checks + structural pins green; `RESULT: PASS`) |
 | **Apply approval (this record)** | this document | ✅ **APPROVED 2026-08-07** (owner's dated sign-off, §6) |
-| Apply execution (dev project) | `docs/matters_apply_execution_2026-08-07.md` (to be written) | ⏳ Only after §6 is signed |
+| Apply execution (dev project) | `docs/matters_apply_execution_2026-08-07.md` (`0181cfa` approval; execution record committed) | ✅ **APPLIED 2026-08-07** — baseline probe → 04_matters → policy → demo seed → post-apply smoke all verified; rollback pairing standing by |
 
 ## 2. Gate criteria — what the r1 rehearsal proved (evidence `ea3a15d`)
 
