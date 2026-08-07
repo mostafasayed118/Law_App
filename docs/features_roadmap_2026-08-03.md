@@ -593,7 +593,7 @@ relaxation.
 | 10 | Phase 10 — matter workspace (read-first, client-only) | MVP spec §4; Phase 7/8/9 seams (details screen + fake-domain pattern) | no | scope note → decision-record ratification (D-W1…D-W6) → slices 10.0–10.2 → gate stack → owner push approval | **SHIPPED 2026-08-04** (`90465df` + `31f0624` + slice 10.2 l10n pins, suite 659, ledger PASS 115; pushed to origin/main) |
 | 11 | Phase 11 — unified search (read-first, client-only, aggregating) | MVP spec §4; Phase 6–10 seams (four fake-domain gateway seams + inert home search field) | no | scope note → decision-record ratification (D-S1…D-S6) → slices 11.0–11.2 → gate stack → owner push approval | **SHIPPED 2026-08-04** (`7c8ead8`, slices 11.0–11.2, suite 691, ledger PASS 115; pushed to origin/main) |
 | 12 | Phase 12 — reverse cross-link (client-only) | MVP §4 read-first; Phase 10 `matterRef` seam + Phase 7 details route | no | scope note → decision-record ratification (D-C1…D-C6) → slices 12.0–12.2 → gate stack → owner push approval | **IMPLEMENTED + SHIPPED 2026-08-05** — 12.0 `16e9b67` (pushed, suite 701/README 698); 12.1 `69622ce` + 12.2 `cd5c903` (committed, suite 706/README 703); ledger PASS 115; push of 12.1/12.2 awaits owner approval |
-| — | §14 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Deferred |
+| — | §14 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Deferred — **matters read is the first per-feature un-deferral, SHIPPED 2026-08-07** (real-matters read slice: RLS design → battery → rehearsal r1 → dated apply-approval → apply → matrix addendum → env-gated client swap; plan `docs/matters_real_data_plan_2026-08-07.md`, evidence `docs/matters_real_data_completion_evidence_2026-08-07.md`; docs/matters/database commits `bf27f84`..`41577a0`, suite 877, ledger PASS 115; documents/messages/storage/realtime/audit/billing/AI stay deferred, each a separate per-feature un-deferral) |
 
 Rules that apply to every phase (definition-of-done from
 `docs/codebase_audit_plan.md`): scope/assumptions/non-goals documented ·
@@ -606,6 +606,18 @@ approval**.
 
 Per README boundary + `docs/permission_matrix.md` §4/§6: **matters,
 documents, messages, storage, realtime, audit surfacing, billing, AI**.
+The **real matters data path is the first per-feature un-deferral —
+SHIPPED 2026-08-07 (read slice)** under this gate: RLS-gate design review
+(`docs/matters_rls_gate_review_2026-08-07.md`), rehearsal-ready artifacts
+(`supabase/migrations/04_matters.sql` + `policies/matters.sql`), policy
+battery (`supabase/tests/04_matter_rls.sql`, ten checks green), rehearsal
+r1 PASSED (ephemeral, owner's host), dated apply-approval + execution on
+the dev project (table + `matters_select_assigned` + demo seed, rollback
+pairing standing by), dated matrix §4 addendum, and the env-gated client
+swap (`SupabaseMatterGateway` behind `env.isConfigured`; VO/presentation
+untouched). The remaining deferred paths each keep this same per-feature
+discipline: documents, messages, storage, realtime, audit surfacing,
+billing, AI.
 The client-only document-metadata surface shipped as Phase 8 (slices
 8.0–8.2, `22d63e5`/`29fd40a`/`430b62b`) carries no real document data —
 the real documents data path stays deferred here with the rest. The

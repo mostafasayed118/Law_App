@@ -135,21 +135,26 @@ un-deferral with the same discipline); audit wiring for matter reads (the
 
 ## 8. Acceptance criteria
 
-- [ ] A matter is readable iff the reader is its assigned client **or**
+- [x] A matter is readable iff the reader is its assigned client **or**
       assigned attorney **and** an active member of its org (RLS + battery).
-- [ ] Org-role-alone, cross-org, unauthenticated, and
+      — battery `04_matter_rls.sql` checks 04.01–04.07; r1 PASSED.
+- [x] Org-role-alone, cross-org, unauthenticated, and
       `platform_owner_admin` reads are denied (battery, 03-style deny rows).
-- [ ] Battery green via `verify_policy_tests.sh`; rehearsal r-series passed
-      with evidence before any apply.
-- [ ] Apply executed only under the owner's dated apply-approval, with
-      `_down.sql` rollback pairing and demo-row cleanup discipline.
-- [ ] Client swap is env-gated; env-less runs and the full Flutter suite
-      are unchanged (fake); `Matter` VO and presentation untouched.
-- [ ] Dated matrix addendum (§7) precedes the client surface shipping;
+      — checks 04.05–04.09 + the owner residual recorded.
+- [x] Battery green via `verify_policy_tests.sh`; rehearsal r-series passed
+      with evidence before any apply. — r1 PASSED (Path A, owner's host).
+- [x] Apply executed only under the owner's dated apply-approval, with
+      `_down.sql` rollback pairing and demo-row cleanup discipline. — §6
+      signed; execution evidence `matters_apply_execution` records the run.
+- [x] Client swap is env-gated; env-less runs and the full Flutter suite
+      are unchanged (fake); `Matter` VO and presentation untouched. — DI
+      flip pinned in `service_locator_test`; suite green on the fake.
+- [x] Dated matrix addendum (§7) precedes the client surface shipping;
       roadmap §14 row flips to per-feature; README count in lockstep;
-      ledger PASS.
-- [ ] Full gate on every client slice: format clean · analyze clean ·
-      suite green · ledger PASS — nothing pushed.
+      ledger PASS. — matrix addendum `3dbf623`; this commit flips §14.
+- [x] Full gate on every client slice: format clean · analyze clean ·
+      suite green · ledger PASS — nothing pushed. — re-run at T8 (evidence
+      §2.1); nothing pushed.
 
 ## 9. Risks / open questions
 
@@ -204,13 +209,16 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   §4/§6 rows for the matter read (assigned-only grant; deny rows) per §7
   discipline — done when: addendum committed **before** the client surface
   ships, ledger sweep green.
-- [ ] **7. Client swap (env-gated)** — touches:
+- [x] **7. Client swap (env-gated)** — touches:
   `lib/data/matters/supabase_matter_gateway.dart` (+ mapper), `lib/app/service_locator.dart`,
   tests (mapping, failure mapping, name resolution, DI pins) — done when:
   format clean · analyze clean · suite green (fake unchanged) · ledger
-  PASS; VO/presentation untouched.
-- [ ] **8. Lockstep + evidence + close** — touches: README test count,
+  PASS; VO/presentation untouched. **SHIPPED 2026-08-07** (`37cc68b` +
+  `41577a0`): seam + impl + gateway + DI flip, 19 new tests (suite
+  857→877), README lockstep, ledger PASS 115.
+- [x] **8. Lockstep + evidence + close** — touches: README test count,
   roadmap §14 per-feature flip + gate-table row, completion evidence
-  `docs/matters_real_data_completion_evidence_<date>.md`, dated close
+  `docs/matters_real_data_completion_evidence_2026-08-07.md`, dated close
   decision — done when: all docs sweep green, full gate re-run on the
-  committed state, close decision recorded.
+  committed state, close decision recorded. **DONE 2026-08-07** — this
+  commit; close decision recorded in the evidence §9.
