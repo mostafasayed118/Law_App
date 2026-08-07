@@ -31,7 +31,7 @@
 
 | Gate step | Artifact | Status |
 |---|---|---|
-| §14 un-deferral gate (P0 closes + policy tests) | `docs/p0_closure_scope_2026-08-05.md` RATIFIED + `scripts/verify_policy_tests.sh` + the **matters precedent SHIPPED + applied** (the FK target + assignment source) | ✅ Met 2026-08-07 |
+| §14 un-deferral gate (P0 closes + policy tests) | `docs/p0_closure_scope_2026-08-05.md` RATIFIED + `scripts/verify_policy_tests.sh` + the **matters precedent SHIPPED + applied** (the FK target + assignment source) | ✅ Met — P0 RATIFIED 2026-08-05 · matters precedent SHIPPED + applied 2026-08-07 |
 | RLS-gate design review | `docs/documents_rls_gate_review_2026-08-07.md` (`77f14fb`) | ✅ Passed 2026-08-07 |
 | Schema artifacts (rehearsal-ready) | `supabase/migrations/05_documents.sql` + `05_documents.down.sql` (`f8cc6c6`, `7c8ab79`) | ✅ Committed — NOT applied |
 | Policy artifact | `supabase/policies/documents.sql` (`f8cc6c6`) | ✅ Committed — NOT applied |
