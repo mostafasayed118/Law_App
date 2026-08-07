@@ -51,18 +51,19 @@ rollback;
 
 -- CHECK 04.10 — POS (privileged half): org-delete cascade — dropping the org
 -- removes its matters (FK on delete cascade), so an org teardown can never
--- strand orphaned matter rows.
+-- strand orphaned matter rows. Deletes org-a (which holds ALL six fixture
+-- matters) so the cascade is actually exercised, not vacuous.
 begin;
 do $$
 declare
   v_cnt bigint;
 begin
-  delete from public.organizations where id = '20000000-0000-4000-8000-000000000002';
+  delete from public.organizations where id = '20000000-0000-4000-8000-000000000001';
   select count(*) into v_cnt
     from public.matters
-   where organization_id = '20000000-0000-4000-8000-000000000002';
+   where organization_id = '20000000-0000-4000-8000-000000000001';
   if v_cnt <> 0 then
-    raise exception 'POLICY-BATTERY FAIL 04.10: % org-b matters survived the org delete', v_cnt;
+    raise exception 'POLICY-BATTERY FAIL 04.10: % org-a matters survived the org delete', v_cnt;
   end if;
 end $$;
 rollback;

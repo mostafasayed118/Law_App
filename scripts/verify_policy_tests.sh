@@ -158,12 +158,16 @@ apply_slice() {
 
   psql_apply "$SUPABASE_DIR/migrations/01_org_schema.sql" "apply migrations/01_org_schema.sql"
   psql_apply "$SUPABASE_DIR/migrations/02_rls_functions.sql" "apply migrations/02_rls_functions.sql"
+  psql_apply "$SUPABASE_DIR/migrations/04_matters.sql" "apply migrations/04_matters.sql"
   # 03_platform_config_seed.sql is deliberately NOT applied: its owner token
   # is an apply-time substitution placeholder for the dev project; the
   # battery's fixtures seed the rehearsal project's own owner row (D-P0C3
   # proves the bound; the seed itself is a trusted migration, not a client
   # reachable path).
   note "apply: 03_platform_config_seed.sql skipped by design (apply-time token; fixtures seed the rehearsal owner)"
+  # The structural pins (7 tables/RLS, 6 policies) and 00_fixtures' matters
+  # reset require the matters slice — applied above via 04_matters.sql.
+  # policies/matters.sql is applied in the policies loop below.
   for f in "$SUPABASE_DIR"/policies/*.sql; do
     psql_apply "$f" "apply $(basename "$f")"
   done
