@@ -225,6 +225,54 @@ there.
 > widens no other row; **in effect since the apply execution 2026-08-07
 > (`f500095`)**, and the client surface (plan T7) ships next.
 
+> **§4 addendum (2026-08-07, real-messages read slice — plan
+> `docs/messages_real_data_plan_2026-08-07.md`, third §14 un-deferral):**
+> a **new "View a message thread (metadata)" row is added** — the
+> **client / attorney cells SHIP**, granted server-side by
+> `message_threads_select_assigned`
+> (`supabase/policies/message_threads.sql`) and policy-tested by
+> `supabase/tests/06_message_rls.sql` (rehearsal r1 **PASSED 2026-08-07**,
+> evidence `docs/messages_rehearsal_evidence_r1_2026-08-07.md`; static
+> battery `--check` 37/0/0). The grant is exactly: an **active member of
+> the thread's org** who is the assigned **client** or the assigned
+> **attorney** on the thread's matter — threads are **matter-scoped
+> content** (line 143/148), so the thread gate IS the matter gate (the
+> policy's exists subquery on `matters`). Deny rows now each have a
+> battery check:
+> - **org role alone** (no matter assignment) → deny, every role;
+> - **org-mismatch** (thread org ≠ its matter's org) → deny, every role
+>   — the load-bearing D-MSR2 clause (a thread is never readable when its
+>   matter is not, line 143/148), NON-VACUOUS: the battery's 06.02 count
+>   proves an assigned reader reads org-a threads generally, so the 06.05
+>   deny is specifically the clause;
+> - **cross-org** (assigned on an org-a matter, org-b member only) → deny;
+> - **suspended membership** in the thread's org → deny;
+> - **unauthenticated** → deny;
+> - **`platform_owner_admin`** → deny, always (owner accounts are never
+>   assigned — an operational invariant, not a policy guarantee; recorded
+>   residual in `docs/messages_rls_gate_review_2026-08-07.md` Q4).
+> The battery also pins the schema contract + teardown safety beyond the
+> grant rows: the `message_count` CHECK rejects a negative count and the
+> matter-delete FK cascade removes a matter's threads (06.10/06.11).
+> **Not granted by this addendum:** the partner / `compliance_officer`
+> "deny unless separately assigned" cells stay **ungranted** (the oversight
+> mechanism is undefined, D-MSR5 — future work, mirroring D-MR5/D-DR5);
+> **the "Read a document/message body" row keeps its §14 deferral** — the
+> `message_threads` table is thread-metadata-only, **no
+> body/preview/attachment/sender column exists** (D-MSG1), and the
+> forward pin now narrows to `('messages','files')` (individual message
+> rows/bodies + file storage stay deferred; the never-built
+> `matter_documents`/`matter_messages` join-table names are dropped).
+> **Basis:** §14 gate-lift (P0 closure RATIFIED + policy battery
+> shipped) · r1 PASS (`a37c6dc`) · apply-approval + execution
+> (`docs/messages_apply_approval_2026-08-07.md` APPLY APPROVED 2026-08-07
+> + `docs/messages_apply_execution_2026-08-07.md` `a14650d` — applied and
+> verified on the dev project: 9 tables / 9 RLS / 8 policies live, the
+> D-MSR2 join probe 0 mismatches, smoke partner 3 / clients 0). Per §7
+> this extends, not replaces, and widens no other row; **in effect since
+> the apply execution 2026-08-07 (`a14650d`)**, and the client surface
+> (plan T7) ships next.
+
 ---
 
 ## 5. `platform_owner_admin` — explicit boundary (contract §2 #2, #4)
