@@ -41,7 +41,7 @@
 | Policy battery + harness | `supabase/tests/06_message_rls.sql`, `00_fixtures.sql`, `scripts/verify_policy_tests.sh` (`0ed14c7`, `4905697`) | ✅ Committed; static `--check` PASS 37/0/0 |
 | **Ephemeral rehearsal (r1)** | `docs/messages_rehearsal_evidence_r1_2026-08-07.md` (`a37c6dc`) | ✅ **PASSED 2026-08-07** — owner's Path A run (§4 evidence) |
 | **Apply approval (this record)** | this document | ✅ **APPROVED 2026-08-07** (owner's dated sign-off, §6) |
-| Apply execution (dev project) | `docs/messages_apply_execution_2026-08-07.md` | ⏳ **Pending** — owner-side run (no CLI link/token on the dev machine at execution time); runbook + expected outcomes in the execution record |
+| Apply execution (dev project) | `docs/messages_apply_execution_2026-08-07.md` | ✅ **APPLIED 2026-08-07** — baseline probe → 06_message_threads → policy → demo seed → post-apply smoke all verified; rollback pairing standing by |
 
 ## 2. Gate criteria — what the r1 rehearsal must prove
 
@@ -176,8 +176,9 @@ Signature is valid — the r1 rehearsal reported PASSED on 2026-08-07
 
 - Signed 2026-08-07: this record's status is ✅ APPLY APPROVED (dated); the
   plan's T5 row annotated.
-- On apply execution: the execution record (`docs/messages_apply_execution_2026-08-07.md`)
-  is written from the actual run (owner-side — no CLI link/token on the
-  dev machine at execution time), T6 (matrix addendum) and T7 (client swap)
+- Executed 2026-08-07: the execution record
+  (`docs/messages_apply_execution_2026-08-07.md`) is APPLIED — baseline
+  probe → 06_message_threads → policy → demo seed → post-apply smoke all
+  verified on the dev project; T6 (matrix addendum) and T7 (client swap)
   follow, and the roadmap §14/§13 + README/ledger lockstep is re-run on the
   merged tree (T8).
