@@ -40,7 +40,7 @@
 | Policy battery + harness | `supabase/tests/05_document_rls.sql`, `00_fixtures.sql`, `scripts/verify_policy_tests.sh` (`b5bf0b2`) | ✅ Committed; static `--check` PASS 31/0/0 |
 | **Ephemeral rehearsal (r1)** | `docs/documents_rehearsal_evidence_r1_2026-08-07.md` | ✅ **PASSED 2026-08-07** — owner's Path A run (§4 evidence) |
 | **Apply approval (this record)** | this document | ✅ **APPROVED 2026-08-07** (owner's dated sign-off, §6) |
-| Apply execution (dev project) | `docs/documents_apply_execution_2026-08-07.md` | ⏳ Execution — runs under this APPROVED record (§4 guardrails) |
+| Apply execution (dev project) | `docs/documents_apply_execution_2026-08-07.md` | ✅ **APPLIED 2026-08-07** — baseline probe → 05_documents → policy → demo seed → post-apply smoke all verified; rollback pairing standing by |
 
 ## 2. Gate criteria — what the r1 rehearsal must prove
 
