@@ -185,6 +185,46 @@ there.
 > effective on apply execution, and the client surface (plan T7) ships only
 > after the apply lands.
 
+> **§4 addendum (2026-08-07, real-documents read slice — plan
+> `docs/documents_real_data_plan_2026-08-07.md`, second §14 un-deferral):**
+> a **new "View a document (metadata)" row is added** — the **client /
+> attorney cells SHIP**, granted server-side by `documents_select_assigned`
+> (`supabase/policies/documents.sql`) and policy-tested by
+> `supabase/tests/05_document_rls.sql` (rehearsal r1 **PASSED 2026-08-07**,
+> evidence `docs/documents_rehearsal_evidence_r1_2026-08-07.md`; static
+> battery `--check` 31/0/0). The grant is exactly: an **active member of
+> the document's org** who is the assigned **client** or the assigned
+> **attorney** on the document's matter — documents are **matter-scoped
+> content** (line 143/148), so the document gate IS the matter gate (the
+> policy's exists subquery on `matters`). Deny rows now each have a
+> battery check:
+> - **org role alone** (no matter assignment) → deny, every role;
+> - **org-mismatch** (document org ≠ its matter's org) → deny, every role
+>   — the load-bearing D-DR2 clause (a document is never readable when its
+>   matter is not, line 143/148);
+> - **cross-org** (assigned on an org-a matter, org-b member only) → deny;
+> - **suspended membership** in the document's org → deny;
+> - **unauthenticated** → deny;
+> - **`platform_owner_admin`** → deny, always (owner accounts are never
+>   assigned — an operational invariant, not a policy guarantee; recorded
+>   residual in `docs/documents_rls_gate_review_2026-08-07.md` Q4).
+> The battery also pins the schema contract + teardown safety beyond the
+> grant rows: the `document_type` CHECK rejects an unmapped value and the
+> matter-delete FK cascade removes a matter's documents (05.10/05.11).
+> **Not granted by this addendum:** the partner / `compliance_officer`
+> "deny unless separately assigned" cells stay **ungranted** (the oversight
+> mechanism is undefined, D-DR5 — future work, mirroring D-MR5); **the
+> "Read a document/message body" row keeps its §14 deferral** — the
+> documents table is metadata-only, **no body/content/size/url column
+> exists** (D-V1), so body reads are structurally impossible in this
+> slice. **Basis:** §14 gate-lift (P0 closure RATIFIED + policy battery
+> shipped) · r1 PASS (`7f9e89a`) · apply-approval + execution
+> (`docs/documents_apply_approval_2026-08-07.md` APPLY APPROVED 2026-08-07
+> + `docs/documents_apply_execution_2026-08-07.md` `f500095` — applied and
+> verified on the dev project). Per §7 this extends, not replaces, and
+> widens no other row; **in effect since the apply execution 2026-08-07
+> (`f500095`)**, and the client surface (plan T7) ships next.
+
 ---
 
 ## 5. `platform_owner_admin` — explicit boundary (contract §2 #2, #4)
