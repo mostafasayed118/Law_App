@@ -137,10 +137,11 @@ un-deferral with the same discipline); audit wiring for matter reads (the
 
 - [x] A matter is readable iff the reader is its assigned client **or**
       assigned attorney **and** an active member of its org (RLS + battery).
-      — battery `04_matter_rls.sql` checks 04.01–04.07; r1 PASSED.
+      — battery `04_matter_rls.sql` checks 04.01–04.03 (assigned
+      positives); r1 PASSED.
 - [x] Org-role-alone, cross-org, unauthenticated, and
       `platform_owner_admin` reads are denied (battery, 03-style deny rows).
-      — checks 04.05–04.09 + the owner residual recorded.
+      — checks 04.04–04.08 (negatives) + the owner residual recorded.
 - [x] Battery green via `verify_policy_tests.sh`; rehearsal r-series passed
       with evidence before any apply. — r1 PASSED (Path A, owner's host).
 - [x] Apply executed only under the owner's dated apply-approval, with

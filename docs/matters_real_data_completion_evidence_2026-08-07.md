@@ -32,7 +32,7 @@ through the env-gated client swap — delivered as plan T1–T8:
 
 ## 2. Verified (actually run, 2026-08-07)
 
-### 2.1 Final gate on `main` (post-T7, re-confirmed at T8)
+### 2.1 Final gate on `main` (post-`41577a0`, the last code commit; T8 is docs-only and re-swept the ledger)
 
 | Check | Result |
 |---|---|
