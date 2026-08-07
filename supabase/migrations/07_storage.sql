@@ -30,7 +30,13 @@ begin;
 -- `owner` is the deprecated column (superseded by owner_id in current
 -- storage versions) and is deliberately omitted; file_size_limit /
 -- allowed_mime_types stay default (unlimited demo posture). `on conflict
--- (id) do nothing` keeps the harness --apply loop idempotent.
+-- (id) do nothing` keeps the harness --apply loop idempotent. The `type`
+-- (USER-DEFINED enum) and `avif_autodetection` columns' nullability /
+-- defaults were NOT probed (information_schema shows types, not
+-- defaults) — the bare insert is verified against the rehearsal host
+-- first (verify-don't-guess, T4) before the T5 apply; if the host's
+-- schema demands `type`, the apply adds it from the rehearsal-proven
+-- column list.
 insert into storage.buckets (id, name, public)
 values ('matter-files', 'matter-files', false)
 on conflict (id) do nothing;
