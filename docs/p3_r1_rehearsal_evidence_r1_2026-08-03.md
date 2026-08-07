@@ -93,7 +93,7 @@ Cross-cutting (all PASSED):
 
 | Step | Apply | Verified |
 |---|---|---|
-| 1 | Amended `rpc/_down.sql` (full file) | ✅ executed cleanly; 0 slice RPCs remain; new function gone (`42883` on call) — full-rollback path |
+| 1 | Amended `rpc/_down.sql` (full file) | ✅ executed cleanly; 0 slice RPCs remain; new function gone (Postgres error 42883 on call — backticks omitted so the ledger hash sweep does not misread the error code as a commit ref) — full-rollback path |
 | 1′ | Pairing drop line (exactly the one added line) | ✅ 17 RPCs; `list_org_members_metadata` absent; `has_function_privilege` → false |
 | 2 | Inventory re-assert | ✅ snapshots 1–4 byte-equal to §3 baseline; snapshot 5 byte-equal **after re-running the migration-02 helper grants** (blanket revoke in the full-file down removes them; baseline restores them — documented, not a slice defect) |
 | 3 | Surface sanity | ✅ R-4 canary green (policy read 6 rows; `write_audit` denied); invitations policy partner=7 / client=0 rows; dropped RPC absent |
