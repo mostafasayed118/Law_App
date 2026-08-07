@@ -100,7 +100,7 @@ distinctly from generic errors.
 
 | Dependency | State |
 |---|---|
-| Applied dev project (`eutmvevpskerzpqmwplv`) | ✅ Up 1–5 GREEN — the 17 RPCs + policies + trigger are live |
+| Applied dev project (`eutmvevpskerzpqmwplv`) | ✅ Up 1–5 GREEN — the 17 applied P2 RPCs + Phase 3 R1 `list_org_members_metadata` (18 total) + policies + trigger are live |
 | `.env` (URL + **anon** key, git-ignored) | ✅ owner-held; anon-key guard must stay in front of any provider wiring |
 | P2 §4.5 **provider loop** (post-apply) | ✅ **P2 closed 2026-08-03; loop DEFERRED as documented residual risk** — not executed (no signup/email/confirm against the dev project); see `docs/p2_close_decision_2026-08-03.md`. P3 end-to-end verification runs against the applied schema with the provider loop deferred to P3, not re-opened as a P2 prerequisite. **RATIFIED 2026-08-05 (D-45.1):** completion plan in `docs/p2_provider_loop_decision_2026-08-05.md` — Phase 1 ephemeral rehearsal loop (zero external effect) first, Phase 2 dev-project smoke under a dated apply-approval once a controlled inbox exists |
 | Provider behaviors observed at apply | email confirmation **enabled** (signup → pending state); sign-in returns `invalid_credentials` for unknown users; reset returns generic `200 {}` — P3 must handle each distinctly |
@@ -134,6 +134,7 @@ distinctly from generic errors.
 | `delete_my_account` | `() → void` | self | §2 delete own |
 | `list_organizations_metadata` | `() → org list` | **owner only** | §5 |
 | `list_members_metadata` | `() → id/name/locale/role/status` | **owner only** | §5 |
+| `list_org_members_metadata` | `(org uuid) → member + pending-invite rows` | partner | §2 addendum (Phase 3 R1 — applied 2026-08-03; `display_name`/`locale` from `profiles` under the in-body guard; the roster `listMembers` routes here) |
 | `suspend_membership_platform` / `reactivate_membership_platform` | `(org uuid, user uuid) → void` | **owner only** | §5 |
 | `delete_demo_account` | `(user uuid) → void` | **owner only** (never self) | §5 |
 | `read_org_audit` / `read_platform_audit` | `(org uuid) → rows` / `() → rows` | partner / owner | §6 |
@@ -156,6 +157,13 @@ distinctly from generic errors.
 ---
 
 ## 5. Current client state (what P3 builds on)
+
+> **Baseline note:** this table is the **pre-implementation** state at plan
+> approval (2026-08-02) — e.g. "no sign-in/sign-up/reset methods" and
+> `Session.memberships` hard-coded empty were true then, not now. Every row
+> was changed by P3.1–P3.5 (see §1 gate table + the five evidence records);
+> the table is retained as the historical starting point, not a
+> description of current code.
 
 | Area | Current | P3 change |
 |---|---|---|
@@ -363,20 +371,34 @@ staging; no real client/legal data.
    RPC amendment slice** (e.g. a partner-scoped member-metadata RPC — the
    D-T6-resolution forward hook), or (b) the owner approves that amendment slice as
    a P3 prerequisite. **Recommendation: (a)** — keep P3 client-only and
-   surface names in a follow-up amendment, per Q5/D-T6.
+   surface names in a follow-up amendment, per Q5/D-T6. **RESOLVED
+   2026-08-03 (R1):** the follow-up amendment shipped as Phase 3 R1 —
+   `list_org_members_metadata` returns `display_name`/`locale` from
+   `profiles` under the in-body guard (matrix §2 addendum); the P3.3
+   roster renders names (see §4).
 2. **Invitation delivery.** No email infra is approved; `invite_member`
    returns the token once for out-of-band delivery (copy/share link). Does
    the owner want an in-app "copy invite link" affordance only (default),
-   or a separate email-delivery slice later?
+   or a separate email-delivery slice later? **RESOLVED (partial,
+   2026-08-07):** the one-shot token ships with a copy affordance (P3.3
+   paste surface) and the accept deep-link **consume** side shipped as
+   Phase 4.1 D-P34.2; the invite-side **share-link generation**
+   (`com.legalhub.app://accept-invite?token=…` produced at invite time) is
+   **NOT built** — recorded as a small client-only follow-up slice; email
+   delivery stays out of scope.
 3. **Active-org persistence.** Persist the selected org in
    `SharedPreferences` (default) vs session-only? (Either is fine — it is
-   UX context, never authorization.)
+   UX context, never authorization.) **RESOLVED 2026-08-05 (D-P32.2):**
+   persisted via `SharedPreferences` (the `LocaleStore` pattern).
 4. **Re-auth UX.** Dedicated re-auth screen vs inline dialog when a session
    expires mid-flow? (Default: dedicated screen routed from
-   `reauthRequired`.)
+   `reauthRequired`.) **RESOLVED 2026-08-05 (P3.1):** dedicated re-auth
+   screen routed from `reauthRequired`.
 5. **Delete-account placement.** Account deletion entry in Settings only,
    or also an in-flow option after failed verification? (Default: Settings
-   only.)
+   only.) **RESOLVED 2026-08-05 (P3.4):** account deletion lives in the
+   profile/settings surface with a destructive confirm, not an in-flow
+   option.
 
 ---
 
