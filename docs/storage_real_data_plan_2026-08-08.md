@@ -282,7 +282,7 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   — **DONE `87b6ef5`** (bucket insert `(id, name, public)` verified live
   via the read-only probe — `owner` deprecated, omitted; NOT applied at
   commit; applied later under the T5 approval).
-- [ ] **3. Policy battery** — touches: `supabase/tests/07_storage_rls.sql`
+- [x] **3. Policy battery** — touches: `supabase/tests/07_storage_rls.sql`
   (new file + object fixture rows referencing the six fixture matters go in
   `supabase/tests/00_fixtures.sql`, the documents/messages precedent —
   including the reset-ordering `delete from public.files;` +
@@ -301,7 +301,14 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   narrowed to `('messages')`), **and the harness header + D-P0C1(b)
   forward-pin comments** ("all nine" → "all ten"; "individual
   messages/files still absent" → "individual message rows/bodies still
-  absent; file storage shipped as the fourth un-deferral") — done when: static `--check` green
+  absent; file storage shipped as the fourth un-deferral")
+  — done when: static `--check` green and the battery runs green against a
+  Postgres-with-storage (owner's Docker `supabase start` host or CI) with
+  the §4/§6 deny rows incl. the non-vacuous org-mismatch + guessed-path
+  rows; committed. — **DONE `47150be`** (static `--check` **331/0/0**;
+  the live battery runs in T4 (r1 PASSED); the anon-posture probe
+  (platform SELECT grants on storage.objects to anon + authenticated)
+  recorded in the battery header + harness 1g). — done when: static `--check` green
   and the battery runs green against a Postgres-with-storage (owner's
   Docker `supabase start` host or CI) with the §4/§6 deny rows incl. the
   non-vacuous org-mismatch + guessed-path rows; committed.
