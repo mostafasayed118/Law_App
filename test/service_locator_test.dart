@@ -22,6 +22,8 @@ import 'package:legalhub/data/auth/supabase_env.dart';
 import 'package:legalhub/data/local/in_memory_org_selection_store.dart';
 import 'package:legalhub/data/local/locale_store.dart';
 import 'package:legalhub/data/local/org_selection_store.dart';
+import 'package:legalhub/data/matters/supabase_matter_api.dart';
+import 'package:legalhub/data/matters/supabase_matter_gateway.dart';
 import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/data/orgs/supabase_membership_repository.dart';
@@ -182,6 +184,14 @@ class _FakeSupabasePlatformAdminApi implements SupabasePlatformAdminApi {
 
   @override
   Future<void> deleteDemoAccount({required String userId}) async {}
+}
+
+/// Hand-rolled fake of the [SupabaseMatterApi] seam for the DI flip test
+/// (same discipline as [_FakeSupabaseOrgApi]).
+class _FakeSupabaseMatterApi implements SupabaseMatterApi {
+  @override
+  Future<List<Map<String, dynamic>>> fetchMatters() async =>
+      <Map<String, dynamic>>[];
 }
 
 /// Builds a JWT-shaped string whose payload carries the given role claim.
@@ -374,9 +384,23 @@ void main() {
       configureDependencies();
 
       // D-M2: same boundary discipline as the discovery/booking gateways —
-      // the dev fake is the registered seam; a real matter backend is a
-      // later approved data-layer slice.
+      // the dev fake is the registered seam; the env-gated real swap (plan
+      // T7) only takes over in configured builds.
       expect(serviceLocator<MatterGateway>(), isA<FakeMatterGateway>());
+    });
+
+    test('flips MatterGateway when env carries an anon key (plan T7)', () {
+      configureDependencies(
+        supabaseEnv: SupabaseEnv(
+          url: 'https://example.supabase.co',
+          anonKey: _anonJwt(),
+        ),
+        // The real bind() needs a running Supabase.instance; tests inject
+        // the seam instead (the flip's test seam, not production code).
+        supabaseMatterApiFactory: _FakeSupabaseMatterApi.new,
+      );
+
+      expect(serviceLocator<MatterGateway>(), isA<SupabaseMatterGateway>());
     });
 
     test('wires the document gateway to the fake dev implementation', () {

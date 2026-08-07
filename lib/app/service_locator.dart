@@ -22,6 +22,9 @@ import '../data/local/locale_store.dart';
 import '../data/local/org_selection_store.dart';
 import '../data/local/shared_preferences_locale_store.dart';
 import '../data/local/shared_preferences_org_selection_store.dart';
+import '../data/matters/supabase_matter_api.dart';
+import '../data/matters/supabase_matter_api_impl.dart';
+import '../data/matters/supabase_matter_gateway.dart';
 import '../data/orgs/fake_membership_repository.dart';
 import '../data/orgs/fake_organization_gateway.dart';
 import '../data/orgs/supabase_membership_repository.dart';
@@ -77,6 +80,7 @@ void configureDependencies({
   SupabaseAuthApi Function()? supabaseAuthApiFactory,
   SupabaseOrgApi Function()? supabaseOrgApiFactory,
   SupabasePlatformAdminApi Function()? supabasePlatformAdminApiFactory,
+  SupabaseMatterApi Function()? supabaseMatterApiFactory,
 }) {
   // Lazy singleton: stateless service, created on first resolution.
   // Per §4.5, stateless services/repositories register as lazy singletons.
@@ -289,9 +293,24 @@ void configureDependencies({
   if (!serviceLocator.isRegistered<MatterGateway>()) {
     // Stateless service: lazy singleton. The matter Cubit is feature-scoped
     // and created per screen via BlocProvider, so it is NOT registered here.
-    // Fake-domain (D-M2): a real matters backend is a later approved
-    // data-layer slice (roadmap §11 boundary).
-    serviceLocator.registerLazySingleton<MatterGateway>(FakeMatterGateway.new);
+    // Like OrganizationGateway, the flip swaps the dev fake for the
+    // Supabase-backed implementation when the build is configured (Batch 3.3
+    // env pattern). The real path reads the applied `matters` table through
+    // the RLS-scoped SELECT (plan D-MR1/D-MR7) and resolves display names
+    // via the roster seam (D-MR4); env-less runs and ALL tests keep the
+    // fake.
+    if (env.isConfigured) {
+      serviceLocator.registerLazySingleton<MatterGateway>(
+        () => SupabaseMatterGateway(
+          (supabaseMatterApiFactory ?? SupabaseMatterApiImpl.bind)(),
+          serviceLocator<OrganizationGateway>(),
+        ),
+      );
+    } else {
+      serviceLocator.registerLazySingleton<MatterGateway>(
+        FakeMatterGateway.new,
+      );
+    }
   }
   if (!serviceLocator.isRegistered<DocumentGateway>()) {
     // Stateless service: lazy singleton. The vault Cubit is feature-scoped
