@@ -15,7 +15,7 @@
 
 begin;
 
--- 5.9 documents — org-scoped, matter-scoped, metadata-only (D-DR1/D-DR3)
+-- 5.1 documents — org-scoped, matter-scoped, metadata-only (D-DR1/D-DR3)
 create table public.documents (
   id              uuid primary key default gen_random_uuid(),
   organization_id uuid not null references public.organizations (id) on delete cascade,

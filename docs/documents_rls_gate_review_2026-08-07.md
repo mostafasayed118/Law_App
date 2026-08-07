@@ -30,7 +30,7 @@
 | Policy tests exist | ✅ Shipped — `scripts/verify_policy_tests.sh` + `docs/p0c1_verification_evidence_2026-08-05.md` |
 | Signed matrix governs the grant (positive + negative) | ✅ `docs/permission_matrix.md` §4 document rows (documents are **matter content** — line 143/148) |
 | Matters precedent (the discipline chain ran green) | ✅ **SHIPPED 2026-08-07** — applied + battery r1 PASSED + matrix addendum + client swap |
-| Applied `matters` table (this slice's FK target + assignment source) | ✅ Applied on the dev project (T5 of the matters plan, `0181cfa`) |
+| Applied `matters` table (this slice's FK target + assignment source) | ✅ Applied on the dev project (T5 of the matters plan — execution evidence `7d0fbfe`, under the dated approval `0181cfa`) |
 | RLS-gate review (this record) | ✅ Answered 2026-08-07 (§3 Q1–Q6) |
 | Rollback pairing | ✅ `supabase/migrations/05_documents.down.sql` + git-revert policy pairing (§6) |
 | Dated matrix addendum **before** the client surface ships | ⏳ T6 of the plan (after apply, before T7) |
