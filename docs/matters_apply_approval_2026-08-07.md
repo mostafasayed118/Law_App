@@ -8,11 +8,11 @@
 > owner's explicit authorization to apply the reviewed + rehearsed slice to
 > the shared dev project, with the rollback pairing standing by.
 >
-> **Status: DRAFT — awaiting the owner's dated signature (§6).** Nothing is
-> authorized by this document until the owner signs it with a date. This
-> draft restates the preconditions, the exact scope, the execution
-> guardrails, and the rollback pairing so the sign-off is a review, not a
-> discovery.
+> **Status: APPLY APPROVED (2026-08-07).** The owner's dated sign-off in §6
+> authorizes the §3 up sequence against the shared dev project
+> (`eutmvevpskerzpqmwplv`, `eu-central-1`) per the §4 execution conditions,
+> with the rollback pairing standing by. Nothing beyond the §3 scope; the
+> §5 exclusions hold.
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
 >
@@ -34,7 +34,7 @@
 | Policy artifact | `supabase/policies/matters.sql` (`6bf570d`) | ✅ Committed — NOT applied |
 | Policy battery + harness | `supabase/tests/04_matter_rls.sql`, `00_fixtures.sql`, `scripts/verify_policy_tests.sh` (`736e433`, `a08ef99`) | ✅ Committed; static `--check` PASS 24/0/0 |
 | **Ephemeral rehearsal (r1)** | `docs/matters_rehearsal_evidence_r1_2026-08-07.md` (`ea3a15d`) | ✅ **Executed — PASSED 2026-08-07** (Path A, owner's Docker host; all ten 04 checks + structural pins green; `RESULT: PASS`) |
-| **Apply approval (this record)** | this document | ⏳ **DRAFT — awaiting the owner's dated signature (§6)** |
+| **Apply approval (this record)** | this document | ✅ **APPROVED 2026-08-07** (owner's dated sign-off, §6) |
 | Apply execution (dev project) | `docs/matters_apply_execution_2026-08-07.md` (to be written) | ⏳ Only after §6 is signed |
 
 ## 2. Gate criteria — what the r1 rehearsal proved (evidence `ea3a15d`)
@@ -120,13 +120,15 @@ By signing below, the Project Owner authorizes the §3 apply against the
 shared dev project (`eutmvevpskerzpqmwplv`), subject to the §4 execution
 conditions and the §5 exclusions, with the rollback pairing standing by.
 
-- **Project Owner:** github.com/mostafasayed118 — **date:** ____________
-  — **signature / approval wording:** "Apply approved — matters read slice
-  (04_matters + policy + demo seed), per this record §3–§5."
+- **Project Owner:** github.com/mostafasayed118 — **date: 2026-08-07**
+  — **approval wording (recorded from the pair-programming session):**
+  "Apply approved — matters read slice (04_matters + policy + demo seed),
+  per this record §3–§5, with the §4 guardrails and rollback pairing."
 
-> **Status flips to APPLY APPROVED (dated) once §6 is filled.** The
-> execution record then captures the actual run; on success, plan T6 (dated
-> matrix addendum) and T7 (client swap) follow.
+> **Signed 2026-08-07.** The execution record
+> (`docs/matters_apply_execution_2026-08-07.md`) captures the actual run;
+> on success, plan T7 (client swap) follows (T6 — the dated matrix
+> addendum — already landed `3dbf623`).
 
 ## 7. Ledger
 
