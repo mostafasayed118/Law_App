@@ -26,6 +26,8 @@ import 'package:legalhub/data/local/locale_store.dart';
 import 'package:legalhub/data/local/org_selection_store.dart';
 import 'package:legalhub/data/matters/supabase_matter_api.dart';
 import 'package:legalhub/data/matters/supabase_matter_gateway.dart';
+import 'package:legalhub/data/messaging/supabase_message_api.dart';
+import 'package:legalhub/data/messaging/supabase_message_gateway.dart';
 import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/data/orgs/supabase_membership_repository.dart';
@@ -201,6 +203,14 @@ class _FakeSupabaseMatterApi implements SupabaseMatterApi {
 class _FakeSupabaseDocumentApi implements SupabaseDocumentApi {
   @override
   Future<List<Map<String, dynamic>>> fetchDocuments() async =>
+      <Map<String, dynamic>>[];
+}
+
+/// Hand-rolled fake of the [SupabaseMessageApi] seam for the DI flip test
+/// (same discipline as [_FakeSupabaseDocumentApi]).
+class _FakeSupabaseMessageApi implements SupabaseMessageApi {
+  @override
+  Future<List<Map<String, dynamic>>> fetchMessageThreads() async =>
       <Map<String, dynamic>>[];
 }
 
@@ -440,9 +450,23 @@ void main() {
       configureDependencies();
 
       // D-MSG2: same boundary discipline as the document/matter gateways —
-      // the dev fake is the registered seam; a real messages backend is a
-      // later approved data-layer slice.
+      // the dev fake is the registered seam; the env-gated real swap (plan
+      // T7) only takes over in configured builds.
       expect(serviceLocator<MessageGateway>(), isA<FakeMessageGateway>());
+    });
+
+    test('flips MessageGateway when env carries an anon key (plan T7)', () {
+      configureDependencies(
+        supabaseEnv: SupabaseEnv(
+          url: 'https://example.supabase.co',
+          anonKey: _anonJwt(),
+        ),
+        // The real bind() needs a running Supabase.instance; tests inject
+        // the seam instead (the flip's test seam, not production code).
+        supabaseMessageApiFactory: _FakeSupabaseMessageApi.new,
+      );
+
+      expect(serviceLocator<MessageGateway>(), isA<SupabaseMessageGateway>());
     });
 
     test('wires the booking gateway to the fake dev implementation', () {

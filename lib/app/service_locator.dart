@@ -28,6 +28,9 @@ import '../data/local/shared_preferences_org_selection_store.dart';
 import '../data/matters/supabase_matter_api.dart';
 import '../data/matters/supabase_matter_api_impl.dart';
 import '../data/matters/supabase_matter_gateway.dart';
+import '../data/messaging/supabase_message_api.dart';
+import '../data/messaging/supabase_message_api_impl.dart';
+import '../data/messaging/supabase_message_gateway.dart';
 import '../data/orgs/fake_membership_repository.dart';
 import '../data/orgs/fake_organization_gateway.dart';
 import '../data/orgs/supabase_membership_repository.dart';
@@ -85,6 +88,7 @@ void configureDependencies({
   SupabasePlatformAdminApi Function()? supabasePlatformAdminApiFactory,
   SupabaseMatterApi Function()? supabaseMatterApiFactory,
   SupabaseDocumentApi Function()? supabaseDocumentApiFactory,
+  SupabaseMessageApi Function()? supabaseMessageApiFactory,
 }) {
   // Lazy singleton: stateless service, created on first resolution.
   // Per §4.5, stateless services/repositories register as lazy singletons.
@@ -340,11 +344,23 @@ void configureDependencies({
   if (!serviceLocator.isRegistered<MessageGateway>()) {
     // Stateless service: lazy singleton. The messaging Cubit is feature-scoped
     // and created per screen via BlocProvider, so it is NOT registered here.
-    // Fake-domain (D-MSG2): a real messages backend is a later approved
-    // data-layer slice (roadmap §13 boundary).
-    serviceLocator.registerLazySingleton<MessageGateway>(
-      FakeMessageGateway.new,
-    );
+    // Like DocumentGateway, the flip swaps the dev fake for the
+    // Supabase-backed implementation when the build is configured (Batch 3.3
+    // env pattern). The real path reads the applied `message_threads` table
+    // through the RLS-scoped SELECT (plan D-MSR1/D-MSR7) and resolves
+    // matterRef via the embedded matters(title) select (D-MSR4); env-less
+    // runs and ALL tests keep the fake.
+    if (env.isConfigured) {
+      serviceLocator.registerLazySingleton<MessageGateway>(
+        () => SupabaseMessageGateway(
+          (supabaseMessageApiFactory ?? SupabaseMessageApiImpl.bind)(),
+        ),
+      );
+    } else {
+      serviceLocator.registerLazySingleton<MessageGateway>(
+        FakeMessageGateway.new,
+      );
+    }
   }
   if (!serviceLocator.isRegistered<AuthCubit>()) {
     // App-scoped because the router and all screens observe one session seam.
