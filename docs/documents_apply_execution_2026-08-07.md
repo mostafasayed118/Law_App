@@ -91,8 +91,11 @@ returned 0); no cross-tenant data visible (all four documents in org
 `ef43087b-…`, each `organization_id` = its matter's org); no
 credential/token/PII in any output (generic demo titles only); the narrow
 grant surface held (anon absent, verified in §2.1). **Rollback pairing
-standing by:** `05_documents.down.sql` drops the table (and its policy dies
-with it; the seeded rows go with it) — clean inverse, never fix-forward.
+standing by (approval §4.3):** `05_documents.down.sql` drops the table
+(and its policy dies with it; the seeded rows go with it) + the targeted
+demo-row delete (`delete from public.documents where matter_id in (the four
+demo matter ids)`) — redundant with the drop but standing by per the
+approval's wording — clean inverse, never fix-forward.
 
 ## 5. Ledger / state
 

@@ -62,7 +62,7 @@ gate is unblocked pending the owner's dated signature in §6.
 
 ## 3. Decision (scope this record authorizes — once signed)
 
-**APPLY APPROVED (pending §6):** apply the reviewed + rehearsed documents
+**APPLY APPROVED (2026-08-07):** apply the reviewed + rehearsed documents
 slice to the shared dev project (`eutmvevpskerzpqmwplv`, `eu-central-1`) in
 this order:
 
