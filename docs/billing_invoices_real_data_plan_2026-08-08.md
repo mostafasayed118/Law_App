@@ -275,15 +275,33 @@ Branch: `feat/billing-invoices-read`
   in effect since the apply execution `fc7ed1b`; basis cited (D-11
   `461cf51` · r1 `da4fa97` · approval + execution `fc7ed1b`), ledger
   PASS 115.
-- [ ] **7. Client swap (env-gated, NEW surface)** — touches:
+- [x] **7. Client swap (env-gated, NEW surface)** — touches:
   `Invoice` VO + `BillingGateway` + fake + `supabase_billing_api`/impl/
   gateway + the matter-invoices section + l10n ×3 + service_locator flip
   + tests (mapping / matterRef-fallback / failure-mapping / DI pins / fake
   determinism) — done when: format clean · analyze clean · suite green ·
-  ledger PASS.
-- [ ] **8. Lockstep + evidence + close** — touches: README test count,
+  ledger PASS. — **DONE (2026-08-08):** the NEW D-BI5 surface shipped at
+  `f116966` — Invoice VO (metadata-only, no payment surface — D-11
+  structural) + `BillingGateway` + deterministic non-PII fake (D-BI4) +
+  `supabase_billing_api`/impl/gateway behind `env.isConfigured`
+  (documents/storage flip pattern) + `matter_invoices_section` on the
+  matter-details screen gated by the existing `canViewDocuments` nav hint
+  (invoices are matter-scoped content like documents; the plan carries no
+  `user_role.dart` change) + l10n ×5 (title/empty/error + issued/paid
+  status labels, EN/AR/TR) + DI pins; tests: impl (5) / gateway mapping
+  + matterRef-fallback + loud-drift + failure-mapping (15) / fake
+  determinism (5) / cubit (6) / DI (2) / section + l10n pins. Gate:
+  format clean · analyze clean · suite 1080 runtime / README 1077
+  declaration · ledger PASS 115.
+- [x] **8. Lockstep + evidence + close** — touches: README test count,
   roadmap §14 billing flip (**ninth** per-feature un-deferral) + §13
   gate-table row + plan task rows, completion evidence
   `docs/billing_invoices_real_data_completion_evidence_2026-08-08.md`,
   dated close decision — done when: all docs sweep green, full gate
-  re-run, close decision recorded, committed as docs(billing).
+  re-run, close decision recorded, committed as docs(billing). — **DONE
+  (2026-08-08):** README 1044→1077 (lockstep with the ledger, caught and
+  fixed in the same commit as T7) · roadmap §14 billing flip to SHIPPED
+  (ninth) + §13 gate-table cell + §14 deferred-list narrowed to AI +
+  forward-hook rows · evidence record §1–§9 · dated close decision §9
+  (CLOSED 2026-08-08, AI the only remaining deferred path) · ledger
+  PASS 115 · committed as docs(billing).
