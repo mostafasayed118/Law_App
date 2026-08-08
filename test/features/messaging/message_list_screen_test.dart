@@ -183,6 +183,9 @@ void main() {
             canViewMessages: true,
             canViewFiles: true,
             canViewAudit: false,
+            canViewAlerts: true,
+            canViewTasks: true,
+            canViewApprovals: true,
           ),
         );
 

@@ -45,6 +45,8 @@ import '../data/orgs/supabase_organization_gateway.dart';
 import '../data/storage/supabase_storage_api.dart';
 import '../data/storage/supabase_storage_api_impl.dart';
 import '../data/storage/supabase_storage_gateway.dart';
+import '../features/approvals/data/fake_approvals_gateway.dart';
+import '../features/approvals/domain/approvals_gateway.dart';
 import '../features/auth/data/fake_password_recovery_gateway.dart';
 import '../features/auth/data/fake_sign_up_gateway.dart';
 import '../features/auth/data/supabase_password_recovery_gateway.dart';
@@ -57,6 +59,8 @@ import '../features/billing/domain/billing_gateway.dart';
 import '../features/booking/data/fake_booking_gateway.dart';
 import '../features/booking/domain/booking_gateway.dart';
 import '../features/booking/domain/booking_prefill.dart';
+import '../features/compliance/data/fake_compliance_gateway.dart';
+import '../features/compliance/domain/compliance_gateway.dart';
 import '../features/discovery/data/fake_attorney_gateway.dart';
 import '../features/discovery/domain/attorney_gateway.dart';
 import '../features/documents/data/fake_document_gateway.dart';
@@ -71,6 +75,8 @@ import '../features/notifications/domain/notification_prefs_store.dart';
 import '../features/orgs/presentation/active_org_store.dart';
 import '../features/storage/data/fake_storage_gateway.dart';
 import '../features/storage/domain/storage_gateway.dart';
+import '../features/tasks/data/fake_task_gateway.dart';
+import '../features/tasks/domain/task_gateway.dart';
 import 'deep_link/pending_accept_invite_store.dart';
 import 'localization/locale_cubit.dart';
 
@@ -425,7 +431,7 @@ void configureDependencies({
       );
     }
   }
-  if (!serviceLocator.isRegistered<AuthCubit>()) {
+if (!serviceLocator.isRegistered<AuthCubit>()) {
     // App-scoped because the router and all screens observe one session seam.
     serviceLocator.registerLazySingleton<AuthCubit>(
       () => AuthCubit(
@@ -434,6 +440,24 @@ void configureDependencies({
         serviceLocator<MembershipRepository>(),
       ),
       dispose: (AuthCubit cubit) => cubit.close(),
+    );
+  }
+  // v1 queue (2026-08-09 scope drafts): read-only demo surfaces behind dev
+  // fakes only — no server surface exists yet, so there is no env flip (the
+  // Phase 5–12 fake-domain pattern, "the fake is the product posture").
+  if (!serviceLocator.isRegistered<ComplianceAlertsGateway>()) {
+    serviceLocator.registerLazySingleton<ComplianceAlertsGateway>(
+      FakeComplianceGateway.new,
+    );
+  }
+  if (!serviceLocator.isRegistered<TaskBoardGateway>()) {
+    serviceLocator.registerLazySingleton<TaskBoardGateway>(
+      FakeTaskGateway.new,
+    );
+  }
+if (!serviceLocator.isRegistered<ApprovalsGateway>()) {
+    serviceLocator.registerLazySingleton<ApprovalsGateway>(
+      FakeApprovalsGateway.new,
     );
   }
 }

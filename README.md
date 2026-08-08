@@ -57,7 +57,7 @@ messaging services.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (1109 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (1124 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), Redactor (password/OTP/email/Bearer redaction
   with leak guards), DI registration graph, validators, router redirect logic
@@ -92,7 +92,14 @@ messaging services.
   in-memory locale store, and the onboarding-success screen. Batch 5 added
   the 800×600 onboarding no-overflow test and the EN/AR/TR localized-fallback
   assertions.
-- Coverage: **1109 tests** (2026-08-09, partner org-audit slice — Task 4:
+- Coverage: **1124 tests** (2026-08-09, v1 queue demo surfaces — read-only
+  `compliance_alerts` (`/alerts`), `collaboration task board` (`/tasks`),
+  `pending_approvals` (`/approvals`): three fake-domain features with
+  text/icon status lines, per-feature widget suites incl. empty/error/retry,
+  three nav-hint capability flags granted to every role, home entries, and
+  EN/AR/TR l10n; scope drafts `docs/v1_compliance_alerts_scope_draft_2026-08-09.md`
+  etc.), building
+  on 1109 (2026-08-09, partner org-audit slice — Task 4:
   the `OrgAuditCubit` + `/organizations/audit` surface: `OrgAuditScreen`
   (redacted rows / honest empty / distinct denied / error-retry, EN/AR/TR +
   RTL) + the partner-gated hub "Audit trail" entry and router capability

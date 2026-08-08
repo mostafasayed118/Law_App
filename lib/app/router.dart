@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../core/roles/user_role.dart';
 import '../features/admin/presentation/platform_admin_screen.dart';
+import '../features/approvals/presentation/approvals_screen.dart';
 import '../features/auth/presentation/auth_cubit.dart';
 import '../features/auth/presentation/forgot_password/forgot_password_email_screen.dart';
 import '../features/auth/presentation/forgot_password/forgot_password_otp_screen.dart';
@@ -13,6 +14,7 @@ import '../features/auth/presentation/sign_in_screen.dart';
 import '../features/auth/presentation/sign_up_screen.dart';
 import '../features/billing/presentation/billing_invoices_screen.dart';
 import '../features/booking/presentation/booking_screen.dart';
+import '../features/compliance/presentation/compliance_alerts_screen.dart';
 import '../features/discovery/presentation/attorney_profile_screen.dart';
 import '../features/discovery/presentation/attorney_search_screen.dart';
 import '../features/documents/presentation/document_list_screen.dart';
@@ -30,6 +32,7 @@ import '../features/orgs/presentation/org_audit_screen.dart';
 import '../features/orgs/presentation/organization_hub_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
 import '../features/search/presentation/search_screen.dart';
+import '../features/tasks/presentation/task_board_screen.dart';
 import '../l10n/app_localizations.dart';
 
 class AppRoutes {
@@ -59,6 +62,9 @@ class AppRoutes {
   static const String messages = '/messages';
   static const String messageThreadDetail = '/messages/:threadId';
   static const String invoices = '/invoices';
+  static const String alerts = '/alerts';
+  static const String tasks = '/tasks';
+  static const String approvals = '/approvals';
   static const String search = '/search';
 
   /// The profile route for one attorney (path-param substitution).
@@ -231,6 +237,21 @@ GoRouter createAppRouter(
           path: AppRoutes.invoices,
           builder: (BuildContext context, GoRouterState state) =>
               const BillingInvoicesScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.alerts,
+          builder: (BuildContext context, GoRouterState state) =>
+              const ComplianceAlertsScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.tasks,
+          builder: (BuildContext context, GoRouterState state) =>
+              const TaskBoardScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.approvals,
+          builder: (BuildContext context, GoRouterState state) =>
+              const ApprovalsScreen(),
         ),
         GoRoute(
           path: AppRoutes.settings,

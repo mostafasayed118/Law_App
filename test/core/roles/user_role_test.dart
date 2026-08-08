@@ -28,6 +28,9 @@ void main() {
         canViewMessages: true,
         canViewFiles: true,
         canViewAudit: false,
+        canViewAlerts: true,
+        canViewTasks: true,
+        canViewApprovals: true,
       );
       const RoleCapability b = RoleCapability(
         canViewHome: true,
@@ -39,6 +42,9 @@ void main() {
         canViewMessages: true,
         canViewFiles: true,
         canViewAudit: false,
+        canViewAlerts: true,
+        canViewTasks: true,
+        canViewApprovals: true,
       );
       const RoleCapability c = RoleCapability(
         canViewHome: true,
@@ -50,6 +56,9 @@ void main() {
         canViewMessages: false,
         canViewFiles: false,
         canViewAudit: false,
+        canViewAlerts: true,
+        canViewTasks: true,
+        canViewApprovals: true,
       );
 
       expect(a, equals(b));
@@ -93,6 +102,12 @@ void main() {
           // to every bootstrap role — navigation hint only, never
           // authorization (the RLS gate is server-side).
           expect(cap.canViewFiles, isTrue, reason: 'role $role');
+          // v1 queue (2026-08-09): the three read-only demo surfaces are
+          // visible to every bootstrap role — nav hints only, never
+          // authorization (no real server authority exists yet).
+          expect(cap.canViewAlerts, isTrue, reason: 'role $role');
+          expect(cap.canViewTasks, isTrue, reason: 'role $role');
+          expect(cap.canViewApprovals, isTrue, reason: 'role $role');
         }
       },
     );

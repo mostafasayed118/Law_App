@@ -964,4 +964,92 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get orgAuditOutcomeDenied => 'Denied';
+
+  @override
+  String get alertsTitle => 'Compliance alerts';
+
+  @override
+  String get alertsEmpty => 'No compliance alerts are available.';
+
+  @override
+  String get alertsError => 'Unable to load compliance alerts.';
+
+  @override
+  String get alertsLocalOnlyNote =>
+      'Demo mode — synthetic alerts only. No real compliance event is shown.';
+
+  @override
+  String get alertsEntryTitle => 'Compliance alerts';
+
+  @override
+  String get alertsEntrySubtitle => 'Browse demo alerts — development demo.';
+
+  @override
+  String get alertSeverityInfo => 'Info';
+
+  @override
+  String get alertSeverityAttention => 'Attention';
+
+  @override
+  String get alertSeverityCritical => 'Critical';
+
+  @override
+  String get tasksTitle => 'Task board';
+
+  @override
+  String get tasksEmpty => 'No tasks are available.';
+
+  @override
+  String get tasksError => 'Unable to load tasks.';
+
+  @override
+  String get tasksLocalOnlyNote =>
+      'Demo mode — synthetic tasks only. No real case work is listed.';
+
+  @override
+  String get tasksEntryTitle => 'Task board';
+
+  @override
+  String get tasksEntrySubtitle => 'Browse demo tasks — development demo.';
+
+  @override
+  String get taskStatusTodo => 'To do';
+
+  @override
+  String get taskStatusInProgress => 'In progress';
+
+  @override
+  String get taskStatusBlocked => 'Blocked';
+
+  @override
+  String get taskStatusDone => 'Done';
+
+  @override
+  String get approvalsTitle => 'Pending approvals';
+
+  @override
+  String get approvalsEmpty => 'No pending approvals are available.';
+
+  @override
+  String get approvalsError => 'Unable to load approvals.';
+
+  @override
+  String get approvalsLocalOnlyNote =>
+      'Demo mode — synthetic redacted rows only. No real approval is pending.';
+
+  @override
+  String get approvalsEntryTitle => 'Pending approvals';
+
+  @override
+  String get approvalsEntrySubtitle =>
+      'Browse demo approvals — development demo.';
+
+  @override
+  String get approvalStatusPending => 'Pending';
+
+  @override
+  String get approvalStatusApproved => 'Approved';
+
+  @override
+  String get approvalStatusDenied => 'Denied';
 }

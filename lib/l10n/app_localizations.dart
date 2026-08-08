@@ -1875,6 +1875,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Denied'**
   String get orgAuditOutcomeDenied;
+
+  /// No description provided for @alertsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Compliance alerts'**
+  String get alertsTitle;
+
+  /// No description provided for @alertsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No compliance alerts are available.'**
+  String get alertsEmpty;
+
+  /// No description provided for @alertsError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load compliance alerts.'**
+  String get alertsError;
+
+  /// No description provided for @alertsLocalOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo mode — synthetic alerts only. No real compliance event is shown.'**
+  String get alertsLocalOnlyNote;
+
+  /// No description provided for @alertsEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Compliance alerts'**
+  String get alertsEntryTitle;
+
+  /// No description provided for @alertsEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse demo alerts — development demo.'**
+  String get alertsEntrySubtitle;
+
+  /// No description provided for @alertSeverityInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Info'**
+  String get alertSeverityInfo;
+
+  /// No description provided for @alertSeverityAttention.
+  ///
+  /// In en, this message translates to:
+  /// **'Attention'**
+  String get alertSeverityAttention;
+
+  /// No description provided for @alertSeverityCritical.
+  ///
+  /// In en, this message translates to:
+  /// **'Critical'**
+  String get alertSeverityCritical;
+
+  /// No description provided for @tasksTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Task board'**
+  String get tasksTitle;
+
+  /// No description provided for @tasksEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No tasks are available.'**
+  String get tasksEmpty;
+
+  /// No description provided for @tasksError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load tasks.'**
+  String get tasksError;
+
+  /// No description provided for @tasksLocalOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo mode — synthetic tasks only. No real case work is listed.'**
+  String get tasksLocalOnlyNote;
+
+  /// No description provided for @tasksEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Task board'**
+  String get tasksEntryTitle;
+
+  /// No description provided for @tasksEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse demo tasks — development demo.'**
+  String get tasksEntrySubtitle;
+
+  /// No description provided for @taskStatusTodo.
+  ///
+  /// In en, this message translates to:
+  /// **'To do'**
+  String get taskStatusTodo;
+
+  /// No description provided for @taskStatusInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get taskStatusInProgress;
+
+  /// No description provided for @taskStatusBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocked'**
+  String get taskStatusBlocked;
+
+  /// No description provided for @taskStatusDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get taskStatusDone;
+
+  /// No description provided for @approvalsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending approvals'**
+  String get approvalsTitle;
+
+  /// No description provided for @approvalsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No pending approvals are available.'**
+  String get approvalsEmpty;
+
+  /// No description provided for @approvalsError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load approvals.'**
+  String get approvalsError;
+
+  /// No description provided for @approvalsLocalOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo mode — synthetic redacted rows only. No real approval is pending.'**
+  String get approvalsLocalOnlyNote;
+
+  /// No description provided for @approvalsEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending approvals'**
+  String get approvalsEntryTitle;
+
+  /// No description provided for @approvalsEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse demo approvals — development demo.'**
+  String get approvalsEntrySubtitle;
+
+  /// No description provided for @approvalStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get approvalStatusPending;
+
+  /// No description provided for @approvalStatusApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get approvalStatusApproved;
+
+  /// No description provided for @approvalStatusDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Denied'**
+  String get approvalStatusDenied;
 }
 
 class _AppLocalizationsDelegate

@@ -6,13 +6,16 @@ import 'package:go_router/go_router.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../app/router.dart';
 import '../../../core/roles/user_role.dart';
+import '../../../features/approvals/presentation/approvals_entry_card.dart';
 import '../../../features/auth/presentation/auth_cubit.dart' show AuthCubit;
 import '../../../features/billing/presentation/billing_invoices_entry_card.dart';
 import '../../../features/booking/presentation/booking_entry_card.dart';
+import '../../../features/compliance/presentation/compliance_alerts_entry_card.dart';
 import '../../../features/discovery/presentation/discovery_entry_card.dart';
 import '../../../features/documents/presentation/document_entry_card.dart';
 import '../../../features/matters/presentation/matter_entry_card.dart';
 import '../../../features/messaging/presentation/message_entry_card.dart';
+import '../../../features/tasks/presentation/task_board_entry_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/widgets.dart';
 import 'widgets/home_cards.dart';
@@ -160,6 +163,28 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: LegalHubTheme.spaceMd),
                     BillingInvoicesEntryCard(
                       onTap: () => context.go(AppRoutes.invoices),
+                    ),
+                  ],
+                  // v1 queue (2026-08-09 scope drafts): the three read-only
+                  // demo surfaces ride their own nav-hint flags; visibility
+                  // hints only, never authorization (pages render demo
+                  // data; the server/authority does not exist yet).
+                  if (capabilities.canViewAlerts) ...[
+                    const SizedBox(height: LegalHubTheme.spaceMd),
+                    ComplianceAlertsEntryCard(
+                      onTap: () => context.go(AppRoutes.alerts),
+                    ),
+                  ],
+                  if (capabilities.canViewTasks) ...[
+                    const SizedBox(height: LegalHubTheme.spaceMd),
+                    TaskBoardEntryCard(
+                      onTap: () => context.go(AppRoutes.tasks),
+                    ),
+                  ],
+                  if (capabilities.canViewApprovals) ...[
+                    const SizedBox(height: LegalHubTheme.spaceMd),
+                    ApprovalsEntryCard(
+                      onTap: () => context.go(AppRoutes.approvals),
                     ),
                   ],
                 ]),

@@ -23,6 +23,9 @@ class RoleCapability extends Equatable {
     required this.canViewMessages,
     required this.canViewFiles,
     required this.canViewAudit,
+    required this.canViewAlerts,
+    required this.canViewTasks,
+    required this.canViewApprovals,
   });
 
   final bool canViewHome;
@@ -69,6 +72,19 @@ class RoleCapability extends Equatable {
   /// (AC-7, never empty success). Granted to partner only.
   final bool canViewAudit;
 
+  /// v1 queue (2026-08-09 scope drafts): whether the home dashboard offers
+  /// the compliance-alerts entry. Read-only demo surface — nav hint only.
+  final bool canViewAlerts;
+
+  /// v1 queue (2026-08-09 scope drafts): whether the home dashboard offers
+  /// the collaboration task-board entry. Read-only demo surface; nav hint
+  /// only.
+  final bool canViewTasks;
+
+  /// v1 queue (2026-08-09 scope drafts): whether the home dashboard offers
+  /// the pending-approvals entry. Read-only demo surface; nav hint only.
+  final bool canViewApprovals;
+
   @override
   List<Object?> get props => <Object?>[
     canViewHome,
@@ -80,6 +96,9 @@ class RoleCapability extends Equatable {
     canViewMessages,
     canViewFiles,
     canViewAudit,
+    canViewAlerts,
+    canViewTasks,
+    canViewApprovals,
   ];
 }
 
@@ -95,6 +114,9 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewMessages: true,
         canViewFiles: true,
         canViewAudit: false,
+        canViewAlerts: true,
+        canViewTasks: true,
+        canViewApprovals: true,
       ),
       UserRole.attorney: RoleCapability(
         canViewHome: true,
@@ -106,6 +128,9 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewMessages: true,
         canViewFiles: true,
         canViewAudit: false,
+        canViewAlerts: true,
+        canViewTasks: true,
+        canViewApprovals: true,
       ),
       UserRole.partner: RoleCapability(
         canViewHome: true,
@@ -119,6 +144,9 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         // Partner org-audit slice: the only role the server's
         // read_org_audit gate admits (navigation hint only).
         canViewAudit: true,
+        canViewAlerts: true,
+        canViewTasks: true,
+        canViewApprovals: true,
       ),
       UserRole.complianceOfficer: RoleCapability(
         canViewHome: true,
@@ -130,6 +158,9 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewMessages: true,
         canViewFiles: true,
         canViewAudit: false,
+        canViewAlerts: true,
+        canViewTasks: true,
+        canViewApprovals: true,
       ),
       UserRole.researchAnalyst: RoleCapability(
         canViewHome: true,
@@ -141,6 +172,9 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewMessages: true,
         canViewFiles: true,
         canViewAudit: false,
+        canViewAlerts: true,
+        canViewTasks: true,
+        canViewApprovals: true,
       ),
       UserRole.admin: RoleCapability(
         canViewHome: true,
@@ -152,5 +186,8 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewMessages: true,
         canViewFiles: true,
         canViewAudit: false,
+        canViewAlerts: true,
+        canViewTasks: true,
+        canViewApprovals: true,
       ),
     };

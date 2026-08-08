@@ -965,4 +965,94 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get orgAuditOutcomeDenied => 'Reddedildi';
+
+  @override
+  String get alertsTitle => 'Uyum uyarıları';
+
+  @override
+  String get alertsEmpty => 'Kullanılabilir uyum uyarısı yok.';
+
+  @override
+  String get alertsError => 'Uyum uyarıları yüklenemedi.';
+
+  @override
+  String get alertsLocalOnlyNote =>
+      'Demo modu — yalnızca sentetik uyarılar. Gerçek bir uyum olayı gösterilmez.';
+
+  @override
+  String get alertsEntryTitle => 'Uyum uyarıları';
+
+  @override
+  String get alertsEntrySubtitle =>
+      'Sentetik uyarılara göz atın — geliştirme demosu.';
+
+  @override
+  String get alertSeverityInfo => 'Bilgi';
+
+  @override
+  String get alertSeverityAttention => 'Dikkat';
+
+  @override
+  String get alertSeverityCritical => 'Kritik';
+
+  @override
+  String get tasksTitle => 'Görev panosu';
+
+  @override
+  String get tasksEmpty => 'Kullanılabilir görev yok.';
+
+  @override
+  String get tasksError => 'Görevler yüklenemedi.';
+
+  @override
+  String get tasksLocalOnlyNote =>
+      'Demo modu — yalnızca sentetik görevler. Gerçek dava işleri listelenmez.';
+
+  @override
+  String get tasksEntryTitle => 'Görev panosu';
+
+  @override
+  String get tasksEntrySubtitle =>
+      'Sentetik görevlere göz atın — geliştirme demosu.';
+
+  @override
+  String get taskStatusTodo => 'Yapılacak';
+
+  @override
+  String get taskStatusInProgress => 'Sürüyor';
+
+  @override
+  String get taskStatusBlocked => 'Engellendi';
+
+  @override
+  String get taskStatusDone => 'Tamamlandı';
+
+  @override
+  String get approvalsTitle => 'Bekleyen onaylar';
+
+  @override
+  String get approvalsEmpty => 'Kullanılabilir bekleyen onay yok.';
+
+  @override
+  String get approvalsError => 'Onaylar yüklenemedi.';
+
+  @override
+  String get approvalsLocalOnlyNote =>
+      'Demo modu — yalnızca sentetik gizlenmiş satırlar. Gerçek bir onay beklemektedir.';
+
+  @override
+  String get approvalsEntryTitle => 'Bekleyen onaylar';
+
+  @override
+  String get approvalsEntrySubtitle =>
+      'Sentetik onaylara göz atın — geliştirme demosu.';
+
+  @override
+  String get approvalStatusPending => 'Bekliyor';
+
+  @override
+  String get approvalStatusApproved => 'Onaylandı';
+
+  @override
+  String get approvalStatusDenied => 'Reddedildi';
 }

@@ -957,4 +957,92 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get orgAuditOutcomeDenied => 'مرفوض';
+
+  @override
+  String get alertsTitle => 'تنبيهات الامتثال';
+
+  @override
+  String get alertsEmpty => 'لا توجد تنبيهات امتثال متاحة.';
+
+  @override
+  String get alertsError => 'تعذّر تحميل تنبيهات الامتثال.';
+
+  @override
+  String get alertsLocalOnlyNote =>
+      'وضع تجريبي — تنبيهات اصطناعية فقط. لا يتم عرض أي حدث امتثال حقيقي.';
+
+  @override
+  String get alertsEntryTitle => 'تنبيهات الامتثال';
+
+  @override
+  String get alertsEntrySubtitle => 'استعرض التنبيهات التجريبية — عرض تطويري.';
+
+  @override
+  String get alertSeverityInfo => 'معلومات';
+
+  @override
+  String get alertSeverityAttention => 'انتباه';
+
+  @override
+  String get alertSeverityCritical => 'حرِج';
+
+  @override
+  String get tasksTitle => 'لوحة المهام';
+
+  @override
+  String get tasksEmpty => 'لا توجد مهام متاحة.';
+
+  @override
+  String get tasksError => 'تعذّر تحميل المهام.';
+
+  @override
+  String get tasksLocalOnlyNote =>
+      'وضع تجريبي — مهام اصطناعية فقط. لا يتم عرض أعمال قضايا حقيقية.';
+
+  @override
+  String get tasksEntryTitle => 'لوحة المهام';
+
+  @override
+  String get tasksEntrySubtitle => 'استعرض المهام التجريبية — عرض تطويري.';
+
+  @override
+  String get taskStatusTodo => 'للتنفيذ';
+
+  @override
+  String get taskStatusInProgress => 'قيد التنفيذ';
+
+  @override
+  String get taskStatusBlocked => 'محظور';
+
+  @override
+  String get taskStatusDone => 'مكتمل';
+
+  @override
+  String get approvalsTitle => 'موافقات معلّقة';
+
+  @override
+  String get approvalsEmpty => 'لا توجد موافقات معلّقة متاحة.';
+
+  @override
+  String get approvalsError => 'تعذّر تحميل الموافقات.';
+
+  @override
+  String get approvalsLocalOnlyNote =>
+      'وضع تجريبي — صفوف اصطناعية منقّحة فقط. لا توجد موافقة حقيقية معلقة.';
+
+  @override
+  String get approvalsEntryTitle => 'الموافقات المعلّقة';
+
+  @override
+  String get approvalsEntrySubtitle =>
+      'استعرض الموافقات التجريبية — عرض تطويري.';
+
+  @override
+  String get approvalStatusPending => 'معلّق';
+
+  @override
+  String get approvalStatusApproved => 'معتمد';
+
+  @override
+  String get approvalStatusDenied => 'مرفوض';
 }

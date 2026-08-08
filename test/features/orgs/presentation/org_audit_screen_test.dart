@@ -43,6 +43,9 @@ void main() {
     canViewMessages: true,
     canViewFiles: true,
     canViewAudit: true,
+    canViewAlerts: true,
+    canViewTasks: true,
+    canViewApprovals: true,
   );
 
   Widget harness({String? organizationId, Locale locale = const Locale('en')}) {

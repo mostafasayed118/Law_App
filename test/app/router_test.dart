@@ -530,6 +530,9 @@ void main() {
               canViewMessages: true,
               canViewFiles: true,
               canViewAudit: true,
+              canViewAlerts: true,
+              canViewTasks: true,
+              canViewApprovals: true,
             ),
           },
         );
@@ -683,6 +686,9 @@ void main() {
               canViewMessages: true,
               canViewFiles: true,
               canViewAudit: true,
+              canViewAlerts: true,
+              canViewTasks: true,
+              canViewApprovals: true,
             ),
           },
         );
@@ -1235,6 +1241,9 @@ void main() {
               canViewMessages: true,
               canViewFiles: true,
               canViewAudit: false,
+              canViewAlerts: true,
+              canViewTasks: true,
+              canViewApprovals: true,
             ),
           },
         );
@@ -1284,6 +1293,9 @@ void main() {
               canViewMessages: false,
               canViewFiles: false,
               canViewAudit: false,
+              canViewAlerts: true,
+              canViewTasks: true,
+              canViewApprovals: true,
             ),
           },
         );
@@ -1356,6 +1368,9 @@ void main() {
             canViewMessages: false,
             canViewFiles: false,
             canViewAudit: false,
+            canViewAlerts: true,
+            canViewTasks: true,
+            canViewApprovals: true,
           ),
         },
       );
@@ -1543,6 +1558,9 @@ void main() {
             canViewMessages: true,
             canViewFiles: true,
             canViewAudit: false,
+            canViewAlerts: true,
+            canViewTasks: true,
+            canViewApprovals: true,
           ),
         },
       );
