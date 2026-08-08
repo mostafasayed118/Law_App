@@ -153,12 +153,12 @@ policy tests before it is exposed here.
 ## 2. Unwired-RPC inventory (client surface vs. committed server RPCs)
 
 `supabase/rpc/` ships 17 applied P2 RPCs plus the applied Phase 3 R1
-`list_org_members_metadata` (18 applied, §5) plus the committed-not-applied
-`send_message` (19 committed, §14 eighth un-deferral); **18 of 18 applied
-RPCs have a client surface**, and the 19th (`send_message`, the audited
-send path) is wired client-side behind the env flip — **applied to the
-dev project 2026-08-08** (send-message slice T5: the function is live
-with the D-SM3 revocation, policies 10→9, `authenticated` INSERT
+`list_org_members_metadata` (18 applied, §5) plus the audited-send
+`send_message` (19 applied, §14 eighth un-deferral); **19 of 19 applied
+RPCs have a client surface** — the 19th (`send_message`, the audited
+send path) is wired client-side behind the env flip and **applied to
+the dev project 2026-08-08** (send-message slice T5: the function is
+live with the D-SM3 revocation, policies 10→9, `authenticated` INSERT
 revoked, §8 audit by construction) —
 `SupabaseOrgApi` maps 11 (`listMembers` routes to the R1
 member-facing RPC) and `SupabasePlatformAdminApi` (P3.5, `47f777b`; the
@@ -697,7 +697,8 @@ D-P0C4 — no raw SELECT on `audit_events` ever); plan
 `docs/audit_surfacing_plan_2026-08-08.md`, evidence
 `docs/audit_surfacing_completion_evidence_2026-08-08.md`; commits
 `7b7c1a8` → `b0f9022`, suite 986/README 983, ledger PASS 115;
-**18-of-18 RPCs now have a client surface** (roadmap §2). **Realtime is
+**19-of-19 RPCs now have a client surface** (roadmap §2 — the 19th,
+`send_message`, applied 2026-08-08). **Realtime is
 now the sixth per-feature un-deferral — SHIPPED 2026-08-08 (read
 slice)** under this gate: RLS-gate design review
 (`docs/realtime_rls_gate_review_2026-08-08.md` — the thread gate extended
