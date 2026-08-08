@@ -42,6 +42,7 @@ delete from public.messages;
 delete from public.files;
 delete from public.message_threads;
 delete from public.documents;
+delete from public.billing_invoices;
 delete from public.matters;
 delete from public.memberships;
 delete from public.invitations;
@@ -395,5 +396,49 @@ begin
   select count(*) into v_cnt from public.messages;
   if v_cnt <> 21 then
     raise exception 'FIXTURE ERROR: messages must hold 21 rows, got %', v_cnt;
+  end if;
+end $$;
+
+-- ---- 13. Billing invoices (billing-invoices slice — the 11_invoice_rls.sql battery) ------
+-- Six invoice METADATA rows, each referencing one of the six fixture matters
+-- (the assignment source of truth) — exercising every policy branch of
+-- invoices_select_assigned (docs/billing_invoices_gate_review_2026-08-08.md
+-- §4): the counts the battery asserts are client-a (assigned on matters 1,2)
+-- sees the invoices on matters 1,2 = 2; partner-a (assigned attorney on
+-- matters 1,2,3) sees 3; orphan (matter 4) sees 1. METADATA ONLY by
+-- construction (D-BI1/D-11): invoice number, amount in cents, currency,
+-- minimal status, dates, generic description — NO card/payment columns of
+-- any kind (the D-11 PCI constraint is structural). Amounts are synthetic
+-- demo values (no real charges); invoice_number is generic INV-2026-000N
+-- style; descriptions are generic demo copy — never PII by convention.
+insert into public.billing_invoices
+  (id, organization_id, matter_id, invoice_number, amount_cents, currency, status, issued_at, due_at, description)
+values
+  ('a0000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000001', 'INV-2026-0001', 2500000, 'EGP', 'issued', now(), now() + interval '30 days', 'Demo invoice — acquisition review'),
+  ('a0000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000002', 'INV-2026-0002', 1500000, 'EGP', 'paid',   now(), now() + interval '30 days', 'Demo invoice — lease consultation'),
+  ('a0000000-0000-4000-8000-000000000003', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000003', 'INV-2026-0003', 3000000, 'EGP', 'issued', now(), now() + interval '30 days', 'Demo invoice — procedural review'),
+  ('a0000000-0000-4000-8000-000000000004', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000004', 'INV-2026-0004', 800000,  'EGP', 'issued', now(), now() + interval '30 days', 'Demo invoice — family consultation'),
+  ('a0000000-0000-4000-8000-000000000005', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000005', 'INV-2026-0005', 5000000, 'EGP', 'paid',   now(), now() + interval '30 days', 'Demo invoice — corporate advisory'),
+  ('a0000000-0000-4000-8000-000000000006', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000006', 'INV-2026-0006', 1200000, 'EGP', 'issued', now(), now() + interval '30 days', 'Demo invoice — civil consultation');
+
+-- Reserved throwaway ids used by 11_invoice_rls.sql (deliberately NEVER
+-- seeded): a0000000-0000-4000-8000-00000000ffff (the amount_cents
+-- CHECK-violation insert — fails before any row exists),
+-- a0000000-0000-4000-8000-00000000fff1 (the status CHECK-violation insert
+-- — also fails before any row exists), and the org-mismatch pair
+-- 40000000-0000-4000-8000-00000000fffa (temp org-b matter) +
+-- a0000000-0000-4000-8000-00000000fffe (its org-mismatched invoice). Listed
+-- here so the harness's static fixture cross-ref resolves them.
+
+-- Sanity: exactly six invoices seeded (the 11 count expectations depend on
+-- it; the org-mismatch temp rows are rolled back inside the battery and
+-- never reach the seeded baseline).
+do $$
+declare
+  v_cnt bigint;
+begin
+  select count(*) into v_cnt from public.billing_invoices;
+  if v_cnt <> 6 then
+    raise exception 'FIXTURE ERROR: billing_invoices must hold 6 rows, got %', v_cnt;
   end if;
 end $$;
