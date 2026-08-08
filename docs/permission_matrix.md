@@ -323,19 +323,32 @@ there.
 > RATIFIED + policy battery shipped) + three shipped precedents · RLS-gate
 > review (`6f52930` + nits `0d7bdca`) · artifacts (`87b6ef5` + `0bc21ed`)
 > · battery + harness (`47150be` + `83b406c`, static `--check` 331/0/0) ·
-> r1 **⏳ PENDING** (owner asserts PASSED on the Docker host; the evidence
-> record `docs/storage_rehearsal_evidence_r1_2026-08-08.md` is not yet
-> filled — no observed output in the repo) · apply-approval **APPLY
+> r1 **⏳ PENDING — SUPERSEDED 2026-08-09 by the Consummation block below
+> (r1 PASSED 2026-08-08, genuinely executed 74/0/0)**: (owner asserts
+> PASSED on the Docker host; the evidence record
+> `docs/storage_rehearsal_evidence_r1_2026-08-08.md` was then not yet
+> filled — no observed output in the repo · now recorded: **PASSED**) · apply-approval **APPLY
 > APPROVED 2026-08-08** (`docs/storage_apply_approval_2026-08-08.md`
-> `91c49ce`; §6 dated sign-off) · apply execution **⏳ HELD** (per §4.1 +
-> rollback_plan §2, on the r1 evidence; the read-only baseline is verified:
+> `91c49ce`; §6 dated sign-off) · apply execution **⏳ HELD — SUPERSEDED
+> 2026-08-09 (EXECUTED 2026-08-08 — see the Consummation block below)**:
+> the pre-apply read-only baseline was still verified at record time —
 > files 0 · bucket 0 · public policies 8→9 · storage policies 0→1 · the
 > four demo matter ids resolve under org `ef43087b-adf4-4480-9bb2-28c26f46ec71`
 > · `storage.buckets.type` NOT NULL **with default** — the bare
 > `(id, name, public)` insert is valid · `storage.foldername` present).
-> Per §7 this extends, not replaces, and widens no other row; **takes
-> effect on the apply execution (pending)** — the client surface (plan
-> T7, env-gated, D-STR7) ships only after the apply lands.
+> **Consummation (2026-08-09, H2 — stale verdicts advanced to the
+> observed facts):** r1 **PASSED 2026-08-08 — genuinely executed 74/0/0**
+> (evidence `docs/storage_rehearsal_evidence_r1_2026-08-08.md` PASSED);
+> the apply **EXECUTED 2026-08-08** (owner-approved; evidence
+> `docs/storage_apply_execution_2026-08-08.md` APPLIED — up sequence
+> complete: bucket `matter-files` 1, tables 10→11, RLS 10→11, public
+> policies 9→10, storage policies 0→1, 4 demo files + 4 demo objects on
+> the applied demo matters, smoke partner 3/3 + family 0, clients 0/0,
+> anon denied on both layers); and the env-gated client surface
+> **SHIPPED** (`704f212`, D-STR7 + `RoleCapability.canViewFiles`, suite
+> 953/README 950, ledger PASS 115). Per §7 this extends, not replaces,
+> and widens no other row; **in effect since the apply execution
+> 2026-08-08** and the client swap `704f212`.
 
 > **§4 addendum (2026-08-08, realtime read slice — plan
 > `docs/realtime_real_data_plan_2026-08-08.md`, sixth §14 un-deferral):**
