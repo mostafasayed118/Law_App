@@ -301,7 +301,19 @@ Branch: `feat/send-message-rpc`
   the D-SM3 revocation), `docs/send_message_apply_approval_2026-08-08.md`
   + execution record — done when: owner's dated sign-off, apply executed
   with the demo-send smoke shifted to an RPC call (audit row observed),
-  rollback pairing standing by. **Owner-gated.**
+  rollback pairing standing by. **Owner-gated.** — **DRAFT (2026-08-08):**
+  `docs/send_message_apply_approval_2026-08-08.md` drafted with the
+  preconditions (r1 PASSED `8df7e47`, criteria §2 all green), the §3
+  apply plan (send_message.sql as one apply unit — function + EXECUTE
+  grant + the D-SM3 revocation; the demo send via the RPC as the assigned
+  partner `8fa94af0-…` on the acquisition thread `5d148bca-…` with the
+  audit row observed — the first §8-audited live write), the §4
+  guardrails (baseline probe policies 10→9 + INSERT-true→false +
+  send_message-absent trigger conditions, verify-don't-guess, rollback
+  pairing `_down.sql` + git-revert of the revocation + demo-row + audit-row
+  delete, per-step verification, post-apply smoke), and the §5
+  exclusions. **Awaiting the owner's dated sign-off in §6** — the apply
+  itself is owner-gated.
 - [ ] **6. Dated matrix addendum** — touches: `docs/permission_matrix.md`
   §4 "Send a message" row mechanism note (audited RPC replaces the direct
   INSERT; the §8 gap closes; D-SM3 revocation recorded) — done when:
