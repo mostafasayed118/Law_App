@@ -319,16 +319,20 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   and the battery runs green against a Postgres-with-storage (owner's
   Docker `supabase start` host or CI) with the §4/§6 deny rows incl. the
   non-vacuous org-mismatch + guessed-path rows; committed.
-- [ ] **4. Ephemeral rehearsal (r-series)** — touches: evidence record
-  `docs/storage_rehearsal_evidence_r1_<date>.md` — done when: the loop
+- [x] **4. Ephemeral rehearsal (r-series)** — touches: evidence record
+  `docs/storage_rehearsal_evidence_r1_2026-08-08.md` — done when: the loop
   (migrate → policies → battery → read-as-roles on **both layers**) passes
   on throwaway infra with zero dev-project contact; **owner-side / CI
   runner** (matters/documents/messages r1 Path A precedent; the `supabase
-  start` host provides the storage schema). — **⏳ PENDING** (owner-side
-  run; the failed-attempt finding — no Docker/psql on this machine and a
-  PowerShell env-var syntax error, no harness execution — is recorded in
-  the evidence record, which stays ⏳ PENDING and uncommitted until real
-  output lands).
+  start` host provides the storage schema). — **DONE (2026-08-08):**
+  genuinely executed Path A on the Docker-backed scratch stack (fresh
+  schema reset → `--apply` 40/0/0 → battery **74/0/0, RESULT: PASS** →
+  selftest 6/6) — pins 1a 11 tables/11 RLS, 1e 10 policies, 1f forward,
+  1g bucket + `files_storage_select` + exactly-one-storage-policy, all
+  ten battery files green; both T4 watch-items resolved (minimal-column
+  bucket insert applied cleanly; storage-policy baseline 0). Evidence
+  record **PASSED**; the earlier no-Docker/psql finding was resolved (the
+  stack was up + the psql shim present at run time).
 - [ ] **5. Dated apply-approval → apply** — touches: dev project
   (07_storage migration + both policies + demo file rows + demo objects),
   `docs/storage_apply_approval_<date>.md` + `docs/storage_apply_execution_<date>.md`
