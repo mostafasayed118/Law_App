@@ -283,14 +283,22 @@ Each task is independently committable with the stated verification; the
 apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
 **no dev-project change until T5**.
 
-- [ ] **1. Scope note + RLS-gate design addendum** — touches: this document
+- [x] **1. Scope note + RLS-gate design addendum** — touches: this document
   + a `messages` §8-style review (`docs/realtime_rls_gate_review_2026-08-08.md`,
   the Q1–Q6 pattern answered for individual messages: the thread-scoped
   assignment model, the three-way-org exists policy (D-RT2), the body
   column + CHECK (D-RT3), author-as-display-name (D-RT4), the live-delivery
   follow-up (D-RT6), negative cases incl. the non-vacuous org-mismatch row,
   rollback pairing, seed plan) — done when: docs committed, ledger sweep
-  green (no dev-project contact).
+  green (no dev-project contact). — **DONE (this commit)** — the review
+  answers Q1–Q6 for the thread-scoped one-hop gate (D-RT2 three-way org
+  equality load-bearing; Q3 no embed needed — the thread title is already
+  client-side; Q5 records the deliberate D-MSG1 reversal scoped to the real
+  read path), the 2/3/1-per-thread positive pins + deny rows incl. the
+  non-vacuous org-mismatch and the `body` CHECK, the schema (D-RT3) with
+  the `(thread_id, sent_at)` index, rollback pairing (08 down + git-revert),
+  and the T3 forward-pin flip note (messages PRESENT → live delivery
+  ABSENT).
 - [ ] **2. Schema artifacts (rehearsal-ready, NOT applied)** — touches:
   `supabase/migrations/08_messages.sql` (+ `08_messages.down.sql`),
   `supabase/policies/messages.sql` — done when: DDL matches D-RT1/D-RT3
