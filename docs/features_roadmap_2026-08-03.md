@@ -168,6 +168,15 @@ server-side, owner-only first surface) + `read_platform_audit`
 (`platform_owner_admin`-only).
 Each row names the owning phase below (or the gate that blocks it).
 
+> **Canonical dev-project state (single source of truth, 2026-08-08):**
+> `docs/current_applied_surface_2026-08-08.md` — the full applied surface
+> (12 tables / 12 RLS / 11 public + 1 storage policy / 19 EXECUTE RPCs /
+> publication exactly `messages` / `matter-files` bucket / demo rows) with
+> the verified apply chronology + cross-refs to the ten execution records.
+> The owner-side configured-build E2E checklist (D-45.1) is
+> `docs/configured_build_e2e_checklist_2026-08-08.md`. Prefer those over
+> any inline count in this roadmap.
+
 | RPC (`supabase/rpc/`) | Wired in client today? | Owning phase | Notes |
 |---|---|---|---|
 | `create_organization` | ✅ `createOrganization` | — | shipped |

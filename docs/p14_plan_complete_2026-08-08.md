@@ -84,6 +84,13 @@ addendum → client swap → close evidence):
 | Billing invoices | `docs/billing_invoices_real_data_plan_2026-08-08.md` | `docs/billing_invoices_gate_review_2026-08-08.md` | `docs/billing_invoices_rehearsal_evidence_r1_2026-08-08.md` | `docs/billing_invoices_apply_approval_2026-08-08.md` + `docs/billing_invoices_apply_execution_2026-08-08.md` | `docs/billing_invoices_real_data_completion_evidence_2026-08-08.md` |
 | AI | — | — | — | — | **DEFERRED — D-07/D-08 + undefined scope** |
 
+> **Canonical current dev-project state:** `docs/current_applied_surface_2026-08-08.md`
+> (12 tables / 12 RLS / 11 public + 1 storage policy / 19 EXECUTE RPCs /
+> publication exactly `messages` / `matter-files` bucket / demo rows + the
+> verified apply chronology) — the single source of truth; the owner-side
+> configured-build E2E checklist (D-45.1) is
+> `docs/configured_build_e2e_checklist_2026-08-08.md`.
+
 ## 4. What is still NOT done (honest, per INSTRUCTIONS §1.3 #5)
 
 - **AI** — the only remaining §14 path; owner-blocked on D-07/D-08 +
@@ -92,7 +99,9 @@ addendum → client swap → close evidence):
   env-gated client swaps (matters/documents/messages/storage/realtime/
   send/billing) are verified by the typed/fake suite + DI pins + the
   applied server surfaces; a configured-build device round-trip (`.env`,
-  git-ignored) remains an owner-side checklist item.
+  git-ignored) remains **owner-side, now with a dated checklist**:
+  `docs/configured_build_e2e_checklist_2026-08-08.md` (per-account
+  expected reads keyed to `docs/current_applied_surface_2026-08-08.md`).
 - **No push beyond `dde0c11`** — `main` == `origin/main` (ahead 0); nothing
   else pending.
 - **Follow-ups recorded in the slices** (each small, none blocking): the
