@@ -236,12 +236,27 @@ until T5**.
   (publication membership only, no new table) + the forward-pin re-scope
   (pg_publication_tables messages 0→1, policies 10→11); §6 rollback
   pairing; ledger PASS 115, no dev-project contact.
-- [ ] **2. Schema artifacts (rehearsal-ready, NOT applied)** — touches:
+- [x] **2. Schema artifacts (rehearsal-ready, NOT applied)** — touches:
   `supabase/migrations/09_realtime_push.sql` (+ `09_realtime_push.down.sql`),
   `supabase/policies/messages_insert.sql` — done when: the migration adds
   exactly `messages` to `supabase_realtime` (D-LV2), the down is the clean
   inverse (`drop table` membership), the INSERT policy mirrors the read
-  gate (D-LV1), committed.
+  gate (D-LV1), committed. — **DONE (this commit, 2026-08-08)** —
+  09_realtime_push.sql (publication membership only — the guard-create is
+  a `do`-block because CREATE PUBLICATION has no IF NOT EXISTS form, a
+  syntax error the live rehearsal caught and fixed; D-LV2 exactly-messages)
+  + a clean idempotent `_down.sql` (membership drop guarded by a
+  `pg_publication_tables` check) + policies/messages_insert.sql
+  (`messages_insert_assigned`, D-LV1 — the read gate applied as WITH
+  CHECK; **the INSERT grant added after a live finding: 08 granted SELECT
+  only, so a policy without the grant never fires**). **Verified live on
+  the rehearsal Docker stack** (not just statically): up/down/up
+  round-trip (membership exactly `messages`, 1→0→1); the INSERT policy
+  gates live — assigned attorney-a INSERT allowed (INSERT 0 1), stranger
+  INSERT denied (new row violates row-level security policy), org-role-
+  alone INSERT denied (org-a member, unassigned on the matter). Battery
+  static `--check` 333/0/0 (09 not yet listed — T3) + ledger PASS 115;
+  NOT applied to the dev project.
 - [ ] **3. Policy battery** — touches: `supabase/tests/09_realtime_push.sql`
   + `scripts/verify_policy_tests.sh` (file list, run loop, `--apply` order
   gains `09_realtime_push.sql`, policy pin **10→11**, forward pin re-scoped
