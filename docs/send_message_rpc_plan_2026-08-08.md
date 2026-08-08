@@ -297,23 +297,26 @@ Branch: `feat/send-message-rpc`
   revoked) → selftest **6/6** → static `--check` **337/0/0**. Evidence in
   `docs/send_message_rehearsal_evidence_r1_2026-08-08.md` (**PASSED**,
   verbatim output + the reset discipline + the honest limits).
-- [ ] **5. Dated apply-approval → apply** — touches: dev project (RPC +
+- [x] **5. Dated apply-approval → apply** — touches: dev project (RPC +
   the D-SM3 revocation), `docs/send_message_apply_approval_2026-08-08.md`
   + execution record — done when: owner's dated sign-off, apply executed
   with the demo-send smoke shifted to an RPC call (audit row observed),
-  rollback pairing standing by. **Owner-gated.** — **DRAFT (2026-08-08):**
-  `docs/send_message_apply_approval_2026-08-08.md` drafted with the
-  preconditions (r1 PASSED `8df7e47`, criteria §2 all green), the §3
-  apply plan (send_message.sql as one apply unit — function + EXECUTE
-  grant + the D-SM3 revocation; the demo send via the RPC as the assigned
-  partner `8fa94af0-…` on the acquisition thread `5d148bca-…` with the
-  audit row observed — the first §8-audited live write), the §4
-  guardrails (baseline probe policies 10→9 + INSERT-true→false +
-  send_message-absent trigger conditions, verify-don't-guess, rollback
-  pairing `_down.sql` + git-revert of the revocation + demo-row + audit-row
-  delete, per-step verification, post-apply smoke), and the §5
-  exclusions. **Awaiting the owner's dated sign-off in §6** — the apply
-  itself is owner-gated.
+  rollback pairing standing by. **Owner-gated.** — **DONE (2026-08-08):**
+  the approval record flipped **APPLY APPROVED** (owner's dated §6
+  sign-off, 2026-08-08) and the apply executed — baseline probe matched
+  the §4.1 predictions exactly (send_message 0, messages 11, policies
+  10, partner assigned on `5d148bca-…`, publication exactly messages,
+  INSERT true) → `send_message.sql` as ONE unit (function prosecdef +
+  EXECUTE true/anon false + D-SM3 revocation: INSERT false, policy gone,
+  policies 10→9) → the demo send via the RPC as the assigned partner
+  (id `1c031882-b054-4c54-ab07-c6b70f25b8f2`) with the **§8 audit row
+  observed** (`message:create/allowed`, actor = partner, resource id =
+  returned id, redacted 'message sent') → post-apply smoke (partner reads
+  1, assigned client 0 — the D-RT2 guard; tally 12). One finding recorded
+  (not a revert): the author is the account's stored display name (an
+  email — owner-side account hygiene), D-RT4 honored. Execution evidence
+  `docs/send_message_apply_execution_2026-08-08.md` **APPLIED**;
+  rollback pairing standing by, unexercised.
 - [x] **6. Dated matrix addendum** — touches: `docs/permission_matrix.md`
   §4 "Send a message" row mechanism note (audited RPC replaces the direct
   INSERT; the §8 gap closes; D-SM3 revocation recorded) — done when:

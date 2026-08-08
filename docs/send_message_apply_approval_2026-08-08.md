@@ -11,8 +11,8 @@
 > rehearsed slice to the shared dev project, with the rollback pairing
 > standing by.
 >
-> **Status: DRAFT (2026-08-08) — awaiting the owner's dated sign-off in
-> §6.** The ephemeral rehearsal r1
+> **Status: APPLY APPROVED 2026-08-08 — the owner's dated sign-off is
+> recorded in §6.** The ephemeral rehearsal r1
 > (`docs/send_message_rehearsal_evidence_r1_2026-08-08.md`) reported
 > **PASSED 2026-08-08** (plan T4 — genuinely executed battery, 74/0/0; §4
 > evidence), and the T2 artifact was validated live on the rehearsal host
@@ -185,23 +185,27 @@ conditions and the §5 exclusions, with the rollback pairing standing by.
 Signature is valid — the r1 rehearsal reported PASSED on 2026-08-08 (plan
 T4; evidence §4, criteria §2 all green — genuinely executed, 74/0/0).
 
-- **Project Owner:** github.com/mostafasayed118 — **date: _____________**
+- **Project Owner:** github.com/mostafasayed118 — **date: 2026-08-08**
   — **approval wording:** "Apply approved — audited send_message RPC
   slice (send_message.sql with the D-SM3 revocation + the demo send via
   the RPC as the assigned partner on the acquisition demo thread), per
   this record §3–§5, with the §4 guardrails and rollback pairing."
+  — **signature:** ✍️ Signed 2026-08-08 by the Project Owner
+  (github.com/mostafasayed118), authorizing the §3 apply against
+  `eutmvevpskerzpqmwplv` subject to the §4 execution conditions.
 
-> **Awaiting the owner's dated sign-off.** On signature, the execution
-> record (`docs/send_message_apply_execution_2026-08-08.md`) captures the
-> actual run; on success, T6 (the dated matrix §4 mechanism-note addendum)
-> precedes T7 (client swap) per the plan.
+> **APPLY APPROVED 2026-08-08.** The execution record
+> (`docs/send_message_apply_execution_2026-08-08.md`) captures the actual
+> run; on success, T6 (the dated matrix §4 mechanism-note addendum)
+> precedes T7 (client swap) per the plan — both already committed in this
+> slice, and the §14 row flipped with the HELD caveat now resolvable.
 
 ## 7. Ledger
 
-- DRAFT 2026-08-08: this record's status is ⏳ DRAFT — awaiting the
+- DRAFT 2026-08-08: this record's status was ⏳ DRAFT — awaiting the
   owner's dated sign-off (§6); the plan's T5 row annotated.
-- Pending: owner's dated sign-off (§6) → apply execution
-  (`docs/send_message_apply_execution_2026-08-08.md`) captures the actual
-  run per §4; on success, T6 (matrix addendum) and T7 (client swap)
-  follow, and the roadmap §13/§2 + README/ledger lockstep is re-run on
-  the merged tree (T8).
+- APPLY APPROVED 2026-08-08: the owner's dated sign-off recorded in §6;
+  the apply execution (`docs/send_message_apply_execution_2026-08-08.md`)
+  captures the actual run per §4; T6 (matrix addendum) and T7 (client
+  swap) were already committed ahead of the sign-off, and the roadmap
+  §13/§2 HELD caveats resolve once the execution record lands.

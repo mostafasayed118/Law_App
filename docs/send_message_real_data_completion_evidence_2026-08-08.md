@@ -6,16 +6,18 @@
 > storage → audit surfacing → individual messages/bodies → live delivery →
 > **the audited send path**), records exactly what was **verified** about
 > the audited `send_message` RPC path (server-side T1–T4 rehearsal-verified,
-> T5 apply **owner-gated and HELD**; client swap `f874a57`, all on
-> `feat/send-message-rpc`, no push) and exactly what is **still pending**,
+> T5 apply **owner-approved and EXECUTED 2026-08-08**
+> (`docs/send_message_apply_execution_2026-08-08.md`); client swap
+> `f874a57`, all on `feat/send-message-rpc`, no push) and exactly what is
+> **still pending**,
 > with no claim beyond what was actually run (INSTRUCTIONS.md §1.3 #5).
 >
-> **Status: SHIPPED 2026-08-08 (client surface) — the full gate green on
-> the committed branch state (analyze clean, suite 1047 runtime / README
-> 1044 declaration, ledger PASS 115); the server apply (the RPC + the
-> D-SM3 revocation, policies 10→9) is ⏳ HELD on the owner's dated sign-off
-> of the T5 approval — the dev project's write path remains the direct
-> INSERT until then.** This slice closed the realtime-push review-Q6
+> **Status: SHIPPED 2026-08-08 — the full gate green on the committed
+> branch state (analyze clean, suite 1047 runtime / README 1044
+> declaration, ledger PASS 115), and the T5 apply EXECUTED the same day
+> (owner's dated §6 sign-off → policies 10→9, `authenticated` INSERT
+> revoked, the demo send `1c031882-…` via the RPC with the §8 audit row
+> observed).** This slice closed the realtime-push review-Q6
 > follow-up: the app's message write path becomes a contract §8-audited
 > RPC by construction. The dated close decision is recorded in §9,
 > mirroring the P0C / P3.1–P3.5 / matters / documents / messages / storage
@@ -76,12 +78,17 @@ through the shipped read) — delivered as plan T1–T8:
   as one apply unit), battery **74/0/0**, pins probed independently (11
   tables / 11 RLS / 10 policies / publication exactly messages / 19
   EXECUTE RPCs / authenticated INSERT **revoked**).
-- **The T5 apply to the dev project has NOT run** — it is ⏳ HELD on the
-  owner's dated sign-off of `docs/send_message_apply_approval_2026-08-08.md`
-  §6. Until then the dev project's write path remains the direct INSERT
-  (`messages_insert_assigned`, policies 10) with no `send_message`
-  function — the §8 gap the slice closes stays open there, exactly as the
-  T6 addendum records.
+- **The T5 apply executed the same day** (owner's dated §6 sign-off →
+  APPLY APPROVED → `docs/send_message_apply_execution_2026-08-08.md`
+  **APPLIED**): `send_message` + the D-SM3 revocation live on the dev
+  project — policies 10→9, `authenticated` INSERT revoked,
+  `messages_insert_assigned` dropped, the demo send `1c031882-…` via
+  the RPC with the **§8 audit row observed** (`message:create/allowed`,
+  actor = the partner, resource id = the returned id, redacted `message
+  sent`). The §8 gap the slice closes is closed there, exactly as the T6
+  addendum records; one finding recorded (the author is the account's
+  stored display name — an email — owner-side account hygiene, D-RT4
+  honored; not a revert).
 
 ### 2.3 Test coverage added by the client swap (+2 declarations, suite 1042 → 1044 declaration; 1045 → 1047 runtime)
 
@@ -110,12 +117,6 @@ through the shipped read) — delivered as plan T1–T8:
 
 ## 3. Pending (honestly NOT run — do not read as verified)
 
-- **The server apply is HELD on the owner's dated sign-off** (T5
-  `a5db0af` DRAFT): `send_message` + the D-SM3 revocation (policies
-  10→9) have NOT been applied to the dev project — the env-gated client
-  flip is therefore **inert in configured builds until the apply runs**
-  (the function does not exist there yet; the write path remains the
-  direct INSERT).
 - **No live configured-build send round-trip on a device/emulator** — all
   client verification is the typed/fake test suite + DI pins (the D-45.1
   Phase 2 convention; needs `.env`, git-ignored). The real RPC call and
@@ -192,10 +193,16 @@ with the resolved commit refs.
   schema was reset first (43 objects cascaded, rebuilt from the committed
   files; `auth`/`storage` untouched), then the rehearsal ran clean —
   40/0/0 apply, 74/0/0 battery, pins verified (`8df7e47`).
-- **T5 honest hold:** the apply-approval record is **DRAFT**, not signed —
-  the slice does NOT claim the dev project carries the RPC or the §8
-  audit; the §14 flip note and §2 row carry the explicit HELD marker so
-  no reader mistakes the rehearsal state for the applied state.
+- **T5 honest hold → executed:** the apply-approval record shipped
+  **DRAFT** (never claimed applied), the §14 flip note and §2 row carried
+  the explicit HELD marker so no reader could mistake the rehearsal state
+  for the applied state; the owner's dated §6 sign-off then closed the
+  gate and the apply executed the same day
+  (`docs/send_message_apply_execution_2026-08-08.md` — policies 10→9,
+  INSERT revoked, demo send `1c031882-…` with the §8 audit row
+  observed), with one finding recorded (the author is the account's
+  stored display name — an email — owner-side account hygiene, D-RT4
+  honored; not a revert).
 - **T7 ledger catch (count accuracy):** the final ledger sweep on the
   uncommitted T7 state caught the README count at 1042 while the ledger's
   git-grep declaration count on the tree was 1044 — the README was updated
@@ -244,9 +251,12 @@ the seam calls `send_message` with no org pre-read + no client author
 fake untouched — with the full gate green on the committed state (format
 PASS · analyze clean · suite 1047 runtime / README 1044 · ledger PASS
 115, the README 1042→1044 drift caught by the final sweep and fixed in
-the same commit). **The T5 server apply is ⏳ HELD on the owner's dated
-sign-off** — the §14 send-message row flips to per-feature SHIPPED for
-the client surface with the HELD caveat recorded, and the §8 gap closes
-on the dev project only when the apply executes. **Nothing pushed**;
+the same commit). **The T5 server apply executed the same day** (owner's
+dated §6 sign-off → APPLY APPROVED →
+`docs/send_message_apply_execution_2026-08-08.md` **APPLIED**: policies
+10→9, INSERT revoked, the demo send `1c031882-…` via the RPC with the
+§8 audit row observed) — the §8 gap is closed on the dev project and the
+§14 send-message row flips to per-feature SHIPPED with the write path
+now the audited RPC. **Nothing pushed**;
 billing (D-09) and AI stay deferred each behind their own future
 per-feature un-deferral.
