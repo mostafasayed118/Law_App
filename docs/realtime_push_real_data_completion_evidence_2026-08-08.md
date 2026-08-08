@@ -236,9 +236,11 @@ green with the resolved commit refs.
 - **Recorded write-path follow-ups:** an **audited `send_message` RPC**
   (review Q6 — the direct-INSERT path is not §8-audited), and message
   edit/delete/attachments/receipts (all out of D-LV1 scope).
-- **Remaining §14 deferred paths:** billing (D-09) and AI (no scope) —
-  the deferred list now narrows to those two; each keeps the same
-  per-feature discipline.
+- **Remaining §14 deferred paths:** billing (spec D-09 — payment
+  provider/tax/PCI, open; not the decided p0 D-09 role semantics) and AI
+  (no scope) — the deferred list now narrows to those two; each keeps the
+  same per-feature discipline (reconciled 2026-08-08 in
+  `docs/send_message_rpc_plan_2026-08-08.md`).
 
 ## 9. Dated close decision
 

@@ -312,7 +312,9 @@ PASS 115. Pushed to `origin/main` on the owner's approval.
 `feat/booking-flow`; four checks green on the merged tree; AC↔test map
 closed per scope note §5) → UI + routing slice (screen, /book route,
 app-shell entry, EN/AR/TR) → full B2 gate stack → owner push approval.
-Client-only; no server change (payment is gated on D-09).
+Client-only; no server change (payment is gated on **spec D-09** — payment
+provider / tax / PCI scope, open, owner + finance; not the decided p0
+D-09 role semantics — see `docs/send_message_rpc_plan_2026-08-08.md` A.1).
 
 The domain + state-machine layer already exists on `feat/booking-flow`
 (`BookingGateway` seam, `BookingRequest` redaction contract, `BookingCubit`
@@ -728,7 +730,11 @@ seam — per-thread `postgres_changes` + reconnect + backfill via the
 shipped `fetchMessages` — `sendMessage` on the gateway/fake + the
 thread-detail composer, insert-only D-LV1, `6154fa3`, suite 1045 runtime
 / README 1042, ledger PASS 115). The remaining deferred paths each keep
-this same per-feature discipline: billing, AI.
+this same per-feature discipline: billing, AI — **reconciled 2026-08-08**
+(both stay deferred behind open owner-side decisions: billing on spec D-09
+payment provider/tax/PCI + D-04 residency + no-live-payment-in-MVP; AI on
+D-07/D-08 + undefined scope — see the reconciliation + next-slice plan
+`docs/send_message_rpc_plan_2026-08-08.md`).
 The client-only document-metadata surface shipped as Phase 8 (slices
 8.0–8.2, `22d63e5`/`29fd40a`/`430b62b`) carries no real document data —
 the real documents read path is the second per-feature un-deferral
