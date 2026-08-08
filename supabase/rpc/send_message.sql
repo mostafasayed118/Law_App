@@ -77,3 +77,15 @@ $$;
 
 revoke execute on function public.send_message(uuid, text) from public, anon;
 grant execute on function public.send_message(uuid, text) to authenticated;
+
+-- D-SM3 (gate review Q6): the direct-INSERT surface is revoked so this RPC
+-- becomes the ONLY message write path — every write is §8-audited by
+-- construction, and no un-audited INSERT path can reappear without an
+-- explicit grant re-add. The SELECT policy (messages_select_assigned, the
+-- delivery gate) is untouched; the policy count moves 11 -> 10 and the
+-- battery pins both halves of the revocation (09.15 privilege-layer deny,
+-- 09.16 policy gone). Backout: git-revert of this block (the policy + grant
+-- re-add), per the gate review §6 — the _down.sql drop above is the
+-- function half of the pairing.
+revoke insert on public.messages from authenticated;
+drop policy if exists messages_insert_assigned on public.messages;

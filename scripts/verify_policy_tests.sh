@@ -10,7 +10,9 @@
 #      the narrow SELECT grants, the function EXECUTE surface (the R-4
 #      policy-helper grants present; the internal helpers + write_audit
 #      denied), zero policies on audit_events/platform_config (D-P0C4), the
-#      eleven-policy total, the storage-surface pins (matter-files bucket +
+#      ten-policy total (the D-SM3 revocation dropped messages_insert_
+#      assigned — the write path moved to the audited send_message RPC), the
+#      storage-surface pins (matter-files bucket +
 #      files_storage_select on storage.objects — the fourth §14
 #      un-deferral), and the D-P0C1(b) forward pin (matters, documents,
 #      message_threads, files + messages shipped as the first five §14
@@ -45,16 +47,24 @@
 #      org-role-alone / org-mismatch / cross-org / suspended / owner / anon
 #      denies + the body CHECK + thread-delete cascade + the message-count
 #      mapping-consistency pin),
-#      09_realtime_push.sql (matrix §4 write rows + §6 delivery — the
-#      realtime live-delivery path, the seventh §14 un-deferral: the
-#      publication-membership pins (messages in supabase_realtime, count 1,
-#      nothing else), the messages_insert_assigned INSERT positives
-#      (assigned attorney/client) + org-role-alone / cross-org / suspended /
-#      owner / anon denies + the empty-body CHECK, and the delivery-
-#      equivalence negative (the §6 row: a subscription for an org/matter
-#      the session no longer has access to delivers nothing — the read gate
-#      IS the delivery gate)). Every matrix row has ≥1 positive + ≥1
-#      negative check (contract §9).
+#      09_realtime_push.sql (matrix §6 delivery + the D-SM3 revocation —
+#      the realtime live-delivery path, the seventh §14 un-deferral,
+#      RE-SCOPED by the send-message slice: the publication-membership pins
+#      (messages in supabase_realtime, count 1, nothing else), the
+#      privileged empty-body CHECK, the delivery-equivalence reads (assigned
+#      attorney + client see the delivered row; suspended / cross-org /
+#      owner / stranger see 0 — the read gate IS the delivery gate), and
+#      the D-SM3 revocation pins (direct INSERT denied at the privilege
+#      layer; messages_insert_assigned gone — the write surface moved to
+#      the audited RPC),
+#      10_send_message_rls.sql (the audited write path — the send-message
+#      slice's battery: send_message positives (assigned attorney/client,
+#      D-RT4 stored author from profiles), the §8 audit-row positive
+#      (message:create/allowed, redacted summary, resource id), the
+#      in-function gate deny rows (org-role-alone / cross-org / suspended /
+#      owner / anon), the empty-body CHECK through the RPC, and the §8
+#      negative (a denied send writes no audit row)). Every matrix row has
+#      ≥1 positive + ≥1 negative check (contract §9).
 #
 # The harness NEVER runs against the live dev project — only against a
 # throwaway rehearsal project (the P2 r1–r5 pattern). The project is built
@@ -127,6 +137,7 @@ BATTERY_FILES=(
   "07_storage_rls.sql"
   "08_message_rls.sql"
   "09_realtime_push.sql"
+  "10_send_message_rls.sql"
 )
 
 usage() {
@@ -177,9 +188,9 @@ static_check() {
   uuids_from=$(grep -hoE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' \
       "$TESTS_DIR/01_identity_session.sql" "$TESTS_DIR/02_organization_membership.sql" \
       "$TESTS_DIR/03_platform_owner_boundary.sql" "$TESTS_DIR/04_matter_rls.sql" \
-      "$TESTS_DIR/05_document_rls.sql" "$TESTS_DIR/06_message_rls.sql"
+      "$TESTS_DIR/05_document_rls.sql"      "$TESTS_DIR/06_message_rls.sql"
       "$TESTS_DIR/07_storage_rls.sql" "$TESTS_DIR/08_message_rls.sql"
-      "$TESTS_DIR/09_realtime_push.sql" | sort -u)
+      "$TESTS_DIR/09_realtime_push.sql" "$TESTS_DIR/10_send_message_rls.sql" | sort -u)
   for ref in $uuids_from; do
     if grep -q "$ref" "$TESTS_DIR/00_fixtures.sql"; then
       ok "fixture UUID $ref resolves in 00_fixtures.sql"
@@ -190,7 +201,7 @@ static_check() {
 
   note "static check: every battery check block carries the FAIL marker"
   local file blocks
-  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql; do
+  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql; do
     blocks=$(grep -c 'POLICY-BATTERY FAIL' "$TESTS_DIR/$f")
     if [ "$blocks" -ge 10 ]; then
       ok "$f: $blocks named check blocks"
@@ -246,7 +257,7 @@ apply_slice() {
   # proves the bound; the seed itself is a trusted migration, not a client
   # reachable path).
   note "apply: 03_platform_config_seed.sql skipped by design (apply-time token; fixtures seed the rehearsal owner)"
-  # The structural pins (11 tables/RLS, 11 policies + the storage-surface
+  # The structural pins (11 tables/RLS, 10 policies + the storage-surface
   # pins + the publication pin) and 00_fixtures' matters + documents +
   # message_threads + files + storage.objects + messages resets require all
   # six un-deferral slices — applied above via 04_matters.sql +
@@ -374,6 +385,7 @@ structural_pins() {
     "read_org_audit(uuid)"
     "read_platform_audit()"
     "list_org_members_metadata(uuid)"
+    "send_message(uuid, text)"
   )
   for sig in "${rpc_list[@]}"; do
     expect_tf "authenticated EXECUTE on public.$sig" \
@@ -389,8 +401,8 @@ structural_pins() {
     "$(run_sql "select count(*) from pg_policies where schemaname='public' and tablename='audit_events';")" "0"
   expect_eq "zero policies on platform_config" \
     "$(run_sql "select count(*) from pg_policies where schemaname='public' and tablename='platform_config';")" "0"
-  expect_eq "exactly eleven policies across the client tables" \
-    "$(run_sql "select count(*) from pg_policies where schemaname='public';")" "11"
+  expect_eq "exactly ten policies across the client tables (11 minus the D-SM3 messages_insert_assigned drop)" \
+    "$(run_sql "select count(*) from pg_policies where schemaname='public';")" "10"
 
   note "--- 1f. Forward pin re-scoped (2026-08-08): matters, documents, message_threads, files + messages are the FIRST FIVE §14 un-deferrals ---"
   # D-P0C1(b) originally pinned 'no matter/document/message tables exist'. The
@@ -412,7 +424,12 @@ structural_pins() {
   # un-deferral). The pin re-scoped at realtime-read T3 to LIVE DELIVERY
   # (absent) is now re-scoped again: live delivery is PRESENT — messages in
   # supabase_realtime, count 1, and the publication holds NOTHING else
-  # (D-P0C1(b) teeth: no accidental table exposure via realtime).
+  # (D-P0C1(b) teeth: no accidental table exposure via realtime). The
+  # audited send-message slice (docs/send_message_rpc_plan_2026-08-08.md,
+  # D-SM3) then moved the WRITE surface off the direct INSERT (grant
+  # revoked, messages_insert_assigned dropped — policies 11 -> 10, pinned
+  # in 09.15/09.16) onto the audited send_message RPC; the publication pin
+  # is untouched (the SELECT policy remains the delivery gate).
   expect_eq "matters present (first un-deferral)" \
     "$(run_sql "select count(*) from information_schema.tables where table_schema='public' and table_name = 'matters';")" "1"
   expect_eq "documents present (second un-deferral)" \
@@ -464,7 +481,7 @@ run_battery() {
   expect_eq "exactly one platform_config row after fixtures" \
     "$(run_sql "select count(*) from public.platform_config;")" "1"
 
-  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql; do
+  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql; do
     note "--- 2c. Battery file: $f ---"
     out=$(psql "$SUPABASE_TEST_DB_URL" -X -q -v ON_ERROR_STOP=1 -f "$TESTS_DIR/$f" 2>&1)
     rc=$?
@@ -531,7 +548,7 @@ selftest() {
   #    00_fixtures.sql (the static cross-ref scan must red)
   local fixture_uuid
   fixture_uuid=$(comm -12 \
-    <(grep -hoE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' "$wt"/supabase/tests/0[1-9]_*.sql | sort -u) \
+    <(grep -hoE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' "$wt"/supabase/tests/0[1-9]_*.sql "$wt"/supabase/tests/10_*.sql | sort -u) \
     <(grep -hoE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' "$wt/supabase/tests/00_fixtures.sql" | sort -u) \
     | head -1)
   if [ -z "$fixture_uuid" ]; then

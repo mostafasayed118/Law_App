@@ -257,12 +257,31 @@ Branch: `feat/send-message-rpc`
   `messages_body_check` with nothing written) → drop round-trip
   (function + grants gone, re-apply restores) → demo rows + audit rows
   cleaned. NOT applied to the dev project.
-- [ ] **3. Battery + harness** — touches: `supabase/tests/10_send_message_rls.sql`
+- [x] **3. Battery + harness** — touches: `supabase/tests/10_send_message_rls.sql`
   (EXECUTE grant pins, in-function deny rows ×5, audit-row positive, body
   CHECK, direct-INSERT-revoked pin) + `scripts/verify_policy_tests.sh`
   edits (file list, run loop, `--apply` order, §1d RPC-EXECUTE gains
   `send_message(uuid, text)` 18→19) — done when: static `--check` green,
-  selftest green.
+  selftest green. — **DONE (this commit, 2026-08-08):** NEW
+  `supabase/tests/10_send_message_rls.sql` (10 named checks: attorney +
+  client send positives with the D-RT4 stored author from profiles, the §8
+  audit-row shape positive, the in-function deny rows (org-role-alone /
+  cross-org / suspended / owner / anon), the empty-body CHECK through the
+  RPC, and the §8 negative — a denied send writes no audit row) + the
+  **09 re-scope** (the INSERT-policy group moved to the 10 battery; 09 now
+  pins publication membership + the privileged empty-body CHECK + the
+  extended delivery equivalence (attorney + client positives, suspended /
+  cross-org / owner / stranger negatives) + the **D-SM3 revocation pins**
+  (09.15 privilege-layer deny, 09.16 policy gone)) + the
+  **send_message.sql D-SM3 revocation tail** (revoke INSERT grant + drop
+  `messages_insert_assigned` — the coherent --apply unit) + harness edits
+  (§1d RPC-EXECUTE **18→19** with `send_message(uuid, text)`; policy pin
+  **11→10**; file list + run loop + UUID scan + FAIL-marker loop gain 10;
+  selftest glob gains 10; header/apply comments). **Verified, not
+  claimed:** static `--check` **337/0/0** · live battery on the rehearsal
+  stack **74/0/0** (10 green, 09 re-scoped green, pins 11 tables / 11 RLS /
+  10 policies / publication exactly messages / 19 EXECUTE RPCs) · selftest
+  **6/6**. NOT applied to the dev project.
 - [ ] **4. Ephemeral rehearsal (r-series)** — touches: Docker-stack
   `verify_policy_tests.sh --apply` + battery (the established genuinely-
   executed precedent) + `docs/send_message_rehearsal_evidence_r1_2026-08-08.md`
