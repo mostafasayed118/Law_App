@@ -154,7 +154,7 @@ Two remediation types apply to **every** exported screen (light + dark): **(B)**
 | message_center, matter_discussion | Maybe | Yes | — |
 | document_vault | Maybe | Yes | — |
 | case_management_dashboard, case_details, shared_case_workspace | Maybe | Yes | — |
-| user_profile, settings_localization, notification_settings, partner_notification_settings | Maybe | Yes | Localization screen must reflect EN/AR/TR |
+| user_profile, settings_localization, notification_settings, partner_notification_settings | Maybe | Yes | Localization screen must reflect EN/AR/TR. `partner_notification_settings` is intentionally satisfied by the shared role-agnostic `notification_settings_screen.dart` — **D-T7** (`docs/tracked_deviations.md`, decision dated 2026-08-09); no duplicate screen, by scoping decision |
 | billing_invoices | Maybe | Yes | Defer real payment (D-09) |
 | video_consultation | Maybe | Yes | Defer (D-11) |
 | collaboration_task_board, pending_approvals_queue | Maybe | Yes | v1 |
