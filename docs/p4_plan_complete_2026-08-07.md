@@ -11,7 +11,7 @@
 >
 > **Status: PHASE 4 PLAN COMPLETE — 4.1/4.2 SHIPPED 2026-08-07, client-only
 > (no schema/RLS change), full gate green on `main` (format 0-changed,
-> analyze clean, suite 850, ledger PASS 162, README 847).** Phase 4's two
+> analyze clean, suite 850, ledger PASS 115, README 847).** Phase 4's two
 > rows are closed: 4.2 (sign-up email-verification UX, 2026-08-03) and 4.1
 > (deep-link recovery — recovery half 2026-08-03 + the accept-invitation
 > deep link D-P34.2 2026-08-07).
@@ -103,7 +103,7 @@ is captured verbatim, never fixed forward).
 - **Phase 4 plan: COMPLETE 2026-08-07** — 4.1 (recovery half +
   accept-invitation deep link) and 4.2 SHIPPED (roadmap §6 bullets + status
   line + gate-table row 4 updated in the slice closes); suite **850**;
-  `verify_ledger.sh` **PASS 162/0/0** (doc sweep incl. the 4.1 plan +
+  `verify_ledger.sh` **PASS 115/0/0** (doc sweep incl. the 4.1 plan +
   evidence); README 847.
 - This decision reconciles **status framing only**. No external action was
   taken against the dev project; nothing is committed/pushed beyond the

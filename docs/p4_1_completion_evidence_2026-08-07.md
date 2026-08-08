@@ -8,7 +8,7 @@
 > no claim beyond what was actually run (INSTRUCTIONS.md §1.3 #5).
 >
 > **Status: SHIPPED 2026-08-07 — implementation complete, full gate green
-> (format clean, analyze clean, suite 850, ledger PASS 162).** The dated close
+> (format clean, analyze clean, suite 850, ledger PASS 115).** The dated close
 > decision for the roadmap rows is recorded in this commit (roadmap status
 > line + §6 4.1 bullet + gate-table row), mirroring the P0C / P3.1–P3.5
 > close. This slice consummates the D-P34.2 forward hook recorded at the
@@ -58,7 +58,7 @@ transitive version) are recorded in the plan document §3.
 | `dart format --output=none --set-exit-if-changed lib test` | 0 files changed (exit 0) |
 | `flutter analyze` | **No issues found** (exit 0) |
 | `flutter test` (full suite) | **850 passed** (exit 0) |
-| `scripts/verify_ledger.sh` | **PASS — 162 passed, 0 warnings, 0 failures** (README 847 in lockstep) |
+| `scripts/verify_ledger.sh` | **PASS — 115 passed, 0 warnings, 0 failures** (README 847 in lockstep) |
 
 ### 2.2 Test coverage added by the slice (+23 declarations, 824 → 847; suite 827 → 850)
 
@@ -129,7 +129,7 @@ bash scripts/verify_ledger.sh <canonical docs + touched files>
 
 README test count synced **824 → 847** in lockstep with the ledger's
 declaration count across the slice (+23). Final state
-`scripts/verify_ledger.sh` **PASS 162/0/0** with README 847. No
+`scripts/verify_ledger.sh` **PASS 115/0/0** with README 847. No
 schema/RLS/policy change — this slice is client code only (`app_links`
 declared direct is the only pubspec change, at the already-resolved
 transitive version).
