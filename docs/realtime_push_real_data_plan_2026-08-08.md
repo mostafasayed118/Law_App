@@ -257,13 +257,28 @@ until T5**.
   alone INSERT denied (org-a member, unassigned on the matter). Battery
   static `--check` 333/0/0 (09 not yet listed — T3) + ledger PASS 115;
   NOT applied to the dev project.
-- [ ] **3. Policy battery** — touches: `supabase/tests/09_realtime_push.sql`
+- [x] **3. Policy battery** — touches: `supabase/tests/09_realtime_push.sql`
   + `scripts/verify_policy_tests.sh` (file list, run loop, `--apply` order
   gains `09_realtime_push.sql`, policy pin **10→11**, forward pin re-scoped
   to **messages in the publication count 1 + nothing else**) + the §6
   delivery-gate negative as a role-impersonated check — done when: battery
   green against a Postgres (the read slice's executable-T4 precedent),
-  committed with the static `--check` green.
+  committed with the static `--check` green. — **DONE (this commit,
+  2026-08-08)** — `supabase/tests/09_realtime_push.sql` (12 checks: the
+  publication-membership pins 09.01/09.02 — messages in `supabase_realtime`
+  count 1 + the publication holds nothing else, D-LV2/D-P0C1(b) teeth; the
+  INSERT positives 09.03/09.04 — assigned attorney/client on thread 1
+  persist, rolled back; the INSERT deny rows 09.05–09.09 — org-role-alone /
+  cross-org / suspended / owner / anon, each a live RLS-violation catch;
+  09.10 the empty-body CHECK; 09.11/09.12 the delivery-equivalence pair —
+  the assigned reader sees the delivered row, suspended/cross-org/owner see
+  0, the §6 matrix row enforced) + harness edits (file list, run loop,
+  `--apply` order gains `09_realtime_push.sql`, policy pin **10→11**,
+  forward pin re-scoped **0→1** to messages-in-publication count 1 +
+  exactly-one-publication-row, selftest fixture glob 0[1-8]→0[1-9], header
+  + apply comments). **Verified live on the rehearsal host 2026-08-08: full
+  battery 72 passed / 0 warnings / 0 failures (09 green), static `--check`
+  335/0/0, selftest 6/6.**
 - [ ] **4. Ephemeral rehearsal (r-series)** — touches: evidence record
   `docs/realtime_push_rehearsal_evidence_r1_2026-08-08.md` — done when: the
   loop (migrate → policy → battery → read-as-roles → the §6 negative)

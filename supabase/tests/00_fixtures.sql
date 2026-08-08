@@ -371,6 +371,13 @@ values
 -- 40000000-0000-4000-8000-00000000fffb (temp org-b matter) +
 -- 60000000-0000-4000-8000-00000000fffd (its org-b thread) +
 -- 90000000-0000-4000-8000-00000000fffe (its org-a message — the mismatch).
+-- Reserved throwaway ids used by 09_realtime_push.sql (deliberately NEVER
+-- seeded): 90000000-0000-4000-8000-00000000fff1 (the delivery-equivalence
+-- temp message on thread 1), ...fff2 (the body CHECK-violation insert),
+-- ...fff3/...fff4 (the assigned attorney/client positive inserts, rolled
+-- back), and ...fff5-...fff9 (the org-role-alone / cross-org / suspended /
+-- owner / anon denied attempts). All rolled back or rejected inside the
+-- battery; never part of the seeded baseline.
 -- Listed here so the harness's static fixture cross-ref resolves them.
 
 -- Sanity: exactly 21 messages seeded (1+2+3+4+5+6 — matching the six
