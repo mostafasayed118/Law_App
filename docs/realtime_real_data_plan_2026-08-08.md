@@ -299,12 +299,20 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   the `(thread_id, sent_at)` index, rollback pairing (08 down + git-revert),
   and the T3 forward-pin flip note (messages PRESENT → live delivery
   ABSENT).
-- [ ] **2. Schema artifacts (rehearsal-ready, NOT applied)** — touches:
+- [x] **2. Schema artifacts (rehearsal-ready, NOT applied)** — touches:
   `supabase/migrations/08_messages.sql` (+ `08_messages.down.sql`),
   `supabase/policies/messages.sql` — done when: DDL matches D-RT1/D-RT3
   (thread FK + org column + `author_display_name` + `body` with the non-empty
   CHECK + `sent_at`, metadata + body only, no attachments/read-receipts/
-  user-id columns), `_down.sql` is a clean inverse, committed.
+  user-id columns), `_down.sql` is a clean inverse, committed. — **DONE
+  (this commit)** — 08_messages.sql (D-RT3 column shape + the
+  `(thread_id, sent_at)` fetch index + RLS + default-deny revokes + the
+  narrow authenticated SELECT grant, Q5) + a clean `_down.sql` inverse
+  (drop table; the body CHECK dies with it) + policies/messages.sql
+  (messages_select_assigned — the thread gate extended one hop with the
+  three-way org equality load-bearing, D-RT2; no owner carve-out Q4);
+  NOT applied at commit; battery `--check` 331/0/0 + ledger PASS 115 on
+  the tree.
 - [ ] **3. Policy battery** — touches: `supabase/tests/08_message_rls.sql`
   (new message fixture rows referencing the six fixture threads in
   `supabase/tests/00_fixtures.sql`, the documents/messages precedent) +
