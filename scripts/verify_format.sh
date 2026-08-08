@@ -37,7 +37,10 @@
 set -u
 
 usage() {
-  sed -n '2,24p' "$0" | awk 'NR > 1 && !/^#/ { exit } /^#/ { sub(/^# ?/, ""); print }'
+  # Print the leading comment block, stopping at the first non-comment
+  # line. No fixed window: the header grows as features are added, so a
+  # hardcoded range would silently truncate --help.
+  awk 'NR > 1 && !/^#/ { exit } /^#/ { sub(/^# ?/, ""); print }' "$0"
 }
 
 if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
