@@ -141,6 +141,7 @@ there.
 |---|---|---|---|---|---|
 | View a matter | ✅ if assigned as the client on it | ✅ if assigned to it | ✅ org policy-approved oversight only, not blanket | ✅ policy-review scope only | ❌ **deny, always** |
 | Read a document/message body | ✅ if assigned | ✅ if assigned | ❌ deny unless separately assigned | ❌ deny unless separately assigned | ❌ **deny, always** |
+| Send a message (insert) | ✅ if assigned | ✅ if assigned | ❌ deny unless separately assigned | ❌ deny unless separately assigned | ❌ **deny, always** |
 | An org role alone (no matter assignment) | ❌ deny | ❌ deny | ❌ deny | ❌ deny | ❌ deny |
 
 **Negative tests required (contract §9 role/nested-scope block):**
@@ -395,6 +396,51 @@ there.
 > the client surface (plan T7, env-gated `fetchMessages` + thread-detail
 > screen) ships next.
 
+> **§4 addendum (2026-08-08, realtime push slice — plan
+> `docs/realtime_push_real_data_plan_2026-08-08.md`, seventh §14
+> un-deferral):** a **new "Send a message (insert)" row is added** — the
+> write side of the consummated body row (the read half shipped at the
+> realtime-read T6, line 143/148): client/attorney cells **SHIP** — granted
+> server-side by `messages_insert_assigned`
+> (`supabase/policies/messages_insert.sql`; the write grant `insert on
+> public.messages to authenticated` was added after the T2 live finding
+> that 08 granted SELECT only — a policy without a grant never fires) and
+> policy-tested by `supabase/tests/09_realtime_push.sql` (rehearsal r1
+> **PASSED 2026-08-08** — genuinely executed battery, 72/0/0, evidence
+> `docs/realtime_push_rehearsal_evidence_r1_2026-08-08.md`; static battery
+> `--check` 335/0/0, selftest 6/6). The grant is exactly: an **active
+> member of the message's org** AND an exists through the thread to the
+> matter with the **three-way org equality load-bearing** AND the assigned
+> **client** or assigned **attorney** on the thread's matter — the read
+> gate (D-RT2/D-LV3) applied as WITH CHECK (D-LV1); a message can never be
+> sent on a thread whose matter the writer is not assigned to. Deny rows
+> now each have a battery check (09.05–09.09): org role alone · cross-org
+> · suspended membership · `platform_owner_admin` (deny always — the §5
+> content boundary extends to the write path; owner accounts are never
+> assigned, recorded residual Q5) · unauthenticated (privilege-layer, no
+> grant) + the empty-body CHECK (schema-level, 09.10). **Insert-only:** no
+> UPDATE/DELETE policy (no edit/delete/attachments/read-receipts — the
+> write-path creep guard). **The direct-INSERT path is not contract §8-
+> audited** (the demo-seed posture, review Q6 — a future real-write slice
+> should route sends through an audited RPC). **Not granted:** the
+> partner / `compliance_officer` "deny unless separately assigned" cells
+> stay **ungranted** (the oversight mechanism is undefined — future work,
+> mirroring D-MR5/D-DR5/D-MSR5/D-STR6). **Basis:** §14 gate-lift (P0
+> closure RATIFIED + policy battery shipped) + six shipped precedents ·
+> mechanism review (`af1715c`) · artifacts (`f1d7903`, validated live on
+> the rehearsal host) · battery + harness (`6302bdc`, static `--check`
+> 335/0/0) · r1 PASS (`51532fd`, genuinely executed 72/0/0) ·
+> apply-approval **APPLY APPROVED 2026-08-08**
+> (`docs/realtime_push_apply_approval_2026-08-08.md` §6 dated sign-off) ·
+> apply execution (`docs/realtime_push_apply_execution_2026-08-08.md`
+> `7efb32b` — applied and verified on the dev project: **11 tables / 11
+> RLS / 10 policies live, publication exactly messages**, the first live
+> INSERT `7cbf49e0-…` through `messages_insert_assigned`, smoke partner 1 /
+> assigned-client-without-membership 0). Per §7 this extends, not
+> replaces, and widens no other row; **in effect since the apply execution
+> 2026-08-08 (`7efb32b`)**, and the client surface (plan T7, env-gated
+> subscription + composer, D-LV1/D-LV4) ships next.
+
 ---
 
 ## 5. `platform_owner_admin` — explicit boundary (contract §2 #2, #4)
@@ -509,6 +555,36 @@ this is the row's own worst-case test and must exist before P2 ships.
 > (realtime delivery) is unchanged. Per §7 this extends, not replaces, and
 > widens no other row; in effect on the client surface ship (T2–T5 of
 > `docs/audit_surfacing_plan_2026-08-08.md`).
+
+> **§6 addendum (2026-08-08, realtime push slice — plan
+> `docs/realtime_push_real_data_plan_2026-08-08.md`, seventh §14
+> un-deferral):** the **"Realtime subscription for an org/matter the
+> session no longer has access to → No events delivered"** row is now
+> **enforced**, resolving the realtime-read addendum's D-RT6 caution
+> ("postgres_changes is a different authorization surface") with the
+> verified mechanism: Supabase **Realtime RLS** makes `postgres_changes`
+> adhere to the underlying table's SELECT policies, so the **existing
+> `messages_select_assigned` policy IS the delivery gate** (D-LV3) —
+> publication membership is the *enablement*, table RLS is the
+> *authorization*, and both are pinned:
+> - **Publication (enablement):** exactly the `messages` table in
+>   `supabase_realtime` (D-LV2) — pinned by the harness forward pin
+>   (`pg_publication_tables` for messages = **1** + exactly-one-publication-
+>   row) and the battery 09.01/09.02; adding any other table trips the pin
+>   loudly (D-P0C1(b) teeth — no accidental table exposure via realtime).
+>   Verified live on the dev project (`7efb32b`): `pg_publication_tables` =
+>   exactly `public.messages`.
+> - **Delivery (authorization):** the role-impersonated delivery-equivalence
+>   checks (09.11/09.12) prove the read gate = the delivery gate: the
+>   assigned reader sees the delivered row; the **suspended / cross-org /
+>   owner readers see 0** — a subscription for an org/matter the session no
+>   longer has access to delivers nothing. **Honest limit recorded:** the
+>   battery proves the RLS proxy for live delivery; the real websocket
+>   round-trip is the env-gated client slice (T7, D-LV4), never claimed by
+>   the battery.
+> The remaining §6 rows (storage, audit) are unchanged. Per §7 this
+> extends, not replaces, and widens no other row; in effect on the apply
+> execution 2026-08-08 (`7efb32b`).
 
 ---
 ## 7. Sign-off

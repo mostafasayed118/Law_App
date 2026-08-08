@@ -312,14 +312,25 @@ until T5**.
   reads 0 (D-RT2 membership guard live), tally 10→11; trigger sweep
   clean, rollback standing by unexercised. Execution evidence in
   `docs/realtime_push_apply_execution_2026-08-08.md` (APPLIED).
-- [ ] **6. Matrix addenda (dated)** — touches: `docs/permission_matrix.md`
+- [x] **6. Matrix addenda (dated)** — touches: `docs/permission_matrix.md`
   §4 (the write row: client/attorney send SHIP behind
   `messages_insert_assigned`; partner/`compliance_officer` ungranted;
   `platform_owner_admin` deny always) + §6 (the "Realtime subscription for
   an org/matter the session no longer has access to → No events delivered"
   row → **enforced**, Realtime RLS = the existing SELECT policy,
   battery-pinned) — done when: addenda committed **before** the client
-  surface ships, ledger sweep green.
+  surface ships, ledger sweep green. — **DONE (this commit, 2026-08-08):**
+  §4 gains the new **"Send a message (insert)"** row (client/attorney
+  SHIP behind `messages_insert_assigned`, D-LV1; partner/`compliance_officer`
+  "deny unless separately assigned" stay ungranted; `platform_owner_admin`
+  deny always with the §5 content boundary extended to the write path;
+  insert-only, no §8 audit on the direct path — review Q6 recorded) + the
+  §6 delivery row flipped to **enforced** (Realtime RLS: the existing
+  `messages_select_assigned` SELECT policy IS the delivery gate; the
+  publication pin = exactly messages, nothing else; the delivery-
+  equivalence battery 09.11/09.12 proves suspended/cross-org/owner see 0;
+  honest RLS-proxy limit recorded). Citing r1 PASS `51532fd` + apply
+  execution `7efb32b` + §7 discipline.
 - [ ] **7. Client swap (env-gated, NEW subscription + composer)** — touches:
   `lib/data/messaging/supabase_message_realtime_api.dart` (NEW seam) +
   impl + gateway (`sendMessage` + subscribe), `fake_message_gateway.dart`
