@@ -239,11 +239,24 @@ Branch: `feat/send-message-rpc`
   denies (Q5), §4 function sketch + deny rows, §5 harness re-scope (§1d
   18→19), §6 rollback pairing (`_down.sql` + git-revert policy re-add).
   Ledger sweep green.
-- [ ] **2. Rehearsal-ready artifacts (NOT applied)** — touches:
+- [x] **2. Rehearsal-ready artifacts (NOT applied)** — touches:
   `supabase/rpc/send_message.sql` + `_down.sql` entry (the `invite_member`
   pattern: `security definer set search_path = public`, `has_org_role`/
   assignment gate, `write_audit`, INSERT, RETURNING id) — done when:
-  artifacts committed, static review clean, nothing applied.
+  artifacts committed, static review clean, nothing applied. — **DONE (this
+  commit, 2026-08-08):** `supabase/rpc/send_message.sql` (D-SM1 in-function
+  gate → profiles display name with the client-parity 'Demo client'
+  fallback → INSERT RETURNING id → `write_audit('message:create',
+  'allowed', …, p_resource_id, redacted summary)` → return; revoke
+  public/anon + grant authenticated) + the `_down.sql` drop entry —
+  **live-validated on the rehearsal stack**: apply → 9 role-impersonated
+  checks all as designed (assigned attorney + assigned client send with
+  the audit row observed — actor, resource id, redacted summary;
+  stranger / org-role-alone / cross-org / suspended / owner denied by the
+  in-function RAISE; anon denied at the grant; empty body →
+  `messages_body_check` with nothing written) → drop round-trip
+  (function + grants gone, re-apply restores) → demo rows + audit rows
+  cleaned. NOT applied to the dev project.
 - [ ] **3. Battery + harness** — touches: `supabase/tests/10_send_message_rls.sql`
   (EXECUTE grant pins, in-function deny rows ×5, audit-row positive, body
   CHECK, direct-INSERT-revoked pin) + `scripts/verify_policy_tests.sh`
