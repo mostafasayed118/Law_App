@@ -233,13 +233,14 @@ void main() {
         expect(outcome.valueOrNull, isEmpty);
       });
 
-      test('non-owner audit reads are denied, never empty-success (AC-7)',
+      test(
+        'non-owner audit reads are denied, never empty-success (AC-7)',
         () async {
           final FakePlatformAdminGateway nonOwnerAudit =
               FakePlatformAdminGateway(
-            organizationGateway: orgGateway,
-            demoIsPlatformOwner: false,
-          );
+                organizationGateway: orgGateway,
+                demoIsPlatformOwner: false,
+              );
           final OrgOutcome<List<AuditEntry>> platform = await nonOwnerAudit
               .readPlatformAudit();
           final OrgOutcome<List<AuditEntry>> org = await nonOwnerAudit

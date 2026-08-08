@@ -172,28 +172,28 @@ void main() {
       );
     });
 
-    test('maps a non-Postgrest audit failure to providerUnavailable',
-      () async {
-        // The stub's PostgrestException path is bypassed by a raw throw from
-        // the injected caller — the impl's defensive `on Object` catch turns
-        // it into a typed unavailable (the storage/auth precedent).
-        final SupabasePlatformAdminApiImpl throwing = SupabasePlatformAdminApiImpl(
-          (String function, Map<String, dynamic> params) async {
+    test('maps a non-Postgrest audit failure to providerUnavailable', () async {
+      // The stub's PostgrestException path is bypassed by a raw throw from
+      // the injected caller — the impl's defensive `on Object` catch turns
+      // it into a typed unavailable (the storage/auth precedent).
+      final SupabasePlatformAdminApiImpl throwing =
+          SupabasePlatformAdminApiImpl((
+            String function,
+            Map<String, dynamic> params,
+          ) async {
             throw StateError('network down');
-          },
-        );
+          });
 
-        await expectLater(
-          throwing.readPlatformAudit(),
-          throwsA(
-            isA<SupabasePlatformAdminException>().having(
-              (e) => e.kind,
-              'kind',
-              SupabasePlatformAdminFailureKind.providerUnavailable,
-            ),
+      await expectLater(
+        throwing.readPlatformAudit(),
+        throwsA(
+          isA<SupabasePlatformAdminException>().having(
+            (e) => e.kind,
+            'kind',
+            SupabasePlatformAdminFailureKind.providerUnavailable,
           ),
-        );
-      },
-    );
+        ),
+      );
+    });
   });
 }

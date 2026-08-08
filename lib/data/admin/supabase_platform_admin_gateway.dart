@@ -198,7 +198,9 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
     final String? outcome = _optionalString(row, 'outcome');
     final String? summary = _optionalString(row, 'redacted_summary');
     final String? timestamp = _optionalString(row, 'server_timestamp');
-    if (action == null || outcome == null || summary == null ||
+    if (action == null ||
+        outcome == null ||
+        summary == null ||
         timestamp == null) {
       throw FormatException(
         'Audit row missing action/outcome/redacted_summary/server_timestamp',

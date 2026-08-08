@@ -272,7 +272,9 @@ void main() {
 
       expect(outcome.isSuccess, isTrue);
       expect(api.calls, <String>['delete:u-9']);
-    });    test('deleteDemoAccount rejects a blank user id without calling the seam',
+    });
+    test(
+      'deleteDemoAccount rejects a blank user id without calling the seam',
       () async {
         final OrgOutcome<void> outcome = await gateway.deleteDemoAccount(
           userId: '   ',
@@ -350,7 +352,8 @@ void main() {
       expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
     });
 
-    test('surfaces a wrong-typed uuid column loudly (no raw TypeError)',
+    test(
+      'surfaces a wrong-typed uuid column loudly (no raw TypeError)',
       () async {
         // A uuid column arriving as a non-string (provider drift) must map
         // to a typed failure, never a raw TypeError across the boundary.

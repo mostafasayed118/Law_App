@@ -198,8 +198,9 @@ class _FakeSupabasePlatformAdminApi implements SupabasePlatformAdminApi {
       <Map<String, dynamic>>[];
 
   @override
-  Future<List<Map<String, dynamic>>> readOrgAudit(String organizationId) async =>
-      <Map<String, dynamic>>[];
+  Future<List<Map<String, dynamic>>> readOrgAudit(
+    String organizationId,
+  ) async => <Map<String, dynamic>>[];
 }
 
 /// Hand-rolled fake of the [SupabaseMatterApi] seam for the DI flip test
@@ -625,27 +626,25 @@ void main() {
       );
     });
 
-    test('resolved platform-admin gateway exposes the audit methods',
-      () async {
-        configureDependencies();
+    test('resolved platform-admin gateway exposes the audit methods', () async {
+      configureDependencies();
 
-        final PlatformAdminGateway admin = serviceLocator<PlatformAdminGateway>();
+      final PlatformAdminGateway admin = serviceLocator<PlatformAdminGateway>();
 
-        // The env-less fake ships the D-AUD5 audit surface (D-AUD3): the
-        // platform audit is non-empty for the demo owner and the org audit
-        // is scoped to the demo org.
-        final OrgOutcome<List<AuditEntry>> platform = await admin
-            .readPlatformAudit();
-        expect(platform.isSuccess, isTrue);
-        expect(platform.valueOrNull, hasLength(5));
+      // The env-less fake ships the D-AUD5 audit surface (D-AUD3): the
+      // platform audit is non-empty for the demo owner and the org audit
+      // is scoped to the demo org.
+      final OrgOutcome<List<AuditEntry>> platform = await admin
+          .readPlatformAudit();
+      expect(platform.isSuccess, isTrue);
+      expect(platform.valueOrNull, hasLength(5));
 
-        final OrgOutcome<List<AuditEntry>> org = await admin.readOrgAudit(
-          organizationId: FakeOrganizationGateway.demoOrganizationId,
-        );
-        expect(org.isSuccess, isTrue);
-        expect(org.valueOrNull, hasLength(3));
-      },
-    );
+      final OrgOutcome<List<AuditEntry>> org = await admin.readOrgAudit(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+      );
+      expect(org.isSuccess, isTrue);
+      expect(org.valueOrNull, hasLength(3));
+    });
 
     test('binds the fake platform-admin gateway to the fake org gateway '
         '(one org state per env-less run, P3.5 Slice B)', () async {

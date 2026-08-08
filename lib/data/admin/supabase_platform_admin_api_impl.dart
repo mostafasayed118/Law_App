@@ -108,9 +108,14 @@ class SupabasePlatformAdminApiImpl implements SupabasePlatformAdminApi {
   @override
   Future<List<Map<String, dynamic>>> readPlatformAudit() async {
     try {
-      return _rowsFrom(await _rpc('read_platform_audit', const <String, dynamic>{}));
+      return _rowsFrom(
+        await _rpc('read_platform_audit', const <String, dynamic>{}),
+      );
     } on PostgrestException catch (e) {
-      throw SupabasePlatformAdminException(kind: _kindFor(e), message: e.message);
+      throw SupabasePlatformAdminException(
+        kind: _kindFor(e),
+        message: e.message,
+      );
     } on Object {
       // A non-Postgrest provider failure (network/transport) is a typed
       // unavailable, never a raw exception across the seam (the auth/storage
@@ -125,11 +130,16 @@ class SupabasePlatformAdminApiImpl implements SupabasePlatformAdminApi {
   @override
   Future<List<Map<String, dynamic>>> readOrgAudit(String organizationId) async {
     try {
-      return _rowsFrom(await _rpc('read_org_audit', <String, dynamic>{
-        'p_organization_id': organizationId,
-      }));
+      return _rowsFrom(
+        await _rpc('read_org_audit', <String, dynamic>{
+          'p_organization_id': organizationId,
+        }),
+      );
     } on PostgrestException catch (e) {
-      throw SupabasePlatformAdminException(kind: _kindFor(e), message: e.message);
+      throw SupabasePlatformAdminException(
+        kind: _kindFor(e),
+        message: e.message,
+      );
     } on Object {
       throw const SupabasePlatformAdminException(
         kind: SupabasePlatformAdminFailureKind.providerUnavailable,
