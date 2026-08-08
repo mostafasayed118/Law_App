@@ -123,6 +123,7 @@ formatting" step runs:
 
 ```bash
 scripts/verify_format.sh
+scripts/verify_format.sh --selftest   # prove the gate's teeth (below)
 ```
 
 ### Why whole-repo, and why a script
@@ -137,10 +138,21 @@ step, so a formatter-revision bump surfaces locally instead of on the
 runner. It also keeps one canonical command in the gate docs instead of an
 inline `dart format` incantation that can be scoped differently.
 
+### `--selftest` mode
+
+Proves the gate's teeth on demand, mirroring the ledger/policy selftests:
+(1) the embedded command still matches `ci.yml`'s "Verify formatting" step
+byte-for-byte — the drift class this script exists to prevent; (2) a
+misformatted file in a scratch temp dir still trips the FAIL path. The
+baseline gate must pass first (or the selftest aborts); the repo working
+tree is never mutated. Both classes are verified to FAIL on injection.
+
 ### Exit codes
 
-- `0` — whole repo formatted (nothing changed).
-- `1` — ≥1 file needs formatting; run `dart format .` and re-check.
+- `0` — whole repo formatted (nothing changed); in `--selftest`, all drift
+  classes detected.
+- `1` — ≥1 file needs formatting; run `dart format .` and re-check; in
+  `--selftest`, a drift class evaded the gate.
 - `2` — usage error or `dart` not on PATH.
 
 ## `verify_policy_tests.sh`
