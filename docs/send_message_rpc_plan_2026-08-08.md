@@ -314,10 +314,17 @@ Branch: `feat/send-message-rpc`
   delete, per-step verification, post-apply smoke), and the §5
   exclusions. **Awaiting the owner's dated sign-off in §6** — the apply
   itself is owner-gated.
-- [ ] **6. Dated matrix addendum** — touches: `docs/permission_matrix.md`
+- [x] **6. Dated matrix addendum** — touches: `docs/permission_matrix.md`
   §4 "Send a message" row mechanism note (audited RPC replaces the direct
   INSERT; the §8 gap closes; D-SM3 revocation recorded) — done when:
   addendum committed **before** the client surface ships, ledger green.
+  **DONE (2026-08-08):** §4 addendum committed — mechanism note updated
+  to the audited RPC (D-SM1 in-function gate re-asserting the exact same
+  authorization, D-SM3 revocation recorded, policies 10→9 on apply), the
+  §8 gap closes the realtime-push review-Q6 caveat, client/attorney stay
+  SHIP (now via the RPC), partner/compliance stay ungranted,
+  platform_owner_admin deny always; cites r1 PASS `8df7e47` + §7
+  discipline.
 - [ ] **7. Client swap (env-gated)** — touches: `supabase_message_api` +
   impl + gateway `sendMessage` → RPC caller (D-SM2), failure mapping,
   fake untouched, tests (impl RPC-call pin incl. **no org pre-read**,

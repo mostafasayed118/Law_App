@@ -441,6 +441,45 @@ there.
 > 2026-08-08 (`7efb32b`)**, and the client surface (plan T7, env-gated
 > subscription + composer, D-LV1/D-LV4) ships next.
 
+> **§4 addendum (2026-08-08, send-message slice — plan
+> `docs/send_message_rpc_plan_2026-08-08.md`, the audited-write
+> consummation):** the **"Send a message (insert)" row's server-side
+> mechanism changes** — the write path moves from the policy-gated direct
+> INSERT (`messages_insert_assigned`, the realtime-push addendum above)
+> to the **audited `send_message` RPC** (`supabase/rpc/send_message.sql`,
+> `security definer` with the **in-function gate** that re-asserts the
+> exact same authorization — D-SM1: an active member of the thread's org
+> AND the thread→matter three-way org equality AND the assigned
+> client/attorney on the thread's matter). **D-SM3:** the direct-INSERT
+> surface is revoked (the `authenticated` INSERT grant on `messages` +
+> `messages_insert_assigned` dropped) so the RPC is the **only** message
+> write path — **policies 10→9** on the dev project once the apply
+> executes; the battery pins both halves (09.15 privilege-layer deny,
+> 09.16 policy gone) plus the RPC behavior (`10_send_message_rls.sql`:
+> assigned attorney + client positives with the D-RT4 stored author from
+> profiles, the in-function deny rows org-role-alone / cross-org /
+> suspended / owner / anon, the empty-body CHECK, and the §8 negative — a
+> denied send writes no audit row). **Contract §8 audit closes the
+> realtime-push review-Q6 gap** (the caveat recorded in the addendum
+> above): every successful send writes `message:create/allowed` with the
+> actor, the message resource id, and a redacted summary ('message sent'
+> — never the body). Client/attorney cells stay **SHIP** (now via the
+> RPC); the partner / `compliance_officer` "deny unless separately
+> assigned" cells stay **ungranted** (unchanged — the oversight mechanism
+> remains undefined); `platform_owner_admin` **deny, always** (unchanged
+> — the §5 boundary extends to the write path, battery 10.07).
+> **Basis:** mechanism review (`7759181`, Q1–Q6, D-SM1..D-SM3 ratified) ·
+> artifact (`60dae71`, live-validated on the rehearsal host) · battery +
+> harness (`b013ee5`, static `--check` 337/0/0, selftest 6/6) · r1 PASS
+> (`8df7e47`, genuinely executed 74/0/0, evidence
+> `docs/send_message_rehearsal_evidence_r1_2026-08-08.md`) · apply-
+> approval **DRAFT** (`docs/send_message_apply_approval_2026-08-08.md`,
+> awaiting the owner's §6 sign-off — the apply execution
+> (`docs/send_message_apply_execution_2026-08-08.md`) will be cited here
+> when it lands). Per §7 this extends, not replaces, and widens no other
+> row; **committed before the client surface ships (plan T7, env-gated
+> `sendMessage` → RPC swap, D-SM2)**, in effect when the apply executes.
+
 ---
 
 ## 5. `platform_owner_admin` — explicit boundary (contract §2 #2, #4)
