@@ -232,11 +232,7 @@ class _FakeSupabaseMessageApi implements SupabaseMessageApi {
       <Map<String, dynamic>>[];
 
   @override
-  Future<Map<String, dynamic>> sendMessage(
-    String threadId,
-    String body, {
-    String? authorDisplayName,
-  }) async => <String, dynamic>{'id': 'msg-1'};
+  Future<String> sendMessage(String threadId, String body) async => 'msg-1';
 }
 
 /// Hand-rolled fake of the [SupabaseMessageRealtimeApi] seam for the DI flip

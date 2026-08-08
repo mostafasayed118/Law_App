@@ -18,11 +18,10 @@ class _StubSupabaseMessageApi implements SupabaseMessageApi {
   List<Map<String, dynamic>> messageRows = <Map<String, dynamic>>[];
   SupabaseMessageException? error;
   final List<String> messageFetches = <String>[];
-  Map<String, dynamic>? sentRow;
+  String? sentRowId;
   SupabaseMessageException? sendError;
   String? sentThreadId;
   String? sentBody;
-  String? sentAuthor;
   int sendCalls = 0;
 
   @override
@@ -43,19 +42,14 @@ class _StubSupabaseMessageApi implements SupabaseMessageApi {
   }
 
   @override
-  Future<Map<String, dynamic>> sendMessage(
-    String threadId,
-    String body, {
-    String? authorDisplayName,
-  }) async {
+  Future<String> sendMessage(String threadId, String body) async {
     sendCalls++;
     sentThreadId = threadId;
     sentBody = body;
-    sentAuthor = authorDisplayName;
     if (sendError != null) {
       throw sendError!;
     }
-    return sentRow ?? _messageRow(id: 'msg-sent-1', threadId: threadId);
+    return sentRowId ?? 'msg-sent-1';
   }
 }
 
@@ -471,28 +465,33 @@ void main() {
     );
   });
 
-  group('sendMessage mapping (D-LV1)', () {
-    test('maps the persisted row to the Message VO and passes the '
-        'author through', () async {
-      api.sentRow = _messageRow(
-        id: 'msg-sent-9',
-        threadId: 'thread-1',
-        author: 'Demo Partner',
-        body: 'A demo send body.',
-        sentAt: '2026-08-08T12:00:00.000Z',
-      );
+  group('sendMessage mapping (D-SM2)', () {
+    test('maps the persisted row to the Message VO via the re-read', () async {
+      api.sentRowId = 'msg-sent-9';
+      api.messageRows = <Map<String, dynamic>>[
+        _messageRow(
+          id: 'msg-sent-9',
+          threadId: 'thread-1',
+          author: 'Demo Partner',
+          body: 'A demo send body.',
+          sentAt: '2026-08-08T12:00:00.000Z',
+        ),
+      ];
 
       final Result<Message> result = await gateway.sendMessage(
         'thread-1',
         'A demo send body.',
-        authorDisplayName: 'Demo Partner',
+        authorDisplayName: 'Demo Client',
       );
 
       expect(result.isSuccess, isTrue);
       expect(api.sendCalls, 1);
       expect(api.sentThreadId, 'thread-1');
       expect(api.sentBody, 'A demo send body.');
-      expect(api.sentAuthor, 'Demo Partner');
+      // The RPC returns the id; the VO maps from the re-read row (the
+      // server-derived stored author from profiles, D-RT4) — the client's
+      // authorDisplayName is unused on the real path.
+      expect(api.messageFetches, <String>['thread-1']);
       final Message message = result.valueOrNull!;
       expect(message.id, 'msg-sent-9');
       expect(message.authorDisplayName, 'Demo Partner');
@@ -503,8 +502,29 @@ void main() {
       );
     });
 
-    test('a malformed returned row fails the send loudly', () async {
-      api.sentRow = <String, dynamic>{'id': 'msg-sent-1'};
+    test(
+      'fails the send loudly when the row is absent on the re-read',
+      () async {
+        api.sentRowId = 'msg-gone';
+        api.messageRows = <Map<String, dynamic>>[
+          _messageRow(id: 'msg-other', threadId: 'thread-1'),
+        ];
+
+        final Result<Message> result = await gateway.sendMessage(
+          'thread-1',
+          'Body',
+        );
+
+        expect(result.isSuccess, isFalse);
+        expect(result.errorOrNull?.code, 'message_send_failed');
+      },
+    );
+
+    test('a malformed re-read row fails the send loudly', () async {
+      api.sentRowId = 'msg-sent-1';
+      api.messageRows = <Map<String, dynamic>>[
+        <String, dynamic>{'id': 'msg-sent-1'},
+      ];
 
       final Result<Message> result = await gateway.sendMessage(
         'thread-1',

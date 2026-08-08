@@ -2,18 +2,26 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_message_api.dart';
 
+/// A PostgREST RPC call: function name + named params → response.
+///
+/// The callable the impl injects for the audited send path (D-SM2) —
+/// mirrors `OrgRpcCaller`/`PlatformAdminRpcCaller` from the org/admin
+/// seams. Plain function type so tests inject a closure and the impl is the
+/// only file that ever touches provider types.
+typedef MessageRpcCaller =
+    Future<PostgrestResponse<dynamic>> Function(
+      String function,
+      Map<String, dynamic> params,
+    );
+
 /// [SupabaseMessageApi] backed by the PostgREST client.
 ///
 /// Like [SupabaseDocumentApiImpl], this is a data-layer file whose only job
 /// is holding the provider import: a table SELECT in, plain map rows out,
 /// and PostgrestExceptions mapped to [SupabaseMessageException]s at the seam.
 class SupabaseMessageApiImpl implements SupabaseMessageApi {
-  SupabaseMessageApiImpl(
-    this._table, {
-    MessageOrgCaller? orgCaller,
-    MessageInsertCaller? insertCaller,
-  }) : _orgCaller = orgCaller ?? _boundOrg,
-       _insertCaller = insertCaller ?? _boundInsert;
+  SupabaseMessageApiImpl(this._table, {MessageRpcCaller? rpcCaller})
+    : _rpcCaller = rpcCaller ?? _boundRpc;
 
   /// Binds to the app-level client after `Supabase.initialize`. Kept a
   /// factory so tests can construct the impl with any callable stub.
@@ -36,34 +44,23 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
     return threadId == null ? query : query.eq('thread_id', threadId);
   }
 
+  /// Binds the audited `send_message` RPC to the app-level client (D-SM2).
+  /// `rpc<T>` builders implement `Future<dynamic>` (T = the data type), so
+  /// the awaited value is the full PostgrestResponse at runtime — cast,
+  /// not wrap, so errors and status flow through unchanged.
+  static Future<PostgrestResponse<dynamic>> _boundRpc(
+    String function,
+    Map<String, dynamic> params,
+  ) async {
+    final dynamic response = await Supabase.instance.client.rpc<dynamic>(
+      function,
+      params: params,
+    );
+    return response as PostgrestResponse<dynamic>;
+  }
+
   final MessageTableCaller _table;
-  final MessageOrgCaller _orgCaller;
-  final MessageInsertCaller _insertCaller;
-
-  /// Binds a single-row SELECT by id (the send path's thread-org
-  /// resolution, D-LV1). `maybeSingle` returns null when the row is not
-  /// visible under the caller's RLS — an unassigned writer cannot read the
-  /// thread's org and therefore cannot send.
-  static Future<Map<String, dynamic>?> _boundOrg(
-    String table,
-    String id,
-  ) async {
-    return Supabase.instance.client
-        .from(table)
-        .select('organization_id')
-        .eq('id', id)
-        .maybeSingle();
-  }
-
-  /// Binds a PostgREST INSERT returning the persisted row (D-LV1). The
-  /// single row comes back via `.select().single()`, so the gateway can map
-  /// the created message without a follow-up read.
-  static Future<Map<String, dynamic>> _boundInsert(
-    String table,
-    Map<String, dynamic> row,
-  ) async {
-    return Supabase.instance.client.from(table).insert(row).select().single();
-  }
+  final MessageRpcCaller _rpcCaller;
 
   @override
   Future<List<Map<String, dynamic>>> fetchMessageThreads() async {
@@ -117,41 +114,27 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
   }
 
   @override
-  Future<Map<String, dynamic>> sendMessage(
-    String threadId,
-    String body, {
-    String? authorDisplayName,
-  }) async {
+  Future<String> sendMessage(String threadId, String body) async {
     try {
-      // The messages_insert_assigned WITH CHECK needs the row's
-      // organization_id (NOT NULL, no default). Resolve the thread's org
-      // under the SAME RLS gate first: the caller must be assigned on the
-      // thread's matter to read it, and the org it returns IS the org the
-      // policy will re-check. An unreadable org = the write cannot be
-      // authorized — a typed denial, never a silent insert attempt.
-      final Map<String, dynamic>? orgRow = await _orgCaller(
-        'message_threads',
-        threadId,
+      // D-SM2: the audited `send_message` RPC is the ONLY message write
+      // path (D-SM3 — the direct INSERT grant is revoked and
+      // `messages_insert_assigned` dropped). The thread's org resolution
+      // moved INTO the function (gate review Q4) and the author is derived
+      // in-function from profiles (D-RT4 stored-name convention), so the
+      // client sends only the thread id + body — no org pre-read, no
+      // author. The function returns the persisted message id (uuid).
+      final PostgrestResponse<dynamic> response = await _rpcCaller(
+        'send_message',
+        <String, dynamic>{'p_thread_id': threadId, 'p_body': body},
       );
-      final Object? org = orgRow?['organization_id'];
-      if (org is! String || org.isEmpty) {
+      final Object? id = response.data;
+      if (id is! String || id.isEmpty) {
         throw const SupabaseMessageException(
-          kind: SupabaseMessageFailureKind.denied,
-          message: 'Thread organization is not readable.',
+          kind: SupabaseMessageFailureKind.unknown,
+          message: 'send_message returned no id.',
         );
       }
-      return await _insertCaller('messages', <String, dynamic>{
-        'organization_id': org,
-        'thread_id': threadId,
-        // D-RT4 stored-name convention: the caller's session display name
-        // when provided; a neutral generic demo name otherwise (never a
-        // fabricated real identity).
-        'author_display_name':
-            (authorDisplayName == null || authorDisplayName.trim().isEmpty)
-            ? 'Demo client'
-            : authorDisplayName.trim(),
-        'body': body,
-      });
+      return id;
     } on SupabaseMessageException {
       rethrow;
     } on PostgrestException catch (e) {
@@ -167,8 +150,10 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
   }
 
   /// Maps a PostgrestException to the provider-neutral failure kind.
-  /// The stable RLS denial text is the only fragment matched; everything
-  /// else is [SupabaseMessageFailureKind.unknown] with the message preserved.
+  /// The stable denial text (including the RPC's in-function `raise
+  /// exception 'permission denied'`) is the only fragment matched;
+  /// everything else is [SupabaseMessageFailureKind.unknown] with the
+  /// message preserved.
   SupabaseMessageFailureKind _kindFor(PostgrestException e) {
     final String message = e.message.toLowerCase();
     if (message.contains('permission denied') ||

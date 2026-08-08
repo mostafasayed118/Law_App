@@ -214,19 +214,33 @@ class SupabaseMessageGateway implements MessageGateway {
     String? authorDisplayName,
   }) async {
     try {
-      // D-LV1: the impl resolves the thread's org under the same RLS gate
-      // and inserts; the persisted row maps back to the [Message] VO.
-      final Map<String, dynamic> row = await _api.sendMessage(
+      // D-SM2: the audited `send_message` RPC returns only the persisted
+      // message id; the full [Message] VO maps from the SHIPPED
+      // fetchMessages read so the row carries the server's own stored
+      // author (profiles, D-RT4) and sent_at — never a fabricated VO.
+      // `authorDisplayName` stays in the domain contract (the fake's seam)
+      // but is intentionally unused on the real path: the RPC derives the
+      // stored author in-function.
+      final String id = await _api.sendMessage(threadId, body);
+      final List<Map<String, dynamic>> rows = await _api.fetchMessages(
         threadId,
-        body,
-        authorDisplayName: authorDisplayName,
       );
+      final Map<String, dynamic>? row = _rowWithId(rows, id);
+      if (row == null) {
+        // The send succeeded but the row is absent on the re-read —
+        // provider drift; surface loudly, never a fabricated VO. The live
+        // channel (D-LV4) still delivers the row if it landed, so the
+        // consumer's dedupe-by-id recovers the visible append.
+        throw const FormatException(
+          'Sent message id was not found on the re-read',
+        );
+      }
       return Result<Message>.success(_messageFromRow(row));
     } on SupabaseMessageException catch (e) {
       return Result<Message>.failure(_mapSendFailure(e));
     } on FormatException catch (e) {
-      // Provider drift in the returned row surfaces loudly, never as a
-      // silently wrong sent message.
+      // Provider drift in the returned/re-read row surfaces loudly, never
+      // as a silently wrong sent message.
       return Result<Message>.failure(
         AppError(
           code: 'message_send_failed',
@@ -235,6 +249,16 @@ class SupabaseMessageGateway implements MessageGateway {
         ),
       );
     }
+  }
+
+  /// Returns the first row whose `id` equals [id], or null when absent.
+  Map<String, dynamic>? _rowWithId(List<Map<String, dynamic>> rows, String id) {
+    for (final Map<String, dynamic> row in rows) {
+      if (row['id'] == id) {
+        return row;
+      }
+    }
+    return null;
   }
 
   @override

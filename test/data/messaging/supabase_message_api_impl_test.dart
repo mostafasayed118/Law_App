@@ -9,12 +9,9 @@ void main() {
     late Map<String, List<Map<String, dynamic>>> tableData;
     late Map<String, PostgrestException> tableErrors;
     late Map<String, Object> objectErrors;
-    late List<String> orgCalls;
-    late Map<String, Map<String, dynamic>?> orgData;
-    late Map<String, PostgrestException> orgErrors;
-    late List<Map<String, dynamic>> insertRows;
-    late Map<String, PostgrestException> insertErrors;
-    late List<Map<String, dynamic>> insertCalls;
+    late List<String> rpcCalls;
+    late Map<String, Object?> rpcData;
+    late Map<String, PostgrestException> rpcErrors;
     late SupabaseMessageApiImpl api;
 
     setUp(() {
@@ -22,12 +19,9 @@ void main() {
       tableData = <String, List<Map<String, dynamic>>>{};
       tableErrors = <String, PostgrestException>{};
       objectErrors = <String, Object>{};
-      orgCalls = <String>[];
-      orgData = <String, Map<String, dynamic>?>{};
-      orgErrors = <String, PostgrestException>{};
-      insertRows = <Map<String, dynamic>>[];
-      insertErrors = <String, PostgrestException>{};
-      insertCalls = <Map<String, dynamic>>[];
+      rpcCalls = <String>[];
+      rpcData = <String, Object?>{};
+      rpcErrors = <String, PostgrestException>{};
       api = SupabaseMessageApiImpl(
         (String table, String columns, [String? threadId]) async {
           calls.add('$table:$columns${threadId == null ? '' : '|$threadId'}');
@@ -41,27 +35,17 @@ void main() {
           }
           return tableData[table] ?? const <Map<String, dynamic>>[];
         },
-        orgCaller: (String table, String id) async {
-          orgCalls.add('$table|$id');
-          final PostgrestException? error = orgErrors[table];
+        rpcCaller: (String function, Map<String, dynamic> params) async {
+          // The recorded shape pins the RPC contract: function name + the
+          // named params (p_thread_id, p_body) and their values.
+          rpcCalls.add(
+            '$function:${params.keys.join(',')}:${params.values.join(',')}',
+          );
+          final PostgrestException? error = rpcErrors[function];
           if (error != null) {
             throw error;
           }
-          return orgData[table];
-        },
-        insertCaller: (String table, Map<String, dynamic> row) async {
-          insertCalls.add(<String, dynamic>{'table': table, ...row});
-          final PostgrestException? error = insertErrors[table];
-          if (error != null) {
-            throw error;
-          }
-          final Map<String, dynamic>? created = insertRows.isNotEmpty
-              ? insertRows.removeAt(0)
-              : null;
-          if (created != null) {
-            return created;
-          }
-          throw const PostgrestException(message: 'no insert row');
+          return PostgrestResponse<dynamic>(data: rpcData[function], count: 0);
         },
       );
     });
@@ -249,88 +233,97 @@ void main() {
       );
     });
 
-    test('sendMessage resolves the thread org first, then inserts with it '
-        '(D-LV1)', () async {
-      orgData['message_threads'] = <String, dynamic>{
-        'organization_id': 'org-1',
-      };
-      insertRows.add(<String, dynamic>{'id': 'msg-1'});
+    test('sendMessage calls the audited send_message RPC with the thread + '
+        'body and returns the persisted id (D-SM2)', () async {
+      rpcData['send_message'] = 'msg-1';
 
-      final Map<String, dynamic> row = await api.sendMessage(
-        'thread-1',
-        'A demo body',
-        authorDisplayName: 'Demo Partner',
-      );
+      final String id = await api.sendMessage('thread-1', 'A demo body');
 
-      expect(row['id'], 'msg-1');
-      expect(orgCalls, <String>['message_threads|thread-1']);
-      expect(insertCalls, hasLength(1));
-      final Map<String, dynamic> insert = insertCalls.single;
-      expect(insert['table'], 'messages');
-      expect(insert['organization_id'], 'org-1');
-      expect(insert['thread_id'], 'thread-1');
-      expect(insert['author_display_name'], 'Demo Partner');
-      expect(insert['body'], 'A demo body');
+      expect(id, 'msg-1');
+      // The only call is the RPC — no org pre-read (Q4: resolution moved
+      // into the function) and no INSERT.
+      expect(rpcCalls, <String>[
+        'send_message:p_thread_id,p_body:thread-1,A demo body',
+      ]);
     });
 
-    test('sendMessage falls back to a generic author when none is given '
-        '(D-RT4)', () async {
-      orgData['message_threads'] = <String, dynamic>{
-        'organization_id': 'org-1',
-      };
-      insertRows.add(<String, dynamic>{'id': 'msg-2'});
+    test('sendMessage sends no author — the RPC derives the stored author '
+        'in-function (D-RT4)', () async {
+      rpcData['send_message'] = 'msg-2';
 
       await api.sendMessage('thread-1', 'Body');
 
-      expect(insertCalls.single['author_display_name'], 'Demo client');
+      // Exactly the two RPC params (p_thread_id, p_body): the author is
+      // derived from profiles inside the function, never sent by the client.
+      expect(rpcCalls, <String>[
+        'send_message:p_thread_id,p_body:thread-1,Body',
+      ]);
     });
 
-    test('sendMessage denies when the thread org is not readable', () async {
-      // The RLS-scoped org lookup returns null for an unassigned writer —
-      // the write cannot be authorized, mapped as a typed denial.
-      orgData['message_threads'] = null;
+    test(
+      'sendMessage maps the in-function denial to the denied kind',
+      () async {
+        // The RPC's `raise exception 'permission denied'` (D-SM1 gate failure)
+        // surfaces as a PostgrestException carrying the stable denial text.
+        rpcErrors['send_message'] = const PostgrestException(
+          message: 'permission denied',
+        );
+
+        await expectLater(
+          api.sendMessage('thread-1', 'Body'),
+          throwsA(
+            isA<SupabaseMessageException>().having(
+              (e) => e.kind,
+              'kind',
+              SupabaseMessageFailureKind.denied,
+            ),
+          ),
+        );
+      },
+    );
+
+    test('sendMessage preserves unknown failures with the message', () async {
+      rpcErrors['send_message'] = const PostgrestException(
+        message: 'provider hiccup',
+      );
 
       await expectLater(
         api.sendMessage('thread-1', 'Body'),
         throwsA(
-          isA<SupabaseMessageException>().having(
-            (e) => e.kind,
-            'kind',
-            SupabaseMessageFailureKind.denied,
-          ),
-        ),
-      );
-      expect(insertCalls, isEmpty);
-    });
-
-    test('sendMessage maps an insert denial to the denied kind', () async {
-      orgData['message_threads'] = <String, dynamic>{
-        'organization_id': 'org-1',
-      };
-      insertErrors['messages'] = const PostgrestException(
-        message: 'new row violates row-level security policy',
-      );
-
-      await expectLater(
-        api.sendMessage('thread-1', 'Body'),
-        throwsA(
-          isA<SupabaseMessageException>().having(
-            (e) => e.kind,
-            'kind',
-            SupabaseMessageFailureKind.denied,
-          ),
+          isA<SupabaseMessageException>()
+              .having((e) => e.kind, 'kind', SupabaseMessageFailureKind.unknown)
+              .having((e) => e.message, 'message', 'provider hiccup'),
         ),
       );
     });
 
-    test('sendMessage maps a non-Postgrest insert failure to '
+    test('sendMessage maps a non-Postgrest failure to '
         'providerUnavailable', () async {
-      orgData['message_threads'] = <String, dynamic>{
-        'organization_id': 'org-1',
-      };
-      insertErrors['messages'] = const PostgrestException(
-        message: 'connection reset by peer',
+      // A raw throw from the injected caller bypasses the Postgrest path;
+      // the impl's defensive `on Object` catch turns it into the typed
+      // unavailable kind (the reads' precedent).
+      final SupabaseMessageApiImpl throwing = SupabaseMessageApiImpl(
+        (String table, String columns, [String? threadId]) async =>
+            const <Map<String, dynamic>>[],
+        rpcCaller: (String function, Map<String, dynamic> params) async {
+          throw StateError('network down');
+        },
       );
+
+      await expectLater(
+        throwing.sendMessage('thread-1', 'Body'),
+        throwsA(
+          isA<SupabaseMessageException>().having(
+            (e) => e.kind,
+            'kind',
+            SupabaseMessageFailureKind.providerUnavailable,
+          ),
+        ),
+      );
+    });
+
+    test('sendMessage fails loudly when the RPC returns no id', () async {
+      rpcData['send_message'] = null;
 
       await expectLater(
         api.sendMessage('thread-1', 'Body'),
