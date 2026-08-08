@@ -4,6 +4,7 @@
 |---|---|---|
 | `verify_ledger.sh` | Governance-ledger integrity (below) | **Before committing any `docs/` amendment** that touches the audit plan or Gate 3 reconciliation; wired into CI as a cheap static gate (`ci.yml` on every push/PR) plus a **nightly teeth-prover** (`ledger-selftest.yml`, 02:00 UTC + `workflow_dispatch`) |
 | `verify_policy_tests.sh` | P0-closure policy battery (below) | Against an **ephemeral rehearsal project only**, before any P0-close decision; `--check` is static and runs anywhere, and is wired into `ci.yml` as a DB-free gate on every push/PR, with a **nightly teeth-prover** (`ledger-selftest.yml` runs `--selftest`, 02:00 UTC + `workflow_dispatch`) |
+| `verify_provider_loop.sh` | D-45.1 Phase 1 ephemeral **provider-loop rehearsal** (signup → email-confirm → sign-in → reset via the local mail catcher) | Against a throwaway `supabase start` stack on a Docker/CI host, before the Phase 2 dev-project smoke (`docs/p2_provider_loop_phase2_smoke_2026-08-08.md`); `--check`/`--selftest` are static and run anywhere |
 | `verify_format.sh` | **Whole-repo** Dart formatting, mirroring `ci.yml`'s exact command | **Before committing any Dart change** — the format step of the standard slice gate. Use this instead of a `lib test`-scoped `dart format` check, which can drift from CI's whole-repo scope (see below) |
 
 ## `verify_ledger.sh`

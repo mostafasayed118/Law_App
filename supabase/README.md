@@ -155,7 +155,11 @@ scripts/verify_policy_tests.sh --check        # static validation, no database
   D-P0C4 audit pins.
 - **Out of battery scope (recorded, not skipped):** provider-level flows
   (signup/sign-in/reset, GoTrue email triggers) stay out of SQL rehearsal
-  scope per the P2 r5 methodology; realtime buckets remain Q4 deferrals
+  scope per the P2 r5 methodology — they have their **own ephemeral
+  rehearsal harness**: `scripts/verify_provider_loop.sh` (D-45.1 Phase 1,
+  `docs/p2_provider_loop_phase1_rehearsal_2026-08-08.md`), the mail-catcher
+  loop that proves the GoTrue round trip on a throwaway stack before the
+  Phase 2 dev-project smoke; realtime buckets remain Q4 deferrals
   (the storage Q4 deferral is consummated — the fourth §14 un-deferral).
   The D-P0C1(b) content-table forward pin is asserted structurally
   (matters, documents, message_threads + files exist as the first four §14
@@ -163,6 +167,22 @@ scripts/verify_policy_tests.sh --check        # static validation, no database
   at schema-review time per the matrix §5 addendum.
 - Record the run as rehearsal evidence (the P0C.3 close decision consumes
   it), then delete the throwaway project.
+
+## Provider-loop rehearsal (D-45.1 Phase 1, 2026-08-08)
+
+The GoTrue provider loop (signup → email-confirm → sign-in → reset) is
+rehearsed on a **throwaway stack** with `scripts/verify_provider_loop.sh`
+(spec: `docs/p2_provider_loop_phase1_rehearsal_2026-08-08.md`) — the
+committed `migrations/` + `policies/` + `rpc/` files build the ephemeral
+project (`--apply`), and the local mail catcher (Inbucket, `127.0.0.1:54324`)
+receives the confirmation/recovery emails (zero real email, zero dev-project
+contact). Five legs: L1 existing-account sign-in · L2 sign-up → D-07 pending
+(no session) · L3 email-confirm → session + `email_confirmed_at` · L4
+confirmed sign-in + trigger-created profile · L5 password-reset round trip.
+`--check`/`--selftest` are static and run anywhere; the live loop needs a
+Docker/CI host (`supabase start`). Phase 2 (the dev-project smoke) stays
+gated on this rehearsal passing + the owner's dated apply-approval
+(`docs/p2_provider_loop_phase2_smoke_2026-08-08.md`).
 
 ## What this directory does NOT authorize
 
