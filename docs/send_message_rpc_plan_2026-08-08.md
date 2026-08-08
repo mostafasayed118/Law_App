@@ -282,10 +282,21 @@ Branch: `feat/send-message-rpc`
   stack **74/0/0** (10 green, 09 re-scoped green, pins 11 tables / 11 RLS /
   10 policies / publication exactly messages / 19 EXECUTE RPCs) · selftest
   **6/6**. NOT applied to the dev project.
-- [ ] **4. Ephemeral rehearsal (r-series)** — touches: Docker-stack
+- [x] **4. Ephemeral rehearsal (r-series)** — touches: Docker-stack
   `verify_policy_tests.sh --apply` + battery (the established genuinely-
   executed precedent) + `docs/send_message_rehearsal_evidence_r1_2026-08-08.md`
-  — done when: r1 PASSED, evidence recorded.
+  — done when: r1 PASSED, evidence recorded. — **DONE (this commit,
+  2026-08-08):** genuine run on the rehearsal stack — the scratch
+  `public` schema reset (the harness `--apply` targets a fresh project;
+  43 objects cascaded, rebuilt from the committed files) → `--apply`
+  **40 passed / 0 failures** (incl. `apply send_message.sql` — the
+  function + EXECUTE grant + the D-SM3 revocation as one unit) → battery
+  **`== summary: 74 passed, 0 warnings, 0 failures ==` / `RESULT: PASS`**
+  (09 re-scoped green, 10 green; pins 11 tables / 11 RLS / 10 policies /
+  publication exactly messages / 19 EXECUTE RPCs; authenticated INSERT
+  revoked) → selftest **6/6** → static `--check` **337/0/0**. Evidence in
+  `docs/send_message_rehearsal_evidence_r1_2026-08-08.md` (**PASSED**,
+  verbatim output + the reset discipline + the honest limits).
 - [ ] **5. Dated apply-approval → apply** — touches: dev project (RPC +
   the D-SM3 revocation), `docs/send_message_apply_approval_2026-08-08.md`
   + execution record — done when: owner's dated sign-off, apply executed
