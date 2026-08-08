@@ -325,13 +325,32 @@ Branch: `feat/send-message-rpc`
   SHIP (now via the RPC), partner/compliance stay ungranted,
   platform_owner_admin deny always; cites r1 PASS `8df7e47` + §7
   discipline.
-- [ ] **7. Client swap (env-gated)** — touches: `supabase_message_api` +
+- [x] **7. Client swap (env-gated)** — touches: `supabase_message_api` +
   impl + gateway `sendMessage` → RPC caller (D-SM2), failure mapping,
   fake untouched, tests (impl RPC-call pin incl. **no org pre-read**,
   denial/unavailable/unknown mapping, DI pins, fake determinism re-run)
   — done when: format clean · analyze clean · suite green · ledger PASS.
-- [ ] **8. Lockstep + evidence + close** — touches: README test count,
+  **DONE (2026-08-08, `f874a57`):** seam `sendMessage` → `send_message`
+  RPC with `p_thread_id`/`p_body` only (no org pre-read — resolution
+  moved into the function, gate review Q4 — no client author — derived
+  in-function from profiles, D-RT4), returns the persisted id; gateway
+  resolves the full [Message] VO through the shipped `fetchMessages`
+  read (never fabricated); `authorDisplayName` stays in the domain
+  contract for the fake, documented unused on the real path. Tests:
+  impl RPC-call pin (function + named params, no org pre-read, no
+  author), id parse, in-function denial, unknown preserved,
+  providerUnavailable, no-id loud failure; gateway re-read mapping (VO
+  author from the server row), absent-on-re-read + malformed-row loud
+  failures, failure mapping; service_locator DI pin. README 1042 → 1044.
+  Gate: format 0 changed · analyze clean · suite 1047 · ledger PASS 115.
+- [x] **8. Lockstep + evidence + close** — touches: README test count,
   roadmap §2 18-of-18 → 19-of-19 + §13 row, completion evidence
   `docs/send_message_real_data_completion_evidence_2026-08-08.md`, dated
   close decision — done when: all docs sweep green, full gate re-run,
-  close decision recorded.
+  close decision recorded. **DONE (2026-08-08, this commit):** README
+  1044 lockstep (T7), roadmap §2 gains the `send_message` row (19
+  committed, 18 applied + send_message ⏳ HELD on the owner's dated
+  sign-off — the dev-project write path stays the direct INSERT until
+  the apply), §13 gate-table row + §14 eighth flip note (client surface
+  SHIPPED; server apply HELD), Phase 10/11/12 cross-refs updated,
+  completion evidence + dated close decision recorded; ledger PASS 115.

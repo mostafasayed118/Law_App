@@ -153,8 +153,13 @@ policy tests before it is exposed here.
 ## 2. Unwired-RPC inventory (client surface vs. committed server RPCs)
 
 `supabase/rpc/` ships 17 applied P2 RPCs plus the applied Phase 3 R1
-`list_org_members_metadata` (18 total, §5); **18 of 18 have a client
-surface** — `SupabaseOrgApi` maps 11 (`listMembers` routes to the R1
+`list_org_members_metadata` (18 applied, §5) plus the committed-not-applied
+`send_message` (19 committed, §14 eighth un-deferral); **18 of 18 applied
+RPCs have a client surface**, and the 19th (`send_message`, the audited
+send path) is wired client-side behind the env flip — its apply ⏳ HELD
+on the owner's dated sign-off (send-message slice T5), so the dev
+project's write path remains the direct INSERT until then —
+`SupabaseOrgApi` maps 11 (`listMembers` routes to the R1
 member-facing RPC) and `SupabasePlatformAdminApi` (P3.5, `47f777b`; the
 audit surfacing slice adds the two audit reads, SHIPPED 2026-08-08) maps
 the five P3.5 owner-only RPCs + `read_org_audit` (org-scoped, partner-capable
@@ -182,6 +187,7 @@ Each row names the owning phase below (or the gate that blocks it).
 | `delete_demo_account` | ✅ `deleteDemoAccount` | P3.5 owner surface (`47f777b`) | `platform_owner_admin`-only; the platform-admin screen deletes demo accounts (never self); the server raise `cannot delete your own account` maps to a typed denial |
 | `suspend_membership_platform` | ✅ `suspendMembership` | P3.5 owner surface (`47f777b`) | `platform_owner_admin`-only; platform-admin suspend toggle |
 | `reactivate_membership_platform` | ✅ `reactivateMembership` | P3.5 owner surface (`47f777b`) | `platform_owner_admin`-only; platform-admin reactivate toggle |
+| `send_message` | ✅ `sendMessage` (audited write path, `f874a57`) | send-message slice (eighth §14 un-deferral, `7759181`..`f874a57`) | **committed + wired client-side; the apply ⏳ HELD on the owner's dated sign-off** (T5 `a5db0af` DRAFT) — the dev project does not have the function yet, so the env-gated flip is inert there until the apply runs (`send_message` + D-SM3 revocation, policies 10→9, §8 audit by construction) |
 
 ## 3. Phase 1 — P3 org & membership UI slice (next approved batch)
 
@@ -596,7 +602,7 @@ relaxation.
 | 10 | Phase 10 — matter workspace (read-first, client-only) | MVP spec §4; Phase 7/8/9 seams (details screen + fake-domain pattern) | no | scope note → decision-record ratification (D-W1…D-W6) → slices 10.0–10.2 → gate stack → owner push approval | **SHIPPED 2026-08-04** (`90465df` + `31f0624` + slice 10.2 l10n pins, suite 659, ledger PASS 115; pushed to origin/main) |
 | 11 | Phase 11 — unified search (read-first, client-only, aggregating) | MVP spec §4; Phase 6–10 seams (four fake-domain gateway seams + inert home search field) | no | scope note → decision-record ratification (D-S1…D-S6) → slices 11.0–11.2 → gate stack → owner push approval | **SHIPPED 2026-08-04** (`7c8ead8`, slices 11.0–11.2, suite 691, ledger PASS 115; pushed to origin/main) |
 | 12 | Phase 12 — reverse cross-link (client-only) | MVP §4 read-first; Phase 10 `matterRef` seam + Phase 7 details route | no | scope note → decision-record ratification (D-C1…D-C6) → slices 12.0–12.2 → gate stack → owner push approval | **IMPLEMENTED + SHIPPED 2026-08-05** — 12.0 `16e9b67` (pushed, suite 701/README 698); 12.1 `69622ce` + 12.2 `cd5c903` (committed, suite 706/README 703); ledger PASS 115; push of 12.1/12.2 awaits owner approval |
-| — | §14 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Per-feature un-deferrals — **matters read (first), SHIPPED 2026-08-07** (real-matters read slice: RLS design → battery → rehearsal r1 → dated apply-approval → apply → matrix addendum → env-gated client swap; plan `docs/matters_real_data_plan_2026-08-07.md`, evidence `docs/matters_real_data_completion_evidence_2026-08-07.md`; docs + database commits `bf27f84`..`41577a0`, suite 877, ledger PASS 115; **documents read is the second per-feature un-deferral, SHIPPED 2026-08-07** (real-documents read slice: RLS design → battery → rehearsal r1 → dated apply-approval → apply → matrix addendum → env-gated client swap; plan `docs/documents_real_data_plan_2026-08-07.md`, evidence `docs/documents_real_data_completion_evidence_2026-08-07.md`; commits `77f14fb`..`cb682ca`, suite 897, ledger PASS 115; **messages read is the third per-feature un-deferral, SHIPPED 2026-08-07** (real-messages read slice: RLS design → battery → rehearsal r1 → dated apply-approval → apply → matrix addendum → env-gated client swap; plan `docs/messages_real_data_plan_2026-08-07.md`, evidence `docs/messages_real_data_completion_evidence_2026-08-07.md`; commits `443f42e`..`7168f38`, suite 921/README 918, ledger PASS 115; **storage read is the fourth per-feature un-deferral, SHIPPED 2026-08-08** (real-storage read slice: RLS design → battery (static `--check` 331/0/0) → dated apply-approval APPLY APPROVED → dated matrix §4 + §6 addendum → env-gated client swap (NEW D-STR7 surface); plan `docs/storage_real_data_plan_2026-08-08.md`, evidence `docs/storage_real_data_completion_evidence_2026-08-08.md`; server commits `6f52930`..`92c72e8` (merged `0b81297`) + client `704f212`, suite 953/README 950, ledger PASS 115; **the r1 rehearsal + the server apply ⏳ HELD on the owner-side r1 evidence — nothing applied to the dev project yet**; **audit surfacing is the fifth per-feature un-deferral, SHIPPED 2026-08-08** (client-only slice: dated matrix §6 addendum + platform-admin seam `readPlatformAudit`/`readOrgAudit` + `AuditEntry` VO + Audit section; the audit RPCs already applied 2026-08-01 + battery-pinned; plan `docs/audit_surfacing_plan_2026-08-08.md`, evidence `docs/audit_surfacing_completion_evidence_2026-08-08.md`; commits `7b7c1a8` → `b0f9022`, suite 986/README 983, ledger PASS 115; **18-of-18 RPCs wired**); **realtime read is the sixth per-feature un-deferral, SHIPPED 2026-08-08** (RLS-gate review `790f6e7` → artifacts `60198e2` → battery + harness `9f01870` (static `--check` 333/0/0) → rehearsal r1 genuinely executed 70/0/0 `f22e672`+`8204245` → dated approval + apply `75f1880`+`35cceb9` (dev project: 08_messages + policy + 10 demo messages, 8→9 policies) → matrix addendum `d350824` → env-gated client swap `7b8a808` (fetchMessages + Message VO + thread-detail surface, suite 1011/README 1011, ledger PASS 115); plan `docs/realtime_real_data_plan_2026-08-08.md`, evidence `docs/realtime_real_data_completion_evidence_2026-08-08.md`); **realtime live delivery is the seventh per-feature un-deferral, SHIPPED 2026-08-08** (mechanism review `af1715c` → artifacts `f1d7903` (live-validated on the rehearsal stack) → battery + harness `6302bdc` (static `--check` 335/0/0) → rehearsal r1 genuinely executed 72/0/0 `51532fd` → dated approval + apply `c96eff7`+`7efb32b` (dev project: publication 0→1 exactly `public.messages`, policies 9→10, the first live INSERT `7cbf49e0-…`) → matrix §4 + §6 addenda `de25c6f` → env-gated client swap `6154fa3` (subscription + composer, suite 1045 runtime / README 1042, ledger PASS 115); plan `docs/realtime_push_real_data_plan_2026-08-08.md`, evidence `docs/realtime_push_real_data_completion_evidence_2026-08-08.md`); billing/AI stay deferred, each a separate per-feature un-deferral) |
+| — | §14 deferred capabilities | **P0 closes (D-02…D-10b)** + policy tests + matrix extension | yes | per feature, same P2 discipline | Per-feature un-deferrals — **matters read (first), SHIPPED 2026-08-07** (real-matters read slice: RLS design → battery → rehearsal r1 → dated apply-approval → apply → matrix addendum → env-gated client swap; plan `docs/matters_real_data_plan_2026-08-07.md`, evidence `docs/matters_real_data_completion_evidence_2026-08-07.md`; docs + database commits `bf27f84`..`41577a0`, suite 877, ledger PASS 115; **documents read is the second per-feature un-deferral, SHIPPED 2026-08-07** (real-documents read slice: RLS design → battery → rehearsal r1 → dated apply-approval → apply → matrix addendum → env-gated client swap; plan `docs/documents_real_data_plan_2026-08-07.md`, evidence `docs/documents_real_data_completion_evidence_2026-08-07.md`; commits `77f14fb`..`cb682ca`, suite 897, ledger PASS 115; **messages read is the third per-feature un-deferral, SHIPPED 2026-08-07** (real-messages read slice: RLS design → battery → rehearsal r1 → dated apply-approval → apply → matrix addendum → env-gated client swap; plan `docs/messages_real_data_plan_2026-08-07.md`, evidence `docs/messages_real_data_completion_evidence_2026-08-07.md`; commits `443f42e`..`7168f38`, suite 921/README 918, ledger PASS 115; **storage read is the fourth per-feature un-deferral, SHIPPED 2026-08-08** (real-storage read slice: RLS design → battery (static `--check` 331/0/0) → dated apply-approval APPLY APPROVED → dated matrix §4 + §6 addendum → env-gated client swap (NEW D-STR7 surface); plan `docs/storage_real_data_plan_2026-08-08.md`, evidence `docs/storage_real_data_completion_evidence_2026-08-08.md`; server commits `6f52930`..`92c72e8` (merged `0b81297`) + client `704f212`, suite 953/README 950, ledger PASS 115; **the r1 rehearsal + the server apply ⏳ HELD on the owner-side r1 evidence — nothing applied to the dev project yet**; **audit surfacing is the fifth per-feature un-deferral, SHIPPED 2026-08-08** (client-only slice: dated matrix §6 addendum + platform-admin seam `readPlatformAudit`/`readOrgAudit` + `AuditEntry` VO + Audit section; the audit RPCs already applied 2026-08-01 + battery-pinned; plan `docs/audit_surfacing_plan_2026-08-08.md`, evidence `docs/audit_surfacing_completion_evidence_2026-08-08.md`; commits `7b7c1a8` → `b0f9022`, suite 986/README 983, ledger PASS 115; **18-of-18 RPCs wired**); **realtime read is the sixth per-feature un-deferral, SHIPPED 2026-08-08** (RLS-gate review `790f6e7` → artifacts `60198e2` → battery + harness `9f01870` (static `--check` 333/0/0) → rehearsal r1 genuinely executed 70/0/0 `f22e672`+`8204245` → dated approval + apply `75f1880`+`35cceb9` (dev project: 08_messages + policy + 10 demo messages, 8→9 policies) → matrix addendum `d350824` → env-gated client swap `7b8a808` (fetchMessages + Message VO + thread-detail surface, suite 1011/README 1011, ledger PASS 115); plan `docs/realtime_real_data_plan_2026-08-08.md`, evidence `docs/realtime_real_data_completion_evidence_2026-08-08.md`); **realtime live delivery is the seventh per-feature un-deferral, SHIPPED 2026-08-08** (mechanism review `af1715c` → artifacts `f1d7903` (live-validated on the rehearsal stack) → battery + harness `6302bdc` (static `--check` 335/0/0) → rehearsal r1 genuinely executed 72/0/0 `51532fd` → dated approval + apply `c96eff7`+`7efb32b` (dev project: publication 0→1 exactly `public.messages`, policies 9→10, the first live INSERT `7cbf49e0-…`) → matrix §4 + §6 addenda `de25c6f` → env-gated client swap `6154fa3` (subscription + composer, suite 1045 runtime / README 1042, ledger PASS 115); plan `docs/realtime_push_real_data_plan_2026-08-08.md`, evidence `docs/realtime_push_real_data_completion_evidence_2026-08-08.md`); **the audited send path is the eighth per-feature un-deferral, SHIPPED 2026-08-08 (client surface)** (mechanism review `7759181` → artifact `60dae71` (live-validated on the rehearsal stack) → battery + harness `b013ee5` (static `--check` 337/0/0, RPC-EXECUTE 18→19, policies 11→10, live 74/0/0) → rehearsal r1 genuinely executed 74/0/0 `8df7e47` → dated apply-approval DRAFTED ⏳ HELD on owner sign-off `a5db0af` (server apply NOT run) → matrix addendum `ea74c63` → env-gated client swap `f874a57` (suite 1047 runtime / README 1044, ledger PASS 115); plan `docs/send_message_rpc_plan_2026-08-08.md`, evidence `docs/send_message_real_data_completion_evidence_2026-08-08.md`; billing/AI stay deferred, each a separate per-feature un-deferral) |
 
 Rules that apply to every phase (definition-of-done from
 `docs/codebase_audit_plan.md`): scope/assumptions/non-goals documented ·
@@ -610,8 +616,8 @@ approval**.
 Per README boundary + `docs/permission_matrix.md` §4/§6, the originally
 deferred capabilities are: **matters, documents, messages, storage,
 realtime, audit surfacing, billing, AI** (matters, documents, messages,
-storage, realtime — read + live delivery — and audit surfacing now
-un-deferred — see the flip notes below).
+storage, realtime — read + live delivery — audit surfacing, and the
+audited send path now un-deferred — see the flip notes below).
 The **real matters data path is the first per-feature un-deferral —
 SHIPPED 2026-08-07 (read slice)** under this gate: RLS-gate design review
 (`docs/matters_rls_gate_review_2026-08-07.md`), rehearsal-ready artifacts
@@ -729,7 +735,34 @@ enforced), and the env-gated client swap (NEW `SupabaseMessageRealtimeApi`
 seam — per-thread `postgres_changes` + reconnect + backfill via the
 shipped `fetchMessages` — `sendMessage` on the gateway/fake + the
 thread-detail composer, insert-only D-LV1, `6154fa3`, suite 1045 runtime
-/ README 1042, ledger PASS 115). The remaining deferred paths each keep
+/ README 1042, ledger PASS 115).
+**The audited message send (send-message) is the eighth per-feature
+un-deferral — SHIPPED 2026-08-08 (client surface)** under this gate: the
+mechanism design review (`docs/send_message_gate_review_2026-08-08.md`
+— the audited `send_message` RPC: `security definer` + the **D-SM1
+in-function gate** re-asserting the exact `messages_insert_assigned`
+authorization, `write_audit` §8 by construction — closing the
+realtime-push review-Q6 gap — and **D-SM3 revoking the direct-INSERT
+surface** so the RPC becomes the only write path), the rehearsal-ready
+artifact (`supabase/rpc/send_message.sql` + `_down.sql`, **live-validated
+on the rehearsal stack** — both assigned positives + all five denies +
+anon + the empty-body CHECK + the backout round-trip), the battery +
+harness (`supabase/tests/10_send_message_rls.sql`, 10 checks; the 09
+battery re-scoped to publication pins + delivery-equivalence + the D-SM3
+revocation pins 09.15/09.16; harness §1d RPC-EXECUTE 18→19, policies
+11→10; static `--check` 337/0/0), rehearsal r1 **PASSED — genuinely
+executed 74/0/0** (`docs/send_message_rehearsal_evidence_r1_2026-08-08.md`),
+the dated apply-approval record **DRAFTED — ⏳ HELD on the owner's dated
+sign-off** (`docs/send_message_apply_approval_2026-08-08.md`; **the
+server apply — `send_message` + the D-SM3 revocation, policies 10→9 —
+has NOT run, so the dev project's write path remains the direct INSERT
+until then**), the dated matrix §4 addendum (the "Send a message" row's
+mechanism note → the audited RPC; client/attorney SHIP, partner/
+`compliance_officer` stay ungranted, `platform_owner_admin` deny always),
+and the env-gated client swap (`f874a57` — the seam calls `send_message`
+with no org pre-read + no client author (D-SM2), the gateway resolves
+the [Message] VO through the shipped read; suite 1047 runtime / README
+1044, ledger PASS 115). The remaining deferred paths each keep
 this same per-feature discipline: billing, AI — **reconciled 2026-08-08**
 (both stay deferred behind open owner-side decisions: billing on spec D-09
 payment provider/tax/PCI + D-04 residency + no-live-payment-in-MVP; AI on
@@ -745,11 +778,11 @@ messages data path is the third per-feature un-deferral (SHIPPED
 2026-08-07 — see the flip note above). The client-only per-matter view
 shipped as Phase 10 (slices 10.0–10.2,
 `90465df`/`31f0624`/`93c2e28`) is a client-side view over the same
-synthetic lists —the real matters, documents and messages read paths are the first four per-feature un-deferrals (see the flip notes above); message bodies + individual messages shipped as the sixth un-deferral (realtime read, 2026-08-08 — see the flip note above); live delivery shipped as the seventh un-deferral (realtime-push, 2026-08-08 — see the flip note above). The client-only unified-search surface shipped
+synthetic lists —the real matters, documents and messages read paths are the first four per-feature un-deferrals (see the flip notes above); message bodies + individual messages shipped as the sixth un-deferral (realtime read, 2026-08-08 — see the flip note above); live delivery shipped as the seventh un-deferral (realtime-push, 2026-08-08 — see the flip note above); the audited send path shipped as the eighth un-deferral (send-message, 2026-08-08 — see the flip note above). The client-only unified-search surface shipped
 as Phase 11 (slices 11.0–11.2) is a client-side aggregation over the same
-synthetic lists —the real matters, documents and messages read paths are the first four per-feature un-deferrals (see the flip notes above); message bodies + individual messages shipped as the sixth un-deferral (realtime read, 2026-08-08 — see the flip note above); live delivery shipped as the seventh un-deferral (realtime-push, 2026-08-08 — see the flip note above). The client-only reverse cross-link shipped as
+synthetic lists —the real matters, documents and messages read paths are the first four per-feature un-deferrals (see the flip notes above); message bodies + individual messages shipped as the sixth un-deferral (realtime read, 2026-08-08 — see the flip note above); live delivery shipped as the seventh un-deferral (realtime-push, 2026-08-08 — see the flip note above); the audited send path shipped as the eighth un-deferral (send-message, 2026-08-08 — see the flip note above). The client-only reverse cross-link shipped as
 Phase 12 slice 12.0 (`16e9b67`) is a navigation hint between the same
-synthetic lists —the real matters, documents and messages read paths are the first four per-feature un-deferrals (see the flip notes above); message bodies + individual messages shipped as the sixth un-deferral (realtime read, 2026-08-08 — see the flip note above); live delivery shipped as the seventh un-deferral (realtime-push, 2026-08-08 — see the flip note above). The
+synthetic lists —the real matters, documents and messages read paths are the first four per-feature un-deferrals (see the flip notes above); message bodies + individual messages shipped as the sixth un-deferral (realtime read, 2026-08-08 — see the flip note above); live delivery shipped as the seventh un-deferral (realtime-push, 2026-08-08 — see the flip note above); the audited send path shipped as the eighth un-deferral (send-message, 2026-08-08 — see the flip note above). The
 matrix requires the `platform_owner_admin` deny-row test and per-row
 negative policy tests **before any of these ship**, and an org role alone
 never grants matter access. The audit RPCs (`read_org_audit`,
