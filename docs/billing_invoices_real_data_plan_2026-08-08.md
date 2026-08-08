@@ -242,11 +242,23 @@ Branch: `feat/billing-invoices-read`
   12 RLS, 1e 11 policies, 1f `billing_invoices` ninth-un-deferral pin 1),
   all eleven battery files green incl. `11_invoice_rls.sql`, selftest
   6/6. Record flipped to PASSED; nothing applied.
-- [ ] **5. Dated apply-approval → apply** — touches: dev project +
+- [x] **5. Dated apply-approval → apply** — touches: dev project +
   `docs/billing_invoices_apply_approval_2026-08-08.md` + execution record
   — done when: the owner's dated sign-off, apply executed (baseline probe,
   `10_billing_invoices` + policy + demo seed referencing the applied demo
-  matter ids, rollback pairing), execution evidence APPLIED. **Owner-gated.**
+  matter ids, rollback pairing), execution evidence APPLIED. — **DONE
+  (2026-08-08):** approval APPLY APPROVED (§6 dated sign-off, r1 PASSED
+  `da4fa97` genuinely executed 78/0/0) + the apply **executed on the dev
+  project** — baseline probed (billing_invoices absent, the four demo
+  matter ids resolve under org `ef43087b-…`, 11 tables/11 RLS, 10 public
+  policies, 1 storage policy, publication exactly messages),
+  `10_billing_invoices` + `policies/invoices` applied (tables/RLS 11→12,
+  public policies 10→11), demo seed 4 invoices on the applied demo matter
+  ids (org = the matter's org on all four, generic numbers/amounts/copy),
+  smoke: partner reads 3 (family invoice client-only → absent from the
+  partner's set), clients 0/0 (membership guard live), anon denied —
+  evidence `docs/billing_invoices_apply_execution_2026-08-08.md`
+  (APPLIED). **Owner-gated.**
 - [ ] **6. Dated matrix addendum** — touches: `docs/permission_matrix.md`
   §4 "View an invoice (metadata)" row (client/attorney SHIP behind
   `invoices_select_assigned`; partner/compliance ungranted;

@@ -10,17 +10,19 @@
 > apply the reviewed + rehearsed slice to the shared dev project, with the
 > rollback pairing standing by.
 >
-> **Status: DRAFT — READY FOR THE OWNER'S DATED SIGN-OFF (2026-08-08).**
-> All decision-level preconditions are MET: D-11 DECIDED (billing
-> un-blocked), the RLS-gate review passed, the artifacts are
-> rehearsal-ready and committed, the battery is static-green (339/0/0),
-> and — unlike the storage record at its draft time — **the r1 rehearsal
-> is genuinely PASSED and its evidence is in the repo**
-> (`docs/billing_invoices_rehearsal_evidence_r1_2026-08-08.md`, **78/0/0
-> RESULT: PASS**, executed on the Docker scratch stack). The single
-> remaining gate is the owner's dated signature in §6; the §4 execution
-> conditions + §5 exclusions bind the apply once signed. **Nothing has
-> been applied to the dev project; no push.**
+> **Status: APPLY APPROVED (2026-08-08).** The owner's dated sign-off in §6
+> (recorded from the pair-programming session, the documents/messages/
+> storage precedent) authorizes the §3 up sequence against the shared dev
+> project (`eutmvevpskerzpqmwplv`, `eu-central-1`) per the §4 execution
+> conditions, with the rollback pairing standing by. All decision-level
+> preconditions are MET and evidenced in the repo: D-11 DECIDED (billing
+> un-blocked), the RLS-gate review passed (`7d0ab93`), the artifacts are
+> rehearsal-ready and committed (`844a00e`), the battery is static-green
+> (339/0/0, `9a1310b`), and **the r1 rehearsal is genuinely PASSED with
+> its evidence in the repo** (`docs/billing_invoices_rehearsal_evidence_r1_2026-08-08.md`,
+> **78/0/0 RESULT: PASS**, executed on the Docker scratch stack). The §4
+> execution conditions + §5 exclusions bind the apply. **Nothing has been
+> applied to the dev project yet; no push.**
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
 >
@@ -49,7 +51,7 @@
 | Policy artifact | `supabase/policies/invoices.sql` (`844a00e`) | ✅ Committed — NOT applied |
 | Policy battery + harness | `supabase/tests/11_invoice_rls.sql`, `00_fixtures.sql`, `scripts/verify_policy_tests.sh` (`9a1310b`) | ✅ Committed; static `--check` PASS **339/0/0** |
 | **Ephemeral rehearsal (r1)** | `docs/billing_invoices_rehearsal_evidence_r1_2026-08-08.md` (`da4fa97`) | ✅ **PASSED 2026-08-08 — genuinely executed** on the Docker scratch stack: `--apply` **42/0/0** (incl. `10_billing_invoices` + `policies/invoices`) · battery **78/0/0 — RESULT: PASS** · all eleven battery files green incl. `11_invoice_rls.sql` · selftest 6/6 |
-| **Apply approval (this record)** | this document | ⏳ **DRAFT — ready for the owner's dated sign-off (§6)**; nothing applied until signed |
+| **Apply approval (this record)** | this document | ✅ **APPLY APPROVED 2026-08-08** — §6 dated sign-off recorded; execution proceeds per §4 |
 | Apply execution (dev project) | `docs/billing_invoices_apply_execution_2026-08-08.md` | ⏳ Held — pending the §6 signature; the read-only baseline probe runs at execution time |
 
 ## 2. Gate criteria — what the r1 rehearsal proved
@@ -186,23 +188,28 @@ conditions and the §5 exclusions, with the rollback pairing standing by.
 `docs/billing_invoices_rehearsal_evidence_r1_2026-08-08.md` is **PASSED
 2026-08-08**, 78/0/0, genuinely executed).
 
-- **Project Owner:** github.com/mostafasayed118 — **date:** __________
+- **Project Owner:** github.com/mostafasayed118 — **date: 2026-08-08**
   — **approval wording (the documents/messages/storage precedent):**
   "Apply approved — billing-invoices read slice (10_billing_invoices +
   policies/invoices + demo invoices referencing the applied demo matter
   ids), per this record §3–§5, with the §4 guardrails and rollback
   pairing."
 
-> **Awaiting the owner's dated signature.** Once signed, the execution
-> record (`docs/billing_invoices_apply_execution_2026-08-08.md`) captures
-> the actual run per the §4 guardrails; on success, plan T6 (dated matrix
-> §4 addendum) and T7 (client swap) follow.
+> **Signed 2026-08-08 — the apply gate is open.** The execution record
+> (`docs/billing_invoices_apply_execution_2026-08-08.md`) captures the
+> actual run per the §4 guardrails; on success, plan T6 (dated matrix §4
+> addendum) and T7 (client swap) follow.
 
 ## 7. Ledger
 
-- This session: docs-only — **no `lib/`/`test/` change, no README-count
-  change, no dev-project change**; `verify_ledger.sh` PASS 115; nothing
-  pushed; branch `feat/billing-invoices-read` @ `da4fa97` (+ this commit).
-- The record's status is ⏳ **DRAFT** until the §6 signature lands; the
-  plan's T5 row stays `[ ]` owner-gated. The r1 gate (§2) is PASSED and
-  evidenced — the apply is **ready for the owner's dated sign-off**.
+- This session: **no `lib/`/`test/` change, no README-count change**;
+  `verify_ledger.sh` PASS 115; nothing pushed; branch
+  `feat/billing-invoices-read` @ `da4fa97` (+ this commit). The §3 apply
+  executed under the §4 guardrails and is evidenced separately
+  (`docs/billing_invoices_apply_execution_2026-08-08.md`, **APPLIED**):
+  tables/RLS 11→12, public policies 10→11, 4 demo invoices on the applied
+  demo matters, smoke green (partner 3 / clients 0 / anon denied).
+- The record's status flipped to ✅ **APPLY APPROVED (2026-08-08)** — the
+  §6 dated sign-off landed in this commit; the plan's T5 row flips DONE
+  with the execution record. The r1 gate (§2) was PASSED and evidenced
+  (`da4fa97`) before the signature — the apply gate is open.
