@@ -279,11 +279,18 @@ until T5**.
   + apply comments). **Verified live on the rehearsal host 2026-08-08: full
   battery 72 passed / 0 warnings / 0 failures (09 green), static `--check`
   335/0/0, selftest 6/6.**
-- [ ] **4. Ephemeral rehearsal (r-series)** — touches: evidence record
+- [x] **4. Ephemeral rehearsal (r-series)** — touches: evidence record
   `docs/realtime_push_rehearsal_evidence_r1_2026-08-08.md` — done when: the
   loop (migrate → policy → battery → read-as-roles → the §6 negative)
   passes on throwaway infra with zero dev-project contact (this session's
-  Docker precedent).
+  Docker precedent). — **DONE — r1 PASSED 2026-08-08** (this commit): the
+  full battery genuinely executed on the Docker stack, **72 passed / 0
+  warnings / 0 failures** (09 green, 01–08 regression unaffected), the
+  state probe confirming publication 1 / 11 policies / `messages_insert_assigned`
+  present, static `--check` **335/0/0**, selftest **6/6**; the
+  delivery-equivalence §6 negative green via the role-impersonated read
+  (the RLS proxy — the real channel round-trip stays T7, honest limit
+  recorded).
 - [ ] **5. Dated apply-approval → apply** — touches: dev project
   (publication + INSERT policy + demo send), `docs/realtime_push_apply_approval_2026-08-08.md`
   + `docs/realtime_push_apply_execution_2026-08-08.md` — done when: the
