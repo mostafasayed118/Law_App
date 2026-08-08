@@ -340,11 +340,28 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   the forward pin flips to messages-present + live-delivery-absent
   (`pg_publication_tables` = 0), and supabase/README.md gains the 08 row;
   static `--check` **333/0/0** + selftest **6/6** + ledger **PASS 115**.
-- [ ] **4. Ephemeral rehearsal (r-series)** — touches: evidence record
+- [x] **4. Ephemeral rehearsal (r-series)** — touches: evidence record
   `docs/realtime_rehearsal_evidence_r1_<date>.md` — done when: the loop
   (migrate → policy → battery → read-as-roles) passes on throwaway infra
   with zero dev-project contact; **owner-side / CI runner** (the four-slice
-  r1 Path A precedent).
+  r1 Path A precedent). — **DONE (this commit, 2026-08-08 — the first
+  genuinely executed r1 in the slice history)** — run locally via Path A:
+  Docker-backed `supabase start` in a scratch project (empty `migrations/`,
+  `--workdir`, because the CLI collides on the repo's `_down.sql` files),
+  the harness `--apply` built the schema from the committed files (37 files
+  incl. 08_messages.sql + policies/messages.sql), a psql shim exec'd into
+  the container (no host psql), and the full battery ran green — `== summary:
+  70 passed, 0 warnings, 0 failures ==` / `RESULT: PASS`, pins 11 tables /
+  11 RLS / 10 policies, forward pin messages-present + live-delivery-absent.
+  **Two rehearsal findings fixed + committed with the evidence:** (1)
+  storage-api v1.68.1+ `protect_objects_delete` trigger blocks the fixtures'
+  objects reset — the reset now sets the session GUC
+  `storage.allow_delete_query = 'true'` (the trigger's own escape hatch,
+  privileged-session only); (2) pre-existing battery defect 01.08 — it read
+  `audit_events` under `set role authenticated`, which holds no SELECT by
+  D-P0C4 design, so it could never pass; fixed with the in-file privileged-
+  observer `reset role` pattern (01.13 precedent). Evidence:
+  `docs/realtime_rehearsal_evidence_r1_2026-08-08.md` (PASSED).
 - [ ] **5. Dated apply-approval → apply** — touches: dev project
   (migrations + policies + demo seed), `docs/realtime_apply_approval_<date>.md`
   + `docs/realtime_apply_execution_<date>.md` — done when: the owner's
