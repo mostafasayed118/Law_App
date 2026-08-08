@@ -367,7 +367,14 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   + `docs/realtime_apply_execution_<date>.md` — done when: the owner's
   dated approval exists, apply executed with `_down.sql` pairing + cleanup
   discipline (demo message ids reference the applied demo thread ids),
-  observed output recorded verbatim.
+  observed output recorded verbatim. — **DRAFT (this commit, 2026-08-08):**
+  `docs/realtime_apply_approval_2026-08-08.md` opened with the r1 PASSED
+  gate (criteria §2 all green — genuinely executed 70/0/0), the §3 scope
+  (08_messages + policies/messages + demo seed referencing the four applied
+  demo thread ids: `5d148bca-…`, `a8fd025e-…`, `d0904762-…`, `4a8755b1-…`),
+  the §4 guardrails (baseline probe 8→9 policies with the storage-HELD
+  caveat, rollback pairing, per-step verification, post-apply smoke), and
+  the §5 exclusions — awaiting the owner's dated sign-off in §6.
 - [ ] **6. Matrix addendum (dated)** — touches: `docs/permission_matrix.md`
   §4 — the **"Read a document/message body"** row gains its dated addendum
   (client/attorney cells SHIP behind `messages_select_assigned` — the
