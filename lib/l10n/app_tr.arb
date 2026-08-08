@@ -332,7 +332,7 @@
   "approvalsTitle": "Bekleyen onaylar",
   "approvalsEmpty": "Kullanılabilir bekleyen onay yok.",
   "approvalsError": "Onaylar yüklenemedi.",
-  "approvalsLocalOnlyNote": "Demo modu — yalnızca sentetik gizlenmiş satırlar. Gerçek bir onay beklemektedir.",
+  "approvalsLocalOnlyNote": "Demo modu — yalnızca sentetik gizlenmiş satırlar. Bekleyen gerçek bir onay yok.",
   "approvalsEntryTitle": "Bekleyen onaylar",
   "approvalsEntrySubtitle": "Sentetik onaylara göz atın — geliştirme demosu.",
   "approvalStatusPending": "Bekliyor",

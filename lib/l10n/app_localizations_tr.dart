@@ -1038,7 +1038,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get approvalsLocalOnlyNote =>
-      'Demo modu — yalnızca sentetik gizlenmiş satırlar. Gerçek bir onay beklemektedir.';
+      'Demo modu — yalnızca sentetik gizlenmiş satırlar. Bekleyen gerçek bir onay yok.';
 
   @override
   String get approvalsEntryTitle => 'Bekleyen onaylar';
