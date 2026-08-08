@@ -1,0 +1,187 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../app/legalhub_theme.dart';
+import '../../../app/service_locator.dart';
+import '../../../core/state/view_state.dart';
+import '../../../features/billing/domain/billing_gateway.dart';
+import '../../../features/billing/domain/invoice.dart';
+import '../../../features/billing/presentation/billing_cubit.dart';
+import '../../../features/billing/presentation/billing_state.dart';
+import '../../../features/billing/presentation/invoice_labels.dart';
+import '../../../l10n/app_localizations.dart';
+
+/// Per-matter Invoices section on the matter details surface (billing slice,
+/// D-BI5).
+///
+/// Provides its own [BillingCubit] (feature-scoped, per-section
+/// `BlocProvider`) and renders the subset of the invoice-metadata list whose
+/// [Invoice.matterRef] equals [matterRef] — a client-side view over the
+/// gateway list (the D-M5 pattern; there is no per-matter fetch). **Metadata
+/// only**: each row renders the invoice number, the amount, and the status —
+/// no pay action, no payment data, no tap affordance (D-11 — no live payment
+/// in MVP; the D-BI1 line is structural). An empty per-matter subset renders
+/// the localized empty copy.
+class MatterInvoicesSection extends StatelessWidget {
+  const MatterInvoicesSection({required this.matterRef, super.key});
+
+  /// The matter title to filter by (matches [Invoice.matterRef], D-BI5).
+  final String matterRef;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider<BillingCubit>(
+      create: (BuildContext context) =>
+          BillingCubit(serviceLocator<BillingGateway>()),
+      child: _InvoicesSectionBody(matterRef: matterRef),
+    );
+  }
+}
+
+class _InvoicesSectionBody extends StatefulWidget {
+  const _InvoicesSectionBody({required this.matterRef});
+
+  final String matterRef;
+
+  @override
+  State<_InvoicesSectionBody> createState() => _InvoicesSectionBodyState();
+}
+
+class _InvoicesSectionBodyState extends State<_InvoicesSectionBody> {
+  @override
+  void initState() {
+    super.initState();
+    // Load the list on open (same pattern as the standalone surfaces); the
+    // per-matter subset is filtered client-side below.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      context.read<BillingCubit>().load();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final ColorScheme scheme = Theme.of(context).colorScheme;
+    final TextTheme text = Theme.of(context).textTheme;
+    return BlocBuilder<BillingCubit, BillingState>(
+      builder: (BuildContext context, BillingState state) {
+        return switch (state.invoices) {
+          ViewLoading() => const Padding(
+            padding: EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
+            child: Center(child: CircularProgressIndicator()),
+          ),
+          ViewEmpty() => _empty(l10n, text, scheme),
+          ViewError() => _error(context, l10n, text, scheme),
+          // A synthetic list has neither state; both render the same empty
+          // copy rather than a distinct offline surface.
+          ViewOffline() || ViewUnauthorized() => _empty(l10n, text, scheme),
+          ViewSuccess<List<Invoice>>(data: final List<Invoice> invoices) =>
+            _rows(context, invoices, l10n, text, scheme),
+        };
+      },
+    );
+  }
+
+  Widget _rows(
+    BuildContext context,
+    List<Invoice> invoices,
+    AppLocalizations l10n,
+    TextTheme text,
+    ColorScheme scheme,
+  ) {
+    final List<Invoice> matched = invoices
+        .where((Invoice i) => i.matterRef == widget.matterRef)
+        .toList();
+    if (matched.isEmpty) {
+      return _empty(l10n, text, scheme);
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        for (final Invoice invoice in matched) ...<Widget>[
+          _InvoiceRow(invoice: invoice),
+          const SizedBox(height: LegalHubTheme.spaceSm),
+        ],
+      ],
+    );
+  }
+
+  Widget _empty(AppLocalizations l10n, TextTheme text, ColorScheme scheme) {
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceXs),
+      child: Text(
+        l10n.matterWorkspaceInvoicesEmpty,
+        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+      ),
+    );
+  }
+
+  Widget _error(
+    BuildContext context,
+    AppLocalizations l10n,
+    TextTheme text,
+    ColorScheme scheme,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          l10n.invoicesError,
+          style: text.bodySmall?.copyWith(color: scheme.error),
+        ),
+        TextButton(
+          onPressed: () => context.read<BillingCubit>().load(),
+          child: Text(l10n.retry),
+        ),
+      ],
+    );
+  }
+}
+
+/// A read-only metadata row. Carries **no onTap, no InkWell, no chevron,
+/// and no trailing action** — the per-matter view keeps the D-BI1
+/// metadata-only line (D-11), so rows must not read as tappable and no pay
+/// affordance exists.
+class _InvoiceRow extends StatelessWidget {
+  const _InvoiceRow({required this.invoice});
+
+  final Invoice invoice;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final ColorScheme scheme = Theme.of(context).colorScheme;
+    final TextTheme text = Theme.of(context).textTheme;
+    final String amount = invoiceAmountLabel(invoice.amountCents);
+    final String status = invoiceStatusLabel(l10n, invoice.status);
+    return Material(
+      color: scheme.surfaceContainerLowest,
+      shape: RoundedRectangleBorder(
+        borderRadius: const BorderRadius.all(
+          Radius.circular(LegalHubTheme.radiusLg),
+        ),
+        side: BorderSide(color: scheme.outlineVariant),
+      ),
+      child: Padding(
+        padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              invoice.invoiceNumber,
+              style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              '${invoice.currency} $amount · $status',
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -907,4 +907,20 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get filesError => 'Dosyalar yüklenemedi.';
+
+  @override
+  String get matterWorkspaceInvoicesTitle => 'Faturalar';
+
+  @override
+  String get matterWorkspaceInvoicesEmpty =>
+      'Bu dava için kullanılabilir fatura yok.';
+
+  @override
+  String get invoicesError => 'Faturalar yüklenemedi.';
+
+  @override
+  String get invoiceStatusIssued => 'Düzenlendi';
+
+  @override
+  String get invoiceStatusPaid => 'Ödendi';
 }

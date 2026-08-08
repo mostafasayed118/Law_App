@@ -1767,6 +1767,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unable to load files.'**
   String get filesError;
+
+  /// No description provided for @matterWorkspaceInvoicesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoices'**
+  String get matterWorkspaceInvoicesTitle;
+
+  /// No description provided for @matterWorkspaceInvoicesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No invoices are available for this matter.'**
+  String get matterWorkspaceInvoicesEmpty;
+
+  /// No description provided for @invoicesError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load invoices.'**
+  String get invoicesError;
+
+  /// No description provided for @invoiceStatusIssued.
+  ///
+  /// In en, this message translates to:
+  /// **'Issued'**
+  String get invoiceStatusIssued;
+
+  /// No description provided for @invoiceStatusPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get invoiceStatusPaid;
 }
 
 class _AppLocalizationsDelegate

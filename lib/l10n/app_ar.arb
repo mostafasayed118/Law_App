@@ -291,5 +291,10 @@
   "matterWorkspaceMessagesEmpty": "لا توجد محادثات متاحة لهذه القضية.",
   "matterWorkspaceFilesTitle": "الملفات",
   "matterWorkspaceFilesEmpty": "لا توجد ملفات متاحة لهذه القضية.",
-  "filesError": "تعذّر تحميل الملفات."
+  "filesError": "تعذّر تحميل الملفات.",
+  "matterWorkspaceInvoicesTitle": "الفواتير",
+  "matterWorkspaceInvoicesEmpty": "لا توجد فواتير متاحة لهذه القضية.",
+  "invoicesError": "تعذّر تحميل الفواتير.",
+  "invoiceStatusIssued": "صادرة",
+  "invoiceStatusPaid": "مدفوعة"
 }

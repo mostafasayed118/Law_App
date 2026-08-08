@@ -291,5 +291,10 @@
   "matterWorkspaceMessagesEmpty": "Bu dava için kullanılabilir mesaj dizisi yok.",
   "matterWorkspaceFilesTitle": "Dosyalar",
   "matterWorkspaceFilesEmpty": "Bu dava için kullanılabilir dosya yok.",
-  "filesError": "Dosyalar yüklenemedi."
+  "filesError": "Dosyalar yüklenemedi.",
+  "matterWorkspaceInvoicesTitle": "Faturalar",
+  "matterWorkspaceInvoicesEmpty": "Bu dava için kullanılabilir fatura yok.",
+  "invoicesError": "Faturalar yüklenemedi.",
+  "invoiceStatusIssued": "Düzenlendi",
+  "invoiceStatusPaid": "Ödendi"
 }

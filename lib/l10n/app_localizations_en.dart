@@ -906,4 +906,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get filesError => 'Unable to load files.';
+
+  @override
+  String get matterWorkspaceInvoicesTitle => 'Invoices';
+
+  @override
+  String get matterWorkspaceInvoicesEmpty =>
+      'No invoices are available for this matter.';
+
+  @override
+  String get invoicesError => 'Unable to load invoices.';
+
+  @override
+  String get invoiceStatusIssued => 'Issued';
+
+  @override
+  String get invoiceStatusPaid => 'Paid';
 }

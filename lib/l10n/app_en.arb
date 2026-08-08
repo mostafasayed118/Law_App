@@ -305,5 +305,10 @@
   "matterWorkspaceMessagesEmpty": "No message threads are available for this matter.",
   "matterWorkspaceFilesTitle": "Files",
   "matterWorkspaceFilesEmpty": "No files are available for this matter.",
-  "filesError": "Unable to load files."
+  "filesError": "Unable to load files.",
+  "matterWorkspaceInvoicesTitle": "Invoices",
+  "matterWorkspaceInvoicesEmpty": "No invoices are available for this matter.",
+  "invoicesError": "Unable to load invoices.",
+  "invoiceStatusIssued": "Issued",
+  "invoiceStatusPaid": "Paid"
 }
