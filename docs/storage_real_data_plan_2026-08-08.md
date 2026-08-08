@@ -333,20 +333,26 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   bucket insert applied cleanly; storage-policy baseline 0). Evidence
   record **PASSED**; the earlier no-Docker/psql finding was resolved (the
   stack was up + the psql shim present at run time).
-- [ ] **5. Dated apply-approval → apply** — touches: dev project
+- [x] **5. Dated apply-approval → apply** — touches: dev project
   (07_storage migration + both policies + demo file rows + demo objects),
   `docs/storage_apply_approval_<date>.md` + `docs/storage_apply_execution_<date>.md`
   — done when: the owner's dated approval exists, apply executed with
   `_down.sql` pairing + cleanup discipline (baseline probe: files absent,
   bucket absent, policies 8→9 public + storage.objects 0→1; demo rows +
   objects reference the applied demo matter ids), observed output recorded
-  verbatim. — **approval APPLY APPROVED 2026-08-08** (`91c49ce`, §6 dated
-  sign-off; the read-only baseline probes verified: files 0, bucket 0,
-  public policies 8→9, storage policies 0→1, the four demo matter ids
-  resolve under org `ef43087b-…`, `storage.buckets.type` NOT NULL with
-  default, `storage.foldername` present); **execution ⏳ HELD on the r1
-  evidence (T4)** — nothing applied; the execution-record skeleton
-  `docs/storage_apply_execution_2026-08-08.md` is drafted, uncommitted.
+  verbatim. — **DONE (2026-08-08):** approval APPLY APPROVED (`91c49ce`,
+  §6 dated sign-off) + r1 PASSED (T4, genuinely executed 74/0/0) + the
+  apply **executed on the dev project** — baseline probed (files 0,
+  bucket 0, 9 public policies current — the approval's "8" predated the
+  realtime-push/send-message applies — storage policies 0, the four demo
+  matter ids resolve under org `ef43087b-…`), `07_storage` + both
+  policies applied (tables 10→11, RLS 10→11, public policies 9→10,
+  storage policies 0→1, bucket `matter-files` 1), demo seed (4 files +
+  4 objects on the applied demo matters, `storage_path` == object name,
+  generic names, D-STR2 org invariant), smoke verified (partner 3/3 +
+  family 0; clients 0/0 — the membership guard; anon denied both
+  layers); rollback pairing standing by, unexercised. Execution evidence
+  `docs/storage_apply_execution_2026-08-08.md` **APPLIED**.
 - [x] **6. Matrix addendum (dated)** — touches: `docs/permission_matrix.md`
   §4 + §6 — adds the **"View a matter file (metadata)"** row (client/
   attorney cells SHIP behind `files_select_assigned`; partner/
