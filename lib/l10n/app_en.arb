@@ -181,6 +181,8 @@
   "platformAdminDeleteConfirmBody": "Delete the demo account for {name}? This cannot be undone.",
   "@platformAdminDeleteConfirmBody": {"placeholders": {"name": {"type": "String"}}},
   "platformAdminDeleteConfirmAction": "Delete",
+  "platformAdminAudit": "Audit log",
+  "platformAdminAuditPlatform": "Platform activity",
   "orgErrorDenied": "You don't have permission to perform this action.",
   "orgErrorDuplicateMember": "This person is already a member of the organization.",
   "orgErrorLastPartner": "The organization must keep at least one active partner.",

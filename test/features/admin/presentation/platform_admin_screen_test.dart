@@ -16,10 +16,13 @@ class _MutablePlatformAdminGateway implements PlatformAdminGateway {
   List<OrganizationSummary> organizations = <OrganizationSummary>[];
   List<OrgMember> members = <OrgMember>[];
   List<AuditEntry> auditEntries = <AuditEntry>[];
+  List<AuditEntry> orgAuditEntries = <AuditEntry>[];
   bool denied = false;
   OrgFailureKind? loadFailureKind;
   OrgFailureKind? voidFailureKind;
+  OrgFailureKind? auditFailureKind;
   int loadCalls = 0;
+  int orgAuditCalls = 0;
 
   @override
   Future<OrgOutcome<List<OrganizationSummary>>> listOrganizations() async {
@@ -109,9 +112,9 @@ class _MutablePlatformAdminGateway implements PlatformAdminGateway {
         OrgFailure(kind: OrgFailureKind.denied),
       );
     }
-    if (loadFailureKind != null) {
+    if (auditFailureKind != null) {
       return OrgOutcome<List<AuditEntry>>.failure(
-        OrgFailure(kind: loadFailureKind!),
+        OrgFailure(kind: auditFailureKind!),
       );
     }
     return OrgOutcome<List<AuditEntry>>.success(auditEntries);
@@ -121,17 +124,18 @@ class _MutablePlatformAdminGateway implements PlatformAdminGateway {
   Future<OrgOutcome<List<AuditEntry>>> readOrgAudit({
     required String organizationId,
   }) async {
+    orgAuditCalls++;
     if (denied) {
       return const OrgOutcome<List<AuditEntry>>.failure(
         OrgFailure(kind: OrgFailureKind.denied),
       );
     }
-    if (loadFailureKind != null) {
+    if (auditFailureKind != null) {
       return OrgOutcome<List<AuditEntry>>.failure(
-        OrgFailure(kind: loadFailureKind!),
+        OrgFailure(kind: auditFailureKind!),
       );
     }
-    return OrgOutcome<List<AuditEntry>>.success(auditEntries);
+    return OrgOutcome<List<AuditEntry>>.success(orgAuditEntries);
   }
 
   static OrgMember _withStatus(OrgMember m, MembershipStatus status) {
@@ -200,6 +204,143 @@ void main() {
       expect(find.byTooltip('Suspend'), findsOneWidget);
       expect(find.byTooltip('Delete demo account'), findsOneWidget);
     });
+
+    testWidgets('renders the audit section with the platform trail', (
+      tester,
+    ) async {
+      final _MutablePlatformAdminGateway gateway =
+          _MutablePlatformAdminGateway()
+            ..organizations = <OrganizationSummary>[_org]
+            ..members = <OrgMember>[_demoMember]
+            ..auditEntries = <AuditEntry>[
+              AuditEntry(
+                id: 1,
+                action: 'organization_created',
+                outcome: 'succeeded',
+                resourceType: 'organization',
+                correlationId: 'audit-0001',
+                redactedSummary: 'Organization created (metadata only)',
+                serverTimestamp: DateTime.utc(2026, 7, 25, 10, 0),
+                actorUserId: 'u-1',
+                organizationId: 'org-1',
+              ),
+            ];
+
+      await tester.pumpWidget(harness(gateway));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Audit log'), findsOneWidget);
+      // The scope selector defaults to the platform trail.
+      expect(find.text('Platform activity'), findsOneWidget);
+      // The redacted row renders action metadata + summary, read-only.
+      expect(find.text('Organization created (metadata only)'), findsOneWidget);
+      expect(find.textContaining('organization_created'), findsOneWidget);
+    });
+
+    testWidgets('the org selector switches to the org-scoped trail', (
+      tester,
+    ) async {
+      final _MutablePlatformAdminGateway gateway =
+          _MutablePlatformAdminGateway()
+            ..organizations = <OrganizationSummary>[_org]
+            ..members = <OrgMember>[_demoMember]
+            ..auditEntries = <AuditEntry>[
+              AuditEntry(
+                id: 1,
+                action: 'organization_created',
+                outcome: 'succeeded',
+                resourceType: 'organization',
+                correlationId: 'audit-0001',
+                redactedSummary: 'Organization created (metadata only)',
+                serverTimestamp: DateTime.utc(2026, 7, 25, 10, 0),
+                actorUserId: 'u-1',
+                organizationId: 'org-1',
+              ),
+            ]
+            ..orgAuditEntries = <AuditEntry>[
+              AuditEntry(
+                id: 2,
+                action: 'member_invited',
+                outcome: 'succeeded',
+                resourceType: 'membership',
+                correlationId: 'audit-1002',
+                redactedSummary: 'Member invited (metadata only)',
+                serverTimestamp: DateTime.utc(2026, 7, 26, 11, 30),
+              ),
+            ];
+
+      await tester.pumpWidget(harness(gateway));
+      await tester.pumpAndSettle();
+      expect(find.text('Organization created (metadata only)'), findsOneWidget);
+
+      await tester.tap(find.text('Platform activity'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Demo Firm').last);
+      await tester.pumpAndSettle();
+
+      expect(gateway.orgAuditCalls, 1);
+      expect(find.text('Member invited (metadata only)'), findsOneWidget);
+      expect(find.text('Organization created (metadata only)'), findsNothing);
+    });
+
+    testWidgets('an empty audit trail renders the empty copy', (tester) async {
+      final _MutablePlatformAdminGateway gateway =
+          _MutablePlatformAdminGateway()
+            ..organizations = <OrganizationSummary>[_org]
+            ..members = <OrgMember>[_demoMember];
+
+      await tester.pumpWidget(harness(gateway));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Audit log'), findsOneWidget);
+      expect(find.text('Nothing to show'), findsWidgets);
+    });
+
+    testWidgets('a denied audit read flips to the distinct denied state', (
+      tester,
+    ) async {
+      final _MutablePlatformAdminGateway gateway =
+          _MutablePlatformAdminGateway()
+            ..organizations = <OrganizationSummary>[_org]
+            ..members = <OrgMember>[_demoMember]
+            ..auditFailureKind = OrgFailureKind.denied;
+
+      await tester.pumpWidget(harness(gateway));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Access not available'), findsOneWidget);
+      // Never an empty-success trail (AC-7).
+      expect(find.text('Audit log'), findsNothing);
+      expect(find.text('Nothing to show'), findsNothing);
+    });
+
+    testWidgets(
+      'a non-denial audit failure renders inline and retry recovers',
+      (tester) async {
+        final _MutablePlatformAdminGateway gateway =
+            _MutablePlatformAdminGateway()
+              ..organizations = <OrganizationSummary>[_org]
+              ..members = <OrgMember>[_demoMember]
+              ..auditFailureKind = OrgFailureKind.unknown;
+
+        await tester.pumpWidget(harness(gateway));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('Something went wrong. Please try again.'),
+          findsOneWidget,
+        );
+        // The loaded lists survive a section-local audit failure.
+        expect(find.text('Demo Firm'), findsOneWidget);
+        expect(find.text('Demo user'), findsOneWidget);
+
+        gateway.auditFailureKind = null;
+        await tester.tap(find.text('Retry'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Nothing to show'), findsWidgets);
+      },
+    );
 
     testWidgets('a successful suspend flips the row to SUSPENDED', (
       tester,
@@ -382,6 +523,9 @@ void main() {
       expect(find.text('الأعضاء'), findsOneWidget);
       // The member status chip is localized too.
       expect(find.text('Demo Firm · نشط'), findsOneWidget);
+      // The audit section headers are localized.
+      expect(find.text('سجل التدقيق'), findsOneWidget);
+      expect(find.text('نشاط المنصة'), findsOneWidget);
     });
 
     testWidgets('renders section headers in Turkish', (tester) async {
@@ -396,6 +540,8 @@ void main() {
       expect(find.text('Kuruluşlar'), findsOneWidget);
       expect(find.text('Üyeler'), findsOneWidget);
       expect(find.text('Demo Firm · AKTİF'), findsOneWidget);
+      expect(find.text('Denetim günlüğü'), findsOneWidget);
+      expect(find.text('Platform etkinliği'), findsOneWidget);
     });
   });
 }

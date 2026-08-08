@@ -181,6 +181,8 @@
   "platformAdminDeleteConfirmBody": "{name} için demo hesabı silinsin mi? Bu geri alınamaz.",
   "@platformAdminDeleteConfirmBody": {"placeholders": {"name": {"type": "String"}}},
   "platformAdminDeleteConfirmAction": "Sil",
+  "platformAdminAudit": "Denetim günlüğü",
+  "platformAdminAuditPlatform": "Platform etkinliği",
   "orgErrorDenied": "Bu işlemi yapma izniniz yok.",
   "orgErrorDuplicateMember": "Bu kişi zaten kuruluşun bir üyesi.",
   "orgErrorLastPartner": "Kuruluşun en az bir aktif ortağı olmalıdır.",

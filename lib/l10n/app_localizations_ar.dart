@@ -569,6 +569,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get platformAdminDeleteConfirmAction => 'حذف';
 
   @override
+  String get platformAdminAudit => 'سجل التدقيق';
+
+  @override
+  String get platformAdminAuditPlatform => 'نشاط المنصة';
+
+  @override
   String get orgErrorDenied => 'ليس لديك صلاحية تنفيذ هذا الإجراء.';
 
   @override

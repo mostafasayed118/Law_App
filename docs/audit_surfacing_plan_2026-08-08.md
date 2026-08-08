@@ -264,10 +264,20 @@ only dated gate is the matrix §6 addendum ordering (T1) and the final push.
   non-PII trails (`audit-*` correlation ids, fixed UTC timestamps,
   metadata-only summaries); owner gate → rows, non-owner → denied
   (never empty), foreign org id → honest empty trail.
-- [ ] **4. Audit section UI** — touches: `platform_admin_cubit.dart` +
+- [x] **4. Audit section UI** — touches: `platform_admin_cubit.dart` +
   `platform_admin_screen.dart` + 3 `.arb` + generated l10n — done when:
   widget/cubit tests (platform + org lists, empty, denied-never-empty,
-  error-retry) + l10n pins green. — **⏳ PENDING**
+  error-retry) + l10n pins green. — **DONE (this commit)** — the Audit
+  section renders the platform trail on mount (section-local `loadAudit`,
+  the matter-sections pattern hosted on the existing cubit per D-AUD2),
+  an org selector drives `selectAuditOrg` for the per-org trail; a denied
+  read flips the whole surface to `PlatformAdminDenied` (AC-7, never
+  empty-success), a non-denial failure renders inline with retry so the
+  loaded lists survive; rows are redacted metadata only (contract §8),
+  read-only; `platformAdminAudit`/`platformAdminAuditPlatform` ×3
+  locales. — suite 986 runtime / 983 declared, ledger PASS 115 (reviewer
+  finding: load() never carries an in-flight audit flag forward — the
+  remounted section re-triggers its own fetch).
 - [ ] **5. Lockstep + evidence + close** — touches: README test count,
   roadmap §14 fifth flip + §13 gate-table row + §2 unwired-RPC inventory
   → 18-of-18, completion evidence `docs/audit_surfacing_completion_evidence_2026-08-08.md`,

@@ -573,6 +573,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get platformAdminDeleteConfirmAction => 'Sil';
 
   @override
+  String get platformAdminAudit => 'Denetim günlüğü';
+
+  @override
+  String get platformAdminAuditPlatform => 'Platform etkinliği';
+
+  @override
   String get orgErrorDenied => 'Bu işlemi yapma izniniz yok.';
 
   @override

@@ -570,6 +570,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get platformAdminDeleteConfirmAction => 'Delete';
 
   @override
+  String get platformAdminAudit => 'Audit log';
+
+  @override
+  String get platformAdminAuditPlatform => 'Platform activity';
+
+  @override
   String get orgErrorDenied =>
       'You don\'t have permission to perform this action.';
 

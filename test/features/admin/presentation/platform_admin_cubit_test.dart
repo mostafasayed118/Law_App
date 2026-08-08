@@ -14,6 +14,10 @@ class _StubPlatformAdminGateway implements PlatformAdminGateway {
   OrgOutcome<List<OrgMember>> membersOutcome =
       const OrgOutcome<List<OrgMember>>.success(<OrgMember>[]);
   OrgOutcome<void> voidOutcome = const OrgOutcome<void>.success(null);
+  OrgOutcome<List<AuditEntry>> platformAuditOutcome =
+      const OrgOutcome<List<AuditEntry>>.success(<AuditEntry>[]);
+  OrgOutcome<List<AuditEntry>> orgAuditOutcome =
+      const OrgOutcome<List<AuditEntry>>.success(<AuditEntry>[]);
   final List<String> calls = <String>[];
 
   @override
@@ -55,7 +59,7 @@ class _StubPlatformAdminGateway implements PlatformAdminGateway {
   @override
   Future<OrgOutcome<List<AuditEntry>>> readPlatformAudit() async {
     calls.add('platformAudit');
-    return const OrgOutcome<List<AuditEntry>>.success(<AuditEntry>[]);
+    return platformAuditOutcome;
   }
 
   @override
@@ -63,7 +67,7 @@ class _StubPlatformAdminGateway implements PlatformAdminGateway {
     required String organizationId,
   }) async {
     calls.add('orgAudit:$organizationId');
-    return const OrgOutcome<List<AuditEntry>>.success(<AuditEntry>[]);
+    return orgAuditOutcome;
   }
 }
 
@@ -288,5 +292,230 @@ void main() {
       );
       expect(cubit.state, isA<PlatformAdminLoaded>());
     });
+  });
+
+  group('PlatformAdminCubit audit trail (T4, section-local)', () {
+    final AuditEntry entry = AuditEntry(
+      id: 1,
+      action: 'member_invited',
+      outcome: 'succeeded',
+      resourceType: 'membership',
+      correlationId: 'audit-0002',
+      redactedSummary: 'Member invited (metadata only)',
+      serverTimestamp: DateTime.utc(2026, 7, 26, 11, 30),
+      actorUserId: 'u-1',
+      organizationId: 'org-1',
+    );
+
+    Future<PlatformAdminCubit> loadedCubit(
+      _StubPlatformAdminGateway gateway,
+    ) async {
+      gateway
+        ..orgsOutcome = OrgOutcome<List<OrganizationSummary>>.success(
+          <OrganizationSummary>[_org],
+        )
+        ..membersOutcome = OrgOutcome<List<OrgMember>>.success(<OrgMember>[
+          _member,
+        ]);
+      final PlatformAdminCubit cubit = PlatformAdminCubit(gateway);
+      await cubit.load();
+      expect(cubit.state, isA<PlatformAdminLoaded>());
+      return cubit;
+    }
+
+    test(
+      'loadAudit fills the platform trail without touching the lists',
+      () async {
+        final _StubPlatformAdminGateway gateway = _StubPlatformAdminGateway()
+          ..platformAuditOutcome = OrgOutcome<List<AuditEntry>>.success(
+            <AuditEntry>[entry],
+          );
+        final PlatformAdminCubit cubit = await loadedCubit(gateway);
+        addTearDown(cubit.close);
+        expect(gateway.calls, isNot(contains('platformAudit')));
+
+        await cubit.loadAudit();
+
+        final PlatformAdminLoaded loaded = cubit.state as PlatformAdminLoaded;
+        expect(loaded.platformAudit.single.id, 1);
+        expect(loaded.organizations.single.id, 'org-1');
+        expect(gateway.calls, contains('platformAudit'));
+      },
+    );
+
+    test('loadAudit is a no-op before the lists have loaded', () async {
+      final _StubPlatformAdminGateway gateway = _StubPlatformAdminGateway();
+      final PlatformAdminCubit cubit = PlatformAdminCubit(gateway);
+      addTearDown(cubit.close);
+
+      await cubit.loadAudit();
+
+      expect(cubit.state, const PlatformAdminInitial());
+      expect(gateway.calls, isEmpty);
+    });
+
+    test(
+      'a denied audit read becomes the distinct denied state (AC-7)',
+      () async {
+        final _StubPlatformAdminGateway gateway = _StubPlatformAdminGateway()
+          ..platformAuditOutcome = const OrgOutcome<List<AuditEntry>>.failure(
+            OrgFailure(kind: OrgFailureKind.denied),
+          );
+        final PlatformAdminCubit cubit = await loadedCubit(gateway);
+        addTearDown(cubit.close);
+
+        await cubit.loadAudit();
+
+        expect(cubit.state, const PlatformAdminDenied());
+      },
+    );
+
+    test(
+      'a non-denial audit failure surfaces the inline section error',
+      () async {
+        final _StubPlatformAdminGateway gateway = _StubPlatformAdminGateway()
+          ..platformAuditOutcome = const OrgOutcome<List<AuditEntry>>.failure(
+            OrgFailure(kind: OrgFailureKind.unknown, message: 'boom'),
+          );
+        final PlatformAdminCubit cubit = await loadedCubit(gateway);
+        addTearDown(cubit.close);
+
+        await cubit.loadAudit();
+
+        final PlatformAdminLoaded loaded = cubit.state as PlatformAdminLoaded;
+        expect(loaded.auditError, OrgFailureKind.unknown);
+        // The loaded lists survive a section-local failure.
+        expect(loaded.organizations.single.id, 'org-1');
+        expect(loaded.members.single.userId, 'u-1');
+      },
+    );
+
+    test('selectAuditOrg fetches and fills the org-scoped trail', () async {
+      final _StubPlatformAdminGateway gateway = _StubPlatformAdminGateway()
+        ..orgAuditOutcome = OrgOutcome<List<AuditEntry>>.success(<AuditEntry>[
+          entry,
+        ]);
+      final PlatformAdminCubit cubit = await loadedCubit(gateway);
+      addTearDown(cubit.close);
+
+      await cubit.selectAuditOrg('org-1');
+
+      final PlatformAdminLoaded loaded = cubit.state as PlatformAdminLoaded;
+      expect(loaded.selectedAuditOrgId, 'org-1');
+      expect(loaded.orgAudit.single.id, 1);
+      expect(gateway.calls, contains('orgAudit:org-1'));
+    });
+
+    test('selectAuditOrg(null) clears the org trail without a fetch', () async {
+      final _StubPlatformAdminGateway gateway = _StubPlatformAdminGateway()
+        ..orgAuditOutcome = OrgOutcome<List<AuditEntry>>.success(<AuditEntry>[
+          entry,
+        ]);
+      final PlatformAdminCubit cubit = await loadedCubit(gateway);
+      addTearDown(cubit.close);
+      await cubit.selectAuditOrg('org-1');
+      expect((cubit.state as PlatformAdminLoaded).orgAudit, isNotEmpty);
+
+      await cubit.selectAuditOrg(null);
+
+      final PlatformAdminLoaded loaded = cubit.state as PlatformAdminLoaded;
+      expect(loaded.selectedAuditOrgId, isNull);
+      expect(loaded.orgAudit, isEmpty);
+      expect(
+        gateway.calls.where((String c) => c.startsWith('orgAudit')),
+        hasLength(1),
+      );
+    });
+
+    test(
+      'a denied org audit read becomes the distinct denied state (AC-7)',
+      () async {
+        final _StubPlatformAdminGateway gateway = _StubPlatformAdminGateway()
+          ..orgAuditOutcome = const OrgOutcome<List<AuditEntry>>.failure(
+            OrgFailure(kind: OrgFailureKind.denied),
+          );
+        final PlatformAdminCubit cubit = await loadedCubit(gateway);
+        addTearDown(cubit.close);
+
+        await cubit.selectAuditOrg('org-1');
+
+        expect(cubit.state, const PlatformAdminDenied());
+      },
+    );
+
+    test('selectAuditOrg is a no-op before the lists have loaded', () async {
+      final _StubPlatformAdminGateway gateway = _StubPlatformAdminGateway();
+      final PlatformAdminCubit cubit = PlatformAdminCubit(gateway);
+      addTearDown(cubit.close);
+
+      await cubit.selectAuditOrg('org-1');
+
+      expect(cubit.state, const PlatformAdminInitial());
+      expect(gateway.calls, isEmpty);
+    });
+
+    test('a second loadAudit is ignored while one is in flight', () async {
+      final _StubPlatformAdminGateway gateway = _StubPlatformAdminGateway()
+        ..platformAuditOutcome = OrgOutcome<List<AuditEntry>>.success(
+          <AuditEntry>[entry],
+        );
+      final PlatformAdminCubit cubit = await loadedCubit(gateway);
+      addTearDown(cubit.close);
+
+      final Future<void> first = cubit.loadAudit();
+      final Future<void> second = cubit.loadAudit();
+      await first;
+      await second;
+
+      // Only one platform audit read; the second submit is ignored.
+      expect(
+        gateway.calls.where((String c) => c == 'platformAudit'),
+        hasLength(1),
+      );
+      expect((cubit.state as PlatformAdminLoaded).platformAudit, isNotEmpty);
+    });
+
+    test('a second selectAuditOrg is ignored while one is in flight', () async {
+      final _StubPlatformAdminGateway gateway = _StubPlatformAdminGateway()
+        ..orgAuditOutcome = OrgOutcome<List<AuditEntry>>.success(<AuditEntry>[
+          entry,
+        ]);
+      final PlatformAdminCubit cubit = await loadedCubit(gateway);
+      addTearDown(cubit.close);
+
+      final Future<void> first = cubit.selectAuditOrg('org-1');
+      final Future<void> second = cubit.selectAuditOrg('org-1');
+      await first;
+      await second;
+
+      expect(
+        gateway.calls.where((String c) => c == 'orgAudit:org-1'),
+        hasLength(1),
+      );
+      expect((cubit.state as PlatformAdminLoaded).orgAudit, isNotEmpty);
+    });
+
+    test(
+      'the audit trail survives a list reload (action), never wiped',
+      () async {
+        final _StubPlatformAdminGateway gateway = _StubPlatformAdminGateway()
+          ..platformAuditOutcome = OrgOutcome<List<AuditEntry>>.success(
+            <AuditEntry>[entry],
+          );
+        final PlatformAdminCubit cubit = await loadedCubit(gateway);
+        addTearDown(cubit.close);
+        await cubit.loadAudit();
+        expect((cubit.state as PlatformAdminLoaded).platformAudit, isNotEmpty);
+
+        await cubit.load();
+
+        final PlatformAdminLoaded loaded = cubit.state as PlatformAdminLoaded;
+        expect(loaded.platformAudit.single.id, 1);
+        expect(loaded.organizations.single.id, 'org-1');
+        // The in-flight flag is never carried forward: the remounted Audit
+        // section re-triggers its own fetch (reviewer finding, audit T4).
+        expect(loaded.auditLoading, isFalse);
+      },
+    );
   });
 }

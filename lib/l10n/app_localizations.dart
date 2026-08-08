@@ -1150,6 +1150,18 @@ abstract class AppLocalizations {
   /// **'Delete'**
   String get platformAdminDeleteConfirmAction;
 
+  /// No description provided for @platformAdminAudit.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit log'**
+  String get platformAdminAudit;
+
+  /// No description provided for @platformAdminAuditPlatform.
+  ///
+  /// In en, this message translates to:
+  /// **'Platform activity'**
+  String get platformAdminAuditPlatform;
+
   /// No description provided for @orgErrorDenied.
   ///
   /// In en, this message translates to:

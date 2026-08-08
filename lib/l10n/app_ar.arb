@@ -181,6 +181,8 @@
   "platformAdminDeleteConfirmBody": "حذف الحساب التجريبي لـ {name}؟ لا يمكن التراجع عن هذا.",
   "@platformAdminDeleteConfirmBody": {"placeholders": {"name": {"type": "String"}}},
   "platformAdminDeleteConfirmAction": "حذف",
+  "platformAdminAudit": "سجل التدقيق",
+  "platformAdminAuditPlatform": "نشاط المنصة",
   "orgErrorDenied": "ليس لديك صلاحية تنفيذ هذا الإجراء.",
   "orgErrorDuplicateMember": "هذا الشخص عضو بالفعل في المؤسسة.",
   "orgErrorLastPartner": "يجب أن تحتفظ المؤسسة بشريك نشط واحد على الأقل.",
