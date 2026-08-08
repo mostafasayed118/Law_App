@@ -232,11 +232,16 @@ Branch: `feat/billing-invoices-read`
   gaining 10, pins tables 11→12 / RLS 11→12 / public policies 10→11, UUID
   + FAIL scans, header comments) — done when: static `--check` green,
   selftest 6/6, committed.
-- [ ] **4. Ephemeral rehearsal (r1)** — touches:
+- [x] **4. Ephemeral rehearsal (r1)** — touches:
   `docs/billing_invoices_rehearsal_evidence_r1_2026-08-08.md` — done
   when: the genuine cycle (`--apply` + battery on the Docker scratch
   stack) runs green and the record flips to PASSED, committed as
-  docs(billing).
+  docs(billing). **DONE 2026-08-08** — genuinely executed on the Docker
+  scratch stack: `--apply` **42/0/0** (incl. `10_billing_invoices` +
+  `policies/invoices`), battery **78/0/0 — RESULT: PASS** (1a 12 tables /
+  12 RLS, 1e 11 policies, 1f `billing_invoices` ninth-un-deferral pin 1),
+  all eleven battery files green incl. `11_invoice_rls.sql`, selftest
+  6/6. Record flipped to PASSED; nothing applied.
 - [ ] **5. Dated apply-approval → apply** — touches: dev project +
   `docs/billing_invoices_apply_approval_2026-08-08.md` + execution record
   — done when: the owner's dated sign-off, apply executed (baseline probe,
