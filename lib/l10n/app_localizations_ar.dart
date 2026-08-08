@@ -932,4 +932,29 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get invoiceStatusPaid => 'مدفوعة';
+
+  @override
+  String get orgAuditTitle => 'سجل التدقيق';
+
+  @override
+  String get orgAuditEmpty => 'لم يتم تسجيل أي أحداث تدقيق حتى الآن.';
+
+  @override
+  String get orgAuditDenied =>
+      'ليس لديك صلاحية للاطلاع على سجل تدقيق هذه المؤسسة.';
+
+  @override
+  String get orgAuditError => 'تعذّر تحميل سجل التدقيق.';
+
+  @override
+  String get orgAuditRetry => 'إعادة المحاولة';
+
+  @override
+  String get orgAuditHubEntry => 'عرض سجل التدقيق';
+
+  @override
+  String get orgAuditOutcomeAllowed => 'مسموح';
+
+  @override
+  String get orgAuditOutcomeDenied => 'مرفوض';
 }

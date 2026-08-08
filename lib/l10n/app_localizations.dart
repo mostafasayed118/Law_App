@@ -1827,6 +1827,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Paid'**
   String get invoiceStatusPaid;
+
+  /// No description provided for @orgAuditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit trail'**
+  String get orgAuditTitle;
+
+  /// No description provided for @orgAuditEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No audit events recorded yet.'**
+  String get orgAuditEmpty;
+
+  /// No description provided for @orgAuditDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to view this organization\'s audit trail.'**
+  String get orgAuditDenied;
+
+  /// No description provided for @orgAuditError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load the audit trail.'**
+  String get orgAuditError;
+
+  /// No description provided for @orgAuditRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get orgAuditRetry;
+
+  /// No description provided for @orgAuditHubEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'View audit trail'**
+  String get orgAuditHubEntry;
+
+  /// No description provided for @orgAuditOutcomeAllowed.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed'**
+  String get orgAuditOutcomeAllowed;
+
+  /// No description provided for @orgAuditOutcomeDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Denied'**
+  String get orgAuditOutcomeDenied;
 }
 
 class _AppLocalizationsDelegate

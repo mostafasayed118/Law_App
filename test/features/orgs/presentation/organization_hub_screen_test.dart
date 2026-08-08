@@ -106,16 +106,16 @@ void main() {
 
   tearDown(() => resetServiceLocator());
 
-  Widget harness(AuthCubit authCubit) {
+  Widget harness(AuthCubit authCubit, {RoleCapability? capabilities}) {
     return MultiBlocProvider(
       providers: <BlocProvider<dynamic>>[
         BlocProvider<AuthCubit>.value(value: authCubit),
       ],
-      child: const MaterialApp(
-        locale: Locale('en'),
+      child: MaterialApp(
+        locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: OrganizationHubScreen(),
+        home: OrganizationHubScreen(capabilities: capabilities),
       ),
     );
   }
@@ -326,5 +326,88 @@ void main() {
       serviceLocator<ActiveOrgStore>().activeOrganizationId,
       created.valueOrNull!.id,
     );
+  });
+
+  group('audit entry gating (partner org-audit slice 2026-08-09)', () {
+    AuthCubit partnerHubCubit() => hubCubit(
+      sessionWith(
+        memberships: <OrganizationMembership>[
+          OrganizationMembership(
+            organizationId: 'org-demo',
+            organizationName: 'Demo Firm',
+            role: UserRole.partner,
+            status: MembershipStatus.active,
+          ),
+        ],
+      ),
+    );
+
+    testWidgets('renders the Audit trail entry when canViewAudit is granted', (
+      tester,
+    ) async {
+      final AuthCubit authCubit = partnerHubCubit();
+      addTearDown(authCubit.close);
+      await authCubit.restore();
+
+      await tester.pumpWidget(
+        harness(
+          authCubit,
+          capabilities: const RoleCapability(
+            canViewHome: true,
+            canViewSettings: true,
+            canBookConsultation: true,
+            canViewAttorneyDiscovery: true,
+            canViewMatters: true,
+            canViewDocuments: true,
+            canViewMessages: true,
+            canViewFiles: true,
+            canViewAudit: true,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('View audit trail'), findsOneWidget);
+    });
+
+    testWidgets('hides the entry when canViewAudit is not granted (nav hint '
+        'only)', (tester) async {
+      final AuthCubit authCubit = partnerHubCubit();
+      addTearDown(authCubit.close);
+      await authCubit.restore();
+
+      await tester.pumpWidget(
+        harness(
+          authCubit,
+          capabilities: const RoleCapability(
+            canViewHome: true,
+            canViewSettings: true,
+            canBookConsultation: true,
+            canViewAttorneyDiscovery: true,
+            canViewMatters: true,
+            canViewDocuments: true,
+            canViewMessages: true,
+            canViewFiles: true,
+            canViewAudit: false,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('View audit trail'), findsNothing);
+    });
+
+    testWidgets('hides the entry when no capability projection is supplied', (
+      tester,
+    ) async {
+      final AuthCubit authCubit = partnerHubCubit();
+      addTearDown(authCubit.close);
+      await authCubit.restore();
+
+      await tester.pumpWidget(harness(authCubit));
+      await tester.pumpAndSettle();
+
+      expect(find.text('View audit trail'), findsNothing);
+    });
   });
 }

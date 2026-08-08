@@ -26,6 +26,7 @@ import '../features/notifications/presentation/notification_settings_screen.dart
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/onboarding/presentation/onboarding_success_screen.dart';
 import '../features/orgs/presentation/accept_invitation_screen.dart';
+import '../features/orgs/presentation/org_audit_screen.dart';
 import '../features/orgs/presentation/organization_hub_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
 import '../features/search/presentation/search_screen.dart';
@@ -44,6 +45,7 @@ class AppRoutes {
   static const String home = '/home';
   static const String settings = '/settings';
   static const String organizations = '/organizations';
+  static const String orgAudit = '/organizations/audit';
   static const String acceptInvitation = '/accept-invitation';
   static const String profile = '/profile';
   static const String notifications = '/notifications';
@@ -237,8 +239,28 @@ GoRouter createAppRouter(
         ),
         GoRoute(
           path: AppRoutes.organizations,
-          builder: (BuildContext context, GoRouterState state) =>
-              const OrganizationHubScreen(),
+          builder: (BuildContext context, GoRouterState state) {
+            // UX-only projection of the active membership's role (mirrors
+            // the shell); the hub's partner "Audit trail" entry is a
+            // navigation hint, never an authorization grant (the
+            // read_org_audit RPC gates server-side).
+            final UserRole role =
+                authCubit.state.session?.primaryRole ?? UserRole.client;
+            return OrganizationHubScreen(
+              capabilities: capabilitiesForRole[role]!,
+            );
+          },
+        ),
+        GoRoute(
+          path: AppRoutes.orgAudit,
+          builder: (BuildContext context, GoRouterState state) {
+            // UX-only projection of the active membership's role (mirrors
+            // the shell); the audit surface renders the server's typed
+            // denial for non-partners — never empty success (AC-7).
+            final UserRole role =
+                authCubit.state.session?.primaryRole ?? UserRole.client;
+            return OrgAuditScreen(capabilities: capabilitiesForRole[role]!);
+          },
         ),
         GoRoute(
           path: AppRoutes.acceptInvitation,
@@ -367,6 +389,7 @@ class _AppShell extends StatelessWidget {
         location == AppRoutes.profile ||
         location == AppRoutes.notifications ||
         location == AppRoutes.organizations ||
+        location == AppRoutes.orgAudit ||
         location == AppRoutes.acceptInvitation ||
         location == AppRoutes.platformAdmin;
     final String targetRoute = onSettingsSurface

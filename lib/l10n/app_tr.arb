@@ -301,5 +301,13 @@
   "invoicesEntryTitle": "Faturalama",
   "invoicesEntrySubtitle": "Sentetik fatura meta verilerine göz atın — geliştirme demosu.",
   "invoiceStatusIssued": "Düzenlendi",
-  "invoiceStatusPaid": "Ödendi"
+  "invoiceStatusPaid": "Ödendi",
+  "orgAuditTitle": "Denetim kaydı",
+  "orgAuditEmpty": "Henüz hiçbir denetim olayı kaydedilmedi.",
+  "orgAuditDenied": "Bu kuruluşun denetim kaydını görüntüleme izniniz yok.",
+  "orgAuditError": "Denetim kaydı yüklenemedi.",
+  "orgAuditRetry": "Tekrar dene",
+  "orgAuditHubEntry": "Denetim kaydını görüntüle",
+  "orgAuditOutcomeAllowed": "İzinli",
+  "orgAuditOutcomeDenied": "Reddedildi"
 }

@@ -1497,6 +1497,73 @@ void main() {
       );
     });
   });
+
+  group('organizations audit route (partner org-audit slice 2026-08-09)', () {
+    testWidgets('hub shows the audit entry for the partner role and tapping '
+        'opens /organizations/audit', (tester) async {
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      router.go(AppRoutes.organizations);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // The demo identity is the org-creating partner, and the shared
+      // capability map grants canViewAudit to partner only — the hub entry
+      // is present.
+      expect(find.text('View audit trail'), findsOneWidget);
+
+      await tester.tap(find.text('View audit trail'));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        AppRoutes.orgAudit,
+      );
+      // The audit surface scaffold renders (AppBar title); the org store is
+      // empty in this harness so no load fires — no crash, no endless
+      // spinner.
+      expect(find.text('Audit trail'), findsWidgets);
+    });
+
+    testWidgets('a role without canViewAudit sees no hub audit entry (nav '
+        'hint only)', (tester) async {
+      final GoRouter restrictedRouter = createAppRouter(
+        authCubit,
+        capabilitiesForRole: <UserRole, RoleCapability>{
+          UserRole.partner: const RoleCapability(
+            canViewHome: true,
+            canViewSettings: true,
+            canBookConsultation: true,
+            canViewAttorneyDiscovery: true,
+            canViewMatters: true,
+            canViewDocuments: true,
+            canViewMessages: true,
+            canViewFiles: true,
+            canViewAudit: false,
+          ),
+        },
+      );
+      addTearDown(restrictedRouter.dispose);
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      restrictedRouter.go(AppRoutes.organizations);
+      await tester.pumpWidget(
+        harness(
+          child: const SizedBox.shrink(),
+          routerOverride: restrictedRouter,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('View audit trail'), findsNothing);
+    });
+  });
 }
 
 /// Test-only gateway emitting a fixed [Session] for a chosen role, so shell

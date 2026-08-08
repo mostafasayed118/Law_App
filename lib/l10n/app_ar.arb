@@ -301,5 +301,13 @@
   "invoicesEntryTitle": "الفوترة",
   "invoicesEntrySubtitle": "تصفّح الفواتير التجريبية — عرض تطويري.",
   "invoiceStatusIssued": "صادرة",
-  "invoiceStatusPaid": "مدفوعة"
+  "invoiceStatusPaid": "مدفوعة",
+  "orgAuditTitle": "سجل التدقيق",
+  "orgAuditEmpty": "لم يتم تسجيل أي أحداث تدقيق حتى الآن.",
+  "orgAuditDenied": "ليس لديك صلاحية للاطلاع على سجل تدقيق هذه المؤسسة.",
+  "orgAuditError": "تعذّر تحميل سجل التدقيق.",
+  "orgAuditRetry": "إعادة المحاولة",
+  "orgAuditHubEntry": "عرض سجل التدقيق",
+  "orgAuditOutcomeAllowed": "مسموح",
+  "orgAuditOutcomeDenied": "مرفوض"
 }

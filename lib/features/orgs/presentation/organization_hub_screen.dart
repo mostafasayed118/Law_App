@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../app/legalhub_theme.dart';
+import '../../../app/router.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/auth/session.dart';
 import '../../../core/organizations/organization_gateway.dart';
+import '../../../core/roles/user_role.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../auth/presentation/auth_cubit.dart';
 import 'active_org_store.dart';
@@ -27,7 +30,13 @@ import 'org_cubit.dart';
 /// background membership refresh (P3.3 Slice C — [AuthCubit.hydrate]) so
 /// the new membership joins [Session.memberships] without re-authenticating.
 class OrganizationHubScreen extends StatefulWidget {
-  const OrganizationHubScreen({super.key});
+  const OrganizationHubScreen({super.key, this.capabilities});
+
+  /// UX-only capability projection from the shell (partner org-audit slice
+  /// 2026-08-09). When null, the partner "Audit trail" entry is hidden —
+  /// the entry is a navigation hint; the `read_org_audit` RPC is the
+  /// authorization.
+  final RoleCapability? capabilities;
 
   @override
   State<OrganizationHubScreen> createState() => _OrganizationHubScreenState();
@@ -96,11 +105,61 @@ class _OrganizationHubScreenState extends State<OrganizationHubScreen> {
                     selectedOrganizationId: organizationId,
                     onChanged: _activeOrgStore.select,
                   ),
+                if (widget.capabilities?.canViewAudit ?? false)
+                  _AuditEntryTile(onTap: () => context.go(AppRoutes.orgAudit)),
                 Expanded(
                   child: MemberRosterScreen(organizationId: organizationId),
                 ),
               ],
             ),
+    );
+  }
+}
+
+/// Partner-only "Audit trail" entry into `/organizations/audit` (partner
+/// org-audit slice 2026-08-09). Navigation hint only — the `read_org_audit`
+/// RPC enforces the actual authorization.
+class _AuditEntryTile extends StatelessWidget {
+  const _AuditEntryTile({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme scheme = Theme.of(context).colorScheme;
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsetsDirectional.fromSTEB(
+        LegalHubTheme.marginMobile,
+        LegalHubTheme.spaceSm,
+        LegalHubTheme.marginMobile,
+        0,
+      ),
+      child: Material(
+        color: scheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.all(Radius.circular(LegalHubTheme.radiusLg)),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.all(
+            Radius.circular(LegalHubTheme.radiusLg),
+          ),
+          child: Padding(
+            padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
+            child: Row(
+              children: <Widget>[
+                Icon(
+                  Icons.receipt_long_outlined,
+                  size: 20,
+                  color: scheme.primary,
+                ),
+                const SizedBox(width: LegalHubTheme.spaceSm),
+                Expanded(child: Text(l10n.orgAuditHubEntry)),
+                Icon(Icons.chevron_right, size: 20, color: scheme.outline),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -940,4 +940,29 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get invoiceStatusPaid => 'Ödendi';
+
+  @override
+  String get orgAuditTitle => 'Denetim kaydı';
+
+  @override
+  String get orgAuditEmpty => 'Henüz hiçbir denetim olayı kaydedilmedi.';
+
+  @override
+  String get orgAuditDenied =>
+      'Bu kuruluşun denetim kaydını görüntüleme izniniz yok.';
+
+  @override
+  String get orgAuditError => 'Denetim kaydı yüklenemedi.';
+
+  @override
+  String get orgAuditRetry => 'Tekrar dene';
+
+  @override
+  String get orgAuditHubEntry => 'Denetim kaydını görüntüle';
+
+  @override
+  String get orgAuditOutcomeAllowed => 'İzinli';
+
+  @override
+  String get orgAuditOutcomeDenied => 'Reddedildi';
 }

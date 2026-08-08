@@ -315,5 +315,13 @@
   "invoicesEntryTitle": "Billing",
   "invoicesEntrySubtitle": "Browse demo invoice metadata — development demo.",
   "invoiceStatusIssued": "Issued",
-  "invoiceStatusPaid": "Paid"
+  "invoiceStatusPaid": "Paid",
+  "orgAuditTitle": "Audit trail",
+  "orgAuditEmpty": "No audit events recorded yet.",
+  "orgAuditDenied": "You do not have permission to view this organization's audit trail.",
+  "orgAuditError": "Unable to load the audit trail.",
+  "orgAuditRetry": "Try again",
+  "orgAuditHubEntry": "View audit trail",
+  "orgAuditOutcomeAllowed": "Allowed",
+  "orgAuditOutcomeDenied": "Denied"
 }

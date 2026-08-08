@@ -939,4 +939,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invoiceStatusPaid => 'Paid';
+
+  @override
+  String get orgAuditTitle => 'Audit trail';
+
+  @override
+  String get orgAuditEmpty => 'No audit events recorded yet.';
+
+  @override
+  String get orgAuditDenied =>
+      'You do not have permission to view this organization\'s audit trail.';
+
+  @override
+  String get orgAuditError => 'Unable to load the audit trail.';
+
+  @override
+  String get orgAuditRetry => 'Try again';
+
+  @override
+  String get orgAuditHubEntry => 'View audit trail';
+
+  @override
+  String get orgAuditOutcomeAllowed => 'Allowed';
+
+  @override
+  String get orgAuditOutcomeDenied => 'Denied';
 }
