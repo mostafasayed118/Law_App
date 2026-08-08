@@ -76,6 +76,11 @@ class _StubOrgApi implements SupabaseOrgApi {
   @override
   Future<String> acceptInvitation({required String token}) async =>
       throw UnimplementedError();
+
+  @override
+  Future<List<Map<String, dynamic>>> readOrgAudit({
+    required String organizationId,
+  }) async => throw UnimplementedError();
 }
 
 void main() {

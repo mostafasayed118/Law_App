@@ -187,6 +187,30 @@ class SupabaseOrganizationGateway implements OrganizationGateway {
     }
   }
 
+  @override
+  Future<OrgOutcome<List<AuditEntry>>> readOrgAudit({
+    required String organizationId,
+  }) async {
+    try {
+      final List<Map<String, dynamic>> rows = await _api.readOrgAudit(
+        organizationId: organizationId,
+      );
+      return OrgOutcome<List<AuditEntry>>.success(
+        rows.map(_auditEntryFromRow).toList(growable: false),
+      );
+    } on SupabaseOrgException catch (e) {
+      return OrgOutcome<List<AuditEntry>>.failure(
+        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+      );
+    } on FormatException catch (e) {
+      // Provider drift (unexpected row shape) surfaces loudly, never as a
+      // silently wrong audit entry.
+      return OrgOutcome<List<AuditEntry>>.failure(
+        OrgFailure(kind: OrgFailureKind.unknown, message: e.message),
+      );
+    }
+  }
+
   Future<OrgOutcome<void>> _runVoid(Future<void> Function() call) async {
     try {
       await call();
@@ -243,6 +267,44 @@ class SupabaseOrganizationGateway implements OrganizationGateway {
       // The member-facing surface exposes the invitation id for invited
       // rows (R1), so Resend/Revoke target a real id; member rows stay null.
       invitationId: row['invitation_id'] as String?,
+    );
+  }
+
+  /// Row → [AuditEntry] mapping (mirrors the platform-admin seam's guarded
+  /// cast discipline): a missing or wrong-typed column is a [FormatException]
+  /// (caught → `unknown`), never a raw [TypeError] crossing the boundary.
+  AuditEntry _auditEntryFromRow(Map<String, dynamic> row) {
+    final Object? idValue = row['id'];
+    if (idValue is! int) {
+      throw FormatException('Audit row id is not an int: $idValue');
+    }
+    final String? action = row['action'] as String?;
+    final String? outcome = row['outcome'] as String?;
+    final String? summary = row['redacted_summary'] as String?;
+    final String? timestamp = row['server_timestamp'] as String?;
+    if (action == null ||
+        outcome == null ||
+        summary == null ||
+        timestamp == null) {
+      throw FormatException(
+        'Audit row missing action/outcome/redacted_summary/server_timestamp',
+      );
+    }
+    final DateTime? parsed = DateTime.tryParse(timestamp);
+    if (parsed == null) {
+      throw FormatException('Audit row server_timestamp unparseable');
+    }
+    return AuditEntry(
+      id: idValue,
+      action: action,
+      outcome: outcome,
+      resourceType: row['resource_type'] as String?,
+      resourceId: row['resource_id'] as String?,
+      correlationId: row['correlation_id'] as String?,
+      redactedSummary: summary,
+      serverTimestamp: parsed,
+      // Org variant: the RPC returns no actor/org columns (the platform
+      // variant adds them) — both stay null here.
     );
   }
 

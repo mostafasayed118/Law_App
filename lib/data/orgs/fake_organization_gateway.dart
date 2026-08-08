@@ -35,6 +35,9 @@ class FakeOrganizationGateway implements OrganizationGateway {
         ),
       },
     });
+    _audit.addAll(<String, List<AuditEntry>>{
+      demoOrganizationId: demoAuditEntries(),
+    });
   }
 
   /// The demo identity shared with the fake auth session.
@@ -51,6 +54,7 @@ class FakeOrganizationGateway implements OrganizationGateway {
       <String, OrganizationSummary>{};
   final Map<String, Map<String, OrgMember>> _members =
       <String, Map<String, OrgMember>>{};
+  final Map<String, List<AuditEntry>> _audit = <String, List<AuditEntry>>{};
 
   final Map<String, _FakeInvitation> _invitations = <String, _FakeInvitation>{};
   int _inviteCounter = 0;
@@ -308,6 +312,61 @@ class FakeOrganizationGateway implements OrganizationGateway {
     }
     return const OrgOutcome<void>.success(null);
   }
+
+  @override
+  Future<OrgOutcome<List<AuditEntry>>> readOrgAudit({
+    required String organizationId,
+  }) async {
+    // Mirrors the server's member-gate: an org the caller has no membership
+    // in reads as the undifferentiated denied (never empty success — the
+    // P3.5 AC-7 posture). A known org with no events yet is an honest empty
+    // trail (fresh orgs have nothing to audit).
+    if (!_members.containsKey(organizationId)) {
+      return const OrgOutcome<List<AuditEntry>>.failure(
+        OrgFailure(kind: OrgFailureKind.denied),
+      );
+    }
+    return OrgOutcome<List<AuditEntry>>.success(
+      _audit[organizationId] ?? const <AuditEntry>[],
+    );
+  }
+
+  /// Deterministic, non-PII demo audit trail for the demo org — mirrors the
+  /// org-scoped RPC's redacted rows (action/outcome/redacted summary/
+  /// correlation id/timestamp only; no content, no credentials, no real
+  /// identity).
+  static List<AuditEntry> demoAuditEntries() => <AuditEntry>[
+    AuditEntry(
+      id: 1,
+      action: 'member:role/change',
+      outcome: 'allowed',
+      resourceType: 'membership',
+      resourceId: 'demo-user',
+      correlationId: 'audit-org-demo-1',
+      redactedSummary: 'role change',
+      serverTimestamp: DateTime.utc(2026, 7, 25, 10, 0),
+    ),
+    AuditEntry(
+      id: 2,
+      action: 'member:invite',
+      outcome: 'allowed',
+      resourceType: 'invitation',
+      resourceId: 'inv-demo-1',
+      correlationId: 'audit-org-demo-2',
+      redactedSummary: 'invitation sent',
+      serverTimestamp: DateTime.utc(2026, 7, 25, 11, 30),
+    ),
+    AuditEntry(
+      id: 3,
+      action: 'member:suspend',
+      outcome: 'denied',
+      resourceType: 'membership',
+      resourceId: 'unknown-user',
+      correlationId: 'audit-org-demo-3',
+      redactedSummary: 'suspension denied',
+      serverTimestamp: DateTime.utc(2026, 7, 25, 12, 45),
+    ),
+  ];
 
   @override
   Future<OrgOutcome<String>> acceptInvitation({required String token}) async {

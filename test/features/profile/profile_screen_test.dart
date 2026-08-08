@@ -402,6 +402,13 @@ class _FailingDeleteOrgGateway implements OrganizationGateway {
       const OrgOutcome<String>.failure(
         OrgFailure(kind: OrgFailureKind.invalidInvitation),
       );
+
+  @override
+  Future<OrgOutcome<List<AuditEntry>>> readOrgAudit({
+    required String organizationId,
+  }) async => const OrgOutcome<List<AuditEntry>>.failure(
+    OrgFailure(kind: OrgFailureKind.denied),
+  );
 }
 
 /// Test-only expired-session gateway: restore() reports sessionExpired so

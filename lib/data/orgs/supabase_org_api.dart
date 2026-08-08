@@ -112,4 +112,12 @@ abstract interface class SupabaseOrgApi {
   /// `accept_invitation(p_token)` — redeems a one-time token; the role is
   /// server-owned from the invitation. Returns the new membership id.
   Future<String> acceptInvitation({required String token});
+
+  /// `read_org_audit(p_organization_id)` — one organization's redacted audit
+  /// trail (partner-capable RPC, applied 2026-08-01). Returns raw map rows
+  /// (redacted metadata only: id, action, outcome, resource refs,
+  /// correlation_id, redacted_summary, server_timestamp).
+  Future<List<Map<String, dynamic>>> readOrgAudit({
+    required String organizationId,
+  });
 }

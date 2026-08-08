@@ -57,7 +57,7 @@ messaging services.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (1084 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (1093 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), Redactor (password/OTP/email/Bearer redaction
   with leak guards), DI registration graph, validators, router redirect logic
@@ -92,7 +92,12 @@ messaging services.
   in-memory locale store, and the onboarding-success screen. Batch 5 added
   the 800×600 onboarding no-overflow test and the EN/AR/TR localized-fallback
   assertions.
-- Coverage: **1084 tests** (2026-08-09, the standalone billing-invoices
+- Coverage: **1093 tests** (2026-08-09, partner org-audit slice — Task 3:
+  `OrganizationGateway.readOrgAudit` on the org seam — `SupabaseOrgApi` RPC
+  wrapper + guarded row→`AuditEntry` mapper + fake mirror (deterministic
+  redacted demo trail, denied-never-empty, honest-empty fresh org),
+  scope `docs/partner_org_audit_scope_2026-08-09.md`), building
+  on 1084 (2026-08-09, the standalone billing-invoices
   surface — spec §6 row 158: `/invoices` route + `BillingInvoicesScreen` +
   home entry riding the `canViewDocuments` gate per D-BI5 + six widget tests
   incl. the D-BI1 metadata-only pins), building

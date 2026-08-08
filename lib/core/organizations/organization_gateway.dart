@@ -1,6 +1,8 @@
+import '../admin/audit_entry.dart';
 import '../roles/user_role.dart';
 import 'organization_models.dart';
 
+export '../admin/audit_entry.dart';
 export 'organization_models.dart';
 
 /// Organization and membership integration boundary.
@@ -80,4 +82,18 @@ abstract interface class OrganizationGateway {
   /// server-owned from the invitation; the client never chooses one. Returns
   /// the new membership id.
   Future<OrgOutcome<String>> acceptInvitation({required String token});
+
+  /// Reads one organization's redacted audit trail (`read_org_audit`) —
+  /// partner-audit surface (2026-08-09 scope note
+  /// `docs/partner_org_audit_scope_2026-08-09.md`).
+  ///
+  /// The RPC is partner-capable and **applied** (2026-08-01); the client
+  /// renders exactly the server-redacted fields ([AuditEntry] — never
+  /// content/credentials) and maps the server's `permission denied` to a
+  /// distinct [OrgFailureKind.denied] (AC-7: denied, never empty success).
+  /// The server re-derives membership per D-08 — the org id passed here is
+  /// the active-org UI context, never an authorization claim.
+  Future<OrgOutcome<List<AuditEntry>>> readOrgAudit({
+    required String organizationId,
+  });
 }

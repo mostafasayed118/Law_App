@@ -85,6 +85,11 @@ class _GatedOrgGateway implements OrganizationGateway {
   @override
   Future<OrgOutcome<String>> acceptInvitation({required String token}) =>
       _inner.acceptInvitation(token: token);
+
+  @override
+  Future<OrgOutcome<List<AuditEntry>>> readOrgAudit({
+    required String organizationId,
+  }) => _inner.readOrgAudit(organizationId: organizationId);
 }
 
 void main() {

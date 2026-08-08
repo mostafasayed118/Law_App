@@ -170,6 +170,11 @@ class _FakeSupabaseOrgApi implements SupabaseOrgApi {
   @override
   Future<String> acceptInvitation({required String token}) async =>
       'membership-1';
+
+  @override
+  Future<List<Map<String, dynamic>>> readOrgAudit({
+    required String organizationId,
+  }) async => <Map<String, dynamic>>[];
 }
 
 /// Hand-rolled fake of the [SupabasePlatformAdminApi] seam for the DI flip

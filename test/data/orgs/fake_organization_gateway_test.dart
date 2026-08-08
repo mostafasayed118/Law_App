@@ -328,4 +328,58 @@ void main() {
       expect(memberships.last.isActive, isTrue);
     });
   });
+
+  group('readOrgAudit', () {
+    late FakeOrganizationGateway gateway;
+
+    setUp(() {
+      gateway = FakeOrganizationGateway();
+    });
+
+    test(
+      'returns a deterministic, non-PII, redacted trail for the demo org',
+      () async {
+        final OrgOutcome<List<AuditEntry>> outcome = await gateway.readOrgAudit(
+          organizationId: FakeOrganizationGateway.demoOrganizationId,
+        );
+
+        expect(outcome.isSuccess, isTrue);
+        final List<AuditEntry> entries = outcome.valueOrNull!;
+        expect(entries.map((AuditEntry e) => e.id), <int>[1, 2, 3]);
+        expect(entries.map((AuditEntry e) => e.action), <String>[
+          'member:role/change',
+          'member:invite',
+          'member:suspend',
+        ]);
+        // Redacted-only: summaries carry no content/credentials and no
+        // actor/org columns exist on the org-variant rows.
+        for (final AuditEntry entry in entries) {
+          expect(entry.actorUserId, isNull);
+          expect(entry.organizationId, isNull);
+          expect(entry.redactedSummary, isNot(contains('demo@firm.com')));
+          expect(entry.serverTimestamp.isUtc, isTrue);
+        }
+      },
+    );
+
+    test('denies an unknown org — never empty success (AC-7)', () async {
+      final OrgOutcome<List<AuditEntry>> outcome = await gateway.readOrgAudit(
+        organizationId: 'org-does-not-exist',
+      );
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.denied);
+    });
+
+    test('returns an honest empty trail for a fresh known org', () async {
+      final OrgOutcome<OrganizationSummary> created = await gateway
+          .createOrganization(name: 'Fresh Firm');
+
+      final OrgOutcome<List<AuditEntry>> outcome = await gateway.readOrgAudit(
+        organizationId: created.valueOrNull!.id,
+      );
+
+      expect(outcome.isSuccess, isTrue);
+      expect(outcome.valueOrNull, isEmpty);
+    });
+  });
 }

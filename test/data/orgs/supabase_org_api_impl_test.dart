@@ -189,6 +189,47 @@ void main() {
       },
     );
 
+    test('readOrgAudit sends the org id and returns only map rows', () async {
+      data['read_org_audit'] = <dynamic>[
+        <String, dynamic>{'id': 1, 'action': 'member:role/change'},
+        'not-a-map',
+      ];
+
+      final List<Map<String, dynamic>> rows = await api.readOrgAudit(
+        organizationId: 'org-1',
+      );
+
+      expect(rows, hasLength(1));
+      expect(calls, <String>['read_org_audit:org-1']);
+    });
+
+    test('readOrgAudit maps an empty response to an empty list', () async {
+      data['read_org_audit'] = null;
+
+      final List<Map<String, dynamic>> rows = await api.readOrgAudit(
+        organizationId: 'org-1',
+      );
+
+      expect(rows, isEmpty);
+    });
+
+    test('readOrgAudit maps permission denied to the denied kind', () async {
+      errors['read_org_audit'] = const PostgrestException(
+        message: 'permission denied',
+      );
+
+      await expectLater(
+        api.readOrgAudit(organizationId: 'org-1'),
+        throwsA(
+          isA<SupabaseOrgException>().having(
+            (e) => e.kind,
+            'kind',
+            SupabaseOrgFailureKind.denied,
+          ),
+        ),
+      );
+    });
+
     test('listMyMemberships maps a table denial', () async {
       tableErrors['memberships'] = const PostgrestException(
         message: 'permission denied',

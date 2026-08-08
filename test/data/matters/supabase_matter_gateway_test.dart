@@ -99,6 +99,11 @@ class _StubOrganizationGateway implements OrganizationGateway {
   @override
   Future<OrgOutcome<String>> acceptInvitation({required String token}) =>
       throw UnimplementedError();
+
+  @override
+  Future<OrgOutcome<List<AuditEntry>>> readOrgAudit({
+    required String organizationId,
+  }) => throw UnimplementedError();
 }
 
 OrgMember _member(

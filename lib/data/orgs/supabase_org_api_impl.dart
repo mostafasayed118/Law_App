@@ -241,6 +241,25 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
     }
   }
 
+  @override
+  Future<List<Map<String, dynamic>>> readOrgAudit({
+    required String organizationId,
+  }) async {
+    try {
+      final PostgrestResponse<dynamic> response = await _rpc(
+        'read_org_audit',
+        <String, dynamic>{'p_organization_id': organizationId},
+      );
+      final Object? data = response.data;
+      if (data is! List<dynamic>) {
+        return const <Map<String, dynamic>>[];
+      }
+      return data.whereType<Map<String, dynamic>>().toList(growable: false);
+    } on PostgrestException catch (e) {
+      throw SupabaseOrgException(kind: _kindFor(e), message: e.message);
+    }
+  }
+
   Future<void> _runVoidRpc(String function, Map<String, dynamic> params) async {
     try {
       await _rpc(function, params);

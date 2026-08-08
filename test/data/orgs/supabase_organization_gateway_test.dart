@@ -15,6 +15,8 @@ class _StubSupabaseOrgApi implements SupabaseOrgApi {
   String? inviteToken;
   SupabaseOrgException? inviteError;
   SupabaseOrgException? voidError;
+  List<Map<String, dynamic>> auditRows = <Map<String, dynamic>>[];
+  SupabaseOrgException? auditError;
   final List<String> calls = <String>[];
 
   @override
@@ -131,6 +133,17 @@ class _StubSupabaseOrgApi implements SupabaseOrgApi {
       throw voidError!;
     }
     return 'membership-1';
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> readOrgAudit({
+    required String organizationId,
+  }) async {
+    calls.add('audit:$organizationId');
+    if (auditError != null) {
+      throw auditError!;
+    }
+    return auditRows;
   }
 }
 
@@ -484,5 +497,68 @@ void main() {
 
       expect(outcome.failureOrNull?.kind, OrgFailureKind.invalidInvitation);
     });
+  });
+
+  group('readOrgAudit', () {
+    test('maps rows to redacted audit entries', () async {
+      api.auditRows = <Map<String, dynamic>>[
+        <String, dynamic>{
+          'id': 1,
+          'action': 'member:role/change',
+          'outcome': 'allowed',
+          'resource_type': 'membership',
+          'resource_id': 'u-1',
+          'correlation_id': 'audit-org-1-1',
+          'redacted_summary': 'role change',
+          'server_timestamp': '2026-07-25T10:00:00.000000Z',
+        },
+      ];
+
+      final OrgOutcome<List<AuditEntry>> outcome = await gateway.readOrgAudit(
+        organizationId: 'org-1',
+      );
+
+      expect(outcome.isSuccess, isTrue);
+      expect(api.calls, <String>['audit:org-1']);
+      final AuditEntry entry = outcome.valueOrNull!.single;
+      expect(entry.id, 1);
+      expect(entry.action, 'member:role/change');
+      expect(entry.outcome, 'allowed');
+      expect(entry.resourceType, 'membership');
+      expect(entry.resourceId, 'u-1');
+      expect(entry.correlationId, 'audit-org-1-1');
+      expect(entry.redactedSummary, 'role change');
+      expect(entry.serverTimestamp, DateTime.utc(2026, 7, 25, 10));
+      expect(entry.actorUserId, isNull);
+      expect(entry.organizationId, isNull);
+    });
+
+    test('maps permission denied to the distinct denied kind', () async {
+      api.auditError = const SupabaseOrgException(
+        kind: SupabaseOrgFailureKind.denied,
+        message: 'permission denied',
+      );
+
+      final OrgOutcome<List<AuditEntry>> outcome = await gateway.readOrgAudit(
+        organizationId: 'org-1',
+      );
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.denied);
+    });
+
+    test(
+      'surfaces a malformed row as unknown, never a raw TypeError',
+      () async {
+        api.auditRows = <Map<String, dynamic>>[
+          <String, dynamic>{'id': 'not-an-int'},
+        ];
+
+        final OrgOutcome<List<AuditEntry>> outcome = await gateway.readOrgAudit(
+          organizationId: 'org-1',
+        );
+
+        expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
+      },
+    );
   });
 }
