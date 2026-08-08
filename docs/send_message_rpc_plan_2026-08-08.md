@@ -221,12 +221,24 @@ None. The RPC uses `public.has_org_role` / membership helpers and
 
 Branch: `feat/send-message-rpc`
 
-- [ ] **1. Mechanism design review** — touches: `docs/send_message_gate_review_2026-08-08.md`
+- [x] **1. Mechanism design review** — touches: `docs/send_message_gate_review_2026-08-08.md`
   (Q1–Q6: function security D-SM1, the in-function gate = the three-way
   org equality, the `write_audit('message:create', …)` row, the D-SM3
   direct-INSERT revocation + why, org resolution moving into the function,
   rollback = `_down.sql` + policy re-add) — done when: review committed,
-  decisions D-SM1..D-SM3 ratified, ledger sweep green.
+  decisions D-SM1..D-SM3 ratified, ledger sweep green. — **DONE (this
+  commit, 2026-08-08):** Q1–Q6 answered — D-SM1 ratified (security
+  definer + explicit in-function gate; RLS does not apply inside the
+  function, so the check IS the sole write authorization), D-SM2 ratified
+  (client RPC swap; the org-resolution pre-read moves into the function),
+  D-SM3 ratified (revoke the direct-INSERT grant + drop
+  `messages_insert_assigned`; the RPC becomes the only write path — with
+  the **09-battery re-scope consequence recorded in Q6**: the ~10
+  role-impersonated INSERT checks move to EXECUTE checks + the revocation
+  pin, policies 11→10 in the same slice); the audit row (Q3), owner/anon
+  denies (Q5), §4 function sketch + deny rows, §5 harness re-scope (§1d
+  18→19), §6 rollback pairing (`_down.sql` + git-revert policy re-add).
+  Ledger sweep green.
 - [ ] **2. Rehearsal-ready artifacts (NOT applied)** — touches:
   `supabase/rpc/send_message.sql` + `_down.sql` entry (the `invite_member`
   pattern: `security definer set search_path = public`, `has_org_role`/
