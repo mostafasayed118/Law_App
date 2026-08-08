@@ -173,3 +173,28 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
   `docs/p2_rehearsal_plan.md` §4 (row updated to RESOLVED);
   `docs/features_roadmap_2026-08-03.md` Phase 3.2 (display-name RPC
   forward hook).
+
+## D-T7: `partner_notification_settings` — satisfied by the shared notification settings screen — **DECIDED (2026-08-09)**
+
+- **Where:** `docs/legalhub_specification.md` §6 row 157 enumerates
+  `notification_settings, partner_notification_settings` as one remediation
+  group (with `user_profile, settings_localization`). No
+  `partner_*`-specific notifications widget, route, or capability exists in
+  `lib/` (verified 2026-08-09 during the screen-completeness audit);
+  `lib/features/notifications/presentation/notification_settings_screen.dart`
+  is the only notifications surface.
+- **Decision:** The designed `partner_notification_settings` entry is
+  **intentionally satisfied** by the shared, role-agnostic
+  `notification_settings_screen.dart` (local-only notification prefs,
+  role-agnostic by design — no role-gated behavior exists for this surface).
+  A partner-specific duplicate screen would be ceremony-only: the same
+  widget, the same prefs, no distinct behavior (INSTRUCTIONS.md §2 —
+  "prefer the smallest safe change that meets the accepted specification";
+  no ceremony-only abstractions). **Deliberately NOT built.**
+- **Status:** **DECIDED (2026-08-09).** This is a scoping decision, not a
+  build: the spec line names two surfaces; the product ships one
+  role-agnostic screen. No code change was made and none is planned.
+- **Owner:** Project Owner (github.com/mostafasayed118), 2026-08-09.
+- **Cross-reference:** `docs/legalhub_specification.md` §6 (remediation row
+  157); the screen-completeness audit record (2026-08-09) that listed this
+  as the single remaining open gap; `INSTRUCTIONS.md` §2.
