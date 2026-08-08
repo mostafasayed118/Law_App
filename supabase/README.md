@@ -122,6 +122,7 @@ this battery hardens that pattern into a committed artifact.
 | `tests/05_document_rls.sql` | Matrix §4 document rows — the second §14 un-deferral (matter-scoped assignment positives + org-role-alone / org-mismatch / cross-org / suspended / owner / anon denies + the document_type CHECK + matter-delete cascade) |
 | `tests/06_message_rls.sql` | Matrix §4 message rows — the third §14 un-deferral (matter-scoped assignment positives + org-role-alone / org-mismatch / cross-org / suspended / owner / anon denies + the message_count CHECK + matter-delete cascade) |
 | `tests/07_storage_rls.sql` | Matrix §4/§6 file rows — the fourth §14 un-deferral (BOTH-layer positives on `public.files` + `storage.objects` + org-role-alone / org-mismatch / cross-org / suspended / owner / anon denies + the guessed-path object row (matrix §6) + the size_bytes CHECK + matter-delete cascade) |
+| `tests/08_message_rls.sql` | Matrix §4 body rows — the sixth §14 un-deferral (thread-scoped individual-message positives + org-role-alone / org-mismatch / cross-org / suspended / owner / anon denies + the body CHECK + thread-delete cascade + the message-count mapping-consistency pin) |
 
 ### Running the battery
 
@@ -141,10 +142,10 @@ scripts/verify_policy_tests.sh --check        # static validation, no database
 ```
 
 - `--apply` applies `migrations/01`, `02`, `04_matters.sql`,
-  `05_documents.sql`, `06_message_threads.sql`, `07_storage.sql` (the four
-  §14 un-deferral slices — `07_storage.sql` requires the platform storage
-  schema, present on the rehearsal host), `policies/*.sql`, `rpc/*.sql` in
-  the apply order above.
+  `05_documents.sql`, `06_message_threads.sql`, `07_storage.sql`,
+  `08_messages.sql` (the five §14 un-deferral slices — `07_storage.sql`
+  requires the platform storage schema, present on the rehearsal host),
+  `policies/*.sql`, `rpc/*.sql` in the apply order above.
   **`03_platform_config_seed.sql` is NOT applied**: its owner token is an
   apply-time substitution placeholder for the dev project; the battery seeds
   its own fixture owner row and proves the single-account bound (D-P0C3)

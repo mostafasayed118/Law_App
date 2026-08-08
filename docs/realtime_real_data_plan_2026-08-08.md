@@ -313,7 +313,7 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   three-way org equality load-bearing, D-RT2; no owner carve-out Q4);
   NOT applied at commit; battery `--check` 331/0/0 + ledger PASS 115 on
   the tree.
-- [ ] **3. Policy battery** — touches: `supabase/tests/08_message_rls.sql`
+- [x] **3. Policy battery** — touches: `supabase/tests/08_message_rls.sql`
   (new message fixture rows referencing the six fixture threads in
   `supabase/tests/00_fixtures.sql`, the documents/messages precedent) +
   `scripts/verify_policy_tests.sh` — the established sites: battery file
@@ -328,7 +328,18 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   (`delete from public.messages;` before `message_threads`; message-count
   pin) — done when: battery runs green against a Postgres (owner's Docker
   host or CI) with the §4 deny rows incl. the non-vacuous org-mismatch row;
-  committed with the static `--check` green.
+  committed with the static `--check` green. — **DONE (this commit)** —
+  08_message_rls.sql (12 checks: client-a 3 / partner-a 6 / orphan 4
+  positives, org-role-alone / non-vacuous org-mismatch / cross-org /
+  suspended / owner / anon denies, the body CHECK, the thread-delete
+  cascade, and the message-count mapping-consistency pin 08.12); fixtures
+  seed 21 messages matching the six threads' message_count columns (1–6,
+  the mapping contract); harness gains 08 in the file list / run loop /
+  UUID scan / FAIL-marker loop, `--apply` order gains 08_messages.sql,
+  pins re-scope 10→11 tables / 9→10 policies + messages grant/anon rows,
+  the forward pin flips to messages-present + live-delivery-absent
+  (`pg_publication_tables` = 0), and supabase/README.md gains the 08 row;
+  static `--check` **333/0/0** + selftest **6/6** + ledger **PASS 115**.
 - [ ] **4. Ephemeral rehearsal (r-series)** — touches: evidence record
   `docs/realtime_rehearsal_evidence_r1_<date>.md` — done when: the loop
   (migrate → policy → battery → read-as-roles) passes on throwaway infra

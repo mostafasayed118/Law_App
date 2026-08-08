@@ -6,15 +6,16 @@
 # The committed SQL battery under supabase/tests/ proves, against an
 # EPHEMERAL rehearsal project built from the committed supabase/ files:
 #
-#   1. STRUCTURAL + GRANT PINS — table existence, RLS enabled on all ten,
+#   1. STRUCTURAL + GRANT PINS — table existence, RLS enabled on all eleven,
 #      the narrow SELECT grants, the function EXECUTE surface (the R-4
 #      policy-helper grants present; the internal helpers + write_audit
 #      denied), zero policies on audit_events/platform_config (D-P0C4), the
-#      nine-policy total, the storage-surface pins (matter-files bucket +
+#      ten-policy total, the storage-surface pins (matter-files bucket +
 #      files_storage_select on storage.objects — the fourth §14
 #      un-deferral), and the D-P0C1(b) forward pin (matters, documents,
-#      message_threads + files shipped as the first four §14 un-deferrals;
-#      individual message rows/bodies still absent).
+#      message_threads, files + messages shipped as the first five §14
+#      un-deferrals; individual message rows/bodies now present as the
+#      sixth, and live delivery still absent).
 #   2. THE BEHAVIOR BATTERY — supabase/tests/00_fixtures.sql (deterministic
 #      seed) then 01_identity_session.sql (matrix §2), 02_organization_
 #      membership.sql (matrix §3 + 2026-08-03 hardening guards),
@@ -36,8 +37,13 @@
 #      path, the fourth §14 un-deferral: BOTH-layer positives (public.files
 #      + storage.objects) + org-role-alone / org-mismatch / cross-org /
 #      suspended / owner / anon denies + the guessed-path object row (matrix
-#      §6) + the size_bytes CHECK + matter-delete cascade). Every
-#      matrix row has ≥1 positive + ≥1 negative check (contract §9).
+#      §6) + the size_bytes CHECK + matter-delete cascade),
+#      08_message_rls.sql (matrix §4 body rows — the realtime read path, the
+#      sixth §14 un-deferral: thread-scoped individual-message positives +
+#      org-role-alone / org-mismatch / cross-org / suspended / owner / anon
+#      denies + the body CHECK + thread-delete cascade + the message-count
+#      mapping-consistency pin). Every matrix row has ≥1 positive + ≥1
+#      negative check (contract §9).
 #
 # The harness NEVER runs against the live dev project — only against a
 # throwaway rehearsal project (the P2 r1–r5 pattern). The project is built
@@ -108,6 +114,7 @@ BATTERY_FILES=(
   "05_document_rls.sql"
   "06_message_rls.sql"
   "07_storage_rls.sql"
+  "08_message_rls.sql"
 )
 
 usage() {
@@ -159,7 +166,7 @@ static_check() {
       "$TESTS_DIR/01_identity_session.sql" "$TESTS_DIR/02_organization_membership.sql" \
       "$TESTS_DIR/03_platform_owner_boundary.sql" "$TESTS_DIR/04_matter_rls.sql" \
       "$TESTS_DIR/05_document_rls.sql" "$TESTS_DIR/06_message_rls.sql"
-      "$TESTS_DIR/07_storage_rls.sql" | sort -u)
+      "$TESTS_DIR/07_storage_rls.sql" "$TESTS_DIR/08_message_rls.sql" | sort -u)
   for ref in $uuids_from; do
     if grep -q "$ref" "$TESTS_DIR/00_fixtures.sql"; then
       ok "fixture UUID $ref resolves in 00_fixtures.sql"
@@ -170,7 +177,7 @@ static_check() {
 
   note "static check: every battery check block carries the FAIL marker"
   local file blocks
-  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql; do
+  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql; do
     blocks=$(grep -c 'POLICY-BATTERY FAIL' "$TESTS_DIR/$f")
     if [ "$blocks" -ge 10 ]; then
       ok "$f: $blocks named check blocks"
@@ -218,21 +225,22 @@ apply_slice() {
   psql_apply "$SUPABASE_DIR/migrations/05_documents.sql" "apply migrations/05_documents.sql"
   psql_apply "$SUPABASE_DIR/migrations/06_message_threads.sql" "apply migrations/06_message_threads.sql"
   psql_apply "$SUPABASE_DIR/migrations/07_storage.sql" "apply migrations/07_storage.sql"
+  psql_apply "$SUPABASE_DIR/migrations/08_messages.sql" "apply migrations/08_messages.sql"
   # 03_platform_config_seed.sql is deliberately NOT applied: its owner token
   # is an apply-time substitution placeholder for the dev project; the
   # battery's fixtures seed the rehearsal project's own owner row (D-P0C3
   # proves the bound; the seed itself is a trusted migration, not a client
   # reachable path).
   note "apply: 03_platform_config_seed.sql skipped by design (apply-time token; fixtures seed the rehearsal owner)"
-  # The structural pins (10 tables/RLS, 9 policies + the storage-surface
+  # The structural pins (11 tables/RLS, 10 policies + the storage-surface
   # pins) and 00_fixtures' matters + documents + message_threads + files +
-  # storage.objects resets require all four un-deferral slices — applied
-  # above via 04_matters.sql + 05_documents.sql + 06_message_threads.sql +
-  # 07_storage.sql.
+  # storage.objects + messages resets require all five un-deferral slices —
+  # applied above via 04_matters.sql + 05_documents.sql +
+  # 06_message_threads.sql + 07_storage.sql + 08_messages.sql.
   # policies/matters.sql + policies/documents.sql + policies/message_threads.sql
-  # + policies/files.sql + policies/storage_objects.sql are applied in the
-  # policies loop below (07_storage.sql requires the platform storage schema,
-  # present on the rehearsal host).
+  # + policies/files.sql + policies/storage_objects.sql + policies/messages.sql
+  # are applied in the policies loop below (07_storage.sql requires the
+  # platform storage schema, present on the rehearsal host).
   for f in "$SUPABASE_DIR"/policies/*.sql; do
     psql_apply "$f" "apply $(basename "$f")"
   done
@@ -269,10 +277,10 @@ expect_tf() { # $1 label, $2 actual ('t'/'f')
 
 structural_pins() {
   note "--- 1a. Tables + RLS ---"
-  expect_eq "ten public tables present" \
-    "$(run_sql "select count(*) from pg_tables where schemaname='public' and tablename in ('profiles','organizations','memberships','invitations','audit_events','platform_config','matters','documents','message_threads','files');")" "10"
-  expect_eq "RLS enabled on all ten" \
-    "$(run_sql "select count(*) from pg_tables where schemaname='public' and tablename in ('profiles','organizations','memberships','invitations','audit_events','platform_config','matters','documents','message_threads','files') and rowsecurity;")" "10"
+  expect_eq "eleven public tables present" \
+    "$(run_sql "select count(*) from pg_tables where schemaname='public' and tablename in ('profiles','organizations','memberships','invitations','audit_events','platform_config','matters','documents','message_threads','files','messages');")" "11"
+  expect_eq "RLS enabled on all eleven" \
+    "$(run_sql "select count(*) from pg_tables where schemaname='public' and tablename in ('profiles','organizations','memberships','invitations','audit_events','platform_config','matters','documents','message_threads','files','messages') and rowsecurity;")" "11"
 
   note "--- 1b. Narrow SELECT grants (01_org_schema.sql) ---"
   expect_tf "authenticated SELECT on profiles" \
@@ -309,6 +317,10 @@ structural_pins() {
     "$(run_sql "select has_table_privilege('authenticated','public.files','SELECT');")"
   expect_eq "anon SELECT on files ABSENT (default-deny)" \
     "$(run_sql "select has_table_privilege('anon','public.files','SELECT');")" "f"
+  expect_tf "authenticated SELECT on messages (08_messages.sql)" \
+    "$(run_sql "select has_table_privilege('authenticated','public.messages','SELECT');")"
+  expect_eq "anon SELECT on messages ABSENT (default-deny)" \
+    "$(run_sql "select has_table_privilege('anon','public.messages','SELECT');")" "f"
 
   note "--- 1c. Function EXECUTE surface (02_rls_functions.sql R-3/R-4) ---"
   expect_tf "policy helper is_active_member granted (R-4)" \
@@ -361,10 +373,10 @@ structural_pins() {
     "$(run_sql "select count(*) from pg_policies where schemaname='public' and tablename='audit_events';")" "0"
   expect_eq "zero policies on platform_config" \
     "$(run_sql "select count(*) from pg_policies where schemaname='public' and tablename='platform_config';")" "0"
-  expect_eq "exactly nine policies across the client tables" \
-    "$(run_sql "select count(*) from pg_policies where schemaname='public';")" "9"
+  expect_eq "exactly ten policies across the client tables" \
+    "$(run_sql "select count(*) from pg_policies where schemaname='public';")" "10"
 
-  note "--- 1f. Forward pin re-scoped (2026-08-08): matters, documents, message_threads + files are the FIRST FOUR §14 un-deferrals ---"
+  note "--- 1f. Forward pin re-scoped (2026-08-08): matters, documents, message_threads, files + messages are the FIRST FIVE §14 un-deferrals ---"
   # D-P0C1(b) originally pinned 'no matter/document/message tables exist'. The
   # real-matters read slice (docs/matters_real_data_plan_2026-08-07.md) ships
   # the matters table + matters_select_assigned policy; the real-documents
@@ -372,11 +384,14 @@ structural_pins() {
   # documents table + documents_select_assigned policy; the real-messages
   # read slice (docs/messages_real_data_plan_2026-08-07.md) ships the
   # message_threads table + message_threads_select_assigned policy (thread
-  # METADATA only, D-MSG1 — individual message rows/bodies stay deferred);
+  # METADATA only, D-MSG1 — individual message rows/bodies were deferred);
   # the real-storage read slice (docs/storage_real_data_plan_2026-08-08.md)
   # ships the files table + files_select_assigned + storage.objects policy
-  # (file METADATA + bytes). The pin is re-scoped to the remaining content
-  # tables, which must still be ABSENT.
+  # (file METADATA + bytes); the realtime read slice
+  # (docs/realtime_real_data_plan_2026-08-08.md) ships the messages table +
+  # messages_select_assigned policy (individual message rows/bodies — the
+  # sixth §14 un-deferral). The pin now re-scopes to LIVE DELIVERY, which
+  # must still be ABSENT: messages must not be in any publication.
   expect_eq "matters present (first un-deferral)" \
     "$(run_sql "select count(*) from information_schema.tables where table_schema='public' and table_name = 'matters';")" "1"
   expect_eq "documents present (second un-deferral)" \
@@ -385,8 +400,10 @@ structural_pins() {
     "$(run_sql "select count(*) from information_schema.tables where table_schema='public' and table_name = 'message_threads';")" "1"
   expect_eq "files present (fourth un-deferral)" \
     "$(run_sql "select count(*) from information_schema.tables where table_schema='public' and table_name = 'files';")" "1"
-  expect_eq "individual messages STILL absent (forward pin baseline)" \
-    "$(run_sql "select count(*) from information_schema.tables where table_schema='public' and table_name = 'messages';")" "0"
+  expect_eq "messages present (sixth un-deferral)" \
+    "$(run_sql "select count(*) from information_schema.tables where table_schema='public' and table_name = 'messages';")" "1"
+  expect_eq "live delivery STILL absent (messages in no publication)" \
+    "$(run_sql "select count(*) from pg_publication_tables where schemaname = 'public' and tablename = 'messages';")" "0"
 
   note "--- 1g. Storage surface (07_storage.sql — fourth un-deferral) ---"
   # The storage layer is platform-native (storage.buckets / storage.objects
@@ -424,7 +441,7 @@ run_battery() {
   expect_eq "exactly one platform_config row after fixtures" \
     "$(run_sql "select count(*) from public.platform_config;")" "1"
 
-  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql; do
+  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql; do
     note "--- 2c. Battery file: $f ---"
     out=$(psql "$SUPABASE_TEST_DB_URL" -X -q -v ON_ERROR_STOP=1 -f "$TESTS_DIR/$f" 2>&1)
     rc=$?
@@ -491,7 +508,7 @@ selftest() {
   #    00_fixtures.sql (the static cross-ref scan must red)
   local fixture_uuid
   fixture_uuid=$(comm -12 \
-    <(grep -hoE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' "$wt"/supabase/tests/0[1-7]_*.sql | sort -u) \
+    <(grep -hoE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' "$wt"/supabase/tests/0[1-8]_*.sql | sort -u) \
     <(grep -hoE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' "$wt/supabase/tests/00_fixtures.sql" | sort -u) \
     | head -1)
   if [ -z "$fixture_uuid" ]; then

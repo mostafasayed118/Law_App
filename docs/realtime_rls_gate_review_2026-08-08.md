@@ -146,14 +146,17 @@ mirrors D-MSR5/D-STR6); billing (D-09); AI (no scope); seeding
 ## 4. Policy + deny-rows spec (the battery contract, executed in T3)
 
 Positive (each grants exactly the message set of the reader's **threads** —
-the 2/3/1 count shape **per thread**, proving no blanket-thread bleed):
+proving no blanket-thread bleed; the fixture seeds each thread with a
+message count EQUAL to its `message_count` column — thread-1: 1 … thread-6:
+6, total 21 — so the seeded reality matches the metadata the client renders
+and the 08.12 mapping-consistency pin holds):
 - **assigned client** (client-a on matters 1,2 → their 2 threads) reads the
-  messages of those threads (fixture counts: e.g. 3 + 2 → 5);
+  messages of those threads (1 + 2 = **3**);
 - **assigned attorney** (partner-a on matters 1,2,3 → 3 threads) reads
-  theirs (e.g. 2 + 1 + 1 → 4);
-- **orphan** (assigned client on matter 4 → 1 thread) reads theirs (e.g. 2);
+  theirs (1 + 2 + 3 = **6**);
+- **orphan** (assigned client on matter 4 → 1 thread) reads theirs (**4**);
 - row-count pins prove the read is thread-scoped, not org-wide (the
-  2/3/1-count discipline applied per thread).
+  per-thread count discipline, pinned dynamically by 08.12).
 
 Negative (deny rows, `03_platform_owner_boundary` style):
 - active org member, **no matter assignment** → denied (org-role-alone);

@@ -29,6 +29,7 @@
 -- storage.objects rows are independent of the public tables (no FK) but
 -- must be cleared before re-seed so the objects-layer counts are exact.
 delete from storage.objects where bucket_id = 'matter-files';
+delete from public.messages;
 delete from public.files;
 delete from public.message_threads;
 delete from public.documents;
@@ -315,5 +316,65 @@ begin
   select count(*) into v_buckets from storage.buckets where id = 'matter-files';
   if v_buckets <> 1 then
     raise exception 'FIXTURE ERROR: matter-files bucket must exist (07_storage.sql), got %', v_buckets;
+  end if;
+end $$;
+
+-- ---- 12. Individual messages (realtime slice — the 08_message_rls.sql battery) ------
+-- Messages referencing the six fixture threads (which reference the six
+-- fixture matters — the assignment source of truth), exercising every policy
+-- branch of messages_select_assigned (docs/realtime_rls_gate_review_2026-08-08.md
+-- §4). The count per thread EQUALS the thread's own message_count column
+-- (thread-1: 1 … thread-6: 6) — the schema-as-mapping-contract decision: the
+-- seeded reality must match the thread metadata the client renders, and the
+-- battery pins the per-thread totals (08.01 client-a sees its threads'
+-- messages 1+2 = 3; 08.02 partner-a 1+2+3 = 6; 08.03 orphan 4) plus the
+-- mapping-consistency check (08.12). Bodies are GENERIC non-PII demo copy
+-- (D-RT4 author display names + neutral text) — never real case content by
+-- convention; the body CHECK rejects empty bodies structurally.
+insert into public.messages
+  (id, organization_id, thread_id, author_display_name, body, sent_at, created_at, updated_at)
+values
+  ('90000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000001', 'Demo client',  'Demo message 1-1: status update.',       now(), now(), now()),
+  ('90000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000002', 'Demo client',  'Demo message 2-1: draft review.',         now(), now(), now()),
+  ('90000000-0000-4000-8000-000000000003', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000002', 'Demo attorney', 'Demo message 2-2: follow-up notes.',       now(), now(), now()),
+  ('90000000-0000-4000-8000-000000000004', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000003', 'Demo attorney', 'Demo message 3-1: procedural note.',       now(), now(), now()),
+  ('90000000-0000-4000-8000-000000000005', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000003', 'Demo attorney', 'Demo message 3-2: reminder.',             now(), now(), now()),
+  ('90000000-0000-4000-8000-000000000006', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000003', 'Demo attorney', 'Demo message 3-3: confirmation.',         now(), now(), now()),
+  ('90000000-0000-4000-8000-000000000007', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000004', 'Demo client',  'Demo message 4-1: consultation request.',  now(), now(), now()),
+  ('90000000-0000-4000-8000-000000000008', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000004', 'Demo client',  'Demo message 4-2: document upload note.',  now(), now(), now()),
+  ('90000000-0000-4000-8000-000000000009', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000004', 'Demo client',  'Demo message 4-3: scheduling.',            now(), now(), now()),
+  ('90000000-0000-4000-8000-000000000010', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000004', 'Demo client',  'Demo message 4-4: closing note.',          now(), now(), now()),
+  ('90000000-0000-4000-8000-000000000011', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000005', 'Demo partner', 'Demo message 5-1: advisory draft.',        now(), now(), now()),
+  ('90000000-0000-4000-8000-000000000012', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000005', 'Demo partner', 'Demo message 5-2: terms outline.',         now(), now(), now()),
+  ('90000000-0000-4000-8000-000000000013', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000005', 'Demo partner', 'Demo message 5-3: next steps.',            now(), now(), now()),
+  ('90000000-0000-4000-8000-000000000014', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000005', 'Demo partner', 'Demo message 5-4: review copy.',           now(), now(), now()),
+  ('90000000-0000-4000-8000-000000000015', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000005', 'Demo partner', 'Demo message 5-5: final draft.',           now(), now(), now()),
+  ('90000000-0000-4000-8000-000000000016', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000006', 'Demo counsel', 'Demo message 6-1: internal note.',         now(), now(), now()),
+  ('90000000-0000-4000-8000-000000000017', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000006', 'Demo counsel', 'Demo message 6-2: status note.',           now(), now(), now()),
+  ('90000000-0000-4000-8000-000000000018', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000006', 'Demo counsel', 'Demo message 6-3: procedural note.',       now(), now(), now()),
+  ('90000000-0000-4000-8000-000000000019', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000006', 'Demo counsel', 'Demo message 6-4: reminder.',             now(), now(), now()),
+  ('90000000-0000-4000-8000-000000000020', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000006', 'Demo counsel', 'Demo message 6-5: confirmation.',         now(), now(), now()),
+  ('90000000-0000-4000-8000-000000000021', '20000000-0000-4000-8000-000000000001', '60000000-0000-4000-8000-000000000006', 'Demo counsel', 'Demo message 6-6: closing note.',          now(), now(), now());
+
+-- Reserved throwaway ids used by 08_message_rls.sql (deliberately NEVER
+-- seeded): 90000000-0000-4000-8000-00000000ffff (the body CHECK-violation
+-- insert — fails before any row exists) and the org-mismatch trio
+-- 40000000-0000-4000-8000-00000000fffb (temp org-b matter) +
+-- 60000000-0000-4000-8000-00000000fffd (its org-b thread) +
+-- 90000000-0000-4000-8000-00000000fffe (its org-a message — the mismatch).
+-- Listed here so the harness's static fixture cross-ref resolves them.
+
+-- Sanity: exactly 21 messages seeded (1+2+3+4+5+6 — matching the six
+-- threads' message_count columns, the mapping contract), and every thread's
+-- message count equals its message_count column (08.12 pins it again
+-- dynamically). The org-mismatch temp rows are rolled back inside the
+-- battery and never reach the seeded baseline.
+do $$
+declare
+  v_cnt bigint;
+begin
+  select count(*) into v_cnt from public.messages;
+  if v_cnt <> 21 then
+    raise exception 'FIXTURE ERROR: messages must hold 21 rows, got %', v_cnt;
   end if;
 end $$;
