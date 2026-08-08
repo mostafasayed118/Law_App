@@ -154,7 +154,9 @@ SUPABASE_TEST_DB_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres \
   bash scripts/verify_policy_tests.sh --apply        # -> 40/0/0
 SUPABASE_TEST_DB_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres \
   bash scripts/verify_policy_tests.sh                # -> 74/0/0, RESULT: PASS
-# T5 — apply on the dev project (OWNER-GATED, HELD — not run)
+# T5 — apply on the dev project (OWNER-GATED; EXECUTED 2026-08-08 — see
+#     docs/send_message_apply_execution_2026-08-08.md; not part of this
+#     client gate's command set)
 # T7 — client gate
 dart format --output=none --set-exit-if-changed .    # whole-repo, CI-exact
 flutter analyze                                      # No issues found

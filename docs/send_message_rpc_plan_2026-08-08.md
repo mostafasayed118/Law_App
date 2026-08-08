@@ -362,7 +362,12 @@ Branch: `feat/send-message-rpc`
   close decision recorded. **DONE (2026-08-08, this commit):** README
   1044 lockstep (T7), roadmap §2 gains the `send_message` row (19
   committed, 18 applied + send_message ⏳ HELD on the owner's dated
-  sign-off — the dev-project write path stays the direct INSERT until
-  the apply), §13 gate-table row + §14 eighth flip note (client surface
-  SHIPPED; server apply HELD), Phase 10/11/12 cross-refs updated,
-  completion evidence + dated close decision recorded; ledger PASS 115.
+  sign-off at T8-commit time — the dev-project write path stays the
+  direct INSERT until the apply), §13 gate-table row + §14 eighth flip
+  note (client surface SHIPPED; server apply HELD at T8-commit time),
+  Phase 10/11/12 cross-refs updated, completion evidence + dated close
+  decision recorded; ledger PASS 115. **The server apply EXECUTED the
+  same day** (owner's dated §6 sign-off → APPLY APPROVED →
+  `docs/send_message_apply_execution_2026-08-08.md` **APPLIED**: policies
+  10→9, INSERT revoked, the demo send `1c031882-…` via the RPC with the
+  §8 audit row observed) — recorded in the T5 row above.
