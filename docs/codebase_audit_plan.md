@@ -149,7 +149,9 @@ ones).
 
 **Acceptance:** the README coverage-gap list shrinks to zero or becomes an
 explicit, dated deferral list. **Verification:** `flutter test` +
-`flutter analyze` + `dart format --output=none --set-exit-if-changed lib test`.
+`flutter analyze` + `bash scripts/verify_format.sh` (whole-repo format
+gate, mirroring `ci.yml` — not a `lib test`-scoped check, which can drift
+from the CI formatter's whole-repo scope).
 
 ---
 

@@ -4,6 +4,7 @@
 |---|---|---|
 | `verify_ledger.sh` | Governance-ledger integrity (below) | **Before committing any `docs/` amendment** that touches the audit plan or Gate 3 reconciliation; wired into CI as a cheap static gate (`ci.yml` on every push/PR) plus a **nightly teeth-prover** (`ledger-selftest.yml`, 02:00 UTC + `workflow_dispatch`) |
 | `verify_policy_tests.sh` | P0-closure policy battery (below) | Against an **ephemeral rehearsal project only**, before any P0-close decision; `--check` is static and runs anywhere, and is wired into `ci.yml` as a DB-free gate on every push/PR, with a **nightly teeth-prover** (`ledger-selftest.yml` runs `--selftest`, 02:00 UTC + `workflow_dispatch`) |
+| `verify_format.sh` | **Whole-repo** Dart formatting, mirroring `ci.yml`'s exact command | **Before committing any Dart change** — the format step of the standard slice gate. Use this instead of a `lib test`-scoped `dart format` check, which can drift from CI's whole-repo scope (see below) |
 
 ## `verify_ledger.sh`
 
@@ -115,6 +116,33 @@ not uncommitted working-tree edits.
   repo working tree is never touched. The suite-claim drift is injected via a
   tampered script copy (the claim lives in the battery, not the docs).
 
+## `verify_format.sh`
+
+The whole-repo Dart format gate. Runs exactly what `ci.yml`'s "Verify
+formatting" step runs:
+
+```bash
+scripts/verify_format.sh
+```
+
+### Why whole-repo, and why a script
+
+CI runs `dart format --output=none --set-exit-if-changed .` — the **entire
+tree**, not just `lib/` and `test/`. A local gate scoped to `lib test` can
+accept bytes CI rejects: the audit T2–T4 files (2026-08-08) passed a
+`lib test`-scoped check under one formatter revision and then failed CI when
+flutter stable 3.44.4's formatter wanted tall-style trailing commas in 6
+files. `verify_format.sh` makes the local gate byte-identical to the CI
+step, so a formatter-revision bump surfaces locally instead of on the
+runner. It also keeps one canonical command in the gate docs instead of an
+inline `dart format` incantation that can be scoped differently.
+
+### Exit codes
+
+- `0` — whole repo formatted (nothing changed).
+- `1` — ≥1 file needs formatting; run `dart format .` and re-check.
+- `2` — usage error or `dart` not on PATH.
+
 ## `verify_policy_tests.sh`
 
 The P0-closure policy battery runner (`supabase/tests/` + this script,
@@ -168,6 +196,11 @@ read-only owner sweep.
 - **`ci.yml`** runs `scripts/verify_ledger.sh` (the plain battery, no
   `--selftest`) on every push to `main` and PR targeting `main` — the
   committed-ledger gate on the exact pushed bytes.
+- **`ci.yml`** runs `dart format --output=none --set-exit-if-changed .` as
+  its "Verify formatting" step — `scripts/verify_format.sh` is the local
+  mirror of that exact command, so the gate docs and CI can never disagree
+  on scope. CI keeps the inline command (no bash dependency for a one-line
+  step); the script exists for the local slice gate.
 - **`ci.yml`** also runs `scripts/verify_policy_tests.sh --check` (the
   DB-free static mode) on every push to `main` and PR targeting `main` —
   the policy battery's structural gate on the exact pushed bytes (battery

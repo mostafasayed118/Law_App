@@ -54,9 +54,10 @@ pre-approved for every commit inside the slice.
 - **Batch 1 (test floor)** — `codebase_audit_plan.md` items 1.1–1.10.
   Backend-free, can run in parallel with the rest. Run `flutter test`,
   `flutter analyze`, and
-  `dart format --output=none --set-exit-if-changed lib test` after each
-  item and report the actual output — don't summarize as "passing" without
-  showing the command result.
+  `bash scripts/verify_format.sh` (the whole-repo format gate — mirrors
+  `ci.yml`'s exact `dart format .` command, so a `lib test`-scoped check
+  can't drift from the CI formatter) after each item and report the actual
+  output — don't summarize as "passing" without showing the command result.
 - **Batch 4 (docs hygiene)** — items 4.1–4.8. Straightforward doc/README
   reconciliation against the real test count and real code state.
 - **Batch 3 / P1 (Supabase adapter, real session model)** — now approved
