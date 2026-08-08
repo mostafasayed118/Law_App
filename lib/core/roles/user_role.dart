@@ -22,6 +22,7 @@ class RoleCapability extends Equatable {
     required this.canViewDocuments,
     required this.canViewMessages,
     required this.canViewFiles,
+    required this.canViewAudit,
   });
 
   final bool canViewHome;
@@ -61,6 +62,13 @@ class RoleCapability extends Equatable {
   /// synthetic in env-less runs (D-STR3/D-STR9).
   final bool canViewFiles;
 
+  /// Partner org-audit slice (2026-08-09 scope note): whether the org hub
+  /// offers the "Audit trail" entry. A navigation/visibility hint only, like
+  /// the other flags — `read_org_audit` is partner-capable server-side and
+  /// the server denies everyone else; the client renders the typed denial
+  /// (AC-7, never empty success). Granted to partner only.
+  final bool canViewAudit;
+
   @override
   List<Object?> get props => <Object?>[
     canViewHome,
@@ -71,6 +79,7 @@ class RoleCapability extends Equatable {
     canViewDocuments,
     canViewMessages,
     canViewFiles,
+    canViewAudit,
   ];
 }
 
@@ -85,6 +94,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewDocuments: true,
         canViewMessages: true,
         canViewFiles: true,
+        canViewAudit: false,
       ),
       UserRole.attorney: RoleCapability(
         canViewHome: true,
@@ -95,6 +105,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewDocuments: true,
         canViewMessages: true,
         canViewFiles: true,
+        canViewAudit: false,
       ),
       UserRole.partner: RoleCapability(
         canViewHome: true,
@@ -105,6 +116,9 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewDocuments: true,
         canViewMessages: true,
         canViewFiles: true,
+        // Partner org-audit slice: the only role the server's
+        // read_org_audit gate admits (navigation hint only).
+        canViewAudit: true,
       ),
       UserRole.complianceOfficer: RoleCapability(
         canViewHome: true,
@@ -115,6 +129,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewDocuments: true,
         canViewMessages: true,
         canViewFiles: true,
+        canViewAudit: false,
       ),
       UserRole.researchAnalyst: RoleCapability(
         canViewHome: true,
@@ -125,6 +140,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewDocuments: true,
         canViewMessages: true,
         canViewFiles: true,
+        canViewAudit: false,
       ),
       UserRole.admin: RoleCapability(
         canViewHome: true,
@@ -135,5 +151,6 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewDocuments: true,
         canViewMessages: true,
         canViewFiles: true,
+        canViewAudit: false,
       ),
     };

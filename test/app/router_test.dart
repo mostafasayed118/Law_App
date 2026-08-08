@@ -529,6 +529,7 @@ void main() {
               canViewDocuments: true,
               canViewMessages: true,
               canViewFiles: true,
+              canViewAudit: true,
             ),
           },
         );
@@ -681,6 +682,7 @@ void main() {
               canViewDocuments: true,
               canViewMessages: true,
               canViewFiles: true,
+              canViewAudit: true,
             ),
           },
         );
@@ -1232,6 +1234,7 @@ void main() {
               canViewDocuments: true,
               canViewMessages: true,
               canViewFiles: true,
+              canViewAudit: false,
             ),
           },
         );
@@ -1280,6 +1283,7 @@ void main() {
               canViewDocuments: false,
               canViewMessages: false,
               canViewFiles: false,
+              canViewAudit: false,
             ),
           },
         );
@@ -1351,6 +1355,7 @@ void main() {
             canViewDocuments: false,
             canViewMessages: false,
             canViewFiles: false,
+            canViewAudit: false,
           ),
         },
       );

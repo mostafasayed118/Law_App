@@ -27,6 +27,7 @@ void main() {
         canViewDocuments: true,
         canViewMessages: true,
         canViewFiles: true,
+        canViewAudit: false,
       );
       const RoleCapability b = RoleCapability(
         canViewHome: true,
@@ -37,6 +38,7 @@ void main() {
         canViewDocuments: true,
         canViewMessages: true,
         canViewFiles: true,
+        canViewAudit: false,
       );
       const RoleCapability c = RoleCapability(
         canViewHome: true,
@@ -47,6 +49,7 @@ void main() {
         canViewDocuments: false,
         canViewMessages: false,
         canViewFiles: false,
+        canViewAudit: false,
       );
 
       expect(a, equals(b));
@@ -93,6 +96,21 @@ void main() {
         }
       },
     );
+
+    test('partner grants canViewAudit; every other role does not', () {
+      // Partner org-audit slice (2026-08-09): the org hub's "Audit trail"
+      // entry is a navigation hint granted to partner only — the server's
+      // read_org_audit gate is the authorization. Pinned per-role so a
+      // future widening is a deliberate edit.
+      for (final UserRole role in UserRole.values) {
+        final bool expected = role == UserRole.partner;
+        expect(
+          roleCapabilities[role]!.canViewAudit,
+          expected,
+          reason: 'role $role',
+        );
+      }
+    });
 
     test('every role can reach at least one destination (shell invariant)', () {
       // _AppShell reads roleCapabilities[role]! and renders its bottom

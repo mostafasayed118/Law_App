@@ -226,6 +226,7 @@ void main() {
                 canViewDocuments: false,
                 canViewMessages: false,
                 canViewFiles: false,
+                canViewAudit: false,
               ),
             ),
           ),

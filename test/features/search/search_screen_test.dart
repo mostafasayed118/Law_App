@@ -22,6 +22,7 @@ void main() {
     canViewDocuments: documents,
     canViewMessages: true,
     canViewFiles: true,
+    canViewAudit: false,
   );
 
   Future<void> pumpSearch(

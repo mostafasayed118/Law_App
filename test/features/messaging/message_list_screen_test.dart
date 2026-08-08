@@ -182,6 +182,7 @@ void main() {
             canViewDocuments: true,
             canViewMessages: true,
             canViewFiles: true,
+            canViewAudit: false,
           ),
         );
 
