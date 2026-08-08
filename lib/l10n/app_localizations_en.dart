@@ -852,6 +852,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get messageThreadDetailTitle => 'Thread messages';
+
+  @override
+  String get messagesDetailEmpty => 'No messages are available in this thread.';
+
+  @override
+  String get messagesDetailError => 'Unable to load messages.';
+
+  @override
   String get searchTitle => 'Search';
 
   @override

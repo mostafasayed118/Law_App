@@ -20,6 +20,7 @@ import '../features/home/presentation/settings_screen.dart';
 import '../features/matters/presentation/matter_details_screen.dart';
 import '../features/matters/presentation/matter_list_screen.dart';
 import '../features/messaging/presentation/message_list_screen.dart';
+import '../features/messaging/presentation/message_thread_detail_screen.dart';
 import '../features/notifications/presentation/notification_settings_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/onboarding/presentation/onboarding_success_screen.dart';
@@ -53,6 +54,7 @@ class AppRoutes {
   static const String matterDetails = '/matters/:matterId';
   static const String vault = '/vault';
   static const String messages = '/messages';
+  static const String messageThreadDetail = '/messages/:threadId';
   static const String search = '/search';
 
   /// The profile route for one attorney (path-param substitution).
@@ -60,6 +62,12 @@ class AppRoutes {
 
   /// The details route for one matter (path-param substitution).
   static String matterDetail(String matterId) => '/matters/$matterId';
+
+  /// The read-only thread-detail route for one thread (path-param
+  /// substitution; the tapped row's title travels as the route `extra` —
+  /// D-RT5/Q3, the title is already client-side so no embed is needed).
+  static String messageThreadDetailFor(String threadId) =>
+      '/messages/$threadId';
 
   /// The search route with its `q` query param (URL-encoded; `?q=` never
   /// carries real data — local-only demo queries, D-S5).
@@ -185,6 +193,20 @@ GoRouter createAppRouter(
             final UserRole role =
                 authCubit.state.session?.primaryRole ?? UserRole.client;
             return MessageListScreen(capabilities: capabilitiesForRole[role]!);
+          },
+        ),
+        GoRoute(
+          path: AppRoutes.messageThreadDetail,
+          builder: (BuildContext context, GoRouterState state) {
+            // The read-only thread-detail surface (D-RT5). The tapped row's
+            // title travels as the route `extra` (Q3 — the title is already
+            // client-side); a deep link without it falls back to the
+            // localized generic title.
+            final Object? extra = state.extra;
+            return MessageThreadDetailScreen(
+              threadId: state.pathParameters['threadId'] ?? '',
+              threadTitle: extra is String ? extra : null,
+            );
           },
         ),
         GoRoute(

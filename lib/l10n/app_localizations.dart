@@ -1666,6 +1666,24 @@ abstract class AppLocalizations {
   /// **'{count} messages'**
   String messagesMessageCount(Object count);
 
+  /// No description provided for @messageThreadDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Thread messages'**
+  String get messageThreadDetailTitle;
+
+  /// No description provided for @messagesDetailEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages are available in this thread.'**
+  String get messagesDetailEmpty;
+
+  /// No description provided for @messagesDetailError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load messages.'**
+  String get messagesDetailError;
+
   /// No description provided for @searchTitle.
   ///
   /// In en, this message translates to:

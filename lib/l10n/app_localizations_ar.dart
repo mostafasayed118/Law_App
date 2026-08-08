@@ -847,6 +847,15 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get messageThreadDetailTitle => 'رسائل المحادثة';
+
+  @override
+  String get messagesDetailEmpty => 'لا توجد رسائل متاحة في هذه المحادثة.';
+
+  @override
+  String get messagesDetailError => 'تعذّر تحميل الرسائل.';
+
+  @override
   String get searchTitle => 'بحث';
 
   @override

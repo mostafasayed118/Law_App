@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/messaging/domain/message.dart';
 import 'package:legalhub/features/messaging/domain/message_gateway.dart';
 import 'package:legalhub/features/messaging/domain/message_thread.dart';
 import 'package:legalhub/features/messaging/presentation/message_cubit.dart';
@@ -155,5 +156,12 @@ class _StubMessageGateway implements MessageGateway {
       return completer!.future;
     }
     return Future<Result<List<MessageThread>>>.value(_queue.removeAt(0));
+  }
+
+  @override
+  Future<Result<List<Message>>> fetchMessages(String threadId) async {
+    // Not exercised by the thread-list cubit tests; an honest empty success
+    // keeps the seam implementable for the detail cubit tests.
+    return const Result<List<Message>>.success(<Message>[]);
   }
 }

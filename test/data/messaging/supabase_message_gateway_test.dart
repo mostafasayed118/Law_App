@@ -3,6 +3,7 @@ import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/data/messaging/supabase_message_api.dart';
 import 'package:legalhub/data/messaging/supabase_message_gateway.dart';
+import 'package:legalhub/features/messaging/domain/message.dart';
 import 'package:legalhub/features/messaging/domain/message_thread.dart';
 
 /// Hand-rolled fake of the [SupabaseMessageApi] seam: records calls and
@@ -10,7 +11,9 @@ import 'package:legalhub/features/messaging/domain/message_thread.dart';
 /// gateway's domain mapping is tested without a provider.
 class _StubSupabaseMessageApi implements SupabaseMessageApi {
   List<Map<String, dynamic>> rows = <Map<String, dynamic>>[];
+  List<Map<String, dynamic>> messageRows = <Map<String, dynamic>>[];
   SupabaseMessageException? error;
+  final List<String> messageFetches = <String>[];
 
   @override
   Future<List<Map<String, dynamic>>> fetchMessageThreads() async {
@@ -19,7 +22,32 @@ class _StubSupabaseMessageApi implements SupabaseMessageApi {
     }
     return rows;
   }
+
+  @override
+  Future<List<Map<String, dynamic>>> fetchMessages(String threadId) async {
+    messageFetches.add(threadId);
+    if (error != null) {
+      throw error!;
+    }
+    return messageRows;
+  }
 }
+
+Map<String, dynamic> _messageRow({
+  String id = 'msg-1',
+  String threadId = 'thread-1',
+  String author = 'Demo attorney',
+  String body =
+      'Demo message 1 — generic demo content, no real client or '
+      'legal data.',
+  String sentAt = '2026-08-07T10:00:00.000Z',
+}) => <String, dynamic>{
+  'id': id,
+  'thread_id': threadId,
+  'author_display_name': author,
+  'body': body,
+  'sent_at': sentAt,
+};
 
 Map<String, dynamic> _row({
   String id = 'thread-1',
@@ -234,6 +262,164 @@ void main() {
       expect(result.isSuccess, isFalse);
       expect(result.errorOrNull?.code, 'message_read_failed');
     });
+  });
+
+  group('row → Message mapping (D-RT5)', () {
+    test('maps a full message row to the Message VO', () async {
+      api.messageRows = <Map<String, dynamic>>[
+        _messageRow(
+          id: 'msg-9',
+          threadId: 'thread-2',
+          author: 'Demo client',
+          body:
+              'Demo message 2 — generic demo content, no real client or '
+              'legal data.',
+          sentAt: '2026-08-07T11:00:00.000Z',
+        ),
+      ];
+
+      final Result<List<Message>> result = await gateway.fetchMessages(
+        'thread-2',
+      );
+
+      expect(result.isSuccess, isTrue);
+      expect(api.messageFetches, <String>['thread-2']);
+      final Message message = result.valueOrNull!.single;
+      expect(message.id, 'msg-9');
+      expect(message.authorDisplayName, 'Demo client');
+      expect(message.body, contains('generic demo content'));
+      expect(
+        message.sentAt,
+        DateTime.parse('2026-08-07T11:00:00.000Z').toLocal(),
+      );
+    });
+
+    test('returns an empty success for no rows', () async {
+      final Result<List<Message>> result = await gateway.fetchMessages(
+        'thread-1',
+      );
+
+      expect(result.isSuccess, isTrue);
+      expect(result.valueOrNull, isEmpty);
+    });
+
+    test('a missing id fails the fetch loudly', () async {
+      api.messageRows = <Map<String, dynamic>>[
+        <String, dynamic>{
+          'author_display_name': 'Demo attorney',
+          'body': 'Demo message',
+          'sent_at': '2026-08-07T10:00:00.000Z',
+        },
+      ];
+
+      final Result<List<Message>> result = await gateway.fetchMessages(
+        'thread-1',
+      );
+
+      expect(result.isSuccess, isFalse);
+      expect(result.errorOrNull?.code, 'message_body_read_failed');
+    });
+
+    test('a missing body fails the fetch loudly', () async {
+      api.messageRows = <Map<String, dynamic>>[
+        <String, dynamic>{
+          'id': 'msg-1',
+          'author_display_name': 'Demo attorney',
+          'sent_at': '2026-08-07T10:00:00.000Z',
+        },
+      ];
+
+      final Result<List<Message>> result = await gateway.fetchMessages(
+        'thread-1',
+      );
+
+      expect(result.isSuccess, isFalse);
+      expect(result.errorOrNull?.code, 'message_body_read_failed');
+    });
+
+    test('a missing author fails the fetch loudly', () async {
+      api.messageRows = <Map<String, dynamic>>[
+        <String, dynamic>{
+          'id': 'msg-1',
+          'body': 'Demo message',
+          'sent_at': '2026-08-07T10:00:00.000Z',
+        },
+      ];
+
+      final Result<List<Message>> result = await gateway.fetchMessages(
+        'thread-1',
+      );
+
+      expect(result.isSuccess, isFalse);
+      expect(result.errorOrNull?.code, 'message_body_read_failed');
+    });
+
+    test('an unparseable sent_at fails the fetch loudly', () async {
+      api.messageRows = <Map<String, dynamic>>[
+        _messageRow(sentAt: 'not-a-date'),
+      ];
+
+      final Result<List<Message>> result = await gateway.fetchMessages(
+        'thread-1',
+      );
+
+      expect(result.isSuccess, isFalse);
+      expect(result.errorOrNull?.code, 'message_body_read_failed');
+    });
+  });
+
+  group('messages failure mapping (contract §5, D-RT5)', () {
+    test('maps a denied read to the message_body denied code', () async {
+      api.error = const SupabaseMessageException(
+        kind: SupabaseMessageFailureKind.denied,
+        message: 'permission denied',
+      );
+
+      final Result<List<Message>> result = await gateway.fetchMessages(
+        'thread-1',
+      );
+
+      final AppError error = result.errorOrNull!;
+      expect(error.code, 'message_body_read_denied');
+      expect(error.technicalMessage, 'permission denied');
+    });
+
+    test(
+      'maps an unavailable read to the message_body unavailable code',
+      () async {
+        api.error = const SupabaseMessageException(
+          kind: SupabaseMessageFailureKind.providerUnavailable,
+          message: 'Provider unavailable.',
+        );
+
+        final Result<List<Message>> result = await gateway.fetchMessages(
+          'thread-1',
+        );
+
+        final AppError error = result.errorOrNull!;
+        expect(error.code, 'message_body_read_unavailable');
+        expect(error.technicalMessage, 'Provider unavailable.');
+      },
+    );
+
+    test(
+      'maps an unknown failure to the generic code with no row content',
+      () async {
+        api.error = const SupabaseMessageException(
+          kind: SupabaseMessageFailureKind.unknown,
+          message: 'provider hiccup',
+        );
+
+        final Result<List<Message>> result = await gateway.fetchMessages(
+          'thread-1',
+        );
+
+        final AppError error = result.errorOrNull!;
+        expect(error.code, 'message_body_read_failed');
+        expect(error.technicalMessage, 'provider hiccup');
+        expect(error.context, isEmpty);
+      },
+    );
   });
 
   group('failure mapping (contract §5)', () {

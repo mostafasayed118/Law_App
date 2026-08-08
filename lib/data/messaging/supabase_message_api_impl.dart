@@ -15,12 +15,20 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
   factory SupabaseMessageApiImpl.bind() => SupabaseMessageApiImpl(_boundTable);
 
   /// Binds a table SELECT to the app-level client. The builder's `select`
-  /// resolves to the raw row list (PostgrestList) — no cast needed.
+  /// resolves to the raw row list (PostgrestList) — no cast needed. When a
+  /// `threadId` is given, the SELECT is filtered `.eq('thread_id', …)` — the
+  /// thread-scoped messages read (D-RT5).
   static Future<List<Map<String, dynamic>>> _boundTable(
     String table,
-    String columns,
-  ) {
-    return Supabase.instance.client.from(table).select(columns);
+    String columns, [
+    String? threadId,
+  ]) {
+    final PostgrestFilterBuilder<List<Map<String, dynamic>>> query = Supabase
+        .instance
+        .client
+        .from(table)
+        .select(columns);
+    return threadId == null ? query : query.eq('thread_id', threadId);
   }
 
   final MessageTableCaller _table;
@@ -43,6 +51,32 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
       // A non-Postgrest provider failure (network/transport) is a typed
       // unavailable, never a raw exception across the seam (the auth
       // impl's defensive-catch precedent).
+      throw const SupabaseMessageException(
+        kind: SupabaseMessageFailureKind.providerUnavailable,
+        message: 'Provider unavailable.',
+      );
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> fetchMessages(String threadId) async {
+    try {
+      // RLS-scoped (D-RT2): `messages_select_assigned` returns only the
+      // rows whose thread's matter the caller is assigned to; the SELECT is
+      // filtered `.eq('thread_id', …)` so only the tapped thread's rows
+      // cross the seam. The body column is the D-MSG1 consummation — read
+      // path only (D-RT5).
+      return await _table(
+        'messages',
+        'id, thread_id, author_display_name, body, sent_at',
+        threadId,
+      );
+    } on PostgrestException catch (e) {
+      throw SupabaseMessageException(kind: _kindFor(e), message: e.message);
+    } on Object {
+      // Same defensive catch as fetchMessageThreads: a non-Postgrest
+      // provider failure is a typed unavailable, never a raw exception
+      // across the seam (the auth impl's defensive-catch precedent).
       throw const SupabaseMessageException(
         kind: SupabaseMessageFailureKind.providerUnavailable,
         message: 'Provider unavailable.',

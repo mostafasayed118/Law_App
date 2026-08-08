@@ -1,4 +1,5 @@
 import '../../../core/errors/result.dart';
+import '../domain/message.dart';
 import '../domain/message_gateway.dart';
 import '../domain/message_thread.dart';
 
@@ -59,10 +60,48 @@ class FakeMessageGateway implements MessageGateway {
     ),
   ];
 
+  /// Fixed synthetic per-thread message rows (D-RT5): each thread gets
+  /// exactly its `messageCount` generic messages, authors alternating
+  /// between the neutral `Demo attorney` / `Demo client`, bodies the generic
+  /// demo pattern, and `sentAt` staggered by whole hours back from a fixed
+  /// base — deterministic on every call (the fake's determinism pin).
+  static final Map<String, List<Message>> syntheticMessagesByThread =
+      <String, List<Message>>{
+        for (final MessageThread thread in syntheticThreads)
+          thread.id: _messagesFor(thread),
+      };
+
+  /// Builds the deterministic message list for one thread.
+  static List<Message> _messagesFor(MessageThread thread) {
+    return List<Message>.unmodifiable(
+      List<Message>.generate(thread.messageCount, (int i) {
+        final int n = i + 1;
+        return Message(
+          id: '${thread.id}-msg-$n',
+          authorDisplayName: n.isOdd ? 'Demo attorney' : 'Demo client',
+          body:
+              'Demo message $n — generic demo content, no real client or '
+              'legal data.',
+          sentAt: thread.lastActivityAt.subtract(Duration(hours: n)),
+        );
+      }),
+    );
+  }
+
   @override
   Future<Result<List<MessageThread>>> fetchThreads() async {
     // Thread metadata only — the synthetic list is returned as-is; nothing
     // crosses this boundary but the D-MSG4 metadata surface.
     return Result<List<MessageThread>>.success(syntheticThreads);
+  }
+
+  @override
+  Future<Result<List<Message>>> fetchMessages(String threadId) async {
+    // Read-path surface (D-RT5): deterministic per-thread generic rows; an
+    // unknown thread id is an honest empty success (the real RLS-scoped
+    // SELECT returns zero rows for an unassigned/unknown thread).
+    return Result<List<Message>>.success(
+      syntheticMessagesByThread[threadId] ?? const <Message>[],
+    );
   }
 }

@@ -11,6 +11,7 @@ import 'package:legalhub/features/matters/data/fake_matter_gateway.dart';
 import 'package:legalhub/features/matters/domain/matter.dart';
 import 'package:legalhub/features/matters/domain/matter_gateway.dart';
 import 'package:legalhub/features/matters/presentation/matter_details_screen.dart';
+import 'package:legalhub/features/messaging/domain/message.dart';
 import 'package:legalhub/features/messaging/domain/message_gateway.dart';
 import 'package:legalhub/features/messaging/domain/message_thread.dart';
 import 'package:legalhub/features/storage/domain/file_metadata.dart';
@@ -263,6 +264,11 @@ class _EmptyMessageGateway implements MessageGateway {
   @override
   Future<Result<List<MessageThread>>> fetchThreads() async {
     return Result<List<MessageThread>>.success(const <MessageThread>[]);
+  }
+
+  @override
+  Future<Result<List<Message>>> fetchMessages(String threadId) async {
+    return Result<List<Message>>.success(const <Message>[]);
   }
 }
 

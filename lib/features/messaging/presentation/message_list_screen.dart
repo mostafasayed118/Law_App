@@ -25,17 +25,20 @@ import 'message_state.dart';
 ///
 /// A `/messages` route that loads the thread-metadata list from the
 /// [MessageGateway] seam (the dev fake in env-less runs, owner decision
-/// D-MSG2). **Thread metadata only** — rows render the five D-MSG4 fields
-/// (title, matter reference, participants, last-activity date, message
-/// count) and nothing else: no message body, no preview, no send/reply, no
-/// thread-open affordance (D-MSG1/D-MSG3). Phase 12 adds the **reverse
-/// cross-link** (D-C1): a row whose `matterRef` resolves to a known
-/// synthetic matter renders the compact "View matter" chip — the only tap
-/// target in the list (D-C2), gated by the `canViewMatters` nav hint
-/// (D-C4). Resolution is title-keyed and client-side against the loaded
-/// synthetic matter list (D-C3, the D-M5 discipline in reverse); rows whose
-/// `matterRef` does not resolve stay metadata-only. All copy is local-only —
-/// the synthetic list must never read as real case communications (R1/D-MSG4).
+/// D-MSG2). Rows render the five D-MSG4 fields (title, matter reference,
+/// participants, last-activity date, message count) and nothing else — no
+/// message body, no preview, no send/reply (D-MSG1/D-MSG3). Phase 12 adds
+/// the **reverse cross-link** (D-C1): a row whose `matterRef` resolves to a
+/// known synthetic matter renders the compact "View matter" chip (D-C2),
+/// gated by the `canViewMatters` nav hint (D-C4). The realtime slice (D-RT5)
+/// adds the **thread-open affordance**: the whole row is tappable and opens
+/// the read-only thread-detail surface (the first place message bodies
+/// appear — the D-MSG1 consummation scoped to the real read path; no
+/// composer/send/reply). Resolution is title-keyed and client-side against
+/// the loaded synthetic matter list (D-C3, the D-M5 discipline in reverse);
+/// rows whose `matterRef` does not resolve stay metadata-only. All copy is
+/// local-only — the synthetic list must never read as real case
+/// communications (R1/D-MSG4).
 class MessageListScreen extends StatelessWidget {
   const MessageListScreen({required this.capabilities, super.key});
 
@@ -190,6 +193,10 @@ class _ListSurfaceState extends State<_ListSurface> {
                   for (final MessageThread thread in threads) ...<Widget>[
                     _MessageThreadTile(
                       thread: thread,
+                      onOpenThread: () => context.go(
+                        AppRoutes.messageThreadDetailFor(thread.id),
+                        extra: thread.title,
+                      ),
                       onViewMatter: _matterTap(context, thread, matters),
                     ),
                     const SizedBox(height: LegalHubTheme.spaceSm),
@@ -218,16 +225,24 @@ class _ListSurfaceState extends State<_ListSurface> {
   }
 }
 
-/// A read-only metadata row. Carries **no onTap on the row body, no chevron,
-/// and no trailing action other than the Phase 12 "View matter" chip** — the
-/// thread list's body-less line (D-MSG1/D-MSG3) now allows exactly one tap
-/// target per resolved row: the compact `MatterLinkChip`, which is the ONLY
-/// InkWell in the list (D-C2). The AC-2 pin asserts these absences
-/// structurally.
+/// A read-only metadata row with **exactly two tap targets**: the whole-row
+/// thread-open affordance (the first thread-open in the app, D-RT5 — tap a
+/// thread row → the read-only detail surface) and, on resolved rows under
+/// the `canViewMatters` hint, the compact `MatterLinkChip` reverse
+/// cross-link (D-C2/D-C4). No chevron and no other trailing action — the
+/// row stays metadata-only otherwise (D-MSG1).
 class _MessageThreadTile extends StatelessWidget {
-  const _MessageThreadTile({required this.thread, required this.onViewMatter});
+  const _MessageThreadTile({
+    required this.thread,
+    required this.onOpenThread,
+    required this.onViewMatter,
+  });
 
   final MessageThread thread;
+
+  /// The whole-row thread-open tap → the read-only thread-detail surface
+  /// (D-RT5). Always non-null for a listed row.
+  final VoidCallback onOpenThread;
 
   /// The reverse cross-link tap, or null when the row renders no chip
   /// (unresolved `matterRef` or the nav hint not granted, D-C2/D-C4).
@@ -255,48 +270,52 @@ class _MessageThreadTile extends StatelessWidget {
         ),
         side: BorderSide(color: scheme.outlineVariant),
       ),
-      child: Padding(
-        padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-        child: Row(
-          children: <Widget>[
-            CircleAvatar(
-              backgroundColor: scheme.primaryContainer,
-              child: Icon(
-                Icons.forum_outlined,
-                size: 20,
-                color: scheme.onPrimaryContainer,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onOpenThread,
+        child: Padding(
+          padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
+          child: Row(
+            children: <Widget>[
+              CircleAvatar(
+                backgroundColor: scheme.primaryContainer,
+                child: Icon(
+                  Icons.forum_outlined,
+                  size: 20,
+                  color: scheme.onPrimaryContainer,
+                ),
               ),
-            ),
-            const SizedBox(width: LegalHubTheme.spaceMd),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    thread.title,
-                    style: text.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
+              const SizedBox(width: LegalHubTheme.spaceMd),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      thread.title,
+                      style: text.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${thread.participants.join(', ')} · $date',
-                    style: text.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
+                    const SizedBox(height: 2),
+                    Text(
+                      '${thread.participants.join(', ')} · $date',
+                      style: text.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: LegalHubTheme.spaceSm),
-            MessageCountChip(
-              label: l10n.messagesMessageCount(thread.messageCount),
-            ),
-            if (onViewMatter case final VoidCallback tap) ...<Widget>[
               const SizedBox(width: LegalHubTheme.spaceSm),
-              MatterLinkChip(onTap: tap),
+              MessageCountChip(
+                label: l10n.messagesMessageCount(thread.messageCount),
+              ),
+              if (onViewMatter case final VoidCallback tap) ...<Widget>[
+                const SizedBox(width: LegalHubTheme.spaceSm),
+                MatterLinkChip(onTap: tap),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

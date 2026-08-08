@@ -12,6 +12,7 @@ import 'package:legalhub/features/documents/domain/document.dart';
 import 'package:legalhub/features/documents/domain/document_gateway.dart';
 import 'package:legalhub/features/matters/domain/matter.dart';
 import 'package:legalhub/features/matters/domain/matter_gateway.dart';
+import 'package:legalhub/features/messaging/domain/message.dart';
 import 'package:legalhub/features/messaging/domain/message_gateway.dart';
 import 'package:legalhub/features/messaging/domain/message_thread.dart';
 import 'package:legalhub/features/search/domain/search_results.dart';
@@ -472,6 +473,13 @@ class _StubMessageGateway implements MessageGateway {
   Future<Result<List<MessageThread>>> fetchThreads() {
     calls += 1;
     return Future<Result<List<MessageThread>>>.value(results.removeAt(0));
+  }
+
+  @override
+  Future<Result<List<Message>>> fetchMessages(String threadId) async {
+    // Not exercised by the search cubit tests; an honest empty success
+    // keeps the seam implementable.
+    return const Result<List<Message>>.success(<Message>[]);
   }
 }
 

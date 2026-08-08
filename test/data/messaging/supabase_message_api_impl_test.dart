@@ -16,8 +16,12 @@ void main() {
       tableData = <String, List<Map<String, dynamic>>>{};
       tableErrors = <String, PostgrestException>{};
       objectErrors = <String, Object>{};
-      api = SupabaseMessageApiImpl((String table, String columns) async {
-        calls.add('$table:$columns');
+      api = SupabaseMessageApiImpl((
+        String table,
+        String columns, [
+        String? threadId,
+      ]) async {
+        calls.add('$table:$columns${threadId == null ? '' : '|$threadId'}');
         final Object? objectError = objectErrors[table];
         if (objectError != null) {
           throw objectError;
@@ -106,6 +110,89 @@ void main() {
                   'message',
                   'connection reset by peer',
                 ),
+          ),
+        );
+      },
+    );
+
+    test('fetchMessages selects the messages table with the VO columns and '
+        "the .eq('thread_id') filter", () async {
+      tableData['messages'] = <Map<String, dynamic>>[
+        <String, dynamic>{'id': 'msg-1'},
+      ];
+
+      final List<Map<String, dynamic>> rows = await api.fetchMessages(
+        'thread-9',
+      );
+
+      expect(rows, hasLength(1));
+      expect(calls, <String>[
+        'messages:id, thread_id, author_display_name, body, sent_at|thread-9',
+      ]);
+    });
+
+    test('fetchMessages maps a table denial to the denied kind', () async {
+      tableErrors['messages'] = const PostgrestException(
+        message: 'permission denied',
+      );
+
+      await expectLater(
+        api.fetchMessages('thread-1'),
+        throwsA(
+          isA<SupabaseMessageException>().having(
+            (e) => e.kind,
+            'kind',
+            SupabaseMessageFailureKind.denied,
+          ),
+        ),
+      );
+    });
+
+    test('fetchMessages maps an RLS denial text to the denied kind', () async {
+      tableErrors['messages'] = const PostgrestException(
+        message: 'new row violates row-level security policy',
+      );
+
+      await expectLater(
+        api.fetchMessages('thread-1'),
+        throwsA(
+          isA<SupabaseMessageException>().having(
+            (e) => e.kind,
+            'kind',
+            SupabaseMessageFailureKind.denied,
+          ),
+        ),
+      );
+    });
+
+    test('fetchMessages preserves unknown failures with the message', () async {
+      tableErrors['messages'] = const PostgrestException(
+        message: 'connection reset by peer',
+      );
+
+      await expectLater(
+        api.fetchMessages('thread-1'),
+        throwsA(
+          isA<SupabaseMessageException>()
+              .having((e) => e.kind, 'kind', SupabaseMessageFailureKind.unknown)
+              .having((e) => e.message, 'message', 'connection reset by peer'),
+        ),
+      );
+    });
+
+    test(
+      'fetchMessages maps a non-Postgrest failure to providerUnavailable',
+      () async {
+        objectErrors['messages'] = Exception('network down');
+
+        await expectLater(
+          api.fetchMessages('thread-1'),
+          throwsA(
+            isA<SupabaseMessageException>().having(
+              (e) => e.kind,
+              'kind',
+              SupabaseMessageFailureKind.providerUnavailable,
+            ),
           ),
         );
       },

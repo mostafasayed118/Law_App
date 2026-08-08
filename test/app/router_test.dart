@@ -623,6 +623,38 @@ void main() {
     });
 
     testWidgets(
+      'tapping a thread row opens the read-only thread-detail surface (realtime '
+      'T7, D-RT5)',
+      (tester) async {
+        await resetServiceLocator();
+        configureDependencies();
+        addTearDown(() => resetServiceLocator());
+
+        await authCubit.startDemoSession();
+        router.go(AppRoutes.messages);
+        await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+        await tester.pumpAndSettle();
+
+        // The thread-open affordance (D-RT5): the whole first row is
+        // tappable and opens /messages/thread-1 with the tapped title as
+        // the route extra.
+        await tester.tap(find.text('Demo matter updates'));
+        await tester.pumpAndSettle();
+
+        expect(
+          router.routerDelegate.currentConfiguration.uri.path,
+          AppRoutes.messageThreadDetailFor('thread-1'),
+        );
+        // The detail surface renders the tapped title and the read-only
+        // message rows from the fake (thread-1 carries 12 generic rows).
+        expect(find.text('Demo matter updates'), findsOneWidget);
+        expect(find.textContaining('generic demo content'), findsWidgets);
+        // Read-only: no composer/send affordance on the detail surface.
+        expect(find.byType(TextField), findsNothing);
+      },
+    );
+
+    testWidgets(
       'renders no View matter chip when canViewMatters is not granted (12.1 '
       'AC-4)',
       (tester) async {

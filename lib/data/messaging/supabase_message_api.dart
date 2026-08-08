@@ -5,13 +5,20 @@
 /// cross this boundary (same discipline as [SupabaseDocumentApi]).
 library;
 
-/// A PostgREST table SELECT: table name + columns → raw map rows.
+/// A PostgREST table SELECT: table name + columns → raw map rows, with an
+/// optional `thread_id` filter.
 ///
 /// The callable the impl injects (mirrors `DocumentTableCaller` from the
 /// documents seam). Plain function type so tests inject a closure and the
-/// provider binding is the only file that touches provider types.
+/// provider binding is the only file that touches provider types. The
+/// optional `threadId` filters the SELECT with `.eq('thread_id', …)` — the
+/// thread-scoped messages read (D-RT5); the threads read passes null.
 typedef MessageTableCaller =
-    Future<List<Map<String, dynamic>>> Function(String table, String columns);
+    Future<List<Map<String, dynamic>>> Function(
+      String table,
+      String columns, [
+      String? threadId,
+    ]);
 
 /// Typed reasons the message-thread read can fail, mapped from the PostgREST
 /// surface. The read path is a plain RLS-scoped SELECT — the RPC-specific
@@ -39,14 +46,22 @@ class SupabaseMessageException implements Exception {
   String toString() => 'SupabaseMessageException(${kind.name}): $message';
 }
 
-/// Message-threads table surface backed by the Supabase PostgREST client.
+/// Message-threads + messages table surface backed by the Supabase
+/// PostgREST client.
 ///
-/// The SELECT is RLS-scoped (plan D-MSR1/D-MSR2): the
+/// The thread SELECT is RLS-scoped (plan D-MSR1/D-MSR2): the
 /// `message_threads_select_assigned` policy returns only the rows whose
 /// matter the caller is assigned to (client or attorney) as an active member
 /// of the thread's org. Rows carry ids + the embedded matter title — the
 /// gateway resolves the VO's title-keyed `matterRef` from the embed, falling
 /// back to the raw matter id (D-MSR4).
+///
+/// The message SELECT is the thread gate extended one hop (D-RT2):
+/// `messages_select_assigned` returns only the rows whose thread's matter
+/// the caller is assigned to — and the three-way org equality is
+/// load-bearing, so a message is never readable when its thread or matter is
+/// not. The `body` column is the D-MSG1 consummation (first content column
+/// in the public schema) — read path only.
 abstract interface class SupabaseMessageApi {
   /// The caller's assignment-scoped `message_threads` rows.
   ///
@@ -55,4 +70,13 @@ abstract interface class SupabaseMessageApi {
   /// metadata-only read surface the [MessageThread] VO needs (D-MSG1: no
   /// body/preview/attachment/sender column exists).
   Future<List<Map<String, dynamic>>> fetchMessageThreads();
+
+  /// The caller's assignment-scoped `messages` rows for one thread.
+  ///
+  /// Columns requested: `id`, `thread_id`, `author_display_name`, `body`,
+  /// `sent_at` — the read-path surface the [Message] VO needs (D-RT3/D-RT5:
+  /// no attachment/read-receipt/user-id column is ever read). The SELECT is
+  /// filtered `.eq('thread_id', threadId)` so only the tapped thread's rows
+  /// cross the seam.
+  Future<List<Map<String, dynamic>>> fetchMessages(String threadId);
 }

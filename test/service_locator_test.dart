@@ -225,6 +225,10 @@ class _FakeSupabaseMessageApi implements SupabaseMessageApi {
   @override
   Future<List<Map<String, dynamic>>> fetchMessageThreads() async =>
       <Map<String, dynamic>>[];
+
+  @override
+  Future<List<Map<String, dynamic>>> fetchMessages(String threadId) async =>
+      <Map<String, dynamic>>[];
 }
 
 /// Hand-rolled fake of the [SupabaseStorageApi] seam for the DI flip test

@@ -1,5 +1,6 @@
 import '../../core/errors/app_error.dart';
 import '../../core/errors/result.dart';
+import '../../features/messaging/domain/message.dart';
 import '../../features/messaging/domain/message_gateway.dart';
 import '../../features/messaging/domain/message_thread.dart';
 import 'supabase_message_api.dart';
@@ -122,8 +123,62 @@ class SupabaseMessageGateway implements MessageGateway {
     );
   }
 
+  @override
+  Future<Result<List<Message>>> fetchMessages(String threadId) async {
+    try {
+      final List<Map<String, dynamic>> rows = await _api.fetchMessages(
+        threadId,
+      );
+      return Result<List<Message>>.success(
+        List<Message>.unmodifiable(rows.map(_messageFromRow)),
+      );
+    } on SupabaseMessageException catch (e) {
+      return Result<List<Message>>.failure(_mapMessageFailure(e));
+    } on FormatException catch (e) {
+      // Provider drift (unexpected body/author/sent_at shape) surfaces
+      // loudly, never as a silently wrong message.
+      return Result<List<Message>>.failure(
+        AppError(
+          code: 'message_body_read_failed',
+          userMessage: 'Unable to load messages. Please try again.',
+          technicalMessage: e.message,
+        ),
+      );
+    }
+  }
+
+  /// Maps one raw message row to the [Message] VO.
+  ///
+  /// Every cast below is guarded above (id/thread_id/author_display_name/
+  /// body/sent_at), so a malformed row surfaces as a typed FormatException →
+  /// AppError, never a raw TypeError across the boundary.
+  Message _messageFromRow(Map<String, dynamic> row) {
+    final Object? id = row['id'];
+    if (id is! String || id.isEmpty) {
+      throw FormatException('Message row has no id');
+    }
+    final Object? author = row['author_display_name'];
+    if (author is! String || author.isEmpty) {
+      throw FormatException('Message row has no author_display_name');
+    }
+    final Object? body = row['body'];
+    if (body is! String || body.isEmpty) {
+      throw FormatException('Message row has no body');
+    }
+    final Object? sentAt = row['sent_at'];
+    if (sentAt is! String || sentAt.isEmpty) {
+      throw FormatException('Message row has no sent_at');
+    }
+    return Message(
+      id: id,
+      authorDisplayName: author,
+      body: body,
+      sentAt: DateTime.parse(sentAt).toLocal(),
+    );
+  }
+
   /// Maps a provider failure to a redaction-safe [AppError]. The technical
-  /// message is the provider's own (denial/availability text) — thread row
+  /// message is the provider's own (denial/availability text) — message
   /// content never crosses into errors.
   AppError _mapFailure(SupabaseMessageException e) {
     final (String code, String userMessage) = switch (e.kind) {
@@ -138,6 +193,33 @@ class SupabaseMessageGateway implements MessageGateway {
       SupabaseMessageFailureKind.unknown => (
         'message_read_failed',
         'Unable to load threads. Please try again.',
+      ),
+    };
+    return AppError(
+      code: code,
+      userMessage: userMessage,
+      technicalMessage: e.message,
+    );
+  }
+
+  /// Maps a provider failure for the messages read to a redaction-safe
+  /// [AppError]. Distinct `message_body_read_*` codes keep the detail
+  /// surface's failures separable from the thread-list's (D-RT5); the
+  /// technical message is the provider's own — message content never
+  /// crosses into errors.
+  AppError _mapMessageFailure(SupabaseMessageException e) {
+    final (String code, String userMessage) = switch (e.kind) {
+      SupabaseMessageFailureKind.denied => (
+        'message_body_read_denied',
+        'You do not have permission to view these messages.',
+      ),
+      SupabaseMessageFailureKind.providerUnavailable => (
+        'message_body_read_unavailable',
+        'Messages are temporarily unavailable. Please try again.',
+      ),
+      SupabaseMessageFailureKind.unknown => (
+        'message_body_read_failed',
+        'Unable to load messages. Please try again.',
       ),
     };
     return AppError(

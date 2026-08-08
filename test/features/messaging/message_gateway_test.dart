@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/features/messaging/data/fake_message_gateway.dart';
+import 'package:legalhub/features/messaging/domain/message.dart';
 import 'package:legalhub/features/messaging/domain/message_thread.dart';
 
 void main() {
@@ -75,5 +76,56 @@ void main() {
         }
       },
     );
+  });
+
+  group('FakeMessageGateway.fetchMessages (D-RT5)', () {
+    test(
+      'returns deterministic per-thread rows matching each messageCount',
+      () async {
+        final FakeMessageGateway gateway = FakeMessageGateway();
+
+        for (final MessageThread thread
+            in FakeMessageGateway.syntheticThreads) {
+          final List<Message> first = (await gateway.fetchMessages(
+            thread.id,
+          )).valueOrNull!;
+          final List<Message> second = (await gateway.fetchMessages(
+            thread.id,
+          )).valueOrNull!;
+
+          // Same values on every call — no wall-clock or random dependence.
+          expect(first, second);
+          expect(first, hasLength(thread.messageCount));
+          // Every row belongs to the requested thread (id prefix contract).
+          expect(first.first.id, startsWith('${thread.id}-msg-'));
+        }
+      },
+    );
+
+    test('rows are read-path generic demo copy, never real communications '
+        '(R1/D-RT4)', () async {
+      final FakeMessageGateway gateway = FakeMessageGateway();
+
+      for (final MessageThread thread in FakeMessageGateway.syntheticThreads) {
+        for (final Message message in (await gateway.fetchMessages(
+          thread.id,
+        )).valueOrNull!) {
+          expect(message.authorDisplayName, isNotEmpty);
+          expect(message.body.toLowerCase(), contains('demo'));
+          expect(message.body, isNot(contains('@')));
+          expect(message.toString(), isNot(contains('@')));
+        }
+      }
+    });
+
+    test('an unknown thread id is an honest empty success', () async {
+      final FakeMessageGateway gateway = FakeMessageGateway();
+
+      final List<Message> messages = (await gateway.fetchMessages(
+        'thread-unknown',
+      )).valueOrNull!;
+
+      expect(messages, isEmpty);
+    });
   });
 }

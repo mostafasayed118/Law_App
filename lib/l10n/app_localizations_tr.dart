@@ -853,6 +853,15 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get messageThreadDetailTitle => 'Konu mesajları';
+
+  @override
+  String get messagesDetailEmpty => 'Bu konuşmada kullanılabilir mesaj yok.';
+
+  @override
+  String get messagesDetailError => 'Mesajlar yüklenemedi.';
+
+  @override
   String get searchTitle => 'Ara';
 
   @override
