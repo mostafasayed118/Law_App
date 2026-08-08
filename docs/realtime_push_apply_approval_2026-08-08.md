@@ -10,8 +10,10 @@
 > the owner's explicit authorization to apply the reviewed + rehearsed
 > slice to the shared dev project, with the rollback pairing standing by.
 >
-> **Status: DRAFT (2026-08-08) — pending the owner's dated sign-off in §6.**
-> All preconditions are met: the ephemeral rehearsal r1
+> **Status: APPLY APPROVED (2026-08-08).** The owner's dated sign-off in §6
+> authorizes the §3 up sequence against the shared dev project
+> (`eutmvevpskerzpqmwplv`, `eu-central-1`) per the §4 execution conditions,
+> with the rollback pairing standing by. The ephemeral rehearsal r1
 > (`docs/realtime_push_rehearsal_evidence_r1_2026-08-08.md`) reported
 > **PASSED 2026-08-08** (plan T4 — genuinely executed battery, 72/0/0; §4
 > evidence), and the T2 artifacts were validated live on the rehearsal host
@@ -40,8 +42,8 @@
 | Policy artifact | `supabase/policies/messages_insert.sql` (`f1d7903`) | ✅ Committed — NOT applied |
 | Policy battery + harness | `supabase/tests/09_realtime_push.sql`, `00_fixtures.sql`, `scripts/verify_policy_tests.sh` (`6302bdc`) | ✅ Committed; static `--check` PASS 335/0/0 · selftest 6/6 |
 | **Ephemeral rehearsal (r1)** | `docs/realtime_push_rehearsal_evidence_r1_2026-08-08.md` (`51532fd`) | ✅ **PASSED 2026-08-08** — genuinely executed run (§4 evidence: 72/0/0) |
-| **Apply approval (this record)** | this document | ⏳ **DRAFT — pending owner's dated sign-off (§6)** |
-| Apply execution (dev project) | `docs/realtime_push_apply_execution_2026-08-08.md` | ⏳ pending execution (this record authorizes it once signed) |
+| **Apply approval (this record)** | this document | ✅ **APPROVED 2026-08-08** (owner's dated sign-off, §6) |
+| Apply execution (dev project) | `docs/realtime_push_apply_execution_2026-08-08.md` | ⏳ pending execution (this record authorizes it) |
 
 ## 2. Gate criteria — what the r1 rehearsal must prove
 
@@ -179,21 +181,22 @@ conditions and the §5 exclusions, with the rollback pairing standing by.
 Signature is valid — the r1 rehearsal reported PASSED on 2026-08-08 (plan
 T4; evidence §4, criteria §2 all green — genuinely executed, 72/0/0).
 
-- **Project Owner:** github.com/mostafasayed118 — **date: ______**
-  — **approval wording:** "Apply approved — realtime live-delivery slice
-  (09_realtime_push + policies/messages_insert + the demo send as the
-  assigned partner on the acquisition demo thread), per this record §3–§5,
-  with the §4 guardrails and rollback pairing."
+- **Project Owner:** github.com/mostafasayed118 — **date: 2026-08-08**
+  — **approval wording (recorded from the pair-programming session):**
+  "Apply approved — realtime live-delivery slice (09_realtime_push +
+  policies/messages_insert + the demo send as the assigned partner on the
+  acquisition demo thread), per this record §3–§5, with the §4 guardrails
+  and rollback pairing."
 
-> **Awaiting signature.** Once signed, the execution record
+> **Signed 2026-08-08.** The execution record
 > (`docs/realtime_push_apply_execution_2026-08-08.md`) captures the actual
 > run; on success, T6 (the dated matrix §4 write-row + §6 delivery-row
 > addenda) precedes T7 (client swap) per the plan.
 
 ## 7. Ledger
 
-- Drafted 2026-08-08: this record's status is ⏳ DRAFT; the plan's T5 row
-  annotated.
+- Signed 2026-08-08: this record's status is ✅ APPLY APPROVED (dated);
+  the plan's T5 row annotated.
 - Pending: owner's dated sign-off (§6) → apply execution
   (`docs/realtime_push_apply_execution_2026-08-08.md`) captures the actual
   run per §4; on success, T6 (matrix addenda) and T7 (client swap) follow,
