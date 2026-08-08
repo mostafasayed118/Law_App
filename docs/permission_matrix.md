@@ -424,11 +424,34 @@ this is the row's own worst-case test and must exist before P2 ships.
 >   not asserted as a battery check row).
 > The remaining §6 rows (realtime delivery, audit) are unchanged. Per §7
 > this extends, not replaces, and widens no other row; in effect on the
-> apply execution (pending — r1 evidence ⏳, apply ⏳ HELD, approval ✅
-> APPLY APPROVED 2026-08-08 `91c49ce`).
+> apply execution (pending — r1 evidence ⏳, apply ⏳ HELD, approval ✅>   APPLY APPROVED 2026-08-08 `91c49ce`).
+
+> **§6 addendum (2026-08-08, audit-surfacing slice — plan
+> `docs/audit_surfacing_plan_2026-08-08.md`, fifth §14 un-deferral):**
+> the **"Read the audit table"** row gains its first **client surface**,
+> behind the two audit RPCs — both **REVIEWED & APPLIED to the dev project
+> 2026-08-01** (backout `rpc/_down.sql`) and both **pinned in the harness
+> battery's §1d RPC-EXECUTE list** (`read_org_audit(uuid)`,
+> `read_platform_audit()`):
+> - **`read_platform_audit()`** — `platform_owner_admin`-only cross-org
+>   audit read; the platform-admin screen's Platform audit list.
+> - **`read_org_audit(org_id)`** — org-scoped audit read; the per-org audit
+>   list for the selected org (the RPC is partner-capable server-side, but
+>   the first surface is owner-only on the platform-admin screen — a
+>   partner-facing org-audit UI is a recorded follow-up).
+> Both render **redacted metadata only** (the RPCs return `redacted_summary`
+> + `correlation_id`; no credentials/content — contract §8), and **D-P0C4
+> holds: no raw `SELECT` on `audit_events` is ever granted** — the RPCs are
+> the only auditable read path (a raw SELECT policy cannot audit a read),
+> and `platform_owner_admin` reading the audit is itself an audited action
+> (owner is not audit-exempt). A **non-owner reader is denied** (the
+> server-side owner-only deny maps to the platform-admin screen's distinct
+> denied state — P3.5 AC-7, never empty-success). The remaining §6 row
+> (realtime delivery) is unchanged. Per §7 this extends, not replaces, and
+> widens no other row; in effect on the client surface ship (T2–T5 of
+> `docs/audit_surfacing_plan_2026-08-08.md`).
 
 ---
-
 ## 7. Sign-off
 
 | Role | Name | Date |

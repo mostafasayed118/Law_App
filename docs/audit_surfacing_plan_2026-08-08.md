@@ -234,12 +234,16 @@ Each task is independently committable with the stated verification; **no
 owner-gated server step exists in this slice** (the RPCs are applied) — the
 only dated gate is the matrix §6 addendum ordering (T1) and the final push.
 
-- [ ] **1. Dated matrix §6 addendum** — touches: `docs/permission_matrix.md`
+- [x] **1. Dated matrix §6 addendum** — touches: `docs/permission_matrix.md`
   — adds the client-surface widening for the "Read the audit table" row
   (owner platform audit + per-org audit behind `read_platform_audit` /
   `read_org_audit`, redacted-only, never raw SELECT, D-P0C4 holds; partner
   org-audit UI stays a follow-up) — done when: addendum committed with the
-  §7 date/place discipline, ledger sweep green. — **⏳ PENDING**
+  §7 date/place discipline, ledger sweep green. — **DONE (this commit)** —
+  placed chronologically after the storage §6 addendum; records the two
+  applied + battery-pinned RPCs as the row's enforcement, owner-only first
+  surface, redacted-only + D-P0C4 + non-owner-denied (AC-7); widens no
+  other row.
 - [ ] **2. Seam + impl + gateway audit methods** — touches:
   `lib/data/admin/supabase_platform_admin_api.dart` +
   `supabase_platform_admin_api_impl.dart` + `supabase_platform_admin_gateway.dart`
