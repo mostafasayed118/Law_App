@@ -691,6 +691,66 @@ void main() {
       expect(ar.viewMatter, isNot(en.viewMatter));
     });
 
+    test('resolves the org-audit keys in every locale (2026-08-09 pin)', () {
+      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+      final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+      final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+      // Partner org-audit surface (partner_org_audit_scope_2026-08-09.md):
+      // exact copy per locale, plus the no-silent-EN-copy guards.
+      expect(en.orgAuditTitle, 'Audit trail');
+      expect(ar.orgAuditTitle, 'سجل التدقيق');
+      expect(tr.orgAuditTitle, 'Denetim kaydı');
+
+      expect(en.orgAuditEmpty, 'No audit events recorded yet.');
+      expect(ar.orgAuditEmpty, 'لم يتم تسجيل أي أحداث تدقيق حتى الآن.');
+      expect(tr.orgAuditEmpty, 'Henüz hiçbir denetim olayı kaydedilmedi.');
+
+      expect(
+        en.orgAuditDenied,
+        "You do not have permission to view this organization's audit trail.",
+      );
+      expect(
+        ar.orgAuditDenied,
+        'ليس لديك صلاحية للاطلاع على سجل تدقيق هذه المؤسسة.',
+      );
+      expect(
+        tr.orgAuditDenied,
+        'Bu kuruluşun denetim kaydını görüntüleme izniniz yok.',
+      );
+
+      expect(en.orgAuditError, 'Unable to load the audit trail.');
+      expect(ar.orgAuditError, 'تعذّر تحميل سجل التدقيق.');
+      expect(tr.orgAuditError, 'Denetim kaydı yüklenemedi.');
+
+      expect(en.orgAuditRetry, 'Try again');
+      expect(ar.orgAuditRetry, 'إعادة المحاولة');
+      expect(tr.orgAuditRetry, 'Tekrar dene');
+
+      expect(en.orgAuditHubEntry, 'View audit trail');
+      expect(ar.orgAuditHubEntry, 'عرض سجل التدقيق');
+      expect(tr.orgAuditHubEntry, 'Denetim kaydını görüntüle');
+
+      expect(en.orgAuditOutcomeAllowed, 'Allowed');
+      expect(ar.orgAuditOutcomeAllowed, 'مسموح');
+      expect(tr.orgAuditOutcomeAllowed, 'İzinli');
+
+      expect(en.orgAuditOutcomeDenied, 'Denied');
+      expect(ar.orgAuditOutcomeDenied, 'مرفوض');
+      expect(tr.orgAuditOutcomeDenied, 'Reddedildi');
+
+      // Real per-locale wording, not silent copies of EN (mirrors the 12.2
+      // guard style).
+      expect(tr.orgAuditTitle, isNot(en.orgAuditTitle));
+      expect(ar.orgAuditTitle, isNot(en.orgAuditTitle));
+      expect(tr.orgAuditEmpty, isNot(en.orgAuditEmpty));
+      expect(ar.orgAuditEmpty, isNot(en.orgAuditEmpty));
+      expect(tr.orgAuditDenied, isNot(en.orgAuditDenied));
+      expect(ar.orgAuditDenied, isNot(en.orgAuditDenied));
+      expect(tr.orgAuditHubEntry, isNot(en.orgAuditHubEntry));
+      expect(ar.orgAuditHubEntry, isNot(en.orgAuditHubEntry));
+    });
+
     test('resolves the recovery error key in every locale (P3.1 pin)', () {
       final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
       final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));

@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/core/admin/audit_entry.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/admin/fake_platform_admin_gateway.dart';
