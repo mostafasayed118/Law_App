@@ -3,7 +3,7 @@
 | Script | What it verifies | When to run |
 |---|---|---|
 | `verify_ledger.sh` | Governance-ledger integrity (below) | **Before committing any `docs/` amendment** that touches the audit plan or Gate 3 reconciliation; wired into CI as a cheap static gate (`ci.yml` on every push/PR) plus a **nightly teeth-prover** (`ledger-selftest.yml`, 02:00 UTC + `workflow_dispatch`) |
-| `verify_policy_tests.sh` | P0-closure policy battery (below) | Against an **ephemeral rehearsal project only**, before any P0-close decision; `--check` is static and runs anywhere, and is wired into `ci.yml` as a DB-free gate on every push/PR |
+| `verify_policy_tests.sh` | P0-closure policy battery (below) | Against an **ephemeral rehearsal project only**, before any P0-close decision; `--check` is static and runs anywhere, and is wired into `ci.yml` as a DB-free gate on every push/PR, with a **nightly teeth-prover** (`ledger-selftest.yml` runs `--selftest`, 02:00 UTC + `workflow_dispatch`) |
 
 ## `verify_ledger.sh`
 
@@ -182,3 +182,10 @@ read-only owner sweep.
   history (`fetch-depth: 0`) because the selftest creates a scratch worktree
   at HEAD and the battery validates cited hashes against the whole object
   database.
+- **`ledger-selftest.yml`** also runs `scripts/verify_policy_tests.sh
+  --selftest` nightly (02:00 UTC, default branch) and on demand via
+  `workflow_dispatch` — the policy battery's teeth-prover: it injects each
+  known drift class (missing battery file, dangling fixture UUID, stripped
+  FAIL marker, weakened harness file list, dropped doc hook, broken harness
+  syntax) into a scratch worktree and asserts the DB-free `--check` battery
+  FAILs on each, mirroring the ledger's six-class selftest.

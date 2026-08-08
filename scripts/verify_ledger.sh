@@ -388,7 +388,14 @@ selftest() {
   ( cd "$wt" && git checkout -- docs/p2_rehearsal_evidence_r4_2026-08-01.md )
 
   # 5. Stale README count — the README claim drifts behind the suite
-  ( cd "$wt" && sed -i 's/Tests (277 total)/Tests (222 total)/; s/\*\*277 tests\*\*/**222 tests**/' README.md )
+  #    (derived from the worktree, not hardcoded: the injection must still
+  #    land as the suite count grows past any fixed figure)
+  local cur_plain cur_gen cur_total wrong_total
+  cur_plain=$( ( cd "$wt" && git grep -hE '(^|[^A-Za-z])(test|testWidgets|blocTest)\(' -- test/ 2>/dev/null ) | wc -l | tr -d ' ')
+  cur_gen=$( ( cd "$wt" && git grep -hE 'blocTest<' -- test/ 2>/dev/null ) | wc -l | tr -d ' ')
+  cur_total=$((cur_plain + cur_gen))
+  wrong_total=$((cur_total + 1))
+  ( cd "$wt" && sed -i "s/Tests ($cur_total total)/Tests ($wrong_total total)/g; s/\*\*$cur_total tests\*\*/**$wrong_total tests**/g" README.md )
   expect_fail "stale README count" "README test count stale"
   ( cd "$wt" && git checkout -- README.md )
 

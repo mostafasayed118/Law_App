@@ -1,13 +1,18 @@
-# LegalHub — scheduled teeth-prover for the governance ledger battery.
-# The push/PR gate (ci.yml) runs scripts/verify_ledger.sh on every commit;
-# this workflow proves the battery itself still has teeth on a cadence by
+# LegalHub — scheduled teeth-prover for the two repo-local static gates:
+# the governance ledger battery (scripts/verify_ledger.sh) and the
+# policy-test battery (scripts/verify_policy_tests.sh --check).
+# The push/PR gate (ci.yml) runs both batteries on every commit; this
+# workflow proves each battery itself still has teeth on a cadence by
 # running its --selftest mode (drift-injection: dead hash, missing marker,
-# wrong suite claim, dropped verdict, stale README count, dropped citation —
-# each must red the battery). Needs only bash + git, no Flutter toolchain.
-# Runs nightly (02:00 UTC) and on demand via workflow_dispatch, so a silent
-# regression in the gate's detection logic is caught even if no commit pushes.
+# wrong suite claim, dropped verdict, stale README count, dropped citation
+# for the ledger; missing battery file, dangling fixture UUID, stripped FAIL
+# marker, weakened harness file list, dropped doc hook, broken harness
+# syntax for the policy battery — each must red its battery). Needs only
+# bash + git, no Flutter toolchain and no database. Runs nightly (02:00 UTC)
+# and on demand via workflow_dispatch, so a silent regression in either
+# gate's detection logic is caught even if no commit pushes.
 # No build, deploy, publish, signing, or release steps are authorized at B2.
-name: Ledger selftest
+name: Governance selftests
 
 on:
   schedule:
@@ -16,7 +21,7 @@ on:
     # occasional late starts are acceptable.
     - cron: '0 2 * * *'
   # On-demand trigger so the teeth check can be run immediately after a
-  # battery change (Actions → "Ledger selftest" → Run workflow), without
+  # battery change (Actions → "Governance selftests" → Run workflow), without
   # waiting for the next nightly window or faking a push.
   workflow_dispatch:
 
@@ -26,8 +31,8 @@ permissions:
   contents: read
 
 jobs:
-  ledger-selftest:
-    name: verify_ledger --selftest
+  governance-selftests:
+    name: governance gates --selftest
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -35,9 +40,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          # Full history (not shallow): the selftest creates a scratch
-          # worktree at HEAD and runs the whole battery inside it, and the
-          # battery validates cited hashes against the whole object database
+          # Full history (not shallow): both selftests create a scratch
+          # worktree at HEAD and run the battery inside it, and the batteries
+          # validate cited hashes against the whole object database
           # (`git rev-list --all`, `git show <hash>:<path>`), so a depth-1
           # clone would make every cited hash look dangling and fail the
           # baseline spuriously.
@@ -48,3 +53,12 @@ jobs:
         # baseline) fails the job — same fail-fast philosophy as the
         # ci.yml ledger step.
         run: bash scripts/verify_ledger.sh --selftest
+
+      - name: Prove policy-battery teeth (--selftest)
+        # Same teeth philosophy as the ledger selftest, for the policy
+        # battery's --check gate (ci.yml): each injected drift class
+        # (missing battery file, dangling fixture UUID, stripped FAIL
+        # marker, weakened harness file list, dropped doc hook, broken
+        # harness syntax) must red the run. DB-free (--check is static;
+        # no database is provisioned), bash + git only.
+        run: bash scripts/verify_policy_tests.sh --selftest

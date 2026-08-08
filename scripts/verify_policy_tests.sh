@@ -62,11 +62,21 @@
 #       battery files present, every fixture UUID referenced by 01/02/03
 #       resolves in 00_fixtures.sql, every check block carries the FAIL
 #       marker, the harness self-syntax-checks.
+#   scripts/verify_policy_tests.sh --selftest
+#       Drift-injection teeth check (no database, bash + git only): creates a
+#       scratch worktree, injects each known drift class (missing battery
+#       file, dangling fixture UUID, stripped FAIL marker, weakened harness
+#       file list, dropped doc hook, broken harness syntax), and asserts the
+#       --check battery FAILs on each. Never mutates the repo working tree;
+#       wired into ledger-selftest.yml as a nightly teeth-prover alongside
+#       verify_ledger.sh --selftest.
 #   scripts/verify_policy_tests.sh --help
 #
 # Exit codes:
-#   0 — all checks passed (WARNs allowed)
-#   1 — one or more FAILs (grant/structural pin violated, battery file error)
+#   0 — all checks passed (WARNs allowed); --selftest: every injected drift
+#       class detected
+#   1 — one or more FAILs (grant/structural pin violated, battery file error,
+#       or a drift class evaded the gate in --selftest mode)
 #   2 — usage/environment error (missing SUPABASE_TEST_DB_URL, psql absent)
 #
 # Intended use: run against a fresh ephemeral rehearsal project before any
@@ -101,8 +111,33 @@ BATTERY_FILES=(
 )
 
 usage() {
-  sed -n '2,40p' "$0" | sed 's/^# \{0,1\}//'
+  # Print the leading comment block only (line 1 shebang, then all `#`
+  # lines until the first non-comment line) — robust as the header grows.
+  # (`next` after print: without it, the `{ exit }` rule re-evaluates the
+  #  sub()-stripped record and would exit on the first `#` line.)
+  awk 'NR == 1 { next } /^#/ { sub(/^# ?/, ""); print; next } { exit }' "$0"
 }
+
+# ---------------------------------------------------------------------------
+# --selftest mode: drift-injection teeth check (no database)
+# ---------------------------------------------------------------------------
+# Injects each known drift class into a scratch worktree and asserts the
+# --check battery FAILs on each (proves the gate's teeth without mutating the
+# repo or needing a database — mirrors verify_ledger.sh --selftest). All
+# selftest state is global so the EXIT trap can clean up safely under `set -u`.
+SELFTEST_MODE=0
+SELFTEST_BASE=""
+SELFTEST_WT=""
+SELFTEST_SCRIPT=""
+SELFTEST_OK=0
+SELFTEST_TOTAL=0
+
+if [ "$#" -gt 0 ] && [ "$1" = "--selftest" ]; then
+  SELFTEST_MODE=1
+  shift
+fi
+
+trap 'if [ -n "$SELFTEST_BASE" ]; then rm -rf "$SELFTEST_BASE"; git worktree prune >/dev/null 2>&1; fi' EXIT
 
 # ---------------------------------------------------------------------------
 # MODE: --check — static validation, no database required
@@ -403,8 +438,114 @@ run_battery() {
 }
 
 # ---------------------------------------------------------------------------
+# SELFTEST — prove the battery's teeth on demand (no database; never mutates
+# the repo working tree)
+# ---------------------------------------------------------------------------
+expect_fail() {  # $1 drift label, $2 literal FAIL message the battery must emit
+  SELFTEST_TOTAL=$((SELFTEST_TOTAL + 1))
+  local out rc
+  out=$( ( cd "$SELFTEST_WT" && bash "$SELFTEST_SCRIPT" --check ) 2>&1 )
+  rc=$?
+  if [ "$rc" -ne 0 ] && printf '%s' "$out" | grep -qF "$2"; then
+    SELFTEST_OK=$((SELFTEST_OK + 1))
+    ok "selftest: $1 — --check FAILed (rc=$rc), matched '$2'"
+  else
+    fail "selftest: $1 — --check rc=$rc, expected FAIL matching '$2'"
+    printf '%s\n' "$out" | tail -4
+  fi
+}
+
+selftest() {
+  local base wt out rc
+  base=$(mktemp -d)
+  SELFTEST_BASE="$base"
+  wt="$base/wt"
+  SELFTEST_WT="$wt"
+  # Run the battery from the WORKTREE's own copy so its SCRIPT_DIR-derived
+  # paths (TESTS_DIR/SUPABASE_DIR) resolve inside the scratch tree — the
+  # ledger's selftest is cwd-relative, but this battery is location-relative.
+  SELFTEST_SCRIPT="$wt/scripts/verify_policy_tests.sh"
+
+  note "selftest: scratch worktree at $(git rev-parse --short HEAD) — $wt"
+  if ! git worktree add --detach "$wt" HEAD >/dev/null 2>&1; then
+    fail "selftest: could not create scratch worktree"
+    return 1
+  fi
+
+  note "selftest: baseline — --check on the unmutated scratch tree (must PASS)"
+  out=$( ( cd "$wt" && bash "$SELFTEST_SCRIPT" --check ) 2>&1 )
+  rc=$?
+  if [ "$rc" -ne 0 ]; then
+    fail "selftest: baseline --check FAILed (rc=$rc) — committed state is red; aborting"
+    printf '%s\n' "$out" | tail -4
+    return 1
+  fi
+  ok "selftest: baseline --check PASS (rc=0)"
+
+  # 1. Missing battery file — a battery file vanishes
+  ( cd "$wt" && rm supabase/tests/07_storage_rls.sql )
+  expect_fail "missing battery file" "battery file missing or empty"
+  ( cd "$wt" && git checkout -- supabase/tests/07_storage_rls.sql )
+
+  # 2. Dangling fixture UUID — a battery-cited fixture UUID drops out of
+  #    00_fixtures.sql (the static cross-ref scan must red)
+  local fixture_uuid
+  fixture_uuid=$(comm -12 \
+    <(grep -hoE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' "$wt"/supabase/tests/0[1-7]_*.sql | sort -u) \
+    <(grep -hoE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' "$wt/supabase/tests/00_fixtures.sql" | sort -u) \
+    | head -1)
+  if [ -z "$fixture_uuid" ]; then
+    fail "selftest: no battery-cited fixture UUID found — cannot construct drift 2"
+    return 1
+  fi
+  ( cd "$wt" && sed -i "s/$fixture_uuid/00000000-0000-4000-8000-0000000000ff/g" supabase/tests/00_fixtures.sql )
+  expect_fail "dangling fixture UUID" "MISSING from 00_fixtures.sql"
+  ( cd "$wt" && git checkout -- supabase/tests/00_fixtures.sql )
+
+  # 3. Stripped FAIL marker — a battery file loses its check markers
+  ( cd "$wt" && sed -i 's/POLICY-BATTERY FAIL/POLICY-BATTERY DONE/g' supabase/tests/06_message_rls.sql )
+  expect_fail "stripped FAIL marker" "06_message_rls.sql: only"
+  ( cd "$wt" && git checkout -- supabase/tests/06_message_rls.sql )
+
+  # 4. Weakened harness file list — the battery expects a file that does not
+  #    exist (the ledger's tampered-script analog: the harness's own claim
+  #    drifts)
+  ( cd "$wt" && sed -i 's/"07_storage_rls.sql"/"07_storage_rls.sql"\n  "99_bogus.sql"/' scripts/verify_policy_tests.sh )
+  expect_fail "weakened harness file list" "99_bogus.sql"
+  ( cd "$wt" && git checkout -- scripts/verify_policy_tests.sh )
+
+  # 5. Dropped doc hook — supabase/README.md loses the battery section
+  #    (note: the replacement must NOT keep the original as a substring, or
+  #    grep -q would still match)
+  ( cd "$wt" && sed -i 's/Policy-test battery/Policy battery/g' supabase/README.md )
+  expect_fail "dropped doc hook" "supabase/README.md battery section missing"
+  ( cd "$wt" && git checkout -- supabase/README.md )
+
+  # 6. Broken harness syntax — a parse-broken battery must red the run (bash's
+  #    own parse error is the detection; the battery's bash -n self-check is
+  #    belt-and-braces)
+  ( cd "$wt" && sed -i 's/^static_check() {/static_check() { if ; then/' scripts/verify_policy_tests.sh )
+  expect_fail "broken harness syntax" "syntax error near unexpected token"
+  ( cd "$wt" && git checkout -- scripts/verify_policy_tests.sh )
+
+  note "selftest: $SELFTEST_OK/$SELFTEST_TOTAL drift classes detected"
+}
+
+# ---------------------------------------------------------------------------
 # RUN
 # ---------------------------------------------------------------------------
+if [ "$SELFTEST_MODE" -eq 1 ]; then
+  printf '\n== verify_policy_tests SELFTEST (drift-injection teeth check, no database) ==\n'
+  selftest
+  printf '\n== summary: %d passed, %d warnings, %d failures ==\n' "$PASSES" "$WARNS" "$FAILS"
+  if [ "$FAILS" -gt 0 ]; then
+    printf 'RESULT: FAIL — %d failure(s). A drift class evaded the gate. Fix the battery.\n' "$FAILS"
+    exit 1
+  fi
+  printf 'RESULT: PASS — all %d drift classes detected.\n' "$SELFTEST_TOTAL"
+  exit 0
+fi
+
 if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
   usage
   exit 0
