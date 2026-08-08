@@ -915,7 +915,24 @@ class AppLocalizationsEn extends AppLocalizations {
       'No invoices are available for this matter.';
 
   @override
+  String get invoicesTitle => 'Invoices';
+
+  @override
+  String get invoicesEmpty => 'No invoices are available.';
+
+  @override
   String get invoicesError => 'Unable to load invoices.';
+
+  @override
+  String get invoicesLocalOnlyNote =>
+      'Demo mode — synthetic invoice metadata only. No real payments are shown.';
+
+  @override
+  String get invoicesEntryTitle => 'Billing';
+
+  @override
+  String get invoicesEntrySubtitle =>
+      'Browse demo invoice metadata — development demo.';
 
   @override
   String get invoiceStatusIssued => 'Issued';

@@ -1780,11 +1780,41 @@ abstract class AppLocalizations {
   /// **'No invoices are available for this matter.'**
   String get matterWorkspaceInvoicesEmpty;
 
+  /// No description provided for @invoicesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoices'**
+  String get invoicesTitle;
+
+  /// No description provided for @invoicesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No invoices are available.'**
+  String get invoicesEmpty;
+
   /// No description provided for @invoicesError.
   ///
   /// In en, this message translates to:
   /// **'Unable to load invoices.'**
   String get invoicesError;
+
+  /// No description provided for @invoicesLocalOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo mode — synthetic invoice metadata only. No real payments are shown.'**
+  String get invoicesLocalOnlyNote;
+
+  /// No description provided for @invoicesEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Billing'**
+  String get invoicesEntryTitle;
+
+  /// No description provided for @invoicesEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse demo invoice metadata — development demo.'**
+  String get invoicesEntrySubtitle;
 
   /// No description provided for @invoiceStatusIssued.
   ///

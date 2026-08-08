@@ -909,7 +909,23 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا توجد فواتير متاحة لهذه القضية.';
 
   @override
+  String get invoicesTitle => 'الفواتير';
+
+  @override
+  String get invoicesEmpty => 'لا توجد فواتير متاحة.';
+
+  @override
   String get invoicesError => 'تعذّر تحميل الفواتير.';
+
+  @override
+  String get invoicesLocalOnlyNote =>
+      'وضع تجريبي — بيانات وصفية اصطناعية للفواتير فقط. لا توجد مدفوعات حقيقية.';
+
+  @override
+  String get invoicesEntryTitle => 'الفوترة';
+
+  @override
+  String get invoicesEntrySubtitle => 'تصفّح الفواتير التجريبية — عرض تطويري.';
 
   @override
   String get invoiceStatusIssued => 'صادرة';

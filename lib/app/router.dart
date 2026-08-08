@@ -11,6 +11,7 @@ import '../features/auth/presentation/forgot_password/forgot_password_otp_screen
 import '../features/auth/presentation/forgot_password/forgot_password_reset_screen.dart';
 import '../features/auth/presentation/sign_in_screen.dart';
 import '../features/auth/presentation/sign_up_screen.dart';
+import '../features/billing/presentation/billing_invoices_screen.dart';
 import '../features/booking/presentation/booking_screen.dart';
 import '../features/discovery/presentation/attorney_profile_screen.dart';
 import '../features/discovery/presentation/attorney_search_screen.dart';
@@ -55,6 +56,7 @@ class AppRoutes {
   static const String vault = '/vault';
   static const String messages = '/messages';
   static const String messageThreadDetail = '/messages/:threadId';
+  static const String invoices = '/invoices';
   static const String search = '/search';
 
   /// The profile route for one attorney (path-param substitution).
@@ -222,6 +224,11 @@ GoRouter createAppRouter(
               capabilities: capabilitiesForRole[role]!,
             );
           },
+        ),
+        GoRoute(
+          path: AppRoutes.invoices,
+          builder: (BuildContext context, GoRouterState state) =>
+              const BillingInvoicesScreen(),
         ),
         GoRoute(
           path: AppRoutes.settings,

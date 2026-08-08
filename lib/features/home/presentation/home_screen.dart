@@ -7,6 +7,7 @@ import '../../../app/legalhub_theme.dart';
 import '../../../app/router.dart';
 import '../../../core/roles/user_role.dart';
 import '../../../features/auth/presentation/auth_cubit.dart' show AuthCubit;
+import '../../../features/billing/presentation/billing_invoices_entry_card.dart';
 import '../../../features/booking/presentation/booking_entry_card.dart';
 import '../../../features/discovery/presentation/discovery_entry_card.dart';
 import '../../../features/documents/presentation/document_entry_card.dart';
@@ -147,6 +148,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: LegalHubTheme.spaceMd),
                     MessageEntryCard(
                       onTap: () => context.go(AppRoutes.messages),
+                    ),
+                  ],
+                  // Billing slice (D-BI5): the standalone invoices list rides
+                  // the same canViewDocuments gate as the per-matter invoices
+                  // section — no new role flag (matrix §4: invoices are
+                  // matter-scoped content with client/attorney SHIP, same as
+                  // documents). Visibility hint only; the RLS gate is
+                  // server-side.
+                  if (capabilities.canViewDocuments) ...[
+                    const SizedBox(height: LegalHubTheme.spaceMd),
+                    BillingInvoicesEntryCard(
+                      onTap: () => context.go(AppRoutes.invoices),
                     ),
                   ],
                 ]),

@@ -294,7 +294,12 @@
   "filesError": "Dosyalar yüklenemedi.",
   "matterWorkspaceInvoicesTitle": "Faturalar",
   "matterWorkspaceInvoicesEmpty": "Bu dava için kullanılabilir fatura yok.",
+  "invoicesTitle": "Faturalar",
+  "invoicesEmpty": "Kullanılabilir fatura yok.",
   "invoicesError": "Faturalar yüklenemedi.",
+  "invoicesLocalOnlyNote": "Demo modu — yalnızca sentetik fatura meta verileri. Gerçek ödeme almaz.",
+  "invoicesEntryTitle": "Faturalama",
+  "invoicesEntrySubtitle": "Sentetik fatura meta verilerine göz atın — geliştirme demosu.",
   "invoiceStatusIssued": "Düzenlendi",
   "invoiceStatusPaid": "Ödendi"
 }

@@ -916,7 +916,24 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu dava için kullanılabilir fatura yok.';
 
   @override
+  String get invoicesTitle => 'Faturalar';
+
+  @override
+  String get invoicesEmpty => 'Kullanılabilir fatura yok.';
+
+  @override
   String get invoicesError => 'Faturalar yüklenemedi.';
+
+  @override
+  String get invoicesLocalOnlyNote =>
+      'Demo modu — yalnızca sentetik fatura meta verileri. Gerçek ödeme almaz.';
+
+  @override
+  String get invoicesEntryTitle => 'Faturalama';
+
+  @override
+  String get invoicesEntrySubtitle =>
+      'Sentetik fatura meta verilerine göz atın — geliştirme demosu.';
 
   @override
   String get invoiceStatusIssued => 'Düzenlendi';

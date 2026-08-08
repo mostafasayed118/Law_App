@@ -294,7 +294,12 @@
   "filesError": "تعذّر تحميل الملفات.",
   "matterWorkspaceInvoicesTitle": "الفواتير",
   "matterWorkspaceInvoicesEmpty": "لا توجد فواتير متاحة لهذه القضية.",
+  "invoicesTitle": "الفواتير",
+  "invoicesEmpty": "لا توجد فواتير متاحة.",
   "invoicesError": "تعذّر تحميل الفواتير.",
+  "invoicesLocalOnlyNote": "وضع تجريبي — بيانات وصفية اصطناعية للفواتير فقط. لا توجد مدفوعات حقيقية.",
+  "invoicesEntryTitle": "الفوترة",
+  "invoicesEntrySubtitle": "تصفّح الفواتير التجريبية — عرض تطويري.",
   "invoiceStatusIssued": "صادرة",
   "invoiceStatusPaid": "مدفوعة"
 }

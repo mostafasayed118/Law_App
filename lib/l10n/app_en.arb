@@ -308,7 +308,12 @@
   "filesError": "Unable to load files.",
   "matterWorkspaceInvoicesTitle": "Invoices",
   "matterWorkspaceInvoicesEmpty": "No invoices are available for this matter.",
+  "invoicesTitle": "Invoices",
+  "invoicesEmpty": "No invoices are available.",
   "invoicesError": "Unable to load invoices.",
+  "invoicesLocalOnlyNote": "Demo mode — synthetic invoice metadata only. No real payments are shown.",
+  "invoicesEntryTitle": "Billing",
+  "invoicesEntrySubtitle": "Browse demo invoice metadata — development demo.",
   "invoiceStatusIssued": "Issued",
   "invoiceStatusPaid": "Paid"
 }
