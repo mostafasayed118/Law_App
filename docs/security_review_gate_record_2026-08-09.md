@@ -40,7 +40,62 @@
 the gate as OPEN.** (Decision-capture P4 row stays BLOCKED / owner `OPEN`
 until item 4 exists.)
 
-## 3. Logged owner actions referenced by other records
+## 4. Work completed for P4 (2026-08-09, evidence-grounded — reviewable, not self-approved)
+
+> These are the *reviewable inputs* listed under §2 items 1–2. They do **not**
+> close the gate: item 3 (rehearsal) and item 4 (dated release approval)
+> remain owner-only. All claims below are reproducible from the repo.
+
+### 4.1 Dependency / configuration review (P4 §2)
+
+Locked at `pubspec.lock` (2026-08-09, `main`):
+
+| Package | Locked | Constraint | UPGRADES notice |
+|---|---|---|---|
+| supabase_flutter | 2.16.0 | `^2.16.0` (major pinned per INSTRUCTIONS §4.6) | no action |
+| flutter_bloc | 9.1.1 | `^9.1.1` | — |
+| bloc | 9.2.1 | `^9.2.1` | — |
+| go_router | 17.3.0 | `^17.3.0` | — |
+| get_it | 9.2.1 | `^9.2.1` | — |
+| equatable | 2.1.0 | `^2.1.0` | — |
+| intl | 0.20.2 | pinned exact | — |
+| mocktail | 1.0.5 | `^1.0.5` | — |
+| app_links | 7.2.1 | `^7.2.1` major-pinned | verify against deep-link slice |
+
+`flutter pub outdated` reports **0 breaking updates within constraints** for
+the direct set (18 packages have newer versions *incompatible with
+constraints* — i.e. niche majors that would require an upgrade slice;
+recorded, not acted on, per §4.6 no-major rule).
+
+Env-hygiene recheck: `.gitignore` excludes `.env`, `.env.*`, `*.env`; the
+dev URL + anon key live only in the ignored `.env`; no service-role key or
+secret string present in `lib/`, `test/`, `supabase/` history scanned on
+2026-08-09 (CI + pre-push scans).
+
+### 4.2 STRIDE-lite sketch (reviewable input, NOT a completed assessment)
+
+| Threat class | Where | Current control (evidence) | Gap |
+|---|---|---|---|
+| Spoofing | Auth/org seam | GoTrue email+password; typed `AuthGateway` seam; sessions `Session` DTO-free (contract §5) | MFA/SSO deferred to v1 (D-07) |
+| Tampering | RPCs — `security definer` in-function gates | applied-ing (batteries: matters / documents / threads / storage / messages / billing) | audit-event write is RPC-only; no raw `audit_events` SELECT ever (D-P0C4) |
+| Repudiation | Audits | every mutation RPC writes audit row; `delete_demo_account` refuses self; audit read = redacted only | partner org-audit UI shipped 2026-08-09 |
+| Information disclosure | RLS (12 tables) + storage + realtime | default-deny; matrix §4 rows exercised by batteries (incl. cross-org 0, anon denied) | `org role alone never grants matter access` invariant — tested |
+| DoS / availability | Realtime publication `messages` only | 1 link, nothing else (battery pin) | provider-side limits not in scope of client |
+| Elevation of privilege | Platform-admin | owner-only `platform_owner_admin` gate + never-self | P4 threat write-up required — **not yet written** |
+
+### 4.3 Outstanding P4 mechanics
+
+- **Rollout rehearsal**: `docs/rollback_plan.md` pairs every apply slice with a
+  `_down.sql`; a dry-run rehearsed rollback is still owner-gated (needs a
+  staging/dev-project cycle).
+- **Release approval**: a dated owner sign-off naming where the client ships
+  (dev/staging/store) — not yet granted.
+- **P4 row**: see §5.
+
+> Bridge note: this annex makes P4 *reviewable*, it does **not** claim it
+> done. The decision-capture P4 row stays `BLOCKED / owner OPEN`.
+
+## 5. Logged owner actions referenced by other records
 
 - Supabase console: add `com.legalhub.app://auth/v1/callback` under Auth →
   URL Configuration (deep-link recovery + invite links otherwise inert).

@@ -751,6 +751,76 @@ void main() {
       expect(ar.orgAuditHubEntry, isNot(en.orgAuditHubEntry));
     });
 
+    test(
+      'resolves the billing-standalone keys in every locale (2026-08-09)',
+      () {
+        final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+        final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+        final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+        // Standalone /invoices surface (billing slice, D-BI5): exact copy per
+        // locale plus the no-silent-EN-copy guards.
+        expect(en.invoicesTitle, 'Invoices');
+        expect(ar.invoicesTitle, 'الفواتير');
+        expect(tr.invoicesTitle, 'Faturalar');
+
+        expect(en.invoicesEmpty, 'No invoices are available.');
+        expect(ar.invoicesEmpty, 'لا توجد فواتير متاحة.');
+        expect(tr.invoicesEmpty, 'Kullanılabilir fatura yok.');
+
+        expect(en.invoicesEntryTitle, 'Billing');
+        expect(ar.invoicesEntryTitle, 'الفوترة');
+        expect(tr.invoicesEntryTitle, 'Faturalama');
+
+        expect(tr.invoicesTitle, isNot(en.invoicesTitle));
+        expect(ar.invoicesTitle, isNot(en.invoicesTitle));
+        expect(tr.invoicesEntryTitle, isNot(en.invoicesEntryTitle));
+        expect(ar.invoicesEntryTitle, isNot(en.invoicesEntryTitle));
+      },
+    );
+
+    test('resolves the v1-queue keys in every locale (2026-08-09 pin)', () {
+      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+      final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+      final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+      // v1 queue demo surfaces (2026-08-09 scope drafts): exact copy per
+      // locale for the three surfaces' titles + locality notes, plus the
+      // no-silent-EN-copy guards.
+      expect(en.alertsTitle, 'Compliance alerts');
+      expect(ar.alertsTitle, 'تنبيهات الامتثال');
+      expect(tr.alertsTitle, 'Uyum uyarıları');
+
+      expect(en.tasksTitle, 'Task board');
+      expect(ar.tasksTitle, 'لوحة المهام');
+      expect(tr.tasksTitle, 'Görev panosu');
+
+      expect(en.approvalsTitle, 'Pending approvals');
+      expect(ar.approvalsTitle, 'موافقات معلّقة');
+      expect(tr.approvalsTitle, 'Bekleyen onaylar');
+
+      expect(
+        en.approvalsLocalOnlyNote,
+        'Demo mode — synthetic redacted rows only. No real approval is pending.',
+      );
+      expect(
+        tr.approvalsLocalOnlyNote,
+        'Demo modu — yalnızca sentetik gizlenmiş satırlar. Bekleyen gerçek bir onay yok.',
+      );
+      expect(
+        ar.approvalsLocalOnlyNote,
+        'وضع تجريبي — صفوف اصطناعية منقّحة فقط. لا توجد موافقة حقيقية معلقة.',
+      );
+
+      expect(tr.alertsTitle, isNot(en.alertsTitle));
+      expect(ar.alertsTitle, isNot(en.alertsTitle));
+      expect(tr.tasksTitle, isNot(en.tasksTitle));
+      expect(ar.tasksTitle, isNot(en.tasksTitle));
+      expect(tr.approvalsTitle, isNot(en.approvalsTitle));
+      expect(ar.approvalsTitle, isNot(en.approvalsTitle));
+      expect(tr.approvalsLocalOnlyNote, isNot(en.approvalsLocalOnlyNote));
+    });
+
     test('resolves the recovery error key in every locale (P3.1 pin)', () {
       final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
       final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
