@@ -1,6 +1,8 @@
 import '../organizations/organization_models.dart';
+import 'audit_entry.dart';
 
 export '../organizations/organization_models.dart';
+export 'audit_entry.dart';
 
 /// Platform-owner administration boundary (permission matrix §5).
 ///
@@ -44,4 +46,14 @@ abstract interface class PlatformAdminGateway {
   /// `delete_demo_account(user)` — owner-only; the RPC refuses the caller's
   /// own id (never self; self-deletion goes through `delete_my_account`).
   Future<OrgOutcome<void>> deleteDemoAccount({required String userId});
+
+  /// `read_platform_audit()` — owner-only cross-org audit trail (redacted
+  /// metadata only; the owner's own read is itself an audited action).
+  Future<OrgOutcome<List<AuditEntry>>> readPlatformAudit();
+
+  /// `read_org_audit(org)` — org-scoped audit trail for the selected org
+  /// (redacted metadata only).
+  Future<OrgOutcome<List<AuditEntry>>> readOrgAudit({
+    required String organizationId,
+  });
 }

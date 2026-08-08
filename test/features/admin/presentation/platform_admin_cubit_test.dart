@@ -51,6 +51,20 @@ class _StubPlatformAdminGateway implements PlatformAdminGateway {
     calls.add('delete:$userId');
     return voidOutcome;
   }
+
+  @override
+  Future<OrgOutcome<List<AuditEntry>>> readPlatformAudit() async {
+    calls.add('platformAudit');
+    return const OrgOutcome<List<AuditEntry>>.success(<AuditEntry>[]);
+  }
+
+  @override
+  Future<OrgOutcome<List<AuditEntry>>> readOrgAudit({
+    required String organizationId,
+  }) async {
+    calls.add('orgAudit:$organizationId');
+    return const OrgOutcome<List<AuditEntry>>.success(<AuditEntry>[]);
+  }
 }
 
 final OrganizationSummary _org = OrganizationSummary(

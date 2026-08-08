@@ -244,15 +244,26 @@ only dated gate is the matrix §6 addendum ordering (T1) and the final push.
   applied + battery-pinned RPCs as the row's enforcement, owner-only first
   surface, redacted-only + D-P0C4 + non-owner-denied (AC-7); widens no
   other row.
-- [ ] **2. Seam + impl + gateway audit methods** — touches:
+- [x] **2. Seam + impl + gateway audit methods** — touches:
   `lib/data/admin/supabase_platform_admin_api.dart` +
   `supabase_platform_admin_api_impl.dart` + `supabase_platform_admin_gateway.dart`
   — done when: both methods exist with guarded row→VO mapping + failure
   mapping on `OrgOutcome` (denied/providerUnavailable/unknown), mapping +
-  impl-columns tests green. — **⏳ PENDING**
-- [ ] **3. VO + fake** — touches: `lib/features/admin/domain/audit_entry.dart`
-  + `fake_platform_admin_gateway.dart` — done when: VO props-pin + fake
-  determinism/non-PII tests green. — **⏳ PENDING**
+  impl-columns tests green. — **DONE (this commit)** — seam gains
+  `readPlatformAudit()`/`readOrgAudit(orgId)` + `providerUnavailable` kind;
+  impl calls `read_platform_audit` (no params) / `read_org_audit`
+  (`p_organization_id`) with the defensive `on Object` → unavailable catch
+  (auth/storage precedent); gateway maps rows → [AuditEntry] with every cast
+  guarded (FormatException, never a raw TypeError) and maps
+  denied/providerUnavailable/unknown onto `OrgFailureKind`.
+- [x] **3. VO + fake** — touches: `lib/core/admin/audit_entry.dart` (next to
+  the gateway it feeds — the plan sketch's `features/admin/domain/` path was
+  corrected to keep core→core layering) + `fake_platform_admin_gateway.dart`
+  — done when: VO props-pin + fake determinism/non-PII tests green.
+  — **DONE (this commit)** — 5-row platform + 3-row org deterministic
+  non-PII trails (`audit-*` correlation ids, fixed UTC timestamps,
+  metadata-only summaries); owner gate → rows, non-owner → denied
+  (never empty), foreign org id → honest empty trail.
 - [ ] **4. Audit section UI** — touches: `platform_admin_cubit.dart` +
   `platform_admin_screen.dart` + 3 `.arb` + generated l10n — done when:
   widget/cubit tests (platform + org lists, empty, denied-never-empty,

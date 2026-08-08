@@ -131,5 +131,69 @@ void main() {
         );
       },
     );
+
+    test('readPlatformAudit calls the RPC with no params', () async {
+      data['read_platform_audit'] = <dynamic>[
+        <String, dynamic>{'id': 1, 'action': 'organization_created'},
+        'not-a-map',
+      ];
+
+      final List<Map<String, dynamic>> rows = await api.readPlatformAudit();
+
+      expect(rows, hasLength(1));
+      expect(calls, <String>['read_platform_audit']);
+    });
+
+    test('readOrgAudit sends the org id to read_org_audit', () async {
+      data['read_org_audit'] = <dynamic>[
+        <String, dynamic>{'id': 2, 'action': 'member_invited'},
+      ];
+
+      final List<Map<String, dynamic>> rows = await api.readOrgAudit('org-1');
+
+      expect(rows, hasLength(1));
+      expect(calls, <String>['read_org_audit:org-1']);
+    });
+
+    test('maps a non-owner audit denial to the denied kind', () async {
+      errors['read_platform_audit'] = const PostgrestException(
+        message: 'permission denied',
+      );
+
+      await expectLater(
+        api.readPlatformAudit(),
+        throwsA(
+          isA<SupabasePlatformAdminException>().having(
+            (e) => e.kind,
+            'kind',
+            SupabasePlatformAdminFailureKind.denied,
+          ),
+        ),
+      );
+    });
+
+    test('maps a non-Postgrest audit failure to providerUnavailable',
+      () async {
+        // The stub's PostgrestException path is bypassed by a raw throw from
+        // the injected caller — the impl's defensive `on Object` catch turns
+        // it into a typed unavailable (the storage/auth precedent).
+        final SupabasePlatformAdminApiImpl throwing = SupabasePlatformAdminApiImpl(
+          (String function, Map<String, dynamic> params) async {
+            throw StateError('network down');
+          },
+        );
+
+        await expectLater(
+          throwing.readPlatformAudit(),
+          throwsA(
+            isA<SupabasePlatformAdminException>().having(
+              (e) => e.kind,
+              'kind',
+              SupabasePlatformAdminFailureKind.providerUnavailable,
+            ),
+          ),
+        );
+      },
+    );
   });
 }

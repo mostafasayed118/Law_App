@@ -108,4 +108,126 @@ class FakePlatformAdminGateway implements PlatformAdminGateway {
     _organizationGateway.deleteAccount(userId);
     return const OrgOutcome<void>.success(null);
   }
+
+  @override
+  Future<OrgOutcome<List<AuditEntry>>> readPlatformAudit() async {
+    if (!demoIsPlatformOwner) {
+      // AC-7: a non-owner is denied, never an empty success.
+      return const OrgOutcome<List<AuditEntry>>.failure(
+        OrgFailure(kind: OrgFailureKind.denied),
+      );
+    }
+    return OrgOutcome<List<AuditEntry>>.success(_platformAuditRows);
+  }
+
+  @override
+  Future<OrgOutcome<List<AuditEntry>>> readOrgAudit({
+    required String organizationId,
+  }) async {
+    if (!demoIsPlatformOwner) {
+      return const OrgOutcome<List<AuditEntry>>.failure(
+        OrgFailure(kind: OrgFailureKind.denied),
+      );
+    }
+    // The fake is org-scoped to the demo org; a foreign org id reads as an
+    // honest empty trail (metadata-only, no fabricated rows).
+    if (organizationId != FakeOrganizationGateway.demoOrganizationId) {
+      return const OrgOutcome<List<AuditEntry>>.success(<AuditEntry>[]);
+    }
+    return OrgOutcome<List<AuditEntry>>.success(_orgAuditRows);
+  }
+
+  /// Deterministic synthetic non-PII platform audit trail (5 rows, the
+  /// D-AUD5 pattern). Fixed ids + correlation ids + timestamps so tests and
+  /// env-less runs are stable; no credentials or content ever (contract §8).
+  static final List<AuditEntry> _platformAuditRows = <AuditEntry>[
+    AuditEntry(
+      id: 1,
+      action: 'organization_created',
+      outcome: 'succeeded',
+      resourceType: 'organization',
+      resourceId: FakeOrganizationGateway.demoOrganizationId,
+      correlationId: 'audit-0001',
+      redactedSummary: 'Organization created (metadata only)',
+      serverTimestamp: DateTime.utc(2026, 7, 25, 10, 0),
+      actorUserId: FakeOrganizationGateway.demoUserId,
+      organizationId: FakeOrganizationGateway.demoOrganizationId,
+    ),
+    AuditEntry(
+      id: 2,
+      action: 'member_invited',
+      outcome: 'succeeded',
+      resourceType: 'membership',
+      correlationId: 'audit-0002',
+      redactedSummary: 'Member invited (metadata only)',
+      serverTimestamp: DateTime.utc(2026, 7, 26, 11, 30),
+      actorUserId: FakeOrganizationGateway.demoUserId,
+      organizationId: FakeOrganizationGateway.demoOrganizationId,
+    ),
+    AuditEntry(
+      id: 3,
+      action: 'member_role_changed',
+      outcome: 'succeeded',
+      resourceType: 'membership',
+      correlationId: 'audit-0003',
+      redactedSummary: 'Member role changed (metadata only)',
+      serverTimestamp: DateTime.utc(2026, 7, 27, 9, 15),
+      actorUserId: FakeOrganizationGateway.demoUserId,
+      organizationId: FakeOrganizationGateway.demoOrganizationId,
+    ),
+    AuditEntry(
+      id: 4,
+      action: 'membership_suspended',
+      outcome: 'succeeded',
+      resourceType: 'membership',
+      correlationId: 'audit-0004',
+      redactedSummary: 'Membership suspended (metadata only)',
+      serverTimestamp: DateTime.utc(2026, 7, 28, 14, 45),
+      actorUserId: FakeOrganizationGateway.demoUserId,
+      organizationId: FakeOrganizationGateway.demoOrganizationId,
+    ),
+    AuditEntry(
+      id: 5,
+      action: 'demo_account_deleted',
+      outcome: 'succeeded',
+      resourceType: 'user',
+      correlationId: 'audit-0005',
+      redactedSummary: 'Demo account deleted (metadata only)',
+      serverTimestamp: DateTime.utc(2026, 7, 29, 16, 20),
+      actorUserId: FakeOrganizationGateway.demoUserId,
+      organizationId: FakeOrganizationGateway.demoOrganizationId,
+    ),
+  ];
+
+  /// Deterministic synthetic non-PII org-scoped trail (3 rows, the demo
+  /// org only).
+  static final List<AuditEntry> _orgAuditRows = <AuditEntry>[
+    AuditEntry(
+      id: 1,
+      action: 'organization_created',
+      outcome: 'succeeded',
+      resourceType: 'organization',
+      correlationId: 'audit-1001',
+      redactedSummary: 'Organization created (metadata only)',
+      serverTimestamp: DateTime.utc(2026, 7, 25, 10, 0),
+    ),
+    AuditEntry(
+      id: 2,
+      action: 'member_invited',
+      outcome: 'succeeded',
+      resourceType: 'membership',
+      correlationId: 'audit-1002',
+      redactedSummary: 'Member invited (metadata only)',
+      serverTimestamp: DateTime.utc(2026, 7, 26, 11, 30),
+    ),
+    AuditEntry(
+      id: 3,
+      action: 'member_role_changed',
+      outcome: 'succeeded',
+      resourceType: 'membership',
+      correlationId: 'audit-1003',
+      redactedSummary: 'Member role changed (metadata only)',
+      serverTimestamp: DateTime.utc(2026, 7, 27, 9, 15),
+    ),
+  ];
 }

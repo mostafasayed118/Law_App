@@ -105,6 +105,49 @@ class SupabasePlatformAdminApiImpl implements SupabasePlatformAdminApi {
     <String, dynamic>{'p_user_id': userId},
   );
 
+  @override
+  Future<List<Map<String, dynamic>>> readPlatformAudit() async {
+    try {
+      return _rowsFrom(await _rpc('read_platform_audit', const <String, dynamic>{}));
+    } on PostgrestException catch (e) {
+      throw SupabasePlatformAdminException(kind: _kindFor(e), message: e.message);
+    } on Object {
+      // A non-Postgrest provider failure (network/transport) is a typed
+      // unavailable, never a raw exception across the seam (the auth/storage
+      // impls' defensive-catch precedent).
+      throw const SupabasePlatformAdminException(
+        kind: SupabasePlatformAdminFailureKind.providerUnavailable,
+        message: 'Provider unavailable.',
+      );
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> readOrgAudit(String organizationId) async {
+    try {
+      return _rowsFrom(await _rpc('read_org_audit', <String, dynamic>{
+        'p_organization_id': organizationId,
+      }));
+    } on PostgrestException catch (e) {
+      throw SupabasePlatformAdminException(kind: _kindFor(e), message: e.message);
+    } on Object {
+      throw const SupabasePlatformAdminException(
+        kind: SupabasePlatformAdminFailureKind.providerUnavailable,
+        message: 'Provider unavailable.',
+      );
+    }
+  }
+
+  /// Extracts the plain map rows from an RPC response, skipping any
+  /// non-map entries (the list-shaped RPCs' shared shape guard).
+  List<Map<String, dynamic>> _rowsFrom(PostgrestResponse<dynamic> response) {
+    final Object? data = response.data;
+    if (data is! List<dynamic>) {
+      return const <Map<String, dynamic>>[];
+    }
+    return data.whereType<Map<String, dynamic>>().toList(growable: false);
+  }
+
   Future<void> _runVoidRpc(String function, Map<String, dynamic> params) async {
     try {
       await _rpc(function, params);

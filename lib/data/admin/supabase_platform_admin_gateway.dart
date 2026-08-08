@@ -89,6 +89,48 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
     return _runVoid(() => _api.deleteDemoAccount(userId: userId.trim()));
   }
 
+  @override
+  Future<OrgOutcome<List<AuditEntry>>> readPlatformAudit() async {
+    try {
+      final List<Map<String, dynamic>> rows = await _api.readPlatformAudit();
+      return OrgOutcome<List<AuditEntry>>.success(
+        rows.map(_auditEntryFromRow).toList(growable: false),
+      );
+    } on SupabasePlatformAdminException catch (e) {
+      return OrgOutcome<List<AuditEntry>>.failure(
+        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+      );
+    } on FormatException catch (e) {
+      // Provider drift (unexpected row shape) surfaces loudly, never as a
+      // silently wrong audit entry.
+      return OrgOutcome<List<AuditEntry>>.failure(
+        OrgFailure(kind: OrgFailureKind.unknown, message: e.message),
+      );
+    }
+  }
+
+  @override
+  Future<OrgOutcome<List<AuditEntry>>> readOrgAudit({
+    required String organizationId,
+  }) async {
+    try {
+      final List<Map<String, dynamic>> rows = await _api.readOrgAudit(
+        organizationId,
+      );
+      return OrgOutcome<List<AuditEntry>>.success(
+        rows.map(_auditEntryFromRow).toList(growable: false),
+      );
+    } on SupabasePlatformAdminException catch (e) {
+      return OrgOutcome<List<AuditEntry>>.failure(
+        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+      );
+    } on FormatException catch (e) {
+      return OrgOutcome<List<AuditEntry>>.failure(
+        OrgFailure(kind: OrgFailureKind.unknown, message: e.message),
+      );
+    }
+  }
+
   Future<OrgOutcome<void>> _runVoid(Future<void> Function() call) async {
     try {
       await call();
@@ -143,9 +185,62 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
     );
   }
 
+  /// Row → [AuditEntry] mapping. Every cast is guarded: a missing or
+  /// wrong-typed column is a [FormatException] (caught → `unknown`), never a
+  /// raw [TypeError] crossing the boundary (the documents/messages T7
+  /// baseline).
+  AuditEntry _auditEntryFromRow(Map<String, dynamic> row) {
+    final Object? idValue = row['id'];
+    if (idValue is! int) {
+      throw FormatException('Audit row id is not an int: $idValue');
+    }
+    final String? action = _optionalString(row, 'action');
+    final String? outcome = _optionalString(row, 'outcome');
+    final String? summary = _optionalString(row, 'redacted_summary');
+    final String? timestamp = _optionalString(row, 'server_timestamp');
+    if (action == null || outcome == null || summary == null ||
+        timestamp == null) {
+      throw FormatException(
+        'Audit row missing action/outcome/redacted_summary/server_timestamp',
+      );
+    }
+    final DateTime? parsed = DateTime.tryParse(timestamp);
+    if (parsed == null) {
+      throw FormatException('Audit row server_timestamp unparseable');
+    }
+    return AuditEntry(
+      id: idValue,
+      action: action,
+      outcome: outcome,
+      resourceType: _optionalString(row, 'resource_type'),
+      resourceId: _optionalString(row, 'resource_id'),
+      correlationId: _optionalString(row, 'correlation_id'),
+      redactedSummary: summary,
+      serverTimestamp: parsed.toLocal(),
+      actorUserId: _optionalString(row, 'actor_user_id'),
+      organizationId: _optionalString(row, 'organization_id'),
+    );
+  }
+
+  /// Null → null; a String → itself; any other non-null value is provider
+  /// drift and surfaces loudly as a [FormatException] — never a raw
+  /// [TypeError] crossing the boundary (the documents/messages T7 baseline).
+  String? _optionalString(Map<String, dynamic> row, String key) {
+    final Object? value = row[key];
+    if (value == null) {
+      return null;
+    }
+    if (value is String) {
+      return value;
+    }
+    throw FormatException('Audit row $key is not a string: $value');
+  }
+
   OrgFailureKind _mapKind(SupabasePlatformAdminFailureKind kind) {
     return switch (kind) {
       SupabasePlatformAdminFailureKind.denied => OrgFailureKind.denied,
+      SupabasePlatformAdminFailureKind.providerUnavailable =>
+        OrgFailureKind.providerUnavailable,
       SupabasePlatformAdminFailureKind.unknown => OrgFailureKind.unknown,
     };
   }

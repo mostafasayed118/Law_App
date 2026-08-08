@@ -15,6 +15,7 @@ import 'package:legalhub/l10n/app_localizations.dart';
 class _MutablePlatformAdminGateway implements PlatformAdminGateway {
   List<OrganizationSummary> organizations = <OrganizationSummary>[];
   List<OrgMember> members = <OrgMember>[];
+  List<AuditEntry> auditEntries = <AuditEntry>[];
   bool denied = false;
   OrgFailureKind? loadFailureKind;
   OrgFailureKind? voidFailureKind;
@@ -99,6 +100,38 @@ class _MutablePlatformAdminGateway implements PlatformAdminGateway {
     }
     members = members.where((OrgMember m) => m.userId != userId).toList();
     return const OrgOutcome<void>.success(null);
+  }
+
+  @override
+  Future<OrgOutcome<List<AuditEntry>>> readPlatformAudit() async {
+    if (denied) {
+      return const OrgOutcome<List<AuditEntry>>.failure(
+        OrgFailure(kind: OrgFailureKind.denied),
+      );
+    }
+    if (loadFailureKind != null) {
+      return OrgOutcome<List<AuditEntry>>.failure(
+        OrgFailure(kind: loadFailureKind!),
+      );
+    }
+    return OrgOutcome<List<AuditEntry>>.success(auditEntries);
+  }
+
+  @override
+  Future<OrgOutcome<List<AuditEntry>>> readOrgAudit({
+    required String organizationId,
+  }) async {
+    if (denied) {
+      return const OrgOutcome<List<AuditEntry>>.failure(
+        OrgFailure(kind: OrgFailureKind.denied),
+      );
+    }
+    if (loadFailureKind != null) {
+      return OrgOutcome<List<AuditEntry>>.failure(
+        OrgFailure(kind: loadFailureKind!),
+      );
+    }
+    return OrgOutcome<List<AuditEntry>>.success(auditEntries);
   }
 
   static OrgMember _withStatus(OrgMember m, MembershipStatus status) {

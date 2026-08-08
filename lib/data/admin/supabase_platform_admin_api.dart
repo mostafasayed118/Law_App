@@ -14,6 +14,9 @@ enum SupabasePlatformAdminFailureKind {
   /// delete target is the caller themselves (`never self`).
   denied,
 
+  /// The provider is unavailable or rate-limited.
+  providerUnavailable,
+
   /// An unspecified failure.
   unknown,
 }
@@ -57,4 +60,15 @@ abstract interface class SupabasePlatformAdminApi {
 
   /// `delete_demo_account(p_user_id)` — the RPC refuses `auth.uid()`.
   Future<void> deleteDemoAccount({required String userId});
+
+  /// `read_platform_audit()` — `platform_owner_admin`-only cross-org audit
+  /// rows: `id`, `actor_user_id`, `action`, `outcome`, `organization_id`,
+  /// `resource_type`, `resource_id`, `correlation_id`, `redacted_summary`,
+  /// `server_timestamp` (redacted metadata only, contract §8).
+  Future<List<Map<String, dynamic>>> readPlatformAudit();
+
+  /// `read_org_audit(p_organization_id)` — org-scoped audit rows: `id`,
+  /// `action`, `outcome`, `resource_type`, `resource_id`, `correlation_id`,
+  /// `redacted_summary`, `server_timestamp` (redacted metadata only).
+  Future<List<Map<String, dynamic>>> readOrgAudit(String organizationId);
 }

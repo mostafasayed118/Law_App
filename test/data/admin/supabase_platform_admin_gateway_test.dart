@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:legalhub/core/admin/audit_entry.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/admin/supabase_platform_admin_api.dart';
@@ -61,6 +62,26 @@ class _StubSupabasePlatformAdminApi implements SupabasePlatformAdminApi {
       throw voidError!;
     }
   }
+
+  @override
+  Future<List<Map<String, dynamic>>> readPlatformAudit() async {
+    calls.add('platformAudit');
+    if (listError != null) {
+      throw listError!;
+    }
+    return auditRows;
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> readOrgAudit(String organizationId) async {
+    calls.add('orgAudit:$organizationId');
+    if (listError != null) {
+      throw listError!;
+    }
+    return auditRows;
+  }
+
+  List<Map<String, dynamic>> auditRows = <Map<String, dynamic>>[];
 }
 
 void main() {
@@ -251,10 +272,7 @@ void main() {
 
       expect(outcome.isSuccess, isTrue);
       expect(api.calls, <String>['delete:u-9']);
-    });
-
-    test(
-      'deleteDemoAccount rejects a blank user id without calling the seam',
+    });    test('deleteDemoAccount rejects a blank user id without calling the seam',
       () async {
         final OrgOutcome<void> outcome = await gateway.deleteDemoAccount(
           userId: '   ',
@@ -265,5 +283,160 @@ void main() {
         expect(api.calls, isEmpty);
       },
     );
+  });
+
+  group('readPlatformAudit', () {
+    test('maps redacted audit rows to AuditEntry', () async {
+      api.auditRows = <Map<String, dynamic>>[
+        <String, dynamic>{
+          'id': 1,
+          'actor_user_id': 'owner-1',
+          'action': 'organization_created',
+          'outcome': 'succeeded',
+          'organization_id': 'org-1',
+          'resource_type': 'organization',
+          'resource_id': 'org-1',
+          'correlation_id': 'audit-0001',
+          'redacted_summary': 'Organization created (metadata only)',
+          'server_timestamp': '2026-07-25T10:00:00.000Z',
+        },
+      ];
+
+      final OrgOutcome<List<AuditEntry>> outcome = await gateway
+          .readPlatformAudit();
+
+      final AuditEntry entry = outcome.valueOrNull!.single;
+      expect(entry.id, 1);
+      expect(entry.action, 'organization_created');
+      expect(entry.outcome, 'succeeded');
+      expect(entry.resourceType, 'organization');
+      expect(entry.resourceId, 'org-1');
+      expect(entry.correlationId, 'audit-0001');
+      expect(entry.redactedSummary, 'Organization created (metadata only)');
+      expect(
+        entry.serverTimestamp,
+        DateTime.parse('2026-07-25T10:00:00.000Z').toLocal(),
+      );
+      expect(entry.actorUserId, 'owner-1');
+      expect(entry.organizationId, 'org-1');
+      expect(api.calls, <String>['platformAudit']);
+    });
+
+    test('surfaces a row missing required columns loudly', () async {
+      api.auditRows = <Map<String, dynamic>>[
+        <String, dynamic>{'action': 'organization_created'},
+      ];
+
+      final OrgOutcome<List<AuditEntry>> outcome = await gateway
+          .readPlatformAudit();
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
+    });
+
+    test('surfaces a non-int id loudly', () async {
+      api.auditRows = <Map<String, dynamic>>[
+        <String, dynamic>{
+          'id': 'not-an-int',
+          'action': 'organization_created',
+          'outcome': 'succeeded',
+          'redacted_summary': 'x',
+          'server_timestamp': '2026-07-25T10:00:00.000Z',
+        },
+      ];
+
+      final OrgOutcome<List<AuditEntry>> outcome = await gateway
+          .readPlatformAudit();
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
+    });
+
+    test('surfaces a wrong-typed uuid column loudly (no raw TypeError)',
+      () async {
+        // A uuid column arriving as a non-string (provider drift) must map
+        // to a typed failure, never a raw TypeError across the boundary.
+        api.auditRows = <Map<String, dynamic>>[
+          <String, dynamic>{
+            'id': 1,
+            'action': 'organization_created',
+            'outcome': 'succeeded',
+            'resource_id': 42, // wrong type for a uuid
+            'redacted_summary': 'x',
+            'server_timestamp': '2026-07-25T10:00:00.000Z',
+          },
+        ];
+
+        final OrgOutcome<List<AuditEntry>> outcome = await gateway
+            .readPlatformAudit();
+
+        expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
+      },
+    );
+
+    test('maps a non-owner denial (AC-7, never empty-success)', () async {
+      api.listError = const SupabasePlatformAdminException(
+        kind: SupabasePlatformAdminFailureKind.denied,
+        message: 'permission denied',
+      );
+
+      final OrgOutcome<List<AuditEntry>> outcome = await gateway
+          .readPlatformAudit();
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.denied);
+      expect(outcome.valueOrNull, isNull);
+    });
+
+    test('maps a provider failure to providerUnavailable', () async {
+      api.listError = const SupabasePlatformAdminException(
+        kind: SupabasePlatformAdminFailureKind.providerUnavailable,
+        message: 'Provider unavailable.',
+      );
+
+      final OrgOutcome<List<AuditEntry>> outcome = await gateway
+          .readPlatformAudit();
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.providerUnavailable);
+    });
+  });
+
+  group('readOrgAudit', () {
+    test('forwards the org id and maps rows', () async {
+      api.auditRows = <Map<String, dynamic>>[
+        <String, dynamic>{
+          'id': 7,
+          'action': 'member_invited',
+          'outcome': 'succeeded',
+          'resource_type': 'membership',
+          'correlation_id': 'audit-1007',
+          'redacted_summary': 'Member invited (metadata only)',
+          'server_timestamp': '2026-07-26T11:30:00.000Z',
+        },
+      ];
+
+      final OrgOutcome<List<AuditEntry>> outcome = await gateway.readOrgAudit(
+        organizationId: 'org-9',
+      );
+
+      final AuditEntry entry = outcome.valueOrNull!.single;
+      expect(entry.id, 7);
+      expect(entry.action, 'member_invited');
+      // Org variant: no actor/org columns on the row.
+      expect(entry.actorUserId, isNull);
+      expect(entry.organizationId, isNull);
+      expect(api.calls, <String>['orgAudit:org-9']);
+    });
+
+    test('maps a non-owner denial (AC-7)', () async {
+      api.listError = const SupabasePlatformAdminException(
+        kind: SupabasePlatformAdminFailureKind.denied,
+        message: 'permission denied',
+      );
+
+      final OrgOutcome<List<AuditEntry>> outcome = await gateway.readOrgAudit(
+        organizationId: 'org-1',
+      );
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.denied);
+      expect(outcome.valueOrNull, isNull);
+    });
   });
 }

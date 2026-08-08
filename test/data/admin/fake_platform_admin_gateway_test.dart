@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:legalhub/core/admin/audit_entry.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/admin/fake_platform_admin_gateway.dart';
@@ -188,6 +189,70 @@ void main() {
         expect(outcome.valueOrNull, hasLength(1));
         expect(outcome.valueOrNull!.single.userId, 'demo-user');
       });
+    });
+
+    group('audit reads (D-AUD5)', () {
+      test('platform audit is deterministic, non-PII, redacted-only', () async {
+        final OrgOutcome<List<AuditEntry>> first = await gateway
+            .readPlatformAudit();
+        final OrgOutcome<List<AuditEntry>> second = await gateway
+            .readPlatformAudit();
+
+        final List<AuditEntry> rows = first.valueOrNull!;
+        expect(rows, hasLength(5));
+        expect(rows, second.valueOrNull);
+        // Every row is redacted metadata: correlation ids present, no
+        // credentials/content-shaped fields.
+        for (final AuditEntry entry in rows) {
+          expect(entry.correlationId, isNotNull);
+          expect(entry.redactedSummary, contains('metadata only'));
+        }
+        expect(rows.first.action, 'organization_created');
+        expect(rows.first.actorUserId, FakeOrganizationGateway.demoUserId);
+        expect(
+          rows.first.organizationId,
+          FakeOrganizationGateway.demoOrganizationId,
+        );
+      });
+
+      test('org audit is scoped to the demo org', () async {
+        final OrgOutcome<List<AuditEntry>> outcome = await gateway.readOrgAudit(
+          organizationId: FakeOrganizationGateway.demoOrganizationId,
+        );
+
+        expect(outcome.valueOrNull, hasLength(3));
+        expect(outcome.valueOrNull!.first.action, 'organization_created');
+      });
+
+      test('a foreign org id reads as an honest empty trail', () async {
+        final OrgOutcome<List<AuditEntry>> outcome = await gateway.readOrgAudit(
+          organizationId: 'org-foreign',
+        );
+
+        expect(outcome.isSuccess, isTrue);
+        expect(outcome.valueOrNull, isEmpty);
+      });
+
+      test('non-owner audit reads are denied, never empty-success (AC-7)',
+        () async {
+          final FakePlatformAdminGateway nonOwnerAudit =
+              FakePlatformAdminGateway(
+            organizationGateway: orgGateway,
+            demoIsPlatformOwner: false,
+          );
+          final OrgOutcome<List<AuditEntry>> platform = await nonOwnerAudit
+              .readPlatformAudit();
+          final OrgOutcome<List<AuditEntry>> org = await nonOwnerAudit
+              .readOrgAudit(
+                organizationId: FakeOrganizationGateway.demoOrganizationId,
+              );
+
+          expect(platform.failureOrNull?.kind, OrgFailureKind.denied);
+          expect(platform.valueOrNull, isNull);
+          expect(org.failureOrNull?.kind, OrgFailureKind.denied);
+          expect(org.valueOrNull, isNull);
+        },
+      );
     });
   });
 }
