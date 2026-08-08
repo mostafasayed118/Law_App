@@ -212,13 +212,30 @@ committable with the stated verification; the apply gate (T5) is the only
 owner-gated step. T2–T4 are server artifacts — **no dev-project change
 until T5**.
 
-- [ ] **1. Mechanism design review** — touches: this document + a
+- [x] **1. Mechanism design review** — touches: this document + a
   `docs/realtime_push_gate_review_2026-08-08.md` (§8-style Q1–Q6 for live
   delivery: the publication + Realtime RLS mechanism, D-LV3 delivery gate =
   the existing SELECT policy, the D-LV1 write source, the D-LV4 client
   lifecycle, rollback, the forward-pin re-scope to
   messages-present + exactly-one-publication-row) — done when: docs
-  committed, ledger sweep green (no dev-project contact).
+  committed, ledger sweep green (no dev-project contact). — **DONE (this
+  commit, 2026-08-08)** — the review answers Q1–Q6 for the mechanism: Q1
+  postgres_changes via the default supabase_realtime publication (exactly
+  messages, D-LV2); Q2 Realtime RLS — the existing messages_select_assigned
+  policy IS the delivery gate (verified mechanism; the D-RT6 surface
+  caution resolves to publication=enablement + RLS=authorization, both
+  pinned; the §6 negative row becomes enforceable); Q3 the D-LV1 minimal
+  send path as the honest event source (insert-only, same gate); Q4 the
+  MessageRealtimeApi seam + backfill via fetchMessages (real reconnect is
+  configured-build pending, never claimed); Q5 no owner carve-out, the
+  oversight rows stay ungranted; Q6 the direct-INSERT path is not
+  contract §8-audited — recorded honestly, a future audited send RPC
+  flagged. §4 pins the INSERT policy + deny rows (org-role-alone,
+  cross-org, suspended, owner, anon, empty-body CHECK, the assigned
+  positive, the delivery-equivalence negative); §5 the 09 migration
+  (publication membership only, no new table) + the forward-pin re-scope
+  (pg_publication_tables messages 0→1, policies 10→11); §6 rollback
+  pairing; ledger PASS 115, no dev-project contact.
 - [ ] **2. Schema artifacts (rehearsal-ready, NOT applied)** — touches:
   `supabase/migrations/09_realtime_push.sql` (+ `09_realtime_push.down.sql`),
   `supabase/policies/messages_insert.sql` — done when: the migration adds
