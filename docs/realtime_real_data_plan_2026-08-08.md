@@ -400,7 +400,7 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   messages-present + live-delivery-absent), citing r1 PASS (`8204245`,
   70/0/0) + apply execution (`35cceb9`, 10 tables / 10 RLS / 9 policies
   live) + §7 discipline; committed **before** the client surface (T7).
-- [ ] **7. Client swap (env-gated, NEW thread-detail surface)** — touches:
+- [x] **7. Client swap (env-gated, NEW thread-detail surface)** — touches:
   `lib/data/messaging/supabase_message_api.dart` +
   `supabase_message_api_impl.dart` + `supabase_message_gateway.dart`
   (`fetchMessages(String threadId)`), `lib/features/messaging/domain/message.dart`
@@ -411,9 +411,30 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   impl columns + `.eq('thread_id')` pin, failure mapping incl.
   `providerUnavailable` from the start, fake determinism, cubit/widget,
   DI pins) — done when: format clean · analyze clean · suite green (fake
-  unchanged) · ledger PASS; shipped thread VO/presentation untouched.
-- [ ] **8. Lockstep + evidence + close** — touches: README test count,
+  unchanged) · ledger PASS; shipped thread VO/presentation untouched. —
+  **DONE (this commit, 2026-08-08 — `7b8a808`)** — fetchMessages on the
+  seam/impl/gateway (`.eq('thread_id')` filter + columns pin, guarded row
+  mapping, `message_body_read_denied/unavailable/failed`), NEW `Message`
+  VO (id/authorDisplayName/body/sentAt), deterministic per-thread non-PII
+  fake rows, `MessageThreadDetailCubit/State/Screen` (read-only, empty/
+  error/retry, demo note), the list row's thread-open InkWell (the D-RT5
+  reversal of the D-C2 chip-only posture), `/messages/:threadId` route
+  with the tapped title as `extra` (Q3), l10n ×3 across en/ar/tr; tests
+  +28 (impl, gateway mapping + loud-drift + failure, fake determinism,
+  cubit lifecycle, detail-screen widgets, router tap pin, list-screen
+  posture re-scope); suite 1014 runtime / 1011 declared, ledger PASS 115,
+  README 983 → 1011 (the first sweep under-counted the two untracked
+  test files at 1001 — corrected before this commit).
+- [x] **8. Lockstep + evidence + close** — touches: README test count,
   roadmap §14 sixth per-feature flip + §13 gate-table row, completion
   evidence `docs/realtime_real_data_completion_evidence_<date>.md`, dated
   close decision — done when: all docs sweep green, full gate re-run on the
-  committed state, close decision recorded.
+  committed state, close decision recorded. — **DONE (this commit,
+  2026-08-08)** — README count lockstep (1011), roadmap §14 sixth flip +
+  §13 gate-table row (the three "message bodies … stay deferred"
+  sentences updated to the shipped read path; live delivery stays
+  deferred D-RT6), evidence
+  `docs/realtime_real_data_completion_evidence_2026-08-08.md` (suite 1014
+  runtime / 1011 declaration, ledger PASS 115, the T4/T5/T7 review-finding
+  resolutions), dated close decision §9; ledger re-swept green on the
+  committed state.
