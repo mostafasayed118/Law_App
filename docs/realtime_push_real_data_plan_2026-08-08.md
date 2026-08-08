@@ -296,6 +296,15 @@ until T5**.
   + `docs/realtime_push_apply_execution_2026-08-08.md` — done when: the
   owner's dated approval exists, apply executed with the down-pairing +
   cleanup (the first live INSERT observed verbatim), rollback standing by.
+  — **record DRAFTED (this commit, 2026-08-08):**
+  `docs/realtime_push_apply_approval_2026-08-08.md` — r1 PASSED + the
+  T2 live artifact validation satisfy every precondition; baseline probe
+  pins (policies **9→10**, publication **0→1**, exactly messages); §3
+  up sequence = 09 migration → policy+grant → the partner demo send on
+  the acquisition thread (`5d148bca-…`, org `ef43087b-…`) as the first
+  live INSERT; §4 guardrails incl. the publication trigger condition;
+  rollback pairing = down + demo-row delete + policy git-revert. ⏳
+  awaiting the owner's dated sign-off (§6).
 - [ ] **6. Matrix addenda (dated)** — touches: `docs/permission_matrix.md`
   §4 (the write row: client/attorney send SHIP behind
   `messages_insert_assigned`; partner/`compliance_officer` ungranted;
