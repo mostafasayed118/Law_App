@@ -227,10 +227,13 @@ with the resolved commit refs.
 - **Configured-build verification (D-SM2):** the real RPC round-trip
   (and the §8 audit row on the dev project) needs the apply + a
   configured build (`.env`, git-ignored) — the D-45.1 convention.
-- **Remaining §14 deferred paths:** billing (spec D-09 — payment
-  provider/tax/PCI, open; not the decided p0 D-09 role semantics) and AI
-  (no scope) — the deferred list now narrows to those two; each keeps the
-  same per-feature discipline (reconciled 2026-08-08 in
+- **Remaining §14 deferred paths:** billing (**D-11 DECIDED 2026-08-08**
+  — Paymob for any real integration, no live payment in MVP, PCI via
+  hosted tokenization, tax deferred — a billing-invoices read-metadata
+  slice is now plannable on the fake-gateway pattern, still
+  §14-deferred as an implementation; not the p0 D-09 role semantics) and
+  AI (no scope) — each keeps the same per-feature discipline
+  (reconciled 2026-08-08 in
   `docs/send_message_rpc_plan_2026-08-08.md`).
 
 ## 9. Dated close decision

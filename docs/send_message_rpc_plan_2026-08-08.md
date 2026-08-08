@@ -11,13 +11,18 @@
 > step stays behind the owner's dated approval (INSTRUCTIONS.md §2.1/§5 hard
 > gates).
 >
-> **Reconciliation verdict (verified 2026-08-08):** the roadmap's remaining
-> **billing, AI** is accurate and neither path is currently plannable as a
-> T1–T8 slice — **billing is blocked on the OPEN spec D-09** (payment
-> provider / tax / PCI scope; owner + finance; also D-04 residency + PCI
-> scope, and "no live payment in MVP"), and **AI has no scope at all**
-> (blocked on OPEN D-07/D-08, legal review; no matrix rows, no RPC, no table,
-> bootstrap spec's not-in-scope list). One **cross-document D-09 collision**
+> **Reconciliation verdict (verified 2026-08-08, amended after D-11):**
+> the roadmap's remaining **billing, AI** — **billing is now UN-BLOCKED
+> for planning** (owner **D-11 DECIDED 2026-08-08**, recorded
+> `docs/d11_billing_payments_decision_2026-08-08.md`: Paymob for any real
+> integration, **no live payment in MVP**, PCI via Paymob-hosted
+> tokenization (SAQ-A-like, no demo PCI claim), tax out of scope; D-04
+> residency confirmed) — a billing-invoices **read-metadata** slice is
+> plannable on the **fake-gateway pattern** (synthetic invoices, no real
+> charges), still §14-deferred as an implementation until its own slice
+> plan + apply gates run; **AI has no scope at all** (blocked on OPEN
+> D-07/D-08, legal review; no matrix rows, no RPC, no table, bootstrap
+> spec's not-in-scope list). One **cross-document D-09 collision**
 > is flagged (A.1): `docs/legalhub_specification.md` D-09 = Payment provider
 > (open) vs `docs/p0_decision_capture.md` D-09 = Role semantics (decided
 > 2026-07-31) — the billing deferral cites the **spec's** D-09.
@@ -42,36 +47,35 @@
 
 ## Part A — §14 reconciliation (verified 2026-08-08)
 
-### A.1 Billing — STAYS DEFERRED (blocked on open owner-side decisions)
+### A.1 Billing — §14-DEFERRED as an implementation, but UN-BLOCKED for planning (D-11 DECIDED 2026-08-08)
 
-**Verified state (2026-08-08):**
+**Verified state (2026-08-08; the gate row amended after D-11):**
 
 | Claim | Verified fact | Source |
 |---|---|---|
 | Billing is the only remaining §14 server-side path | matters, documents, messages, storage, audit, realtime (read + push) all SHIPPED; roadmap §13/§14 tails say "billing, AI" | roadmap §13 row, §14 tail |
-| Payment is gated on D-09 | Phase 5 (consultation booking) is client-only, "no live payment" | roadmap §5 line 315; spec §4 MVP list |
-| D-09 = payment provider / tax / PCI scope, **open** | Owner + finance; gate "Before billing/payment spec"; impacts "Billing, booking payment" | `docs/legalhub_specification.md` D-09 |
+| Payment is gated on the (now-closed) provider/tax/PCI decision | Phase 5 (consultation booking) is client-only, "no live payment" | roadmap §5 line 315; spec §4 MVP list |
+| Provider/tax/PCI = **spec D-09, now DECIDED as D-11 (2026-08-08)** | Paymob for any real integration · **no live payment in MVP** (fake-gateway pattern) · PCI via Paymob-hosted tokenization (SAQ-A-like, no demo claim) · tax out of scope | `docs/d11_billing_payments_decision_2026-08-08.md`; supersedes the spec's D-09 |
 | Billing also gated on D-04 + PCI | "Billing / payments \| D-09, D-04 (residency), PCI scope" | `docs/legalhub_specification.md` §13 |
 | No billing data model exists | "No data models for matters/documents/messages/billing"; `billing_invoices` screen "Maybe \| Defer real payment (D-09)" | `docs/legalhub_bootstrap_specification.md`; spec §13 |
 | No billing RPC / matrix rows | repo scan: zero billing/payment rows in `docs/permission_matrix.md`, zero billing RPCs in `supabase/rpc/` | verified 2026-08-08 |
 
-**⚠ D-09 collision (flagged):** `docs/legalhub_specification.md` D-09 =
-Payment provider / tax / PCI scope (**open**); `docs/p0_decision_capture.md`
-D-09 = Role semantics (**DECIDED 2026-08-07-31**). The billing deferral and
-the roadmap Phase-5 line ("payment is gated on D-09") cite the **spec's**
-D-09. The realtime-push T8 evidence §8's "billing (D-09)" inherits the
-ambiguity. **Recommendation:** future billing references say "spec D-09
-(payment provider / tax / PCI)" to disambiguate; the p0 capture's D-09
-(role semantics) is closed and unrelated.
+**⚠ D-09 collision (flagged + resolved):** `docs/legalhub_specification.md`
+D-09 = Payment provider / tax / PCI scope; `docs/p0_decision_capture.md`
+D-09 = Role semantics (**DECIDED 2026-07-31**). The billing deferral cited
+the **spec's** D-09. **The owner's D-11 decision (2026-08-08) now
+supersedes the spec's D-09** — future billing references say **D-11**;
+the p0 capture's D-09 (role semantics) is closed and unrelated.
 
-**Verdict:** NOT plannable as a T1–T8 slice. The §14 gate ("per feature,
-same P2 discipline") presupposes a table + RLS + battery + matrix rows;
-billing has none, and the gate to creating any is the **owner's dated
-closing of spec D-09 (+ D-04)** — an external payment/PCI/tax decision
-(owner + finance per the spec), not a planning decision. A
-billing-invoices **read-metadata** slice (invoice rows + RLS + client
-surface, mirroring the six read slices) becomes plannable **only after**
-that closes. Recorded as owner-blocked, not forgotten.
+**Verdict (amended):** the §14 gate ("per feature, same P2 discipline")
+presupposes a table + RLS + battery + matrix rows; billing has none, but
+the un-block gate is now **MET** (D-11: provider, PCI, tax, residency all
+decided). A billing-invoices **read-metadata** slice (invoice rows + RLS
++ battery + rehearsal + dated apply + matrix addendum + env-gated client
+swap, mirroring the seven read slices, **fake-gateway pattern** — no live
+payment, no real charges) is now **plannable** under the same T1–T8
+discipline; it stays §14-deferred as an implementation until its own
+slice plan + apply gates run.
 
 ### A.2 AI — STAYS DEFERRED (no scope)
 
@@ -93,10 +97,15 @@ and stays.
 
 ### A.3 Reconciliation verdict
 
-- The §14 deferred list is now **exhausted of plannable items**: 7 of 9
-  paths un-deferred and SHIPPED; **billing and AI both stay deferred
-  behind open owner-side decisions** (spec D-09 + D-04; D-07/D-08), each
-  with a concrete un-block gate recorded above.
+- The §14 deferred list is now **exhausted of plannable items except
+  billing**: 8 of 9 paths un-deferred and SHIPPED (matters, documents,
+  messages, storage, audit, realtime read, realtime push, send-message);
+  **billing is now UN-BLOCKED for planning** (D-11 DECIDED 2026-08-08 —
+  Paymob, no live payment in MVP, PCI hosted tokenization, tax deferred;
+  a billing-invoices read-metadata slice is plannable on the fake-gateway
+  pattern, still §14-deferred as an implementation); **AI stays deferred
+  behind open owner-side decisions** (D-07/D-08 + no scope), with a
+  concrete un-block gate recorded above.
 - **Next slice (this plan):** the audited `send_message` RPC — the
   write-path §8-audit gap recorded by the realtime-push slice. Chosen by
   autonomy (best value/risk among the remaining recorded follow-ups:
