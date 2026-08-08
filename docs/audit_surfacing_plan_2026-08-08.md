@@ -278,8 +278,16 @@ only dated gate is the matrix §6 addendum ordering (T1) and the final push.
   locales. — suite 986 runtime / 983 declared, ledger PASS 115 (reviewer
   finding: load() never carries an in-flight audit flag forward — the
   remounted section re-triggers its own fetch).
-- [ ] **5. Lockstep + evidence + close** — touches: README test count,
+- [x] **5. Lockstep + evidence + close** — touches: README test count,
   roadmap §14 fifth flip + §13 gate-table row + §2 unwired-RPC inventory
   → 18-of-18, completion evidence `docs/audit_surfacing_completion_evidence_2026-08-08.md`,
   dated close decision — done when: all docs sweep green, full gate re-run
-  on the committed state, close decision recorded. — **⏳ PENDING**
+  on the committed state, close decision recorded. — **DONE (this
+  commit)** — README 983 in lockstep; roadmap §14 flip note (fifth
+  un-deferral, client-only, RPCs already applied 2026-08-01) + §13
+  gate-table row + §2 inventory now reads **18-of-18** (both audit rows
+  ❌ → ✅ with `readOrgAudit`/`readPlatformAudit`); evidence record
+  (`docs/audit_surfacing_completion_evidence_2026-08-08.md`) captures the
+  gate (analyze clean, suite 986 runtime / 983 declared, ledger PASS 115)
+  and the reviewer-finding resolutions incl. the auditLoading-carry race;
+  dated close decision recorded in the evidence §9.
