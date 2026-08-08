@@ -690,6 +690,27 @@ this is the row's own worst-case test and must exist before P2 ships.
 > extends, not replaces, and widens no other row; in effect on the apply
 > execution 2026-08-08 (`7efb32b`).
 
+> **§6 addendum (2026-08-09, partner org-audit read surface — the recorded
+> follow-up consummated; scope note
+> `docs/partner_org_audit_scope_2026-08-09.md`):** the **"Read the audit
+> table" row's partner cell gains its first in-product surface** — the same
+> remote record of the audit-surfacing addendum ("a partner-facing org-audit
+> UI is a recorded follow-up") ships: partner-scoped, read-only, org-scoped
+> to the active-org context (D-08, server re-derives membership), rendering
+> **server-redacted fields only** (action/outcome/`redacted_summary`/
+> timestamp; never content or credentials — contract §8) with no export
+> affordance (D-AUD1), and a **distinct denied state for non-partners —
+> never empty-success** (P3.5 AC-7, server `permission denied` maps to a
+> typed denial). The only server surface consumed is `read_org_audit`, which
+> is **already applied (2026-08-01) and partner-capable** — **no server
+> change, no new RPC, no grant**: this addendum only records the client-side
+> consummation (`OrganizationGateway.readOrgAudit` + `OrgAuditCubit` +
+> `/organizations/audit` surface + `canViewAudit` partner-hint + l10n ×3 +
+> env-gated `SupabaseOrgApi.readOrgAudit` RPC call). Per §7 this extends,
+> not replaces, and widens no other row; the enforcement remains the applied
+> in-RPC gate (a non-partner is denied server-side); raw SELECT on
+> `audit_events` stays ungranted (D-P0C4 holds).
+
 ---
 ## 7. Sign-off
 
