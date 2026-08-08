@@ -11,16 +11,13 @@
 > rehearsed slice to the shared dev project, with the rollback pairing
 > standing by.
 >
-> **Status: DRAFT — pending the owner's dated signature in §6.** The r1
-> rehearsal is **PASSED 2026-08-08** (plan T4 — the first genuinely
-> executed battery in the slice history: run locally on a Docker-backed
-> scratch stack, `== summary: 70 passed, 0 warnings, 0 failures ==`, pins
-> 11 tables / 11 RLS / 10 policies; evidence
-> `docs/realtime_rehearsal_evidence_r1_2026-08-08.md`), so the apply gate
-> is unblocked pending sign-off. On signature, this record authorizes the
-> §3 up sequence against the shared dev project
+> **Status: APPLY APPROVED (2026-08-08).** The owner's dated sign-off in §6
+> authorizes the §3 up sequence against the shared dev project
 > (`eutmvevpskerzpqmwplv`, `eu-central-1`) per the §4 execution conditions,
-> with the rollback pairing standing by.
+> with the rollback pairing standing by. The ephemeral rehearsal r1
+> (`docs/realtime_rehearsal_evidence_r1_2026-08-08.md`) reported **PASSED
+> 2026-08-08** (plan T4 — genuinely executed battery, 70/0/0; §4 evidence).
+> Nothing beyond the §3 scope; the §5 exclusions hold.
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
 >
@@ -44,8 +41,8 @@
 | Policy artifact | `supabase/policies/messages.sql` (`60198e2`) | ✅ Committed — NOT applied |
 | Policy battery + harness | `supabase/tests/08_message_rls.sql`, `00_fixtures.sql`, `scripts/verify_policy_tests.sh` (`9f01870`, `f22e672`) | ✅ Committed; static `--check` PASS 333/0/0 |
 | **Ephemeral rehearsal (r1)** | `docs/realtime_rehearsal_evidence_r1_2026-08-08.md` (`8204245`) | ✅ **PASSED 2026-08-08** — genuinely executed run (§4 evidence: 70/0/0) |
-| **Apply approval (this record)** | this document | ⏳ **DRAFT — pending owner's dated sign-off (§6)** |
-| Apply execution (dev project) | `docs/realtime_apply_execution_2026-08-08.md` | ⏳ pending approval + execution |
+| **Apply approval (this record)** | this document | ✅ **APPROVED 2026-08-08** (owner's dated sign-off, §6) |
+| Apply execution (dev project) | `docs/realtime_apply_execution_2026-08-08.md` | ⏳ pending execution (this record authorizes it) |
 
 ## 2. Gate criteria — what the r1 rehearsal must prove
 
@@ -174,22 +171,23 @@ conditions and the §5 exclusions, with the rollback pairing standing by.
 Signature is valid — the r1 rehearsal reported PASSED on 2026-08-08 (plan
 T4; evidence §4, criteria §2 all green — genuinely executed, 70/0/0).
 
-- **Project Owner:** github.com/mostafasayed118 — **date: ______** —
-  **approval wording (recorded from the pair-programming session):**
+- **Project Owner:** github.com/mostafasayed118 — **date: 2026-08-08**
+  — **approval wording (recorded from the pair-programming session):**
   "Apply approved — realtime read slice (08_messages + policies/messages +
   demo seed referencing the applied demo thread ids), per this record
   §3–§5, with the §4 guardrails and rollback pairing."
 
-> **Pending signature.** On sign-off, the execution record
+> **Signed 2026-08-08.** The execution record
 > (`docs/realtime_apply_execution_2026-08-08.md`) captures the actual run;
 > on success, T6 (the dated matrix §4 addendum for the "Read a
 > document/message body" row) precedes T7 (client swap) per the plan.
 
 ## 7. Ledger
 
-- DRAFT 2026-08-08: r1 rehearsal PASSED (plan T4, evidence `8204245`);
-  this record opened with the gate table showing the apply-approval row ⏳.
-- Pending: owner's dated sign-off (§6) → flip status to ✅ APPLY APPROVED
-  (dated) → execute per §4 → record execution evidence → T6 matrix addendum
-  → T7 client swap → T8 lockstep + close (roadmap §14/§13 + README/ledger
-  re-swept on the merged tree).
+- Signed 2026-08-08: this record's status is ✅ APPLY APPROVED (dated); the
+  plan's T5 row annotated.
+- Pending: execution record
+  (`docs/realtime_apply_execution_2026-08-08.md`) captures the actual run
+  per §4; on success, T6 (matrix addendum) and T7 (client swap) follow,
+  and the roadmap §14/§13 + README/ledger lockstep is re-run on the
+  merged tree (T8).

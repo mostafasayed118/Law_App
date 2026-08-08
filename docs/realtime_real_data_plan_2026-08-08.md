@@ -362,19 +362,25 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   D-P0C4 design, so it could never pass; fixed with the in-file privileged-
   observer `reset role` pattern (01.13 precedent). Evidence:
   `docs/realtime_rehearsal_evidence_r1_2026-08-08.md` (PASSED).
-- [ ] **5. Dated apply-approval → apply** — touches: dev project
+- [x] **5. Dated apply-approval → apply** — touches: dev project
   (migrations + policies + demo seed), `docs/realtime_apply_approval_<date>.md`
   + `docs/realtime_apply_execution_<date>.md` — done when: the owner's
   dated approval exists, apply executed with `_down.sql` pairing + cleanup
   discipline (demo message ids reference the applied demo thread ids),
-  observed output recorded verbatim. — **DRAFT (this commit, 2026-08-08):**
-  `docs/realtime_apply_approval_2026-08-08.md` opened with the r1 PASSED
-  gate (criteria §2 all green — genuinely executed 70/0/0), the §3 scope
-  (08_messages + policies/messages + demo seed referencing the four applied
-  demo thread ids: `5d148bca-…`, `a8fd025e-…`, `d0904762-…`, `4a8755b1-…`),
-  the §4 guardrails (baseline probe 8→9 policies with the storage-HELD
-  caveat, rollback pairing, per-step verification, post-apply smoke), and
-  the §5 exclusions — awaiting the owner's dated sign-off in §6.
+  observed output recorded verbatim. — **DONE (this commit, 2026-08-08):**
+  the owner signed `docs/realtime_apply_approval_2026-08-08.md` §6
+  (APPLY APPROVED 2026-08-08); the apply executed via `supabase db query
+  --linked` — baseline probe (messages absent, 8 policies, four demo
+  threads, one partner account with two org memberships) → `08_messages`
+  → `policies/messages` (pg_policies 8→9, RLS on, authenticated SELECT
+  only) → demo seed of **10 messages** (acquisition 1 / lease 2 /
+  procedural 3 / family 4, matching each thread's message_count; org
+  resolved per thread — 0 org mismatches; generic demo authors/bodies,
+  no PII) → post-apply smoke (partner reads 6/10 as assigned attorney on
+  3 of 4 matters — family's attorney is NULL so its 4 deny, the D-RT2
+  clause firing live; cross-org 0; stranger 0; the body CHECK rejects an
+  empty string live) — all recorded verbatim in
+  `docs/realtime_apply_execution_2026-08-08.md` (APPLIED).
 - [ ] **6. Matrix addendum (dated)** — touches: `docs/permission_matrix.md`
   §4 — the **"Read a document/message body"** row gains its dated addendum
   (client/attorney cells SHIP behind `messages_select_assigned` — the
