@@ -291,7 +291,7 @@ until T5**.
   delivery-equivalence §6 negative green via the role-impersonated read
   (the RLS proxy — the real channel round-trip stays T7, honest limit
   recorded).
-- [ ] **5. Dated apply-approval → apply** — touches: dev project
+- [x] **5. Dated apply-approval → apply** — touches: dev project
   (publication + INSERT policy + demo send), `docs/realtime_push_apply_approval_2026-08-08.md`
   + `docs/realtime_push_apply_execution_2026-08-08.md` — done when: the
   owner's dated approval exists, apply executed with the down-pairing +
@@ -341,9 +341,20 @@ until T5**.
   failure, cubit live-append/dedupe/reconnect, widget composer, DI pins) —
   done when: format clean · analyze clean · suite green (fake unchanged) ·
   ledger PASS.
-- [ ] **8. Lockstep + evidence + close** — touches: README test count,
+- [x] **8. Lockstep + evidence + close** — touches: README test count,
   roadmap §14 seventh per-feature flip + §13 gate-table row (the deferred
   list narrows to **billing/AI**), completion evidence
   `docs/realtime_push_real_data_completion_evidence_2026-08-08.md`, dated
   close decision — done when: all docs sweep green, full gate re-run on the
-  committed state, close decision recorded.
+  committed state, close decision recorded. — **DONE (this commit,
+  2026-08-08):** README count lockstep **1042** (the T7 amend fixed the
+  1037→1042 drift the final ledger sweep caught — the committed bytes now
+  match the ledger's ground-truth declaration count); roadmap §14 gains
+  the **seventh per-feature un-deferral** flip note (realtime live
+  delivery) + §13 gate-table row (deferred list narrows to **billing/AI**);
+  the Phase 10/11/12 cross-ref sentences re-scoped from "live delivery
+  stays deferred (D-RT6)" to the shipped seventh un-deferral; completion
+  evidence in
+  `docs/realtime_push_real_data_completion_evidence_2026-08-08.md`
+  (SHIPPED, dated close decision §9); ledger sweep green on the committed
+  state.
