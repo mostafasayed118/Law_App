@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import '../../core/errors/app_error.dart';
 import '../../core/errors/result.dart';
 import '../../features/messaging/domain/message.dart';
 import '../../features/messaging/domain/message_gateway.dart';
+import '../../features/messaging/domain/message_realtime_event.dart';
 import '../../features/messaging/domain/message_thread.dart';
 import 'supabase_message_api.dart';
+import 'supabase_message_realtime_api.dart';
 
 /// [MessageGateway] backed by the Supabase provider via [SupabaseMessageApi].
 ///
@@ -23,9 +27,10 @@ import 'supabase_message_api.dart';
 /// gate, so the embed resolves), falling back to the raw matter id when the
 /// embed is absent (plan §9) — never a fabricated title.
 class SupabaseMessageGateway implements MessageGateway {
-  SupabaseMessageGateway(this._api);
+  SupabaseMessageGateway(this._api, this._realtimeApi);
 
   final SupabaseMessageApi _api;
+  final SupabaseMessageRealtimeApi _realtimeApi;
 
   @override
   Future<Result<List<MessageThread>>> fetchThreads() async {
@@ -193,6 +198,92 @@ class SupabaseMessageGateway implements MessageGateway {
       SupabaseMessageFailureKind.unknown => (
         'message_read_failed',
         'Unable to load threads. Please try again.',
+      ),
+    };
+    return AppError(
+      code: code,
+      userMessage: userMessage,
+      technicalMessage: e.message,
+    );
+  }
+
+  @override
+  Future<Result<Message>> sendMessage(
+    String threadId,
+    String body, {
+    String? authorDisplayName,
+  }) async {
+    try {
+      // D-LV1: the impl resolves the thread's org under the same RLS gate
+      // and inserts; the persisted row maps back to the [Message] VO.
+      final Map<String, dynamic> row = await _api.sendMessage(
+        threadId,
+        body,
+        authorDisplayName: authorDisplayName,
+      );
+      return Result<Message>.success(_messageFromRow(row));
+    } on SupabaseMessageException catch (e) {
+      return Result<Message>.failure(_mapSendFailure(e));
+    } on FormatException catch (e) {
+      // Provider drift in the returned row surfaces loudly, never as a
+      // silently wrong sent message.
+      return Result<Message>.failure(
+        AppError(
+          code: 'message_send_failed',
+          userMessage: 'Unable to send the message. Please try again.',
+          technicalMessage: e.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Stream<MessageRealtimeEvent> watchMessages(String threadId) {
+    // D-LV4: raw delivered events map to the domain events the cubit
+    // drives. A malformed live row (provider drift) is dropped (null
+    // filtered) — a live event must never crash the stream listener, and
+    // the next reconnect backfill re-reads through the loud fetch path if
+    // the drift persists.
+    return _realtimeApi
+        .watchMessages(threadId)
+        .map(_liveEventFromRow)
+        .where((MessageRealtimeEvent? event) => event != null)
+        .cast<MessageRealtimeEvent>();
+  }
+
+  MessageRealtimeEvent? _liveEventFromRow(SupabaseMessageRealtimeEvent event) {
+    return switch (event) {
+      SupabaseMessageRealtimeInsert(row: final Map<String, dynamic> row) =>
+        _liveInsertFromRow(row),
+      SupabaseMessageRealtimeReconnected() => const MessageLiveReconnected(),
+    };
+  }
+
+  MessageRealtimeEvent? _liveInsertFromRow(Map<String, dynamic> row) {
+    try {
+      return MessageLiveInsert(_messageFromRow(row));
+    } on FormatException {
+      return null;
+    }
+  }
+
+  /// Maps a provider failure for the send path to a redaction-safe
+  /// [AppError]. Distinct `message_send_*` codes keep the write surface's
+  /// failures separable from the reads' (D-LV1); the technical message is
+  /// the provider's own — message content never crosses into errors.
+  AppError _mapSendFailure(SupabaseMessageException e) {
+    final (String code, String userMessage) = switch (e.kind) {
+      SupabaseMessageFailureKind.denied => (
+        'message_send_denied',
+        'You do not have permission to send messages on this thread.',
+      ),
+      SupabaseMessageFailureKind.providerUnavailable => (
+        'message_send_unavailable',
+        'Sending is temporarily unavailable. Please try again.',
+      ),
+      SupabaseMessageFailureKind.unknown => (
+        'message_send_failed',
+        'Unable to send the message. Please try again.',
       ),
     };
     return AppError(

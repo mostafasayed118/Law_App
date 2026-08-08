@@ -292,6 +292,8 @@
   "messageThreadDetailTitle": "Thread messages",
   "messagesDetailEmpty": "No messages are available in this thread.",
   "messagesDetailError": "Unable to load messages.",
+  "messageComposerHint": "Type a message",
+  "messageSend": "Send",
   "searchTitle": "Search",
   "searchNoQuery": "Type a search term to find demo matters, documents, messages, or attorneys.",
   "searchEmpty": "No results match your search.",

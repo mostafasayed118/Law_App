@@ -31,6 +31,8 @@ import '../data/matters/supabase_matter_gateway.dart';
 import '../data/messaging/supabase_message_api.dart';
 import '../data/messaging/supabase_message_api_impl.dart';
 import '../data/messaging/supabase_message_gateway.dart';
+import '../data/messaging/supabase_message_realtime_api.dart';
+import '../data/messaging/supabase_message_realtime_api_impl.dart';
 import '../data/orgs/fake_membership_repository.dart';
 import '../data/orgs/fake_organization_gateway.dart';
 import '../data/orgs/supabase_membership_repository.dart';
@@ -94,6 +96,7 @@ void configureDependencies({
   SupabaseMatterApi Function()? supabaseMatterApiFactory,
   SupabaseDocumentApi Function()? supabaseDocumentApiFactory,
   SupabaseMessageApi Function()? supabaseMessageApiFactory,
+  SupabaseMessageRealtimeApi Function()? supabaseMessageRealtimeApiFactory,
   SupabaseStorageApi Function()? supabaseStorageApiFactory,
 }) {
   // Lazy singleton: stateless service, created on first resolution.
@@ -352,14 +355,19 @@ void configureDependencies({
     // and created per screen via BlocProvider, so it is NOT registered here.
     // Like DocumentGateway, the flip swaps the dev fake for the
     // Supabase-backed implementation when the build is configured (Batch 3.3
-    // env pattern). The real path reads the applied `message_threads` table
-    // through the RLS-scoped SELECT (plan D-MSR1/D-MSR7) and resolves
-    // matterRef via the embedded matters(title) select (D-MSR4); env-less
-    // runs and ALL tests keep the fake.
+    // env pattern). The real path reads the applied `message_threads` +
+    // `messages` tables through the RLS-scoped SELECTs (plan D-MSR1/D-MSR7/
+    // D-RT5) and resolves matterRef via the embedded matters(title) select
+    // (D-MSR4); the send path (D-LV1) resolves the thread's org under the
+    // same gate and inserts, and the live path (D-LV4) binds the
+    // postgres_changes subscription; env-less runs and ALL tests keep the
+    // fake.
     if (env.isConfigured) {
       serviceLocator.registerLazySingleton<MessageGateway>(
         () => SupabaseMessageGateway(
           (supabaseMessageApiFactory ?? SupabaseMessageApiImpl.bind)(),
+          (supabaseMessageRealtimeApiFactory ??
+              SupabaseMessageRealtimeApiImpl.bind)(),
         ),
       );
     } else {

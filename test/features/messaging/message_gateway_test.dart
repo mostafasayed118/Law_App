@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/features/messaging/data/fake_message_gateway.dart';
 import 'package:legalhub/features/messaging/domain/message.dart';
+import 'package:legalhub/features/messaging/domain/message_realtime_event.dart';
 import 'package:legalhub/features/messaging/domain/message_thread.dart';
 
 void main() {
@@ -127,5 +128,81 @@ void main() {
 
       expect(messages, isEmpty);
     });
+  });
+
+  group('FakeMessageGateway.sendMessage (D-LV1)', () {
+    test(
+      'appends a deterministic row the fetchMessages read reflects',
+      () async {
+        final FakeMessageGateway gateway = FakeMessageGateway();
+        final String threadId = FakeMessageGateway.syntheticThreads.first.id;
+        final int before = (await gateway.fetchMessages(
+          threadId,
+        )).valueOrNull!.length;
+
+        final Message? sent = (await gateway.sendMessage(
+          threadId,
+          'A demo send',
+          authorDisplayName: 'Demo Partner',
+        )).valueOrNull;
+        final List<Message> after = (await gateway.fetchMessages(
+          threadId,
+        )).valueOrNull!;
+
+        expect(sent, isNotNull);
+        expect(sent!.id, '$threadId-sent-1');
+        expect(sent.authorDisplayName, 'Demo Partner');
+        expect(sent.body, 'A demo send');
+        // Fixed timestamp — no wall-clock dependence (the determinism pin).
+        expect(sent.sentAt, DateTime.utc(2026, 8, 8));
+        expect(after, hasLength(before + 1));
+        expect(after.last.id, sent.id);
+      },
+    );
+
+    test(
+      'falls back to a neutral generic author when none is given (D-RT4)',
+      () async {
+        final FakeMessageGateway gateway = FakeMessageGateway();
+
+        final Message? sent = (await gateway.sendMessage(
+          'thread-1',
+          'Body',
+        )).valueOrNull;
+
+        expect(sent!.authorDisplayName, 'Demo client');
+      },
+    );
+
+    test('sent state is instance-scoped, never shared across fakes', () async {
+      final FakeMessageGateway a = FakeMessageGateway();
+      final FakeMessageGateway b = FakeMessageGateway();
+      final String threadId = FakeMessageGateway.syntheticThreads.first.id;
+
+      await a.sendMessage(threadId, 'From A');
+      final List<Message> bMessages = (await b.fetchMessages(
+        threadId,
+      )).valueOrNull!;
+
+      expect(bMessages.any((Message m) => m.body == 'From A'), isFalse);
+    });
+  });
+
+  group('FakeMessageGateway.watchMessages (D-LV4)', () {
+    test(
+      'is a never-emitting stream (no live delivery in env-less runs)',
+      () async {
+        final FakeMessageGateway gateway = FakeMessageGateway();
+
+        final List<MessageRealtimeEvent> events = <MessageRealtimeEvent>[];
+        await for (final MessageRealtimeEvent event in gateway.watchMessages(
+          'thread-1',
+        )) {
+          events.add(event);
+        }
+
+        expect(events, isEmpty);
+      },
+    );
   });
 }

@@ -9,6 +9,12 @@ void main() {
     late Map<String, List<Map<String, dynamic>>> tableData;
     late Map<String, PostgrestException> tableErrors;
     late Map<String, Object> objectErrors;
+    late List<String> orgCalls;
+    late Map<String, Map<String, dynamic>?> orgData;
+    late Map<String, PostgrestException> orgErrors;
+    late List<Map<String, dynamic>> insertRows;
+    late Map<String, PostgrestException> insertErrors;
+    late List<Map<String, dynamic>> insertCalls;
     late SupabaseMessageApiImpl api;
 
     setUp(() {
@@ -16,22 +22,48 @@ void main() {
       tableData = <String, List<Map<String, dynamic>>>{};
       tableErrors = <String, PostgrestException>{};
       objectErrors = <String, Object>{};
-      api = SupabaseMessageApiImpl((
-        String table,
-        String columns, [
-        String? threadId,
-      ]) async {
-        calls.add('$table:$columns${threadId == null ? '' : '|$threadId'}');
-        final Object? objectError = objectErrors[table];
-        if (objectError != null) {
-          throw objectError;
-        }
-        final PostgrestException? error = tableErrors[table];
-        if (error != null) {
-          throw error;
-        }
-        return tableData[table] ?? const <Map<String, dynamic>>[];
-      });
+      orgCalls = <String>[];
+      orgData = <String, Map<String, dynamic>?>{};
+      orgErrors = <String, PostgrestException>{};
+      insertRows = <Map<String, dynamic>>[];
+      insertErrors = <String, PostgrestException>{};
+      insertCalls = <Map<String, dynamic>>[];
+      api = SupabaseMessageApiImpl(
+        (String table, String columns, [String? threadId]) async {
+          calls.add('$table:$columns${threadId == null ? '' : '|$threadId'}');
+          final Object? objectError = objectErrors[table];
+          if (objectError != null) {
+            throw objectError;
+          }
+          final PostgrestException? error = tableErrors[table];
+          if (error != null) {
+            throw error;
+          }
+          return tableData[table] ?? const <Map<String, dynamic>>[];
+        },
+        orgCaller: (String table, String id) async {
+          orgCalls.add('$table|$id');
+          final PostgrestException? error = orgErrors[table];
+          if (error != null) {
+            throw error;
+          }
+          return orgData[table];
+        },
+        insertCaller: (String table, Map<String, dynamic> row) async {
+          insertCalls.add(<String, dynamic>{'table': table, ...row});
+          final PostgrestException? error = insertErrors[table];
+          if (error != null) {
+            throw error;
+          }
+          final Map<String, dynamic>? created = insertRows.isNotEmpty
+              ? insertRows.removeAt(0)
+              : null;
+          if (created != null) {
+            return created;
+          }
+          throw const PostgrestException(message: 'no insert row');
+        },
+      );
     });
 
     test('fetchMessageThreads selects the message_threads table with the VO '
@@ -212,6 +244,101 @@ void main() {
             (e) => e.kind,
             'kind',
             SupabaseMessageFailureKind.providerUnavailable,
+          ),
+        ),
+      );
+    });
+
+    test('sendMessage resolves the thread org first, then inserts with it '
+        '(D-LV1)', () async {
+      orgData['message_threads'] = <String, dynamic>{
+        'organization_id': 'org-1',
+      };
+      insertRows.add(<String, dynamic>{'id': 'msg-1'});
+
+      final Map<String, dynamic> row = await api.sendMessage(
+        'thread-1',
+        'A demo body',
+        authorDisplayName: 'Demo Partner',
+      );
+
+      expect(row['id'], 'msg-1');
+      expect(orgCalls, <String>['message_threads|thread-1']);
+      expect(insertCalls, hasLength(1));
+      final Map<String, dynamic> insert = insertCalls.single;
+      expect(insert['table'], 'messages');
+      expect(insert['organization_id'], 'org-1');
+      expect(insert['thread_id'], 'thread-1');
+      expect(insert['author_display_name'], 'Demo Partner');
+      expect(insert['body'], 'A demo body');
+    });
+
+    test('sendMessage falls back to a generic author when none is given '
+        '(D-RT4)', () async {
+      orgData['message_threads'] = <String, dynamic>{
+        'organization_id': 'org-1',
+      };
+      insertRows.add(<String, dynamic>{'id': 'msg-2'});
+
+      await api.sendMessage('thread-1', 'Body');
+
+      expect(insertCalls.single['author_display_name'], 'Demo client');
+    });
+
+    test('sendMessage denies when the thread org is not readable', () async {
+      // The RLS-scoped org lookup returns null for an unassigned writer —
+      // the write cannot be authorized, mapped as a typed denial.
+      orgData['message_threads'] = null;
+
+      await expectLater(
+        api.sendMessage('thread-1', 'Body'),
+        throwsA(
+          isA<SupabaseMessageException>().having(
+            (e) => e.kind,
+            'kind',
+            SupabaseMessageFailureKind.denied,
+          ),
+        ),
+      );
+      expect(insertCalls, isEmpty);
+    });
+
+    test('sendMessage maps an insert denial to the denied kind', () async {
+      orgData['message_threads'] = <String, dynamic>{
+        'organization_id': 'org-1',
+      };
+      insertErrors['messages'] = const PostgrestException(
+        message: 'new row violates row-level security policy',
+      );
+
+      await expectLater(
+        api.sendMessage('thread-1', 'Body'),
+        throwsA(
+          isA<SupabaseMessageException>().having(
+            (e) => e.kind,
+            'kind',
+            SupabaseMessageFailureKind.denied,
+          ),
+        ),
+      );
+    });
+
+    test('sendMessage maps a non-Postgrest insert failure to '
+        'providerUnavailable', () async {
+      orgData['message_threads'] = <String, dynamic>{
+        'organization_id': 'org-1',
+      };
+      insertErrors['messages'] = const PostgrestException(
+        message: 'connection reset by peer',
+      );
+
+      await expectLater(
+        api.sendMessage('thread-1', 'Body'),
+        throwsA(
+          isA<SupabaseMessageException>().having(
+            (e) => e.kind,
+            'kind',
+            SupabaseMessageFailureKind.unknown,
           ),
         ),
       );

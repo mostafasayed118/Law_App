@@ -861,6 +861,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get messagesDetailError => 'Unable to load messages.';
 
   @override
+  String get messageComposerHint => 'Type a message';
+
+  @override
+  String get messageSend => 'Send';
+
+  @override
   String get searchTitle => 'Search';
 
   @override

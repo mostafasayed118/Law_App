@@ -7,6 +7,7 @@ import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/features/messaging/domain/message.dart';
 import 'package:legalhub/features/messaging/domain/message_gateway.dart';
+import 'package:legalhub/features/messaging/domain/message_realtime_event.dart';
 import 'package:legalhub/features/messaging/domain/message_thread.dart';
 import 'package:legalhub/features/messaging/presentation/message_cubit.dart';
 import 'package:legalhub/features/messaging/presentation/message_state.dart';
@@ -163,5 +164,22 @@ class _StubMessageGateway implements MessageGateway {
     // Not exercised by the thread-list cubit tests; an honest empty success
     // keeps the seam implementable for the detail cubit tests.
     return const Result<List<Message>>.success(<Message>[]);
+  }
+
+  @override
+  Future<Result<Message>> sendMessage(
+    String threadId,
+    String body, {
+    String? authorDisplayName,
+  }) async {
+    // Not exercised by the thread-list cubit tests.
+    return Result<Message>.failure(
+      const AppError(code: 'not_exercised', userMessage: ''),
+    );
+  }
+
+  @override
+  Stream<MessageRealtimeEvent> watchMessages(String threadId) {
+    return const Stream<MessageRealtimeEvent>.empty();
   }
 }

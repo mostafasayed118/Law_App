@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/features/matters/presentation/matter_link_chip.dart';
 import 'package:legalhub/features/messaging/data/fake_message_gateway.dart';
 import 'package:legalhub/features/messaging/domain/message.dart';
 import 'package:legalhub/features/messaging/domain/message_gateway.dart';
+import 'package:legalhub/features/messaging/domain/message_realtime_event.dart';
 import 'package:legalhub/features/messaging/domain/message_thread.dart';
 import 'package:legalhub/features/messaging/presentation/message_list_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
@@ -239,6 +241,24 @@ class _UnresolvedRefMessageGateway implements MessageGateway {
   Future<Result<List<Message>>> fetchMessages(String threadId) async {
     return const Result<List<Message>>.success(<Message>[]);
   }
+
+  @override
+  Future<Result<Message>> sendMessage(
+    String threadId,
+    String body, {
+    String? authorDisplayName,
+  }) async {
+    // Not exercised by these tests; an honest failure keeps the seam
+    // implementable.
+    return Result<Message>.failure(
+      const AppError(code: 'not_exercised', userMessage: ''),
+    );
+  }
+
+  @override
+  Stream<MessageRealtimeEvent> watchMessages(String threadId) {
+    return const Stream<MessageRealtimeEvent>.empty();
+  }
 }
 
 /// Gateway stub that yields an empty thread list (empty-state widget pin).
@@ -251,5 +271,23 @@ class _EmptyMessageGateway implements MessageGateway {
   @override
   Future<Result<List<Message>>> fetchMessages(String threadId) async {
     return const Result<List<Message>>.success(<Message>[]);
+  }
+
+  @override
+  Future<Result<Message>> sendMessage(
+    String threadId,
+    String body, {
+    String? authorDisplayName,
+  }) async {
+    // Not exercised by these tests; an honest failure keeps the seam
+    // implementable.
+    return Result<Message>.failure(
+      const AppError(code: 'not_exercised', userMessage: ''),
+    );
+  }
+
+  @override
+  Stream<MessageRealtimeEvent> watchMessages(String threadId) {
+    return const Stream<MessageRealtimeEvent>.empty();
   }
 }

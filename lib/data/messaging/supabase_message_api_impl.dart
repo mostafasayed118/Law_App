@@ -8,7 +8,12 @@ import 'supabase_message_api.dart';
 /// is holding the provider import: a table SELECT in, plain map rows out,
 /// and PostgrestExceptions mapped to [SupabaseMessageException]s at the seam.
 class SupabaseMessageApiImpl implements SupabaseMessageApi {
-  SupabaseMessageApiImpl(this._table);
+  SupabaseMessageApiImpl(
+    this._table, {
+    MessageOrgCaller? orgCaller,
+    MessageInsertCaller? insertCaller,
+  }) : _orgCaller = orgCaller ?? _boundOrg,
+       _insertCaller = insertCaller ?? _boundInsert;
 
   /// Binds to the app-level client after `Supabase.initialize`. Kept a
   /// factory so tests can construct the impl with any callable stub.
@@ -32,6 +37,33 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
   }
 
   final MessageTableCaller _table;
+  final MessageOrgCaller _orgCaller;
+  final MessageInsertCaller _insertCaller;
+
+  /// Binds a single-row SELECT by id (the send path's thread-org
+  /// resolution, D-LV1). `maybeSingle` returns null when the row is not
+  /// visible under the caller's RLS — an unassigned writer cannot read the
+  /// thread's org and therefore cannot send.
+  static Future<Map<String, dynamic>?> _boundOrg(
+    String table,
+    String id,
+  ) async {
+    return Supabase.instance.client
+        .from(table)
+        .select('organization_id')
+        .eq('id', id)
+        .maybeSingle();
+  }
+
+  /// Binds a PostgREST INSERT returning the persisted row (D-LV1). The
+  /// single row comes back via `.select().single()`, so the gateway can map
+  /// the created message without a follow-up read.
+  static Future<Map<String, dynamic>> _boundInsert(
+    String table,
+    Map<String, dynamic> row,
+  ) async {
+    return Supabase.instance.client.from(table).insert(row).select().single();
+  }
 
   @override
   Future<List<Map<String, dynamic>>> fetchMessageThreads() async {
@@ -77,6 +109,56 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
       // Same defensive catch as fetchMessageThreads: a non-Postgrest
       // provider failure is a typed unavailable, never a raw exception
       // across the seam (the auth impl's defensive-catch precedent).
+      throw const SupabaseMessageException(
+        kind: SupabaseMessageFailureKind.providerUnavailable,
+        message: 'Provider unavailable.',
+      );
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> sendMessage(
+    String threadId,
+    String body, {
+    String? authorDisplayName,
+  }) async {
+    try {
+      // The messages_insert_assigned WITH CHECK needs the row's
+      // organization_id (NOT NULL, no default). Resolve the thread's org
+      // under the SAME RLS gate first: the caller must be assigned on the
+      // thread's matter to read it, and the org it returns IS the org the
+      // policy will re-check. An unreadable org = the write cannot be
+      // authorized — a typed denial, never a silent insert attempt.
+      final Map<String, dynamic>? orgRow = await _orgCaller(
+        'message_threads',
+        threadId,
+      );
+      final Object? org = orgRow?['organization_id'];
+      if (org is! String || org.isEmpty) {
+        throw const SupabaseMessageException(
+          kind: SupabaseMessageFailureKind.denied,
+          message: 'Thread organization is not readable.',
+        );
+      }
+      return await _insertCaller('messages', <String, dynamic>{
+        'organization_id': org,
+        'thread_id': threadId,
+        // D-RT4 stored-name convention: the caller's session display name
+        // when provided; a neutral generic demo name otherwise (never a
+        // fabricated real identity).
+        'author_display_name':
+            (authorDisplayName == null || authorDisplayName.trim().isEmpty)
+            ? 'Demo client'
+            : authorDisplayName.trim(),
+        'body': body,
+      });
+    } on SupabaseMessageException {
+      rethrow;
+    } on PostgrestException catch (e) {
+      throw SupabaseMessageException(kind: _kindFor(e), message: e.message);
+    } on Object {
+      // Same defensive catch as the reads: a non-Postgrest provider failure
+      // is a typed unavailable, never a raw exception across the seam.
       throw const SupabaseMessageException(
         kind: SupabaseMessageFailureKind.providerUnavailable,
         message: 'Provider unavailable.',

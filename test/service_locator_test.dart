@@ -28,6 +28,7 @@ import 'package:legalhub/data/matters/supabase_matter_api.dart';
 import 'package:legalhub/data/matters/supabase_matter_gateway.dart';
 import 'package:legalhub/data/messaging/supabase_message_api.dart';
 import 'package:legalhub/data/messaging/supabase_message_gateway.dart';
+import 'package:legalhub/data/messaging/supabase_message_realtime_api.dart';
 import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/data/orgs/supabase_membership_repository.dart';
@@ -229,6 +230,25 @@ class _FakeSupabaseMessageApi implements SupabaseMessageApi {
   @override
   Future<List<Map<String, dynamic>>> fetchMessages(String threadId) async =>
       <Map<String, dynamic>>[];
+
+  @override
+  Future<Map<String, dynamic>> sendMessage(
+    String threadId,
+    String body, {
+    String? authorDisplayName,
+  }) async => <String, dynamic>{'id': 'msg-1'};
+}
+
+/// Hand-rolled fake of the [SupabaseMessageRealtimeApi] seam for the DI flip
+/// test (same discipline as [_FakeSupabaseMessageApi]; a never-emitting
+/// stream keeps the configured flip hermetic without a provider).
+class _FakeSupabaseMessageRealtimeApi implements SupabaseMessageRealtimeApi {
+  @override
+  Stream<SupabaseMessageRealtimeEvent> watchMessages(String threadId) =>
+      const Stream<SupabaseMessageRealtimeEvent>.empty();
+
+  @override
+  Future<void> close() async {}
 }
 
 /// Hand-rolled fake of the [SupabaseStorageApi] seam for the DI flip test
@@ -488,8 +508,9 @@ void main() {
           anonKey: _anonJwt(),
         ),
         // The real bind() needs a running Supabase.instance; tests inject
-        // the seam instead (the flip's test seam, not production code).
+        // the seams instead (the flip's test seam, not production code).
         supabaseMessageApiFactory: _FakeSupabaseMessageApi.new,
+        supabaseMessageRealtimeApiFactory: _FakeSupabaseMessageRealtimeApi.new,
       );
 
       expect(serviceLocator<MessageGateway>(), isA<SupabaseMessageGateway>());

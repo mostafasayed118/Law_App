@@ -1684,6 +1684,18 @@ abstract class AppLocalizations {
   /// **'Unable to load messages.'**
   String get messagesDetailError;
 
+  /// No description provided for @messageComposerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a message'**
+  String get messageComposerHint;
+
+  /// No description provided for @messageSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get messageSend;
+
   /// No description provided for @searchTitle.
   ///
   /// In en, this message translates to:

@@ -278,6 +278,8 @@
   "messageThreadDetailTitle": "Konu mesajları",
   "messagesDetailEmpty": "Bu konuşmada kullanılabilir mesaj yok.",
   "messagesDetailError": "Mesajlar yüklenemedi.",
+  "messageComposerHint": "Bir mesaj yazın",
+  "messageSend": "Gönder",
   "searchTitle": "Ara",
   "searchNoQuery": "Demo konular, belgeler, mesajlar veya avukatlar bulmak için bir arama terimi yazın.",
   "searchEmpty": "Aramanızla eşleşen sonuç yok.",

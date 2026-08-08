@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/data/messaging/supabase_message_api.dart';
 import 'package:legalhub/data/messaging/supabase_message_gateway.dart';
+import 'package:legalhub/data/messaging/supabase_message_realtime_api.dart';
 import 'package:legalhub/features/messaging/domain/message.dart';
+import 'package:legalhub/features/messaging/domain/message_realtime_event.dart';
 import 'package:legalhub/features/messaging/domain/message_thread.dart';
 
 /// Hand-rolled fake of the [SupabaseMessageApi] seam: records calls and
@@ -14,6 +18,12 @@ class _StubSupabaseMessageApi implements SupabaseMessageApi {
   List<Map<String, dynamic>> messageRows = <Map<String, dynamic>>[];
   SupabaseMessageException? error;
   final List<String> messageFetches = <String>[];
+  Map<String, dynamic>? sentRow;
+  SupabaseMessageException? sendError;
+  String? sentThreadId;
+  String? sentBody;
+  String? sentAuthor;
+  int sendCalls = 0;
 
   @override
   Future<List<Map<String, dynamic>>> fetchMessageThreads() async {
@@ -30,6 +40,43 @@ class _StubSupabaseMessageApi implements SupabaseMessageApi {
       throw error!;
     }
     return messageRows;
+  }
+
+  @override
+  Future<Map<String, dynamic>> sendMessage(
+    String threadId,
+    String body, {
+    String? authorDisplayName,
+  }) async {
+    sendCalls++;
+    sentThreadId = threadId;
+    sentBody = body;
+    sentAuthor = authorDisplayName;
+    if (sendError != null) {
+      throw sendError!;
+    }
+    return sentRow ?? _messageRow(id: 'msg-sent-1', threadId: threadId);
+  }
+}
+
+/// Hand-rolled fake of the [SupabaseMessageRealtimeApi] seam: a broadcast
+/// controller the test drives, so the gateway's live-event mapping is
+/// tested without a provider (D-LV4).
+class _StubSupabaseMessageRealtimeApi implements SupabaseMessageRealtimeApi {
+  final StreamController<SupabaseMessageRealtimeEvent> controller =
+      StreamController<SupabaseMessageRealtimeEvent>.broadcast();
+  String? watchedThreadId;
+  int closeCalls = 0;
+
+  @override
+  Stream<SupabaseMessageRealtimeEvent> watchMessages(String threadId) {
+    watchedThreadId = threadId;
+    return controller.stream;
+  }
+
+  @override
+  Future<void> close() async {
+    closeCalls++;
   }
 }
 
@@ -69,11 +116,13 @@ Map<String, dynamic> _row({
 
 void main() {
   late _StubSupabaseMessageApi api;
+  late _StubSupabaseMessageRealtimeApi realtimeApi;
   late SupabaseMessageGateway gateway;
 
   setUp(() {
     api = _StubSupabaseMessageApi();
-    gateway = SupabaseMessageGateway(api);
+    realtimeApi = _StubSupabaseMessageRealtimeApi();
+    gateway = SupabaseMessageGateway(api, realtimeApi);
   });
 
   group('row → MessageThread mapping (D-MSR7)', () {
@@ -420,6 +469,167 @@ void main() {
         expect(error.context, isEmpty);
       },
     );
+  });
+
+  group('sendMessage mapping (D-LV1)', () {
+    test('maps the persisted row to the Message VO and passes the '
+        'author through', () async {
+      api.sentRow = _messageRow(
+        id: 'msg-sent-9',
+        threadId: 'thread-1',
+        author: 'Demo Partner',
+        body: 'A demo send body.',
+        sentAt: '2026-08-08T12:00:00.000Z',
+      );
+
+      final Result<Message> result = await gateway.sendMessage(
+        'thread-1',
+        'A demo send body.',
+        authorDisplayName: 'Demo Partner',
+      );
+
+      expect(result.isSuccess, isTrue);
+      expect(api.sendCalls, 1);
+      expect(api.sentThreadId, 'thread-1');
+      expect(api.sentBody, 'A demo send body.');
+      expect(api.sentAuthor, 'Demo Partner');
+      final Message message = result.valueOrNull!;
+      expect(message.id, 'msg-sent-9');
+      expect(message.authorDisplayName, 'Demo Partner');
+      expect(message.body, 'A demo send body.');
+      expect(
+        message.sentAt,
+        DateTime.parse('2026-08-08T12:00:00.000Z').toLocal(),
+      );
+    });
+
+    test('a malformed returned row fails the send loudly', () async {
+      api.sentRow = <String, dynamic>{'id': 'msg-sent-1'};
+
+      final Result<Message> result = await gateway.sendMessage(
+        'thread-1',
+        'Body',
+      );
+
+      expect(result.isSuccess, isFalse);
+      expect(result.errorOrNull?.code, 'message_send_failed');
+    });
+  });
+
+  group('send failure mapping (contract §5, D-LV1)', () {
+    test('maps a denied send to the message_send denied code', () async {
+      api.sendError = const SupabaseMessageException(
+        kind: SupabaseMessageFailureKind.denied,
+        message: 'new row violates row-level security policy',
+      );
+
+      final Result<Message> result = await gateway.sendMessage(
+        'thread-1',
+        'Body',
+      );
+
+      final AppError error = result.errorOrNull!;
+      expect(error.code, 'message_send_denied');
+      expect(
+        error.technicalMessage,
+        'new row violates row-level security policy',
+      );
+    });
+
+    test(
+      'maps an unavailable send to the message_send unavailable code',
+      () async {
+        api.sendError = const SupabaseMessageException(
+          kind: SupabaseMessageFailureKind.providerUnavailable,
+          message: 'Provider unavailable.',
+        );
+
+        final Result<Message> result = await gateway.sendMessage(
+          'thread-1',
+          'Body',
+        );
+
+        final AppError error = result.errorOrNull!;
+        expect(error.code, 'message_send_unavailable');
+        expect(error.technicalMessage, 'Provider unavailable.');
+      },
+    );
+
+    test('maps an unknown send failure to the generic code', () async {
+      api.sendError = const SupabaseMessageException(
+        kind: SupabaseMessageFailureKind.unknown,
+        message: 'provider hiccup',
+      );
+
+      final Result<Message> result = await gateway.sendMessage(
+        'thread-1',
+        'Body',
+      );
+
+      final AppError error = result.errorOrNull!;
+      expect(error.code, 'message_send_failed');
+      expect(error.technicalMessage, 'provider hiccup');
+      expect(error.context, isEmpty);
+    });
+  });
+
+  group('watchMessages mapping (D-LV4)', () {
+    test('maps a delivered insert row to MessageLiveInsert', () async {
+      final List<MessageRealtimeEvent> events = <MessageRealtimeEvent>[];
+      final StreamSubscription<MessageRealtimeEvent> sub = gateway
+          .watchMessages('thread-1')
+          .listen(events.add);
+      addTearDown(sub.cancel);
+
+      expect(realtimeApi.watchedThreadId, 'thread-1');
+      realtimeApi.controller.add(
+        SupabaseMessageRealtimeInsert(
+          _messageRow(
+            id: 'msg-live-1',
+            threadId: 'thread-1',
+            body: 'Demo live message',
+          ),
+        ),
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(events, hasLength(1));
+      final MessageLiveInsert insert = events.single as MessageLiveInsert;
+      expect(insert.message.id, 'msg-live-1');
+      expect(insert.message.body, 'Demo live message');
+    });
+
+    test('maps a channel recovery to MessageLiveReconnected', () async {
+      final List<MessageRealtimeEvent> events = <MessageRealtimeEvent>[];
+      final StreamSubscription<MessageRealtimeEvent> sub = gateway
+          .watchMessages('thread-1')
+          .listen(events.add);
+      addTearDown(sub.cancel);
+
+      realtimeApi.controller.add(const SupabaseMessageRealtimeReconnected());
+      await Future<void>.delayed(Duration.zero);
+
+      expect(events, hasLength(1));
+      expect(events.single, isA<MessageLiveReconnected>());
+    });
+
+    test('drops a malformed live row instead of crashing the stream', () async {
+      final List<MessageRealtimeEvent> events = <MessageRealtimeEvent>[];
+      final StreamSubscription<MessageRealtimeEvent> sub = gateway
+          .watchMessages('thread-1')
+          .listen(events.add);
+      addTearDown(sub.cancel);
+
+      realtimeApi.controller.add(
+        const SupabaseMessageRealtimeInsert(<String, dynamic>{'id': 'x'}),
+      );
+      realtimeApi.controller.add(const SupabaseMessageRealtimeReconnected());
+      await Future<void>.delayed(Duration.zero);
+
+      // The malformed row is dropped; the recovery signal still lands.
+      expect(events, hasLength(1));
+      expect(events.single, isA<MessageLiveReconnected>());
+    });
   });
 
   group('failure mapping (contract §5)', () {

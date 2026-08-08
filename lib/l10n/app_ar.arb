@@ -278,6 +278,8 @@
   "messageThreadDetailTitle": "رسائل المحادثة",
   "messagesDetailEmpty": "لا توجد رسائل متاحة في هذه المحادثة.",
   "messagesDetailError": "تعذّر تحميل الرسائل.",
+  "messageComposerHint": "اكتب رسالة",
+  "messageSend": "إرسال",
   "searchTitle": "بحث",
   "searchNoQuery": "اكتب كلمة بحث للعثور على القضايا أو المستندات أو الرسائل أو المحامين التجريبية.",
   "searchEmpty": "لا توجد نتائج مطابقة لبحثك.",

@@ -20,6 +20,22 @@ typedef MessageTableCaller =
       String? threadId,
     ]);
 
+/// A single-row SELECT by id: table + id → the row or null (the send path's
+/// thread-org resolution under the same RLS gate, D-LV1). Plain function
+/// type so tests inject a closure and the provider binding is the only file
+/// that touches provider types.
+typedef MessageOrgCaller =
+    Future<Map<String, dynamic>?> Function(String table, String id);
+
+/// An INSERT: table + row → the inserted row (the send path, D-LV1). Plain
+/// function type so tests inject a closure and the provider binding is the
+/// only file that touches provider types.
+typedef MessageInsertCaller =
+    Future<Map<String, dynamic>> Function(
+      String table,
+      Map<String, dynamic> row,
+    );
+
 /// Typed reasons the message-thread read can fail, mapped from the PostgREST
 /// surface. The read path is a plain RLS-scoped SELECT — the RPC-specific
 /// kinds of the organization seam cannot occur here.
@@ -79,4 +95,20 @@ abstract interface class SupabaseMessageApi {
   /// filtered `.eq('thread_id', threadId)` so only the tapped thread's rows
   /// cross the seam.
   Future<List<Map<String, dynamic>>> fetchMessages(String threadId);
+
+  /// Inserts one message on the thread and returns the persisted row
+  /// (D-LV1 — the minimal insert-only write source).
+  ///
+  /// The `messages_insert_assigned` WITH CHECK requires the row's
+  /// `organization_id`, which is NOT NULL with no default — the impl
+  /// resolves the thread's org FIRST under the same RLS gate (the caller
+  /// must be assigned on the thread's matter to read it), then inserts with
+  /// it. `authorDisplayName` is the caller's session display name (the
+  /// stored-name convention, D-RT4); null falls back to a neutral generic
+  /// demo name. Insert-only: the caller never supplies id/timestamps.
+  Future<Map<String, dynamic>> sendMessage(
+    String threadId,
+    String body, {
+    String? authorDisplayName,
+  });
 }

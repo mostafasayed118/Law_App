@@ -862,6 +862,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get messagesDetailError => 'Mesajlar yüklenemedi.';
 
   @override
+  String get messageComposerHint => 'Bir mesaj yazın';
+
+  @override
+  String get messageSend => 'Gönder';
+
+  @override
   String get searchTitle => 'Ara';
 
   @override

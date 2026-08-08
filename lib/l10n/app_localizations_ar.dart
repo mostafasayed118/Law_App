@@ -856,6 +856,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get messagesDetailError => 'تعذّر تحميل الرسائل.';
 
   @override
+  String get messageComposerHint => 'اكتب رسالة';
+
+  @override
+  String get messageSend => 'إرسال';
+
+  @override
   String get searchTitle => 'بحث';
 
   @override

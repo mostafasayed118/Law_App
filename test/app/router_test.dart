@@ -646,11 +646,16 @@ void main() {
           AppRoutes.messageThreadDetailFor('thread-1'),
         );
         // The detail surface renders the tapped title and the read-only
-        // message rows from the fake (thread-1 carries 12 generic rows).
+        // message rows from the fake (thread-1 carries 12 generic rows),
+        // plus the insert-only composer (D-LV1).
         expect(find.text('Demo matter updates'), findsOneWidget);
         expect(find.textContaining('generic demo content'), findsWidgets);
-        // Read-only: no composer/send affordance on the detail surface.
-        expect(find.byType(TextField), findsNothing);
+        // The single composer field + send affordance; no edit/delete
+        // affordance anywhere (the write path stays insert-only).
+        expect(find.byType(TextField), findsOneWidget);
+        expect(find.byIcon(Icons.send), findsOneWidget);
+        expect(find.byIcon(Icons.delete), findsNothing);
+        expect(find.byIcon(Icons.edit), findsNothing);
       },
     );
 

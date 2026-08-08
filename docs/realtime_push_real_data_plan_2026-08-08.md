@@ -331,7 +331,7 @@ until T5**.
   equivalence battery 09.11/09.12 proves suspended/cross-org/owner see 0;
   honest RLS-proxy limit recorded). Citing r1 PASS `51532fd` + apply
   execution `7efb32b` + §7 discipline.
-- [ ] **7. Client swap (env-gated, NEW subscription + composer)** — touches:
+- [x] **7. Client swap (env-gated, NEW subscription + composer)** — touches:
   `lib/data/messaging/supabase_message_realtime_api.dart` (NEW seam) +
   impl + gateway (`sendMessage` + subscribe), `fake_message_gateway.dart`
   (deterministic send + a fake channel), `message_thread_detail_cubit.dart`
