@@ -178,9 +178,10 @@ revocation git-revert) stands by, unexercised.
   in-function gate, §8 audit by construction) + the EXECUTE grant
   (authenticated, anon denied) + **D-SM3 revocation** (INSERT revoked,
   `messages_insert_assigned` dropped) + the demo send
-  (`1c031882-b054-4c54-ab07-c6b70f25b8f2`). Dev project now: **11 tables
-  / 11 RLS / 9 policies / publication exactly messages (1) / 19 EXECUTE
-  RPCs** — the approval's exact predictions, with the message tally 12.
+  (`1c031882-b054-4c54-ab07-c6b70f25b8f2`). Dev project now: **10 tables
+  / 10 RLS / 9 policies / publication exactly messages (1) / 19 EXECUTE
+  RPCs** — the approval's exact predictions, with the message tally 12
+  (tables 10 — `files` landed later with the storage apply).
 - **Plan T5 row:** flipped DONE (the dated approval §6 + this execution
   record close the apply gate; the §14/§13/§2 HELD markers resolve).
 - **⚠ Owner-side follow-up (account hygiene) — RESOLVED 2026-08-08:**

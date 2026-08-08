@@ -150,9 +150,9 @@ the policy git-revert) stands by, unexercised.
 
 - **Applied 2026-08-08:** `09_realtime_push` (publication, exactly
   messages) + `policies/messages_insert` (grant + `messages_insert_assigned`)
-  + the demo send (`7cbf49e0-…`). Dev project now: **11 tables / 11 RLS /
+  + the demo send (`7cbf49e0-…`). Dev project now: **10 tables / 10 RLS /
   10 policies / publication exactly messages (1)** — the approval's exact
-  predictions.
+  predictions (tables 10: `files` landed later with the storage apply).
 - **Plan T5 row:** flipped DONE (the dated approval §6 + this execution
   record close the apply gate).
 - **Pending:** T6 — the dated matrix §4 write-row + §6 delivery-row

@@ -51,12 +51,12 @@ deliberately denies them; recorded as designed, never a defect).
 > approval's "8 → 9 policies" baseline was written before the realtime-push
 > + send-message applies and gives the true pre-apply state (**10 tables /
 > 10 RLS / 9 public / 0 storage**). The send-message + realtime-push
-> records each carry a spurious **"11 tables / 11 RLS"** line in their §5
-> (the true count at 16:07–18:14 was **10 tables** — `files` landed at
-> 18:36 with storage); the storage baseline probe + this note's chronology
-> are authoritative. The billing record's client sub `0c54d251-6b23-…`
-> differs from the canonical `0c54d251-1cdd-…` (messages record) — a
-> one-segment UUID typo in that smoke table, not a different account.
+> records originally carried spurious **"11 tables / 11 RLS"** lines in
+> their §5 (the true count at 16:07–18:14 was **10 tables** — `files`
+> landed at 18:36 with storage); those lines were corrected to 10 in the
+> source records, and the billing record's one-segment client-UUID typo
+> (`0c54d251-6b23-…` → `0c54d251-1cdd-…`) was corrected — this note's
+> chronology is authoritative.
 
 ## 4. Cross-references
 

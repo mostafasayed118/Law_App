@@ -106,7 +106,7 @@ on the live dev project:
 |---|---|---|---|---|
 | Partner (assigned attorney, the **only** dev member) | `sub=8fa94af0-7390-4f7a-988a-3965f7da04de` | reads the invoices on its 3 assigned matters | **3** — `INV-2026-0001/0002/0003` | ✅ positive — assigned attorney sees exactly its set |
 | Partner — family matter (client-only) | same | 0 (not assigned) | invoice `INV-2026-0004` **absent** from the partner's read set | ✅ the assignment gate, live |
-| Assigned client (NO membership rows) | `sub=0c54d251-6b23-4d59-b6a4-7b0f74c9d123` (family) | 0 — the D-BI2 membership guard | **0** | ✅ membership guard firing live — recorded as an honest expectation, never a defect (the matters/documents/messages/storage smoke precedent) |
+| Assigned client (NO membership rows) | `sub=0c54d251-1cdd-4be6-9ce5-623a5987045f` (family) | 0 — the D-BI2 membership guard | **0** | ✅ membership guard firing live — recorded as an honest expectation, never a defect (the matters/documents/messages/storage smoke precedent) |
 | Assigned client (NO membership rows) | `sub=9acfd3b4-96c6-4836-aaa7-defd7864cefb` (acquisition) | 0 — same | **0** | ✅ same |
 | Anon | `role=anon` | denied | `permission denied for table billing_invoices` (42501 — no grant, default-deny) | ✅ anon denied |
 
