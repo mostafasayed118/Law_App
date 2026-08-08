@@ -381,14 +381,25 @@ apply gate (T5) is the only owner-gated step. T2–T4 are server artifacts —
   clause firing live; cross-org 0; stranger 0; the body CHECK rejects an
   empty string live) — all recorded verbatim in
   `docs/realtime_apply_execution_2026-08-08.md` (APPLIED).
-- [ ] **6. Matrix addendum (dated)** — touches: `docs/permission_matrix.md`
+- [x] **6. Matrix addendum (dated)** — touches: `docs/permission_matrix.md`
   §4 — the **"Read a document/message body"** row gains its dated addendum
   (client/attorney cells SHIP behind `messages_select_assigned` — the
   body row's first client surface; partner/`compliance_officer` "deny
   unless separately assigned" cells stay ungranted; `platform_owner_admin`
   deny always) and records the D-MSG1 reversal scoped to the real read
   path + live delivery staying deferred — done when: addendum committed
-  **before** the client surface ships, ledger sweep green.
+  **before** the client surface ships, ledger sweep green. — **DONE (this
+  commit, 2026-08-08)** — the §4 addendum lands the body row's first
+  client surface: client/attorney SHIP behind `messages_select_assigned`
+  (three-way org equality load-bearing, D-RT2), deny rows each
+  battery-checked (org-role-alone, non-vacuous org-mismatch, cross-org,
+  suspended, anon, owner), the D-MSG1 reversal recorded (the `body`
+  column — the first content column in the public schema — read-path
+  only), partner/compliance "deny unless separately assigned" stay
+  ungranted, live delivery stays §14-deferred (D-RT6, forward pin now
+  messages-present + live-delivery-absent), citing r1 PASS (`8204245`,
+  70/0/0) + apply execution (`35cceb9`, 10 tables / 10 RLS / 9 policies
+  live) + §7 discipline; committed **before** the client surface (T7).
 - [ ] **7. Client swap (env-gated, NEW thread-detail surface)** — touches:
   `lib/data/messaging/supabase_message_api.dart` +
   `supabase_message_api_impl.dart` + `supabase_message_gateway.dart`

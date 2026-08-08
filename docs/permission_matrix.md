@@ -336,6 +336,65 @@ there.
 > effect on the apply execution (pending)** — the client surface (plan
 > T7, env-gated, D-STR7) ships only after the apply lands.
 
+> **§4 addendum (2026-08-08, realtime read slice — plan
+> `docs/realtime_real_data_plan_2026-08-08.md`, sixth §14 un-deferral):**
+> **the "Read a document/message body" row's client/attorney cells now
+> SHIP** — the body row's long deferral ends for the assigned reader only
+> (line 143/148: messages are matter-scoped content). Granted server-side
+> by `messages_select_assigned` (`supabase/policies/messages.sql`) and
+> policy-tested by `supabase/tests/08_message_rls.sql` (rehearsal r1
+> **PASSED 2026-08-08** — genuinely executed battery, 70/0/0, evidence
+> `docs/realtime_rehearsal_evidence_r1_2026-08-08.md`; static battery
+> `--check` 333/0/0). The grant is exactly: an **active member of the
+> message's org** AND an exists through the thread to the matter with the
+> **three-way org equality load-bearing** (`messages.organization_id =
+> thread.organization_id = matter.organization_id`) AND the assigned
+> **client** or assigned **attorney** on the thread's matter — the thread
+> gate (D-MSR2) extended one hop (D-RT2); a message is never readable
+> when its thread or matter is not. **The `body` column is the first
+> content column in the public schema** — the deliberate, scoped D-MSG1
+> reversal (read path only; no write grant), consummating the metadata-only
+> deferral that the documents/messages/storage addenda recorded. Deny rows
+> now each have a battery check:
+> - **org role alone** (no matter assignment) → deny, every role;
+> - **org-mismatch** (message org ≠ its thread's/matter's org) → deny,
+>   every role — the load-bearing D-RT2 clause, **NON-VACUOUS** (the
+>   08 battery proves partner-a reads 6 messages on its assigned threads
+>   generally, so the 08.06 deny is the clause);
+> - **cross-org** (assigned on an org-a matter, org-b member only) → deny;
+> - **suspended membership** in the message's org → deny;
+> - **unauthenticated** → deny;
+> - **`platform_owner_admin`** → deny, always (owner accounts are never
+>   assigned — an operational invariant, not a policy guarantee; recorded
+>   residual in `docs/realtime_rls_gate_review_2026-08-08.md` Q4).
+> The battery also pins the schema contract + teardown safety: the
+> `body` CHECK rejects an empty body (verified live on the dev project in
+> the apply smoke), the thread-delete FK cascade removes a thread's
+> messages, and the 08.12 mapping-consistency pin (every thread's live
+> message count equals its `message_count` column — the seeded demo rows
+> match 1/2/3/4). **Not granted by this addendum:** the partner /
+> `compliance_officer` "deny unless separately assigned" cells stay
+> **ungranted** (the oversight mechanism is undefined — future work,
+> mirroring D-MR5/D-DR5/D-MSR5/D-STR6); **live delivery stays
+> §14-deferred (D-RT6)** — `postgres_changes`/Supabase Realtime push is a
+> different authorization surface (publication membership ≠ table SELECT
+> RLS) and gets its own mechanism review + dated approval; the forward
+> pin now pins **messages present + live delivery absent** (the deferred
+> item is the push half, not the table). **Basis:** §14 gate-lift (P0
+> closure RATIFIED + policy battery shipped) + five shipped precedents ·
+> RLS-gate review (`790f6e7`) · artifacts (`60198e2`) · battery + harness
+> (`9f01870` + `f22e672`, static `--check` 333/0/0) · r1 PASS (`8204245`,
+> genuinely executed 70/0/0) · apply-approval **APPLY APPROVED 2026-08-08**
+> (`docs/realtime_apply_approval_2026-08-08.md` §6 dated sign-off, flipped
+> in `35cceb9`) · apply execution (`docs/realtime_apply_execution_2026-08-08.md`
+> `35cceb9` — applied and verified on the dev project: **10 tables / 10
+> RLS / 9 policies live**, the D-RT2 org-mismatch probe 0, smoke partner 6
+> / stranger 0, and the family-thread 4-denial as the assignment clause
+> firing live). Per §7 this extends, not replaces, and widens no other
+> row; **in effect since the apply execution 2026-08-08 (`35cceb9`)**, and
+> the client surface (plan T7, env-gated `fetchMessages` + thread-detail
+> screen) ships next.
+
 ---
 
 ## 5. `platform_owner_admin` — explicit boundary (contract §2 #2, #4)
