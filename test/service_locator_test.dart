@@ -19,6 +19,8 @@ import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/auth/supabase_auth_api.dart';
 import 'package:legalhub/data/auth/supabase_auth_gateway.dart';
 import 'package:legalhub/data/auth/supabase_env.dart';
+import 'package:legalhub/data/billing/supabase_billing_api.dart';
+import 'package:legalhub/data/billing/supabase_billing_gateway.dart';
 import 'package:legalhub/data/documents/supabase_document_api.dart';
 import 'package:legalhub/data/documents/supabase_document_gateway.dart';
 import 'package:legalhub/data/local/in_memory_org_selection_store.dart';
@@ -42,6 +44,8 @@ import 'package:legalhub/features/auth/data/supabase_password_recovery_gateway.d
 import 'package:legalhub/features/auth/domain/password_recovery_gateway.dart';
 import 'package:legalhub/features/auth/domain/sign_up_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
+import 'package:legalhub/features/billing/data/fake_billing_gateway.dart';
+import 'package:legalhub/features/billing/domain/billing_gateway.dart';
 import 'package:legalhub/features/booking/data/fake_booking_gateway.dart';
 import 'package:legalhub/features/booking/domain/booking_gateway.dart';
 import 'package:legalhub/features/booking/domain/booking_prefill.dart';
@@ -252,6 +256,14 @@ class _FakeSupabaseMessageRealtimeApi implements SupabaseMessageRealtimeApi {
 class _FakeSupabaseStorageApi implements SupabaseStorageApi {
   @override
   Future<List<Map<String, dynamic>>> fetchFiles() async =>
+      <Map<String, dynamic>>[];
+}
+
+/// Hand-rolled fake of the [SupabaseBillingApi] seam for the DI flip test
+/// (same discipline as [_FakeSupabaseStorageApi]).
+class _FakeSupabaseBillingApi implements SupabaseBillingApi {
+  @override
+  Future<List<Map<String, dynamic>>> fetchInvoices() async =>
       <Map<String, dynamic>>[];
 }
 
@@ -533,6 +545,30 @@ void main() {
       );
 
       expect(serviceLocator<StorageGateway>(), isA<SupabaseStorageGateway>());
+    });
+
+    test('wires the billing gateway to the fake dev implementation', () {
+      configureDependencies();
+
+      // D-BI5: same boundary discipline as the message/document/storage
+      // gateways — the dev fake is the registered seam; the env-gated real
+      // swap (plan T7) only takes over in configured builds. D-BI4 — the
+      // fake is the product posture, not a stopgap.
+      expect(serviceLocator<BillingGateway>(), isA<FakeBillingGateway>());
+    });
+
+    test('flips BillingGateway when env carries an anon key (plan T7)', () {
+      configureDependencies(
+        supabaseEnv: SupabaseEnv(
+          url: 'https://example.supabase.co',
+          anonKey: _anonJwt(),
+        ),
+        // The real bind() needs a running Supabase.instance; tests inject
+        // the seam instead (the flip's test seam, not production code).
+        supabaseBillingApiFactory: _FakeSupabaseBillingApi.new,
+      );
+
+      expect(serviceLocator<BillingGateway>(), isA<SupabaseBillingGateway>());
     });
 
     test('wires the booking gateway to the fake dev implementation', () {

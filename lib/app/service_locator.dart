@@ -16,6 +16,9 @@ import '../data/auth/supabase_auth_api.dart';
 import '../data/auth/supabase_auth_api_impl.dart';
 import '../data/auth/supabase_auth_gateway.dart';
 import '../data/auth/supabase_env.dart';
+import '../data/billing/supabase_billing_api.dart';
+import '../data/billing/supabase_billing_api_impl.dart';
+import '../data/billing/supabase_billing_gateway.dart';
 import '../data/documents/supabase_document_api.dart';
 import '../data/documents/supabase_document_api_impl.dart';
 import '../data/documents/supabase_document_gateway.dart';
@@ -49,6 +52,8 @@ import '../features/auth/data/supabase_sign_up_gateway.dart';
 import '../features/auth/domain/password_recovery_gateway.dart';
 import '../features/auth/domain/sign_up_gateway.dart';
 import '../features/auth/presentation/auth_cubit.dart';
+import '../features/billing/data/fake_billing_gateway.dart';
+import '../features/billing/domain/billing_gateway.dart';
 import '../features/booking/data/fake_booking_gateway.dart';
 import '../features/booking/domain/booking_gateway.dart';
 import '../features/booking/domain/booking_prefill.dart';
@@ -98,6 +103,7 @@ void configureDependencies({
   SupabaseMessageApi Function()? supabaseMessageApiFactory,
   SupabaseMessageRealtimeApi Function()? supabaseMessageRealtimeApiFactory,
   SupabaseStorageApi Function()? supabaseStorageApiFactory,
+  SupabaseBillingApi Function()? supabaseBillingApiFactory,
 }) {
   // Lazy singleton: stateless service, created on first resolution.
   // Per §4.5, stateless services/repositories register as lazy singletons.
@@ -394,6 +400,28 @@ void configureDependencies({
     } else {
       serviceLocator.registerLazySingleton<StorageGateway>(
         FakeStorageGateway.new,
+      );
+    }
+  }
+  if (!serviceLocator.isRegistered<BillingGateway>()) {
+    // Stateless service: lazy singleton. The billing Cubit is feature-scoped
+    // and created per section via BlocProvider, so it is NOT registered here.
+    // Like StorageGateway, the flip swaps the dev fake for the
+    // Supabase-backed implementation when the build is configured (Batch 3.3
+    // env pattern). The real path reads the applied `billing_invoices` table
+    // through the RLS-scoped SELECT (plan D-BI2/D-BI5) and resolves matterRef
+    // via the embedded matters(title) select (D-BI5); env-less runs and ALL
+    // tests keep the fake (D-BI4 — the fake is the product posture, not a
+    // stopgap).
+    if (env.isConfigured) {
+      serviceLocator.registerLazySingleton<BillingGateway>(
+        () => SupabaseBillingGateway(
+          (supabaseBillingApiFactory ?? SupabaseBillingApiImpl.bind)(),
+        ),
+      );
+    } else {
+      serviceLocator.registerLazySingleton<BillingGateway>(
+        FakeBillingGateway.new,
       );
     }
   }

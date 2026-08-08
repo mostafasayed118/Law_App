@@ -546,6 +546,34 @@ void main() {
         tr.matterWorkspaceMessagesTitle,
         isNot(en.matterWorkspaceMessagesTitle),
       );
+
+      // Billing slice (D-BI5): the invoices section title + empty copy +
+      // status labels resolve in every locale.
+      expect(en.matterWorkspaceInvoicesTitle, 'Invoices');
+      expect(ar.matterWorkspaceInvoicesTitle, 'الفواتير');
+      expect(tr.matterWorkspaceInvoicesTitle, 'Faturalar');
+      expect(
+        en.matterWorkspaceInvoicesEmpty,
+        'No invoices are available for this matter.',
+      );
+      expect(
+        ar.matterWorkspaceInvoicesEmpty,
+        'لا توجد فواتير متاحة لهذه القضية.',
+      );
+      expect(
+        tr.matterWorkspaceInvoicesEmpty,
+        'Bu dava için kullanılabilir fatura yok.',
+      );
+      expect(en.invoiceStatusIssued, 'Issued');
+      expect(ar.invoiceStatusIssued, 'صادرة');
+      expect(tr.invoiceStatusIssued, 'Düzenlendi');
+      expect(en.invoiceStatusPaid, 'Paid');
+      expect(ar.invoiceStatusPaid, 'مدفوعة');
+      expect(tr.invoiceStatusPaid, 'Ödendi');
+      expect(
+        tr.matterWorkspaceInvoicesTitle,
+        isNot(en.matterWorkspaceInvoicesTitle),
+      );
     });
 
     test('workspace copy is local-only wording, no legal-advice/realtime/send '
@@ -564,6 +592,10 @@ void main() {
       expect(en.matterWorkspaceMessagesEmpty, isNot(contains('send')));
       expect(en.matterWorkspaceMessagesEmpty, isNot(contains('realtime')));
       expect(en.matterWorkspaceMessagesEmpty, isNot(contains('delivery')));
+      // The invoices empty copy must not drift into payment/charge framing
+      // (D-11 — no live payment in MVP; the metadata-only line holds).
+      expect(en.matterWorkspaceInvoicesEmpty, isNot(contains('pay')));
+      expect(en.matterWorkspaceInvoicesEmpty, isNot(contains('charge')));
     });
 
     test('resolves the search keys in every locale (11.2 pin)', () {

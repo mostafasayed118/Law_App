@@ -232,30 +232,76 @@ Branch: `feat/billing-invoices-read`
   gaining 10, pins tables 11→12 / RLS 11→12 / public policies 10→11, UUID
   + FAIL scans, header comments) — done when: static `--check` green,
   selftest 6/6, committed.
-- [ ] **4. Ephemeral rehearsal (r1)** — touches:
+- [x] **4. Ephemeral rehearsal (r1)** — touches:
   `docs/billing_invoices_rehearsal_evidence_r1_2026-08-08.md` — done
   when: the genuine cycle (`--apply` + battery on the Docker scratch
   stack) runs green and the record flips to PASSED, committed as
-  docs(billing).
-- [ ] **5. Dated apply-approval → apply** — touches: dev project +
+  docs(billing). **DONE 2026-08-08** — genuinely executed on the Docker
+  scratch stack: `--apply` **42/0/0** (incl. `10_billing_invoices` +
+  `policies/invoices`), battery **78/0/0 — RESULT: PASS** (1a 12 tables /
+  12 RLS, 1e 11 policies, 1f `billing_invoices` ninth-un-deferral pin 1),
+  all eleven battery files green incl. `11_invoice_rls.sql`, selftest
+  6/6. Record flipped to PASSED; nothing applied.
+- [x] **5. Dated apply-approval → apply** — touches: dev project +
   `docs/billing_invoices_apply_approval_2026-08-08.md` + execution record
   — done when: the owner's dated sign-off, apply executed (baseline probe,
   `10_billing_invoices` + policy + demo seed referencing the applied demo
-  matter ids, rollback pairing), execution evidence APPLIED. **Owner-gated.**
-- [ ] **6. Dated matrix addendum** — touches: `docs/permission_matrix.md`
+  matter ids, rollback pairing), execution evidence APPLIED. — **DONE
+  (2026-08-08):** approval APPLY APPROVED (§6 dated sign-off, r1 PASSED
+  `da4fa97` genuinely executed 78/0/0) + the apply **executed on the dev
+  project** — baseline probed (billing_invoices absent, the four demo
+  matter ids resolve under org `ef43087b-…`, 11 tables/11 RLS, 10 public
+  policies, 1 storage policy, publication exactly messages),
+  `10_billing_invoices` + `policies/invoices` applied (tables/RLS 11→12,
+  public policies 10→11), demo seed 4 invoices on the applied demo matter
+  ids (org = the matter's org on all four, generic numbers/amounts/copy),
+  smoke: partner reads 3 (family invoice client-only → absent from the
+  partner's set), clients 0/0 (membership guard live), anon denied —
+  evidence `docs/billing_invoices_apply_execution_2026-08-08.md`
+  (APPLIED). **Owner-gated.**
+- [x] **6. Dated matrix addendum** — touches: `docs/permission_matrix.md`
   §4 "View an invoice (metadata)" row (client/attorney SHIP behind
   `invoices_select_assigned`; partner/compliance ungranted;
   `platform_owner_admin` deny always) — done when: committed **before**
-  the client surface (T7), ledger green.
-- [ ] **7. Client swap (env-gated, NEW surface)** — touches:
+  the client surface (T7), ledger green. — **DONE (2026-08-08):** the
+  dated §4 addendum is in `docs/permission_matrix.md` after the
+  send-message addendum — client/attorney SHIP behind
+  `invoices_select_assigned` (D-BI2, documents gate verbatim), the six
+  deny rows with battery checks (org-role-alone / **org-mismatch
+  non-vacuous** 11.02-vs-11.05 / cross-org / suspended / anon / owner),
+  the schema contract (11.10 amount CHECK, 11.11 status CHECK, 11.12
+  cascade), partner/compliance "deny unless separately assigned"
+  ungranted, **no payment surface** (D-11, metadata-only by construction),
+  in effect since the apply execution `fc7ed1b`; basis cited (D-11
+  `461cf51` · r1 `da4fa97` · approval + execution `fc7ed1b`), ledger
+  PASS 115.
+- [x] **7. Client swap (env-gated, NEW surface)** — touches:
   `Invoice` VO + `BillingGateway` + fake + `supabase_billing_api`/impl/
   gateway + the matter-invoices section + l10n ×3 + service_locator flip
   + tests (mapping / matterRef-fallback / failure-mapping / DI pins / fake
   determinism) — done when: format clean · analyze clean · suite green ·
-  ledger PASS.
-- [ ] **8. Lockstep + evidence + close** — touches: README test count,
+  ledger PASS. — **DONE (2026-08-08):** the NEW D-BI5 surface shipped at
+  `f116966` — Invoice VO (metadata-only, no payment surface — D-11
+  structural) + `BillingGateway` + deterministic non-PII fake (D-BI4) +
+  `supabase_billing_api`/impl/gateway behind `env.isConfigured`
+  (documents/storage flip pattern) + `matter_invoices_section` on the
+  matter-details screen gated by the existing `canViewDocuments` nav hint
+  (invoices are matter-scoped content like documents; the plan carries no
+  `user_role.dart` change) + l10n ×5 (title/empty/error + issued/paid
+  status labels, EN/AR/TR) + DI pins; tests: impl (5) / gateway mapping
+  + matterRef-fallback + loud-drift + failure-mapping (15) / fake
+  determinism (5) / cubit (6) / DI (2) / section + l10n pins. Gate:
+  format clean · analyze clean · suite 1080 runtime / README 1077
+  declaration · ledger PASS 115.
+- [x] **8. Lockstep + evidence + close** — touches: README test count,
   roadmap §14 billing flip (**ninth** per-feature un-deferral) + §13
   gate-table row + plan task rows, completion evidence
   `docs/billing_invoices_real_data_completion_evidence_2026-08-08.md`,
   dated close decision — done when: all docs sweep green, full gate
-  re-run, close decision recorded, committed as docs(billing).
+  re-run, close decision recorded, committed as docs(billing). — **DONE
+  (2026-08-08):** README 1044→1077 (lockstep with the ledger, caught and
+  fixed in the same commit as T7) · roadmap §14 billing flip to SHIPPED
+  (ninth) + §13 gate-table cell + §14 deferred-list narrowed to AI +
+  forward-hook rows · evidence record §1–§9 · dated close decision §9
+  (CLOSED 2026-08-08, AI the only remaining deferred path) · ledger
+  PASS 115 · committed as docs(billing).

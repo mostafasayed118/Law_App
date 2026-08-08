@@ -13,6 +13,7 @@ import '../domain/matter_gateway.dart';
 import 'matter_cubit.dart';
 import 'matter_documents_section.dart';
 import 'matter_files_section.dart';
+import 'matter_invoices_section.dart';
 import 'matter_labels.dart';
 import 'matter_messages_section.dart';
 import 'matter_state.dart';
@@ -194,6 +195,19 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
           ),
           const SizedBox(height: LegalHubTheme.spaceSm),
           MatterDocumentsSection(matterRef: matter.title),
+          const SizedBox(height: LegalHubTheme.spaceXl),
+        ],
+        // Invoices are matter-scoped content like documents (matrix §4 — the
+        // same client/attorney SHIP cells), so the section rides the same
+        // canViewDocuments visibility gate (D-BI5 — no new capability flag;
+        // the plan's file list carries no user_role.dart change).
+        if (widget.capabilities.canViewDocuments) ...<Widget>[
+          Text(
+            l10n.matterWorkspaceInvoicesTitle,
+            style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: LegalHubTheme.spaceSm),
+          MatterInvoicesSection(matterRef: matter.title),
           const SizedBox(height: LegalHubTheme.spaceXl),
         ],
         if (widget.capabilities.canViewFiles) ...<Widget>[

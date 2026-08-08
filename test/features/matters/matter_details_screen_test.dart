@@ -5,6 +5,8 @@ import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/features/billing/domain/billing_gateway.dart';
+import 'package:legalhub/features/billing/domain/invoice.dart';
 import 'package:legalhub/features/documents/domain/document.dart';
 import 'package:legalhub/features/documents/domain/document_gateway.dart';
 import 'package:legalhub/features/matters/data/fake_matter_gateway.dart';
@@ -107,8 +109,9 @@ void main() {
     });
 
     testWidgets(
-      'workspace sections render only this matter’s documents, files, and '
-      'threads (Phase 10 AC-1; storage D-STR7)',
+      'workspace sections render only this matter’s documents, files, '
+      'threads, and invoices (Phase 10 AC-1; storage D-STR7; billing '
+      'D-BI5)',
       (tester) async {
         await pumpDetails(tester, 'matter-1');
 
@@ -116,10 +119,11 @@ void main() {
         expect(find.text('Documents'), findsOneWidget);
         expect(find.text('Files'), findsOneWidget);
         expect(find.text('Messages'), findsOneWidget);
+        expect(find.text('Invoices'), findsOneWidget);
 
-        // matter-1 owns doc-1 + file-1 + thread-1 only — the per-matter
-        // filter is a client-side view over the fake lists
-        // (D-M5/D-W1/D-W2/D-STR5).
+        // matter-1 owns doc-1 + file-1 + thread-1 + invoice-1 only — the
+        // per-matter filter is a client-side view over the fake lists
+        // (D-M5/D-W1/D-W2/D-STR5/D-BI5).
         expect(find.text('Demo engagement letter'), findsOneWidget);
         expect(find.text('Demo retainer scan'), findsOneWidget);
         // The file row's secondary line is the byte-size label (245760 bytes
@@ -127,9 +131,11 @@ void main() {
         // through the widget (D-STR3 metadata surface).
         expect(find.text('240 KB'), findsOneWidget);
         expect(find.text('Demo matter updates'), findsOneWidget);
+        expect(find.text('INV-2026-0001'), findsOneWidget);
         expect(find.text('Sample matter brief — demo'), findsNothing);
         expect(find.text('Demo lease annex'), findsNothing);
         expect(find.text('Consultation follow-up — demo'), findsNothing);
+        expect(find.text('INV-2026-0002'), findsNothing);
       },
     );
 
@@ -168,6 +174,9 @@ void main() {
       serviceLocator.registerLazySingleton<StorageGateway>(
         _EmptyStorageGateway.new,
       );
+      serviceLocator.registerLazySingleton<BillingGateway>(
+        _EmptyBillingGateway.new,
+      );
 
       await pumpDetails(tester, 'matter-1');
 
@@ -183,9 +192,14 @@ void main() {
         find.text('No message threads are available for this matter.'),
         findsOneWidget,
       );
+      expect(
+        find.text('No invoices are available for this matter.'),
+        findsOneWidget,
+      );
       expect(find.text('Demo engagement letter'), findsNothing);
       expect(find.text('Demo retainer scan'), findsNothing);
       expect(find.text('Demo matter updates'), findsNothing);
+      expect(find.text('INV-2026-0001'), findsNothing);
     });
 
     testWidgets(
@@ -296,6 +310,15 @@ class _EmptyStorageGateway implements StorageGateway {
   @override
   Future<Result<List<FileMetadata>>> fetchFiles() async {
     return Result<List<FileMetadata>>.success(const <FileMetadata>[]);
+  }
+}
+
+/// Gateway stub that yields an empty invoice list (workspace empty pin,
+/// billing D-BI5).
+class _EmptyBillingGateway implements BillingGateway {
+  @override
+  Future<Result<List<Invoice>>> fetchInvoices() async {
+    return Result<List<Invoice>>.success(const <Invoice>[]);
   }
 }
 

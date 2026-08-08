@@ -57,7 +57,7 @@ messaging services.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (1044 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (1077 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), Redactor (password/OTP/email/Bearer redaction
   with leak guards), DI registration graph, validators, router redirect logic
@@ -92,8 +92,12 @@ messaging services.
   in-memory locale store, and the onboarding-success screen. Batch 5 added
   the 800×600 onboarding no-overflow test and the EN/AR/TR localized-fallback
   assertions.
-- Coverage: **1044 tests** (2026-08-08, send-message T7 — the env-gated
-  client swap to the audited `send_message` RPC (D-SM2): the seam's
+- Coverage: **1077 tests** (2026-08-08, billing T7 — the env-gated
+  `SupabaseBillingGateway` swap (D-BI5): the ninth §14 un-deferral's new
+  consumer-attached surface (Invoice VO + `BillingGateway` + deterministic
+  non-PII fake + the matter-invoices section + l10n ×5 + DI pins +
+  mapping/matterRef-fallback/failure-mapping/impl/cubit tests), building on
+  the audited `send_message` RPC (D-SM2): the seam's
   send returns the persisted id via the RPC caller (no org pre-read, no
   client author), the gateway resolves the row through the shipped read,
   on top of the realtime-push live-delivery subscription + insert-only

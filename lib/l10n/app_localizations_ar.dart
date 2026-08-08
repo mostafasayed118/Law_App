@@ -900,4 +900,20 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get filesError => 'تعذّر تحميل الملفات.';
+
+  @override
+  String get matterWorkspaceInvoicesTitle => 'الفواتير';
+
+  @override
+  String get matterWorkspaceInvoicesEmpty =>
+      'لا توجد فواتير متاحة لهذه القضية.';
+
+  @override
+  String get invoicesError => 'تعذّر تحميل الفواتير.';
+
+  @override
+  String get invoiceStatusIssued => 'صادرة';
+
+  @override
+  String get invoiceStatusPaid => 'مدفوعة';
 }
