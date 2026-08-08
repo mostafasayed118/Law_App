@@ -28,6 +28,15 @@
 -- ---- 0. Reset (dependency-safe delete order: children before parents) ----
 -- storage.objects rows are independent of the public tables (no FK) but
 -- must be cleared before re-seed so the objects-layer counts are exact.
+-- HOST-COMPAT (verified live 2026-08-08, realtime T4): storage-api
+-- v1.68.1+ ships a `protect_objects_delete` trigger on storage.objects
+-- that blocks direct DELETEs unless the session GUC
+-- `storage.allow_delete_query` is 'true' (the trigger's own documented
+-- escape hatch — it reads the setting and skips). The battery's fixtures
+-- run as the privileged connection role and MUST reset the objects rows,
+-- so this session-local set is required on current hosts and harmless on
+-- older ones without the trigger. Scoped to this psql session only.
+set storage.allow_delete_query = 'true';
 delete from storage.objects where bucket_id = 'matter-files';
 delete from public.messages;
 delete from public.files;

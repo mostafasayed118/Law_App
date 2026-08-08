@@ -172,7 +172,16 @@ begin
 end $$;
 
 -- CHECK 01.08 — POS (audited read, design §7): the partner roster read wrote
--- its own 'partner:list_org_members' audit row.
+-- its own 'partner:list_org_members' audit row. This is a PRIVILEGED
+-- observation (verifying the server-side audit trail the RPC wrote) and
+-- runs as the connection role via reset role: authenticated holds NO SELECT
+-- on audit_events by design (D-P0C4 — audit is RPC-only), so the direct
+-- read must NOT run under the impersonated role (the 01.13 orphan-probe
+-- reset pattern). REHEARSAL FINDING (realtime T4, 2026-08-08): the original
+-- check ran as authenticated and could never pass against the committed
+-- schema — surfaced by the first genuinely executed battery on a
+-- storage-capable host.
+reset role;
 do $$
 declare
   v_cnt bigint;
@@ -184,6 +193,7 @@ begin
     raise exception 'POLICY-BATTERY FAIL 01.08: partner roster read was not audited';
   end if;
 end $$;
+set role authenticated;
 
 -- CHECK 01.09 — NEG: a client (non-partner) is denied the RPC entirely —
 -- own-row-only does not apply; the call is denied (generic 'permission
