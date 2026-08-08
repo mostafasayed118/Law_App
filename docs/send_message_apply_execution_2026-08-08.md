@@ -161,11 +161,12 @@ its INSERT passed `'Demo attorney'` explicitly). The RPC implemented
 D-RT4 exactly as rehearsed (stored display name from profiles; the
 `'Demo client'` fallback only when empty) — the rehearsal battery pinned
 'Partner A' because the rehearsal fixtures' profiles store generic names,
-while the dev accounts' profiles store emails. The email is the account's
-own pre-existing profile data, not data this apply wrote; the RPC is
-correct. **No rollback was invoked** (never fix-forward) — the fix is an
-account-hygiene update outside this slice's scope (§4.6/§5), flagged for
-the owner (§5).
+while the dev accounts' profiles store emails. The emailis the account's
+  own pre-existing profile data, not data this apply wrote; the RPC is
+  correct. **No rollback was invoked** (never fix-forward) — the fix was
+  an account-hygiene update outside this slice's scope (§4.6/§5), flagged
+  for the owner (§5) and **resolved the same day**: generic demo display
+  names set on the two dev profiles (see §5).
 
 No other trigger condition fired; **no rollback invoked**. The rollback
 pairing (`rpc/_down.sql` drop + the demo-row/audit-row delete + the
@@ -182,13 +183,19 @@ revocation git-revert) stands by, unexercised.
   RPCs** — the approval's exact predictions, with the message tally 12.
 - **Plan T5 row:** flipped DONE (the dated approval §6 + this execution
   record close the apply gate; the §14/§13/§2 HELD markers resolve).
-- **⚠ Owner-side follow-up (account hygiene, pre-existing, out of scope
-  here):** the two dev demo accounts' `profiles.display_name` store their
-  email addresses, so any D-RT4-derived author on the dev project is the
-  account's email. Setting generic demo display names on those two
-  profiles (an account-data update, owner-approved) would make future
-  D-RT4 authors generic — the client impl's `'Demo client'` fallback
-  never fires because the stored names are non-empty.
+- **⚠ Owner-side follow-up (account hygiene) — RESOLVED 2026-08-08:**
+  the two dev demo accounts' `profiles.display_name` stored their email
+  addresses, so any D-RT4-derived author on the dev project was the
+  account's email. **Applied the same day (owner-approved):**
+  `update public.profiles set display_name = 'Demo Partner' where user_id
+  = '8fa94af0-…'` and `… = 'Demo Client' where user_id =
+  '0c54d251-…'` (roles verified first — the partner is the assigned
+  attorney, the second account a demo client); verified by re-running the
+  RPC's exact in-function author SELECT impersonated as the partner:
+  `resolved_author` = **`Demo Partner`**. Future D-RT4 message authors are
+  now generic. (Optional deeper consistency: `auth.users`
+  `raw_user_meta_data` may still carry the legacy display names — not
+  touched; the D-RT4 source is `profiles`, which is now generic.)
 - **Configured-build verification (D-SM2):** the env-gated client swap
   (plan T7, committed `f874a57`) now has its server prerequisite live —
   a configured build's send will call the audited RPC and observe the §8

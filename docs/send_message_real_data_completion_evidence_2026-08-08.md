@@ -200,9 +200,11 @@ with the resolved commit refs.
   gate and the apply executed the same day
   (`docs/send_message_apply_execution_2026-08-08.md` — policies 10→9,
   INSERT revoked, demo send `1c031882-…` with the §8 audit row
-  observed), with one finding recorded (the author is the account's
-  stored display name — an email — owner-side account hygiene, D-RT4
-  honored; not a revert).
+  observed), with one finding recorded and **resolved the same day**:
+  the author was the account's stored display name (an email — D-RT4
+  honored, not a revert); generic demo display names were set on the two
+  dev profiles (`Demo Partner` / `Demo Client`, verified via the RPC's
+  exact author SELECT) — see the execution record §5.
 - **T7 ledger catch (count accuracy):** the final ledger sweep on the
   uncommitted T7 state caught the README count at 1042 while the ledger's
   git-grep declaration count on the tree was 1044 — the README was updated
