@@ -480,6 +480,58 @@ there.
 > row; **committed before the client surface ships (plan T7, env-gated
 > `sendMessage` → RPC swap, D-SM2)**, in effect when the apply executes.
 
+> **§4 addendum (2026-08-08, billing-invoices read slice — plan
+> `docs/billing_invoices_real_data_plan_2026-08-08.md`, ninth §14
+> un-deferral):** a **new "View an invoice (metadata)" row is added** —
+> the **client / attorney cells SHIP**, granted server-side by
+> `invoices_select_assigned` (`supabase/policies/invoices.sql`) and
+> policy-tested by `supabase/tests/11_invoice_rls.sql` (rehearsal r1
+> **PASSED 2026-08-08**, evidence
+> `docs/billing_invoices_rehearsal_evidence_r1_2026-08-08.md`, genuinely
+> executed **78/0/0**; static battery `--check` 339/0/0). The grant is
+> exactly: an **active member of the invoice's org** who is the assigned
+> **client** or the assigned **attorney** on the invoice's matter —
+> invoices are **matter-scoped content** (line 143/148), so the invoice
+> gate IS the matter gate (the policy's exists subquery on `matters`, the
+> documents D-DR2 pattern verbatim — D-BI2). Deny rows now each have a
+> battery check:
+> - **org role alone** (no matter assignment) → deny, every role;
+> - **org-mismatch** (invoice org ≠ its matter's org) → deny, every role
+>   — the load-bearing D-BI2 clause (an invoice is never readable when its
+>   matter is not, line 143/148), NON-VACUOUS: the battery's 11.02 count
+>   proves an assigned reader reads org-a invoices generally, so the 11.05
+>   deny is specifically the clause;
+> - **cross-org** (assigned on an org-a matter, org-b member only) → deny;
+> - **suspended membership** in the invoice's org → deny (the
+>   `is_active_member` arm);
+> - **unauthenticated** → deny (no grant — `permission denied` at the
+>   privilege layer);
+> - **`platform_owner_admin`** → deny, always (owner accounts are never
+>   assigned — an operational invariant, not a policy guarantee; recorded
+>   residual in `docs/billing_invoices_gate_review_2026-08-08.md` Q4).
+> The battery also pins the schema contract + teardown safety beyond the
+> grant rows: the `amount_cents` CHECK rejects a negative amount and the
+> `status` CHECK rejects an unmapped status (D-11's deliberately minimal
+> mapping contract — `issued`/`paid` only, no tax/lifecycle machinery),
+> and the matter-delete FK cascade removes a matter's invoices
+> (11.10/11.11/11.12). **Not granted by this addendum:** the partner /
+> `compliance_officer` "deny unless separately assigned" cells stay
+> **ungranted** (the oversight mechanism is undefined, mirroring
+> D-DR5/D-MR5); **no payment surface of any kind is granted** — D-11 "no
+> live payment in MVP" (Paymob is a separate, future, owner-approved
+> integration spec; the table is metadata-only by construction — D-BI1,
+> no card/payment columns can even exist). **Basis:** §14 gate-lift (P0
+> closure RATIFIED + policy battery shipped) · D-11 DECIDED 2026-08-08
+> (`461cf51`) · r1 PASS (`da4fa97`, genuinely executed 78/0/0) ·
+> apply-approval **APPLY APPROVED 2026-08-08** + execution
+> (`docs/billing_invoices_apply_approval_2026-08-08.md` §6 dated sign-off
+> + `docs/billing_invoices_apply_execution_2026-08-08.md` `fc7ed1b` —
+> applied and verified on the dev project: tables/RLS 11→12, public
+> policies 10→11, 4 demo invoices, smoke green). Per §7 this extends, not
+> replaces, and widens no other row; **in effect since the apply execution
+> 2026-08-08 (`fc7ed1b`)**, and the client surface (plan T7, env-gated
+> `BillingGateway` swap) ships next.
+
 ---
 
 ## 5. `platform_owner_admin` — explicit boundary (contract §2 #2, #4)

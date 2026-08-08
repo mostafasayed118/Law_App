@@ -259,11 +259,22 @@ Branch: `feat/billing-invoices-read`
   partner's set), clients 0/0 (membership guard live), anon denied —
   evidence `docs/billing_invoices_apply_execution_2026-08-08.md`
   (APPLIED). **Owner-gated.**
-- [ ] **6. Dated matrix addendum** — touches: `docs/permission_matrix.md`
+- [x] **6. Dated matrix addendum** — touches: `docs/permission_matrix.md`
   §4 "View an invoice (metadata)" row (client/attorney SHIP behind
   `invoices_select_assigned`; partner/compliance ungranted;
   `platform_owner_admin` deny always) — done when: committed **before**
-  the client surface (T7), ledger green.
+  the client surface (T7), ledger green. — **DONE (2026-08-08):** the
+  dated §4 addendum is in `docs/permission_matrix.md` after the
+  send-message addendum — client/attorney SHIP behind
+  `invoices_select_assigned` (D-BI2, documents gate verbatim), the six
+  deny rows with battery checks (org-role-alone / **org-mismatch
+  non-vacuous** 11.02-vs-11.05 / cross-org / suspended / anon / owner),
+  the schema contract (11.10 amount CHECK, 11.11 status CHECK, 11.12
+  cascade), partner/compliance "deny unless separately assigned"
+  ungranted, **no payment surface** (D-11, metadata-only by construction),
+  in effect since the apply execution `fc7ed1b`; basis cited (D-11
+  `461cf51` · r1 `da4fa97` · approval + execution `fc7ed1b`), ledger
+  PASS 115.
 - [ ] **7. Client swap (env-gated, NEW surface)** — touches:
   `Invoice` VO + `BillingGateway` + fake + `supabase_billing_api`/impl/
   gateway + the matter-invoices section + l10n ×3 + service_locator flip
