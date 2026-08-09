@@ -256,11 +256,19 @@ bounded capability, server-gated, audited, never audit-exempt.
     (evidence `docs/matter_write_slice_rehearsal_r1_2026-08-09.md`); the
     mechanism/RLS-gate review PASSED the same date
     (`docs/matter_write_slice_review_2026-08-09.md`, findings R-1/R-2
-    remediated in-review). When the slice
-    ships to the dev project (RLS-gate review → **dated apply approval** →
-    apply → matrix addendum), the §4.4/§4.6 owner-deny rows become an
-    enforced guarantee rather than an invariant — until then, the invariant
-    remains pinned by battery 12.
+    remediated in-review). **APPLIED to the dev project 2026-08-09**
+    (execution evidence `docs/matter_write_apply_execution_2026-08-09.md`;
+    dated approval `docs/matter_write_apply_approval_2026-08-09.md` §6):
+    the §4.4/§4.6 owner-deny rows are now an **enforced guarantee** for all
+    new writes (RPC refusal + categorical trigger), verified live (demo
+    create `d28f1f05-…` + §8 audit row, owner-refusal + member-guard + anon
+    negatives, owner reads 0). **Caveat surfaced by the apply — see the
+    findings register F-12:** the dev demo matter `a6715e17-…` was seeded
+    (2026-08-07, pre-F-01) with the platform-owner id as its assigned
+    client; the state is **contained** (the owner holds no memberships, so
+    the `is_active_member` arm of `matters_select_assigned` blocks the
+    read — verified live) and an owner-side data remediation is tracked in
+    the register. The matrix §4 addendum + applied-surface addendum remain.
 
 ---
 

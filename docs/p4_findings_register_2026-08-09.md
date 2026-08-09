@@ -33,7 +33,7 @@
 
 | ID | Finding | Severity (demo posture) | Status | Threat-model ref | Remediation slice |
 |---|---|---|---|---|---|
-| F-01 | Content-table owner deny is an **operational invariant**, not an enforced clause | Medium (High if real data) | **STEP 1 SHIPPED + r1 PASSED; STEP 2 BUILT + r1 PASSED + REVIEW PASS 2026-08-09** (apply-approval prepared, pending owner signature; step 3 superseded) | §4.6, §6 residual 1 | **Step 1 done** (battery 12 + r1); **step 2 built + r1 PASSED + mechanism review PASS 2026-08-09** (`create_matter` RPC refusal + categorical trigger + battery 13; rehearsal `docs/matter_write_slice_rehearsal_r1_2026-08-09.md` — apply 44/44, battery 82/0/0 ×2; review `docs/matter_write_slice_review_2026-08-09.md` — R-1/R-2 remediated, battery 16 blocks); step 3 dropped — the trigger achieves the categorical deny without the R-4 probe widening |
+| F-01 | Content-table owner deny is an **operational invariant**, not an enforced clause | Medium (High if real data) | **STEP 1 SHIPPED + r1 PASSED; STEP 2 BUILT + r1 PASSED + REVIEW PASS + APPLIED 2026-08-09** (dev project; step 3 superseded; apply surfaced **F-12** — pre-existing dev demo data, contained) | §4.6, §6 residual 1 | **Step 1 done** (battery 12 + r1); **step 2 built + r1 PASSED + mechanism review PASS + APPLIED 2026-08-09** (`create_matter` RPC refusal + categorical trigger + battery 13; rehearsal `docs/matter_write_slice_rehearsal_r1_2026-08-09.md` — apply 44/44, battery 82/0/0 ×2; review `docs/matter_write_slice_review_2026-08-09.md` — R-1/R-2 remediated, battery 16 blocks; **execution `docs/matter_write_apply_execution_2026-08-09.md`** — demo create `d28f1f05-…` + §8 audit live, negatives + smoke green, **F-12 surfaced**); step 3 dropped — the trigger achieves the categorical deny without the R-4 probe widening |
 | F-02 | MFA/SSO deferred; single owner account is the highest-value target | Medium (High if real data) | DEFERRED (D-07) | §4.6, §6.1 | v1 MFA slice for the owner account (GoTrue TOTP) |
 | F-03 | Signed-URL TTL window after membership removal (D-STR4) | Low (Medium if real files) | ACCEPTED (recorded D-STR4) | §4.4, §6.2 | Shorten TTL; re-check membership at fetch time when a download surface ships (D-STR9) |
 | F-04 | Realtime delivery verified by RLS proxy, not a live websocket round-trip | Low (verification gap) | OPEN | §4.4, §6.3 | Execute D-45.1 configured-build E2E; D-LV4 polish slice |
@@ -307,6 +307,35 @@
 
 ---
 
+### F-12 — Dev demo data violates the F-01 never-assigned invariant (surfaced by the F-01 step 2 apply; contained)
+
+- **Gap:** the dev project's `platform_config.owner_user_id` **is the
+  account id historically seeded as the acquisition demo matter's
+  "client"** (`9acfd3b4-…`), so the pre-existing demo matter
+  `a6715e17-…` ("Demo matter — acquisition review", seeded 2026-08-07 by
+  the matters apply) has the **platform owner id as `assigned_client_id`**
+  — the exact Q4 residual state F-01 forbids, present in the dev demo data
+  since before the F-01 work. Battery 12's never-assigned invariant is
+  therefore **false against the dev demo data** (the battery itself is
+  ephemeral-only and never ran here).
+- **Evidence:** `docs/matter_write_apply_execution_2026-08-09.md` §5 —
+  verified live: impersonating the owner returns **0 visible matters** —
+  the `matters_select_assigned` `is_active_member` arm blocks it (the
+  owner holds no memberships).
+- **Severity:** Low today — **contained, no live disclosure** (verified by
+  owner impersonation). Would rise to High if the owner ever gained a
+  membership while assigned (the F-01 scenario the trigger now prevents for
+  new writes).
+- **Owner:** Project Owner (data change on the shared dev project).
+- **Remediation path (owner-approved data slice):** re-assign
+  `a6715e17-…`'s `assigned_client_id` from the owner id to the real
+  demo-client account (`0c54d251-…`) to restore the invariant, and note the
+  account-hygiene history (the owner account was seeded as a demo
+  "client" pre-F-01). F-01 step 2's trigger + RPC now guarantee no **NEW**
+  owner assignment through any path (live-proven).
+
+---
+
 ## 3. What this register does NOT do
 
 - It does **not** close the P4 gate — items 3 (controlled-rollout rehearsal)
@@ -332,7 +361,9 @@
 | `supabase/tests/13_matter_write_rls.sql` + harness wiring | F-01 step 2 — 16 check blocks (RPC pos/neg, trigger INSERT + UPDATE arms + narrowness, §8 audit pos/neg, F2-D5 orphan, cross-org/anon/validation denials); 13 wired into the harness file list/loops + 11 into the apply order + §1c/§1d pins |
 | `docs/matter_write_slice_rehearsal_r1_2026-08-09.md` | F-01 step 2 r1 evidence — genuinely executed 2026-08-09 (`--apply` 44/44, full battery 82/0/0 ×2, battery 13 all 16 checks green, teardown recorded) |
 | `docs/matter_write_slice_review_2026-08-09.md` | F-01 step 2 mechanism/RLS-gate review — PASS 2026-08-09; findings R-1 (UPDATE arm) + R-2 (F2-D5) remediated in-review (13.14/13.15/13.16), re-run 82/0/0 ×2 |
-| `docs/matter_write_apply_approval_2026-08-09.md` | F-01 step 2 **dated apply-approval record — PREPARED 2026-08-09, PENDING owner signature** (§6 sign-off block; §3 apply scope: create_matter + 11_matter_write + optional live demo smoke; §4 guardrails; §5 exclusions) |
+| `docs/matter_write_apply_approval_2026-08-09.md` | F-01 step 2 **dated apply-approval record — APPLY APPROVED + EXECUTED 2026-08-09** (§6 dated sign-off recorded in-session; §3 scope: create_matter + 11_matter_write + live demo smoke; §4 guardrails; §5 exclusions) |
+| `docs/matter_write_apply_execution_2026-08-09.md` | F-01 step 2 **apply execution evidence — APPLIED + VERIFIED 2026-08-09** on the dev project: baseline probe → create_matter → 11_matter_write → demo create `d28f1f05-…` (§8 audit row observed) → negatives + smoke green → **finding F-12 recorded** (pre-existing owner-assigned demo matter, contained, owner-side remediation) |
+| `docs/permission_matrix.md` §4 addendum + `docs/current_applied_surface_2026-08-08.md` addendum | **Dated addenda 2026-08-09** — the "Create a matter" row (partner gate, owner refusal, member guard, orphan creates, UPDATE re-assignment denial) + the applied-surface deltas (RPC-EXECUTE 19→20, trigger live, matters 4→5, F-12 noted) |
 
 Verification: `bash scripts/verify_policy_tests.sh --check` → PASS (see §4);
 `--selftest` re-run green on the committed baseline.

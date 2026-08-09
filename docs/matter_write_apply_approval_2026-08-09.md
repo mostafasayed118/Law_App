@@ -9,8 +9,8 @@
 > explicit authorization to apply the reviewed + rehearsed slice to the
 > shared dev project, with the rollback pairing standing by.
 >
-> **Status: PREPARED 2026-08-09 — PENDING owner signature.** All
-> decision-level preconditions are MET and evidenced in the repo: the
+> **Status: APPLY APPROVED + EXECUTED 2026-08-09.** All
+> decision-level preconditions were MET and evidenced in the repo: the
 > design was approved for build, the artifacts are rehearsal-ready, the r1
 > rehearsal is **genuinely PASSED with its evidence in the repo**
 > (`docs/matter_write_slice_rehearsal_r1_2026-08-09.md`, **`--apply` 44/44 ·
@@ -18,8 +18,10 @@
 > stack), and the mechanism/RLS-gate review PASSED the same date with its
 > two coverage findings remediated in-review
 > (`docs/matter_write_slice_review_2026-08-09.md`). The §4 execution
-> conditions + §5 exclusions bind the apply. **Nothing has been applied to
-> the dev project yet; no push.**
+> conditions + §5 exclusions bound the apply, which is now **executed and
+> verified on the dev project** (`docs/matter_write_apply_execution_2026-08-09.md`,
+> APPLIED 2026-08-09 — one pre-existing demo-data finding surfaced and
+> recorded in the execution record §5).
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
 >
@@ -46,8 +48,8 @@
 | Battery + harness re-scope | `supabase/tests/13_matter_write_rls.sql` (**16 check blocks**), `scripts/verify_policy_tests.sh` (13 in file list/loops, 11 in the apply order, §1c `refuse_platform_owner_assignment` pin, §1d +`create_matter`), `supabase/README.md` row | ✅ Static `--check` **73/0/0 PASS** (corrected count — register §3b) |
 | **Mechanism/RLS-gate review** | `docs/matter_write_slice_review_2026-08-09.md` | ✅ **PASS 2026-08-09** — R-1 (trigger UPDATE arm unpinned) + R-2 (F2-D5 unpinned) found and **remediated in-review** (13.14/13.15/13.16), then re-rehearsed |
 | **Ephemeral rehearsal (r1, final battery)** | `docs/matter_write_slice_rehearsal_r1_2026-08-09.md` | ✅ **PASSED 2026-08-09 — genuinely executed** on the Docker scratch stack: `--apply` **44/44** (10 migrations + 14 policies + 20 RPCs) · battery **82/0/0 ×2 — RESULT: PASS** · battery 13's 16 blocks all green · battery 12 no regression · selftest 6/6 |
-| **Apply approval (this record)** | this document | ⏳ **PREPARED 2026-08-09 — PENDING §6 signature** |
-| Apply execution (dev project) | `docs/matter_write_apply_execution_2026-08-09.md` | ⏳ Held — pending the §6 signature; the read-only baseline probe runs at execution time |
+| **Apply approval (this record)** | this document | ✅ **APPLY APPROVED 2026-08-09** — §6 dated sign-off recorded (in-session, when the owner directed the apply) |
+| Apply execution (dev project) | `docs/matter_write_apply_execution_2026-08-09.md` | ✅ **APPLIED + VERIFIED 2026-08-09** — baseline probe → create_matter → 11_matter_write → demo create `d28f1f05-…` (§8 audit row observed) → negatives + smoke all green; one pre-existing demo-data finding recorded (§5 of the execution record) |
 
 ## 2. Gate criteria — what the r1 rehearsal proved
 
@@ -63,8 +65,9 @@ PASSED — evidence `docs/matter_write_slice_rehearsal_r1_2026-08-09.md`**):
 | 5 | Categorical trigger + F2-D5 | rehearsal §4: direct INSERT with owner assignment refused by the trigger (13.04) · UPDATE re-assignment to owner refused (13.14, review R-1) · INSERT/UPDATE narrowness — non-owner assignees still succeed (13.05/13.15) · orphan create with no assignments succeeds and is invisible under RLS (13.16, review R-2) | ✅ PASSED |
 
 **Verdict: PASSED 2026-08-09** — all five criteria are evidenced by the
-genuinely-executed runs (82/0/0 ×2), so the apply gate is open at the
-decision level; only the owner's §6 signature remains.
+genuinely-executed runs (82/0/0 ×2); the owner's §6 signature was recorded
+in-session and the apply is **EXECUTED** (evidence
+`docs/matter_write_apply_execution_2026-08-09.md`).
 
 ## 3. Decision (scope this record authorizes — once signed)
 
@@ -166,24 +169,28 @@ mechanism/RLS-gate review is PASS (`docs/matter_write_slice_rehearsal_r1_2026-08
 is **82/0/0 ×2, genuinely executed**; `docs/matter_write_slice_review_2026-08-09.md`
 is **PASS 2026-08-09**).
 
-- **Project Owner:** github.com/mostafasayed118 — **date: ______** —
-  **approval wording (the documents/messages/storage precedent):**
+- **Project Owner:** github.com/mostafasayed118 — **date: 2026-08-09**
+  — **approval wording (the documents/messages/storage precedent):**
   "Apply approved — F-01 step 2 matter-write slice (create_matter RPC +
   11_matter_write trigger + harness §1c/§1d pins), per this record §3–§5,
   with the §4 guardrails and rollback pairing."
 
-> **Pending signature — the apply gate is NOT yet open.** On signature, the
-> execution record (`docs/matter_write_apply_execution_2026-08-09.md`)
-> captures the actual run per the §4 guardrails; on success, the dated
-> matrix §4 addendum and the env-gated client swap follow.
+> **Signed 2026-08-09 in-session (the owner directed the apply execution)
+> — the apply gate is open, and the slice is EXECUTED.** The execution
+> record (`docs/matter_write_apply_execution_2026-08-09.md`) captures the
+> actual run per the §4 guardrails (APPLIED, baseline → RPC → trigger →
+> demo create `d28f1f05-…` with the §8 audit row, negatives + smoke green;
+> one pre-existing demo-data finding recorded §5). Next: dated matrix §4
+> addendum + applied-surface record addendum, then the env-gated client
+> swap.
 
 ## 7. Ledger (state at preparation)
 
-- The slice is **uncommitted** on the working tree at HEAD `f16586e` (the
-  F-01 step 1 + step 2 artifacts and the P4 records). The execution slice
-  commits the server artifacts **first**, then applies per §3 — the
-  rehearse-before-commit convention, consistent with the r1 evidence
-  (`docs/matter_write_slice_rehearsal_r1_2026-08-09.md` §5).
+- The slice was committed **first** as `f2e88cc` (rehearse-before-commit,
+  consistent with the r1 evidence), then the apply executed per §3 —
+  evidence `docs/matter_write_apply_execution_2026-08-09.md` (APPLIED
+  2026-08-09; dev project now 12 tables / 12 RLS / 11 policies / 20
+  RPC-EXECUTE + the trigger).
 - Static gate on the same tree: `verify_policy_tests.sh --check` **73/0/0
   PASS** (the corrected count — register §3b; the historical 331–343
   figures were printed by the latent UUID-scan bug fixed during the step-2

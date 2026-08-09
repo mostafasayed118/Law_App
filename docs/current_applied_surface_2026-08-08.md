@@ -19,6 +19,15 @@
 | **Bucket** | **`matter-files` (1)** | `storage.objects` rows for the 4 demo files; no other bucket. |
 | **Demo rows** | 4 matters · 4 documents · 4 threads · **12 messages** · 4 files + 4 objects · 4 invoices | Counts below (§2). |
 
+## 1a. Addendum (2026-08-09 — F-01 step 2 matter-write apply)
+
+| Surface | Before → After | Evidence |
+|---|---|---|
+| **RPCs** | **19 → 20 EXECUTE** (anon false) | `create_matter(uuid, text, text, uuid, uuid)` added (audited, F2-D1/D2/D4; §8 by construction). Harness RPC-EXECUTE pin 19 → 20 (`docs/matter_write_apply_execution_2026-08-09.md` §2.1). |
+| **Trigger (not a policy)** | **new** — `refuse_platform_owner_assignment` `BEFORE INSERT OR UPDATE` on `matters`, EXECUTE-revoked | The categorical F-01 owner-assignment guard (`docs/matter_write_apply_execution_2026-08-09.md` §2.2). **Policies row unchanged** (11 public + 1 storage — the trigger is a data-layer mechanism, no RLS arm, no R-4 probe widening). |
+| **Demo matters** | 4 → **5** | The first §8-audited live matter write `d28f1f05-f95f-46ea-9b15-767f15778c01` (via the RPC as the demo partner; §2 below). **⚠ F-12:** the pre-existing matter `a6715e17-…` carries the platform-owner id as `assigned_client_id` (seeded 2026-08-07, pre-F-01) — contained (owner reads 0, no membership), owner-side remediation tracked (`docs/p4_findings_register_2026-08-09.md` F-12). |
+| **Matter write path** | none → **audited RPC + categorical trigger** | `create_matter` is the ONLY matter-write surface (no INSERT/UPDATE grants to clients); every create §8-audited. |
+
 ## 2. Demo rows (org `ef43087b-adf4-4480-9bb2-28c26f46ec71`, generic only — no real PII)
 
 | Kind | Rows | Anchors |
@@ -46,6 +55,7 @@ deliberately denies them; recorded as designed, never a defect).
 | 6 | send-message `031ebdc` (18:14) | `send_message` RPC + D-SM3 (drop `messages_insert_assigned`) + audited send | 10 tables / 9 policies |
 | 7 | storage `e9a02ac` (18:36) | `07_storage` (bucket + files) + 2 policies + 4 files/objects | **11 tables / 10 public + 1 storage** |
 | 8 | billing `fc7ed1b` (21:31) | `10_billing_invoices` + `invoices_select_assigned` + 4 invoices | **12 tables / 11 public + 1 storage** |
+| 9 | F-01 step 2 `f2e88cc` (08-09) | `create_matter` RPC + `11_matter_write` trigger + demo create `d28f1f05-…` | **12 tables / 11 public + 1 storage / 20 RPC-EXECUTE** (trigger is not a policy) |
 
 > **Baseline-count honesty:** storage's §0 note explicitly records that its
 > approval's "8 → 9 policies" baseline was written before the realtime-push
@@ -66,7 +76,7 @@ deliberately denies them; recorded as designed, never a defect).
   `send_message_apply_execution_2026-08-08.md` · `storage_apply_execution_2026-08-08.md` ·
   `billing_invoices_apply_execution_2026-08-08.md` (+ P2-era: `p2_apply_execution_2026-08-01.md`,
   `p2_hardening_apply_execution_2026-08-03.md`).
-- Harness pins: `scripts/verify_policy_tests.sh` §1a (12 tables / 12 RLS), §1d (19 RPC-EXECUTE),
+- Harness pins: `scripts/verify_policy_tests.sh` §1a (12 tables / 12 RLS), §1d (**20 RPC-EXECUTE** — 19 + `create_matter`, 2026-08-09 addendum),
   §1e (11 public + 1 storage), §1g (publication exactly messages, bucket).
 - Rehearsal evidence (the same set, scratch stack): r1 records per slice.
 - Not live by design: AI (deferred, D-07/D-08) · storage write/download (D-STR9) · billing
@@ -76,7 +86,12 @@ deliberately denies them; recorded as designed, never a defect).
 ## 5. Owner-side notes
 
 - **Configured-build E2E (D-45.1)** remains the only un-executed verification: the 12-table /
-  11-policy / 19-RPC surface above is battery-proven and smoke-proven via role-impersonated
-  SQL, but no `.env` build has round-tripped it from the app.
+  11-policy / **20-RPC** surface above is battery-proven and smoke-proven via role-impersonated
+  SQL, but no `.env` build has round-tripped it from the app (the 2026-08-09 addendum moved the
+  RPC count 19 → 20).
+- **⚠ F-12 (2026-08-09):** the demo matter `a6715e17-…` carries the platform-owner id as
+  `assigned_client_id` (seeded 2026-08-07, pre-F-01) — contained (the owner reads 0, no
+  membership rows), owner-side remediation (re-assign to the demo-client account) tracked in
+  `docs/p4_findings_register_2026-08-09.md`.
 - The demo **clients** have no membership rows — add them (a deliberate data action) if a
   client-side demo wants the assigned-client positives live.

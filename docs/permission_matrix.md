@@ -545,6 +545,51 @@ there.
 > 2026-08-08 (`fc7ed1b`)**, and the client surface (plan T7, env-gated
 > `BillingGateway` swap) ships next.
 
+> **§4 addendum (2026-08-09, F-01 step 2 matter-write slice — the FIRST
+> matter-WRITE row; closes `docs/p4_findings_register_2026-08-09.md`
+> F-01):** a **new "Create a matter" row is added** — the partner cell
+> **SHIPS** (the `create_matter` RPC, `supabase/rpc/create_matter.sql`,
+> `security definer` + `set search_path = public`; F2-D1 — the creator
+> must be an **active partner of the org**, re-derived server-side via
+> `has_org_role(org,'partner')` → `active_membership` `status='active'`,
+> D-08: never trust the arg alone). All other cells stay **ungranted**
+> (clients/attorneys/`compliance_officer` cannot create — the general
+> matter-authoring policy stays undefined, D-MR5). **The F-01 core
+> (F2-D2): the platform-owner id is NEVER assignable** — as assigned
+> client or attorney, refused by the RPC **and** by the categorical
+> `BEFORE INSERT OR UPDATE` trigger `refuse_platform_owner_assignment`
+> (`supabase/migrations/11_matter_write.sql`, EXECUTE-revoked — fires for
+> the connection role too, so **no path** — RPC, seeds, manual fixes — can
+> create the Q4 residual state). The §5 content boundary
+> (`platform_owner_admin` deny always on matter content) is now an
+> **enforced clause for the write path**, not an invariant. **F2-D4:**
+> assignees must be **active members of the org** (non-member / suspended
+> refused — a dead assignment would be unreadable by the assignee).
+> **F2-D5:** assignments **nullable at creation** — the orphan row,
+> invisible to every role under RLS (the invoice-orphan 11 semantics).
+> **§8:** every create is audited (`matter:create`/`allowed`, redacted
+> summary `matter created` — never the title); a denied create writes
+> nothing. **Deny rows, each battery-pinned:** anon (privilege-layer, no
+> EXECUTE) · non-partner creator (generic `permission denied`) · cross-org
+> (tenant isolation) · owner as assignee (deny always) · non-member /
+> suspended assignee. **No UPDATE/DELETE surface beyond the trigger's
+> owner-guard:** the trigger refuses owner **re-assignment** (the UPDATE
+> arm, pinned 13.14/13.15); general matter editing stays future work
+> (D-MR5). **Basis:** design (`docs/f01_step2_matter_write_design_2026-08-09.md`
+> F2-D1…F2-D5) → build → rehearsal r1 **82/0/0 ×2** (`docs/matter_write_slice_rehearsal_r1_2026-08-09.md`)
+> → mechanism/RLS-gate review PASS (`docs/matter_write_slice_review_2026-08-09.md`,
+> R-1/R-2 remediated) → dated apply-approval (`docs/matter_write_apply_approval_2026-08-09.md`
+> §6, **APPLY APPROVED 2026-08-09**) → apply execution (`docs/matter_write_apply_execution_2026-08-09.md`
+> — dev project: **RPC-EXECUTE 19→20**, trigger live, demo create
+> `d28f1f05-…` via the RPC with the §8 audit row observed, negatives +
+> smoke green). Per §7 this extends, not replaces, and widens no other
+> row; **in effect since the apply execution 2026-08-09**, and the client
+> surface (env-gated `createMatter` swap) ships next. **Caveat recorded:
+> F-12** — the pre-existing demo matter `a6715e17-…` carries the owner id
+> as assigned client (seeded 2026-08-07, pre-F-01); contained (owner
+> reads 0 — the `is_active_member` arm) with an owner-side data
+> remediation tracked in the register.
+
 ---
 
 ## 5. `platform_owner_admin` — explicit boundary (contract §2 #2, #4)
