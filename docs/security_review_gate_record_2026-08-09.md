@@ -1,11 +1,13 @@
 # P4 Security-Review Gate — Status Record (2026-08-09)
 
 > **Record type:** Status record for the **P4 slice — Security review +
-> controlled rollout** (row in `docs/p0_decision_capture.md` §3, currently
-> **BLOCKED / owner OPEN**). This record does **not** authorize a release and
-> does **not** claim a completed security review — it pins what was verified
-> during the 2026-08-09 audit and what remains owner-gated. Owner: Project
-> Owner (github.com/mostafasayed118).
+> controlled rollout** (row in `docs/p0_decision_capture.md` §3, resolved
+> 2026-08-09 to **DEMO-READY (non-production)** — see
+> `docs/p4_release_readiness_2026-08-09.md`). This record does **not**
+> authorize a production release and does **not** claim a completed
+> security review — it pins what was verified during the 2026-08-09 audit
+> and what remains owner-gated. Owner: Project Owner
+> (github.com/mostafasayed118).
 
 ## 1. Verified facts (2026-08-09, whole-tree gate)
 
@@ -37,8 +39,9 @@
 4. **Release approval** — dated owner sign-off naming what ships where.
 
 **Nothing above was performed during the 2026-08-09 audit; this record flags
-the gate as OPEN.** (Decision-capture P4 row stays BLOCKED / owner `OPEN`
-until item 4 exists.)
+the gate as OPEN at the time.** (The decision-capture P4 row is now
+`DEMO-READY (non-production)` per `docs/p4_release_readiness_2026-08-09.md`
+— the dated demo-scoped release approval, item 4.)
 
 ## 4. Work completed for P4 (2026-08-09, evidence-grounded — reviewable, not self-approved)
 
@@ -92,8 +95,10 @@ secret string present in `lib/`, `test/`, `supabase/` history scanned on
   (dev/staging/store) — not yet granted.
 - **P4 row**: see §5.
 
-> Bridge note: this annex makes P4 *reviewable*, it does **not** claim it
-> done. The decision-capture P4 row stays `BLOCKED / owner OPEN`.
+> Bridge note: this annex made P4 *reviewable*; it did not claim it done.
+> The decision-capture P4 row is now `DEMO-READY (non-production)` per
+> `docs/p4_release_readiness_2026-08-09.md` (dated 2026-08-09, explicitly
+> scoped as non-production).
 
 ## 5. Logged owner actions referenced by other records
 

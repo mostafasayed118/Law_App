@@ -34,12 +34,12 @@
 | ID | Finding | Severity (demo posture) | Status | Threat-model ref | Remediation slice |
 |---|---|---|---|---|---|
 | F-01 | Content-table owner deny is an **operational invariant**, not an enforced clause | Medium (High if real data) | **STEP 1 SHIPPED + r1 PASSED; STEP 2 BUILT + r1 PASSED + REVIEW PASS + APPLIED 2026-08-09** (dev project; step 3 superseded; F-12 resolved; **client swap BUILT 2026-08-09 (`93d5ed0`) + REVIEW PASS — R-1/R-2 remediated, analyze + 1156-suite green, awaiting D-45.1 configured-build verification**) | §4.6, §6 residual 1 | **Step 1 done** (battery 12 + r1); **step 2 built + r1 PASSED + mechanism review PASS + APPLIED 2026-08-09** (`create_matter` RPC refusal + categorical trigger + battery 13; rehearsal `docs/matter_write_slice_rehearsal_r1_2026-08-09.md` — apply 44/44, battery 82/0/0 ×2; review `docs/matter_write_slice_review_2026-08-09.md` — R-1/R-2 remediated, battery 16 blocks; **execution `docs/matter_write_apply_execution_2026-08-09.md`** — demo create `d28f1f05-…` + §8 audit live, negatives + smoke green, **F-12 surfaced**); step 3 dropped — the trigger achieves the categorical deny without the R-4 probe widening |
-| F-02 | MFA/SSO deferred; single owner account is the highest-value target | Medium (High if real data) | DEFERRED (D-07) | §4.6, §6.1 | v1 MFA slice for the owner account (GoTrue TOTP) |
+| F-02 | MFA/SSO deferred; single owner account is the highest-value target | Medium (High if real data) | ACCEPTED (demo-posture, 2026-08-09, Project Owner) | §4.6, §6.1 | v1 MFA slice for the owner account (GoTrue TOTP) |
 | F-03 | Signed-URL TTL window after membership removal (D-STR4) | Low (Medium if real files) | ACCEPTED (recorded D-STR4) | §4.4, §6.2 | Shorten TTL; re-check membership at fetch time when a download surface ships (D-STR9) |
 | F-04 | Realtime delivery verified by RLS proxy, not a live websocket round-trip | Low (verification gap) | OPEN | §4.4, §6.3 | Execute D-45.1 configured-build E2E; D-LV4 polish slice |
-| F-05 | Invite emails (R2) absent; one-time token delivered out-of-band | Low-Medium | DEFERRED (roadmap 3.3 R2) | §4.1, §6.4 | GoTrue email-trigger slice (provider config + review) |
+| F-05 | Invite emails (R2) absent; one-time token delivered out-of-band | Low-Medium | ACCEPTED (demo-posture, 2026-08-09, Project Owner) | §4.1, §6.4 | GoTrue email-trigger slice (provider config + review) |
 | F-06 | Accept-invite one-time token rides in a deep-link URL | Low | OPEN | §4.1 | Document exposure; verified app-links; optional server-side short-lived code |
-| F-07 | No throttling beyond GoTrue defaults (D-07) | Low | DEFERRED (D-07) | §4.5, §6.7 | Verify provider rate-limit settings; revisit before real-data rollout |
+| F-07 | No throttling beyond GoTrue defaults (D-07) | Low | ACCEPTED (demo-posture, 2026-08-09, Project Owner) | §4.5, §6.7 | Verify provider rate-limit settings; revisit before real-data rollout |
 | F-08 | Denied RPC attempts not logged as `denied` audit rows (deliberate) | Info / Low | ACCEPTED (10.09 pins the negative) | §4.3, §6.8 | Ops decision; optional opt-in `denied` outcomes behind a review |
 | F-09 | Demo clients hold no membership rows — client-side positives not demoable live | Low (data posture) | ACCEPTED (recorded as designed) | §6.5 | Owner-approved deliberate data action when a client demo is wanted |
 | F-10 | Provider/hosting posture assumed, not verified (rate limits, storage defaults, JWT `email` claim) | Low | OPEN | §4.5, §6.6 | Read-only dev-project probes + GoTrue config check |
@@ -134,6 +134,9 @@
   from a compromise beyond the demo project); **High** if the project ever
   moves toward real data.
 - **Owner:** Project Owner (product decision); engineering (v1 slice).
+- **Status (2026-08-09):** ACCEPTED as demo-posture — portfolio/demo
+  project, no real client data; revisit if that scope ever changes. Not
+  implemented (see `docs/p4_release_readiness_2026-08-09.md`).
 - **Remediation path:** v1 auth slice — enable GoTrue **TOTP MFA** on the
   owner account (and any future operator account) before any release beyond
   the dev project; record the credential-hygiene rule (never share the owner
@@ -195,6 +198,9 @@
 - **Severity:** Low-Medium (single-use token, hashed at rest, 7-day expiry —
   the exposure is delivery-channel hygiene, not storage).
 - **Owner:** Project Owner (provider-config decision); engineering (slice).
+- **Status (2026-08-09):** ACCEPTED as demo-posture — portfolio/demo
+  project, no real client data; revisit if that scope ever changes. Not
+  implemented (see `docs/p4_release_readiness_2026-08-09.md`).
 - **Remediation path:** R2 slice — GoTrue email trigger on invite (provider
   config + a short review + a matrix note if the surface widens); until then,
   keep the in-app single display as the shipped posture.
@@ -231,6 +237,9 @@
 - **Severity:** Low (demo posture; provider defaults are reasonable for the
   scale).
 - **Owner:** Project Owner.
+- **Status (2026-08-09):** ACCEPTED as demo-posture — portfolio/demo
+  project, no real client data; revisit if that scope ever changes. Not
+  implemented (see `docs/p4_release_readiness_2026-08-09.md`).
 - **Remediation path:** verify the dev project's Auth rate-limit settings
   (read-only probe / console) and record them in the P4 release notes;
   revisit custom throttling only if a real-data rollout is approved.

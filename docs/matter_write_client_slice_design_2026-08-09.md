@@ -289,6 +289,8 @@ test/                          (see §5) + README counts
 - **Q1 (C-D7 scope):** include the matter-scoped **activity section** on
   the details screen in this slice, or ship the surfacing as-is (the org
   audit view already shows `matter:create` rows) and defer the section?
+  - *Status: **DEFERRED (Project Owner, 2026-08-09)** — no further action
+    this slice.*
 - **Q2 (assignee UX):** pre-filtered dropdowns from the roster seam
   (recommended) vs. free-form id entry (demo-only)?
 - **Q3 (orphan create):** allow orphan creates in the UI (F2-D5, honest
@@ -296,5 +298,7 @@ test/                          (see §5) + README counts
 - **Q4 (fake-read handoff):** should a fake-created matter appear on the
   matter list after refresh (fake write → read-fake shared list), the demo
   nicety?
+  - *Status: **DEFERRED (Project Owner, 2026-08-09)** — no further action
+    this slice.*
 - **Q5 (entry point):** FAB vs header action on the matters list; and the
   success destination — matter details (recommended) vs. list refresh?
