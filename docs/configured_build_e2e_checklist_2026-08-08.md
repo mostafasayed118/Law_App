@@ -12,6 +12,24 @@
 >
 > **Nothing here is a security control** — it verifies the client reads what
 > the RLS/RPC surface already proved server-side (INSTRUCTIONS.md §1.2).
+>
+> **Status (dated 2026-08-09): INTERACTIVE PASS DEFERRED — server-side
+> halves VERIFIED.** The owner-side device/UI pass (this checklist's §3
+> runbook + §5 sign-off) could not be executed from the working environment:
+> no emulator/device is attached (only Windows desktop + web targets; the
+> project has no web target), and the demo-account passwords are
+> owner-held by design (never recorded — `.env` is anon-key-only, verified
+> 2026-08-09: dev-project URL + `anon` role claim). Every server-side half
+> the pass would confirm is already evidenced live on the dev project by
+> `docs/final_demo_walkthrough_evidence_2026-08-09.md` (2026-08-09): the
+> partner's RLS-gated read surface (matters 5 / documents 3 / threads 3 /
+> messages 8 / files 3 / storage objects 3 / invoices 3 / orgs 2), the
+> audited `create_matter` + `send_message` RPC writes (verified in-txn,
+> rolled back with zero residue), the org-audit view showing the full F-01
+> chain, and the F-01 invariant (owner id in 0 assignment columns). All four
+> demo accounts confirmed present in GoTrue (ready to sign in the moment
+> credentials are supplied). The **interactive device pass + §5 sign-off
+> remain reserved for the owner** (device + credentials are owner-side).
 
 ## 0. Prerequisites (owner-side, git-ignored)
 
@@ -81,6 +99,14 @@ designed in every smoke). Org `ef43087b-adf4-4480-9bb2-28c26f46ec71`.
   checklist changes any policy/RPC/table.
 
 ## 5. Owner sign-off (dated)
+
+> **Status (2026-08-09): sign-off RESERVED for the owner.** The interactive
+> device pass was not executed from the working environment (no attached
+> device/emulator; demo credentials owner-held by design) — recorded as
+> deferred above. Server-side halves verified 2026-08-09
+> (`docs/final_demo_walkthrough_evidence_2026-08-09.md`). When the owner
+> completes §3 on a device (or supplies the demo partner password for an
+> environment-driven pass), complete this section with the dated signature.
 
 - [ ] Section 0 prerequisites in place (`.env` = URL + anon key only).
 - [ ] Partner pass (steps 1–4) matches the §1 table exactly.
