@@ -25,7 +25,7 @@
 |---|---|---|
 | **RPCs** | **19 → 20 EXECUTE** (anon false) | `create_matter(uuid, text, text, uuid, uuid)` added (audited, F2-D1/D2/D4; §8 by construction). Harness RPC-EXECUTE pin 19 → 20 (`docs/matter_write_apply_execution_2026-08-09.md` §2.1). |
 | **Trigger (not a policy)** | **new** — `refuse_platform_owner_assignment` `BEFORE INSERT OR UPDATE` on `matters`, EXECUTE-revoked | The categorical F-01 owner-assignment guard (`docs/matter_write_apply_execution_2026-08-09.md` §2.2). **Policies row unchanged** (11 public + 1 storage — the trigger is a data-layer mechanism, no RLS arm, no R-4 probe widening). |
-| **Demo matters** | 4 → **5** | The first §8-audited live matter write `d28f1f05-f95f-46ea-9b15-767f15778c01` (via the RPC as the demo partner; §2 below). **⚠ F-12:** the pre-existing matter `a6715e17-…` carries the platform-owner id as `assigned_client_id` (seeded 2026-08-07, pre-F-01) — contained (owner reads 0, no membership), owner-side remediation tracked (`docs/p4_findings_register_2026-08-09.md` F-12). |
+| **Demo matters** | 4 → **5** | The first §8-audited live matter write `d28f1f05-f95f-46ea-9b15-767f15778c01` (via the RPC as the demo partner; §2 below). **F-12 RESOLVED 2026-08-09:** the pre-existing matter `a6715e17-…` carried the platform-owner id as `assigned_client_id` (seeded 2026-08-07, pre-F-01) — re-assigned onto the demo client (`0c54d251-…`) with a machine audit row; **the owner id now appears in no assignment column** (`docs/f12_data_remediation_2026-08-09.md`). |
 | **Matter write path** | none → **audited RPC + categorical trigger** | `create_matter` is the ONLY matter-write surface (no INSERT/UPDATE grants to clients); every create §8-audited. |
 
 ## 2. Demo rows (org `ef43087b-adf4-4480-9bb2-28c26f46ec71`, generic only — no real PII)
@@ -89,9 +89,9 @@ deliberately denies them; recorded as designed, never a defect).
   11-policy / **20-RPC** surface above is battery-proven and smoke-proven via role-impersonated
   SQL, but no `.env` build has round-tripped it from the app (the 2026-08-09 addendum moved the
   RPC count 19 → 20).
-- **⚠ F-12 (2026-08-09):** the demo matter `a6715e17-…` carries the platform-owner id as
-  `assigned_client_id` (seeded 2026-08-07, pre-F-01) — contained (the owner reads 0, no
-  membership rows), owner-side remediation (re-assign to the demo-client account) tracked in
-  `docs/p4_findings_register_2026-08-09.md`.
+- **F-12 RESOLVED (2026-08-09):** the demo matter `a6715e17-…` had carried the platform-owner
+  id as `assigned_client_id` (seeded 2026-08-07, pre-F-01); re-assigned onto the demo-client
+  account with a machine audit row — **the owner id now appears in no assignment column**
+  (`docs/f12_data_remediation_2026-08-09.md`).
 - The demo **clients** have no membership rows — add them (a deliberate data action) if a
   client-side demo wants the assigned-client positives live.

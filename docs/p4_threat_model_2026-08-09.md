@@ -262,13 +262,17 @@ bounded capability, server-gated, audited, never audit-exempt.
     the §4.4/§4.6 owner-deny rows are now an **enforced guarantee** for all
     new writes (RPC refusal + categorical trigger), verified live (demo
     create `d28f1f05-…` + §8 audit row, owner-refusal + member-guard + anon
-    negatives, owner reads 0). **Caveat surfaced by the apply — see the
-    findings register F-12:** the dev demo matter `a6715e17-…` was seeded
-    (2026-08-07, pre-F-01) with the platform-owner id as its assigned
-    client; the state is **contained** (the owner holds no memberships, so
-    the `is_active_member` arm of `matters_select_assigned` blocks the
-    read — verified live) and an owner-side data remediation is tracked in
-    the register. The matrix §4 addendum + applied-surface addendum remain.
+    negatives, owner reads 0). **F-12 (surfaced by the apply, now
+    RESOLVED 2026-08-09):** the dev demo matter `a6715e17-…` had been
+    seeded (2026-08-07, pre-F-01) with the platform-owner id as its
+    assigned client; the state was **contained** (the owner holds no
+    memberships, so the `is_active_member` arm of `matters_select_assigned`
+    blocked the read — verified live) and was **remediated** the same day
+    (owner-directed re-assignment onto the demo-client account with a
+    machine audit row — `docs/f12_data_remediation_2026-08-09.md`): the
+    owner id now appears in **no** assignment column. The matrix §4
+    addendum + applied-surface addendum are in place; the env-gated client
+    swap remains.
 
 ---
 

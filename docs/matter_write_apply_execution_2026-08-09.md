@@ -208,9 +208,11 @@ stands by, unexercised.
 - **§8 matter-create audit live** — the F-01 step 2 guarantee is enforced
   on the shared dev project; the demo smoke row `d28f1f05-…` persists (the
   send-message demo-send precedent).
-- **⚠ Owner-side follow-up (§5 finding):** re-assign the acquisition demo
-  matter's client off the owner id (owner-approved data slice) to restore
-  the F-01 invariant in the dev demo data.
+- **⚠ Owner-side follow-up (§5 finding) — RESOLVED 2026-08-09:** the
+  acquisition demo matter's client was re-assigned off the owner id onto
+  the demo-client account with a machine audit row
+  (`docs/f12_data_remediation_2026-08-09.md`); the F-01 invariant now
+  holds in the dev demo data (owner id in 0 assignment columns).
 - **Remaining gate steps:** dated matrix §4 addendum (matter-write row) +
   applied-surface record addendum (RPC-EXECUTE 19 → 20, trigger) + the
   env-gated client swap (separate slice).

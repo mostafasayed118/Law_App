@@ -307,7 +307,7 @@
 
 ---
 
-### F-12 — Dev demo data violates the F-01 never-assigned invariant (surfaced by the F-01 step 2 apply; contained)
+### F-12 — Dev demo data violates the F-01 never-assigned invariant (surfaced by the F-01 step 2 apply; contained) — **RESOLVED 2026-08-09**
 
 - **Gap:** the dev project's `platform_config.owner_user_id` **is the
   account id historically seeded as the acquisition demo matter's
@@ -333,6 +333,15 @@
   account-hygiene history (the owner account was seeded as a demo
   "client" pre-F-01). F-01 step 2's trigger + RPC now guarantee no **NEW**
   owner assignment through any path (live-proven).
+- **Resolution (2026-08-09, owner-directed):** **APPLIED + VERIFIED** on
+  the dev project — `a6715e17-15a6-4456-96e3-78fc56630cfe`'s
+  `assigned_client_id` moved off the owner id onto the demo-client account
+  (`0c54d251-1cdd-4be6-9ce5-623a5987045f`) with a machine audit row
+  (`matter:assignee_remediation`, Q6 NULL actor); **the owner id now
+  appears in NO matter assignment column (0/5)** — the F-01 invariant
+  holds in the dev demo data. Evidence:
+  `docs/f12_data_remediation_2026-08-09.md`. The demo client still holds
+  no membership rows (reads 0 — the F-09 posture, unchanged).
 
 ---
 
@@ -364,6 +373,7 @@
 | `docs/matter_write_apply_approval_2026-08-09.md` | F-01 step 2 **dated apply-approval record — APPLY APPROVED + EXECUTED 2026-08-09** (§6 dated sign-off recorded in-session; §3 scope: create_matter + 11_matter_write + live demo smoke; §4 guardrails; §5 exclusions) |
 | `docs/matter_write_apply_execution_2026-08-09.md` | F-01 step 2 **apply execution evidence — APPLIED + VERIFIED 2026-08-09** on the dev project: baseline probe → create_matter → 11_matter_write → demo create `d28f1f05-…` (§8 audit row observed) → negatives + smoke green → **finding F-12 recorded** (pre-existing owner-assigned demo matter, contained, owner-side remediation) |
 | `docs/permission_matrix.md` §4 addendum + `docs/current_applied_surface_2026-08-08.md` addendum | **Dated addenda 2026-08-09** — the "Create a matter" row (partner gate, owner refusal, member guard, orphan creates, UPDATE re-assignment denial) + the applied-surface deltas (RPC-EXECUTE 19→20, trigger live, matters 4→5, F-12 noted) |
+| `docs/f12_data_remediation_2026-08-09.md` | **F-12 RESOLVED 2026-08-09** — owner-directed data remediation on the dev project (acquisition matter re-assigned off the owner id onto the demo client + machine audit row; invariant restored: owner id in 0 assignment columns) |
 
 Verification: `bash scripts/verify_policy_tests.sh --check` → PASS (see §4);
 `--selftest` re-run green on the committed baseline.
