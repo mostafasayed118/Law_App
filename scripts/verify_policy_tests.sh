@@ -70,7 +70,16 @@
 #      positives (client-a 2 / partner-a 3 / orphan 1) + org-role-alone /
 #      org-mismatch / cross-org / suspended / owner / anon denies + the
 #      amount_cents + status CHECKs (D-11 metadata-only mapping contract)
-#      + matter-delete cascade). Every matrix row has
+#      + matter-delete cascade),
+#      12_owner_assignment.sql (the F-01 owner-assignment invariant pin —
+#      docs/p4_findings_register_2026-08-09.md F-01 step 1: the fixture
+#      platform-owner id never appears in any matter assignment column or
+#      content-table uuid column, with non-vacuity preconditions),
+#      13_matter_write_rls.sql (the F-01 step 2 matter-write battery —
+#      docs/f01_step2_matter_write_design_2026-08-09.md: create_matter
+#      partner-gate + owner-assignment refusal + active-member assignee guard
+#      + §8 audit rows, the categorical trigger-layer refusal + narrowness,
+#      cross-org / anon / validation denials). Every matrix row has
 #      ≥1 positive + ≥1 negative check (contract §9).
 #
 # The harness NEVER runs against the live dev project — only against a
@@ -93,9 +102,9 @@
 #       SUPABASE_TEST_DB_URL.
 #   scripts/verify_policy_tests.sh --check
 #       Static validation WITHOUT a database (runs anywhere with bash + git):
-#       battery files present, every fixture UUID referenced by 01/02/03
-#       resolves in 00_fixtures.sql, every check block carries the FAIL
-#       marker, the harness self-syntax-checks.
+#       battery files present, every fixture UUID referenced by any battery
+#       file (01-13) resolves in 00_fixtures.sql, every check block carries
+#       the FAIL marker, the harness self-syntax-checks.
 #   scripts/verify_policy_tests.sh --selftest
 #       Drift-injection teeth check (no database, bash + git only): creates a
 #       scratch worktree, injects each known drift class (missing battery
@@ -146,6 +155,8 @@ BATTERY_FILES=(
   "09_realtime_push.sql"
   "10_send_message_rls.sql"
   "11_invoice_rls.sql"
+  "12_owner_assignment.sql"
+  "13_matter_write_rls.sql"
 )
 
 usage() {
@@ -196,10 +207,11 @@ static_check() {
   uuids_from=$(grep -hoE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' \
       "$TESTS_DIR/01_identity_session.sql" "$TESTS_DIR/02_organization_membership.sql" \
       "$TESTS_DIR/03_platform_owner_boundary.sql" "$TESTS_DIR/04_matter_rls.sql" \
-      "$TESTS_DIR/05_document_rls.sql"      "$TESTS_DIR/06_message_rls.sql"
-      "$TESTS_DIR/07_storage_rls.sql" "$TESTS_DIR/08_message_rls.sql"
-      "$TESTS_DIR/09_realtime_push.sql" "$TESTS_DIR/10_send_message_rls.sql"
-      "$TESTS_DIR/11_invoice_rls.sql" | sort -u)
+      "$TESTS_DIR/05_document_rls.sql"      "$TESTS_DIR/06_message_rls.sql" \
+      "$TESTS_DIR/07_storage_rls.sql" "$TESTS_DIR/08_message_rls.sql" \
+      "$TESTS_DIR/09_realtime_push.sql" "$TESTS_DIR/10_send_message_rls.sql" \
+      "$TESTS_DIR/11_invoice_rls.sql" "$TESTS_DIR/12_owner_assignment.sql" \
+      "$TESTS_DIR/13_matter_write_rls.sql" | sort -u)
   for ref in $uuids_from; do
     if grep -q "$ref" "$TESTS_DIR/00_fixtures.sql"; then
       ok "fixture UUID $ref resolves in 00_fixtures.sql"
@@ -210,7 +222,7 @@ static_check() {
 
   note "static check: every battery check block carries the FAIL marker"
   local file blocks
-  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql 11_invoice_rls.sql; do
+  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql 11_invoice_rls.sql 12_owner_assignment.sql 13_matter_write_rls.sql; do
     blocks=$(grep -c 'POLICY-BATTERY FAIL' "$TESTS_DIR/$f")
     if [ "$blocks" -ge 10 ]; then
       ok "$f: $blocks named check blocks"
@@ -261,6 +273,7 @@ apply_slice() {
   psql_apply "$SUPABASE_DIR/migrations/08_messages.sql" "apply migrations/08_messages.sql"
   psql_apply "$SUPABASE_DIR/migrations/09_realtime_push.sql" "apply migrations/09_realtime_push.sql"
   psql_apply "$SUPABASE_DIR/migrations/10_billing_invoices.sql" "apply migrations/10_billing_invoices.sql"
+  psql_apply "$SUPABASE_DIR/migrations/11_matter_write.sql" "apply migrations/11_matter_write.sql"
   # 03_platform_config_seed.sql is deliberately NOT applied: its owner token
   # is an apply-time substitution placeholder for the dev project; the
   # battery's fixtures seed the rehearsal project's own owner row (D-P0C3
@@ -380,6 +393,8 @@ structural_pins() {
     "$(run_sql "select has_function_privilege('authenticated','public.expire_stale_invitations()','EXECUTE');")" "f"
   expect_eq "handle_new_user denied to authenticated" \
     "$(run_sql "select has_function_privilege('authenticated','public.handle_new_user()','EXECUTE');")" "f"
+  expect_eq "refuse_platform_owner_assignment denied to authenticated (11_matter_write F2-D3)" \
+    "$(run_sql "select has_function_privilege('authenticated','public.refuse_platform_owner_assignment()','EXECUTE');")" "f"
 
   note "--- 1d. RPC EXECUTE grants (client surface intact) ---"
   local sig rpc_list=(
@@ -402,6 +417,7 @@ structural_pins() {
     "read_platform_audit()"
     "list_org_members_metadata(uuid)"
     "send_message(uuid, text)"
+    "create_matter(uuid, text, text, uuid, uuid)"
   )
   for sig in "${rpc_list[@]}"; do
     expect_tf "authenticated EXECUTE on public.$sig" \
@@ -504,7 +520,7 @@ run_battery() {
   expect_eq "exactly one platform_config row after fixtures" \
     "$(run_sql "select count(*) from public.platform_config;")" "1"
 
-  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql 11_invoice_rls.sql; do
+  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql 11_invoice_rls.sql 12_owner_assignment.sql 13_matter_write_rls.sql; do
     note "--- 2c. Battery file: $f ---"
     out=$(psql "$SUPABASE_TEST_DB_URL" -X -q -v ON_ERROR_STOP=1 -f "$TESTS_DIR/$f" 2>&1)
     rc=$?
@@ -571,7 +587,7 @@ selftest() {
   #    00_fixtures.sql (the static cross-ref scan must red)
   local fixture_uuid
   fixture_uuid=$(comm -12 \
-    <(grep -hoE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' "$wt"/supabase/tests/0[1-9]_*.sql "$wt"/supabase/tests/10_*.sql | sort -u) \
+    <(grep -hoE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' "$wt"/supabase/tests/0[1-9]_*.sql "$wt"/supabase/tests/1[0-9]_*.sql | sort -u) \
     <(grep -hoE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' "$wt/supabase/tests/00_fixtures.sql" | sort -u) \
     | head -1)
   if [ -z "$fixture_uuid" ]; then

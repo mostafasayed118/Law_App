@@ -374,12 +374,15 @@ values
 -- 90000000-0000-4000-8000-00000000fffe (its org-a message — the mismatch).
 -- Reserved throwaway ids used by 09_realtime_push.sql (deliberately NEVER
 -- seeded): 90000000-0000-4000-8000-00000000fff1 (the delivery-equivalence
--- temp message on thread 1) and ...fff2 (the body CHECK-violation insert).
+-- temp message on thread 1) and 90000000-0000-4000-8000-00000000fff2 (the
+-- body CHECK-violation insert).
 -- RE-SCOPED 2026-08-08 (send-message slice, D-SM3): the INSERT-policy group
--- (formerly ...fff3-...fff9) moved to the audited send_message RPC battery
+-- (formerly 90000000-0000-4000-8000-00000000fff3-...fff9) moved to the
+-- audited send_message RPC battery
 -- (10_send_message_rls.sql), which uses NO throwaway ids — its positive
 -- sends go through the RPC and return real generated uuids. The 09 D-SM3
--- revocation pin (09.15) reuses ...fff3 for the denied raw-insert attempt.
+-- revocation pin (09.15) reuses 90000000-0000-4000-8000-00000000fff3 for the
+-- denied raw-insert attempt.
 -- All rolled back or rejected inside the battery; never part of the seeded
 -- baseline.
 -- Listed here so the harness's static fixture cross-ref resolves them.

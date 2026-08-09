@@ -30,6 +30,7 @@ drop function if exists public.read_org_audit(uuid);
 drop function if exists public.read_platform_audit();
 drop function if exists public.list_org_members_metadata(uuid);
 drop function if exists public.send_message(uuid, text);
+drop function if exists public.create_matter(uuid, text, text, uuid, uuid);
 
 -- The revokes above run first so the drops below are the final privilege
 -- reset: functions are gone and no execute grant survives in any role.
