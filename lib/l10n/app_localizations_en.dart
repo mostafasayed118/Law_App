@@ -818,6 +818,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matterCreateAssigneeNone => 'None';
 
   @override
+  String get matterCreateNoOrg =>
+      'No active organization is selected. Choose an organization from the org hub, then return here to create a matter.';
+
+  @override
   String get matterCreateSubmit => 'Create matter';
 
   @override

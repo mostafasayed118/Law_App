@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/features/matters/data/fake_matter_write_gateway.dart';
-import 'package:legalhub/features/matters/domain/matter_write_gateway.dart';
-import 'package:legalhub/features/matters/presentation/matter_create_cubit.dart';
 import 'package:legalhub/features/matters/presentation/matter_create_screen.dart';
 import 'package:legalhub/features/orgs/presentation/active_org_store.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
@@ -14,9 +11,14 @@ void main() {
 
   Future<void> pumpCreate(WidgetTester tester) async {
     // The screen resolves MatterWriteGateway / ActiveOrgStore /
-    // OrganizationGateway from the locator (the dev fakes in env-less runs).
+    // OrganizationGateway from the locator (the dev fakes in env-less runs)
+    // and provides its OWN MatterCreateCubit (the MatterListScreen pattern)
+    // — pumping it bare pins that self-providing behavior (review R-1: the
+    // route must not need an external provider).
     configureDependencies();
-    // The create intent targets the ACTIVE org (D-08 routing hint).
+    // The create intent targets the ACTIVE org (D-08 routing hint). The
+    // screen seeds the store from the session, so selecting the demo org
+    // here mirrors a hub visit.
     serviceLocator<ActiveOrgStore>().select(
       FakeMatterWriteGateway.demoOrganizationId,
     );
@@ -28,11 +30,7 @@ void main() {
       MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: BlocProvider<MatterCreateCubit>(
-          create: (BuildContext context) =>
-              MatterCreateCubit(serviceLocator<MatterWriteGateway>()),
-          child: const MatterCreateScreen(),
-        ),
+        home: const MatterCreateScreen(),
       ),
     );
     await tester.pumpAndSettle();
@@ -68,6 +66,30 @@ void main() {
 
       expect(find.text('This field is required.'), findsOneWidget);
       expect(find.text('Matter created'), findsNothing);
+    });
+
+    testWidgets('shows the honest no-org state instead of a silent dead '
+        'form (review R-2)', (tester) async {
+      // No active org selected (no hub visit, no explicit selection): the
+      // surface must say so — not render a form whose submit silently
+      // no-ops.
+      configureDependencies();
+      tester.view.physicalSize = const Size(800, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const MatterCreateScreen(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('No active organization'), findsOneWidget);
+      expect(find.text('Title'), findsNothing);
+      expect(find.text('Create matter'), findsOneWidget); // AppBar only
     });
 
     testWidgets('offers the org\'s active members as assignees and refuses '

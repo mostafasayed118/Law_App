@@ -265,6 +265,7 @@
   "matterCreateAssignedClientLabel": "الموكّل المعيَّن (اختياري)",
   "matterCreateAssignedAttorneyLabel": "المحامي المعيَّن (اختياري)",
   "matterCreateAssigneeNone": "لا أحد",
+  "matterCreateNoOrg": "لم يتم تحديد مؤسسة نشطة. اختر مؤسسة من مركز المؤسسات ثم عُد إلى هنا لإنشاء قضية.",
   "matterCreateSubmit": "إنشاء القضية",
   "matterCreateSuccessTitle": "تم إنشاء القضية",
   "matterCreateSuccessBody": "تم إنشاء القضية {id}.",

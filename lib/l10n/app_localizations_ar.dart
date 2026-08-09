@@ -812,6 +812,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get matterCreateAssigneeNone => 'لا أحد';
 
   @override
+  String get matterCreateNoOrg =>
+      'لم يتم تحديد مؤسسة نشطة. اختر مؤسسة من مركز المؤسسات ثم عُد إلى هنا لإنشاء قضية.';
+
+  @override
   String get matterCreateSubmit => 'إنشاء القضية';
 
   @override

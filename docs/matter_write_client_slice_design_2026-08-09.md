@@ -1,7 +1,10 @@
 # LegalHub — Env-Gated Matter-Creation Client Slice: Design (2026-08-09)
 
-> **Status: BUILT 2026-08-09 (Gate 3 → build; analyze + suite green —
-> 1151 declared / 1154 executed; awaiting the mechanism review + commit).**
+> **Status: BUILT + REVIEW PASS 2026-08-09** (committed `93d5ed0`; the
+> mechanism review `docs/matter_write_client_slice_review_2026-08-09.md`
+> PASSED with R-1/R-2 remediated — the screen now self-provides its cubit
+> and shows a visible no-org state; analyze clean, full suite 1156,
+> ledger PASS; awaiting the D-45.1 configured-build verification).
 > This
 > is the last planned step of the F-01 step 2 chain: the **server** side is
 > live (the `create_matter` RPC + categorical trigger applied 2026-08-09,

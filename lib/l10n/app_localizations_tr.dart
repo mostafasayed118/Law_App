@@ -820,6 +820,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get matterCreateAssigneeNone => 'Yok';
 
   @override
+  String get matterCreateNoOrg =>
+      'Etkin bir kuruluş seçilmedi. Kuruluş merkezinden bir kuruluş seçin, ardından dava oluşturmak için buraya dönün.';
+
+  @override
   String get matterCreateSubmit => 'Dava oluştur';
 
   @override

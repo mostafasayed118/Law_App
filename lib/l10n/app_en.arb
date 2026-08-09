@@ -279,6 +279,7 @@
   "matterCreateAssignedClientLabel": "Assigned client (optional)",
   "matterCreateAssignedAttorneyLabel": "Assigned attorney (optional)",
   "matterCreateAssigneeNone": "None",
+  "matterCreateNoOrg": "No active organization is selected. Choose an organization from the org hub, then return here to create a matter.",
   "matterCreateSubmit": "Create matter",
   "matterCreateSuccessTitle": "Matter created",
   "matterCreateSuccessBody": "Matter {id} was created.",

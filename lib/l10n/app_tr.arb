@@ -265,6 +265,7 @@
   "matterCreateAssignedClientLabel": "Atanan müvekkil (isteğe bağlı)",
   "matterCreateAssignedAttorneyLabel": "Atanan avukat (isteğe bağlı)",
   "matterCreateAssigneeNone": "Yok",
+  "matterCreateNoOrg": "Etkin bir kuruluş seçilmedi. Kuruluş merkezinden bir kuruluş seçin, ardından dava oluşturmak için buraya dönün.",
   "matterCreateSubmit": "Dava oluştur",
   "matterCreateSuccessTitle": "Dava oluşturuldu",
   "matterCreateSuccessBody": "{id} numaralı dava oluşturuldu.",

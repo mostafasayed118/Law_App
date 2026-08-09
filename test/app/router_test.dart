@@ -17,7 +17,9 @@ import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/local/in_memory_locale_store.dart';
 import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
+import 'package:legalhub/features/matters/data/fake_matter_write_gateway.dart';
 import 'package:legalhub/features/matters/presentation/matter_link_chip.dart';
+import 'package:legalhub/features/orgs/presentation/active_org_store.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
 void main() {
@@ -458,6 +460,33 @@ void main() {
 
       expect(find.text('Welcome Back'), findsOneWidget);
       expect(authCubit.state.isAuthenticated, isFalse);
+    });
+
+    testWidgets('renders the create-matter surface through the real router '
+        '(F-01 client swap review R-1)', (tester) async {
+      // The /matters/new route must render WITHOUT an external cubit
+      // provider (the screen provides its own — review R-1 pin: before the
+      // fix, the route crashed with ProviderNotFoundException).
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      // The active org is a hub-seeded UX convenience (D-08); the create
+      // surface needs it as the routing hint, so the test selects the demo
+      // org the way a hub visit would.
+      serviceLocator<ActiveOrgStore>().select(
+        FakeMatterWriteGateway.demoOrganizationId,
+      );
+      router.go(AppRoutes.matterCreate);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // The form rendered (title label + the assignee dropdowns' "None"
+      // default) — not a crash (the R-1 ProviderNotFoundException pin) and
+      // not the no-org dead end.
+      expect(find.text('Title'), findsOneWidget);
+      expect(find.text('None'), findsNWidgets(2));
     });
   });
 

@@ -1606,6 +1606,12 @@ abstract class AppLocalizations {
   /// **'None'**
   String get matterCreateAssigneeNone;
 
+  /// No description provided for @matterCreateNoOrg.
+  ///
+  /// In en, this message translates to:
+  /// **'No active organization is selected. Choose an organization from the org hub, then return here to create a matter.'**
+  String get matterCreateNoOrg;
+
   /// No description provided for @matterCreateSubmit.
   ///
   /// In en, this message translates to:
