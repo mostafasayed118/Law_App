@@ -60,14 +60,10 @@ void main() {
       );
     });
 
-    testWidgets('empty state renders the localized empty copy', (
-      tester,
-    ) async {
-      await _registerStub(
-        <Result<List<ComplianceAlert>>>[
-          Result<List<ComplianceAlert>>.success(const <ComplianceAlert>[]),
-        ],
-      );
+    testWidgets('empty state renders the localized empty copy', (tester) async {
+      await _registerStub(<Result<List<ComplianceAlert>>>[
+        Result<List<ComplianceAlert>>.success(const <ComplianceAlert>[]),
+      ]);
       await pumpAlerts(tester);
 
       expect(find.text('No compliance alerts are available.'), findsOneWidget);
@@ -88,8 +84,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Unable to load compliance alerts.'), findsNothing);
-      expect(find.text(FakeComplianceGateway.syntheticAlerts.first.title),
-          findsOneWidget);
+      expect(
+        find.text(FakeComplianceGateway.syntheticAlerts.first.title),
+        findsOneWidget,
+      );
     });
   });
 }

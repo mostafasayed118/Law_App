@@ -156,7 +156,10 @@ class _ApprovalTile extends StatelessWidget {
         Icons.check_circle_outline,
         l10n.approvalStatusApproved,
       ),
-      ApprovalStatus.denied => (Icons.cancel_outlined, l10n.approvalStatusDenied),
+      ApprovalStatus.denied => (
+        Icons.cancel_outlined,
+        l10n.approvalStatusDenied,
+      ),
     };
     final String date = DateFormat.yMMMd(
       l10n.localeName,

@@ -24,9 +24,8 @@ class ComplianceAlertsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context).alertsTitle)),
       body: BlocProvider<ComplianceAlertsCubit>(
-        create: (BuildContext context) => ComplianceAlertsCubit(
-          serviceLocator<ComplianceAlertsGateway>(),
-        ),
+        create: (BuildContext context) =>
+            ComplianceAlertsCubit(serviceLocator<ComplianceAlertsGateway>()),
         child: const _AlertsSurface(),
       ),
     );

@@ -58,7 +58,9 @@ class _TaskSurfaceState extends State<_TaskSurface> {
       child: BlocBuilder<TaskBoardCubit, TaskBoardState>(
         builder: (BuildContext context, TaskBoardState state) {
           final Widget empty = Padding(
-            padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
+            padding: const EdgeInsetsDirectional.only(
+              top: LegalHubTheme.spaceMd,
+            ),
             child: Text(
               l10n.tasksEmpty,
               style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
@@ -139,10 +141,7 @@ class _TaskTile extends StatelessWidget {
     final TextTheme text = Theme.of(context).textTheme;
     final (IconData, String) status = switch (task.status) {
       TaskStatus.todo => (Icons.radio_button_unchecked, l10n.taskStatusTodo),
-      TaskStatus.inProgress => (
-        Icons.hourglass_top,
-        l10n.taskStatusInProgress,
-      ),
+      TaskStatus.inProgress => (Icons.hourglass_top, l10n.taskStatusInProgress),
       TaskStatus.blocked => (Icons.block, l10n.taskStatusBlocked),
       TaskStatus.done => (Icons.check_circle_outline, l10n.taskStatusDone),
     };

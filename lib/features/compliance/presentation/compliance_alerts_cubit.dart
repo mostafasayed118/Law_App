@@ -13,8 +13,7 @@ import 'compliance_alerts_state.dart';
 /// vault/messages pattern); loading/empty/error+retry via the shared
 /// [ViewState] vocabulary.
 class ComplianceAlertsCubit extends Cubit<ComplianceAlertsState> {
-  ComplianceAlertsCubit(this._gateway)
-      : super(const ComplianceAlertsState());
+  ComplianceAlertsCubit(this._gateway) : super(const ComplianceAlertsState());
 
   final ComplianceAlertsGateway _gateway;
 
@@ -26,11 +25,7 @@ class ComplianceAlertsCubit extends Cubit<ComplianceAlertsState> {
     }
     _loading = true;
     if (state.alerts is! ViewLoading<List<ComplianceAlert>>) {
-      emit(
-        state.copyWith(
-          alerts: const ViewLoading<List<ComplianceAlert>>(),
-        ),
-      );
+      emit(state.copyWith(alerts: const ViewLoading<List<ComplianceAlert>>()));
     }
     final Result<List<ComplianceAlert>> result = await _gateway.fetchAlerts();
     _loading = false;
@@ -49,9 +44,7 @@ class ComplianceAlertsCubit extends Cubit<ComplianceAlertsState> {
           ),
         );
       case Failure<List<ComplianceAlert>>(error: final AppError error):
-        emit(
-          state.copyWith(alerts: ViewError<List<ComplianceAlert>>(error)),
-        );
+        emit(state.copyWith(alerts: ViewError<List<ComplianceAlert>>(error)));
     }
   }
 }

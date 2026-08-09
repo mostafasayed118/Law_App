@@ -29,8 +29,8 @@ class ApprovalsCubit extends Cubit<ApprovalsState> {
         state.copyWith(approvals: const ViewLoading<List<PendingApproval>>()),
       );
     }
-    final Result<List<PendingApproval>> result =
-        await _gateway.fetchApprovals();
+    final Result<List<PendingApproval>> result = await _gateway
+        .fetchApprovals();
     _loading = false;
     if (isClosed) {
       return;

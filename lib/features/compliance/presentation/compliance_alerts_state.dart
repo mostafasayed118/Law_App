@@ -11,9 +11,7 @@ class ComplianceAlertsState extends Equatable {
 
   final ViewState<List<ComplianceAlert>> alerts;
 
-  ComplianceAlertsState copyWith({
-    ViewState<List<ComplianceAlert>>? alerts,
-  }) {
+  ComplianceAlertsState copyWith({ViewState<List<ComplianceAlert>>? alerts}) {
     return ComplianceAlertsState(alerts: alerts ?? this.alerts);
   }
 
