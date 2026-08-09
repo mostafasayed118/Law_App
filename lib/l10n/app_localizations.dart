@@ -1558,6 +1558,120 @@ abstract class AppLocalizations {
   /// **'Created'**
   String get matterDetailsCreated;
 
+  /// No description provided for @matterCreateFab.
+  ///
+  /// In en, this message translates to:
+  /// **'New matter'**
+  String get matterCreateFab;
+
+  /// No description provided for @matterCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create matter'**
+  String get matterCreateTitle;
+
+  /// No description provided for @matterCreateTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get matterCreateTitleLabel;
+
+  /// No description provided for @matterCreateTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Generic demo wording — never a real client or case name'**
+  String get matterCreateTitleHint;
+
+  /// No description provided for @matterCreatePracticeAreaLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice area'**
+  String get matterCreatePracticeAreaLabel;
+
+  /// No description provided for @matterCreateAssignedClientLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Assigned client (optional)'**
+  String get matterCreateAssignedClientLabel;
+
+  /// No description provided for @matterCreateAssignedAttorneyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Assigned attorney (optional)'**
+  String get matterCreateAssignedAttorneyLabel;
+
+  /// No description provided for @matterCreateAssigneeNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get matterCreateAssigneeNone;
+
+  /// No description provided for @matterCreateSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Create matter'**
+  String get matterCreateSubmit;
+
+  /// No description provided for @matterCreateSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Matter created'**
+  String get matterCreateSuccessTitle;
+
+  /// No description provided for @matterCreateSuccessBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Matter {id} was created.'**
+  String matterCreateSuccessBody(String id);
+
+  /// No description provided for @matterCreateSuccessNote.
+  ///
+  /// In en, this message translates to:
+  /// **'It appears on your matters list only when your access allows reading it.'**
+  String get matterCreateSuccessNote;
+
+  /// No description provided for @matterCreateDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get matterCreateDone;
+
+  /// No description provided for @matterCreateErrorDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to create matters in this organization.'**
+  String get matterCreateErrorDenied;
+
+  /// No description provided for @matterCreateErrorOwnerForbidden.
+  ///
+  /// In en, this message translates to:
+  /// **'The platform owner cannot be assigned to a matter.'**
+  String get matterCreateErrorOwnerForbidden;
+
+  /// No description provided for @matterCreateErrorAssigneeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'The assigned member is not an active member of this organization.'**
+  String get matterCreateErrorAssigneeInvalid;
+
+  /// No description provided for @matterCreateErrorValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'A matter title is required.'**
+  String get matterCreateErrorValidation;
+
+  /// No description provided for @matterCreateErrorUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Matter creation is temporarily unavailable. Please try again.'**
+  String get matterCreateErrorUnavailable;
+
+  /// No description provided for @matterCreateErrorFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to create the matter. Please try again.'**
+  String get matterCreateErrorFailed;
+
   /// No description provided for @vaultTitle.
   ///
   /// In en, this message translates to:

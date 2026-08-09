@@ -20,6 +20,7 @@ import '../features/discovery/presentation/attorney_search_screen.dart';
 import '../features/documents/presentation/document_list_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/home/presentation/settings_screen.dart';
+import '../features/matters/presentation/matter_create_screen.dart';
 import '../features/matters/presentation/matter_details_screen.dart';
 import '../features/matters/presentation/matter_list_screen.dart';
 import '../features/messaging/presentation/message_list_screen.dart';
@@ -57,6 +58,7 @@ class AppRoutes {
   static const String discovery = '/discovery';
   static const String discoveryProfile = '/discovery/:attorneyId';
   static const String matters = '/matters';
+  static const String matterCreate = '/matters/new';
   static const String matterDetails = '/matters/:matterId';
   static const String vault = '/vault';
   static const String messages = '/messages';
@@ -166,8 +168,20 @@ GoRouter createAppRouter(
         ),
         GoRoute(
           path: AppRoutes.matters,
+          builder: (BuildContext context, GoRouterState state) {
+            // F-01 step 2 client swap: the create entry is a UX-only partner
+            // gate (the shell's capability pattern); the `create_matter` RPC
+            // re-asserts F2-D1 server-side, so a non-partner caller reaching
+            // the create screen gets the typed denial, never empty success.
+            final UserRole role =
+                authCubit.state.session?.primaryRole ?? UserRole.client;
+            return MatterListScreen(canCreateMatter: role == UserRole.partner);
+          },
+        ),
+        GoRoute(
+          path: AppRoutes.matterCreate,
           builder: (BuildContext context, GoRouterState state) =>
-              const MatterListScreen(),
+              const MatterCreateScreen(),
         ),
         GoRoute(
           path: AppRoutes.matterDetails,

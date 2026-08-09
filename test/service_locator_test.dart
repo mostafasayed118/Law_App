@@ -28,6 +28,8 @@ import 'package:legalhub/data/local/locale_store.dart';
 import 'package:legalhub/data/local/org_selection_store.dart';
 import 'package:legalhub/data/matters/supabase_matter_api.dart';
 import 'package:legalhub/data/matters/supabase_matter_gateway.dart';
+import 'package:legalhub/data/matters/supabase_matter_write_api.dart';
+import 'package:legalhub/data/matters/supabase_matter_write_gateway.dart';
 import 'package:legalhub/data/messaging/supabase_message_api.dart';
 import 'package:legalhub/data/messaging/supabase_message_gateway.dart';
 import 'package:legalhub/data/messaging/supabase_message_realtime_api.dart';
@@ -54,7 +56,9 @@ import 'package:legalhub/features/discovery/domain/attorney_gateway.dart';
 import 'package:legalhub/features/documents/data/fake_document_gateway.dart';
 import 'package:legalhub/features/documents/domain/document_gateway.dart';
 import 'package:legalhub/features/matters/data/fake_matter_gateway.dart';
+import 'package:legalhub/features/matters/data/fake_matter_write_gateway.dart';
 import 'package:legalhub/features/matters/domain/matter_gateway.dart';
+import 'package:legalhub/features/matters/domain/matter_write_gateway.dart';
 import 'package:legalhub/features/messaging/data/fake_message_gateway.dart';
 import 'package:legalhub/features/messaging/domain/message_gateway.dart';
 import 'package:legalhub/features/orgs/presentation/active_org_store.dart';
@@ -221,6 +225,19 @@ class _FakeSupabaseMatterApi implements SupabaseMatterApi {
       <Map<String, dynamic>>[];
 }
 
+/// Hand-rolled fake of the [SupabaseMatterWriteApi] seam for the DI flip
+/// test (same discipline as [_FakeSupabaseMatterApi]).
+class _FakeSupabaseMatterWriteApi implements SupabaseMatterWriteApi {
+  @override
+  Future<String> createMatter({
+    required String organizationId,
+    required String title,
+    required String practiceArea,
+    String? assignedClientId,
+    String? assignedAttorneyId,
+  }) async => 'created-matter-1';
+}
+
 /// Hand-rolled fake of the [SupabaseDocumentApi] seam for the DI flip test
 /// (same discipline as [_FakeSupabaseMatterApi]).
 class _FakeSupabaseDocumentApi implements SupabaseDocumentApi {
@@ -349,6 +366,7 @@ void main() {
       expect(serviceLocator.isRegistered<AttorneyGateway>(), isTrue);
       expect(serviceLocator.isRegistered<ActiveOrgStore>(), isTrue);
       expect(serviceLocator.isRegistered<MatterGateway>(), isTrue);
+      expect(serviceLocator.isRegistered<MatterWriteGateway>(), isTrue);
       expect(serviceLocator.isRegistered<DocumentGateway>(), isTrue);
       expect(serviceLocator.isRegistered<MessageGateway>(), isTrue);
       expect(serviceLocator.isRegistered<StorageGateway>(), isTrue);
@@ -480,6 +498,35 @@ void main() {
       );
 
       expect(serviceLocator<MatterGateway>(), isA<SupabaseMatterGateway>());
+    });
+
+    test('wires the matter-write gateway to the fake dev implementation', () {
+      configureDependencies();
+
+      // C-D3/C-D5: same boundary discipline as the matter read gateway — the
+      // dev fake is the registered seam in env-less runs; the env-gated real
+      // swap only takes over in configured builds.
+      expect(
+        serviceLocator<MatterWriteGateway>(),
+        isA<FakeMatterWriteGateway>(),
+      );
+    });
+
+    test('flips MatterWriteGateway when env carries an anon key (F-01)', () {
+      configureDependencies(
+        supabaseEnv: SupabaseEnv(
+          url: 'https://example.supabase.co',
+          anonKey: _anonJwt(),
+        ),
+        // The real bind() needs a running Supabase.instance; tests inject
+        // the seam instead (the flip's test seam, not production code).
+        supabaseMatterWriteApiFactory: _FakeSupabaseMatterWriteApi.new,
+      );
+
+      expect(
+        serviceLocator<MatterWriteGateway>(),
+        isA<SupabaseMatterWriteGateway>(),
+      );
     });
 
     test('wires the document gateway to the fake dev implementation', () {

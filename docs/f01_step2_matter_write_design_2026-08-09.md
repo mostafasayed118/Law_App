@@ -312,9 +312,11 @@ touched only if its battery description needs the count.
    — **pending owner signature**; on signature, the execution record follows.
 7. **Matrix §4 addendum** (dated, per §7 discipline) — extends, never
    silently widens.
-8. **Env-gated client swap** (future UI slice — separate approval; the
-   `OrganizationGateway`/fake gains `createMatter`, the screen ships behind
-   `env.isConfigured`).
+8. **Env-gated client swap** (separate approval; the `MatterWriteGateway`
+   seam/fake gains `createMatter`, the screen ships behind
+   `env.isConfigured`). ✅ **DESIGNED 2026-08-09** —
+   `docs/matter_write_client_slice_design_2026-08-09.md` (Gate 3, pending
+   owner approval; decisions C-D1…C-D8, open questions Q1–Q5).
 
 ## 9. Open questions (owner)
 

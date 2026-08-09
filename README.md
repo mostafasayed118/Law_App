@@ -57,7 +57,7 @@ messaging services.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (1126 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (1151 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), Redactor (password/OTP/email/Bearer redaction
   with leak guards), DI registration graph, validators, router redirect logic
@@ -92,7 +92,15 @@ messaging services.
   in-memory locale store, and the onboarding-success screen. Batch 5 added
   the 800×600 onboarding no-overflow test and the EN/AR/TR localized-fallback
   assertions.
-- Coverage: **1126 tests** (2026-08-09, v1 queue demo surfaces — read-only
+- Coverage: **1151 tests** (2026-08-09, F-01 step 2 client
+  swap — the env-gated matter-creation surface: the `MatterWriteGateway`
+  seam + `FakeMatterWriteGateway` (F2-D2 owner refusal / F2-D4 member guard /
+  validation mirrors) + the `create_matter` RPC caller (exact `p_*` param
+  pin, the C-D2 failure-kind mapping) + the sealed create cubit + the
+  `/matters/new` form flow (partner-gated list FAB, roster-filtered assignee
+  dropdowns, honest success copy) + the DI flip pins + EN/AR/TR keys;
+  `docs/matter_write_client_slice_design_2026-08-09.md`), building
+  on 1126 (2026-08-09, v1 queue demo surfaces — read-only
   `compliance_alerts` (`/alerts`), `collaboration task board` (`/tasks`),
   `pending_approvals` (`/approvals`): three fake-domain features with
   text/icon status lines, per-feature widget suites incl. empty/error/retry,

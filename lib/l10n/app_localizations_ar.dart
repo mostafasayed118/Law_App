@@ -787,6 +787,71 @@ class AppLocalizationsAr extends AppLocalizations {
   String get matterDetailsCreated => 'تاريخ الإنشاء';
 
   @override
+  String get matterCreateFab => 'قضية جديدة';
+
+  @override
+  String get matterCreateTitle => 'إنشاء قضية';
+
+  @override
+  String get matterCreateTitleLabel => 'العنوان';
+
+  @override
+  String get matterCreateTitleHint =>
+      'صياغة تجريبية عامة — ليست اسم موكّل أو قضية حقيقيًا';
+
+  @override
+  String get matterCreatePracticeAreaLabel => 'مجال الممارسة';
+
+  @override
+  String get matterCreateAssignedClientLabel => 'الموكّل المعيَّن (اختياري)';
+
+  @override
+  String get matterCreateAssignedAttorneyLabel => 'المحامي المعيَّن (اختياري)';
+
+  @override
+  String get matterCreateAssigneeNone => 'لا أحد';
+
+  @override
+  String get matterCreateSubmit => 'إنشاء القضية';
+
+  @override
+  String get matterCreateSuccessTitle => 'تم إنشاء القضية';
+
+  @override
+  String matterCreateSuccessBody(String id) {
+    return 'تم إنشاء القضية $id.';
+  }
+
+  @override
+  String get matterCreateSuccessNote =>
+      'تظهر في قائمتك فقط عندما يسمح وصولك بقراءتها.';
+
+  @override
+  String get matterCreateDone => 'تم';
+
+  @override
+  String get matterCreateErrorDenied =>
+      'ليست لديك صلاحية إنشاء قضايا في هذه المؤسسة.';
+
+  @override
+  String get matterCreateErrorOwnerForbidden =>
+      'لا يمكن إسناد مالك المنصة إلى قضية.';
+
+  @override
+  String get matterCreateErrorAssigneeInvalid =>
+      'العضو المعيَّن ليس عضوًا نشطًا في هذه المؤسسة.';
+
+  @override
+  String get matterCreateErrorValidation => 'عنوان القضية مطلوب.';
+
+  @override
+  String get matterCreateErrorUnavailable =>
+      'إنشاء القضية غير متاح مؤقتًا. حاول مرة أخرى.';
+
+  @override
+  String get matterCreateErrorFailed => 'تعذّر إنشاء القضية. حاول مرة أخرى.';
+
+  @override
   String get vaultTitle => 'المستندات';
 
   @override

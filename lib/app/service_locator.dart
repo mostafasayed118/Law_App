@@ -31,6 +31,9 @@ import '../data/local/shared_preferences_org_selection_store.dart';
 import '../data/matters/supabase_matter_api.dart';
 import '../data/matters/supabase_matter_api_impl.dart';
 import '../data/matters/supabase_matter_gateway.dart';
+import '../data/matters/supabase_matter_write_api.dart';
+import '../data/matters/supabase_matter_write_api_impl.dart';
+import '../data/matters/supabase_matter_write_gateway.dart';
 import '../data/messaging/supabase_message_api.dart';
 import '../data/messaging/supabase_message_api_impl.dart';
 import '../data/messaging/supabase_message_gateway.dart';
@@ -66,7 +69,9 @@ import '../features/discovery/domain/attorney_gateway.dart';
 import '../features/documents/data/fake_document_gateway.dart';
 import '../features/documents/domain/document_gateway.dart';
 import '../features/matters/data/fake_matter_gateway.dart';
+import '../features/matters/data/fake_matter_write_gateway.dart';
 import '../features/matters/domain/matter_gateway.dart';
+import '../features/matters/domain/matter_write_gateway.dart';
 import '../features/messaging/data/fake_message_gateway.dart';
 import '../features/messaging/domain/message_gateway.dart';
 import '../features/notifications/data/in_memory_notification_prefs_store.dart';
@@ -105,6 +110,7 @@ void configureDependencies({
   SupabaseOrgApi Function()? supabaseOrgApiFactory,
   SupabasePlatformAdminApi Function()? supabasePlatformAdminApiFactory,
   SupabaseMatterApi Function()? supabaseMatterApiFactory,
+  SupabaseMatterWriteApi Function()? supabaseMatterWriteApiFactory,
   SupabaseDocumentApi Function()? supabaseDocumentApiFactory,
   SupabaseMessageApi Function()? supabaseMessageApiFactory,
   SupabaseMessageRealtimeApi Function()? supabaseMessageRealtimeApiFactory,
@@ -341,6 +347,27 @@ void configureDependencies({
       );
     }
   }
+  if (!serviceLocator.isRegistered<MatterWriteGateway>()) {
+    // Stateless service: lazy singleton. The create cubit is feature-scoped
+    // and created per screen via BlocProvider, so it is NOT registered here.
+    // F-01 step 2 client swap (C-D5): like MatterGateway, the flip swaps the
+    // dev fake for the Supabase-backed implementation when the build is
+    // configured (Batch 3.3 env pattern). The real path calls the applied
+    // `create_matter` RPC (RPC-EXECUTE 20) — the server re-derives the
+    // partner/owner/member gates in-function (F2-D1/D2/D4, F-11); env-less
+    // runs and ALL tests keep the fake (C-D3).
+    if (env.isConfigured) {
+      serviceLocator.registerLazySingleton<MatterWriteGateway>(
+        () => SupabaseMatterWriteGateway(
+          (supabaseMatterWriteApiFactory ?? SupabaseMatterWriteApiImpl.bind)(),
+        ),
+      );
+    } else {
+      serviceLocator.registerLazySingleton<MatterWriteGateway>(
+        FakeMatterWriteGateway.new,
+      );
+    }
+  }
   if (!serviceLocator.isRegistered<DocumentGateway>()) {
     // Stateless service: lazy singleton. The vault Cubit is feature-scoped
     // and created per screen via BlocProvider, so it is NOT registered here.
@@ -431,7 +458,7 @@ void configureDependencies({
       );
     }
   }
-if (!serviceLocator.isRegistered<AuthCubit>()) {
+  if (!serviceLocator.isRegistered<AuthCubit>()) {
     // App-scoped because the router and all screens observe one session seam.
     serviceLocator.registerLazySingleton<AuthCubit>(
       () => AuthCubit(
@@ -451,11 +478,9 @@ if (!serviceLocator.isRegistered<AuthCubit>()) {
     );
   }
   if (!serviceLocator.isRegistered<TaskBoardGateway>()) {
-    serviceLocator.registerLazySingleton<TaskBoardGateway>(
-      FakeTaskGateway.new,
-    );
+    serviceLocator.registerLazySingleton<TaskBoardGateway>(FakeTaskGateway.new);
   }
-if (!serviceLocator.isRegistered<ApprovalsGateway>()) {
+  if (!serviceLocator.isRegistered<ApprovalsGateway>()) {
     serviceLocator.registerLazySingleton<ApprovalsGateway>(
       FakeApprovalsGateway.new,
     );

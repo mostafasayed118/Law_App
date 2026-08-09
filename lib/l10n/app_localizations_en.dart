@@ -792,6 +792,73 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matterDetailsCreated => 'Created';
 
   @override
+  String get matterCreateFab => 'New matter';
+
+  @override
+  String get matterCreateTitle => 'Create matter';
+
+  @override
+  String get matterCreateTitleLabel => 'Title';
+
+  @override
+  String get matterCreateTitleHint =>
+      'Generic demo wording — never a real client or case name';
+
+  @override
+  String get matterCreatePracticeAreaLabel => 'Practice area';
+
+  @override
+  String get matterCreateAssignedClientLabel => 'Assigned client (optional)';
+
+  @override
+  String get matterCreateAssignedAttorneyLabel =>
+      'Assigned attorney (optional)';
+
+  @override
+  String get matterCreateAssigneeNone => 'None';
+
+  @override
+  String get matterCreateSubmit => 'Create matter';
+
+  @override
+  String get matterCreateSuccessTitle => 'Matter created';
+
+  @override
+  String matterCreateSuccessBody(String id) {
+    return 'Matter $id was created.';
+  }
+
+  @override
+  String get matterCreateSuccessNote =>
+      'It appears on your matters list only when your access allows reading it.';
+
+  @override
+  String get matterCreateDone => 'Done';
+
+  @override
+  String get matterCreateErrorDenied =>
+      'You do not have permission to create matters in this organization.';
+
+  @override
+  String get matterCreateErrorOwnerForbidden =>
+      'The platform owner cannot be assigned to a matter.';
+
+  @override
+  String get matterCreateErrorAssigneeInvalid =>
+      'The assigned member is not an active member of this organization.';
+
+  @override
+  String get matterCreateErrorValidation => 'A matter title is required.';
+
+  @override
+  String get matterCreateErrorUnavailable =>
+      'Matter creation is temporarily unavailable. Please try again.';
+
+  @override
+  String get matterCreateErrorFailed =>
+      'Unable to create the matter. Please try again.';
+
+  @override
   String get vaultTitle => 'Documents';
 
   @override

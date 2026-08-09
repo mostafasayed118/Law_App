@@ -84,6 +84,38 @@ void main() {
       // The synthetic list must never read as real cases.
       expect(find.textContaining('synthetic matters only'), findsOneWidget);
     });
+
+    testWidgets('hides the create entry by default (UX-only partner gate)', (
+      tester,
+    ) async {
+      await pumpList(tester);
+
+      // F-01 step 2 client swap: the FAB is offered only when the router
+      // resolves the active role to partner; the default (tests, and any
+      // caller the router does not gate) is hidden.
+      expect(find.byType(FloatingActionButton), findsNothing);
+    });
+
+    testWidgets('shows the create entry when the router gates it to partner', (
+      tester,
+    ) async {
+      configureDependencies();
+      tester.view.physicalSize = const Size(800, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const MatterListScreen(canCreateMatter: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(FloatingActionButton), findsOneWidget);
+      expect(find.text('New matter'), findsOneWidget);
+    });
   });
 }
 

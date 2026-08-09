@@ -793,6 +793,74 @@ class AppLocalizationsTr extends AppLocalizations {
   String get matterDetailsCreated => 'Oluşturulma';
 
   @override
+  String get matterCreateFab => 'Yeni dava';
+
+  @override
+  String get matterCreateTitle => 'Dava oluştur';
+
+  @override
+  String get matterCreateTitleLabel => 'Başlık';
+
+  @override
+  String get matterCreateTitleHint =>
+      'Genel demo ifadesi — gerçek bir müvekkil veya dava adı değil';
+
+  @override
+  String get matterCreatePracticeAreaLabel => 'Çalışma alanı';
+
+  @override
+  String get matterCreateAssignedClientLabel =>
+      'Atanan müvekkil (isteğe bağlı)';
+
+  @override
+  String get matterCreateAssignedAttorneyLabel =>
+      'Atanan avukat (isteğe bağlı)';
+
+  @override
+  String get matterCreateAssigneeNone => 'Yok';
+
+  @override
+  String get matterCreateSubmit => 'Dava oluştur';
+
+  @override
+  String get matterCreateSuccessTitle => 'Dava oluşturuldu';
+
+  @override
+  String matterCreateSuccessBody(String id) {
+    return '$id numaralı dava oluşturuldu.';
+  }
+
+  @override
+  String get matterCreateSuccessNote =>
+      'Yalnızca erişiminiz okumaya izin verdiğinde dava listenizde görünür.';
+
+  @override
+  String get matterCreateDone => 'Tamam';
+
+  @override
+  String get matterCreateErrorDenied =>
+      'Bu kuruluşta dava oluşturma izniniz yok.';
+
+  @override
+  String get matterCreateErrorOwnerForbidden =>
+      'Platform sahibi bir davaya atanamaz.';
+
+  @override
+  String get matterCreateErrorAssigneeInvalid =>
+      'Atanan üye bu kuruluşun aktif bir üyesi değil.';
+
+  @override
+  String get matterCreateErrorValidation => 'Dava başlığı gereklidir.';
+
+  @override
+  String get matterCreateErrorUnavailable =>
+      'Dava oluşturma geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get matterCreateErrorFailed =>
+      'Dava oluşturulamadı. Lütfen tekrar deneyin.';
+
+  @override
   String get vaultTitle => 'Belgeler';
 
   @override

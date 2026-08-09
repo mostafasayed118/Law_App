@@ -24,20 +24,28 @@ import 'matter_status_chip.dart';
 /// read as real cases (R1/D-M4). Tapping a row (slice 7.2) navigates to the
 /// read-only details surface (`/matters/:id`, AC-3).
 class MatterListScreen extends StatelessWidget {
-  const MatterListScreen({super.key});
+  const MatterListScreen({super.key, this.canCreateMatter = false});
+
+  /// F-01 step 2 client swap (C-D6/Q5): whether the create-matter entry is
+  /// offered. A UX-only partner gate resolved by the router (the shell's
+  /// capability pattern); `create_matter` re-asserts F2-D1 server-side, so
+  /// this is a navigation hint, never an authorization grant.
+  final bool canCreateMatter;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<MatterCubit>(
       create: (BuildContext context) =>
           MatterCubit(serviceLocator<MatterGateway>()),
-      child: const _ListSurface(),
+      child: _ListSurface(canCreateMatter: canCreateMatter),
     );
   }
 }
 
 class _ListSurface extends StatefulWidget {
-  const _ListSurface();
+  const _ListSurface({required this.canCreateMatter});
+
+  final bool canCreateMatter;
 
   @override
   State<_ListSurface> createState() => _ListSurfaceState();
@@ -65,6 +73,15 @@ class _ListSurfaceState extends State<_ListSurface> {
     final TextTheme text = Theme.of(context).textTheme;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.matterTitle)),
+      // F-01 step 2 client swap: the partner-gated create entry (C-D6/Q5) —
+      // a FAB over the read-first list. The server re-asserts F2-D1.
+      floatingActionButton: widget.canCreateMatter
+          ? FloatingActionButton.extended(
+              onPressed: () => context.go(AppRoutes.matterCreate),
+              icon: const Icon(Icons.add),
+              label: Text(l10n.matterCreateFab),
+            )
+          : null,
       body: SafeArea(
         child: BlocBuilder<MatterCubit, MatterState>(
           builder: (BuildContext context, MatterState state) {
