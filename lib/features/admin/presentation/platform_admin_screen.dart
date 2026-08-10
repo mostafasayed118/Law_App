@@ -5,6 +5,7 @@ import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/admin/platform_admin_gateway.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/widgets.dart';
 import '../../orgs/presentation/org_error_messages.dart';
 import 'platform_admin_cubit.dart';
 
@@ -307,33 +308,11 @@ class _MemberRow extends StatelessWidget {
   /// own account (never self). Typed denials surface as localized messages.
   Future<void> _confirmAndDelete(BuildContext context) async {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final bool? confirmed = await showDialog<bool>(
+    final bool? confirmed = await showConfirmDialog(
       context: context,
-      builder: (BuildContext dialogContext) {
-        final ColorScheme scheme = Theme.of(dialogContext).colorScheme;
-        return AlertDialog(
-          title: Text(l10n.platformAdminDeleteConfirmTitle),
-          content: Text(
-            l10n.platformAdminDeleteConfirmBody(member.displayName),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text(l10n.cancel),
-            ),
-            // Error-tinted confirm so the destructive action reads as
-            // dangerous (M3 pattern, mirroring the member-removal dialog).
-            FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: scheme.error,
-                foregroundColor: scheme.onError,
-              ),
-              onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: Text(l10n.platformAdminDeleteConfirmAction),
-            ),
-          ],
-        );
-      },
+      title: l10n.platformAdminDeleteConfirmTitle,
+      content: Text(l10n.platformAdminDeleteConfirmBody(member.displayName)),
+      confirmLabel: l10n.platformAdminDeleteConfirmAction,
     );
     if (confirmed != true || !context.mounted) {
       return;

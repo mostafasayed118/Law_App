@@ -312,31 +312,11 @@ class _MemberRosterScreenState extends State<MemberRosterScreen> {
   /// resolve to false, and the member is left untouched.
   Future<bool?> _confirmRemove(OrgMember member) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    return showDialog<bool>(
+    return showConfirmDialog(
       context: context,
-      builder: (BuildContext dialogContext) {
-        final ColorScheme scheme = Theme.of(dialogContext).colorScheme;
-        return AlertDialog(
-          title: Text(l10n.removeMemberConfirmTitle),
-          content: Text(l10n.removeMemberConfirmBody(member.displayName)),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text(l10n.cancel),
-            ),
-            // Error-tinted confirm so the destructive action reads as
-            // dangerous, distinct from any primary button (M3 pattern).
-            FilledButton(
-              onPressed: () => Navigator.of(dialogContext).pop(true),
-              style: FilledButton.styleFrom(
-                backgroundColor: scheme.error,
-                foregroundColor: scheme.onError,
-              ),
-              child: Text(l10n.removeMemberConfirmAction),
-            ),
-          ],
-        );
-      },
+      title: l10n.removeMemberConfirmTitle,
+      content: Text(l10n.removeMemberConfirmBody(member.displayName)),
+      confirmLabel: l10n.removeMemberConfirmAction,
     );
   }
 

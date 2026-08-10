@@ -103,46 +103,26 @@ class _ProfileBodyState extends State<_ProfileBody> {
   /// non-sensitive message; the session stays alive until success.
   Future<void> _deleteAccount() async {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final bool? confirmed = await showDialog<bool>(
+    final bool? confirmed = await showConfirmDialog(
       context: context,
-      builder: (BuildContext dialogContext) {
-        final ColorScheme scheme = Theme.of(dialogContext).colorScheme;
-        return AlertDialog(
-          title: Text(l10n.deleteAccountConfirmTitle),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(l10n.deleteAccountConfirmBody),
-              const SizedBox(height: LegalHubTheme.spaceSm),
-              // P3.4: audit-survives semantics stated in copy — retained by
-              // law, never promised as data recovery.
-              Text(
-                l10n.deleteAccountAuditNote,
-                style: Theme.of(
-                  dialogContext,
-                ).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-              ),
-            ],
+      title: l10n.deleteAccountConfirmTitle,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(l10n.deleteAccountConfirmBody),
+          const SizedBox(height: LegalHubTheme.spaceSm),
+          // P3.4: audit-survives semantics stated in copy — retained by
+          // law, never promised as data recovery.
+          Text(
+            l10n.deleteAccountAuditNote,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text(l10n.cancel),
-            ),
-            // Error-tinted confirm so the destructive action reads as
-            // dangerous (M3 pattern), like the member-removal dialog.
-            FilledButton(
-              onPressed: () => Navigator.of(dialogContext).pop(true),
-              style: FilledButton.styleFrom(
-                backgroundColor: scheme.error,
-                foregroundColor: scheme.onError,
-              ),
-              child: Text(l10n.deleteAccountConfirmAction),
-            ),
-          ],
-        );
-      },
+        ],
+      ),
+      confirmLabel: l10n.deleteAccountConfirmAction,
     );
     if (confirmed != true || !mounted) {
       return;
