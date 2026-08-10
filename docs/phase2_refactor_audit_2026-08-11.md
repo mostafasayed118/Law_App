@@ -289,6 +289,26 @@ screens) that E9 did not touch.
   all three arms unchanged (suite stays 1257). The widget stays local per
   the single-screen rule — it did not join the shared barrel.
 
+  **Admin-pair review 2026-08-11: STAY SEPARATE (confirmed).** The
+  admin `_DeniedState`/`_FailedState` (`platform_admin_screen.dart:532`/
+  `569`) were re-read against `_CenteredState` to decide whether they
+  justify promoting it to a shared widget. They do not — the geometry
+  differs on four axes:
+
+  | Axis | org `_CenteredState` | admin `_DeniedState` | admin `_FailedState` |
+  |---|---|---|---|
+  | padding | `EdgeInsetsDirectional` `marginMobile` | `EdgeInsets` `marginMobile` | none |
+  | icon | 40px | 40px | **32px** |
+  | gaps | `spaceMd` | **`spaceSm`** | **`spaceSm`** |
+  | text | one centered line | **two lines** (`headlineSmall` title + body) | one line |
+  | action | optional, `FilledButton` | none | `TextButton` retry |
+
+  Absorbing the admin pair would require `iconSize`, `gap`, `title`,
+  `actionStyle`, and padding-presence parameters — exactly the flag
+  sprawl the Phase-1 rules forbid — and the pair differs as much from
+  each other as from the trio. The close-out addendum §4 claim is
+  verified: they stay local and separate.
+
 ### Re-verified as still NOT worth extracting
 
 - Label/value rows (`_DetailRow`/`_SummaryRow`/`_InfoRow`), member rows
