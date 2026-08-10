@@ -4,9 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:legalhub/app/localization/locale_cubit.dart';
 import 'package:legalhub/app/router.dart';
 import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/app/theme/theme_cubit.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/local/in_memory_locale_store.dart';
+import 'package:legalhub/data/local/in_memory_theme_mode_store.dart';
 import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/main.dart';
@@ -21,6 +23,7 @@ import 'package:legalhub/main.dart';
 void main() {
   late AuthCubit authCubit;
   late LocaleCubit localeCubit;
+  late ThemeCubit themeCubit;
   late GoRouter router;
 
   setUp(() {
@@ -30,6 +33,7 @@ void main() {
       FakeMembershipRepository(),
     );
     localeCubit = LocaleCubit(InMemoryLocaleStore());
+    themeCubit = ThemeCubit(InMemoryThemeModeStore());
     router = createAppRouter(authCubit);
   });
 
@@ -37,6 +41,7 @@ void main() {
     router.dispose();
     await authCubit.close();
     await localeCubit.close();
+    await themeCubit.close();
     await resetServiceLocator();
   });
 
@@ -62,6 +67,7 @@ void main() {
         router: router,
         authCubit: authCubit,
         localeCubit: localeCubit,
+        themeCubit: themeCubit,
       ),
     );
     await tester.pumpAndSettle();

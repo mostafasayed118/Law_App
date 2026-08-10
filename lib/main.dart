@@ -13,6 +13,7 @@ import 'app/legalhub_theme.dart';
 import 'app/localization/locale_cubit.dart';
 import 'app/router.dart';
 import 'app/service_locator.dart';
+import 'app/theme/theme_cubit.dart';
 import 'data/auth/supabase_auth_api_impl.dart';
 import 'data/auth/supabase_env.dart';
 import 'features/auth/presentation/auth_cubit.dart';
@@ -36,6 +37,10 @@ Future<void> main() async {
   configureDependencies(preferences: preferences);
   final LocaleCubit localeCubit = serviceLocator<LocaleCubit>();
   await localeCubit.load();
+  final ThemeCubit themeCubit = serviceLocator<ThemeCubit>();
+  // Restore the persisted theme mode before the first frame so the app
+  // starts on the user's choice (light/dark/system) instead of the default.
+  await themeCubit.load();
   final AuthCubit authCubit = serviceLocator<AuthCubit>();
   // Contract-§5: restore any persisted provider session before the first
   // frame so the router starts on the true auth state instead of a
@@ -56,7 +61,12 @@ Future<void> main() async {
     () => router.go(AppRoutes.acceptInvitation),
   );
   runApp(
-    LegalHubApp(router: router, authCubit: authCubit, localeCubit: localeCubit),
+    LegalHubApp(
+      router: router,
+      authCubit: authCubit,
+      localeCubit: localeCubit,
+      themeCubit: themeCubit,
+    ),
   );
   // Start after runApp so the router is attached; the plugin holds the
   // cold-start link until requested, so nothing is missed.
@@ -68,12 +78,14 @@ class LegalHubApp extends StatelessWidget {
     required this.router,
     required this.authCubit,
     required this.localeCubit,
+    required this.themeCubit,
     super.key,
   });
 
   final RouterConfig<Object> router;
   final AuthCubit authCubit;
   final LocaleCubit localeCubit;
+  final ThemeCubit themeCubit;
 
   @override
   Widget build(BuildContext context) {
@@ -81,26 +93,33 @@ class LegalHubApp extends StatelessWidget {
       providers: <BlocProvider<dynamic>>[
         BlocProvider<AuthCubit>.value(value: authCubit),
         BlocProvider<LocaleCubit>.value(value: localeCubit),
+        BlocProvider<ThemeCubit>.value(value: themeCubit),
       ],
       child: BlocBuilder<LocaleCubit, LocaleState>(
         builder: (BuildContext context, LocaleState state) {
-          return MaterialApp.router(
-            onGenerateTitle: (BuildContext context) =>
-                AppLocalizations.of(context).appTitle,
-            debugShowCheckedModeBanner: false,
-            theme: LegalHubTheme.forBrightness(
-              Brightness.light,
-              locale: state.locale,
-            ),
-            darkTheme: LegalHubTheme.forBrightness(
-              Brightness.dark,
-              locale: state.locale,
-            ),
-            themeMode: ThemeMode.system,
-            locale: state.locale,
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            routerConfig: router,
+          // The theme mode follows the user's persisted choice; system
+          // resolves through the platform brightness by ThemeMode.system.
+          return BlocBuilder<ThemeCubit, ThemeMode>(
+            builder: (BuildContext context, ThemeMode themeMode) {
+              return MaterialApp.router(
+                onGenerateTitle: (BuildContext context) =>
+                    AppLocalizations.of(context).appTitle,
+                debugShowCheckedModeBanner: false,
+                theme: LegalHubTheme.forBrightness(
+                  Brightness.light,
+                  locale: state.locale,
+                ),
+                darkTheme: LegalHubTheme.forBrightness(
+                  Brightness.dark,
+                  locale: state.locale,
+                ),
+                themeMode: themeMode,
+                locale: state.locale,
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                routerConfig: router,
+              );
+            },
           );
         },
       ),

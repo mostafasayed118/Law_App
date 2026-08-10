@@ -9,12 +9,14 @@ import 'package:legalhub/app/deep_link/pending_accept_invite_store.dart';
 import 'package:legalhub/app/localization/locale_cubit.dart';
 import 'package:legalhub/app/router.dart';
 import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/app/theme/theme_cubit.dart';
 import 'package:legalhub/core/auth/auth_gateway.dart';
 import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/local/in_memory_locale_store.dart';
+import 'package:legalhub/data/local/in_memory_theme_mode_store.dart';
 import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/matters/data/fake_matter_write_gateway.dart';
@@ -26,6 +28,7 @@ void main() {
   late FakeAuthGateway gateway;
   late AuthCubit authCubit;
   late LocaleCubit localeCubit;
+  late ThemeCubit themeCubit;
   late GoRouter router;
 
   setUp(() {
@@ -36,6 +39,7 @@ void main() {
       FakeMembershipRepository(),
     );
     localeCubit = LocaleCubit(InMemoryLocaleStore());
+    themeCubit = ThemeCubit(InMemoryThemeModeStore());
     // The reset step (Phase 4.1 recovery landing) resolves
     // PasswordRecoveryGateway via the service locator when it builds its
     // cubit; configureDependencies() registers the fake (idempotent).
@@ -47,6 +51,7 @@ void main() {
     router.dispose();
     await authCubit.close();
     await localeCubit.close();
+    await themeCubit.close();
     await gateway.dispose();
     await resetServiceLocator();
   });
@@ -65,6 +70,7 @@ void main() {
       providers: <BlocProvider<dynamic>>[
         BlocProvider<AuthCubit>.value(value: cubitOverride ?? authCubit),
         BlocProvider<LocaleCubit>.value(value: localeCubit),
+        BlocProvider<ThemeCubit>.value(value: themeCubit),
       ],
       child: MaterialApp.router(
         routerConfig: routerOverride ?? router,
@@ -1444,7 +1450,13 @@ void main() {
         );
         expect(find.text('Language'), findsWidgets);
 
-        // 2. Notifications tile → the notification-settings screen.
+        // 2. Notifications tile → the notification-settings screen (scroll
+        //    the list; the theme section pushed the tiles down).
+        await tester.scrollUntilVisible(
+          find.text('Notifications'),
+          100,
+          scrollable: find.byType(Scrollable).first,
+        );
         await tester.tap(find.text('Notifications'));
         await tester.pumpAndSettle();
         expect(

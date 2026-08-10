@@ -24,10 +24,13 @@ import '../data/documents/supabase_document_api_impl.dart';
 import '../data/documents/supabase_document_gateway.dart';
 import '../data/local/in_memory_locale_store.dart';
 import '../data/local/in_memory_org_selection_store.dart';
+import '../data/local/in_memory_theme_mode_store.dart';
 import '../data/local/locale_store.dart';
 import '../data/local/org_selection_store.dart';
 import '../data/local/shared_preferences_locale_store.dart';
 import '../data/local/shared_preferences_org_selection_store.dart';
+import '../data/local/shared_preferences_theme_mode_store.dart';
+import '../data/local/theme_mode_store.dart';
 import '../data/matters/supabase_matter_api.dart';
 import '../data/matters/supabase_matter_api_impl.dart';
 import '../data/matters/supabase_matter_gateway.dart';
@@ -84,6 +87,7 @@ import '../features/tasks/data/fake_task_gateway.dart';
 import '../features/tasks/domain/task_gateway.dart';
 import 'deep_link/pending_accept_invite_store.dart';
 import 'localization/locale_cubit.dart';
+import 'theme/theme_cubit.dart';
 
 /// The application's single GetIt service-locator instance.
 ///
@@ -184,6 +188,23 @@ void configureDependencies({
     serviceLocator.registerLazySingleton<LocaleCubit>(
       () => LocaleCubit(serviceLocator<LocaleStore>()),
       dispose: (LocaleCubit cubit) => cubit.close(),
+    );
+  }
+  if (!serviceLocator.isRegistered<ThemeModeStore>()) {
+    // The LocaleStore pattern: SharedPreferences when available, in-memory
+    // otherwise (tests / env-less runs).
+    serviceLocator.registerLazySingleton<ThemeModeStore>(
+      () => preferences == null
+          ? InMemoryThemeModeStore()
+          : SharedPreferencesThemeModeStore(preferences),
+    );
+  }
+  if (!serviceLocator.isRegistered<ThemeCubit>()) {
+    // App-scoped because the root MaterialApp reads the selected mode to
+    // pick light/dark/system.
+    serviceLocator.registerLazySingleton<ThemeCubit>(
+      () => ThemeCubit(serviceLocator<ThemeModeStore>()),
+      dispose: (ThemeCubit cubit) => cubit.close(),
     );
   }
   if (!serviceLocator.isRegistered<PasswordRecoveryGateway>()) {

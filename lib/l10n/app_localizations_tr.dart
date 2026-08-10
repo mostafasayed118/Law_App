@@ -38,6 +38,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String get languageLabel => 'Dil';
 
   @override
+  String get themeLabel => 'Tema';
+
+  @override
+  String get themeModeSystem => 'Sistem varsayılanı';
+
+  @override
+  String get themeModeLight => 'Açık';
+
+  @override
+  String get themeModeDark => 'Koyu';
+
+  @override
   String get roleLabel => 'Yer tutucu rol';
 
   @override

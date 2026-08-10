@@ -57,10 +57,11 @@ messaging services.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (1169 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (1190 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
-  unsupported-code rejection), Redactor (password/OTP/email/Bearer redaction
-  with leak guards), DI registration graph, validators, router redirect logic
+  unsupported-code rejection), ThemeCubit (mode persistence + restart
+  restore), Redactor (password/OTP/email/Bearer redaction with leak guards),
+  DI registration graph, validators, router redirect logic
   (unauthenticated-deny + authenticated-redirect), sign-in screen (welcome copy
   + empty-form blocking + valid submit + forgot link + error snackbar),
   sign-up screen (title + 4 fields + terms-checkbox gating + invalid-form
@@ -92,10 +93,14 @@ messaging services.
   in-memory locale store, and the onboarding-success screen. Batch 5 added
   the 800×600 onboarding no-overflow test and the EN/AR/TR localized-fallback
   assertions.
-- Coverage: **1169 tests** (2026-08-10 — responsive pass: the shared
-  `ResponsiveContent` shell wrapper (centered 840px content column on
-  tablets/desktop, no-op on phones) + adaptive OTP cells + wrapping
-  label/chip rows + 7-screen responsive smoke suite driving the real router
+- Coverage: **1190 tests** (2026-08-10 — theme pass: the persisted
+  light/dark/system `ThemeCubit` + `ThemeModeStore` (SharedPreferences,
+  LocaleStore pattern), settings-screen theme switcher, semantic
+  success/warning/info tokens, and the app-level theme-mode wiring tests,
+  on top of the responsive pass: the shared `ResponsiveContent` shell
+  wrapper (centered 840px content column on tablets/desktop, no-op on
+  phones) + adaptive OTP cells + wrapping label/chip rows + 7-screen
+  responsive smoke suite driving the real router
   at 320–1024px, scales 1.0/1.3/2.0, EN/AR, keyboard-open; on top of the
   strong-password policy:
   NIST 800-63B / OWASP validator (12-char floor, 3-of-4 classes, email-

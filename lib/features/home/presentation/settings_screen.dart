@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../app/localization/locale_cubit.dart';
 import '../../../app/router.dart';
+import '../../../app/theme/theme_cubit.dart';
 import '../../../core/auth/auth_state.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/widgets.dart';
@@ -19,11 +20,18 @@ class SettingsScreen extends StatelessWidget {
     Locale('tr'),
   ];
 
+  static const List<ThemeMode> _themeModes = <ThemeMode>[
+    ThemeMode.system,
+    ThemeMode.light,
+    ThemeMode.dark,
+  ];
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final LocaleState localeState = context.watch<LocaleCubit>().state;
     final AuthState authState = context.watch<AuthCubit>().state;
+    final ThemeMode themeMode = context.watch<ThemeCubit>().state;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.settingsTitle)),
       body: ListView(
@@ -48,6 +56,38 @@ class SettingsScreen extends StatelessWidget {
             onChanged: (Locale? value) {
               if (value != null) {
                 context.read<LocaleCubit>().setLocale(value);
+              }
+            },
+          ),
+          const SizedBox(height: LegalHubTheme.spaceXl),
+          Text(
+            l10n.themeLabel,
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+          const SizedBox(height: LegalHubTheme.spaceSm),
+          DropdownButtonFormField<ThemeMode>(
+            initialValue: themeMode,
+            // isExpanded lets the selected label ellipsize inside the field
+            // instead of overflowing — needed on narrow screens (the route
+            // transition lays the incoming page out at ~176px) and at text
+            // scale 2.0 (the language dropdown's value is short, EN; the
+            // theme value, "System default", is not).
+            isExpanded: true,
+            decoration: InputDecoration(labelText: l10n.themeLabel),
+            items: _themeModes
+                .map(
+                  (ThemeMode mode) => DropdownMenuItem<ThemeMode>(
+                    value: mode,
+                    child: Text(
+                      _themeModeLabel(context, mode),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                )
+                .toList(),
+            onChanged: (ThemeMode? value) {
+              if (value != null) {
+                context.read<ThemeCubit>().setThemeMode(value);
               }
             },
           ),
@@ -110,5 +150,14 @@ class SettingsScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  static String _themeModeLabel(BuildContext context, ThemeMode mode) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    return switch (mode) {
+      ThemeMode.system => l10n.themeModeSystem,
+      ThemeMode.light => l10n.themeModeLight,
+      ThemeMode.dark => l10n.themeModeDark,
+    };
   }
 }

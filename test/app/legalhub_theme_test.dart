@@ -62,6 +62,24 @@ void main() {
     });
   });
 
+  group('LegalHubTheme semantic status tokens', () {
+    test('light success/warning/info resolve through the ColorScheme', () {
+      final ColorScheme scheme = LegalHubTheme.light.colorScheme;
+
+      expect(scheme.success, const Color(0xFF1B5E20));
+      expect(scheme.warning, const Color(0xFF7A5900));
+      expect(scheme.info, const Color(0xFF00608C));
+    });
+
+    test('dark success/warning/info resolve through the ColorScheme', () {
+      final ColorScheme scheme = LegalHubTheme.dark.colorScheme;
+
+      expect(scheme.success, const Color(0xFF7AC98B));
+      expect(scheme.warning, const Color(0xFFE8C16D));
+      expect(scheme.info, const Color(0xFF8FD0F0));
+    });
+  });
+
   group('LegalHubTheme spacing and radius constants', () {
     test('exposes the documented spacing scale', () {
       // Pinning the scale guards against a token rename that silently
