@@ -116,14 +116,17 @@
      invariant is now a pinned property across the whole content surface
      (matters is the single assignment source of truth). No policy changed;
      no server gate needed (battery + harness only).
-  2. **When the first matter write slice ships (future) — BUILT 2026-08-09
-     (REHEARSAL-READY, NOT applied)** per the approved design
+  2. **When the first matter write slice ships — DONE 2026-08-09 (BUILT,
+     r1 PASSED, mechanism review PASS, APPLIED + VERIFIED on the dev
+     project)** per the approved design
      (`docs/f01_step2_matter_write_design_2026-08-09.md`): the `create_matter`
      RPC refuses owner assignment (F2-D2, derived from `platform_config`), a
      `BEFORE INSERT OR UPDATE` trigger on `matters` refuses it categorically
      (F2-D3), and battery 13 pins the refusal (positive + negative +
-     trigger-layer + §8-negative rows). Awaiting: mechanism review → r1
-     rehearsal → dated apply → matrix §4 addendum.
+     trigger-layer + §8-negative rows). Execution evidence:
+     `docs/matter_write_apply_execution_2026-08-09.md` (dev project — demo
+     create `d28f1f05-…` + §8 audit row live, negatives + smoke green;
+     F-12 surfaced and RESOLVED); dated matrix §4 addendum shipped.
   3. **Optional hardening (needs a review of the R-4 tradeoff):** an explicit
      owner-deny arm in content policies via a dedicated EXECUTE-granted
      definer helper. **Caveat:** `is_platform_owner()` is deliberately
@@ -181,7 +184,9 @@
   the publication pin (exactly `messages`), but no live websocket round-trip
   has been observed from the app. The env-gated configured-build E2E
   (D-45.1) — the one verification the suite cannot do — is **not yet
-  executed**.
+  executed for the realtime delivery path** (the 2026-08-09 D-45.1
+  execution covered the matter-write chain — `docs/f01_client_swap_verification_evidence_2026-08-09.md`
+  — not this round-trip).
 - **Evidence:** `supabase/tests/09_realtime_push.sql` 09.11/09.12; harness
   §1f publication pin; `docs/configured_build_e2e_checklist_2026-08-08.md`;
   threat model §4.4 / §6 residual 3; D-LV4 recorded follow-up.
@@ -191,7 +196,8 @@
 - **Remediation path:** execute the D-45.1 checklist (`.env` build, partner
   sign-in, live send → immediate delivery observed, denied-role 0 events)
   and record the evidence in `docs/`; ship the D-LV4 reconnect/backfill
-  polish as a small client slice.
+  polish as a small client slice. — See the verification plan:
+  `docs/f04_f06_f10_verification_plan_2026-08-10.md`.
 
 ---
 
@@ -233,7 +239,8 @@
   note; when the Android release is configured, verify **App Links
   (assetlinks.json)** so the scheme cannot be claimed by another app; the
   stronger fix (short-lived server-issued code instead of the token in the
-  URL) needs an edge function + review and is a future slice.
+  URL) needs an edge function + review and is a future slice. — See the
+  verification plan: `docs/f04_f06_f10_verification_plan_2026-08-10.md`.
 
 ---
 
@@ -304,7 +311,8 @@
 - **Owner:** Project Owner; engineering.
 - **Remediation path:** run the recorded read-only probes on the dev project
   (storage-policy baseline, `storage.objects` grants) and confirm the GoTrue
-  JWT carries `email`; record results in the P4 release notes.
+  JWT carries `email`; record results in the P4 release notes. — See the
+  verification plan: `docs/f04_f06_f10_verification_plan_2026-08-10.md`.
 
 ---
 

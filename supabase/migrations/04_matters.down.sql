@@ -1,4 +1,4 @@
--- 04_matters.down.sql — backout for 04_matters.sql (REHEARSAL-READY — not run on dev)
+-- 04_matters.down.sql — backout for 04_matters.sql (REVIEWED — rollback standby; not run on dev)
 -- Clean inverse: drop the table, then the type it depends on.
 
 begin;

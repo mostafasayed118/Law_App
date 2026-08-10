@@ -114,3 +114,61 @@ the deferral (see Adj-1 on the scope approval).
 - This decision reconciles **status framing only**. No new external action was
   taken against the dev project; no credentials were generated or disclosed;
   nothing is committed/pushed without further explicit approval.
+
+## 6. Addendum (2026-08-10) — the provider-loop deferral, explained for future readers
+
+> **Purpose:** one self-contained note so a future reader can understand the
+> deferral without re-reading three records. **It changes no status** — the
+> loop remains DEFERRED, NOT passed, NOT executed end-to-end. It only states,
+> precisely, what was verified and why the remainder is deferred.
+
+**The loop:** signup → email-confirm → sign-in → password-reset, through the
+dev project's real GoTrue (`eutmvevpskerzpqmwplv`, `eu-central-1`).
+
+**What WAS verified live (recorded, evidence below):**
+
+1. **The provider endpoints are live and respond correctly at the typed-denial
+   level** — `docs/p2_apply_execution_2026-08-01.md` §6 (2026-08-01): sign-in
+   of a never-created user → `400 invalid_credentials` (correct denial);
+   password-reset `recover` → generic `200 {}` (non-enumerating); sign-up
+   attempts → `400 email_address_invalid` (reserved-TLD) then
+   `429 over_email_send_rate_limit` (observed provider behavior). Zero residue
+   after cleanup.
+2. **The full SQL/RLS/RPC surface** (the P2 slice + all nine §14 un-deferrals)
+   is applied to the dev project and battery-verified; the **D-45.1
+   matter-write verification (2026-08-09)** exercised the live `create_matter`
+   flow with a §8 audit row observed through the org-audit read path
+   (`docs/f01_client_swap_verification_evidence_2026-08-09.md`); the **final
+   E2E walkthrough (2026-08-09)** round-tripped the partner's read surface and
+   the audited, rolled-back writes (`docs/final_demo_walkthrough_evidence_2026-08-09.md`).
+
+So: everything that **was** executed **passed**. That is the honest extent of
+"verified and working" — no claim is made that the full auth loop passed,
+because it was never run (§1.3 #5 — no false assurance).
+
+**Why the full loop is deferred (the reason, precisely):**
+
+1. **D-07** keeps email verification **REQUIRED** at sign-up — non-negotiable.
+2. Dev GoTrue rejects the **reserved-TLD synthetic domains** the rehearsal
+   fixtures use (`400 email_address_invalid`).
+3. A synthetic gmail-format attempt then hit **`429 over_email_send_rate_limit`**
+   — the deliberate halt: continuing would have sent more **real confirmation
+   emails** to addresses no one can receive, hammering the built-in SMTP rate
+   limit.
+4. **No controlled inbox exists** on this portfolio project (synthetic data
+   only, no mail infrastructure approved).
+
+→ Completing the loop safely requires EITHER a real controlled inbox
+(owner-held) OR relaxing D-07 — both out of scope today.
+
+**Path forward (recorded, not executed):** the D-45.1 two-phase plan
+(`docs/p2_provider_loop_decision_2026-08-05.md` §5): Phase 1 = ephemeral
+rehearsal loop on Docker-capable infra (zero external effect); Phase 2 =
+dev-project smoke under a dated apply-approval, only once a controlled inbox
+exists. Both plans are **DRAFT — NOT executed** (`p2_provider_loop_phase1_rehearsal_2026-08-08.md`,
+`p2_provider_loop_phase2_smoke_2026-08-08.md`).
+
+**No false assurance (§1.3 #5):** this addendum does not claim the loop
+passed. The deferral stands as a documented residual risk; it becomes a
+mandatory gate only if the project ever moves toward real client data
+(`docs/p4_release_readiness_2026-08-09.md` §5).

@@ -1,4 +1,4 @@
--- policies/messages_insert.sql — realtime push INSERT policy (REHEARSAL-READY — NOT applied, 2026-08-08)
+-- policies/messages_insert.sql — realtime push INSERT policy (REVIEWED & APPLIED — dev project, 2026-08-08; REVOKED by the send-message D-SM3 slice, 2026-08-08 — not live)
 -- Source of truth: docs/realtime_push_real_data_plan_2026-08-08.md (D-LV1)
 --                + docs/realtime_push_gate_review_2026-08-08.md (§4 deny-rows).
 -- Backout: git revert of this policy commit (rollback_plan.md design §7).

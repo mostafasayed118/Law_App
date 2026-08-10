@@ -1,4 +1,4 @@
--- rpc/create_matter.sql — matter-creation RPC (REHEARSAL-READY — NOT applied, 2026-08-09)
+-- rpc/create_matter.sql — matter-creation RPC (REVIEWED & APPLIED — dev project, 2026-08-09)
 -- Source of truth: docs/f01_step2_matter_write_design_2026-08-09.md (F2-D1/F2-D2/F2-D4)
 --                + docs/p4_findings_register_2026-08-09.md (F-01 step 2).
 -- Backout: rpc/_down.sql (drop function; the blanket revoke covers the grant).

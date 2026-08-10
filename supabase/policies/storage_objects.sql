@@ -1,4 +1,4 @@
--- policies/storage_objects.sql — storage objects read policy (REHEARSAL-READY — NOT applied, 2026-08-08)
+-- policies/storage_objects.sql — storage objects read policy (REVIEWED & APPLIED — dev project, 2026-08-08)
 -- Source of truth: docs/storage_real_data_plan_2026-08-08.md (D-STR2/D-STR4)
 --                + docs/storage_rls_gate_review_2026-08-08.md (§3 Q2/Q4, §4 deny-rows).
 -- Backout: git revert of this policy commit (rollback_plan.md design §7).

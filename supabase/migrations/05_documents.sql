@@ -1,4 +1,4 @@
--- 05_documents.sql — documents read-path migration (REHEARSAL-READY — NOT applied, 2026-08-07)
+-- 05_documents.sql — documents read-path migration (REVIEWED & APPLIED — dev project, 2026-08-07)
 -- Source of truth: docs/documents_real_data_plan_2026-08-07.md (D-DR1/D-DR3)
 --                + docs/documents_rls_gate_review_2026-08-07.md (Q1-Q6).
 -- Rollback: 05_documents.down.sql (same directory).

@@ -1,4 +1,4 @@
--- policies/matters.sql — matters read policy (REHEARSAL-READY — NOT applied, 2026-08-07)
+-- policies/matters.sql — matters read policy (REVIEWED & APPLIED — dev project, 2026-08-07)
 -- Source of truth: docs/matters_real_data_plan_2026-08-07.md (D-MR1)
 --                + docs/matters_rls_gate_review_2026-08-07.md (§4 deny-rows).
 -- Backout: git revert of this policy commit (rollback_plan.md design §7).

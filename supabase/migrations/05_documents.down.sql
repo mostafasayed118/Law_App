@@ -1,4 +1,4 @@
--- 05_documents.down.sql — backout for 05_documents.sql (REHEARSAL-READY — not run on dev)
+-- 05_documents.down.sql — backout for 05_documents.sql (REVIEWED — rollback standby; not run on dev)
 -- Clean inverse: drop the table. The inline document_type CHECK dies with
 -- the table — unlike 04's matter_status enum, there is no type object to
 -- drop.

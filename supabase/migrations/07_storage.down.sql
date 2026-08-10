@@ -1,4 +1,4 @@
--- 07_storage.down.sql — backout for 07_storage.sql (REHEARSAL-READY — not run on dev)
+-- 07_storage.down.sql — backout for 07_storage.sql (REVIEWED — rollback standby; not run on dev)
 -- Clean inverse: drop the files table, then delete the private bucket.
 -- The inline size_bytes CHECK dies with the table — like 05/06, there is
 -- no type object to drop. The bucket delete cascades its objects via the

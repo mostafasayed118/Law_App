@@ -1,4 +1,4 @@
--- 09_realtime_push.down.sql — backout for 09_realtime_push.sql (REHEARSAL-READY — not run on dev)
+-- 09_realtime_push.down.sql — backout for 09_realtime_push.sql (REVIEWED — rollback standby; not run on dev)
 -- Clean inverse: drop the messages membership from the supabase_realtime
 -- publication. Idempotent guard: ALTER PUBLICATION ... DROP TABLE has no
 -- IF EXISTS form, so the check runs first (the messages table stays —

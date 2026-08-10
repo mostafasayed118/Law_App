@@ -1,5 +1,5 @@
 -- 11_matter_write.down.sql — rollback for 11_matter_write.sql
--- (REHEARSAL-READY — NOT applied; rollback pairing per docs/rollback_plan.md).
+-- (REVIEWED — rollback standby; not run on dev; rollback pairing per docs/rollback_plan.md).
 
 begin;
 

@@ -1,4 +1,4 @@
--- 09_realtime_push.sql — live-delivery publication migration (REHEARSAL-READY — NOT applied, 2026-08-08)
+-- 09_realtime_push.sql — live-delivery publication migration (REVIEWED & APPLIED — dev project, 2026-08-08)
 -- Source of truth: docs/realtime_push_real_data_plan_2026-08-08.md (D-LV2)
 --                + docs/realtime_push_gate_review_2026-08-08.md (Q1, §5).
 -- Rollback: 09_realtime_push.down.sql (same directory).

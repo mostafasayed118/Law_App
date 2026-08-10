@@ -1,4 +1,4 @@
--- 11_matter_write.sql — matter-write trigger hardening (REHEARSAL-READY — NOT applied, 2026-08-09)
+-- 11_matter_write.sql — matter-write trigger hardening (REVIEWED & APPLIED — dev project, 2026-08-09)
 -- Source of truth: docs/f01_step2_matter_write_design_2026-08-09.md (F2-D3)
 --                + docs/p4_findings_register_2026-08-09.md (F-01 step 2).
 -- Rollback: 11_matter_write.down.sql (drop trigger + function).

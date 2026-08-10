@@ -1,4 +1,4 @@
--- 10_billing_invoices.sql — billing invoices read-path migration (REHEARSAL-READY — NOT applied, 2026-08-08)
+-- 10_billing_invoices.sql — billing invoices read-path migration (REVIEWED & APPLIED — dev project, 2026-08-08)
 -- Source of truth: docs/billing_invoices_real_data_plan_2026-08-08.md (D-BI1)
 --                + docs/billing_invoices_gate_review_2026-08-08.md (Q1-Q6).
 -- Rollback: 10_billing_invoices.down.sql (same directory).

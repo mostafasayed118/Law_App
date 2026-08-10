@@ -1,4 +1,4 @@
--- 04_matters.sql — matters read-path migration (REHEARSAL-READY — NOT applied, 2026-08-07)
+-- 04_matters.sql — matters read-path migration (REVIEWED & APPLIED — dev project, 2026-08-07)
 -- Source of truth: docs/matters_real_data_plan_2026-08-07.md (D-MR1/D-MR3)
 --                + docs/matters_rls_gate_review_2026-08-07.md (Q1-Q6).
 -- Rollback: 04_matters.down.sql (same directory).

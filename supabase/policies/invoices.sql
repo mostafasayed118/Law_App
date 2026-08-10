@@ -1,4 +1,4 @@
--- policies/invoices.sql — billing invoices read policy (REHEARSAL-READY — NOT applied, 2026-08-08)
+-- policies/invoices.sql — billing invoices read policy (REVIEWED & APPLIED — dev project, 2026-08-08)
 -- Source of truth: docs/billing_invoices_real_data_plan_2026-08-08.md (D-BI2)
 --                + docs/billing_invoices_gate_review_2026-08-08.md (§4 deny-rows).
 -- Backout: git revert of this policy commit (rollback_plan.md design §7).

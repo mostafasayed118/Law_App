@@ -1,4 +1,4 @@
--- policies/documents.sql — documents read policy (REHEARSAL-READY — NOT applied, 2026-08-07)
+-- policies/documents.sql — documents read policy (REVIEWED & APPLIED — dev project, 2026-08-07)
 -- Source of truth: docs/documents_real_data_plan_2026-08-07.md (D-DR1/D-DR2)
 --                + docs/documents_rls_gate_review_2026-08-07.md (§4 deny-rows).
 -- Backout: git revert of this policy commit (rollback_plan.md design §7).

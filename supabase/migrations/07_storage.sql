@@ -1,4 +1,4 @@
--- 07_storage.sql — storage read-path migration (REHEARSAL-READY — NOT applied, 2026-08-08)
+-- 07_storage.sql — storage read-path migration (REVIEWED & APPLIED — dev project, 2026-08-08)
 -- Source of truth: docs/storage_real_data_plan_2026-08-08.md (D-STR1/D-STR3/D-STR4)
 --                + docs/storage_rls_gate_review_2026-08-08.md (Q1-Q6).
 -- Rollback: 07_storage.down.sql (same directory).

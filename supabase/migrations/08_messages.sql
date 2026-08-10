@@ -1,4 +1,4 @@
--- 08_messages.sql — realtime read-path migration (REHEARSAL-READY — NOT applied, 2026-08-08)
+-- 08_messages.sql — realtime read-path migration (REVIEWED & APPLIED — dev project, 2026-08-08)
 -- Source of truth: docs/realtime_real_data_plan_2026-08-08.md (D-RT1/D-RT3)
 --                + docs/realtime_rls_gate_review_2026-08-08.md (Q1-Q6).
 -- Rollback: 08_messages.down.sql (same directory).

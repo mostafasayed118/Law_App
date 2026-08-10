@@ -1,4 +1,4 @@
--- policies/message_threads.sql — messages read policy (REHEARSAL-READY — NOT applied, 2026-08-07)
+-- policies/message_threads.sql — messages read policy (REVIEWED & APPLIED — dev project, 2026-08-07)
 -- Source of truth: docs/messages_real_data_plan_2026-08-07.md (D-MSR1/D-MSR2)
 --                + docs/messages_rls_gate_review_2026-08-07.md (§4 deny-rows).
 -- Backout: git revert of this policy commit (rollback_plan.md design §7).

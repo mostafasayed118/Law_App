@@ -1,4 +1,4 @@
--- 06_message_threads.sql — messages read-path migration (REHEARSAL-READY — NOT applied, 2026-08-07)
+-- 06_message_threads.sql — messages read-path migration (REVIEWED & APPLIED — dev project, 2026-08-07)
 -- Source of truth: docs/messages_real_data_plan_2026-08-07.md (D-MSR1/D-MSR3)
 --                + docs/messages_rls_gate_review_2026-08-07.md (Q1-Q6).
 -- Rollback: 06_message_threads.down.sql (same directory).

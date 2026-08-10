@@ -4,7 +4,8 @@
 > project (`eutmvevpskerzpqmwplv`, `eu-central-1`) as of the **last apply
 > (billing, `fc7ed1b`, 2026-08-08 21:31)**. Every number is cross-referenced
 > to the ten apply-execution records below — the harness/CI pins
-> (`scripts/verify_policy_tests.sh` `--check` **339/0/0**) pin the same set
+> (`scripts/verify_policy_tests.sh` `--check` **73/0/0** — corrected count,
+> register §3b) pin the same set
 > on a fresh scratch stack. This note is the reference for configured-build
 > E2E (D-45.1) and any future slice.
 
