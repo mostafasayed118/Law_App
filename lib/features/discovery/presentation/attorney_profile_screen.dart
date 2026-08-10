@@ -72,7 +72,11 @@ class _ProfileSurfaceState extends State<_ProfileSurface> {
             return switch (state.attorneys) {
               ViewLoading() => const Center(child: CircularProgressIndicator()),
               ViewEmpty() => _message(l10n.discoveryProfileNotFound),
-              ViewError() => _error(context, l10n),
+              ViewError() => AppCenteredRetry(
+                message: l10n.discoveryError,
+                onRetry: context.read<DiscoveryCubit>().load,
+                retryLabel: l10n.retry,
+              ),
               // The sealed ViewState set also carries offline/unauthorized
               // variants (shared vocabulary); a synthetic list has neither
               // state, so both render the not-found copy.
@@ -109,26 +113,6 @@ class _ProfileSurfaceState extends State<_ProfileSurface> {
           textAlign: TextAlign.center,
           style: textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
         ),
-      ),
-    );
-  }
-
-  Widget _error(BuildContext context, AppLocalizations l10n) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Text(
-            l10n.discoveryError,
-            textAlign: TextAlign.center,
-            style: TextStyle(color: scheme.error),
-          ),
-          TextButton(
-            onPressed: () => context.read<DiscoveryCubit>().load(),
-            child: Text(l10n.retry),
-          ),
-        ],
       ),
     );
   }

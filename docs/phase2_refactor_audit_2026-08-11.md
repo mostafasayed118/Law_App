@@ -175,6 +175,10 @@ different geometry or domain meaning, not a superficial clone:
    Close-out residual #6 **PARTIALLY ADDRESSED**; +1 AppTile test (suite
    1242 → 1243).
 3. **E9** `AppCenteredRetry` — 2 sites, partial #5 resolution.
+   **COMPLETE 2026-08-11** — `lib/shared/widgets/app_centered_retry.dart`
+   (+4 tests, suite 1243 → 1247), both error arms re-pointed; booking's
+   start-aligned `ViewError` arm documented as a separate shape. Close-out
+   residual #5 **PARTIALLY ADDRESSED**.
 4. **E10** workspace section shell — only if the boilerplate still
    justifies it after E8.
 

@@ -10,6 +10,7 @@
 /// converting "retained by contract" into "retained by use."
 library;
 
+export 'app_centered_retry.dart';
 export 'app_entry_card.dart';
 export 'app_filter_chips.dart';
 export 'app_tile.dart';

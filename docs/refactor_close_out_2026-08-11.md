@@ -125,7 +125,11 @@ documented at its site and kept as-is:
    superficial clone.
 5. **Centered-message screens — `attorney_profile`, `matter_details`,
    `booking`. `Center(spinner)` loading and centered message shapes differ
-   from `ViewStateSwitch`'s start-aligned arms.
+   from `ViewStateSwitch`'s start-aligned arms. **PARTIALLY ADDRESSED
+   2026-08-11 (E9)** — the two identical error arms (error text + retry
+   button, centered) now delegate to shared `AppCenteredRetry`; the
+   booking `ViewError` arm (start-aligned inside the scroll view) is a
+   different shape and stays excluded.
 6. **Column-layout rows — thread-detail `_MessageTile` and the matter
    workspace `_*Row`s.** No leading avatar, vertical text stack — not
    `AppTile` rows. **PARTIALLY ADDRESSED 2026-08-11 (E8)** — the four
