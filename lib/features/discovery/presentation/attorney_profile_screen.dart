@@ -71,7 +71,9 @@ class _ProfileSurfaceState extends State<_ProfileSurface> {
           builder: (BuildContext context, DiscoveryState state) {
             return switch (state.attorneys) {
               ViewLoading() => const Center(child: CircularProgressIndicator()),
-              ViewEmpty() => _message(l10n.discoveryProfileNotFound),
+              ViewEmpty() => AppCenteredMessage(
+                text: l10n.discoveryProfileNotFound,
+              ),
               ViewError() => AppCenteredRetry(
                 message: l10n.discoveryError,
                 onRetry: context.read<DiscoveryCubit>().load,
@@ -80,8 +82,9 @@ class _ProfileSurfaceState extends State<_ProfileSurface> {
               // The sealed ViewState set also carries offline/unauthorized
               // variants (shared vocabulary); a synthetic list has neither
               // state, so both render the not-found copy.
-              ViewOffline() ||
-              ViewUnauthorized() => _message(l10n.discoveryProfileNotFound),
+              ViewOffline() || ViewUnauthorized() => AppCenteredMessage(
+                text: l10n.discoveryProfileNotFound,
+              ),
               ViewSuccess(data: final List<Attorney> attorneys) => _profile(
                 context,
                 _findById(attorneys, widget.attorneyId),
@@ -102,24 +105,11 @@ class _ProfileSurfaceState extends State<_ProfileSurface> {
     return null;
   }
 
-  Widget _message(String text) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceLg),
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-        ),
-      ),
-    );
-  }
-
   Widget _profile(BuildContext context, Attorney? attorney) {
     if (attorney == null) {
-      return _message(AppLocalizations.of(context).discoveryProfileNotFound);
+      return AppCenteredMessage(
+        text: AppLocalizations.of(context).discoveryProfileNotFound,
+      );
     }
     final AppLocalizations l10n = AppLocalizations.of(context);
     final ColorScheme scheme = Theme.of(context).colorScheme;

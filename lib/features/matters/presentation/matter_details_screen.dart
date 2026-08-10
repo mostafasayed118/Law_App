@@ -89,7 +89,9 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
           builder: (BuildContext context, MatterState state) {
             return switch (state.matters) {
               ViewLoading() => const Center(child: CircularProgressIndicator()),
-              ViewEmpty() => _message(l10n, l10n.matterDetailsNotFound),
+              ViewEmpty() => AppCenteredMessage(
+                text: l10n.matterDetailsNotFound,
+              ),
               ViewError() => AppCenteredRetry(
                 message: l10n.matterError,
                 onRetry: context.read<MatterCubit>().load,
@@ -98,8 +100,9 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
               // The sealed ViewState set also carries offline/unauthorized
               // variants (shared vocabulary); a synthetic list has neither
               // state, so both render the not-found copy.
-              ViewOffline() ||
-              ViewUnauthorized() => _message(l10n, l10n.matterDetailsNotFound),
+              ViewOffline() || ViewUnauthorized() => AppCenteredMessage(
+                text: l10n.matterDetailsNotFound,
+              ),
               ViewSuccess(data: final List<Matter> matters) => _details(
                 context,
                 l10n,
@@ -121,24 +124,9 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
     return null;
   }
 
-  Widget _message(AppLocalizations l10n, String text) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceLg),
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-        ),
-      ),
-    );
-  }
-
   Widget _details(BuildContext context, AppLocalizations l10n, Matter? matter) {
     if (matter == null) {
-      return _message(l10n, l10n.matterDetailsNotFound);
+      return AppCenteredMessage(text: l10n.matterDetailsNotFound);
     }
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;

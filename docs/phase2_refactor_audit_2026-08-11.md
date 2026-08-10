@@ -262,6 +262,9 @@ screens) that E9 did not touch.
   only difference is an unused `l10n` parameter in the matter-details copy.
 - A shared `AppCenteredMessage(text)` — 2 sites, mechanical, **P0-sized**.
   This is the plain-text half of residual #5 (the error half was E9).
+  **IMPLEMENTED 2026-08-11** — `lib/shared/widgets/app_centered_message.dart`
+  (+3 tests, suite 1254 → 1257), both `_message` helpers re-pointed (the
+  unused `l10n` param dropped).
 
 ### Candidate B — centered icon-state family (org-audit, 3 near-copies)
 
