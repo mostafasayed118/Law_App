@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
-
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/organizations/organization_gateway.dart';
 import '../../../core/roles/user_role.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/formatting/date_formatting.dart';
 import 'active_org_store.dart';
 import 'org_audit_cubit.dart';
 
@@ -124,9 +123,10 @@ class _AuditRow extends StatelessWidget {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final String issued = DateFormat.yMMMd(
-      l10n.localeName,
-    ).format(entry.serverTimestamp.toLocal());
+    final String issued = formatMediumDate(
+      l10n,
+      entry.serverTimestamp.toLocal(),
+    );
     return Material(
       color: scheme.surfaceContainerLowest,
       shape: RoundedRectangleBorder(

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
-
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/state/view_state.dart';
@@ -11,6 +9,7 @@ import '../../../features/documents/presentation/document_cubit.dart';
 import '../../../features/documents/presentation/document_labels.dart';
 import '../../../features/documents/presentation/document_state.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/formatting/date_formatting.dart';
 
 /// Per-matter Documents section on the matter details surface (Phase 10,
 /// slice 10.1, owner decisions D-W1/D-W3/D-W4).
@@ -154,9 +153,7 @@ class _DocumentRow extends StatelessWidget {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
-    final String date = DateFormat.yMMMd(
-      l10n.localeName,
-    ).format(document.createdAt);
+    final String date = formatMediumDate(l10n, document.createdAt);
     return Material(
       color: scheme.surfaceContainerLowest,
       shape: RoundedRectangleBorder(

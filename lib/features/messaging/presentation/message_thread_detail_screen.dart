@@ -2,13 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
-
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/state/view_state.dart';
 import '../../../features/auth/presentation/auth_cubit.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/formatting/date_formatting.dart';
 import '../domain/message.dart';
 import '../domain/message_gateway.dart';
 import 'message_thread_detail_cubit.dart';
@@ -188,9 +187,7 @@ class _MessageTile extends StatelessWidget {
     final TextTheme text = Theme.of(context).textTheme;
     // Same localized date shape as the list/vault surfaces (yMMMd,
     // locale-aware via l10n.localeName).
-    final String date = DateFormat.yMMMd(
-      l10n.localeName,
-    ).format(message.sentAt);
+    final String date = formatMediumDate(l10n, message.sentAt);
     return Material(
       color: scheme.surfaceContainerLowest,
       shape: RoundedRectangleBorder(

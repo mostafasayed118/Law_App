@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
-
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/formatting/date_formatting.dart';
 import '../domain/billing_gateway.dart';
 import '../domain/invoice.dart';
 import 'billing_cubit.dart';
@@ -144,9 +143,7 @@ class _InvoiceTile extends StatelessWidget {
     final TextTheme text = Theme.of(context).textTheme;
     final String amount = invoiceAmountLabel(invoice.amountCents);
     final String status = invoiceStatusLabel(l10n, invoice.status);
-    final String issued = DateFormat.yMMMd(
-      l10n.localeName,
-    ).format(invoice.issuedAt);
+    final String issued = formatMediumDate(l10n, invoice.issuedAt);
     return Material(
       color: scheme.surfaceContainerLowest,
       shape: RoundedRectangleBorder(

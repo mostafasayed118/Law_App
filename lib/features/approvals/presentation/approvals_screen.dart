@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:intl/intl.dart';
-
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/formatting/date_formatting.dart';
 import '../domain/approvals_gateway.dart';
 import '../domain/pending_approval.dart';
 import 'approvals_cubit.dart';
@@ -161,9 +160,7 @@ class _ApprovalTile extends StatelessWidget {
         l10n.approvalStatusDenied,
       ),
     };
-    final String date = DateFormat.yMMMd(
-      l10n.localeName,
-    ).format(approval.createdAt);
+    final String date = formatMediumDate(l10n, approval.createdAt);
     return Material(
       color: scheme.surfaceContainerLowest,
       shape: RoundedRectangleBorder(

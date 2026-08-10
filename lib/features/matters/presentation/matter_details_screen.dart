@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
-
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/roles/user_role.dart';
 import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/formatting/date_formatting.dart';
 import '../../../shared/widgets/widgets.dart';
 import '../domain/matter.dart';
 import '../domain/matter_gateway.dart';
@@ -159,8 +158,6 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
     }
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
-    // Same localized date shape as the profile surface (yMMMd, locale-aware).
-    final DateFormat createdFormat = DateFormat.yMMMd(l10n.localeName);
     return ListView(
       padding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
       children: <Widget>[
@@ -185,7 +182,7 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
         const SizedBox(height: LegalHubTheme.spaceMd),
         _DetailRow(
           label: l10n.matterDetailsCreated,
-          value: createdFormat.format(matter.createdAt),
+          value: formatMediumDate(l10n, matter.createdAt),
         ),
         const SizedBox(height: LegalHubTheme.spaceLg),
         if (widget.capabilities.canViewDocuments) ...<Widget>[

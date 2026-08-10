@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
-
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/auth/auth_state.dart';
@@ -12,6 +10,7 @@ import '../../../core/state/view_state.dart';
 import '../../../features/auth/presentation/auth_cubit.dart';
 import '../../../features/orgs/presentation/org_error_messages.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/formatting/date_formatting.dart';
 import '../../../shared/widgets/widgets.dart';
 
 /// Read-only projection of the authenticated session's identity.
@@ -170,7 +169,6 @@ class _ProfileBodyState extends State<_ProfileBody> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final DateFormat expiresFormat = DateFormat.yMMMd(l10n.localeName).add_jm();
     final Session session = widget.session;
     return ListView(
       padding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
@@ -199,7 +197,7 @@ class _ProfileBodyState extends State<_ProfileBody> {
         ListTile(
           contentPadding: EdgeInsets.zero,
           leading: const Icon(Icons.schedule_outlined),
-          title: Text(expiresFormat.format(session.expiresAt)),
+          title: Text(formatMediumDateTime(l10n, session.expiresAt)),
           subtitle: Text(l10n.profileExpiresLabel),
         ),
         const SizedBox(height: LegalHubTheme.spaceLg),

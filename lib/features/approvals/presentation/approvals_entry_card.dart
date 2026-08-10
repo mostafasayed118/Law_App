@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../../../app/legalhub_theme.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/app_entry_card.dart';
 
 /// Home-dashboard entry into the pending-approvals list (`/approvals`, v1
 /// queue 2026-08-09). Navigation hint only.
+///
+/// E1 compatibility wrapper: the visual shell is the shared [AppEntryCard];
+/// this class keeps the feature's icon + localized copy and the public name
+/// the home screen and tests construct by type.
 class ApprovalsEntryCard extends StatelessWidget {
   const ApprovalsEntryCard({required this.onTap, super.key});
 
@@ -13,63 +17,11 @@ class ApprovalsEntryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
-    return Material(
-      color: scheme.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusXl),
-        ),
-        side: BorderSide(color: scheme.outlineVariant),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-          child: Row(
-            children: <Widget>[
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: scheme.primaryContainer,
-                  shape: BoxShape.circle,
-                ),
-                alignment: Alignment.center,
-                child: Icon(
-                  Icons.approval_outlined,
-                  size: 22,
-                  color: scheme.onPrimaryContainer,
-                  fill: 1,
-                ),
-              ),
-              const SizedBox(width: LegalHubTheme.spaceMd),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      l10n.approvalsEntryTitle,
-                      style: text.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      l10n.approvalsEntrySubtitle,
-                      style: text.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(Icons.chevron_right, color: scheme.outline),
-            ],
-          ),
-        ),
-      ),
+    return AppEntryCard(
+      icon: Icons.approval_outlined,
+      title: l10n.approvalsEntryTitle,
+      subtitle: l10n.approvalsEntrySubtitle,
+      onTap: onTap,
     );
   }
 }

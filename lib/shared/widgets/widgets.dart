@@ -10,6 +10,7 @@
 /// converting "retained by contract" into "retained by use."
 library;
 
+export 'app_entry_card.dart';
 export 'directional_icon.dart';
 export 'form_fields/labelled_field.dart';
 export 'form_fields/legalhub_text_field.dart';

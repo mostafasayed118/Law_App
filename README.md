@@ -57,7 +57,7 @@ messaging services.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (1190 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (1202 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), ThemeCubit (mode persistence + restart
   restore), Redactor (password/OTP/email/Bearer redaction with leak guards),
@@ -93,7 +93,10 @@ messaging services.
   in-memory locale store, and the onboarding-success screen. Batch 5 added
   the 800×600 onboarding no-overflow test and the EN/AR/TR localized-fallback
   assertions.
-- Coverage: **1190 tests** (2026-08-10 — theme pass: the persisted
+- Coverage: **1202 tests** (2026-08-10 — E1/E6 extraction: shared `AppEntryCard`
+  (nine feature entry cards reduced to thin wrappers) + centralized
+  `formatMediumDate`/`formatMediumDateTime` (12 call sites de-duplicated),
+  on top of the theme pass: the persisted
   light/dark/system `ThemeCubit` + `ThemeModeStore` (SharedPreferences,
   LocaleStore pattern), settings-screen theme switcher, semantic
   success/warning/info tokens, and the app-level theme-mode wiring tests,
