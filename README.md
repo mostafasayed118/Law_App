@@ -98,8 +98,9 @@ messaging services.
   two-metadata-line billing row joins the shared tile (stray trailing gap
   dropped per owner ratification), on top of the pattern-B follow-up:
   shared `ViewStateList` (the note-wrapped ListView arms of the approvals,
-  compliance, and task-board screens unified; offline/unauthorized quirk
-  preserved), on top of the E5 extraction: shared `LabelChip`
+  compliance, and task-board screens unified; offline/unauthorized arms
+  normalized to the note-wrapped empty arm per owner decision), on top of
+  the E5 extraction: shared `LabelChip`
   (the matter status / document type / message count / roster role and
   status chips unified; the audit `_OutcomeChip` and home `StatusChip` keep
   their distinct geometry), on top of the E4 extraction: shared

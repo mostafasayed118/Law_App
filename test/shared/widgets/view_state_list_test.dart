@@ -9,8 +9,9 @@ import 'package:legalhub/shared/widgets/view_state_list.dart';
 // docs/view_state_list_followup_design_2026-08-11.md): the approvals,
 // compliance, and task-board screens previously duplicated this
 // note-wrapped ListView switch. These tests pin the rendering contract —
-// including the preserved offline/unauthorized quirk (plain empty copy, no
-// note) and the note placement on the empty and success arms.
+// including the owner-normalized offline/unauthorized arms (now the same
+// note-wrapped empty ListView as the empty arm) and the note placement on
+// the empty and success arms.
 void main() {
   Widget pumpViewState<T>(ViewState<T> state, {VoidCallback? onRetry}) {
     return MaterialApp(
@@ -50,17 +51,17 @@ void main() {
     expect(find.text('Local-only note'), findsOneWidget);
   });
 
-  testWidgets('offline and unauthorized render the plain empty copy, no note '
-      '(quirk preserved)', (tester) async {
+  testWidgets('offline and unauthorized render the note-wrapped empty arm '
+      '(owner-normalized)', (tester) async {
     await tester.pumpWidget(pumpViewState<String>(const ViewOffline<String>()));
     expect(find.text('empty copy'), findsOneWidget);
-    expect(find.text('Local-only note'), findsNothing);
+    expect(find.text('Local-only note'), findsOneWidget);
 
     await tester.pumpWidget(
       pumpViewState<String>(const ViewUnauthorized<String>()),
     );
     expect(find.text('empty copy'), findsOneWidget);
-    expect(find.text('Local-only note'), findsNothing);
+    expect(find.text('Local-only note'), findsOneWidget);
   });
 
   testWidgets('error branch renders the error copy and fires retry', (

@@ -15,10 +15,10 @@ import '../../l10n/app_localizations.dart';
 /// local-only note, and tile builder; the arms render identically
 /// everywhere.
 ///
-/// Behavior note: the offline/unauthorized arms render the *plain* empty
-/// copy while the empty arm renders the note-wrapped ListView — the
-/// pre-existing posture is preserved (see the design doc's §4 decision
-/// point).
+/// Behavior note: the offline/unauthorized arms render the same
+/// note-wrapped empty ListView as the empty arm — normalized per the owner
+/// decision recorded in the design doc's §4 (previously they rendered the
+/// plain empty copy, an inconsistency of the pre-extraction screens).
 class ViewStateList<T> extends StatelessWidget {
   const ViewStateList({
     required this.state,
@@ -42,8 +42,8 @@ class ViewStateList<T> extends StatelessWidget {
   /// The success arm's tile widgets, including their inter-tile gaps.
   final List<Widget> Function(BuildContext context, T data) itemBuilder;
 
-  /// The feature's plain empty copy, rendered for empty (inside the
-  /// note-wrapped ListView) and for offline/unauthorized (unwrapped).
+  /// The feature's plain empty copy, rendered inside the note-wrapped
+  /// ListView for empty, offline, and unauthorized alike.
   final Widget empty;
 
   /// The feature's error copy, rendered above the retry button.
@@ -68,7 +68,7 @@ class ViewStateList<T> extends StatelessWidget {
         padding: EdgeInsetsDirectional.all(LegalHubTheme.spaceXl),
         child: Center(child: CircularProgressIndicator()),
       ),
-      ViewEmpty<T>() => ListView(
+      ViewEmpty<T>() || ViewOffline<T>() || ViewUnauthorized<T>() => ListView(
         padding: listPadding,
         children: <Widget>[
           empty,
@@ -89,7 +89,6 @@ class ViewStateList<T> extends StatelessWidget {
           ),
         ],
       ),
-      ViewOffline<T>() || ViewUnauthorized<T>() => empty,
       ViewSuccess<T>(data: final T data) => ListView(
         padding: listPadding,
         children: <Widget>[

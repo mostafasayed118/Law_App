@@ -104,12 +104,13 @@ documented at its site and kept as-is:
 
 1. **Pattern-B list screens — approvals, compliance, tasks.** Their
    loading/empty/error arms are wrapped in `ListView`s with local-only
-   notes, and their offline/unauthorized arms render the *plain* empty copy
-   while the empty arm renders the note-wrapped variant. **ADDRESSED
+   notes, and their offline/unauthorized arms rendered the *plain* empty
+   copy while the empty arm rendered the note-wrapped variant. **ADDRESSED
    2026-08-11** by `lib/shared/widgets/view_state_list.dart` (design:
    `docs/view_state_list_followup_design_2026-08-11.md`) — a sibling of
    `ViewStateSwitch` that owns the ListView + note layout; the
-   offline/unauthorized quirk is preserved and pinned by tests.
+   offline/unauthorized arms are now **normalized** to the note-wrapped
+   empty arm per the owner decision in the design doc §4.
 2. **Invoice tile (billing).** Two subtitle lines plus a stray trailing
    `SizedBox` gap — did not fit the single-subtitle `AppTile` row.
    **ADDRESSED 2026-08-11** — `AppTile.subtitle` generalized to
@@ -141,8 +142,8 @@ documented at its site and kept as-is:
 ## 6. Follow-ups
 
 - **Pattern-B scrollable-state variant — DONE 2026-08-11** (`ViewStateList`,
-  approvals/compliance/tasks re-pointed). Optional owner decision remains:
-  normalize the offline/empty-arm quirk (see the design doc §4).
+  approvals/compliance/tasks re-pointed); the offline/empty-arm
+  inconsistency is also **normalized** (owner decision, design doc §4).
 - **Invoice-tile multi-line variant — DONE 2026-08-11** (billing joins
   `AppTile` via `subtitles: List<String>`; stray gap dropped, owner-ratified).
 - Optional: fold `_OutcomeChip`/home `StatusChip` into a parameterized

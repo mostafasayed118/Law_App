@@ -133,15 +133,11 @@ local stays (used by both the widget and nothing else in the builder).
 - **Every arm renders byte-identically** to today: same paddings, gaps,
   colors, styles, note placement, retry label (`l10n.retry` resolved
   internally, like `showConfirmDialog`'s cancel).
-- **The offline/unauthorized quirk is preserved**: those two arms render the
-  *plain* `empty` copy while the empty arm renders the note-wrapped ListView.
-  This is an existing inconsistency (offline users see no note), but it is
-  today's behavior and is pinned, not silently "fixed".
-- **Owner decision (optional, NOT required to ship):** if the owner wants
-  offline/unauthorized to render the note-wrapped empty arm for consistency,
-  that is a one-line change inside `ViewStateList` (route both arms to the
-  empty-arm render) + a re-pinned test. It is recorded here as a separate
-  decision so the extraction itself needs no behavioral judgment.
+- **Owner decision — DECIDED 2026-08-11:** normalize the offline/
+  unauthorized arms. They render the same note-wrapped empty ListView as
+  the empty arm (the pre-extraction screens showed the plain `empty` copy
+  with no note — an inconsistency where offline users saw no note). The
+  normalization is a grouped arm in `ViewStateList` + a re-pinned test.
 
 ## 5. Tests
 
@@ -150,7 +146,8 @@ New `test/shared/widgets/view_state_list_test.dart`, mirroring the
 
 1. loading → spinner, no list
 2. empty → note-wrapped ListView with the empty copy + note text
-3. offline and unauthorized → plain empty copy, **no note** (the quirk pin)
+3. offline and unauthorized → note-wrapped empty arm, **with the note** (the
+   owner-normalized pin)
 4. error → error copy + retry, retry tap fires `onRetry`
 5. success → items then `spaceLg`-gap then the note
 6. RTL + 320px no-overflow
@@ -172,5 +169,6 @@ stay green unchanged (they find the same text/labels).
 - [ ] Commit as `refactor(shared): extract ViewStateList for note-wrapped list screens`
 
 Estimated size: **S** (one widget + 3 mechanical re-points + one test file).
-Risk: low — the rendering contract is pinned by tests; the only judgment
-call (offline quirk) is explicitly preserved by default.
+Risk: low — the rendering contract is pinned by tests; the one judgment
+call (the offline/unauthorized arms) was resolved by owner decision
+(normalize) on 2026-08-11.
