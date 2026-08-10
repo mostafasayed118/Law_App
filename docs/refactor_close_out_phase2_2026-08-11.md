@@ -230,5 +230,27 @@ widgets in the barrel, suite 1193 → 1261 (**+68 tests**), all gates
 green, every commit gated and pushed. The honest Phase-4 candidates, if
 any further code-quality work is wanted, are **not** extraction: the
 optional file decomposition of the two 500+ line screens (readability)
-— executed, see the close-out above — plus coverage deepening
-(admin/booking step tests) or moving to feature work per the roadmap.
+— executed, see the close-outs above — plus coverage deepening
+(admin/booking step tests) — executed, see below — or moving to feature
+work per the roadmap.
+
+**Phase-4 slate close-out (2026-08-11)** — the Phase-4 slate is FULLY
+EXECUTED. Every candidate from the §7 decision is done and pushed:
+
+| Item | Commits | Suite |
+|---|---|---|
+| Readability split — booking | `4bce267` | 1261 |
+| Readability split — admin | `61d9191` | 1261 |
+| Readability close-out | `d8456cf` | 1261 |
+| Coverage deepening — admin terminal states | `71b5efe` | 1261 → 1263 |
+| Coverage deepening — booking steps + retry fix | `328489d` | 1263 → 1270 |
+
+No Phase-4 items remain open: no further extraction (residuals are all
+deliberate-distinct geometry), no further readability splits (both
+500+ line screens split), no further coverage-deepening arms (admin
+terminal states + booking step states pinned, with the latent slot-retry
+defect found and fixed by the new arm). The remaining forward hooks are
+the non-refactor kind: feature work per the roadmap (deferred product
+areas) or a new audit pass. Final verified state at `328489d`: suite
+1270, format clean, analyze clean, ledger PASS 115/0/0, policy PASS
+73/0/0, tree clean, `origin/main == HEAD`.
