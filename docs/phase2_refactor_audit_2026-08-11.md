@@ -5,10 +5,12 @@
 > extraction series (`docs/refactor_close_out_2026-08-11.md`), produced as
 > the prioritized extraction list the owner asked for.
 >
-> **Status: COMPLETE 2026-08-11** — audit performed against `main` at
-> `148ea95` (working tree clean, `origin/main == HEAD`), all claims
-> verified against the code with `file:line` citations. No code was
-> changed; this record is the input to the next extraction decisions.
+> **Status: EXECUTED 2026-08-11** — audit performed against `main` at
+> `148ea95`; all four planned extractions (E7–E10) were subsequently
+> implemented, tested, committed, and pushed to `origin/main` (§7). This
+> record served as the approved extraction list for the execution slice.
+> All claims were verified against the code with `file:line` citations at
+> audit time.
 >
 > **Scope discipline:** every candidate below was judged against the
 > Phase-1 rules — extract only what has a clear responsibility and is
@@ -201,3 +203,46 @@ gain **#6 ADDRESSED** and **#5 partially ADDRESSED** on completion.
   no separate widget was needed.
 - The org-audit `_OutcomeChip` (residual #3) and home `StatusChip`
   (residual #4) remain deliberately distinct geometries — no change.
+
+## 7. Execution close-out (2026-08-11)
+
+All four planned extractions were implemented, tested, committed, and
+pushed as separate commits, following the E1–E6 pattern:
+
+| # | Commit | Content | Tests |
+|---|---|---|---|
+| E7 | `821631e` | `AppFilterChips<T>` + 2 re-pointed chip rows | +6 (suite 1242) |
+| E8 | `b1d7725` | 4 workspace rows → `AppTile` + `fileSizeLabel` | +1 (suite 1243) |
+| E9 | `b3d21c9` | `AppCenteredRetry` + 2 re-pointed error arms | +4 (suite 1247) |
+| E10 | `74970ae` | `WorkspaceSection<T>` + 4 re-pointed sections | +7 (suite 1254) |
+
+Plus the audit record itself (`38fe212`). **Suite: 1236 → 1254** (+18
+new tests, none deleted or weakened).
+
+### Gates at close-out
+
+- `dart format --set-exit-if-changed lib test` — clean
+- `flutter analyze` — No issues found
+- `flutter test` — **1254 passed**
+- `bash scripts/verify_ledger.sh` — PASS 115/0/0
+- `bash scripts/verify_policy_tests.sh --check` — PASS 73/0/0
+- `git status` — clean; `origin/main == HEAD` at `74970ae`
+
+### Residual-list outcome (vs the E1–E6 close-out)
+
+- Close-out residual #5 (centered-message screens): **PARTIALLY ADDRESSED
+  (E9)** — the two identical error arms unified; booking's start-aligned
+  `ViewError` arm stays excluded.
+- Close-out residual #6 (workspace rows): **PARTIALLY ADDRESSED (E8 + E10)**
+  — the four workspace rows delegate to `AppTile`, and the section shells
+  delegate to `WorkspaceSection`; the thread-detail `_MessageTile` stays
+  excluded (genuinely different shape).
+- Residuals #3 (`_OutcomeChip`) and #4 (home `StatusChip`) unchanged —
+  deliberately distinct geometries.
+
+### Remaining planned surface (from §2 P2 — deliberately not extracted)
+
+- `_GroupSection` (search) — single-screen; promoted only if a second
+  screen grows the same header.
+- Controller-fields `_SearchField`/`_TopicField` — differ in
+  initialization and cubit calls; merging risks a subtle behavior change.
