@@ -246,3 +246,52 @@ new tests, none deleted or weakened).
   screen grows the same header.
 - Controller-fields `_SearchField`/`_TopicField` — differ in
   initialization and cubit calls; merging risks a subtle behavior change.
+
+## 8. Post-close-out re-audit (2026-08-11, after E7–E10)
+
+Re-scan of the full feature surface at `9d142ff` (suite 1254). The E7–E10
+clusters are gone; the remaining duplication is concentrated in the
+centered-state family — the part of close-out residual #5 (centered-message
+screens) that E9 did not touch.
+
+### Candidate A — `AppCenteredMessage` (2 byte-identical plain messages)
+
+- `_message` in `attorney_profile_screen.dart:105` and
+  `matter_details_screen.dart:124` are byte-identical: `Center` →
+  `Padding(spaceLg)` → centered `Text(bodyMedium onSurfaceVariant)`. The
+  only difference is an unused `l10n` parameter in the matter-details copy.
+- A shared `AppCenteredMessage(text)` — 2 sites, mechanical, **P0-sized**.
+  This is the plain-text half of residual #5 (the error half was E9).
+
+### Candidate B — centered icon-state family (org-audit, 3 near-copies)
+
+- `org_audit_screen.dart` has three copies of the same centered
+  icon-state shell: `_EmptyState` (211, `check_circle_outline` 40
+  `outline`), `_DeniedState` (245, `lock_outline` 40 `error`),
+  `_ErrorState` (274, `cloud_off_outlined` 40 `error` + retry
+  `FilledButton`). Each: `Center` → `Padding(marginMobile)` →
+  `Column(min)` → `Icon(40)` + `spaceMd` + centered `Text` (+ optional
+  action).
+- Admin's `_DeniedState`/`_FailedState` (532/576) are **similar but not
+  clones** — `spaceSm` gaps, `headlineSmall` title, 32px icon, `TextButton`
+  retry. Different geometry, do not force into the same widget.
+- Verdict: **P1-optional** — a parameterized `AppCenteredState(icon,
+  iconColor, message, action?)` would collapse the org-audit trio (≈60
+  lines) but is single-screen reuse (orgs only); per the Phase-1 rules it
+  is a legitimate local consolidation rather than a cross-feature
+  extraction. Defer unless a second screen grows the same shape.
+
+### Re-verified as still NOT worth extracting
+
+- Label/value rows (`_DetailRow`/`_SummaryRow`/`_InfoRow`), member rows
+  (admin vs orgs), audit rows (admin/orgs/hub), `_MessageTile`,
+  `_SelectableTile`, `_AuditSection`, `_GroupSection`, controller-fields
+  (`_SearchField`/`_TopicField`) — all unchanged from §3; each is a
+  genuinely different geometry or single-screen use.
+- Booking `_SuccessStep` (405) — centered success celebration (56px icon,
+  headline, ListView) — a different shape from both candidates.
+
+### Post-E10 barrel
+
+11 shared widgets (E7–E10 added `AppFilterChips`, `AppCenteredRetry`,
+`WorkspaceSection` to the E1–E6 set of 8).
