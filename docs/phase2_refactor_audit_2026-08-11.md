@@ -164,6 +164,8 @@ different geometry or domain meaning, not a superficial clone:
 ## 5. Suggested execution order
 
 1. **E7** `AppFilterChips<T>` — smallest, 2 sites, mechanical.
+   **COMPLETE 2026-08-11** — `lib/shared/widgets/app_filter_chips.dart`
+   (+6 tests, suite 1236 → 1242), both chip rows re-pointed.
 2. **E8** workspace rows → `AppTile` — kills close-out residual #6, 4
    sites, enabled by the `subtitles` generalization.
 3. **E9** `AppCenteredRetry` — 2 sites, partial #5 resolution.

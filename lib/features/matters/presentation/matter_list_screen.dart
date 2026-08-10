@@ -84,12 +84,20 @@ class _ListSurfaceState extends State<_ListSurface> {
       body: SafeArea(
         child: BlocBuilder<MatterCubit, MatterState>(
           builder: (BuildContext context, MatterState state) {
+            final MatterCubit cubit = context.read<MatterCubit>();
             return ListView(
               padding: const EdgeInsetsDirectional.all(
                 LegalHubTheme.marginMobile,
               ),
               children: <Widget>[
-                _StatusFilterChips(selected: state.status),
+                AppFilterChips<MatterStatus>(
+                  values: MatterStatus.values,
+                  selected: state.status,
+                  allLabel: l10n.matterFilterAll,
+                  labelOf: (MatterStatus status) =>
+                      matterStatusLabel(l10n, status),
+                  onSelected: cubit.setStatus,
+                ),
                 const SizedBox(height: LegalHubTheme.spaceLg),
                 _resultsView(context, state, l10n, text, scheme),
                 const SizedBox(height: LegalHubTheme.spaceLg),
@@ -155,39 +163,6 @@ class _ListSurfaceState extends State<_ListSurface> {
             ),
       empty: empty,
       errorCopy: l10n.matterError,
-    );
-  }
-}
-
-class _StatusFilterChips extends StatelessWidget {
-  const _StatusFilterChips({required this.selected});
-
-  final MatterStatus? selected;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context);
-    final MatterCubit cubit = context.read<MatterCubit>();
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: <Widget>[
-          FilterChip(
-            label: Text(l10n.matterFilterAll),
-            selected: selected == null,
-            onSelected: (_) => cubit.setStatus(null),
-          ),
-          for (final MatterStatus status in MatterStatus.values) ...<Widget>[
-            const SizedBox(width: LegalHubTheme.spaceSm),
-            FilterChip(
-              label: Text(matterStatusLabel(l10n, status)),
-              selected: selected == status,
-              onSelected: (bool value) =>
-                  cubit.setStatus(value ? status : null),
-            ),
-          ],
-        ],
-      ),
     );
   }
 }

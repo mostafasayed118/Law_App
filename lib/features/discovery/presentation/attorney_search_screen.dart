@@ -67,6 +67,7 @@ class _SearchSurfaceState extends State<_SearchSurface> {
       body: SafeArea(
         child: BlocBuilder<DiscoveryCubit, DiscoveryState>(
           builder: (BuildContext context, DiscoveryState state) {
+            final DiscoveryCubit cubit = context.read<DiscoveryCubit>();
             return ListView(
               padding: const EdgeInsetsDirectional.all(
                 LegalHubTheme.marginMobile,
@@ -74,7 +75,13 @@ class _SearchSurfaceState extends State<_SearchSurface> {
               children: <Widget>[
                 const _SearchField(),
                 const SizedBox(height: LegalHubTheme.spaceMd),
-                _AreaFilterChips(selected: state.practiceArea),
+                AppFilterChips<PracticeArea>(
+                  values: PracticeArea.values,
+                  selected: state.practiceArea,
+                  allLabel: l10n.discoveryFilterAll,
+                  labelOf: (PracticeArea area) => practiceAreaLabel(l10n, area),
+                  onSelected: cubit.setPracticeArea,
+                ),
                 const SizedBox(height: LegalHubTheme.spaceLg),
                 _resultsView(context, state, l10n, text, scheme),
                 const SizedBox(height: LegalHubTheme.spaceLg),
@@ -166,39 +173,6 @@ class _SearchFieldState extends State<_SearchField> {
       controller: _controller,
       hint: l10n.discoverySearchHint,
       prefixIcon: Icons.search,
-    );
-  }
-}
-
-class _AreaFilterChips extends StatelessWidget {
-  const _AreaFilterChips({required this.selected});
-
-  final PracticeArea? selected;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context);
-    final DiscoveryCubit cubit = context.read<DiscoveryCubit>();
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: <Widget>[
-          FilterChip(
-            label: Text(l10n.discoveryFilterAll),
-            selected: selected == null,
-            onSelected: (_) => cubit.setPracticeArea(null),
-          ),
-          for (final PracticeArea area in PracticeArea.values) ...<Widget>[
-            const SizedBox(width: LegalHubTheme.spaceSm),
-            FilterChip(
-              label: Text(practiceAreaLabel(l10n, area)),
-              selected: selected == area,
-              onSelected: (bool value) =>
-                  cubit.setPracticeArea(value ? area : null),
-            ),
-          ],
-        ],
-      ),
     );
   }
 }
