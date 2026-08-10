@@ -42,22 +42,22 @@ void main() {
       await tester.pumpWidget(pumpScreen(const Locale('en')));
       await tester.pumpAndSettle();
 
-      // Enter an initial password that satisfies the minLength(8) rule.
-      await tester.enterText(find.byType(TextFormField).first, 'password1');
+      // Enter an initial password that satisfies the strong-password rule.
+      await tester.enterText(find.byType(TextFormField).first, 'Str0ng-Pass-1');
       await tester.pump();
 
       // Enter a matching confirm value; validation must pass at this point.
-      await tester.enterText(find.byType(TextFormField).last, 'password1');
+      await tester.enterText(find.byType(TextFormField).last, 'Str0ng-Pass-1');
       final FormState form = tester.state(find.byType(Form));
       expect(form.validate(), isTrue);
 
       // Now edit the new-password field to a different value WITHOUT
       // rebuilding the confirm validator's closure. If the validator had
       // captured the old password at build time, re-validating would still
-      // pass against 'password1' (the stale value) — a false positive. With
-      // the fix, re-validating must FAIL because the confirm field no longer
-      // matches the current password.
-      await tester.enterText(find.byType(TextFormField).first, 'newpassword2');
+      // pass against 'Str0ng-Pass-1' (the stale value) — a false positive.
+      // With the fix, re-validating must FAIL because the confirm field no
+      // longer matches the current password.
+      await tester.enterText(find.byType(TextFormField).first, 'Str0ng-Pass-2');
       await tester.pump();
 
       expect(form.validate(), isFalse);
@@ -70,8 +70,8 @@ void main() {
     await tester.pumpWidget(pumpScreen(const Locale('en')));
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextFormField).first, 'newpassword2');
-    await tester.enterText(find.byType(TextFormField).last, 'newpassword2');
+    await tester.enterText(find.byType(TextFormField).first, 'Str0ng-Pass-1');
+    await tester.enterText(find.byType(TextFormField).last, 'Str0ng-Pass-1');
     final FormState form = tester.state(find.byType(Form));
     expect(form.validate(), isTrue);
   });
@@ -110,8 +110,8 @@ void main() {
 
       // Enter a valid new password + matching confirmation so the form
       // validates and the submit reaches the Cubit.
-      await tester.enterText(find.byType(TextFormField).first, 'newpassword1');
-      await tester.enterText(find.byType(TextFormField).last, 'newpassword1');
+      await tester.enterText(find.byType(TextFormField).first, 'Str0ng-Pass-1');
+      await tester.enterText(find.byType(TextFormField).last, 'Str0ng-Pass-1');
       await tester.pump();
 
       final ElevatedButton submit = tester.widget<ElevatedButton>(

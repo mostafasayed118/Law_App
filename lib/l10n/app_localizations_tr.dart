@@ -169,7 +169,8 @@ class AppLocalizationsTr extends AppLocalizations {
   String get phonePlaceholder => '+1 (555) 000-0000';
 
   @override
-  String get passwordHint => 'En az 8 karakter olmalıdır.';
+  String get passwordHint =>
+      'En az 12 karakter ve 4\'ten 3\'ü: büyük harf, küçük harf, rakam, sembol.';
 
   @override
   String get agreeToTerms =>
@@ -362,6 +363,28 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get validatorMismatch => 'Şifreler eşleşmiyor.';
+
+  @override
+  String validatorPasswordLength(int count) {
+    return 'En az $count karakter olmalıdır.';
+  }
+
+  @override
+  String get validatorPasswordClasses =>
+      '4\'ten en az 3\'ünü içermelidir: büyük harf, küçük harf, rakam, sembol.';
+
+  @override
+  String get validatorPasswordEmail =>
+      'Şifreniz e-posta adresinizi içermemelidir.';
+
+  @override
+  String get passwordStrengthWeak => 'Zayıf';
+
+  @override
+  String get passwordStrengthFair => 'Orta';
+
+  @override
+  String get passwordStrengthStrong => 'Güçlü';
 
   @override
   String get casesNavigation => 'Davalar';

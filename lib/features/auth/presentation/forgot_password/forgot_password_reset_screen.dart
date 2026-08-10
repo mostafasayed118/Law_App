@@ -105,7 +105,32 @@ class _ForgotPasswordResetScreenState extends State<ForgotPasswordResetScreen> {
                       controller: _password,
                       label: l10n.newPasswordLabel,
                       hint: l10n.passwordPlaceholder,
-                      validator: LegalHubValidators.minLength(l10n, 8),
+                      // Same strong-password policy as sign-up (NIST
+                      // 800-63B / OWASP): min 12 chars, 3 of 4 classes,
+                      // no email inclusion against the threaded email.
+                      validator: LegalHubValidators.strongPassword(
+                        l10n,
+                        email: routing.email,
+                      ),
+                    ),
+                    // Live strength tier (icon + label, never color alone).
+                    ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: _password,
+                      builder:
+                          (BuildContext context, TextEditingValue value, _) {
+                            return Padding(
+                              padding: const EdgeInsetsDirectional.only(
+                                top: LegalHubTheme.spaceXs,
+                                start: LegalHubTheme.spaceXs,
+                              ),
+                              child: Align(
+                                alignment: AlignmentDirectional.centerStart,
+                                child: PasswordStrengthIndicator(
+                                  value: value.text,
+                                ),
+                              ),
+                            );
+                          },
                     ),
                     const SizedBox(height: LegalHubTheme.spaceMd),
                     PasswordField(

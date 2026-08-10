@@ -68,8 +68,11 @@ void main() {
       'amira@example.com',
     );
     await tester.enterText(find.byType(TextFormField).at(2), '+201234567890');
-    await tester.enterText(find.byType(TextFormField).at(3), 'strong-pw-1');
+    await tester.enterText(find.byType(TextFormField).at(3), 'Str0ng-Pass-1');
     await tester.pump();
+    // The form grew taller with the strength indicator; scroll the terms
+    // checkbox into the test viewport before tapping it.
+    await tester.ensureVisible(find.byType(Checkbox));
     await tester.tap(find.byType(Checkbox));
     await tester.pump();
   }
@@ -84,6 +87,38 @@ void main() {
     expect(find.byType(TextFormField), findsNWidgets(4));
   });
 
+  testWidgets('shows the live strength tier for the password field', (
+    tester,
+  ) async {
+    await tester.pumpWidget(pumpScreen());
+    await tester.pumpAndSettle();
+
+    // Empty field: the indicator stays hidden.
+    expect(find.text('Weak'), findsNothing);
+    expect(find.text('Fair'), findsNothing);
+    expect(find.text('Strong'), findsNothing);
+
+    // A weak value shows the Weak tier (icon + label, never color alone).
+    await tester.enterText(find.byType(TextFormField).at(3), 'abc');
+    await tester.pump();
+    expect(find.text('Weak'), findsOneWidget);
+
+    // A policy-meeting value (4 classes, 13 chars) shows Fair.
+    await tester.enterText(find.byType(TextFormField).at(3), 'Str0ng-Pass-1');
+    await tester.pump();
+    expect(find.text('Weak'), findsNothing);
+    expect(find.text('Fair'), findsOneWidget);
+
+    // A long 4-class value shows Strong.
+    await tester.enterText(
+      find.byType(TextFormField).at(3),
+      'Str0ng-Pass-1234',
+    );
+    await tester.pump();
+    expect(find.text('Fair'), findsNothing);
+    expect(find.text('Strong'), findsOneWidget);
+  });
+
   testWidgets(
     'disables the create-account button until the terms box is checked',
     (tester) async {
@@ -95,6 +130,7 @@ void main() {
       );
       expect(button.onPressed, isNull);
 
+      await tester.ensureVisible(find.byType(Checkbox));
       await tester.tap(find.byType(Checkbox));
       await tester.pump();
 
@@ -111,6 +147,7 @@ void main() {
       await tester.pumpWidget(pumpScreen());
       await tester.pumpAndSettle();
 
+      await tester.ensureVisible(find.byType(Checkbox));
       await tester.tap(find.byType(Checkbox));
       await tester.pump();
 
@@ -157,7 +194,7 @@ void main() {
       expect(gateway.received!.name, 'Amira Hassan');
       expect(gateway.received!.email, 'amira@example.com');
       expect(gateway.received!.phone, '+201234567890');
-      expect(gateway.received!.password, 'strong-pw-1');
+      expect(gateway.received!.password, 'Str0ng-Pass-1');
 
       // Success (Phase 4.2): the form is replaced by the check-your-inbox
       // confirmation. No snackbar, no silent route to sign-in — the user

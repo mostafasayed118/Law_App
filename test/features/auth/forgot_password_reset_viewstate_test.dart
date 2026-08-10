@@ -43,8 +43,8 @@ void main() {
 
       // Enter a valid new password and matching confirmation so the form
       // validates and the submit reaches the Cubit.
-      await tester.enterText(find.byType(TextFormField).first, 'newpassword1');
-      await tester.enterText(find.byType(TextFormField).last, 'newpassword1');
+      await tester.enterText(find.byType(TextFormField).first, 'Str0ng-Pass-1');
+      await tester.enterText(find.byType(TextFormField).last, 'Str0ng-Pass-1');
       await tester.pump();
 
       // Submit. Invoke the ElevatedButton directly to avoid hit-test

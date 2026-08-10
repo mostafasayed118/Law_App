@@ -92,8 +92,8 @@ void main() {
 
       // Step 3: enter a new password + matching confirmation, then submit.
       expect(find.text('Reset Password'), findsWidgets);
-      await tester.enterText(find.byType(TextFormField).first, 'newpassword1');
-      await tester.enterText(find.byType(TextFormField).last, 'newpassword1');
+      await tester.enterText(find.byType(TextFormField).first, 'Str0ng-Pass-1');
+      await tester.enterText(find.byType(TextFormField).last, 'Str0ng-Pass-1');
       await tester.pump();
       tester
           .widget<ElevatedButton>(find.byType(ElevatedButton).last)
@@ -105,7 +105,7 @@ void main() {
       expect(gateway.received, isNotNull);
       expect(gateway.received!.email, 'amira@example.com');
       expect(gateway.received!.otp, '012345');
-      expect(gateway.received!.newPassword, 'newpassword1');
+      expect(gateway.received!.newPassword, 'Str0ng-Pass-1');
     },
   );
 

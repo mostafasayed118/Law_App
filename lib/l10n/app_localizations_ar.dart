@@ -168,7 +168,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get phonePlaceholder => '+1 (555) 000-0000';
 
   @override
-  String get passwordHint => 'يجب أن تكون ٨ أحرف على الأقل.';
+  String get passwordHint =>
+      'يجب أن تكون ١٢ حرفًا على الأقل مع ٣ من ٤: أحرف كبيرة، صغيرة، أرقام، رموز.';
 
   @override
   String get agreeToTerms => 'أوافق على الشروط والأحكام وسياسة الخصوصية.';
@@ -359,6 +360,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get validatorMismatch => 'كلمتا المرور غير متطابقتين.';
+
+  @override
+  String validatorPasswordLength(int count) {
+    return 'يجب أن يكون على الأقل $count أحرف.';
+  }
+
+  @override
+  String get validatorPasswordClasses =>
+      'أدخل ٣ من ٤ على الأقل: أحرف كبيرة، صغيرة، أرقام، رموز.';
+
+  @override
+  String get validatorPasswordEmail =>
+      'لا تُدرج عنوان بريدك الإلكتروني في كلمة المرور.';
+
+  @override
+  String get passwordStrengthWeak => 'ضعيفة';
+
+  @override
+  String get passwordStrengthFair => 'متوسطة';
+
+  @override
+  String get passwordStrengthStrong => 'قوية';
 
   @override
   String get casesNavigation => 'القضايا';

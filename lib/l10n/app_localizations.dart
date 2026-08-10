@@ -409,7 +409,7 @@ abstract class AppLocalizations {
   /// No description provided for @passwordHint.
   ///
   /// In en, this message translates to:
-  /// **'Must be at least 8 characters.'**
+  /// **'At least 12 characters with 3 of 4: uppercase, lowercase, digit, symbol.'**
   String get passwordHint;
 
   /// No description provided for @agreeToTerms.
@@ -759,6 +759,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Passwords do not match.'**
   String get validatorMismatch;
+
+  /// No description provided for @validatorPasswordLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Must be at least {count} characters.'**
+  String validatorPasswordLength(int count);
+
+  /// No description provided for @validatorPasswordClasses.
+  ///
+  /// In en, this message translates to:
+  /// **'Include at least 3 of 4: uppercase, lowercase, digit, symbol.'**
+  String get validatorPasswordClasses;
+
+  /// No description provided for @validatorPasswordEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t include your email address in the password.'**
+  String get validatorPasswordEmail;
+
+  /// No description provided for @passwordStrengthWeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Weak'**
+  String get passwordStrengthWeak;
+
+  /// No description provided for @passwordStrengthFair.
+  ///
+  /// In en, this message translates to:
+  /// **'Fair'**
+  String get passwordStrengthFair;
+
+  /// No description provided for @passwordStrengthStrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong'**
+  String get passwordStrengthStrong;
 
   /// No description provided for @casesNavigation.
   ///

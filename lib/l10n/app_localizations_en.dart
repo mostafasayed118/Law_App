@@ -168,7 +168,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get phonePlaceholder => '+1 (555) 000-0000';
 
   @override
-  String get passwordHint => 'Must be at least 8 characters.';
+  String get passwordHint =>
+      'At least 12 characters with 3 of 4: uppercase, lowercase, digit, symbol.';
 
   @override
   String get agreeToTerms =>
@@ -360,6 +361,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get validatorMismatch => 'Passwords do not match.';
+
+  @override
+  String validatorPasswordLength(int count) {
+    return 'Must be at least $count characters.';
+  }
+
+  @override
+  String get validatorPasswordClasses =>
+      'Include at least 3 of 4: uppercase, lowercase, digit, symbol.';
+
+  @override
+  String get validatorPasswordEmail =>
+      'Don\'t include your email address in the password.';
+
+  @override
+  String get passwordStrengthWeak => 'Weak';
+
+  @override
+  String get passwordStrengthFair => 'Fair';
+
+  @override
+  String get passwordStrengthStrong => 'Strong';
 
   @override
   String get casesNavigation => 'Cases';
