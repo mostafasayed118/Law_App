@@ -227,7 +227,7 @@ class _DocumentTile extends StatelessWidget {
     return AppTile(
       icon: Icons.folder_outlined,
       title: document.title,
-      subtitle: '${documentTypeLabel(l10n, document.type)} · $date',
+      subtitles: <String>['${documentTypeLabel(l10n, document.type)} · $date'],
       // The chips wrap beneath the metadata line (the roster pattern); the
       // link chip stays the only tap target in the row (D-C2), so the card
       // itself renders no InkWell and no chevron (AppTile null onTap).

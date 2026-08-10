@@ -111,8 +111,12 @@ documented at its site and kept as-is:
    `ViewStateSwitch` that owns the ListView + note layout; the
    offline/unauthorized quirk is preserved and pinned by tests.
 2. **Invoice tile (billing).** Two subtitle lines plus a stray trailing
-   `SizedBox` gap — does not fit the single-subtitle `AppTile` row without
-   a multi-line variant (designed follow-up).
+   `SizedBox` gap — did not fit the single-subtitle `AppTile` row.
+   **ADDRESSED 2026-08-11** — `AppTile.subtitle` generalized to
+   `subtitles: List<String>` (design:
+   `docs/invoice_tile_followup_design_2026-08-11.md`); the billing row now
+   delegates to `AppTile` with two metadata lines, and the stray gap was
+   dropped per the owner-ratified §4 cleanup.
 3. **Audit `_OutcomeChip` (orgs).** `spaceXs` vertical padding, `radiusLg`,
    `labelMedium` — different geometry from `LabelChip`'s `spaceSm`/`radiusSm`.
 4. **Home `StatusChip` (dashboard).** Uppercase text transform, `spaceXs`
@@ -139,6 +143,7 @@ documented at its site and kept as-is:
 - **Pattern-B scrollable-state variant — DONE 2026-08-11** (`ViewStateList`,
   approvals/compliance/tasks re-pointed). Optional owner decision remains:
   normalize the offline/empty-arm quirk (see the design doc §4).
-- Invoice-tile two-subtitle-line variant so billing joins `AppTile`.
+- **Invoice-tile multi-line variant — DONE 2026-08-11** (billing joins
+  `AppTile` via `subtitles: List<String>`; stray gap dropped, owner-ratified).
 - Optional: fold `_OutcomeChip`/home `StatusChip` into a parameterized
   `LabelChip` only if a second consumer of their geometry appears.

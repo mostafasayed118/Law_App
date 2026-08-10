@@ -122,7 +122,7 @@ class _ApprovalTile extends StatelessWidget {
     return AppTile(
       leading: Icon(status.$1, size: 20, color: scheme.onSurfaceVariant),
       title: '${approval.entityType} · ${approval.reference}',
-      subtitle: '${status.$2} · $date',
+      subtitles: <String>['${status.$2} · $date'],
     );
   }
 }

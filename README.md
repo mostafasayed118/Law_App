@@ -57,7 +57,7 @@ messaging services.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (1231 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (1233 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), ThemeCubit (mode persistence + restart
   restore), Redactor (password/OTP/email/Bearer redaction with leak guards),
@@ -93,8 +93,11 @@ messaging services.
   in-memory locale store, and the onboarding-success screen. Batch 5 added
   the 800×600 onboarding no-overflow test and the EN/AR/TR localized-fallback
   assertions.
-- Coverage: **1231 tests** (2026-08-11 — pattern-B follow-up: shared
-  `ViewStateList` (the note-wrapped ListView arms of the approvals,
+- Coverage: **1233 tests** (2026-08-11 — invoice-tile follow-up:
+  `AppTile.subtitle` generalized to `subtitles: List<String>` so the
+  two-metadata-line billing row joins the shared tile (stray trailing gap
+  dropped per owner ratification), on top of the pattern-B follow-up:
+  shared `ViewStateList` (the note-wrapped ListView arms of the approvals,
   compliance, and task-board screens unified; offline/unauthorized quirk
   preserved), on top of the E5 extraction: shared `LabelChip`
   (the matter status / document type / message count / roster role and

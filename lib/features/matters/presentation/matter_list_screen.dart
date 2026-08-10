@@ -134,8 +134,9 @@ class _ListSurfaceState extends State<_ListSurface> {
                   AppTile(
                     icon: Icons.folder_outlined,
                     title: matter.title,
-                    subtitle:
-                        '${practiceAreaLabel(l10n, matter.practiceArea)} · ${matter.assignedAttorneyName}',
+                    subtitles: <String>[
+                      '${practiceAreaLabel(l10n, matter.practiceArea)} · ${matter.assignedAttorneyName}',
+                    ],
                     trailing: Wrap(
                       spacing: LegalHubTheme.spaceSm,
                       runSpacing: LegalHubTheme.spaceSm,

@@ -16,7 +16,7 @@ void main() {
     IconData? icon,
     Widget? leading,
     Widget? trailing,
-    String? subtitle,
+    List<String> subtitles = const <String>['Tile subtitle'],
     TextDirection direction = TextDirection.ltr,
     double width = 400,
   }) {
@@ -28,7 +28,7 @@ void main() {
           width: width,
           child: AppTile(
             title: 'Tile title',
-            subtitle: subtitle ?? 'Tile subtitle',
+            subtitles: subtitles,
             icon: icon,
             leading: leading,
             trailing: trailing,
@@ -139,5 +139,30 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('Tile title'), findsOneWidget);
     expect(find.text('Tile subtitle'), findsOneWidget);
+  });
+
+  testWidgets('renders multiple subtitle lines (the invoice posture)', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      pumpAppTile(
+        icon: Icons.request_quote_outlined,
+        subtitles: const <String>['USD 250 · Paid', 'matter-ref · Aug 8'],
+        width: 320,
+      ),
+    );
+
+    expect(find.text('USD 250 · Paid'), findsOneWidget);
+    expect(find.text('matter-ref · Aug 8'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('empty subtitles render no metadata line', (tester) async {
+    await tester.pumpWidget(
+      pumpAppTile(icon: Icons.folder_outlined, subtitles: const <String>[]),
+    );
+
+    expect(find.text('Tile title'), findsOneWidget);
+    expect(find.byType(Text), findsOneWidget); // title only
   });
 }

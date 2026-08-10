@@ -241,7 +241,7 @@ class _MessageThreadTile extends StatelessWidget {
     return AppTile(
       icon: Icons.forum_outlined,
       title: thread.title,
-      subtitle: '${thread.participants.join(', ')} · $date',
+      subtitles: <String>['${thread.participants.join(', ')} · $date'],
       // The chips wrap beneath the metadata line (the roster pattern); the
       // link chip stays a secondary tap target in the row (D-C2). The row
       // stays chevron-free (D-MSG1).

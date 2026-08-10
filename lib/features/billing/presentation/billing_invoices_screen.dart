@@ -115,63 +115,19 @@ class _InvoiceTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
     final String amount = invoiceAmountLabel(invoice.amountCents);
     final String status = invoiceStatusLabel(l10n, invoice.status);
     final String issued = formatMediumDate(l10n, invoice.issuedAt);
-    return Material(
-      color: scheme.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusLg),
-        ),
-        side: BorderSide(color: scheme.outlineVariant),
-      ),
-      child: Padding(
-        padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-        child: Row(
-          children: <Widget>[
-            CircleAvatar(
-              backgroundColor: scheme.primaryContainer,
-              child: Icon(
-                Icons.request_quote_outlined,
-                size: 20,
-                color: scheme.onPrimaryContainer,
-              ),
-            ),
-            const SizedBox(width: LegalHubTheme.spaceMd),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    invoice.invoiceNumber,
-                    style: text.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${invoice.currency} $amount · $status',
-                    style: text.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${invoice.matterRef} · $issued',
-                    style: text.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: LegalHubTheme.spaceSm),
-          ],
-        ),
-      ),
+    // Two metadata lines via AppTile's multi-line subtitles; the stray
+    // trailing gap of the pre-E2 row was dropped (owner-ratified cleanup,
+    // docs/invoice_tile_followup_design_2026-08-11.md §4).
+    return AppTile(
+      icon: Icons.request_quote_outlined,
+      title: invoice.invoiceNumber,
+      subtitles: <String>[
+        '${invoice.currency} $amount · $status',
+        '${invoice.matterRef} · $issued',
+      ],
     );
   }
 }

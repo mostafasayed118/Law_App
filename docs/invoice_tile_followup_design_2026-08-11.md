@@ -134,13 +134,15 @@ text lines. The responsive smoke suite already covers the billing screen at
 
 ## 6. Execution checklist
 
-- [ ] `app_tile.dart`: `subtitle` → `subtitles: List<String>` + doc comment
-- [ ] Re-point 9 `AppTile` call sites + the test helper
-- [ ] `_InvoiceTile` → `AppTile` with `subtitles: [line1, line2]`
-- [ ] `app_tile_test.dart`: rename + 2-line + empty-list tests
-- [ ] README count; `dart format`, `flutter analyze`, full `flutter test`,
-      `verify_ledger.sh`, `verify_policy_tests.sh --check`
-- [ ] Update `docs/refactor_close_out_2026-08-11.md` §4.2 → addressed
+- [x] `app_tile.dart`: `subtitle` → `subtitles: List<String>` + doc comment
+- [x] Re-point 9 `AppTile` call sites + the test helper
+- [x] `_InvoiceTile` → `AppTile` with `subtitles: [line1, line2]` (gap
+      dropped, owner-ratified)
+- [x] `app_tile_test.dart`: rename + 2-line + empty-list tests (2 new)
+- [x] README count 1231 → 1233; gates green: `dart format` clean,
+      `flutter analyze` 0 issues, `flutter test` 1236 passed,
+      `verify_ledger.sh` PASS, `verify_policy_tests.sh --check` PASS
+- [x] Update `docs/refactor_close_out_2026-08-11.md` §4.2 → addressed
 - [ ] Commit as `refactor(shared): generalize AppTile subtitles to multi-line (invoice tile)`
 
 Estimated size: **S**. Risk: low — one param rename (9 mechanical sites) +

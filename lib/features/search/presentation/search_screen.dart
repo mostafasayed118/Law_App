@@ -222,8 +222,9 @@ class _SearchSurfaceState extends State<_SearchSurface> {
               AppTile(
                 icon: Icons.folder_outlined,
                 title: matter.title,
-                subtitle:
-                    '${practiceAreaLabel(l10n, matter.practiceArea)} · ${matter.assignedAttorneyName}',
+                subtitles: <String>[
+                  '${practiceAreaLabel(l10n, matter.practiceArea)} · ${matter.assignedAttorneyName}',
+                ],
                 trailing: Wrap(
                   spacing: LegalHubTheme.spaceSm,
                   runSpacing: LegalHubTheme.spaceSm,
@@ -251,8 +252,9 @@ class _SearchSurfaceState extends State<_SearchSurface> {
               AppTile(
                 icon: Icons.folder_outlined,
                 title: document.title,
-                subtitle:
-                    '${documentTypeLabel(l10n, document.type)} · ${formatMediumDate(l10n, document.createdAt)}',
+                subtitles: <String>[
+                  '${documentTypeLabel(l10n, document.type)} · ${formatMediumDate(l10n, document.createdAt)}',
+                ],
                 trailing: Wrap(
                   spacing: LegalHubTheme.spaceSm,
                   runSpacing: LegalHubTheme.spaceSm,
@@ -280,8 +282,9 @@ class _SearchSurfaceState extends State<_SearchSurface> {
               AppTile(
                 icon: Icons.forum_outlined,
                 title: thread.title,
-                subtitle:
-                    '${thread.participants.join(', ')} · ${formatMediumDate(l10n, thread.lastActivityAt)}',
+                subtitles: <String>[
+                  '${thread.participants.join(', ')} · ${formatMediumDate(l10n, thread.lastActivityAt)}',
+                ],
                 trailing: Wrap(
                   spacing: LegalHubTheme.spaceSm,
                   runSpacing: LegalHubTheme.spaceSm,
@@ -322,8 +325,9 @@ class _SearchSurfaceState extends State<_SearchSurface> {
                   ),
                 ),
                 title: attorney.name,
-                subtitle:
-                    '${practiceAreaLabel(l10n, attorney.practiceArea)} · ${attorney.locale}',
+                subtitles: <String>[
+                  '${practiceAreaLabel(l10n, attorney.practiceArea)} · ${attorney.locale}',
+                ],
                 onTap: () => context.go(AppRoutes.attorneyProfile(attorney.id)),
               ),
               const SizedBox(height: LegalHubTheme.spaceSm),

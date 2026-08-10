@@ -21,7 +21,7 @@ import '../../app/legalhub_theme.dart';
 class AppTile extends StatelessWidget {
   const AppTile({
     required this.title,
-    this.subtitle,
+    this.subtitles = const <String>[],
     this.icon,
     this.leading,
     this.trailing,
@@ -33,8 +33,9 @@ class AppTile extends StatelessWidget {
   /// The row's title (`bodyMedium` w600).
   final String title;
 
-  /// The metadata line under the title (`bodySmall`, `onSurfaceVariant`).
-  final String? subtitle;
+  /// The metadata lines under the title (`bodySmall`, `onSurfaceVariant`),
+  /// each separated by the standard 2px gap; empty renders no subtitle.
+  final List<String> subtitles;
 
   /// Convenience leading: a primary-container avatar wrapping [icon]. Ignored
   /// when [leading] is provided.
@@ -85,10 +86,10 @@ class AppTile extends StatelessWidget {
                   title,
                   style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                 ),
-                if (subtitle != null) ...<Widget>[
+                for (final String line in subtitles) ...<Widget>[
                   const SizedBox(height: 2),
                   Text(
-                    subtitle!,
+                    line,
                     style: text.bodySmall?.copyWith(
                       color: scheme.onSurfaceVariant,
                     ),
