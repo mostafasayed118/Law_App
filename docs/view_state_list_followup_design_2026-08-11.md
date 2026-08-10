@@ -160,13 +160,15 @@ stay green unchanged (they find the same text/labels).
 
 ## 6. Execution checklist
 
-- [ ] `lib/shared/widgets/view_state_list.dart` + barrel export
-- [ ] Re-point `approvals_screen.dart`, `compliance_alerts_screen.dart`,
+- [x] `lib/shared/widgets/view_state_list.dart` + barrel export
+- [x] Re-point `approvals_screen.dart`, `compliance_alerts_screen.dart`,
       `task_board_screen.dart`
-- [ ] `test/shared/widgets/view_state_list_test.dart`
-- [ ] README count 1225 → +N; run `dart format`, `flutter analyze`,
-      full `flutter test`, `verify_ledger.sh`, `verify_policy_tests.sh --check`
-- [ ] Update `docs/refactor_close_out_2026-08-11.md` §4.1 → addressed
+- [x] `test/shared/widgets/view_state_list_test.dart` (6 tests)
+- [x] README count 1225 → 1231; gates green: `dart format` clean,
+      `flutter analyze` 0 issues, `flutter test` 1234 passed,
+      `verify_ledger.sh` PASS 115/0/0, `verify_policy_tests.sh --check`
+      PASS 73/0/0
+- [x] Update `docs/refactor_close_out_2026-08-11.md` §4.1 → addressed
 - [ ] Commit as `refactor(shared): extract ViewStateList for note-wrapped list screens`
 
 Estimated size: **S** (one widget + 3 mechanical re-points + one test file).

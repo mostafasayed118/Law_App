@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
-import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/widgets.dart';
 import '../domain/compliance_alert.dart';
 import '../domain/compliance_gateway.dart';
 import 'compliance_alerts_cubit.dart';
@@ -68,64 +68,20 @@ class _AlertsSurfaceState extends State<_AlertsSurface> {
               style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
             ),
           );
-          return switch (state.alerts) {
-            ViewLoading() => const Padding(
-              padding: EdgeInsetsDirectional.all(LegalHubTheme.spaceXl),
-              child: Center(child: CircularProgressIndicator()),
-            ),
-            ViewEmpty() => ListView(
-              padding: const EdgeInsetsDirectional.all(
-                LegalHubTheme.marginMobile,
-              ),
-              children: <Widget>[
-                empty,
-                const SizedBox(height: LegalHubTheme.spaceLg),
-                Text(
-                  l10n.alertsLocalOnlyNote,
-                  style: text.bodySmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-            ViewError() => ListView(
-              padding: const EdgeInsetsDirectional.all(
-                LegalHubTheme.marginMobile,
-              ),
-              children: <Widget>[
-                Text(
-                  l10n.alertsError,
-                  style: text.bodyMedium?.copyWith(color: scheme.error),
-                ),
-                TextButton(
-                  onPressed: () => context.read<ComplianceAlertsCubit>().load(),
-                  child: Text(l10n.retry),
-                ),
-              ],
-            ),
-            ViewOffline() || ViewUnauthorized() => empty,
-            ViewSuccess<List<ComplianceAlert>>(
-              data: final List<ComplianceAlert> alerts,
-            ) =>
-              ListView(
-                padding: const EdgeInsetsDirectional.all(
-                  LegalHubTheme.marginMobile,
-                ),
-                children: <Widget>[
+          return ViewStateList<List<ComplianceAlert>>(
+            state: state.alerts,
+            onRetry: () => context.read<ComplianceAlertsCubit>().load(),
+            itemBuilder: (BuildContext context, List<ComplianceAlert> alerts) =>
+                <Widget>[
                   for (final ComplianceAlert alert in alerts) ...<Widget>[
                     _AlertTile(alert: alert),
                     const SizedBox(height: LegalHubTheme.spaceSm),
                   ],
-                  const SizedBox(height: LegalHubTheme.spaceLg),
-                  Text(
-                    l10n.alertsLocalOnlyNote,
-                    style: text.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
                 ],
-              ),
-          };
+            empty: empty,
+            errorCopy: l10n.alertsError,
+            localOnlyNote: l10n.alertsLocalOnlyNote,
+          );
         },
       ),
     );

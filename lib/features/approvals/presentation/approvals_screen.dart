@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
-import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/formatting/date_formatting.dart';
 import '../../../shared/widgets/widgets.dart';
@@ -71,64 +70,23 @@ class _ApprovalsSurfaceState extends State<_ApprovalsSurface> {
               style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
             ),
           );
-          return switch (state.approvals) {
-            ViewLoading() => const Padding(
-              padding: EdgeInsetsDirectional.all(LegalHubTheme.spaceXl),
-              child: Center(child: CircularProgressIndicator()),
-            ),
-            ViewEmpty() => ListView(
-              padding: const EdgeInsetsDirectional.all(
-                LegalHubTheme.marginMobile,
-              ),
-              children: <Widget>[
-                empty,
-                const SizedBox(height: LegalHubTheme.spaceLg),
-                Text(
-                  l10n.approvalsLocalOnlyNote,
-                  style: text.bodySmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-            ViewError() => ListView(
-              padding: const EdgeInsetsDirectional.all(
-                LegalHubTheme.marginMobile,
-              ),
-              children: <Widget>[
-                Text(
-                  l10n.approvalsError,
-                  style: text.bodyMedium?.copyWith(color: scheme.error),
-                ),
-                TextButton(
-                  onPressed: () => context.read<ApprovalsCubit>().load(),
-                  child: Text(l10n.retry),
-                ),
-              ],
-            ),
-            ViewOffline() || ViewUnauthorized() => empty,
-            ViewSuccess<List<PendingApproval>>(
-              data: final List<PendingApproval> approvals,
-            ) =>
-              ListView(
-                padding: const EdgeInsetsDirectional.all(
-                  LegalHubTheme.marginMobile,
-                ),
-                children: <Widget>[
+          return ViewStateList<List<PendingApproval>>(
+            state: state.approvals,
+            onRetry: () => context.read<ApprovalsCubit>().load(),
+            itemBuilder:
+                (
+                  BuildContext context,
+                  List<PendingApproval> approvals,
+                ) => <Widget>[
                   for (final PendingApproval approval in approvals) ...<Widget>[
                     _ApprovalTile(approval: approval),
                     const SizedBox(height: LegalHubTheme.spaceSm),
                   ],
-                  const SizedBox(height: LegalHubTheme.spaceLg),
-                  Text(
-                    l10n.approvalsLocalOnlyNote,
-                    style: text.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
                 ],
-              ),
-          };
+            empty: empty,
+            errorCopy: l10n.approvalsError,
+            localOnlyNote: l10n.approvalsLocalOnlyNote,
+          );
         },
       ),
     );

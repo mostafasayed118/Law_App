@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
-import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/widgets.dart';
 import '../domain/task_gateway.dart';
@@ -67,62 +66,20 @@ class _TaskSurfaceState extends State<_TaskSurface> {
               style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
             ),
           );
-          return switch (state.tasks) {
-            ViewLoading() => const Padding(
-              padding: EdgeInsetsDirectional.all(LegalHubTheme.spaceXl),
-              child: Center(child: CircularProgressIndicator()),
-            ),
-            ViewEmpty() => ListView(
-              padding: const EdgeInsetsDirectional.all(
-                LegalHubTheme.marginMobile,
-              ),
-              children: <Widget>[
-                empty,
-                const SizedBox(height: LegalHubTheme.spaceLg),
-                Text(
-                  l10n.tasksLocalOnlyNote,
-                  style: text.bodySmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-            ViewError() => ListView(
-              padding: const EdgeInsetsDirectional.all(
-                LegalHubTheme.marginMobile,
-              ),
-              children: <Widget>[
-                Text(
-                  l10n.tasksError,
-                  style: text.bodyMedium?.copyWith(color: scheme.error),
-                ),
-                TextButton(
-                  onPressed: () => context.read<TaskBoardCubit>().load(),
-                  child: Text(l10n.retry),
-                ),
-              ],
-            ),
-            ViewOffline() || ViewUnauthorized() => empty,
-            ViewSuccess<List<TaskItem>>(data: final List<TaskItem> tasks) =>
-              ListView(
-                padding: const EdgeInsetsDirectional.all(
-                  LegalHubTheme.marginMobile,
-                ),
-                children: <Widget>[
+          return ViewStateList<List<TaskItem>>(
+            state: state.tasks,
+            onRetry: () => context.read<TaskBoardCubit>().load(),
+            itemBuilder: (BuildContext context, List<TaskItem> tasks) =>
+                <Widget>[
                   for (final TaskItem task in tasks) ...<Widget>[
                     _TaskTile(task: task),
                     const SizedBox(height: LegalHubTheme.spaceSm),
                   ],
-                  const SizedBox(height: LegalHubTheme.spaceLg),
-                  Text(
-                    l10n.tasksLocalOnlyNote,
-                    style: text.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
                 ],
-              ),
-          };
+            empty: empty,
+            errorCopy: l10n.tasksError,
+            localOnlyNote: l10n.tasksLocalOnlyNote,
+          );
         },
       ),
     );
