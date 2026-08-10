@@ -128,7 +128,14 @@ documented at its site and kept as-is:
    from `ViewStateSwitch`'s start-aligned arms.
 6. **Column-layout rows — thread-detail `_MessageTile` and the matter
    workspace `_*Row`s.** No leading avatar, vertical text stack — not
-   `AppTile` rows.
+   `AppTile` rows. **PARTIALLY ADDRESSED 2026-08-11 (E8)** — the four
+   workspace rows (`_DocumentRow`/`_FileRow`/`_InvoiceRow`/`_ThreadRow`)
+   were excluded before `AppTile.subtitle` was generalized to
+   `subtitles: List<String>` (`c11062c`); that structural reason is gone,
+   so they now delegate to `AppTile` directly (title + `subtitles`, no
+   icon/leading, `onTap: null`). The thread-detail `_MessageTile` (header
+   row + body text, no leading) is a genuinely different shape and remains
+   excluded.
 
 ## 5. Verification at close-out
 

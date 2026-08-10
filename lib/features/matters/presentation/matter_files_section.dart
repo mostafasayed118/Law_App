@@ -102,7 +102,10 @@ class _FilesSectionBodyState extends State<_FilesSectionBody> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         for (final FileMetadata file in matched) ...<Widget>[
-          _FileRow(file: file),
+          AppTile(
+            title: file.name,
+            subtitles: <String>[fileSizeLabel(file.sizeBytes)],
+          ),
           const SizedBox(height: LegalHubTheme.spaceSm),
         ],
       ],
@@ -120,63 +123,22 @@ class _FilesSectionBodyState extends State<_FilesSectionBody> {
   }
 }
 
-/// A read-only metadata row. Carries **no onTap, no InkWell, no chevron,
-/// and no trailing action** — the per-matter view keeps the D-STR3
-/// metadata-only line (D-STR9), so rows must not read as tappable and no
-/// download affordance exists.
-class _FileRow extends StatelessWidget {
-  const _FileRow({required this.file});
-
-  final FileMetadata file;
-
-  /// Formats a byte count as a compact human label (240 KB / 1.5 MB / 512 B).
-  /// Deterministic, locale-independent — the row's only secondary field. A
-  /// whole value drops its trailing `.0` (240 KB, not 240.0 KB).
-  static String sizeLabel(int bytes) {
-    if (bytes >= 1048576) {
-      return '${_trimOne(bytes / 1048576)} MB';
-    }
-    if (bytes >= 1024) {
-      return '${_trimOne(bytes / 1024)} KB';
-    }
-    return '$bytes B';
+/// Formats a byte count as a compact human label (240 KB / 1.5 MB / 512 B).
+/// Deterministic, locale-independent — the row's only secondary field. A
+/// whole value drops its trailing `.0` (240 KB, not 240.0 KB). Kept in the
+/// storage feature (domain formatting, not UI) after the E8 row extraction.
+String fileSizeLabel(int bytes) {
+  if (bytes >= 1048576) {
+    return '${_trimOne(bytes / 1048576)} MB';
   }
-
-  /// Renders [value] with one decimal, dropping a trailing `.0`.
-  static String _trimOne(double value) {
-    final String fixed = value.toStringAsFixed(1);
-    return fixed.endsWith('.0') ? fixed.substring(0, fixed.length - 2) : fixed;
+  if (bytes >= 1024) {
+    return '${_trimOne(bytes / 1024)} KB';
   }
+  return '$bytes B';
+}
 
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
-    return Material(
-      color: scheme.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusLg),
-        ),
-        side: BorderSide(color: scheme.outlineVariant),
-      ),
-      child: Padding(
-        padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              file.name,
-              style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              sizeLabel(file.sizeBytes),
-              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+/// Renders [value] with one decimal, dropping a trailing `.0`.
+String _trimOne(double value) {
+  final String fixed = value.toStringAsFixed(1);
+  return fixed.endsWith('.0') ? fixed.substring(0, fixed.length - 2) : fixed;
 }

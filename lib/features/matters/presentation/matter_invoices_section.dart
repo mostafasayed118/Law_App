@@ -102,7 +102,14 @@ class _InvoicesSectionBodyState extends State<_InvoicesSectionBody> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         for (final Invoice invoice in matched) ...<Widget>[
-          _InvoiceRow(invoice: invoice),
+          AppTile(
+            title: invoice.invoiceNumber,
+            subtitles: <String>[
+              '${invoice.currency} '
+                  '${invoiceAmountLabel(invoice.amountCents)} · '
+                  '${invoiceStatusLabel(l10n, invoice.status)}',
+            ],
+          ),
           const SizedBox(height: LegalHubTheme.spaceSm),
         ],
       ],
@@ -115,51 +122,6 @@ class _InvoicesSectionBodyState extends State<_InvoicesSectionBody> {
       child: Text(
         l10n.matterWorkspaceInvoicesEmpty,
         style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-      ),
-    );
-  }
-}
-
-/// A read-only metadata row. Carries **no onTap, no InkWell, no chevron,
-/// and no trailing action** — the per-matter view keeps the D-BI1
-/// metadata-only line (D-11), so rows must not read as tappable and no pay
-/// affordance exists.
-class _InvoiceRow extends StatelessWidget {
-  const _InvoiceRow({required this.invoice});
-
-  final Invoice invoice;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context);
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
-    final String amount = invoiceAmountLabel(invoice.amountCents);
-    final String status = invoiceStatusLabel(l10n, invoice.status);
-    return Material(
-      color: scheme.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusLg),
-        ),
-        side: BorderSide(color: scheme.outlineVariant),
-      ),
-      child: Padding(
-        padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              invoice.invoiceNumber,
-              style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              '${invoice.currency} $amount · $status',
-              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-          ],
-        ),
       ),
     );
   }

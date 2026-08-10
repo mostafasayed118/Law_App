@@ -101,7 +101,13 @@ class _DocumentsSectionBodyState extends State<_DocumentsSectionBody> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         for (final Document document in matched) ...<Widget>[
-          _DocumentRow(document: document),
+          AppTile(
+            title: document.title,
+            subtitles: <String>[
+              '${documentTypeLabel(l10n, document.type)} · '
+                  '${formatMediumDate(l10n, document.createdAt)}',
+            ],
+          ),
           const SizedBox(height: LegalHubTheme.spaceSm),
         ],
       ],
@@ -114,49 +120,6 @@ class _DocumentsSectionBodyState extends State<_DocumentsSectionBody> {
       child: Text(
         l10n.matterWorkspaceDocumentsEmpty,
         style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-      ),
-    );
-  }
-}
-
-/// A read-only metadata row. Carries **no onTap, no InkWell, no chevron,
-/// and no trailing action** — the per-matter view keeps the D-V1 metadata-only
-/// line (D-W4), so rows must not read as tappable.
-class _DocumentRow extends StatelessWidget {
-  const _DocumentRow({required this.document});
-
-  final Document document;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context);
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
-    final String date = formatMediumDate(l10n, document.createdAt);
-    return Material(
-      color: scheme.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusLg),
-        ),
-        side: BorderSide(color: scheme.outlineVariant),
-      ),
-      child: Padding(
-        padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              document.title,
-              style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              '${documentTypeLabel(l10n, document.type)} · $date',
-              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-          ],
-        ),
       ),
     );
   }

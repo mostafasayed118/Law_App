@@ -165,4 +165,15 @@ void main() {
     expect(find.text('Tile title'), findsOneWidget);
     expect(find.byType(Text), findsOneWidget); // title only
   });
+
+  testWidgets('no icon and no leading renders title + subtitles only '
+      '(the workspace-row posture)', (tester) async {
+    await tester.pumpWidget(
+      pumpAppTile(subtitles: const <String>['Secondary line']),
+    );
+
+    expect(find.byType(CircleAvatar), findsNothing);
+    expect(find.text('Tile title'), findsOneWidget);
+    expect(find.text('Secondary line'), findsOneWidget);
+  });
 }

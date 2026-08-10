@@ -103,7 +103,13 @@ class _MessagesSectionBodyState extends State<_MessagesSectionBody> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         for (final MessageThread thread in matched) ...<Widget>[
-          _ThreadRow(thread: thread),
+          AppTile(
+            title: thread.title,
+            subtitles: <String>[
+              '${thread.participants.join(', ')} · '
+                  '${formatMediumDate(l10n, thread.lastActivityAt)}',
+            ],
+          ),
           const SizedBox(height: LegalHubTheme.spaceSm),
         ],
       ],
@@ -116,49 +122,6 @@ class _MessagesSectionBodyState extends State<_MessagesSectionBody> {
       child: Text(
         l10n.matterWorkspaceMessagesEmpty,
         style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-      ),
-    );
-  }
-}
-
-/// A read-only metadata row. Carries **no onTap, no InkWell, no chevron,
-/// and no trailing action** — the per-matter view keeps the D-MSG1 body-less
-/// line (D-W4), so rows must not read as tappable.
-class _ThreadRow extends StatelessWidget {
-  const _ThreadRow({required this.thread});
-
-  final MessageThread thread;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context);
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
-    final String date = formatMediumDate(l10n, thread.lastActivityAt);
-    return Material(
-      color: scheme.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusLg),
-        ),
-        side: BorderSide(color: scheme.outlineVariant),
-      ),
-      child: Padding(
-        padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              thread.title,
-              style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              '${thread.participants.join(', ')} · $date',
-              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-          ],
-        ),
       ),
     );
   }

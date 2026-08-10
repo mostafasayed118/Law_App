@@ -168,6 +168,12 @@ different geometry or domain meaning, not a superficial clone:
    (+6 tests, suite 1236 → 1242), both chip rows re-pointed.
 2. **E8** workspace rows → `AppTile` — kills close-out residual #6, 4
    sites, enabled by the `subtitles` generalization.
+   **COMPLETE 2026-08-11** — the four workspace rows now delegate to
+   `AppTile` (`title` + `subtitles`, no icon/leading, `onTap: null`);
+   `fileSizeLabel` kept in the storage feature as a top-level helper; the
+   thread-detail `_MessageTile` remains excluded (different shape).
+   Close-out residual #6 **PARTIALLY ADDRESSED**; +1 AppTile test (suite
+   1242 → 1243).
 3. **E9** `AppCenteredRetry` — 2 sites, partial #5 resolution.
 4. **E10** workspace section shell — only if the boilerplate still
    justifies it after E8.

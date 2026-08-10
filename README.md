@@ -57,7 +57,7 @@ messaging services.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (1239 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (1240 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), ThemeCubit (mode persistence + restart
   restore), Redactor (password/OTP/email/Bearer redaction with leak guards),
@@ -93,7 +93,12 @@ messaging services.
   in-memory locale store, and the onboarding-success screen. Batch 5 added
   the 800×600 onboarding no-overflow test and the EN/AR/TR localized-fallback
   assertions.
-- Coverage: **1239 tests** (2026-08-11 — E7 extraction: shared
+- Coverage: **1240 tests** (2026-08-11 — E8 extraction: the four matter
+  workspace section rows (`_DocumentRow`/`_FileRow`/`_InvoiceRow`/
+  `_ThreadRow`) now delegate to shared `AppTile` (title + `subtitles`, no
+  icon, `onTap: null`), closing close-out residual #6 for the workspace
+  rows; the thread-detail `_MessageTile` stays excluded as a genuinely
+  different shape. On top of the E7 extraction: shared
   `AppFilterChips<T>` (the matter status + practice-area single-select chip
   rows unified, presentational — label fn + selection callback passed in),
   on top of the invoice-tile follow-up:
