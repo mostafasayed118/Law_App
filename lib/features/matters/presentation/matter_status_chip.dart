@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 
-import '../../../app/legalhub_theme.dart';
+import '../../../shared/widgets/label_chip.dart';
 
 /// Small colored chip rendering a matter's lifecycle status.
 ///
 /// Shared by the list tile and the details surface (both within the matters
 /// feature — the roster's private-chip pattern generalized to the second
 /// surface that needs it; feature-local, never a home import).
+///
+/// E5 wrapper: the visual shell is the shared [LabelChip]; this class keeps
+/// the feature's secondary-container colors and the public name the list
+/// tiles construct by type.
 class MatterStatusChip extends StatelessWidget {
   const MatterStatusChip({required this.label, super.key});
 
@@ -15,25 +19,10 @@ class MatterStatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsetsDirectional.symmetric(
-        horizontal: LegalHubTheme.spaceSm,
-        vertical: 2,
-      ),
-      decoration: BoxDecoration(
-        color: scheme.secondaryContainer,
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusSm),
-        ),
-      ),
-      child: Text(
-        label,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: Theme.of(
-          context,
-        ).textTheme.labelSmall?.copyWith(color: scheme.onSecondaryContainer),
-      ),
+    return LabelChip(
+      label: label,
+      background: scheme.secondaryContainer,
+      foreground: scheme.onSecondaryContainer,
     );
   }
 }

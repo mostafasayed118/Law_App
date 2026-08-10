@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../app/legalhub_theme.dart';
+import '../../../shared/widgets/label_chip.dart';
 
 /// Small chip rendering a thread's synthetic message count on the list tile.
 ///
@@ -8,6 +8,10 @@ import '../../../app/legalhub_theme.dart';
 /// count only — never message content (D-MSG1 body-less line: a number, not
 /// text). Display-only — the chip has no tap affordance, consistent with the
 /// read-only thread list (rows are deliberately not interactive, D-MSG3).
+///
+/// E5 wrapper: the visual shell is the shared [LabelChip]; this class keeps
+/// the feature's tertiary-container colors and the public name the list
+/// tiles and l10n tests construct by type.
 class MessageCountChip extends StatelessWidget {
   const MessageCountChip({required this.label, super.key});
 
@@ -16,25 +20,10 @@ class MessageCountChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsetsDirectional.symmetric(
-        horizontal: LegalHubTheme.spaceSm,
-        vertical: 2,
-      ),
-      decoration: BoxDecoration(
-        color: scheme.tertiaryContainer,
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusSm),
-        ),
-      ),
-      child: Text(
-        label,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: Theme.of(
-          context,
-        ).textTheme.labelSmall?.copyWith(color: scheme.onTertiaryContainer),
-      ),
+    return LabelChip(
+      label: label,
+      background: scheme.tertiaryContainer,
+      foreground: scheme.onTertiaryContainer,
     );
   }
 }

@@ -468,24 +468,14 @@ class _RoleChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsetsDirectional.symmetric(
-        horizontal: LegalHubTheme.spaceSm,
-        vertical: 2,
-      ),
-      decoration: BoxDecoration(
-        color: scheme.secondaryContainer,
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusSm),
-        ),
-      ),
-      child: Text(
-        roleLabel(AppLocalizations.of(context), role),
-        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-          color: scheme.onSecondaryContainer,
-          letterSpacing: 0.3,
-        ),
-      ),
+    return LabelChip(
+      label: roleLabel(AppLocalizations.of(context), role),
+      background: scheme.secondaryContainer,
+      foreground: scheme.onSecondaryContainer,
+      style: Theme.of(
+        context,
+      ).textTheme.labelLarge?.copyWith(letterSpacing: 0.3),
+      maxLines: null,
     );
   }
 }
@@ -523,23 +513,14 @@ class _StatusChip extends StatelessWidget {
         scheme.outline,
       ),
     };
-    return Container(
-      padding: const EdgeInsetsDirectional.symmetric(
-        horizontal: LegalHubTheme.spaceSm,
-        vertical: 2,
-      ),
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusSm),
-        ),
-      ),
-      child: Text(
-        label,
-        style: Theme.of(
-          context,
-        ).textTheme.labelLarge?.copyWith(color: foreground, letterSpacing: 0.3),
-      ),
+    return LabelChip(
+      label: label,
+      background: background,
+      foreground: foreground,
+      style: Theme.of(
+        context,
+      ).textTheme.labelLarge?.copyWith(letterSpacing: 0.3),
+      maxLines: null,
     );
   }
 }
