@@ -339,6 +339,12 @@ one promote-later, everything else stays separate.
   header into the E10 `WorkspaceSection`, which already owns the state
   shell). Single-screen → **local**, per the rules; promote only if a
   second screen grows the same header.
+  **IMPLEMENTED 2026-08-11 (local)** — the four blocks now delegate to a
+  private `_WorkspaceBlock(title, child)` in `matter_details_screen.dart`
+  (the `titleSmall` w700 header + `spaceSm` gap + section + `spaceXl`
+  trailing gap, ≈−20 lines). The existing matter-details screen tests
+  already pin all four headers visible + capability-gated (suite stays
+  1257). Stays local per the single-screen rule.
 
 ### C2 · Section-header family — P1, promote later
 

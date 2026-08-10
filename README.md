@@ -93,7 +93,10 @@ messaging services.
   in-memory locale store, and the onboarding-success screen. Batch 5 added
   the 800×600 onboarding no-overflow test and the EN/AR/TR localized-fallback
   assertions.
-- Coverage: **1254 tests** (2026-08-11 — the post-E10 re-audit
+- Coverage: **1254 tests** (2026-08-11 — the Phase-3 candidate C1: the
+  four matter-details workspace section headers (title + section +
+  trailing gap) consolidated into one local `_WorkspaceBlock`, on top of
+  the post-E10 re-audit
   candidate B: the org-audit centered icon-state trio
   (`_EmptyState`/`_DeniedState`/`OrgAuditFailedBlock`) consolidated into
   one parameterized local `_CenteredState` (icon/color/message/optional
