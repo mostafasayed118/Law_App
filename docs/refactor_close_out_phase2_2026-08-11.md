@@ -197,6 +197,14 @@ feature work), not splits. Verified at `61d9191`: suite 1261, all gates
 green (format clean, analyze clean, ledger PASS, policy PASS), tree
 clean, `origin/main == HEAD`.
 
+**Coverage deepening (2026-08-11)** — the admin terminal-state arms from
+the Phase-4 candidate list are added: two dedicated `_DeniedState` /
+`_FailedState` widget tests in `platform_admin_screen_test.dart` pin the
+error-tinted 40px lock vs 32px error icon, the denied no-retry gate
+(identity, not transient — no `TextButton`, never the empty label), and
+Retry reissuing the load through the cubit (`loadCalls` 1 → 2). Suite
+1261 → 1263 (admin 14 → 16).
+
 **Program totals at decision time** (`e105ce6`, suite 1261): 12
 extractions + 2 consolidations (E1–E6, E7–E10, A/B, C1/C2), 13 shared
 widgets in the barrel, suite 1193 → 1261 (**+68 tests**), all gates

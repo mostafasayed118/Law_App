@@ -57,7 +57,7 @@ messaging services.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (1258 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (1260 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), ThemeCubit (mode persistence + restart
   restore), Redactor (password/OTP/email/Bearer redaction with leak guards),
@@ -93,7 +93,11 @@ messaging services.
   in-memory locale store, and the onboarding-success screen. Batch 5 added
   the 800×600 onboarding no-overflow test and the EN/AR/TR localized-fallback
   assertions.
-- Coverage: **1258 tests** (2026-08-11 — the Phase-4 readability pass: the
+- Coverage: **1260 tests** (2026-08-11 — the admin terminal-state arms: two
+  dedicated `_DeniedState`/`_FailedState` widget tests pinning the
+  error-tinted lock vs error icon, the denied no-retry gate, and Retry
+  reissuing the load through the cubit (loadCalls 1 → 2), on top of the
+  Phase-4 readability pass: the
   admin screen's section widgets split into `part` files under
   `lib/features/admin/presentation/` (`platform_admin_lists` /
   `platform_admin_member_row` / `platform_admin_audit_section` /

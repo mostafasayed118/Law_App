@@ -480,6 +480,35 @@ void main() {
       expect(find.text('Organizations'), findsNothing);
       expect(find.text('Members'), findsNothing);
     });
+
+    testWidgets(
+      'denied state is a distinct gate: error-tinted lock, no retry',
+      (tester) async {
+        final FakeOrganizationGateway orgGateway = FakeOrganizationGateway();
+        final FakePlatformAdminGateway gateway = FakePlatformAdminGateway(
+          organizationGateway: orgGateway,
+          demoIsPlatformOwner: false,
+        );
+
+        await tester.pumpWidget(harness(gateway));
+        await tester.pumpAndSettle();
+
+        // The 40px lock is error-tinted (identity denial, not a transient).
+        final Finder lockFinder = find.byIcon(Icons.lock_outline);
+        final Icon lock = tester.widget<Icon>(lockFinder);
+        expect(lock.size, 40);
+        expect(
+          lock.color,
+          Theme.of(tester.element(lockFinder)).colorScheme.error,
+        );
+        // No retry affordance: the gate is identity, never a transient
+        // failure, so it must not offer the retry path (_FailedState does).
+        expect(find.text('Retry'), findsNothing);
+        expect(find.byType(TextButton), findsNothing);
+        // And never the empty-success label (AC-7).
+        expect(find.text('Nothing to show'), findsNothing);
+      },
+    );
   });
 
   group('PlatformAdminScreen failures', () {
@@ -504,6 +533,39 @@ void main() {
       await tester.tap(find.text('Retry'));
       await tester.pumpAndSettle();
 
+      expect(find.text('Demo Firm'), findsOneWidget);
+    });
+
+    testWidgets('failure state pins the error icon and retry reissues load', (
+      tester,
+    ) async {
+      final _MutablePlatformAdminGateway gateway =
+          _MutablePlatformAdminGateway()
+            ..organizations = <OrganizationSummary>[_org]
+            ..members = <OrgMember>[_demoMember]
+            ..loadFailureKind = OrgFailureKind.unknown;
+
+      await tester.pumpWidget(harness(gateway));
+      await tester.pumpAndSettle();
+
+      // The 32px error icon is error-tinted (transient failure, unlike the
+      // denied gate's 40px lock).
+      final Finder errorFinder = find.byIcon(Icons.error_outline);
+      final Icon error = tester.widget<Icon>(errorFinder);
+      expect(error.size, 32);
+      expect(
+        error.color,
+        Theme.of(tester.element(errorFinder)).colorScheme.error,
+      );
+      // The first-frame load ran once; Retry reissues the load through the
+      // cubit (not a local state clear): the stub's call counter advances.
+      expect(gateway.loadCalls, 1);
+
+      gateway.loadFailureKind = null;
+      await tester.tap(find.text('Retry'));
+      await tester.pumpAndSettle();
+
+      expect(gateway.loadCalls, 2);
       expect(find.text('Demo Firm'), findsOneWidget);
     });
   });
