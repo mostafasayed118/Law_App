@@ -6,13 +6,14 @@
 > the E1–E6 close-out (`docs/refactor_close_out_2026-08-11.md`), plus the
 > post-E10 re-audit (Candidates A/B) that the follow-on scan surfaced.
 >
-> **Status: COMPLETE 2026-08-11** — all four planned extractions and both
-> re-audit candidates implemented, tested, committed, and pushed to
-> `origin/main`. Suite **1254 → 1257** since the E7–E10 close-out record
-> (`9d142ff`), **1236 → 1257** across the whole Phase-2 program. All gates
-> green at the final state: `dart format` clean, `flutter analyze`
-> **0 issues**, **1257 tests passing**, `verify_ledger.sh` **PASS
-> 115/0/0**, `verify_policy_tests.sh --check` **PASS 73/0/0**.
+> **Status: COMPLETE 2026-08-11** — all four planned extractions, both
+> re-audit candidates, and the Phase-3 draft slate (C1/C2) implemented,
+> tested, committed, and pushed to `origin/main`. Suite **1254 → 1261**
+> since the E7–E10 close-out record (`9d142ff`), **1236 → 1261** across
+> the whole Phase-2/3 program. All gates green at the final state:
+> `dart format` clean, `flutter analyze` **0 issues**, **1261 tests
+> passing**, `verify_ledger.sh` **PASS 115/0/0**,
+> `verify_policy_tests.sh --check` **PASS 73/0/0**.
 >
 > **Scope discipline:** behavior-preserving by contract — no navigation,
 > auth, RPC, state-management, model, l10n-key, or fake/demo-seam changes.
@@ -36,10 +37,9 @@
 | A | `6087a4e` | `AppCenteredMessage` + 2 re-pointed `_message` helpers | +3 |
 | B | `227b7a5` | org-audit centered icon-state trio → local `_CenteredState` | — (screen tests pin) |
 | C1 | `c840a36` | matter-details workspace headers → local `_WorkspaceBlock` | — (screen tests pin) |
-| C2 | *(pending)* | `AppSectionHeader` (search + matter-details unified, shared) | +4 |
+| C2 | `a5e6c5c` | `AppSectionHeader` (search + matter-details unified, shared) | +4 |
 
-Suite: **1236 → 1261** (+25 new tests, none deleted or weakened) once C2
-lands.
+Suite: **1236 → 1261** (+25 new tests, none deleted or weakened).
 
 ## 2. Extraction-by-extraction
 
@@ -117,13 +117,17 @@ documented, not forced:
 - `flutter test` — **1257 passed**
 - `bash scripts/verify_ledger.sh` — PASS 115/0/0
 - `bash scripts/verify_policy_tests.sh --check` — PASS 73/0/0
-- `git status` — clean; `origin/main == HEAD` at `227b7a5`
+- `git status` — clean; `origin/main == HEAD` at `a5e6c5c`
 
 ## 6. Program summary
 
-The full refactor program (E1–E6 + follow-ups + E7–E10 + A/B) ran from
-suite 1193 → 1257 (**+64 tests**), every commit individually gated and
-pushed, with two dated close-out records
+The full refactor program (E1–E6 + follow-ups + E7–E10 + A/B + C1/C2)
+ran from suite 1193 → 1261 (**+68 tests**), every commit individually
+gated and pushed, with two dated close-out records
 (`docs/refactor_close_out_2026-08-11.md`, this addendum) and the live
 audit ledger (`docs/phase2_refactor_audit_2026-08-11.md`) tracking the
-execution and residuals.
+execution and residuals. The Phase-3 draft slate (§9 of the audit
+ledger) is fully executed: C1 (workspace headers, superseded by C2) and
+C2 (`AppSectionHeader`, shared barrel). Remaining duplication is the
+documented distinct-geometry residual set — no planned extraction
+outstanding.
