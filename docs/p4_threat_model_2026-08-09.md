@@ -227,7 +227,18 @@ bounded capability, server-gated, audited, never audit-exempt.
    membership guard firing as designed; a fuller client demo is a deliberate,
    separate data action (owner-approved).
 6. **Provider-side controls** (GoTrue rate limits, hosting posture) are
-   assumed, not client-verifiable.
+   assumed, not client-verifiable. — **VERIFIED 2026-08-10 (F-10 probes
+   executed, read-only):** the storage-policy baseline on the dev project is
+   exactly the recorded expectation (one policy, `files_storage_select`),
+   the platform default grants on `storage.objects` are confirmed (anon +
+   authenticated full set; the RLS gate compensates), the GoTrue JWT
+   `email` claim source + the `accept_invitation` precondition are verified
+   (all demo accounts email-confirmed; `auth.jwt() ->> 'email'` read),
+   and the Auth rate limits are recorded (`email_sent=30`, `otp=30`,
+   `token_refresh=150`, `verify=30`, `anonymous=30`, `sms=30`, `web3=30`;
+   custom SMTP). Evidence: `docs/f10_provider_posture_probes_2026-08-10.md`.
+   The literal token decode remains the checklist §5 owner step (owner-held
+   demo credentials).
 7. **No custom throttling / no password-reset rate-limit layer** beyond GoTrue
    defaults (D-07).
 8. **Denied RPC attempts are not logged as `denied` audit rows** (deliberate:

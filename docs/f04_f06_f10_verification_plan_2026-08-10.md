@@ -25,7 +25,7 @@
 |---|---|---|---|---|
 | F-04 — Realtime delivery verified by RLS proxy, not a live websocket round-trip | summary row 39; detail §2 | §4.4 / §6 residual 3 | Low (verification gap) | **OPEN** |
 | F-06 — Accept-invite one-time token rides in a deep-link URL | summary row; detail §2 | §4.1 | Low | **OPEN** |
-| F-10 — Provider/hosting posture assumed, not verified | summary row; detail §2 | §4.5 / §6 residual 6 | Low | **OPEN** |
+| F-10 — Provider/hosting posture assumed, not verified | summary row; detail §2 | §4.5 / §6 residual 6 | Low | **VERIFIED 2026-08-10** — V-F10-1..4 executed; see `docs/f10_provider_posture_probes_2026-08-10.md` |
 
 ---
 
@@ -151,4 +151,4 @@ F-06 V-F06-2 (release-config)**.
 |---|---|
 | F-04 | `configured_build_e2e_checklist_2026-08-08.md` §5 dated sign-off, or a dated realtime-probe record (`docs/…realtime_roundtrip_evidence_2026-08-10.md`) |
 | F-06 | dated exposure note appended to `p4_41_deeplink_recovery_scope_2026-08-03.md` + release-checklist verification row |
-| F-10 | dated probe record (`docs/f10_provider_posture_probes_2026-08-10.md`) |
+| F-10 | dated probe record (`docs/f10_provider_posture_probes_2026-08-10.md`) — **FILLED 2026-08-10**: V-F10-1..4 executed; literal token decode recorded as the checklist §5 owner step |

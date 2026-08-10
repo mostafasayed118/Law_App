@@ -42,7 +42,7 @@
 | F-07 | No throttling beyond GoTrue defaults (D-07) | Low | ACCEPTED (demo-posture, 2026-08-09, Project Owner) | §4.5, §6.7 | Verify provider rate-limit settings; revisit before real-data rollout |
 | F-08 | Denied RPC attempts not logged as `denied` audit rows (deliberate) | Info / Low | ACCEPTED (10.09 pins the negative) | §4.3, §6.8 | Ops decision; optional opt-in `denied` outcomes behind a review |
 | F-09 | Demo clients hold no membership rows — client-side positives not demoable live | Low (data posture) | ACCEPTED (recorded as designed) | §6.5 | Owner-approved deliberate data action when a client demo is wanted |
-| F-10 | Provider/hosting posture assumed, not verified (rate limits, storage defaults, JWT `email` claim) | Low | OPEN | §4.5, §6.6 | Read-only dev-project probes + GoTrue config check |
+| F-10 | Provider/hosting posture assumed, not verified (rate limits, storage defaults, JWT `email` claim) | Low | **VERIFIED 2026-08-10** — V-F10-1..4 probes executed on the dev project; see `docs/f10_provider_posture_probes_2026-08-10.md` (literal token decode = checklist §5 owner step, recorded) | §4.5, §6.6 | Read-only dev-project probes + GoTrue config check — **executed 2026-08-10** |
 | F-11 | Self-scoped helpers exposed as PostgREST `/rpc/` endpoints | Info (safe today) | ACCEPTED (R-4 note) | §4.6 | Keep "self-scoped only" as a standing RLS-gate review criterion |
 
 ---
@@ -296,23 +296,33 @@
 
 ---
 
-### F-10 — Provider/hosting posture assumed, not verified
+### F-10 — Provider/hosting posture assumed, not verified — **VERIFIED 2026-08-10**
 
 - **Gap:** several controls rest on hosting assumptions that the repo records
   but has not fully probed: the rehearsal-host storage-policy baseline
   (harness WATCH-ITEM), the platform default SELECT grants on
   `storage.objects`, and the GoTrue JWT-`email`-claim precondition for
   `accept_invitation` (README refinement #8).
-- **Evidence:** `scripts/verify_policy_tests.sh` §1g WATCH-ITEM;
-  `supabase/rpc/accept_invitation.sql` precondition comment; threat model
-  §4.5 / §6 residual 6.
+- **Evidence (probes executed):** `docs/f10_provider_posture_probes_2026-08-10.md`
+  — V-F10-1: exactly one storage-schema policy (`files_storage_select`),
+  matching the harness WATCH-ITEM expectation; V-F10-2: platform default
+  grants on `storage.objects` to `anon`+`authenticated` confirmed (the RLS
+  gate compensates, as the batteries assume); V-F10-3: all four demo
+  accounts email-confirmed (claim source) + `accept_invitation` reads
+  `auth.jwt() ->> 'email'` (`accept_invitation.sql:28-34`); V-F10-4: dev
+  Auth rate limits recorded (`email_sent=30`, `otp=30`, `token_refresh=150`,
+  `verify=30`, `anonymous=30`, `sms=30`, `web3=30`; custom SMTP configured).
 - **Severity:** Low — verification gaps; the policy/battery pins compensate
   for the storage defaults.
 - **Owner:** Project Owner; engineering.
-- **Remediation path:** run the recorded read-only probes on the dev project
-  (storage-policy baseline, `storage.objects` grants) and confirm the GoTrue
-  JWT carries `email`; record results in the P4 release notes. — See the
-  verification plan: `docs/f04_f06_f10_verification_plan_2026-08-10.md`.
+- **Remediation path (executed 2026-08-10):** the recorded read-only probes
+  ran on the dev project (storage-policy baseline, `storage.objects`
+  grants, claim source + RPC precondition, Auth config rate limits);
+  results recorded in `docs/f10_provider_posture_probes_2026-08-10.md`.
+  The **literal token decode** of a dev-project-issued token remains the
+  checklist §5 owner step (owner-held demo password) — recorded in the
+  probe doc, not a blocking gap. Plan ref:
+  `docs/f04_f06_f10_verification_plan_2026-08-10.md` §3.
 
 ---
 
@@ -407,6 +417,8 @@
 | D-45.1 configured-build verification (2026-08-09) | **EXECUTED 2026-08-09 — `docs/f01_client_swap_verification_evidence_2026-08-09.md`** — the live `create_matter` flow returned `4a8425d4-…`, the §8 `matter:create`/`allowed` row appeared through the org-audit read path (resource = the returned id, redaction `matter created`), RLS read-back 5/5, and the owner-assignment negative returned the exact F2-D2 fragment the client maps to `matter_write_owner_forbidden`. **F-01 chain CLOSED 2026-08-09** |
 | Final E2E demo walkthrough (2026-08-09) | **EXECUTED + PASSED — `docs/final_demo_walkthrough_evidence_2026-08-09.md`** — the partner's full configured-build surface round-tripped the live dev project (matters 5 / documents 3 / threads 3 / messages 8 / files 3 / storage objects 3 / invoices 3 / orgs 2), the audited `create_matter` + `send_message` RPCs verified with in-txn §8 audit rows and **rolled back with zero content residue**, the org-audit view showed the full F-01 chain (F-12 remediation + apply create + D-45.1 create), and the battery-12 mirror confirmed the owner id in 0 assignment columns. Sole residual: one `audit:read_org` row from the walkthrough's own audited read (by design) |
 
+| F-10 provider posture probes (2026-08-10) | **EXECUTED — `docs/f10_provider_posture_probes_2026-08-10.md`** — V-F10-1 storage baseline (exactly one policy, `files_storage_select`, matches the harness WATCH-ITEM), V-F10-2 default grants on `storage.objects` confirmed (anon+authenticated full set; RLS is the gate), V-F10-3 claim source + `accept_invitation` precondition verified (4/4 demo accounts email-confirmed; `auth.jwt() ->> 'email'` at `accept_invitation.sql:28-34`; literal token decode = checklist §5 owner step, recorded), V-F10-4 Auth rate limits recorded (`email_sent=30`, `otp=30`, `token_refresh=150`, `verify=30`, `anonymous=30`, `sms=30`, `web3=30`; custom SMTP). **F-10 VERIFIED 2026-08-10** — read-only probes, zero residue |
+
 Verification: `bash scripts/verify_policy_tests.sh --check` → PASS (see §4);
 `--selftest` re-run green on the committed baseline.
 
@@ -452,3 +464,5 @@ could not have detected a dangling ref cited only by files 07+.
   corrected — §3b) · `scripts/verify_policy_tests.sh` (§1c/§1d/§1e/§1f/§1g pins).
 - Recorded follow-ups this register tracks: D-STR9 (download), D-LV4
   (reconnect/backfill), R2 (invite emails), D-45.1 (configured-build E2E).
+- F-10 probe evidence: `docs/f10_provider_posture_probes_2026-08-10.md`
+  (V-F10-1..4 executed 2026-08-10; F-10 VERIFIED).
