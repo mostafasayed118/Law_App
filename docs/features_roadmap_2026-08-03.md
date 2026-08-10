@@ -637,7 +637,12 @@ approval**.
 > un-blocked (D-11, planning only) by the Paymob spec
 > `docs/paymob_integration_spec_2026-08-11.md`; a new notification-feed
 > read surface (no provider) is designed for owner decision in
-> `docs/notification_feed_scope_2026-08-11.md`. All three are planning
+> `docs/notification_feed_scope_2026-08-11.md`; the conflict/waiver/wall/
+> filing cluster and video consultation each have owner-answerable
+> question sheets (`docs/d03_d06_conflict_scope_questions_2026-08-11.md`,
+> `docs/video_consultation_scope_questions_2026-08-11.md` — the video row
+> is spec D-11, whose label collides with the billing record; flagged in
+> the sheet). All five are planning
 > artifacts only — none approved, none built.
 
 Per README boundary + `docs/permission_matrix.md` §4/§6, the originally

@@ -99,12 +99,16 @@ addendum → client swap → close evidence):
   undefined scope. No scope, no build, nothing committed; the
   decision-ready question sheet `docs/d07_d08_ai_scope_questions_2026-08-11.md`
   (2026-08-11, planning only) is the first step toward the missing scope
-  note. Two further planning artifacts landed 2026-08-11 (both planning
-  only, neither approved): the Paymob spec
-  `docs/paymob_integration_spec_2026-08-11.md` (D-11 un-block) and the
+  note. Four further planning artifacts landed 2026-08-11 (all planning
+  only, none approved): the Paymob spec
+  `docs/paymob_integration_spec_2026-08-11.md` (D-11 un-block), the
   notification-feed scope note
   `docs/notification_feed_scope_2026-08-11.md` (new read surface, no
-  provider).
+  provider), the conflict-check question sheet
+  `docs/d03_d06_conflict_scope_questions_2026-08-11.md` (D-03/D-06), and
+  the video-consultation question sheet
+  `docs/video_consultation_scope_questions_2026-08-11.md` (spec D-11,
+  label collision with the billing record flagged).
 - **Owner-side live E2E on configured builds** — the D-45.1 convention: the
   env-gated client swaps (matters/documents/messages/storage/realtime/
   send/billing) are verified by the typed/fake suite + DI pins + the
