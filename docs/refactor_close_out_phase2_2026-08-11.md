@@ -131,3 +131,39 @@ ledger) is fully executed: C1 (workspace headers, superseded by C2) and
 C2 (`AppSectionHeader`, shared barrel). Remaining duplication is the
 documented distinct-geometry residual set — no planned extraction
 outstanding.
+
+## 7. Phase-4 decision (2026-08-11): extraction program COMPLETE
+
+> **Decision:** declare the shared-component extraction program **COMPLETE**.
+> The remaining residual list is all deliberate-distinct geometry — no
+> further duplication clusters exist.
+
+**Evidence (three independent scans, all at green gates):**
+
+1. **Post-E10 re-audit (§8 of the audit ledger)** — the only remaining
+   centered-state duplication was Candidates A (`AppCenteredMessage`,
+   shared) and B (org-audit `_CenteredState`, local), both executed.
+2. **Admin-pair review (2026-08-11)** — admin `_DeniedState`/
+   `_FailedState` differ from `_CenteredState` on four axes (padding,
+   icon size, gaps, text lines, action style); absorbing them would need
+   five parameters of flag sprawl — STAY SEPARATE.
+3. **Post-C2 scan (2026-08-11)** — `_GroupSection`/`_WorkspaceBlock`
+   deleted; the only remaining `fontWeight.w700` headers are the intended
+   `titleStyle:` overrides into `AppSectionHeader` and two non-header
+   shapes (home app-bar title, invite-token chip).
+
+**The 500+ line screens are co-location, not duplication** — the private
+step/section widgets (`_BookingWizard` steps, `_AdminLists`/
+`_AuditSection`, roster rows/chips) are each single-responsibility and
+feature-local per the Phase-1 rules; the roster chips already delegate to
+`LabelChip`. Splitting them into separate files would remove zero
+duplication — it is an optional readability refactor, not an extraction.
+
+**Program totals at decision time** (`e105ce6`, suite 1261): 12
+extractions + 2 consolidations (E1–E6, E7–E10, A/B, C1/C2), 13 shared
+widgets in the barrel, suite 1193 → 1261 (**+68 tests**), all gates
+green, every commit gated and pushed. The honest Phase-4 candidates, if
+any further code-quality work is wanted, are **not** extraction: optional
+file decomposition of the two 500+ line screens (readability), coverage
+deepening (admin/booking step tests), or moving to feature work per the
+roadmap.
