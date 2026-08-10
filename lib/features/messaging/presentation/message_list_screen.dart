@@ -8,6 +8,7 @@ import '../../../core/roles/user_role.dart';
 import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/formatting/date_formatting.dart';
+import '../../../shared/widgets/widgets.dart';
 import '../../matters/domain/matter.dart';
 import '../../matters/domain/matter_gateway.dart';
 import '../../matters/domain/matter_title_resolver.dart';
@@ -159,50 +160,30 @@ class _ListSurfaceState extends State<_ListSurface> {
         style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
       ),
     );
-    return switch (state.threads) {
-      ViewLoading() => const Padding(
-        padding: EdgeInsetsDirectional.all(LegalHubTheme.spaceXl),
-        child: Center(child: CircularProgressIndicator()),
-      ),
-      ViewEmpty() => empty,
-      ViewError() => Padding(
-        padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              l10n.messagesError,
-              style: text.bodyMedium?.copyWith(color: scheme.error),
-            ),
-            TextButton(onPressed: cubit.load, child: Text(l10n.retry)),
-          ],
-        ),
-      ),
-      // The sealed ViewState set also carries offline/unauthorized variants
-      // (shared vocabulary); a synthetic list has neither state, so both
-      // render the same empty copy rather than a distinct offline surface.
-      ViewOffline() || ViewUnauthorized() => empty,
-      ViewSuccess<List<MessageThread>>(
-        data: final List<MessageThread> threads,
-      ) =>
-        threads.isEmpty
-            ? empty
-            : Column(
-                children: <Widget>[
-                  for (final MessageThread thread in threads) ...<Widget>[
-                    _MessageThreadTile(
-                      thread: thread,
-                      onOpenThread: () => context.go(
-                        AppRoutes.messageThreadDetailFor(thread.id),
-                        extra: thread.title,
-                      ),
-                      onViewMatter: _matterTap(context, thread, matters),
+    return ViewStateSwitch<List<MessageThread>>(
+      state: state.threads,
+      onRetry: cubit.load,
+      builder: (BuildContext context, List<MessageThread> threads) =>
+          threads.isEmpty
+          ? empty
+          : Column(
+              children: <Widget>[
+                for (final MessageThread thread in threads) ...<Widget>[
+                  _MessageThreadTile(
+                    thread: thread,
+                    onOpenThread: () => context.go(
+                      AppRoutes.messageThreadDetailFor(thread.id),
+                      extra: thread.title,
                     ),
-                    const SizedBox(height: LegalHubTheme.spaceSm),
-                  ],
+                    onViewMatter: _matterTap(context, thread, matters),
+                  ),
+                  const SizedBox(height: LegalHubTheme.spaceSm),
                 ],
-              ),
-    };
+              ],
+            ),
+      empty: empty,
+      errorCopy: l10n.messagesError,
+    );
   }
 
   /// The reverse cross-link target for a row, or null when the row renders

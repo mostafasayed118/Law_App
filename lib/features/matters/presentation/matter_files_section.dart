@@ -3,12 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
-import '../../../core/state/view_state.dart';
 import '../../../features/storage/domain/file_metadata.dart';
 import '../../../features/storage/domain/storage_gateway.dart';
 import '../../../features/storage/presentation/storage_cubit.dart';
 import '../../../features/storage/presentation/storage_state.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/widgets.dart';
 
 /// Per-matter Files section on the matter details surface (storage slice,
 /// D-STR7).
@@ -68,21 +68,19 @@ class _FilesSectionBodyState extends State<_FilesSectionBody> {
     final TextTheme text = Theme.of(context).textTheme;
     return BlocBuilder<StorageCubit, StorageState>(
       builder: (BuildContext context, StorageState state) {
-        return switch (state.files) {
-          ViewLoading() => const Padding(
-            padding: EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-            child: Center(child: CircularProgressIndicator()),
+        return ViewStateSwitch<List<FileMetadata>>(
+          state: state.files,
+          onRetry: () => context.read<StorageCubit>().load(),
+          builder: (BuildContext context, List<FileMetadata> files) =>
+              _rows(context, files, l10n, text, scheme),
+          empty: _empty(l10n, text, scheme),
+          errorCopy: l10n.filesError,
+          loadingPadding: const EdgeInsetsDirectional.all(
+            LegalHubTheme.spaceMd,
           ),
-          ViewEmpty() => _empty(l10n, text, scheme),
-          ViewError() => _error(context, l10n, text, scheme),
-          // A synthetic list has neither state; both render the same empty
-          // copy rather than a distinct offline surface.
-          ViewOffline() || ViewUnauthorized() => _empty(l10n, text, scheme),
-          ViewSuccess<List<FileMetadata>>(
-            data: final List<FileMetadata> files,
-          ) =>
-            _rows(context, files, l10n, text, scheme),
-        };
+          errorPadding: EdgeInsets.zero,
+          errorTextStyle: text.bodySmall?.copyWith(color: scheme.error),
+        );
       },
     );
   }
@@ -118,27 +116,6 @@ class _FilesSectionBodyState extends State<_FilesSectionBody> {
         l10n.matterWorkspaceFilesEmpty,
         style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
       ),
-    );
-  }
-
-  Widget _error(
-    BuildContext context,
-    AppLocalizations l10n,
-    TextTheme text,
-    ColorScheme scheme,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          l10n.filesError,
-          style: text.bodySmall?.copyWith(color: scheme.error),
-        ),
-        TextButton(
-          onPressed: () => context.read<StorageCubit>().load(),
-          child: Text(l10n.retry),
-        ),
-      ],
     );
   }
 }

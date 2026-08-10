@@ -3,13 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
-import '../../../core/state/view_state.dart';
 import '../../../features/billing/domain/billing_gateway.dart';
 import '../../../features/billing/domain/invoice.dart';
 import '../../../features/billing/presentation/billing_cubit.dart';
 import '../../../features/billing/presentation/billing_state.dart';
 import '../../../features/billing/presentation/invoice_labels.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/widgets.dart';
 
 /// Per-matter Invoices section on the matter details surface (billing slice,
 /// D-BI5).
@@ -68,19 +68,19 @@ class _InvoicesSectionBodyState extends State<_InvoicesSectionBody> {
     final TextTheme text = Theme.of(context).textTheme;
     return BlocBuilder<BillingCubit, BillingState>(
       builder: (BuildContext context, BillingState state) {
-        return switch (state.invoices) {
-          ViewLoading() => const Padding(
-            padding: EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-            child: Center(child: CircularProgressIndicator()),
+        return ViewStateSwitch<List<Invoice>>(
+          state: state.invoices,
+          onRetry: () => context.read<BillingCubit>().load(),
+          builder: (BuildContext context, List<Invoice> invoices) =>
+              _rows(context, invoices, l10n, text, scheme),
+          empty: _empty(l10n, text, scheme),
+          errorCopy: l10n.invoicesError,
+          loadingPadding: const EdgeInsetsDirectional.all(
+            LegalHubTheme.spaceMd,
           ),
-          ViewEmpty() => _empty(l10n, text, scheme),
-          ViewError() => _error(context, l10n, text, scheme),
-          // A synthetic list has neither state; both render the same empty
-          // copy rather than a distinct offline surface.
-          ViewOffline() || ViewUnauthorized() => _empty(l10n, text, scheme),
-          ViewSuccess<List<Invoice>>(data: final List<Invoice> invoices) =>
-            _rows(context, invoices, l10n, text, scheme),
-        };
+          errorPadding: EdgeInsets.zero,
+          errorTextStyle: text.bodySmall?.copyWith(color: scheme.error),
+        );
       },
     );
   }
@@ -116,27 +116,6 @@ class _InvoicesSectionBodyState extends State<_InvoicesSectionBody> {
         l10n.matterWorkspaceInvoicesEmpty,
         style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
       ),
-    );
-  }
-
-  Widget _error(
-    BuildContext context,
-    AppLocalizations l10n,
-    TextTheme text,
-    ColorScheme scheme,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          l10n.invoicesError,
-          style: text.bodySmall?.copyWith(color: scheme.error),
-        ),
-        TextButton(
-          onPressed: () => context.read<BillingCubit>().load(),
-          child: Text(l10n.retry),
-        ),
-      ],
     );
   }
 }

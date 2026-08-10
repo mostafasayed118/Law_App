@@ -6,7 +6,6 @@ import '../../../app/legalhub_theme.dart';
 import '../../../app/router.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/practice_area.dart';
-import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/widgets.dart';
 import '../domain/attorney.dart';
@@ -108,46 +107,28 @@ class _SearchSurfaceState extends State<_SearchSurface> {
         style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
       ),
     );
-    return switch (state.attorneys) {
-      ViewLoading() => const Padding(
-        padding: EdgeInsetsDirectional.all(LegalHubTheme.spaceXl),
-        child: Center(child: CircularProgressIndicator()),
-      ),
-      ViewEmpty() => empty,
-      ViewError() => Padding(
-        padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              l10n.discoveryError,
-              style: text.bodyMedium?.copyWith(color: scheme.error),
-            ),
-            TextButton(onPressed: cubit.load, child: Text(l10n.retry)),
-          ],
-        ),
-      ),
-      // The sealed ViewState set also carries offline/unauthorized variants
-      // (shared vocabulary); a synthetic list has neither state, so both
-      // render the same empty copy rather than a distinct offline surface.
-      ViewOffline() || ViewUnauthorized() => empty,
-      ViewSuccess<List<Attorney>>() =>
-        state.visibleAttorneys.isEmpty
-            ? empty
-            : Column(
-                children: <Widget>[
-                  for (final Attorney attorney
-                      in state.visibleAttorneys) ...<Widget>[
-                    _AttorneyTile(
-                      attorney: attorney,
-                      onTap: () =>
-                          context.go(AppRoutes.attorneyProfile(attorney.id)),
-                    ),
-                    const SizedBox(height: LegalHubTheme.spaceSm),
-                  ],
+    return ViewStateSwitch<List<Attorney>>(
+      state: state.attorneys,
+      onRetry: cubit.load,
+      builder: (BuildContext context, List<Attorney> attorneys) =>
+          state.visibleAttorneys.isEmpty
+          ? empty
+          : Column(
+              children: <Widget>[
+                for (final Attorney attorney
+                    in state.visibleAttorneys) ...<Widget>[
+                  _AttorneyTile(
+                    attorney: attorney,
+                    onTap: () =>
+                        context.go(AppRoutes.attorneyProfile(attorney.id)),
+                  ),
+                  const SizedBox(height: LegalHubTheme.spaceSm),
                 ],
-              ),
-    };
+              ],
+            ),
+      empty: empty,
+      errorCopy: l10n.discoveryError,
+    );
   }
 }
 

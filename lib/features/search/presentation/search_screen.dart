@@ -7,7 +7,6 @@ import '../../../app/legalhub_theme.dart';
 import '../../../app/router.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/roles/user_role.dart';
-import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/formatting/date_formatting.dart';
 import '../../../shared/widgets/widgets.dart';
@@ -197,39 +196,14 @@ class _SearchSurfaceState extends State<_SearchSurface> {
     if (state.isNoQuery) {
       return noQuery;
     }
-    return switch (state.results) {
-      ViewLoading() => const Padding(
-        padding: EdgeInsetsDirectional.all(LegalHubTheme.spaceXl),
-        child: Center(child: CircularProgressIndicator()),
-      ),
-      ViewEmpty() => empty,
-      ViewError() => Padding(
-        padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              l10n.searchError,
-              style: text.bodyMedium?.copyWith(color: scheme.error),
-            ),
-            TextButton(
-              onPressed: () => cubit.search(state.query),
-              child: Text(l10n.retry),
-            ),
-          ],
-        ),
-      ),
-      // The sealed ViewState set also carries offline/unauthorized variants
-      // (shared vocabulary); a synthetic search has neither state, so both
-      // render the same empty copy rather than a distinct offline surface.
-      ViewOffline() || ViewUnauthorized() => empty,
-      ViewSuccess<SearchResults>(data: final SearchResults results) => _grouped(
-        context,
-        results,
-        l10n,
-        empty,
-      ),
-    };
+    return ViewStateSwitch<SearchResults>(
+      state: state.results,
+      onRetry: () => cubit.search(state.query),
+      builder: (BuildContext context, SearchResults results) =>
+          _grouped(context, results, l10n, empty),
+      empty: empty,
+      errorCopy: l10n.searchError,
+    );
   }
 
   Widget _grouped(

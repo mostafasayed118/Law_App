@@ -8,6 +8,7 @@ import '../../../core/roles/user_role.dart';
 import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/formatting/date_formatting.dart';
+import '../../../shared/widgets/widgets.dart';
 import '../../matters/domain/matter.dart';
 import '../../matters/domain/matter_gateway.dart';
 import '../../matters/domain/matter_title_resolver.dart';
@@ -158,44 +159,26 @@ class _ListSurfaceState extends State<_ListSurface> {
         style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
       ),
     );
-    return switch (state.documents) {
-      ViewLoading() => const Padding(
-        padding: EdgeInsetsDirectional.all(LegalHubTheme.spaceXl),
-        child: Center(child: CircularProgressIndicator()),
-      ),
-      ViewEmpty() => empty,
-      ViewError() => Padding(
-        padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              l10n.vaultError,
-              style: text.bodyMedium?.copyWith(color: scheme.error),
-            ),
-            TextButton(onPressed: cubit.load, child: Text(l10n.retry)),
-          ],
-        ),
-      ),
-      // The sealed ViewState set also carries offline/unauthorized variants
-      // (shared vocabulary); a synthetic list has neither state, so both
-      // render the same empty copy rather than a distinct offline surface.
-      ViewOffline() || ViewUnauthorized() => empty,
-      ViewSuccess<List<Document>>(data: final List<Document> documents) =>
-        documents.isEmpty
-            ? empty
-            : Column(
-                children: <Widget>[
-                  for (final Document document in documents) ...<Widget>[
-                    _DocumentTile(
-                      document: document,
-                      onViewMatter: _matterTap(context, document, matters),
-                    ),
-                    const SizedBox(height: LegalHubTheme.spaceSm),
-                  ],
+    return ViewStateSwitch<List<Document>>(
+      state: state.documents,
+      onRetry: cubit.load,
+      builder: (BuildContext context, List<Document> documents) =>
+          documents.isEmpty
+          ? empty
+          : Column(
+              children: <Widget>[
+                for (final Document document in documents) ...<Widget>[
+                  _DocumentTile(
+                    document: document,
+                    onViewMatter: _matterTap(context, document, matters),
+                  ),
+                  const SizedBox(height: LegalHubTheme.spaceSm),
                 ],
-              ),
-    };
+              ],
+            ),
+      empty: empty,
+      errorCopy: l10n.vaultError,
+    );
   }
 
   /// The reverse cross-link target for a row, or null when the row renders

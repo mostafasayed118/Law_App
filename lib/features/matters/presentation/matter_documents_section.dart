@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
-import '../../../core/state/view_state.dart';
 import '../../../features/documents/domain/document.dart';
 import '../../../features/documents/domain/document_gateway.dart';
 import '../../../features/documents/presentation/document_cubit.dart';
@@ -10,6 +9,7 @@ import '../../../features/documents/presentation/document_labels.dart';
 import '../../../features/documents/presentation/document_state.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/formatting/date_formatting.dart';
+import '../../../shared/widgets/widgets.dart';
 
 /// Per-matter Documents section on the matter details surface (Phase 10,
 /// slice 10.1, owner decisions D-W1/D-W3/D-W4).
@@ -67,19 +67,19 @@ class _DocumentsSectionBodyState extends State<_DocumentsSectionBody> {
     final TextTheme text = Theme.of(context).textTheme;
     return BlocBuilder<DocumentCubit, DocumentState>(
       builder: (BuildContext context, DocumentState state) {
-        return switch (state.documents) {
-          ViewLoading() => const Padding(
-            padding: EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-            child: Center(child: CircularProgressIndicator()),
+        return ViewStateSwitch<List<Document>>(
+          state: state.documents,
+          onRetry: () => context.read<DocumentCubit>().load(),
+          builder: (BuildContext context, List<Document> documents) =>
+              _rows(context, documents, l10n, text, scheme),
+          empty: _empty(l10n, text, scheme),
+          errorCopy: l10n.vaultError,
+          loadingPadding: const EdgeInsetsDirectional.all(
+            LegalHubTheme.spaceMd,
           ),
-          ViewEmpty() => _empty(l10n, text, scheme),
-          ViewError() => _error(context, l10n, text, scheme),
-          // A synthetic list has neither state; both render the same empty
-          // copy rather than a distinct offline surface.
-          ViewOffline() || ViewUnauthorized() => _empty(l10n, text, scheme),
-          ViewSuccess<List<Document>>(data: final List<Document> documents) =>
-            _rows(context, documents, l10n, text, scheme),
-        };
+          errorPadding: EdgeInsets.zero,
+          errorTextStyle: text.bodySmall?.copyWith(color: scheme.error),
+        );
       },
     );
   }
@@ -115,27 +115,6 @@ class _DocumentsSectionBodyState extends State<_DocumentsSectionBody> {
         l10n.matterWorkspaceDocumentsEmpty,
         style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
       ),
-    );
-  }
-
-  Widget _error(
-    BuildContext context,
-    AppLocalizations l10n,
-    TextTheme text,
-    ColorScheme scheme,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          l10n.vaultError,
-          style: text.bodySmall?.copyWith(color: scheme.error),
-        ),
-        TextButton(
-          onPressed: () => context.read<DocumentCubit>().load(),
-          child: Text(l10n.retry),
-        ),
-      ],
     );
   }
 }

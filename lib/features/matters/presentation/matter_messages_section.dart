@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
-import '../../../core/state/view_state.dart';
 import '../../../features/messaging/domain/message_gateway.dart';
 import '../../../features/messaging/domain/message_thread.dart';
 import '../../../features/messaging/presentation/message_cubit.dart';
 import '../../../features/messaging/presentation/message_state.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/formatting/date_formatting.dart';
+import '../../../shared/widgets/widgets.dart';
 
 /// Per-matter Messages section on the matter details surface (Phase 10,
 /// slice 10.1, owner decisions D-W1/D-W3/D-W4).
@@ -69,21 +69,19 @@ class _MessagesSectionBodyState extends State<_MessagesSectionBody> {
     final TextTheme text = Theme.of(context).textTheme;
     return BlocBuilder<MessageCubit, MessageState>(
       builder: (BuildContext context, MessageState state) {
-        return switch (state.threads) {
-          ViewLoading() => const Padding(
-            padding: EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-            child: Center(child: CircularProgressIndicator()),
+        return ViewStateSwitch<List<MessageThread>>(
+          state: state.threads,
+          onRetry: () => context.read<MessageCubit>().load(),
+          builder: (BuildContext context, List<MessageThread> threads) =>
+              _rows(context, threads, l10n, text, scheme),
+          empty: _empty(l10n, text, scheme),
+          errorCopy: l10n.messagesError,
+          loadingPadding: const EdgeInsetsDirectional.all(
+            LegalHubTheme.spaceMd,
           ),
-          ViewEmpty() => _empty(l10n, text, scheme),
-          ViewError() => _error(context, l10n, text, scheme),
-          // A synthetic list has neither state; both render the same empty
-          // copy rather than a distinct offline surface.
-          ViewOffline() || ViewUnauthorized() => _empty(l10n, text, scheme),
-          ViewSuccess<List<MessageThread>>(
-            data: final List<MessageThread> threads,
-          ) =>
-            _rows(context, threads, l10n, text, scheme),
-        };
+          errorPadding: EdgeInsets.zero,
+          errorTextStyle: text.bodySmall?.copyWith(color: scheme.error),
+        );
       },
     );
   }
@@ -119,27 +117,6 @@ class _MessagesSectionBodyState extends State<_MessagesSectionBody> {
         l10n.matterWorkspaceMessagesEmpty,
         style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
       ),
-    );
-  }
-
-  Widget _error(
-    BuildContext context,
-    AppLocalizations l10n,
-    TextTheme text,
-    ColorScheme scheme,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          l10n.messagesError,
-          style: text.bodySmall?.copyWith(color: scheme.error),
-        ),
-        TextButton(
-          onPressed: () => context.read<MessageCubit>().load(),
-          child: Text(l10n.retry),
-        ),
-      ],
     );
   }
 }

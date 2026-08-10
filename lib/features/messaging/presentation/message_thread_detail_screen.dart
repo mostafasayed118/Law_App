@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
-import '../../../core/state/view_state.dart';
 import '../../../features/auth/presentation/auth_cubit.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/formatting/date_formatting.dart';
+import '../../../shared/widgets/widgets.dart';
 import '../domain/message.dart';
 import '../domain/message_gateway.dart';
 import 'message_thread_detail_cubit.dart';
@@ -134,41 +134,23 @@ class _DetailSurfaceState extends State<_DetailSurface> {
         style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
       ),
     );
-    return switch (state.messages) {
-      ViewLoading() => const Padding(
-        padding: EdgeInsetsDirectional.all(LegalHubTheme.spaceXl),
-        child: Center(child: CircularProgressIndicator()),
-      ),
-      ViewEmpty() => empty,
-      ViewError() => Padding(
-        padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              l10n.messagesDetailError,
-              style: text.bodyMedium?.copyWith(color: scheme.error),
-            ),
-            TextButton(
-              onPressed: () => cubit.load(widget.threadId),
-              child: Text(l10n.retry),
-            ),
-          ],
-        ),
-      ),
-      ViewOffline() || ViewUnauthorized() => empty,
-      ViewSuccess<List<Message>>(data: final List<Message> messages) =>
-        messages.isEmpty
-            ? empty
-            : Column(
-                children: <Widget>[
-                  for (final Message message in messages) ...<Widget>[
-                    _MessageTile(message: message),
-                    const SizedBox(height: LegalHubTheme.spaceSm),
-                  ],
+    return ViewStateSwitch<List<Message>>(
+      state: state.messages,
+      onRetry: () => cubit.load(widget.threadId),
+      builder: (BuildContext context, List<Message> messages) =>
+          messages.isEmpty
+          ? empty
+          : Column(
+              children: <Widget>[
+                for (final Message message in messages) ...<Widget>[
+                  _MessageTile(message: message),
+                  const SizedBox(height: LegalHubTheme.spaceSm),
                 ],
-              ),
-    };
+              ],
+            ),
+      empty: empty,
+      errorCopy: l10n.messagesDetailError,
+    );
   }
 }
 

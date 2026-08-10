@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
-import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/formatting/date_formatting.dart';
+import '../../../shared/widgets/widgets.dart';
 import '../domain/billing_gateway.dart';
 import '../domain/invoice.dart';
 import 'billing_cubit.dart';
@@ -74,54 +74,30 @@ class _InvoicesSurfaceState extends State<_InvoicesSurface> {
     return SafeArea(
       child: BlocBuilder<BillingCubit, BillingState>(
         builder: (BuildContext context, BillingState state) {
-          return switch (state.invoices) {
-            ViewLoading() => const Padding(
-              padding: EdgeInsetsDirectional.all(LegalHubTheme.spaceXl),
-              child: Center(child: CircularProgressIndicator()),
-            ),
-            ViewEmpty() => empty,
-            ViewError() => Padding(
-              padding: const EdgeInsetsDirectional.only(
-                top: LegalHubTheme.spaceMd,
+          return ViewStateSwitch<List<Invoice>>(
+            state: state.invoices,
+            onRetry: () => context.read<BillingCubit>().load(),
+            builder: (BuildContext context, List<Invoice> invoices) => ListView(
+              padding: const EdgeInsetsDirectional.all(
+                LegalHubTheme.marginMobile,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    l10n.invoicesError,
-                    style: text.bodyMedium?.copyWith(color: scheme.error),
-                  ),
-                  TextButton(
-                    onPressed: () => context.read<BillingCubit>().load(),
-                    child: Text(l10n.retry),
-                  ),
+              children: <Widget>[
+                for (final Invoice invoice in invoices) ...<Widget>[
+                  _InvoiceTile(invoice: invoice),
+                  const SizedBox(height: LegalHubTheme.spaceSm),
                 ],
-              ),
-            ),
-            // The sealed ViewState set also carries offline/unauthorized
-            // variants; the synthetic list has neither state, so both render
-            // the same empty copy (the vault/messages posture).
-            ViewOffline() || ViewUnauthorized() => empty,
-            ViewSuccess<List<Invoice>>(data: final List<Invoice> invoices) =>
-              ListView(
-                padding: const EdgeInsetsDirectional.all(
-                  LegalHubTheme.marginMobile,
+                const SizedBox(height: LegalHubTheme.spaceLg),
+                Text(
+                  l10n.invoicesLocalOnlyNote,
+                  style: text.bodySmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
                 ),
-                children: <Widget>[
-                  for (final Invoice invoice in invoices) ...<Widget>[
-                    _InvoiceTile(invoice: invoice),
-                    const SizedBox(height: LegalHubTheme.spaceSm),
-                  ],
-                  const SizedBox(height: LegalHubTheme.spaceLg),
-                  Text(
-                    l10n.invoicesLocalOnlyNote,
-                    style: text.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-          };
+              ],
+            ),
+            empty: empty,
+            errorCopy: l10n.invoicesError,
+          );
         },
       ),
     );

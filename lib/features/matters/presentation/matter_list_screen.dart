@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../app/router.dart';
 import '../../../app/service_locator.dart';
-import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/widgets.dart';
 import '../domain/matter.dart';
@@ -123,45 +122,26 @@ class _ListSurfaceState extends State<_ListSurface> {
         style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
       ),
     );
-    return switch (state.matters) {
-      ViewLoading() => const Padding(
-        padding: EdgeInsetsDirectional.all(LegalHubTheme.spaceXl),
-        child: Center(child: CircularProgressIndicator()),
-      ),
-      ViewEmpty() => empty,
-      ViewError() => Padding(
-        padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              l10n.matterError,
-              style: text.bodyMedium?.copyWith(color: scheme.error),
-            ),
-            TextButton(onPressed: cubit.load, child: Text(l10n.retry)),
-          ],
-        ),
-      ),
-      // The sealed ViewState set also carries offline/unauthorized variants
-      // (shared vocabulary); a synthetic list has neither state, so both
-      // render the same empty copy rather than a distinct offline surface.
-      ViewOffline() || ViewUnauthorized() => empty,
-      ViewSuccess<List<Matter>>() =>
-        state.visibleMatters.isEmpty
-            ? empty
-            : Column(
-                children: <Widget>[
-                  for (final Matter matter in state.visibleMatters) ...<Widget>[
-                    _MatterTile(
-                      matter: matter,
-                      onTap: () =>
-                          context.go(AppRoutes.matterDetail(matter.id)),
-                    ),
-                    const SizedBox(height: LegalHubTheme.spaceSm),
-                  ],
+    return ViewStateSwitch<List<Matter>>(
+      state: state.matters,
+      onRetry: cubit.load,
+      builder: (BuildContext context, List<Matter> matters) =>
+          state.visibleMatters.isEmpty
+          ? empty
+          : Column(
+              children: <Widget>[
+                for (final Matter matter in state.visibleMatters) ...<Widget>[
+                  _MatterTile(
+                    matter: matter,
+                    onTap: () => context.go(AppRoutes.matterDetail(matter.id)),
+                  ),
+                  const SizedBox(height: LegalHubTheme.spaceSm),
                 ],
-              ),
-    };
+              ],
+            ),
+      empty: empty,
+      errorCopy: l10n.matterError,
+    );
   }
 }
 
