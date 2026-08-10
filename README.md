@@ -93,8 +93,13 @@ messaging services.
   in-memory locale store, and the onboarding-success screen. Batch 5 added
   the 800×600 onboarding no-overflow test and the EN/AR/TR localized-fallback
   assertions.
-- Coverage: **1258 tests** (2026-08-11 — the Phase-3 candidate C2: shared
-  `AppSectionHeader` (the search `_GroupSection` + matter-details
+- Coverage: **1258 tests** (2026-08-11 — the Phase-4 readability pass: the
+  booking wizard step pipeline split into `part` files under
+  `lib/features/booking/presentation/` (`booking_category_step` /
+  `booking_datetime_step` / `booking_review_step` / `booking_success_step` /
+  `booking_selectable_tile`) — a pure mechanical split, zero behavior
+  change, declaration count unchanged; on top of the Phase-3 candidate C2:
+  shared `AppSectionHeader` (the search `_GroupSection` + matter-details
   workspace headers unified — title style parameterized, inter-section
   spacing moved to the parents), on top of the Phase-3 candidate C1: the
   four matter-details workspace section headers (title + section +

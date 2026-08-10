@@ -159,6 +159,22 @@ feature-local per the Phase-1 rules; the roster chips already delegate to
 `LabelChip`. Splitting them into separate files would remove zero
 duplication — it is an optional readability refactor, not an extraction.
 
+**Phase-4 readability pass executed (2026-08-11)** — the optional file
+decomposition candidate: the booking wizard step pipeline split into
+`part` files under `lib/features/booking/presentation/`
+(`booking_category_step.dart`, `booking_datetime_step.dart`,
+`booking_review_step.dart`, `booking_success_step.dart`, and
+`booking_selectable_tile.dart`; `booking_screen.dart` remains the library
+file with the screen + wizard shell and the centralized imports). Chosen
+mechanics: `part`/`part of`, so every step widget stays private
+(no public-API change) and the 16 imports stay in one place — a pure
+mechanical readability split with zero behavior change; the 10 booking
+screen tests pin by l10n text and pass unchanged (suite stays 1261). The
+admin screen (`_AdminLists`/`_AuditSection`) remains the one not-yet-split
+500+ line screen; it is a different shape (stateful fetch-on-mount
+sections, not a step pipeline) and is left as the remaining optional
+candidate.
+
 **Program totals at decision time** (`e105ce6`, suite 1261): 12
 extractions + 2 consolidations (E1–E6, E7–E10, A/B, C1/C2), 13 shared
 widgets in the barrel, suite 1193 → 1261 (**+68 tests**), all gates
