@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
 import '../../../features/storage/domain/file_metadata.dart';
 import '../../../features/storage/domain/storage_gateway.dart';
@@ -64,61 +63,21 @@ class _FilesSectionBodyState extends State<_FilesSectionBody> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
     return BlocBuilder<StorageCubit, StorageState>(
       builder: (BuildContext context, StorageState state) {
-        return ViewStateSwitch<List<FileMetadata>>(
+        return WorkspaceSection<FileMetadata>(
           state: state.files,
           onRetry: () => context.read<StorageCubit>().load(),
-          builder: (BuildContext context, List<FileMetadata> files) =>
-              _rows(context, files, l10n, text, scheme),
-          empty: _empty(l10n, text, scheme),
           errorCopy: l10n.filesError,
-          loadingPadding: const EdgeInsetsDirectional.all(
-            LegalHubTheme.spaceMd,
-          ),
-          errorPadding: EdgeInsets.zero,
-          errorTextStyle: text.bodySmall?.copyWith(color: scheme.error),
-        );
-      },
-    );
-  }
-
-  Widget _rows(
-    BuildContext context,
-    List<FileMetadata> files,
-    AppLocalizations l10n,
-    TextTheme text,
-    ColorScheme scheme,
-  ) {
-    final List<FileMetadata> matched = files
-        .where((FileMetadata f) => f.matterRef == widget.matterRef)
-        .toList();
-    if (matched.isEmpty) {
-      return _empty(l10n, text, scheme);
-    }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        for (final FileMetadata file in matched) ...<Widget>[
-          AppTile(
+          emptyCopy: l10n.matterWorkspaceFilesEmpty,
+          matterRef: widget.matterRef,
+          matterRefOf: (FileMetadata file) => file.matterRef,
+          itemBuilder: (BuildContext context, FileMetadata file) => AppTile(
             title: file.name,
             subtitles: <String>[fileSizeLabel(file.sizeBytes)],
           ),
-          const SizedBox(height: LegalHubTheme.spaceSm),
-        ],
-      ],
-    );
-  }
-
-  Widget _empty(AppLocalizations l10n, TextTheme text, ColorScheme scheme) {
-    return Padding(
-      padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceXs),
-      child: Text(
-        l10n.matterWorkspaceFilesEmpty,
-        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-      ),
+        );
+      },
     );
   }
 }

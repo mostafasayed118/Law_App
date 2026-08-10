@@ -29,3 +29,4 @@ export 'role_label.dart';
 export 'view_state_list.dart';
 export 'view_state_switch.dart';
 export 'view_state_view.dart';
+export 'workspace_section.dart';

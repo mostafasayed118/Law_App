@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
 import '../../../features/documents/domain/document.dart';
 import '../../../features/documents/domain/document_gateway.dart';
@@ -63,64 +62,24 @@ class _DocumentsSectionBodyState extends State<_DocumentsSectionBody> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
     return BlocBuilder<DocumentCubit, DocumentState>(
       builder: (BuildContext context, DocumentState state) {
-        return ViewStateSwitch<List<Document>>(
+        return WorkspaceSection<Document>(
           state: state.documents,
           onRetry: () => context.read<DocumentCubit>().load(),
-          builder: (BuildContext context, List<Document> documents) =>
-              _rows(context, documents, l10n, text, scheme),
-          empty: _empty(l10n, text, scheme),
           errorCopy: l10n.vaultError,
-          loadingPadding: const EdgeInsetsDirectional.all(
-            LegalHubTheme.spaceMd,
-          ),
-          errorPadding: EdgeInsets.zero,
-          errorTextStyle: text.bodySmall?.copyWith(color: scheme.error),
-        );
-      },
-    );
-  }
-
-  Widget _rows(
-    BuildContext context,
-    List<Document> documents,
-    AppLocalizations l10n,
-    TextTheme text,
-    ColorScheme scheme,
-  ) {
-    final List<Document> matched = documents
-        .where((Document d) => d.matterRef == widget.matterRef)
-        .toList();
-    if (matched.isEmpty) {
-      return _empty(l10n, text, scheme);
-    }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        for (final Document document in matched) ...<Widget>[
-          AppTile(
+          emptyCopy: l10n.matterWorkspaceDocumentsEmpty,
+          matterRef: widget.matterRef,
+          matterRefOf: (Document document) => document.matterRef,
+          itemBuilder: (BuildContext context, Document document) => AppTile(
             title: document.title,
             subtitles: <String>[
               '${documentTypeLabel(l10n, document.type)} · '
                   '${formatMediumDate(l10n, document.createdAt)}',
             ],
           ),
-          const SizedBox(height: LegalHubTheme.spaceSm),
-        ],
-      ],
-    );
-  }
-
-  Widget _empty(AppLocalizations l10n, TextTheme text, ColorScheme scheme) {
-    return Padding(
-      padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceXs),
-      child: Text(
-        l10n.matterWorkspaceDocumentsEmpty,
-        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-      ),
+        );
+      },
     );
   }
 }

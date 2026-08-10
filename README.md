@@ -57,7 +57,7 @@ messaging services.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (1244 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (1251 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), ThemeCubit (mode persistence + restart
   restore), Redactor (password/OTP/email/Bearer redaction with leak guards),
@@ -93,7 +93,12 @@ messaging services.
   in-memory locale store, and the onboarding-success screen. Batch 5 added
   the 800×600 onboarding no-overflow test and the EN/AR/TR localized-fallback
   assertions.
-- Coverage: **1244 tests** (2026-08-11 — E9 extraction: shared
+- Coverage: **1251 tests** (2026-08-11 — E10 extraction: shared
+  `WorkspaceSection<T>` (the four matter workspace sections' state shell —
+  the `ViewStateSwitch` arm config, the filter-by-matterRef rows column,
+  and the inline empty copy — unified; each section keeps its own
+  `BlocProvider`/`BlocBuilder` wiring and passes state/retry/copies/
+  item-builder). On top of the E9 extraction: shared
   `AppCenteredRetry` (the attorney-profile + matter-details centered error
   arms unified — message + retry callback + localized retry label passed
   in), partially addressing close-out residual #5 (centered-message

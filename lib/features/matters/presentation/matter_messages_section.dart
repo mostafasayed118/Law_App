@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
 import '../../../features/messaging/domain/message_gateway.dart';
 import '../../../features/messaging/domain/message_thread.dart';
@@ -65,64 +64,24 @@ class _MessagesSectionBodyState extends State<_MessagesSectionBody> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
     return BlocBuilder<MessageCubit, MessageState>(
       builder: (BuildContext context, MessageState state) {
-        return ViewStateSwitch<List<MessageThread>>(
+        return WorkspaceSection<MessageThread>(
           state: state.threads,
           onRetry: () => context.read<MessageCubit>().load(),
-          builder: (BuildContext context, List<MessageThread> threads) =>
-              _rows(context, threads, l10n, text, scheme),
-          empty: _empty(l10n, text, scheme),
           errorCopy: l10n.messagesError,
-          loadingPadding: const EdgeInsetsDirectional.all(
-            LegalHubTheme.spaceMd,
-          ),
-          errorPadding: EdgeInsets.zero,
-          errorTextStyle: text.bodySmall?.copyWith(color: scheme.error),
-        );
-      },
-    );
-  }
-
-  Widget _rows(
-    BuildContext context,
-    List<MessageThread> threads,
-    AppLocalizations l10n,
-    TextTheme text,
-    ColorScheme scheme,
-  ) {
-    final List<MessageThread> matched = threads
-        .where((MessageThread t) => t.matterRef == widget.matterRef)
-        .toList();
-    if (matched.isEmpty) {
-      return _empty(l10n, text, scheme);
-    }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        for (final MessageThread thread in matched) ...<Widget>[
-          AppTile(
+          emptyCopy: l10n.matterWorkspaceMessagesEmpty,
+          matterRef: widget.matterRef,
+          matterRefOf: (MessageThread thread) => thread.matterRef,
+          itemBuilder: (BuildContext context, MessageThread thread) => AppTile(
             title: thread.title,
             subtitles: <String>[
               '${thread.participants.join(', ')} · '
                   '${formatMediumDate(l10n, thread.lastActivityAt)}',
             ],
           ),
-          const SizedBox(height: LegalHubTheme.spaceSm),
-        ],
-      ],
-    );
-  }
-
-  Widget _empty(AppLocalizations l10n, TextTheme text, ColorScheme scheme) {
-    return Padding(
-      padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceXs),
-      child: Text(
-        l10n.matterWorkspaceMessagesEmpty,
-        style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-      ),
+        );
+      },
     );
   }
 }

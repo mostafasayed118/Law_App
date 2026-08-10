@@ -180,7 +180,12 @@ different geometry or domain meaning, not a superficial clone:
    start-aligned `ViewError` arm documented as a separate shape. Close-out
    residual #5 **PARTIALLY ADDRESSED**.
 4. **E10** workspace section shell — only if the boilerplate still
-   justifies it after E8.
+   justifies it after E8. **COMPLETE 2026-08-11** —
+   `lib/shared/widgets/workspace_section.dart` (the `ViewStateSwitch` arm
+   config, the filter-by-matterRef rows column, and the inline empty copy
+   unified as `WorkspaceSection<T>`; the four sections keep their own
+   `BlocProvider`/`BlocBuilder` wiring and pass state/retry/copies/
+   item-builder), +7 tests, suite 1247 → 1254.
 
 Each lands as its own commit with focused shared-widget tests, following
 the E1–E6 pattern; all gates (`dart format`, `flutter analyze`,
@@ -191,6 +196,8 @@ gain **#6 ADDRESSED** and **#5 partially ADDRESSED** on completion.
 ## 6. Follow-ups (not extraction)
 
 - After E8, re-check whether the `_empty` helper folding belongs in E10 or
-  is small enough to ride with E8.
+  is small enough to ride with E8. **RESOLVED 2026-08-11** — the `_empty`
+  helper folded into `WorkspaceSection<T>` (E10) as its inline empty copy;
+  no separate widget was needed.
 - The org-audit `_OutcomeChip` (residual #3) and home `StatusChip`
   (residual #4) remain deliberately distinct geometries — no change.
