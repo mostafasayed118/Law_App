@@ -56,10 +56,7 @@ class _DateTimeStep extends StatelessWidget {
             l10n.bookingSlotsError,
             style: text.bodyMedium?.copyWith(color: scheme.error),
           ),
-          TextButton(
-            onPressed: cubit.continueFromCategory,
-            child: Text(l10n.retry),
-          ),
+          TextButton(onPressed: cubit.retryLoadSlots, child: Text(l10n.retry)),
         ],
       ),
       // The sealed ViewState set also carries offline/unauthorized variants

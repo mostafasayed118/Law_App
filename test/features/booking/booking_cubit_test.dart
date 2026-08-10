@@ -130,6 +130,78 @@ void main() {
     );
 
     blocTest<BookingCubit, BookingState>(
+      'retryLoadSlots re-runs the slot fetch and recovers from a failure',
+      setUp: () => gateway = _StubBookingGateway(
+        slotsResult: Result<List<BookingSlot>>.failure(_slotsFailure),
+      ),
+      build: () => BookingCubit(gateway),
+      act: (BookingCubit cubit) async {
+        cubit.selectCategory(BookingCategory.general);
+        await cubit.continueFromCategory();
+        // Swap the gateway outcome: the retry path must re-fetch (not just
+        // clear the error locally) and land on the recovered slots.
+        gateway.slotsResult = Result<List<BookingSlot>>.success(_slots);
+        await cubit.retryLoadSlots();
+      },
+      expect: () => <BookingState>[
+        BookingState(draft: BookingDraft(category: BookingCategory.general)),
+        BookingState(
+          step: BookingStep.dateTime,
+          draft: BookingDraft(category: BookingCategory.general),
+          slots: ViewLoading<List<BookingSlot>>(),
+        ),
+        BookingState(
+          step: BookingStep.dateTime,
+          draft: BookingDraft(category: BookingCategory.general),
+          slots: ViewError<List<BookingSlot>>(_slotsFailure),
+        ),
+        BookingState(
+          step: BookingStep.dateTime,
+          draft: BookingDraft(category: BookingCategory.general),
+          slots: ViewLoading<List<BookingSlot>>(),
+        ),
+        BookingState(
+          step: BookingStep.dateTime,
+          draft: BookingDraft(category: BookingCategory.general),
+          slots: ViewSuccess<List<BookingSlot>>(_slots),
+        ),
+      ],
+      verify: (_) => expect(gateway.fetchSlotsCalls, 2),
+    );
+
+    blocTest<BookingCubit, BookingState>(
+      'retryLoadSlots is ignored when the last load succeeded',
+      build: () => BookingCubit(gateway),
+      act: (BookingCubit cubit) async {
+        cubit.selectCategory(BookingCategory.general);
+        await cubit.continueFromCategory();
+        await cubit.retryLoadSlots();
+      },
+      expect: () => <BookingState>[
+        BookingState(draft: BookingDraft(category: BookingCategory.general)),
+        BookingState(
+          step: BookingStep.dateTime,
+          draft: BookingDraft(category: BookingCategory.general),
+          slots: ViewLoading<List<BookingSlot>>(),
+        ),
+        BookingState(
+          step: BookingStep.dateTime,
+          draft: BookingDraft(category: BookingCategory.general),
+          slots: ViewSuccess<List<BookingSlot>>(_slots),
+        ),
+      ],
+      verify: (_) => expect(gateway.fetchSlotsCalls, 1),
+    );
+
+    blocTest<BookingCubit, BookingState>(
+      'retryLoadSlots is ignored off the date-time step',
+      build: () => BookingCubit(gateway),
+      act: (BookingCubit cubit) => cubit.retryLoadSlots(),
+      expect: () => <BookingState>[],
+      verify: (_) => expect(gateway.fetchSlotsCalls, 0),
+    );
+
+    blocTest<BookingCubit, BookingState>(
       'selectSlot then continueFromDateTime advances to review',
       build: () => BookingCubit(gateway),
       act: (BookingCubit cubit) async {
@@ -769,7 +841,7 @@ class _StubBookingGateway implements BookingGateway {
     completer = Completer<Result<BookingConfirmation>>();
   }
 
-  final Result<List<BookingSlot>> slotsResult;
+  Result<List<BookingSlot>> slotsResult;
   List<Result<BookingConfirmation>>? confirmResults;
   Completer<Result<BookingConfirmation>>? completer;
   int fetchSlotsCalls = 0;

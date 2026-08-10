@@ -205,6 +205,25 @@ error-tinted 40px lock vs 32px error icon, the denied no-retry gate
 Retry reissuing the load through the cubit (`loadCalls` 1 → 2). Suite
 1261 → 1263 (admin 14 → 16).
 
+**Coverage deepening — booking (2026-08-11)** — the booking step arms from
+the Phase-4 candidate list are added, and the arm exposed a real defect:
+
+- **Latent-bug fix** — the `_DateTimeStep` slot-error arm's Retry was
+  wired to `cubit.continueFromCategory`, whose guard requires the category
+  step — a silent no-op from the date-time step (the error arm's Retry
+  did nothing). The cubit now exposes `retryLoadSlots()` (only on the
+  date-time step and only after an actual failure), sharing a `_loadSlots`
+  fetch tail with `continueFromCategory`; the error arm re-pointed.
+- **Arms added** — four `_DateTimeStep`/`_SuccessStep` widget tests
+  (loading via a gated Completer fetch, empty copy, slot-error + retry
+  re-fetch to recovery, and the success step: 56px secondary-tinted icon,
+  reference, demo note, Done) plus three `retryLoadSlots` blocTests
+  (fail → retry → recover with `fetchSlotsCalls` 1 → 2, ignored after
+  success, ignored off the date-time step). The offline/unauthorized arms
+  of the slot view remain unreachable (the synthetic surface never
+  produces them — cubit maps only to loading/empty/error/success), as the
+  code comment documents. Suite 1263 → 1270 (booking 40 → 47).
+
 **Program totals at decision time** (`e105ce6`, suite 1261): 12
 extractions + 2 consolidations (E1–E6, E7–E10, A/B, C1/C2), 13 shared
 widgets in the barrel, suite 1193 → 1261 (**+68 tests**), all gates

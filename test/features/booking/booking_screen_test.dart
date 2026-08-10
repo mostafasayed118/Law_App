@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/service_locator.dart';
@@ -11,6 +13,39 @@ import 'package:legalhub/features/booking/domain/booking_request.dart';
 import 'package:legalhub/features/booking/domain/booking_slot.dart';
 import 'package:legalhub/features/booking/presentation/booking_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+
+/// Gateway with a mutable slot outcome so the date-time step's loading,
+/// empty, and error arms are reachable in a widget test (the error arm's
+/// retry re-fetches through the cubit's `retryLoadSlots`).
+class _MutableSlotsGateway implements BookingGateway {
+  _MutableSlotsGateway({List<BookingSlot>? slots})
+    : slots = slots ?? FakeBookingGateway.syntheticSlots;
+
+  List<BookingSlot> slots;
+  AppError? slotError;
+
+  /// When set, [fetchSlots] awaits it first — the loading arm stays visible
+  /// until the test completes the gate.
+  Completer<void>? slotGate;
+
+  @override
+  Future<Result<List<BookingSlot>>> fetchSlots() async {
+    if (slotGate != null) {
+      await slotGate!.future;
+    }
+    if (slotError != null) {
+      return Result<List<BookingSlot>>.failure(slotError!);
+    }
+    return Result<List<BookingSlot>>.success(slots);
+  }
+
+  @override
+  Future<Result<BookingConfirmation>> confirm(BookingRequest request) async {
+    return const Result<BookingConfirmation>.success(
+      BookingConfirmation(referenceId: 'LH-DEMO-0001'),
+    );
+  }
+}
 
 /// Gateway whose slot load succeeds but whose confirm always fails, so the
 /// review-step error surface (AC-4) is reachable in a widget test.
@@ -187,6 +222,96 @@ void main() {
       // The draft is intact and the user stays on review to retry.
       expect(find.text('Review your booking'), findsOneWidget);
       expect(find.text('General'), findsOneWidget);
+    });
+
+    testWidgets(
+      'date-time step shows a loading indicator while slots resolve',
+      (tester) async {
+        final _MutableSlotsGateway gateway = _MutableSlotsGateway()
+          ..slotGate = Completer<void>();
+        serviceLocator.registerLazySingleton<BookingGateway>(() => gateway);
+        await pumpBooking(tester);
+        await selectCategory(tester);
+
+        await tester.tap(find.text('Continue'));
+        await tester.pump();
+
+        // The fetch is gated: the loading arm renders, not the slot list.
+        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+        expect(find.text('9:00 AM'), findsNothing);
+
+        gateway.slotGate!.complete();
+        await tester.pumpAndSettle();
+
+        expect(find.text('9:00 AM'), findsOneWidget);
+      },
+    );
+
+    testWidgets('date-time step shows the empty copy when no times remain', (
+      tester,
+    ) async {
+      final _MutableSlotsGateway gateway = _MutableSlotsGateway(
+        slots: <BookingSlot>[],
+      );
+      serviceLocator.registerLazySingleton<BookingGateway>(() => gateway);
+      await pumpBooking(tester);
+      await goToDateTime(tester);
+
+      expect(find.text('No times available.'), findsOneWidget);
+      expect(find.text('9:00 AM'), findsNothing);
+    });
+
+    testWidgets('date-time step shows the slot error and retry re-fetches', (
+      tester,
+    ) async {
+      final _MutableSlotsGateway gateway = _MutableSlotsGateway()
+        ..slotError = const AppError(
+          code: 'booking.slots.unavailable',
+          userMessage: 'Unavailable',
+        );
+      serviceLocator.registerLazySingleton<BookingGateway>(() => gateway);
+      await pumpBooking(tester);
+      await goToDateTime(tester);
+
+      expect(find.text('Unable to load available times.'), findsOneWidget);
+
+      // Retry re-runs the slot fetch from the date-time step (cubit
+      // retryLoadSlots — previously wired to continueFromCategory, which
+      // no-ops off the category step); with the failure cleared the slots
+      // render.
+      gateway.slotError = null;
+      await tester.tap(find.text('Retry'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Unable to load available times.'), findsNothing);
+      expect(find.text('9:00 AM'), findsOneWidget);
+    });
+
+    testWidgets('success step pins the confirmation content and demo note', (
+      tester,
+    ) async {
+      await pumpBooking(tester);
+      await goToReview(tester);
+      await tester.tap(find.text('Confirm booking'));
+      await tester.pumpAndSettle();
+
+      // The 56px success icon is secondary-tinted.
+      final Finder iconFinder = find.byIcon(Icons.check_circle_outline);
+      final Icon icon = tester.widget<Icon>(iconFinder);
+      expect(icon.size, 56);
+      expect(
+        icon.color,
+        Theme.of(tester.element(iconFinder)).colorScheme.secondary,
+      );
+
+      expect(find.text('Booking confirmed'), findsOneWidget);
+      expect(find.text('Reference: LH-DEMO-0001'), findsOneWidget);
+      // The local-only note repeats on the terminal step (D-B3/D-B6).
+      expect(
+        find.text('Demo mode — no consultation is actually booked or sent.'),
+        findsOneWidget,
+      );
+      expect(find.text('Done'), findsOneWidget);
     });
 
     testWidgets(

@@ -97,6 +97,28 @@ class BookingCubit extends Cubit<BookingState> {
         submitStatus: BookingSubmitStatus.idle,
       ),
     );
+    await _loadSlots();
+  }
+
+  /// Re-runs the slot fetch from the date-time step (the slot-error arm's
+  /// retry). Only fires while the date-time step is visible AND the previous
+  /// load failed; a tap during an in-flight reload no-ops (the loading state
+  /// replaced the error state).
+  Future<void> retryLoadSlots() async {
+    if (isClosed ||
+        state.step != BookingStep.dateTime ||
+        state.slots is! ViewError<List<BookingSlot>>) {
+      return;
+    }
+    emit(state.copyWith(slots: const ViewLoading<List<BookingSlot>>()));
+    await _loadSlots();
+  }
+
+  /// Shared slot-fetch tail for [continueFromCategory] and [retryLoadSlots]:
+  /// maps the gateway result into [BookingState.slots]. A response that
+  /// lands after the user has left the date-time step is dropped (stale
+  /// guard).
+  Future<void> _loadSlots() async {
     final Result<List<BookingSlot>> result = await _gateway.fetchSlots();
     if (isClosed || state.step != BookingStep.dateTime) {
       return;
