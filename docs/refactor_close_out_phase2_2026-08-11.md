@@ -181,15 +181,27 @@ decomposition candidates, both 500+ line screens now split into
 Chosen mechanics for both: `part`/`part of`, so every widget stays
 private (no public-API change) and the imports stay in one place — a pure
 mechanical readability split with zero behavior change; the admin tests
-pin by l10n text and pass unchanged (14), suite stays 1261. With both
-500+ line screens split, the Phase-4 readability candidate list is
-exhausted.
+pin by l10n text and pass unchanged (14), suite stays 1261.
+
+**Phase-4 close-out (2026-08-11)** — the readability candidate list is
+EXHAUSTED. Both 500+ line screens are split and pushed:
+
+- Booking `4bce267` — `refactor(booking): split step pipeline into part
+  files (Phase-4 readability pass)`
+- Admin `61d9191` — `refactor(admin): split section widgets into part
+  files (Phase-4 readability pass)`
+
+No further readability candidates remain; the only Phase-4-adjacent items
+left on the table are the non-extraction ones (coverage deepening,
+feature work), not splits. Verified at `61d9191`: suite 1261, all gates
+green (format clean, analyze clean, ledger PASS, policy PASS), tree
+clean, `origin/main == HEAD`.
 
 **Program totals at decision time** (`e105ce6`, suite 1261): 12
 extractions + 2 consolidations (E1–E6, E7–E10, A/B, C1/C2), 13 shared
 widgets in the barrel, suite 1193 → 1261 (**+68 tests**), all gates
 green, every commit gated and pushed. The honest Phase-4 candidates, if
-any further code-quality work is wanted, are **not** extraction: optional
-file decomposition of the two 500+ line screens (readability), coverage
-deepening (admin/booking step tests), or moving to feature work per the
-roadmap.
+any further code-quality work is wanted, are **not** extraction: the
+optional file decomposition of the two 500+ line screens (readability)
+— executed, see the close-out above — plus coverage deepening
+(admin/booking step tests) or moving to feature work per the roadmap.
