@@ -94,7 +94,11 @@ messaging services.
   the 800×600 onboarding no-overflow test and the EN/AR/TR localized-fallback
   assertions.
 - Coverage: **1254 tests** (2026-08-11 — the post-E10 re-audit
-  candidate A: shared `AppCenteredMessage` (the attorney-profile +
+  candidate B: the org-audit centered icon-state trio
+  (`_EmptyState`/`_DeniedState`/`OrgAuditFailedBlock`) consolidated into
+  one parameterized local `_CenteredState` (icon/color/message/optional
+  action), on top of candidate A: shared
+  `AppCenteredMessage` (the attorney-profile +
   matter-details centered plain-message helpers unified), on top of the
   E10 extraction: shared `WorkspaceSection<T>` (the four matter workspace
   sections' state shell —

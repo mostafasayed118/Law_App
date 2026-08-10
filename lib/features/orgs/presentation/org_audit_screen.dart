@@ -75,12 +75,28 @@ class _OrgAuditScreenState extends State<OrgAuditScreen> {
               ),
               OrgAuditLoaded(entries: final List<AuditEntry> entries) =>
                 entries.isEmpty
-                    ? _EmptyState(message: l10n.orgAuditEmpty)
+                    ? _CenteredState(
+                        icon: Icons.check_circle_outline,
+                        iconColor: Theme.of(context).colorScheme.outline,
+                        message: l10n.orgAuditEmpty,
+                      )
                     : _AuditList(entries: entries),
-              OrgAuditDenied() => _DeniedState(l10n: l10n),
-              OrgAuditFailed() => OrgAuditFailedBlock(
-                retry: _cubit.retry,
-                l10n: l10n,
+              // AC-7: the server said `permission denied` — never empty
+              // success, and no retry (the gate is not transient).
+              OrgAuditDenied() => _CenteredState(
+                icon: Icons.lock_outline,
+                iconColor: Theme.of(context).colorScheme.error,
+                message: l10n.orgAuditDenied,
+              ),
+              // Transient failure with a retry that re-issues the load.
+              OrgAuditFailed() => _CenteredState(
+                icon: Icons.cloud_off_outlined,
+                iconColor: Theme.of(context).colorScheme.error,
+                message: l10n.orgAuditError,
+                action: FilledButton(
+                  onPressed: _cubit.retry,
+                  child: Text(l10n.orgAuditRetry),
+                ),
               ),
             };
           },
@@ -207,67 +223,23 @@ class _OutcomeChip extends StatelessWidget {
   }
 }
 
-/// Honest empty trail — distinct from the denied state.
-class _EmptyState extends StatelessWidget {
-  const _EmptyState({required this.message});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Icon(Icons.check_circle_outline, size: 40, color: scheme.outline),
-            const SizedBox(height: LegalHubTheme.spaceMd),
-            Text(message, textAlign: TextAlign.center),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Distinct denied state (AC-7) — the server said `permission denied`; this
-/// is never "an empty trail".
-class _DeniedState extends StatelessWidget {
-  const _DeniedState({required this.l10n});
-
-  final AppLocalizations l10n;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Icon(Icons.lock_outline, size: 40, color: scheme.error),
-            const SizedBox(height: LegalHubTheme.spaceMd),
-            Text(l10n.orgAuditDenied, textAlign: TextAlign.center),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Failed state with a retry that re-issues the same org load.
-class OrgAuditFailedBlock extends StatelessWidget {
-  const OrgAuditFailedBlock({
-    super.key,
-    required this.retry,
-    required this.l10n,
+/// The centered icon-state shell shared by the empty / denied / failed
+/// arms — Candidate B consolidation (the three previously duplicated this
+/// exact `Center` → `Padding(marginMobile)` → `Column(min)` → `Icon(40)` +
+/// `spaceMd` → centered `Text` shape). The optional [action] renders after
+/// another `spaceMd` gap (the failed arm's retry button).
+class _CenteredState extends StatelessWidget {
+  const _CenteredState({
+    required this.icon,
+    required this.iconColor,
+    required this.message,
+    this.action,
   });
 
-  final Future<void> Function() retry;
-  final AppLocalizations l10n;
+  final IconData icon;
+  final Color iconColor;
+  final String message;
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
@@ -277,15 +249,13 @@ class OrgAuditFailedBlock extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Icon(
-              Icons.cloud_off_outlined,
-              size: 40,
-              color: Theme.of(context).colorScheme.error,
-            ),
+            Icon(icon, size: 40, color: iconColor),
             const SizedBox(height: LegalHubTheme.spaceMd),
-            Text(l10n.orgAuditError, textAlign: TextAlign.center),
-            const SizedBox(height: LegalHubTheme.spaceMd),
-            FilledButton(onPressed: retry, child: Text(l10n.orgAuditRetry)),
+            Text(message, textAlign: TextAlign.center),
+            if (action != null) ...<Widget>[
+              const SizedBox(height: LegalHubTheme.spaceMd),
+              action!,
+            ],
           ],
         ),
       ),
