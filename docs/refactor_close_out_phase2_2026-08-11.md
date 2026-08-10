@@ -160,20 +160,30 @@ feature-local per the Phase-1 rules; the roster chips already delegate to
 duplication — it is an optional readability refactor, not an extraction.
 
 **Phase-4 readability pass executed (2026-08-11)** — the optional file
-decomposition candidate: the booking wizard step pipeline split into
-`part` files under `lib/features/booking/presentation/`
-(`booking_category_step.dart`, `booking_datetime_step.dart`,
-`booking_review_step.dart`, `booking_success_step.dart`, and
-`booking_selectable_tile.dart`; `booking_screen.dart` remains the library
-file with the screen + wizard shell and the centralized imports). Chosen
-mechanics: `part`/`part of`, so every step widget stays private
-(no public-API change) and the 16 imports stay in one place — a pure
-mechanical readability split with zero behavior change; the 10 booking
-screen tests pin by l10n text and pass unchanged (suite stays 1261). The
-admin screen (`_AdminLists`/`_AuditSection`) remains the one not-yet-split
-500+ line screen; it is a different shape (stateful fetch-on-mount
-sections, not a step pipeline) and is left as the remaining optional
-candidate.
+decomposition candidates, both 500+ line screens now split into
+`part` files:
+
+- **Booking** (`lib/features/booking/presentation/`): the wizard step
+  pipeline split into `booking_category_step.dart`,
+  `booking_datetime_step.dart`, `booking_review_step.dart`,
+  `booking_success_step.dart`, and `booking_selectable_tile.dart`;
+  `booking_screen.dart` remains the library file with the screen + wizard
+  shell and the centralized imports.
+- **Admin** (`lib/features/admin/presentation/`):
+  `platform_admin_screen.dart` (596 lines) slimmed to the screen +
+  state + `_LoadOnMount` shell; the three-section lists shell
+  (`platform_admin_lists.dart`), member rows
+  (`platform_admin_member_row.dart`), the fetch-on-mount audit section
+  with its rows (`platform_admin_audit_section.dart`), and the
+  denied/failed terminal states (`platform_admin_states.dart`) moved to
+  `part` files.
+
+Chosen mechanics for both: `part`/`part of`, so every widget stays
+private (no public-API change) and the imports stay in one place — a pure
+mechanical readability split with zero behavior change; the admin tests
+pin by l10n text and pass unchanged (14), suite stays 1261. With both
+500+ line screens split, the Phase-4 readability candidate list is
+exhausted.
 
 **Program totals at decision time** (`e105ce6`, suite 1261): 12
 extractions + 2 consolidations (E1–E6, E7–E10, A/B, C1/C2), 13 shared
