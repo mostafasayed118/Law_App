@@ -303,17 +303,26 @@ class _MessageThreadTile extends StatelessWidget {
                         color: scheme.onSurfaceVariant,
                       ),
                     ),
+                    // The chips wrap beneath the metadata line (the roster
+                    // pattern): a count badge + the reverse cross-link cannot
+                    // fit beside the title at 320px, and this keeps the row
+                    // overflow-free at every width and text scale. The link
+                    // chip stays the only tap target in the row (D-C2).
+                    Wrap(
+                      spacing: LegalHubTheme.spaceSm,
+                      runSpacing: LegalHubTheme.spaceSm,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: <Widget>[
+                        MessageCountChip(
+                          label: l10n.messagesMessageCount(thread.messageCount),
+                        ),
+                        if (onViewMatter case final VoidCallback tap)
+                          MatterLinkChip(onTap: tap),
+                      ],
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(width: LegalHubTheme.spaceSm),
-              MessageCountChip(
-                label: l10n.messagesMessageCount(thread.messageCount),
-              ),
-              if (onViewMatter case final VoidCallback tap) ...<Widget>[
-                const SizedBox(width: LegalHubTheme.spaceSm),
-                MatterLinkChip(onTap: tap),
-              ],
             ],
           ),
         ),

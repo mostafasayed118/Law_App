@@ -405,11 +405,23 @@ class _MatterResultTile extends StatelessWidget {
                         color: scheme.onSurfaceVariant,
                       ),
                     ),
+                    // The chip wraps beneath the metadata line (the roster
+                    // pattern) so the row never overflows at narrow widths;
+                    // the chevron stays as the trailing navigation
+                    // affordance.
+                    Wrap(
+                      spacing: LegalHubTheme.spaceSm,
+                      runSpacing: LegalHubTheme.spaceSm,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: <Widget>[
+                        MatterStatusChip(
+                          label: matterStatusLabel(l10n, matter.status),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(width: LegalHubTheme.spaceSm),
-              MatterStatusChip(label: matterStatusLabel(l10n, matter.status)),
               const SizedBox(width: LegalHubTheme.spaceSm),
               Icon(Icons.chevron_right, color: scheme.outline),
             ],
@@ -478,11 +490,23 @@ class _DocumentResultTile extends StatelessWidget {
                         color: scheme.onSurfaceVariant,
                       ),
                     ),
+                    // The chip wraps beneath the metadata line (the roster
+                    // pattern) so the row never overflows at narrow widths;
+                    // the chevron stays as the trailing navigation
+                    // affordance.
+                    Wrap(
+                      spacing: LegalHubTheme.spaceSm,
+                      runSpacing: LegalHubTheme.spaceSm,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: <Widget>[
+                        DocumentTypeChip(
+                          label: documentTypeLabel(l10n, document.type),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(width: LegalHubTheme.spaceSm),
-              DocumentTypeChip(label: documentTypeLabel(l10n, document.type)),
               const SizedBox(width: LegalHubTheme.spaceSm),
               Icon(Icons.chevron_right, color: scheme.outline),
             ],
@@ -551,12 +575,22 @@ class _ThreadResultTile extends StatelessWidget {
                         color: scheme.onSurfaceVariant,
                       ),
                     ),
+                    // The chip wraps beneath the metadata line (the roster
+                    // pattern) so the row never overflows at narrow widths;
+                    // the chevron stays as the trailing navigation
+                    // affordance.
+                    Wrap(
+                      spacing: LegalHubTheme.spaceSm,
+                      runSpacing: LegalHubTheme.spaceSm,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: <Widget>[
+                        MessageCountChip(
+                          label: l10n.messagesMessageCount(thread.messageCount),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-              ),
-              const SizedBox(width: LegalHubTheme.spaceSm),
-              MessageCountChip(
-                label: l10n.messagesMessageCount(thread.messageCount),
               ),
               const SizedBox(width: LegalHubTheme.spaceSm),
               Icon(Icons.chevron_right, color: scheme.outline),

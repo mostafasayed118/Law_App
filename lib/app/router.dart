@@ -35,6 +35,7 @@ import '../features/profile/presentation/profile_screen.dart';
 import '../features/search/presentation/search_screen.dart';
 import '../features/tasks/presentation/task_board_screen.dart';
 import '../l10n/app_localizations.dart';
+import '../shared/responsive/responsive.dart';
 
 class AppRoutes {
   AppRoutes._();
@@ -445,7 +446,13 @@ class _AppShell extends StatelessWidget {
     // graceful-degradation guard for capability combinations that do not
     // exist yet.
     return Scaffold(
-      body: child,
+      // Responsive content shell: every screen nested under the ShellRoute
+      // (home, matters, documents, messaging, orgs, admin, settings, …) has
+      // its body centered and capped at 840px on medium/expanded widths
+      // instead of stretching full-bleed. On compact widths the constraint
+      // is a no-op, so phone layouts are unchanged. The bottom nav stays
+      // full-width.
+      body: ResponsiveContent(child: child),
       bottomNavigationBar: destinations.length < 2
           ? null
           : NavigationBar(

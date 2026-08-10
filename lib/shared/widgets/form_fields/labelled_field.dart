@@ -29,8 +29,15 @@ class LabelledField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        // Wrap (not a fixed Row) so a wide label + trailing pair — e.g. the
+        // sign-in "PASSWORD" + "Forgot Password?" link — stays on one line
+        // when it fits and wraps the trailing to a second line instead of
+        // overflowing on narrow screens or large text scales.
+        Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          runAlignment: WrapAlignment.start,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: LegalHubTheme.spaceSm,
           children: <Widget>[
             Text(
               displayUppercase(label, Localizations.localeOf(context)),

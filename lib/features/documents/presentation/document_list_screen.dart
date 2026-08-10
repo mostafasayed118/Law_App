@@ -284,15 +284,29 @@ class _DocumentTile extends StatelessWidget {
                       color: scheme.onSurfaceVariant,
                     ),
                   ),
+                  if (onViewMatter case final VoidCallback tap) ...<Widget>[
+                    const SizedBox(height: LegalHubTheme.spaceSm),
+                    // The chips wrap beneath the metadata line (the roster
+                    // pattern) instead of competing with the text for row
+                    // width — a type chip + the reverse cross-link cannot fit
+                    // beside the title at 320px, and this keeps the row
+                    // overflow-free at every width and text scale. The link
+                    // chip stays the only tap target in the row (D-C2).
+                    Wrap(
+                      spacing: LegalHubTheme.spaceSm,
+                      runSpacing: LegalHubTheme.spaceSm,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: <Widget>[
+                        DocumentTypeChip(
+                          label: documentTypeLabel(l10n, document.type),
+                        ),
+                        MatterLinkChip(onTap: tap),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
-            const SizedBox(width: LegalHubTheme.spaceSm),
-            DocumentTypeChip(label: documentTypeLabel(l10n, document.type)),
-            if (onViewMatter case final VoidCallback tap) ...<Widget>[
-              const SizedBox(width: LegalHubTheme.spaceSm),
-              MatterLinkChip(onTap: tap),
-            ],
           ],
         ),
       ),

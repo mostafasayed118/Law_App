@@ -250,11 +250,23 @@ class _MatterTile extends StatelessWidget {
                         color: scheme.onSurfaceVariant,
                       ),
                     ),
+                    // The status chip wraps beneath the metadata line (the
+                    // roster pattern) so the row never overflows during the
+                    // narrow transient layout of a route transition; the
+                    // chevron stays as the trailing navigation affordance.
+                    Wrap(
+                      spacing: LegalHubTheme.spaceSm,
+                      runSpacing: LegalHubTheme.spaceSm,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: <Widget>[
+                        MatterStatusChip(
+                          label: matterStatusLabel(l10n, matter.status),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(width: LegalHubTheme.spaceSm),
-              MatterStatusChip(label: matterStatusLabel(l10n, matter.status)),
               const SizedBox(width: LegalHubTheme.spaceSm),
               Icon(Icons.chevron_right, color: scheme.outline),
             ],

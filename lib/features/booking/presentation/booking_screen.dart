@@ -375,14 +375,17 @@ class _SummaryRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          SizedBox(
-            width: 96,
+          // Flexible label (wraps instead of overflowing at narrow widths or
+          // large text scales) with the value taking the remaining space.
+          Flexible(
+            flex: 2,
             child: Text(
               label,
               style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
             ),
           ),
-          Expanded(child: Text(value, style: text.bodyMedium)),
+          const SizedBox(width: LegalHubTheme.spaceMd),
+          Expanded(flex: 3, child: Text(value, style: text.bodyMedium)),
         ],
       ),
     );

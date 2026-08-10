@@ -22,8 +22,18 @@ class SectionHeader extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: <Widget>[
-        Text(title, style: Theme.of(context).textTheme.headlineMedium),
-        if (actionLabel != null)
+        // Expanded + ellipsis keeps the trailing action on-screen when the
+        // title wraps at narrow widths or large text scales.
+        Expanded(
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.headlineMedium,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        if (actionLabel != null) ...<Widget>[
+          const SizedBox(width: LegalHubTheme.spaceSm),
           TextButton(
             onPressed: onAction,
             style: TextButton.styleFrom(
@@ -39,6 +49,7 @@ class SectionHeader extends StatelessWidget {
               ),
             ),
           ),
+        ],
       ],
     );
   }

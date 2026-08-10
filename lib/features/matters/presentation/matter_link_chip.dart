@@ -47,11 +47,18 @@ class MatterLinkChip extends StatelessWidget {
                 color: scheme.onSecondaryContainer,
               ),
               const SizedBox(width: 4),
-              Text(
-                l10n.viewMatter,
-                style: text.labelSmall?.copyWith(
-                  color: scheme.onSecondaryContainer,
-                  fontWeight: FontWeight.w600,
+              // Flexible + ellipsis lets the chip shrink (instead of
+              // overflowing) when a tight transient layout or large text
+              // scale squeezes the row it sits in.
+              Flexible(
+                child: Text(
+                  l10n.viewMatter,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: text.labelSmall?.copyWith(
+                    color: scheme.onSecondaryContainer,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],

@@ -97,15 +97,23 @@ class EditorialDivider extends StatelessWidget {
     return Row(
       children: <Widget>[
         Expanded(child: Container(height: 1, color: scheme.outlineVariant)),
-        Padding(
-          padding: const EdgeInsetsDirectional.symmetric(
-            horizontal: LegalHubTheme.spaceMd,
-          ),
-          child: Text(
-            label,
-            style: Theme.of(
-              context,
-            ).textTheme.labelLarge?.copyWith(color: scheme.outline),
+        // Flexible + ellipsis: at narrow widths or large text scales the
+        // label squeezes (gracefully truncating) instead of pushing the
+        // divider lines out of the viewport.
+        Flexible(
+          flex: 10,
+          child: Padding(
+            padding: const EdgeInsetsDirectional.symmetric(
+              horizontal: LegalHubTheme.spaceMd,
+            ),
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(
+                context,
+              ).textTheme.labelLarge?.copyWith(color: scheme.outline),
+            ),
           ),
         ),
         Expanded(child: Container(height: 1, color: scheme.outlineVariant)),

@@ -73,48 +73,69 @@ class OtpFieldRowState extends State<OtpFieldRow> {
   @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: List<Widget>.generate(widget.length, (int i) {
-        return SizedBox(
-          width: 48,
-          height: 56,
-          child: TextField(
-            controller: _controllers[i],
-            focusNode: _nodes[i],
-            keyboardType: TextInputType.number,
-            textAlign: TextAlign.center,
-            maxLength: 1,
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly,
-            ],
-            style: Theme.of(context).textTheme.headlineMedium,
-            decoration: InputDecoration(
-              counterText: '',
-              filled: true,
-              fillColor: scheme.surfaceContainerLowest,
-              enabledBorder: OutlineInputBorder(
-                borderRadius: const BorderRadius.all(
-                  Radius.circular(LegalHubTheme.radiusDefault),
-                ),
-                borderSide: BorderSide(color: scheme.outline),
+    // Responsive cells: six fixed 48px cells overflow the ~280px available on
+    // a 320px phone (6×48 = 288), so the cells share the available width via
+    // Expanded instead of a hardcoded 48. The row is capped at 360 so cells
+    // never stretch absurdly wide on tablets. The digit is capped at 32px so
+    // a single cell keeps the glyph inside the cell at 2.0 text scale.
+    final double digitSize = MediaQuery.textScalerOf(
+      context,
+    ).scale(22.0).clamp(22.0, 32.0);
+    final List<Widget> cells = <Widget>[];
+    for (int i = 0; i < widget.length; i++) {
+      if (i > 0) {
+        cells.add(const SizedBox(width: LegalHubTheme.spaceSm));
+      }
+      cells.add(
+        Expanded(
+          child: SizedBox(
+            height: 56,
+            child: TextField(
+              controller: _controllers[i],
+              focusNode: _nodes[i],
+              keyboardType: TextInputType.number,
+              textAlign: TextAlign.center,
+              maxLength: 1,
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.digitsOnly,
+              ],
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontSize: digitSize,
+                height: 1,
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: const BorderRadius.all(
-                  Radius.circular(LegalHubTheme.radiusDefault),
+              decoration: InputDecoration(
+                counterText: '',
+                filled: true,
+                fillColor: scheme.surfaceContainerLowest,
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(LegalHubTheme.radiusDefault),
+                  ),
+                  borderSide: BorderSide(color: scheme.outline),
                 ),
-                borderSide: BorderSide(color: scheme.primary, width: 2),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(LegalHubTheme.radiusDefault),
+                  ),
+                  borderSide: BorderSide(color: scheme.primary, width: 2),
+                ),
               ),
+              onChanged: (String value) {
+                if (value.isNotEmpty && i < widget.length - 1) {
+                  _nodes[i + 1].requestFocus();
+                }
+                _publish();
+              },
             ),
-            onChanged: (String value) {
-              if (value.isNotEmpty && i < widget.length - 1) {
-                _nodes[i + 1].requestFocus();
-              }
-              _publish();
-            },
           ),
-        );
-      }),
+        ),
+      );
+    }
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 360),
+        child: Row(children: cells),
+      ),
     );
   }
 }

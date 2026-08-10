@@ -282,9 +282,17 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 StatusChip(label: l10n.activeCaseChip),
-                Text(
-                  l10n.activeCaseTime,
-                  style: text.bodySmall?.copyWith(color: scheme.outline),
+                // Flexible + ellipsis keeps the timestamp on-screen when the
+                // row is squeezed by a transient narrow layout or a large
+                // text scale.
+                Flexible(
+                  child: Text(
+                    l10n.activeCaseTime,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.end,
+                    style: text.bodySmall?.copyWith(color: scheme.outline),
+                  ),
                 ),
               ],
             ),
@@ -301,21 +309,31 @@ class _HomeScreenState extends State<HomeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    CircleAvatar(
-                      radius: 12,
-                      backgroundColor: scheme.primaryContainer,
-                      child: Icon(
-                        Icons.person,
-                        size: 14,
-                        color: scheme.onPrimaryContainer,
+                Expanded(
+                  child: Row(
+                    children: <Widget>[
+                      CircleAvatar(
+                        radius: 12,
+                        backgroundColor: scheme.primaryContainer,
+                        child: Icon(
+                          Icons.person,
+                          size: 14,
+                          color: scheme.onPrimaryContainer,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: LegalHubTheme.spaceSm),
-                    Text(l10n.activeCaseAttorney, style: text.bodySmall),
-                  ],
+                      const SizedBox(width: LegalHubTheme.spaceSm),
+                      Expanded(
+                        child: Text(
+                          l10n.activeCaseAttorney,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: text.bodySmall,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+                const SizedBox(width: LegalHubTheme.spaceSm),
                 DirectionalIcon(
                   icon: Icons.chevron_right,
                   mirroredIcon: Icons.chevron_left,
