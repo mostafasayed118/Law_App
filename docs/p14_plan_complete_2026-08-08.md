@@ -47,17 +47,19 @@ with a verified gate on `main` (all key commits re-verified against git
 | 7 | Realtime live delivery (publication + subscription + composer) | 2026-08-08 | ✅ EXECUTED (`c96eff7`+`7efb32b`) | `docs/realtime_push_real_data_plan_2026-08-08.md` / `docs/realtime_push_real_data_completion_evidence_2026-08-08.md` | 1045 / 1042 |
 | 8 | Audited send path (`send_message` RPC, §8 audit, D-SM3) | 2026-08-08 | ✅ EXECUTED (`docs/send_message_apply_execution_2026-08-08.md`) | `docs/send_message_rpc_plan_2026-08-08.md` / `docs/send_message_real_data_completion_evidence_2026-08-08.md` | 1047 / 1044 |
 | 9 | Billing invoices read-metadata (D-11, fake-gateway posture) | 2026-08-08 | ✅ EXECUTED (`docs/billing_invoices_apply_execution_2026-08-08.md`) | `docs/billing_invoices_real_data_plan_2026-08-08.md` / `docs/billing_invoices_real_data_completion_evidence_2026-08-08.md` | 1080 / 1077 |
-| 10 | **AI** | — | — | **DEFERRED — owner-blocked (D-07/D-08 + undefined scope)** | — |
+| 10 | **AI** | — | — | **DEFERRED — owner-blocked (D-07/D-08 + undefined scope)** — decision-ready 2026-08-11: `docs/d07_d08_ai_scope_questions_2026-08-11.md` | — |
 
 **Remaining path (the one not closed):** **AI** stays deferred on
 **D-07/D-08** (`docs/p0_decision_capture.md` — authentication policy and
 organization semantics, both **Decided 2026-07-31** at the decision level)
 **+ undefined scope** — there is no AI feature spec, so there is nothing to
-plan. When/if the owner defines an AI scope, it enters the same T1–T8
-per-feature discipline behind its own RLS-gate/mechanism review (per the
-reconciliation note in `docs/send_message_rpc_plan_2026-08-08.md`). This
-is a product-scope gate, **not** a codebase blocker — nothing in the repo
-is waiting on AI.
+plan; as of 2026-08-11 the owner has a decision-ready question sheet
+(`docs/d07_d08_ai_scope_questions_2026-08-11.md`) whose answers produce
+that scope note. When/if the owner defines an AI scope, it enters the same
+T1–T8 per-feature discipline behind its own RLS-gate/mechanism review (per
+the reconciliation note in `docs/send_message_rpc_plan_2026-08-08.md`).
+This is a product-scope gate, **not** a codebase blocker — nothing in the
+repo is waiting on AI.
 
 ## 2. The last gate table (§13 row — nine of ten green)
 
@@ -94,7 +96,15 @@ addendum → client swap → close evidence):
 ## 4. What is still NOT done (honest, per INSTRUCTIONS §1.3 #5)
 
 - **AI** — the only remaining §14 path; owner-blocked on D-07/D-08 +
-  undefined scope. No spec, no plan, nothing committed.
+  undefined scope. No scope, no build, nothing committed; the
+  decision-ready question sheet `docs/d07_d08_ai_scope_questions_2026-08-11.md`
+  (2026-08-11, planning only) is the first step toward the missing scope
+  note. Two further planning artifacts landed 2026-08-11 (both planning
+  only, neither approved): the Paymob spec
+  `docs/paymob_integration_spec_2026-08-11.md` (D-11 un-block) and the
+  notification-feed scope note
+  `docs/notification_feed_scope_2026-08-11.md` (new read surface, no
+  provider).
 - **Owner-side live E2E on configured builds** — the D-45.1 convention: the
   env-gated client swaps (matters/documents/messages/storage/realtime/
   send/billing) are verified by the typed/fake suite + DI pins + the
@@ -122,4 +132,6 @@ full gate green at every tip (final: suite 1080 runtime / README 1077,
 ledger PASS 115, battery static `--check` 339/0/0, `main` @ `dde0c11`,
 pushed). **AI is the only remaining deferred path** — it stays deferred on
 D-07/D-08 + undefined scope until the owner defines an AI scope, at which
-point it enters the same per-feature discipline.
+point it enters the same per-feature discipline; a decision-ready
+question sheet (`docs/d07_d08_ai_scope_questions_2026-08-11.md`, 2026-08-11)
+is the first step toward that scope — planning only.

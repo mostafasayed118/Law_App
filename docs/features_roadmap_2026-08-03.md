@@ -631,7 +631,14 @@ approval**.
 > holds the last gate table, the full evidence index (plan → review →
 > artifacts → battery → r1 → approval → execution → addendum → client swap
 > → close evidence for all nine slices), and the dated close decision;
-> **AI is the only remaining deferred path** (D-07/D-08 + undefined scope).
+> **AI is the only remaining deferred path** (D-07/D-08 + undefined scope) —
+> decision-ready since 2026-08-11: the owner-answerable question sheet
+> `docs/d07_d08_ai_scope_questions_2026-08-11.md`. Billing planning is
+> un-blocked (D-11, planning only) by the Paymob spec
+> `docs/paymob_integration_spec_2026-08-11.md`; a new notification-feed
+> read surface (no provider) is designed for owner decision in
+> `docs/notification_feed_scope_2026-08-11.md`. All three are planning
+> artifacts only — none approved, none built.
 
 Per README boundary + `docs/permission_matrix.md` §4/§6, the originally
 deferred capabilities are: **matters, documents, messages, storage,
@@ -810,7 +817,10 @@ env-gated client swap `f116966`; plan
 `docs/billing_invoices_real_data_completion_evidence_2026-08-08.md`).
 **AI is the only remaining deferred path** — it stays deferred on
 D-07/D-08 + undefined scope — see the reconciliation + next-slice plan
-`docs/send_message_rpc_plan_2026-08-08.md`).
+`docs/send_message_rpc_plan_2026-08-08.md`); decision-ready since
+2026-08-11 via the owner-answerable question sheet
+`docs/d07_d08_ai_scope_questions_2026-08-11.md` (planning only — the
+answers produce the missing AI scope note).
 The client-only document-metadata surface shipped as Phase 8 (slices
 8.0–8.2, `22d63e5`/`29fd40a`/`430b62b`) carries no real document data —
 the real documents read path is the second per-feature un-deferral
