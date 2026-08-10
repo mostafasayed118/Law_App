@@ -344,7 +344,9 @@ one promote-later, everything else stays separate.
   (the `titleSmall` w700 header + `spaceSm` gap + section + `spaceXl`
   trailing gap, ≈−20 lines). The existing matter-details screen tests
   already pin all four headers visible + capability-gated (suite stays
-  1257). Stays local per the single-screen rule.
+  1257). Stays local per the single-screen rule. **SUPERSEDED 2026-08-11
+  by C2** — the C2 unification moved the shape into the shared
+  `AppSectionHeader` and the private `_WorkspaceBlock` was deleted.
 
 ### C2 · Section-header family — P1, promote later
 
@@ -355,6 +357,14 @@ one promote-later, everything else stays separate.
   stateful widget (different concern). Keep separate now; if C1 is
   parameterized as `AppSectionHeader(title)` with the style as a
   parameter, search can join as a second consumer.
+  **IMPLEMENTED 2026-08-11 (shared)** — `lib/shared/widgets/app_section_header.dart`
+  (`AppSectionHeader(title, children, titleStyle?)`, default `titleMedium`
+  w700 primary emphasis; the trailing `spaceXl` moved from the C1 block to
+  the matter-details parent, matching search's parent-owned `spaceLg`
+  spacing), +4 tests, suite 1257 → 1261. Search `_GroupSection` deleted;
+  matter-details `_WorkspaceBlock` deleted (C1 superseded). The admin
+  `_AuditSection` remains separate (fetch-on-mount stateful widget — a
+  different concern).
 
 ### Re-verified stay-separate (with the reason)
 

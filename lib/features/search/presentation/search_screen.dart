@@ -215,7 +215,7 @@ class _SearchSurfaceState extends State<_SearchSurface> {
     final List<Widget> sections = <Widget>[];
     if (widget.capabilities.canViewMatters && results.matters.isNotEmpty) {
       sections.add(
-        _GroupSection(
+        AppSectionHeader(
           title: l10n.matterTitle,
           children: <Widget>[
             for (final Matter matter in results.matters) ...<Widget>[
@@ -245,7 +245,7 @@ class _SearchSurfaceState extends State<_SearchSurface> {
     }
     if (widget.capabilities.canViewDocuments && results.documents.isNotEmpty) {
       sections.add(
-        _GroupSection(
+        AppSectionHeader(
           title: l10n.vaultTitle,
           children: <Widget>[
             for (final Document document in results.documents) ...<Widget>[
@@ -275,7 +275,7 @@ class _SearchSurfaceState extends State<_SearchSurface> {
     }
     if (widget.capabilities.canViewMessages && results.threads.isNotEmpty) {
       sections.add(
-        _GroupSection(
+        AppSectionHeader(
           title: l10n.messagesTitle,
           children: <Widget>[
             for (final MessageThread thread in results.threads) ...<Widget>[
@@ -306,7 +306,7 @@ class _SearchSurfaceState extends State<_SearchSurface> {
     if (widget.capabilities.canViewAttorneyDiscovery &&
         results.attorneys.isNotEmpty) {
       sections.add(
-        _GroupSection(
+        AppSectionHeader(
           title: l10n.discoveryTitle,
           children: <Widget>[
             for (final Attorney attorney in results.attorneys) ...<Widget>[
@@ -349,34 +349,6 @@ class _SearchSurfaceState extends State<_SearchSurface> {
           if (i < sections.length - 1)
             const SizedBox(height: LegalHubTheme.spaceLg),
         ],
-      ],
-    );
-  }
-}
-
-/// One capability-gated result group: a header plus its metadata rows.
-class _GroupSection extends StatelessWidget {
-  const _GroupSection({required this.title, required this.children});
-
-  final String title;
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          title,
-          style: text.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: scheme.primary,
-          ),
-        ),
-        const SizedBox(height: LegalHubTheme.spaceSm),
-        ...children,
       ],
     );
   }

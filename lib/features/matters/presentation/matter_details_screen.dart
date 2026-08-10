@@ -158,68 +158,45 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
         ),
         const SizedBox(height: LegalHubTheme.spaceLg),
         if (widget.capabilities.canViewDocuments) ...<Widget>[
-          _WorkspaceBlock(
+          AppSectionHeader(
             title: l10n.matterWorkspaceDocumentsTitle,
-            child: MatterDocumentsSection(matterRef: matter.title),
+            titleStyle: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+            children: <Widget>[MatterDocumentsSection(matterRef: matter.title)],
           ),
+          const SizedBox(height: LegalHubTheme.spaceXl),
         ],
         // Invoices are matter-scoped content like documents (matrix §4 — the
         // same client/attorney SHIP cells), so the section rides the same
         // canViewDocuments visibility gate (D-BI5 — no new capability flag;
         // the plan's file list carries no user_role.dart change).
         if (widget.capabilities.canViewDocuments) ...<Widget>[
-          _WorkspaceBlock(
+          AppSectionHeader(
             title: l10n.matterWorkspaceInvoicesTitle,
-            child: MatterInvoicesSection(matterRef: matter.title),
+            titleStyle: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+            children: <Widget>[MatterInvoicesSection(matterRef: matter.title)],
           ),
+          const SizedBox(height: LegalHubTheme.spaceXl),
         ],
         if (widget.capabilities.canViewFiles) ...<Widget>[
-          _WorkspaceBlock(
+          AppSectionHeader(
             title: l10n.matterWorkspaceFilesTitle,
-            child: MatterFilesSection(matterRef: matter.title),
+            titleStyle: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+            children: <Widget>[MatterFilesSection(matterRef: matter.title)],
           ),
+          const SizedBox(height: LegalHubTheme.spaceXl),
         ],
         if (widget.capabilities.canViewMessages) ...<Widget>[
-          _WorkspaceBlock(
+          AppSectionHeader(
             title: l10n.matterWorkspaceMessagesTitle,
-            child: MatterMessagesSection(matterRef: matter.title),
+            titleStyle: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+            children: <Widget>[MatterMessagesSection(matterRef: matter.title)],
           ),
+          const SizedBox(height: LegalHubTheme.spaceXl),
         ],
         Text(
           l10n.matterLocalOnlyNote,
           style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
         ),
-      ],
-    );
-  }
-}
-
-/// One matter-workspace section: a `titleSmall` w700 header, the section
-/// widget, and the standard trailing gap.
-///
-/// C1 consolidation: the four workspace blocks (documents / invoices /
-/// files / messages) previously duplicated this exact structure —
-/// `Text(titleSmall w700)` + `spaceSm` + section + `spaceXl`.
-class _WorkspaceBlock extends StatelessWidget {
-  const _WorkspaceBlock({required this.title, required this.child});
-
-  final String title;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          title,
-          style: Theme.of(
-            context,
-          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-        ),
-        const SizedBox(height: LegalHubTheme.spaceSm),
-        child,
-        const SizedBox(height: LegalHubTheme.spaceXl),
       ],
     );
   }

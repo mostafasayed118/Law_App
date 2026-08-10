@@ -14,6 +14,7 @@ export 'app_centered_message.dart';
 export 'app_centered_retry.dart';
 export 'app_entry_card.dart';
 export 'app_filter_chips.dart';
+export 'app_section_header.dart';
 export 'app_tile.dart';
 export 'confirm_dialog.dart';
 export 'directional_icon.dart';

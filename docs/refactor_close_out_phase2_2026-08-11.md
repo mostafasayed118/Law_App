@@ -35,8 +35,11 @@
 | — | `7d26669` | Post-E10 re-audit (Candidates A/B list) | — |
 | A | `6087a4e` | `AppCenteredMessage` + 2 re-pointed `_message` helpers | +3 |
 | B | `227b7a5` | org-audit centered icon-state trio → local `_CenteredState` | — (screen tests pin) |
+| C1 | `c840a36` | matter-details workspace headers → local `_WorkspaceBlock` | — (screen tests pin) |
+| C2 | *(pending)* | `AppSectionHeader` (search + matter-details unified, shared) | +4 |
 
-Suite: **1236 → 1257** (+21 new tests, none deleted or weakened).
+Suite: **1236 → 1261** (+25 new tests, none deleted or weakened) once C2
+lands.
 
 ## 2. Extraction-by-extraction
 
