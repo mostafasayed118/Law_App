@@ -219,8 +219,21 @@ class _SearchSurfaceState extends State<_SearchSurface> {
           title: l10n.matterTitle,
           children: <Widget>[
             for (final Matter matter in results.matters) ...<Widget>[
-              _MatterResultTile(
-                matter: matter,
+              AppTile(
+                icon: Icons.folder_outlined,
+                title: matter.title,
+                subtitle:
+                    '${practiceAreaLabel(l10n, matter.practiceArea)} · ${matter.assignedAttorneyName}',
+                trailing: Wrap(
+                  spacing: LegalHubTheme.spaceSm,
+                  runSpacing: LegalHubTheme.spaceSm,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: <Widget>[
+                    MatterStatusChip(
+                      label: matterStatusLabel(l10n, matter.status),
+                    ),
+                  ],
+                ),
                 onTap: () => context.go(AppRoutes.matterDetail(matter.id)),
               ),
               const SizedBox(height: LegalHubTheme.spaceSm),
@@ -235,8 +248,21 @@ class _SearchSurfaceState extends State<_SearchSurface> {
           title: l10n.vaultTitle,
           children: <Widget>[
             for (final Document document in results.documents) ...<Widget>[
-              _DocumentResultTile(
-                document: document,
+              AppTile(
+                icon: Icons.folder_outlined,
+                title: document.title,
+                subtitle:
+                    '${documentTypeLabel(l10n, document.type)} · ${formatMediumDate(l10n, document.createdAt)}',
+                trailing: Wrap(
+                  spacing: LegalHubTheme.spaceSm,
+                  runSpacing: LegalHubTheme.spaceSm,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: <Widget>[
+                    DocumentTypeChip(
+                      label: documentTypeLabel(l10n, document.type),
+                    ),
+                  ],
+                ),
                 onTap: () => context.go(AppRoutes.vault),
               ),
               const SizedBox(height: LegalHubTheme.spaceSm),
@@ -251,8 +277,21 @@ class _SearchSurfaceState extends State<_SearchSurface> {
           title: l10n.messagesTitle,
           children: <Widget>[
             for (final MessageThread thread in results.threads) ...<Widget>[
-              _ThreadResultTile(
-                thread: thread,
+              AppTile(
+                icon: Icons.forum_outlined,
+                title: thread.title,
+                subtitle:
+                    '${thread.participants.join(', ')} · ${formatMediumDate(l10n, thread.lastActivityAt)}',
+                trailing: Wrap(
+                  spacing: LegalHubTheme.spaceSm,
+                  runSpacing: LegalHubTheme.spaceSm,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: <Widget>[
+                    MessageCountChip(
+                      label: l10n.messagesMessageCount(thread.messageCount),
+                    ),
+                  ],
+                ),
                 onTap: () => context.go(AppRoutes.messages),
               ),
               const SizedBox(height: LegalHubTheme.spaceSm),
@@ -268,8 +307,23 @@ class _SearchSurfaceState extends State<_SearchSurface> {
           title: l10n.discoveryTitle,
           children: <Widget>[
             for (final Attorney attorney in results.attorneys) ...<Widget>[
-              _AttorneyResultTile(
-                attorney: attorney,
+              AppTile(
+                leading: CircleAvatar(
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.primaryContainer,
+                  child: Text(
+                    attorney.name.isEmpty
+                        ? '?'
+                        : attorney.name.substring(0, 1).toUpperCase(),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                  ),
+                ),
+                title: attorney.name,
+                subtitle:
+                    '${practiceAreaLabel(l10n, attorney.practiceArea)} · ${attorney.locale}',
                 onTap: () => context.go(AppRoutes.attorneyProfile(attorney.id)),
               ),
               const SizedBox(height: LegalHubTheme.spaceSm),
@@ -320,320 +374,6 @@ class _GroupSection extends StatelessWidget {
         const SizedBox(height: LegalHubTheme.spaceSm),
         ...children,
       ],
-    );
-  }
-}
-
-/// A matter result row — a navigation hint into the read-only details route
-/// (D-S3); renders the same D-M4 metadata fields as the matter list surface.
-class _MatterResultTile extends StatelessWidget {
-  const _MatterResultTile({required this.matter, required this.onTap});
-
-  final Matter matter;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context);
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
-    return Material(
-      color: scheme.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusLg),
-        ),
-        side: BorderSide(color: scheme.outlineVariant),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-          child: Row(
-            children: <Widget>[
-              CircleAvatar(
-                backgroundColor: scheme.primaryContainer,
-                child: Icon(
-                  Icons.folder_outlined,
-                  size: 20,
-                  color: scheme.onPrimaryContainer,
-                ),
-              ),
-              const SizedBox(width: LegalHubTheme.spaceMd),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      matter.title,
-                      style: text.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${practiceAreaLabel(l10n, matter.practiceArea)} · ${matter.assignedAttorneyName}',
-                      style: text.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
-                    // The chip wraps beneath the metadata line (the roster
-                    // pattern) so the row never overflows at narrow widths;
-                    // the chevron stays as the trailing navigation
-                    // affordance.
-                    Wrap(
-                      spacing: LegalHubTheme.spaceSm,
-                      runSpacing: LegalHubTheme.spaceSm,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: <Widget>[
-                        MatterStatusChip(
-                          label: matterStatusLabel(l10n, matter.status),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: LegalHubTheme.spaceSm),
-              Icon(Icons.chevron_right, color: scheme.outline),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// A document-metadata result row — a navigation hint into the read-only
-/// vault route (D-S3); renders the same D-V4 fields as the vault surface,
-/// never a body or preview.
-class _DocumentResultTile extends StatelessWidget {
-  const _DocumentResultTile({required this.document, required this.onTap});
-
-  final Document document;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context);
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
-    final String date = formatMediumDate(l10n, document.createdAt);
-    return Material(
-      color: scheme.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusLg),
-        ),
-        side: BorderSide(color: scheme.outlineVariant),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-          child: Row(
-            children: <Widget>[
-              CircleAvatar(
-                backgroundColor: scheme.primaryContainer,
-                child: Icon(
-                  Icons.folder_outlined,
-                  size: 20,
-                  color: scheme.onPrimaryContainer,
-                ),
-              ),
-              const SizedBox(width: LegalHubTheme.spaceMd),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      document.title,
-                      style: text.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${documentTypeLabel(l10n, document.type)} · $date',
-                      style: text.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
-                    // The chip wraps beneath the metadata line (the roster
-                    // pattern) so the row never overflows at narrow widths;
-                    // the chevron stays as the trailing navigation
-                    // affordance.
-                    Wrap(
-                      spacing: LegalHubTheme.spaceSm,
-                      runSpacing: LegalHubTheme.spaceSm,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: <Widget>[
-                        DocumentTypeChip(
-                          label: documentTypeLabel(l10n, document.type),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: LegalHubTheme.spaceSm),
-              Icon(Icons.chevron_right, color: scheme.outline),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// A thread-metadata result row — a navigation hint into the read-only
-/// messages route (D-S3); renders the same D-MSG4 fields as the messages
-/// surface, never a message body or preview.
-class _ThreadResultTile extends StatelessWidget {
-  const _ThreadResultTile({required this.thread, required this.onTap});
-
-  final MessageThread thread;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context);
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
-    final String date = formatMediumDate(l10n, thread.lastActivityAt);
-    return Material(
-      color: scheme.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusLg),
-        ),
-        side: BorderSide(color: scheme.outlineVariant),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-          child: Row(
-            children: <Widget>[
-              CircleAvatar(
-                backgroundColor: scheme.primaryContainer,
-                child: Icon(
-                  Icons.forum_outlined,
-                  size: 20,
-                  color: scheme.onPrimaryContainer,
-                ),
-              ),
-              const SizedBox(width: LegalHubTheme.spaceMd),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      thread.title,
-                      style: text.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${thread.participants.join(', ')} · $date',
-                      style: text.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
-                    // The chip wraps beneath the metadata line (the roster
-                    // pattern) so the row never overflows at narrow widths;
-                    // the chevron stays as the trailing navigation
-                    // affordance.
-                    Wrap(
-                      spacing: LegalHubTheme.spaceSm,
-                      runSpacing: LegalHubTheme.spaceSm,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: <Widget>[
-                        MessageCountChip(
-                          label: l10n.messagesMessageCount(thread.messageCount),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: LegalHubTheme.spaceSm),
-              Icon(Icons.chevron_right, color: scheme.outline),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// An attorney result row — a navigation hint into the read-only profile
-/// route (D-S3); renders the same D-A4 fields as the discovery surface.
-class _AttorneyResultTile extends StatelessWidget {
-  const _AttorneyResultTile({required this.attorney, required this.onTap});
-
-  final Attorney attorney;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context);
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
-    return Material(
-      color: scheme.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusLg),
-        ),
-        side: BorderSide(color: scheme.outlineVariant),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-          child: Row(
-            children: <Widget>[
-              CircleAvatar(
-                backgroundColor: scheme.primaryContainer,
-                child: Text(
-                  attorney.name.isEmpty
-                      ? '?'
-                      : attorney.name.substring(0, 1).toUpperCase(),
-                  style: TextStyle(color: scheme.onPrimaryContainer),
-                ),
-              ),
-              const SizedBox(width: LegalHubTheme.spaceMd),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      attorney.name,
-                      style: text.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${practiceAreaLabel(l10n, attorney.practiceArea)} · ${attorney.locale}',
-                      style: text.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(Icons.chevron_right, color: scheme.outline),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

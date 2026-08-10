@@ -235,76 +235,30 @@ class _MessageThreadTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
     // Same localized date shape as the vault/details surfaces (yMMMd,
     // locale-aware via l10n.localeName).
     final String date = formatMediumDate(l10n, thread.lastActivityAt);
-    return Material(
-      color: scheme.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusLg),
-        ),
-        side: BorderSide(color: scheme.outlineVariant),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onOpenThread,
-        child: Padding(
-          padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-          child: Row(
-            children: <Widget>[
-              CircleAvatar(
-                backgroundColor: scheme.primaryContainer,
-                child: Icon(
-                  Icons.forum_outlined,
-                  size: 20,
-                  color: scheme.onPrimaryContainer,
-                ),
-              ),
-              const SizedBox(width: LegalHubTheme.spaceMd),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      thread.title,
-                      style: text.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${thread.participants.join(', ')} · $date',
-                      style: text.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
-                    // The chips wrap beneath the metadata line (the roster
-                    // pattern): a count badge + the reverse cross-link cannot
-                    // fit beside the title at 320px, and this keeps the row
-                    // overflow-free at every width and text scale. The link
-                    // chip stays the only tap target in the row (D-C2).
-                    Wrap(
-                      spacing: LegalHubTheme.spaceSm,
-                      runSpacing: LegalHubTheme.spaceSm,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: <Widget>[
-                        MessageCountChip(
-                          label: l10n.messagesMessageCount(thread.messageCount),
-                        ),
-                        if (onViewMatter case final VoidCallback tap)
-                          MatterLinkChip(onTap: tap),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
+    return AppTile(
+      icon: Icons.forum_outlined,
+      title: thread.title,
+      subtitle: '${thread.participants.join(', ')} · $date',
+      // The chips wrap beneath the metadata line (the roster pattern); the
+      // link chip stays a secondary tap target in the row (D-C2). The row
+      // stays chevron-free (D-MSG1).
+      trailing: Wrap(
+        spacing: LegalHubTheme.spaceSm,
+        runSpacing: LegalHubTheme.spaceSm,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: <Widget>[
+          MessageCountChip(
+            label: l10n.messagesMessageCount(thread.messageCount),
           ),
-        ),
+          if (onViewMatter case final VoidCallback tap)
+            MatterLinkChip(onTap: tap),
+        ],
       ),
+      onTap: onOpenThread,
+      showChevron: false,
     );
   }
 }

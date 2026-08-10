@@ -11,6 +11,7 @@
 library;
 
 export 'app_entry_card.dart';
+export 'app_tile.dart';
 export 'directional_icon.dart';
 export 'form_fields/labelled_field.dart';
 export 'form_fields/legalhub_text_field.dart';

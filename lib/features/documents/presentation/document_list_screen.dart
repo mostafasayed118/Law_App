@@ -221,75 +221,31 @@ class _DocumentTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
     // Same localized date shape as the matter details surface (yMMMd,
     // locale-aware via l10n.localeName).
     final String date = formatMediumDate(l10n, document.createdAt);
-    return Material(
-      color: scheme.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusLg),
+    return AppTile(
+      icon: Icons.folder_outlined,
+      title: document.title,
+      subtitle: '${documentTypeLabel(l10n, document.type)} · $date',
+      // The chips wrap beneath the metadata line (the roster pattern); the
+      // link chip stays the only tap target in the row (D-C2), so the card
+      // itself renders no InkWell and no chevron (AppTile null onTap).
+      trailing: switch (onViewMatter) {
+        final VoidCallback tap => Padding(
+          padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceSm),
+          child: Wrap(
+            spacing: LegalHubTheme.spaceSm,
+            runSpacing: LegalHubTheme.spaceSm,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: <Widget>[
+              DocumentTypeChip(label: documentTypeLabel(l10n, document.type)),
+              MatterLinkChip(onTap: tap),
+            ],
+          ),
         ),
-        side: BorderSide(color: scheme.outlineVariant),
-      ),
-      child: Padding(
-        padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-        child: Row(
-          children: <Widget>[
-            CircleAvatar(
-              backgroundColor: scheme.primaryContainer,
-              child: Icon(
-                Icons.folder_outlined,
-                size: 20,
-                color: scheme.onPrimaryContainer,
-              ),
-            ),
-            const SizedBox(width: LegalHubTheme.spaceMd),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    document.title,
-                    style: text.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${documentTypeLabel(l10n, document.type)} · $date',
-                    style: text.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                  if (onViewMatter case final VoidCallback tap) ...<Widget>[
-                    const SizedBox(height: LegalHubTheme.spaceSm),
-                    // The chips wrap beneath the metadata line (the roster
-                    // pattern) instead of competing with the text for row
-                    // width — a type chip + the reverse cross-link cannot fit
-                    // beside the title at 320px, and this keeps the row
-                    // overflow-free at every width and text scale. The link
-                    // chip stays the only tap target in the row (D-C2).
-                    Wrap(
-                      spacing: LegalHubTheme.spaceSm,
-                      runSpacing: LegalHubTheme.spaceSm,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: <Widget>[
-                        DocumentTypeChip(
-                          label: documentTypeLabel(l10n, document.type),
-                        ),
-                        MatterLinkChip(onTap: tap),
-                      ],
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+        null => null,
+      },
     );
   }
 }

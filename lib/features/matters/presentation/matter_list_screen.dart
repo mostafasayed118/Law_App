@@ -131,8 +131,21 @@ class _ListSurfaceState extends State<_ListSurface> {
           : Column(
               children: <Widget>[
                 for (final Matter matter in state.visibleMatters) ...<Widget>[
-                  _MatterTile(
-                    matter: matter,
+                  AppTile(
+                    icon: Icons.folder_outlined,
+                    title: matter.title,
+                    subtitle:
+                        '${practiceAreaLabel(l10n, matter.practiceArea)} · ${matter.assignedAttorneyName}',
+                    trailing: Wrap(
+                      spacing: LegalHubTheme.spaceSm,
+                      runSpacing: LegalHubTheme.spaceSm,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: <Widget>[
+                        MatterStatusChip(
+                          label: matterStatusLabel(l10n, matter.status),
+                        ),
+                      ],
+                    ),
                     onTap: () => context.go(AppRoutes.matterDetail(matter.id)),
                   ),
                   const SizedBox(height: LegalHubTheme.spaceSm),
@@ -173,85 +186,6 @@ class _StatusFilterChips extends StatelessWidget {
             ),
           ],
         ],
-      ),
-    );
-  }
-}
-
-class _MatterTile extends StatelessWidget {
-  const _MatterTile({required this.matter, required this.onTap});
-
-  final Matter matter;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context);
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
-    return Material(
-      color: scheme.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusLg),
-        ),
-        side: BorderSide(color: scheme.outlineVariant),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-          child: Row(
-            children: <Widget>[
-              CircleAvatar(
-                backgroundColor: scheme.primaryContainer,
-                child: Icon(
-                  Icons.folder_outlined,
-                  size: 20,
-                  color: scheme.onPrimaryContainer,
-                ),
-              ),
-              const SizedBox(width: LegalHubTheme.spaceMd),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      matter.title,
-                      style: text.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${practiceAreaLabel(l10n, matter.practiceArea)} · ${matter.assignedAttorneyName}',
-                      style: text.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
-                    // The status chip wraps beneath the metadata line (the
-                    // roster pattern) so the row never overflows during the
-                    // narrow transient layout of a route transition; the
-                    // chevron stays as the trailing navigation affordance.
-                    Wrap(
-                      spacing: LegalHubTheme.spaceSm,
-                      runSpacing: LegalHubTheme.spaceSm,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: <Widget>[
-                        MatterStatusChip(
-                          label: matterStatusLabel(l10n, matter.status),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: LegalHubTheme.spaceSm),
-              Icon(Icons.chevron_right, color: scheme.outline),
-            ],
-          ),
-        ),
       ),
     );
   }

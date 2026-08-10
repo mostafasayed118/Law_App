@@ -6,6 +6,7 @@ import '../../../app/service_locator.dart';
 import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/formatting/date_formatting.dart';
+import '../../../shared/widgets/widgets.dart';
 import '../domain/approvals_gateway.dart';
 import '../domain/pending_approval.dart';
 import 'approvals_cubit.dart';
@@ -145,7 +146,6 @@ class _ApprovalTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
     final (IconData, String) status = switch (approval.status) {
       ApprovalStatus.pending => (
         Icons.hourglass_top,
@@ -161,43 +161,10 @@ class _ApprovalTile extends StatelessWidget {
       ),
     };
     final String date = formatMediumDate(l10n, approval.createdAt);
-    return Material(
-      color: scheme.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusLg),
-        ),
-        side: BorderSide(color: scheme.outlineVariant),
-      ),
-      child: Padding(
-        padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-        child: Row(
-          children: <Widget>[
-            Icon(status.$1, size: 20, color: scheme.onSurfaceVariant),
-            const SizedBox(width: LegalHubTheme.spaceMd),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    '${approval.entityType} · ${approval.reference}',
-                    style: text.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${status.$2} · $date',
-                    style: text.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+    return AppTile(
+      leading: Icon(status.$1, size: 20, color: scheme.onSurfaceVariant),
+      title: '${approval.entityType} · ${approval.reference}',
+      subtitle: '${status.$2} · $date',
     );
   }
 }

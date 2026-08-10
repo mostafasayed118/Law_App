@@ -5,6 +5,7 @@ import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/widgets.dart';
 import '../domain/task_gateway.dart';
 import '../domain/task_item.dart';
 import 'task_board_cubit.dart';
@@ -138,50 +139,16 @@ class _TaskTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
     final (IconData, String) status = switch (task.status) {
       TaskStatus.todo => (Icons.radio_button_unchecked, l10n.taskStatusTodo),
       TaskStatus.inProgress => (Icons.hourglass_top, l10n.taskStatusInProgress),
       TaskStatus.blocked => (Icons.block, l10n.taskStatusBlocked),
       TaskStatus.done => (Icons.check_circle_outline, l10n.taskStatusDone),
     };
-    return Material(
-      color: scheme.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusLg),
-        ),
-        side: BorderSide(color: scheme.outlineVariant),
-      ),
-      child: Padding(
-        padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-        child: Row(
-          children: <Widget>[
-            Icon(status.$1, size: 20, color: scheme.onSurfaceVariant),
-            const SizedBox(width: LegalHubTheme.spaceMd),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    task.title,
-                    style: text.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${task.matterRef} · ${status.$2}',
-                    style: text.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+    return AppTile(
+      leading: Icon(status.$1, size: 20, color: scheme.onSurfaceVariant),
+      title: task.title,
+      subtitle: '${task.matterRef} · ${status.$2}',
     );
   }
 }
