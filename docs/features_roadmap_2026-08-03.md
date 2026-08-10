@@ -641,8 +641,8 @@ approval**.
 > filing cluster and video consultation each have owner-answerable
 > question sheets (`docs/d03_d06_conflict_scope_questions_2026-08-11.md`,
 > `docs/video_consultation_scope_questions_2026-08-11.md` — the video row
-> is spec D-11, whose label collides with the billing record; flagged in
-> the sheet). All five are planning
+> is spec D-15, renumbered 2026-08-11 to resolve the D-11 label collision
+> with the billing record; tracked_deviations D-T8). All five are planning
 > artifacts only — none approved, none built.
 
 Per README boundary + `docs/permission_matrix.md` §4/§6, the originally

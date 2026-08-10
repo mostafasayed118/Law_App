@@ -245,7 +245,7 @@ bounded capability, server-gated, audited, never audit-exempt.
    no probe noise; the §8 negative is pinned in 10.09). A future ops choice,
    not a contract gap.
 9. **Deferred surfaces with no threat surface yet:** AI (D-07/D-08 +
-   undefined scope), video consultation (D-11), real payment (D-11/Paymob,
+   undefined scope), video consultation (D-15), real payment (D-11/Paymob,
    metadata-only table), notification delivery (v1).
 10. **Consummation (2026-08-09, F-01 step 1 — the never-assigned invariant is
     now pinned):** `supabase/tests/12_owner_assignment.sql` asserts the

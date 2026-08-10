@@ -44,7 +44,7 @@ D-01 and D-10 are now confirmed, which unblocks the **project-bootstrap** work p
 | D-07 | Legal research data source/license/freshness | open (legal review) | Product owner + vendor/legal | Before research spec | Research, citations, statutory browser |
 | D-08 | AI usage policy (store/show/rely; review) | open (legal review) | Product owner + counsel | Before AI/drafting spec | AI research, legal drafting |
 | D-09 | Payment provider / tax / PCI scope | open | Product owner + finance | Before billing/payment spec | Billing, booking payment |
-| D-11 | Video consultation provider & data-handling | open | Product owner | Before video spec | Video consultation |
+| D-15 | Video consultation provider & data-handling | open | Product owner | Before video spec | Video consultation |
 | D-12 | `plan.md` / discovery report availability | open | Product owner | Immediately | Full specification reconciliation |
 | **D-13** | Canonical body typeface | **CONFIRMED** | Design lead | Resolved at bootstrap-spec approval | Typography theme — see `docs/legalhub_bootstrap_specification.md` |
 | **D-14** | Dark-theme token values | **CONFIRMED** (approved as-is per ADR-0002) | Design lead | Resolved 2026-07-30 | All dark-mode screens |
@@ -57,7 +57,7 @@ Unchanged in shape from Rev 1; now anchored to the confirmed brand and canonical
 
 **MVP (safe to build):** Authentication (sign in/up, forgot-password email→OTP→reset) · Role-aware app shell & navigation · Attorney discovery (read-only) · Consultation booking (no live payment) · Matter-scoped messaging · Document vault (scoped, no e-signature) · Case/matter dashboard & details (read-first) · Settings & localization (EN/AR/TR, light/dark) — all rendered from the **LegalHub** brand and the single canonical theme.
 
-**v1 (after MVP):** Billing/invoices (D-09) · Video consultation (D-11) · Collaboration task board / shared workspace · Notification delivery · Compliance audit-trail read-only viewer.
+**v1 (after MVP):** Billing/invoices (D-09) · Video consultation (D-15) · Collaboration task board / shared workspace · Notification delivery · Compliance audit-trail read-only viewer.
 
 **Deferred (do NOT build now):** Conflict check/disclosure/analytics (D-03/D-06) · Waivers (D-06) · Ethical walls (D-06) · Regulatory filing submission (D-03) · Research AI assistant / citation manager / statutory browser / legal draft workspace (D-07/D-08) · Global compliance map / risk & advanced analytics (validated data + D-03).
 
@@ -156,7 +156,7 @@ Two remediation types apply to **every** exported screen (light + dark): **(B)**
 | case_management_dashboard, case_details, shared_case_workspace | Maybe | Yes | — |
 | user_profile, settings_localization, notification_settings, partner_notification_settings | Maybe | Yes | Localization screen must reflect EN/AR/TR. `partner_notification_settings` is intentionally satisfied by the shared role-agnostic `notification_settings_screen.dart` — **D-T7** (`docs/tracked_deviations.md`, decision dated 2026-08-09); no duplicate screen, by scoping decision |
 | billing_invoices | Maybe | Yes | Defer real payment (D-09) |
-| video_consultation | Maybe | Yes | Defer (D-11) |
+| video_consultation | Maybe | Yes | Defer (D-15) |
 | collaboration_task_board, pending_approvals_queue | Maybe | Yes | v1 |
 | conflict_check_search | Yes — `<title>Lexis Conflict Check` | Yes | **Safety:** remove green **"Clear"** badge & "prevent professional ethical breaches" copy (violates §4.4). **Deferred.** |
 | conflict_disclosure_* (matter_selection, party_identification, analysis_findings, final_review) | Maybe | Yes | **Deferred (D-03/D-06)** |
@@ -203,7 +203,7 @@ The bootstrap package builds **foundation only** — no features, no high-risk w
 | Legal research / statutory browser | D-03, D-07 |
 | AI assistant / legal drafting | D-07, D-08 |
 | Billing / payments | D-09, D-04 (residency), PCI scope |
-| Video consultation | D-11, D-04 |
+| Video consultation | D-15, D-04 |
 | Documents & messaging (retention aspects) | D-05 |
 | Compliance/audit & analytics dashboards | D-03, D-05, validated data source |
 | Full-spec reconciliation | D-12 (`plan.md`) |

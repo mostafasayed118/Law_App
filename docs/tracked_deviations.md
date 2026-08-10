@@ -198,3 +198,33 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
 - **Cross-reference:** `docs/legalhub_specification.md` §6 (remediation row
   157); the screen-completeness audit record (2026-08-09) that listed this
   as the single remaining open gap; `INSTRUCTIONS.md` §2.
+
+## D-T8: spec D-11 label collision — video consultation renumbered to D-15 — **RESOLVED (2026-08-11)**
+
+- **Where:** `docs/legalhub_specification.md`'s decision table assigned
+  **D-11 to video consultation** (row 47) while the repo's billing record
+  (`docs/d11_billing_payments_decision_2026-08-08.md`) uses the **D-11
+  label for billing/payments** (that record supersedes the spec's D-09
+  payment row); `docs/p0_decision_capture.md` has **no D-11 entry**. The
+  collision was first flagged in
+  `docs/video_consultation_scope_questions_2026-08-11.md` (2026-08-11).
+- **Change:** the spec's video-consultation row is **renumbered D-11 →
+  D-15** (the next free number after D-14) in all four references — row 47
+  (decision table), line 60 (v1-after-MVP list), line 159
+  (`video_consultation` screen deferral), line 206 (dependency row). The
+  billing record keeps D-11. The same sweep fixed the three other docs
+  where the collision had manifested: `legalhub_bootstrap_specification.md`
+  (line 50), `p4_threat_model_2026-08-09.md` (line 248), and
+  `screen_completeness_matrix_2026-08-09.md` (rows 48/77).
+- **Decision:** renumber the spec row rather than the decided billing
+  record — the billing record's D-11 label is referenced by committed
+  plans/evidence (billing-invoices slice, Paymob spec) and is the
+  de-facto register entry.
+- **Status:** **RESOLVED (2026-08-11).** Doc-only change; no code, no
+  live-system effect.
+- **Owner:** Project Owner (github.com/mostafasayed118), 2026-08-11.
+- **Cross-reference:** `docs/legalhub_specification.md` rows 47/60/159/206;
+  `docs/video_consultation_scope_questions_2026-08-11.md`;
+  `docs/d11_billing_payments_decision_2026-08-08.md`;
+  `docs/features_roadmap_2026-08-03.md` §14;
+  `docs/p14_plan_complete_2026-08-08.md` §4.

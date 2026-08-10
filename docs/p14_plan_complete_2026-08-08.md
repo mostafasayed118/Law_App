@@ -107,8 +107,9 @@ addendum → client swap → close evidence):
   provider), the conflict-check question sheet
   `docs/d03_d06_conflict_scope_questions_2026-08-11.md` (D-03/D-06), and
   the video-consultation question sheet
-  `docs/video_consultation_scope_questions_2026-08-11.md` (spec D-11,
-  label collision with the billing record flagged).
+  `docs/video_consultation_scope_questions_2026-08-11.md` (spec D-15 —
+  renumbered 2026-08-11 to resolve the D-11 label collision with the
+  billing record; tracked_deviations D-T8).
 - **Owner-side live E2E on configured builds** — the D-45.1 convention: the
   env-gated client swaps (matters/documents/messages/storage/realtime/
   send/billing) are verified by the typed/fake suite + DI pins + the

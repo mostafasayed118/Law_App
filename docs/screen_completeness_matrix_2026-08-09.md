@@ -45,7 +45,7 @@
 | notification_settings | legalhub §6:157 | DONE_COMMITTED | `notification_settings_screen.dart`; test |
 | partner_notification_settings | legalhub §6:157 | **DECIDED CLOSED** — D-T7 (2026-08-09): satisfied by shared screen; no duplicate | `tracked_deviations.md` D-T7; spec row cité |
 | billing_invoices | legalhub §6:158; D-11 | DONE_COMMITTED (2026-08-09, `f4396cf`) | `billing_invoices_screen.dart`; `billing_invoices_screen_test.dart` |
-| video_consultation | legalhub §6:159; v1 | DEFERRED_PHASE (v1; D-11 open) | no screen |
+| video_consultation | legalhub §6:159; v1 | DEFERRED_PHASE (v1; D-15 open) | no screen |
 | collaboration_task_board | legalhub §6:160; v1 | **DONE_COMMITTED demo** (2026-08-09, `b7325f8`) | `task_board_screen.dart`; `task_board_screen_test.dart` |
 | pending_approvals_queue | legalhub §6:160; v1 | **DONE_COMMITTED demo** (2026-08-09) | `approvals_screen.dart`; `approvals_screen_test.dart` |
 | compliance_alerts | legalhub §6:168; v1 read-only | **DONE_COMMITTED demo** (2026-08-09) | `compliance_alerts_screen.dart`; `compliance_alerts_screen_test.dart` |
@@ -74,7 +74,7 @@
 | PARTIAL | 0 |
 | NOT_STARTED | 0 |
 | DONE_WIP (uncommitted) | 0 |
-| DEFERRED_PHASE | video (v1, D-11 open) |
+| DEFERRED_PHASE | video (v1, D-15 open) |
 | DEFERRED_DECIDED | 8 groups (conflicts, waivers, walls, filings, research/AI, citations, compliance map/risk/analytics) |
 | OUT_OF_SCOPE_MVP | inert home practice-area cards + notification bell (D-S4) |
 

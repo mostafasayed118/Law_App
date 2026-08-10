@@ -47,7 +47,7 @@ Establish a runnable, testable, localized, themeable, role-aware **application s
 | Confirm min platform targets (iOS/Android versions) | Project setup | Tech lead |
 
 ## 2.3 Deferred decisions that do NOT block bootstrap
-D-02..D-09, D-11 (product legal model, jurisdiction, residency, retention, review authority, research/AI/payment/video) — all deferred; bootstrap does not depend on them.
+D-02..D-09, D-15 (product legal model, jurisdiction, residency, retention, review authority, research/AI/payment/video — video renumbered D-11→D-15 per tracked_deviations D-T8) — all deferred; bootstrap does not depend on them.
 
 ## 2.4 `plan.md` accessibility (limitation only)
 `plan.md` is **not accessible in this project workspace**. This is recorded as a **workspace-accessibility limitation only**; it is not a claim that the file does not exist. If provided, it will be reconciled in a later pass. Bootstrap does not depend on it.
