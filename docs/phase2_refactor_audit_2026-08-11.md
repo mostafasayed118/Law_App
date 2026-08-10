@@ -323,3 +323,47 @@ screens) that E9 did not touch.
 
 11 shared widgets (E7–E10 added `AppFilterChips`, `AppCenteredRetry`,
 `WorkspaceSection` to the E1–E6 set of 8).
+
+## 9. Phase-3 candidate assessment (2026-08-11, at `9a4dd70`)
+
+Re-review of the §3 do-not-extract list and the §2 P2 items with fresh
+code reads, to draft the Phase-3 slate. Verdict: **one real candidate,**
+one promote-later, everything else stays separate.
+
+### C1 · Workspace section header — P0, local consolidation
+
+- `matter_details_screen.dart:161–199`: the four workspace blocks each
+  repeat `Text(titleSmall w700)` + `spaceSm` + section + `spaceXl` —
+  byte-identical except the l10n key and the section widget.
+- Extract a small `WorkspaceSectionHeader(title, child)` (or fold the
+  header into the E10 `WorkspaceSection`, which already owns the state
+  shell). Single-screen → **local**, per the rules; promote only if a
+  second screen grows the same header.
+
+### C2 · Section-header family — P1, promote later
+
+- Search `_GroupSection` (`search_screen.dart:358`, `titleMedium` w700
+  primary + `spaceSm` + children) and the C1 workspace headers
+  (`titleSmall` w700 plain) are **two different styles**, each
+  single-screen; the admin `_AuditSection` is a full fetch-on-mount
+  stateful widget (different concern). Keep separate now; if C1 is
+  parameterized as `AppSectionHeader(title)` with the style as a
+  parameter, search can join as a second consumer.
+
+### Re-verified stay-separate (with the reason)
+
+- **Label/value rows** — `_DetailRow` (Column label-over-value),
+  `_SummaryRow` (Row Flexible/Expanded), `_InfoRow` (icon card): three
+  geometries, three screens; no dominant shape.
+- **Audit rows** — admin `_AuditRow`, orgs `_AuditRow`, hub
+  `_AuditEntryTile`: three distinct shapes.
+- **Member rows** — admin vs orgs: different layouts and meanings.
+- **Controller-fields** `_SearchField`/`_TopicField` — differ in init
+  (the booking field seeds from `draft.topic`) and cubit calls; 2 sites,
+  thin wrappers over `LegalHubTextField`.
+- The close-out residual set (thread-detail `_MessageTile`, booking
+  `_SuccessStep`, `_SelectableTile`, `_AuditSection`, `_OutcomeChip`,
+  home `StatusChip`, admin `_DeniedState`/`_FailedState`) — all
+  documented distinct geometry, unchanged.
+- Roster chips `_RoleChip`/`_StatusChip` are already thin `LabelChip`
+  wrappers (E5) — no further action.
