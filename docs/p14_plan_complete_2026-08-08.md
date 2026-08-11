@@ -10,7 +10,7 @@
 > no false assurance (INSTRUCTIONS.md §1.3 #5).
 >
 > **Status: §14 PLAN CLOSE — nine of ten originally-deferred capabilities
-> un-deferred and SHIPPED 2026-08-07/08, each with the full per-feature
+> un-deferred and SHIPPED 2026-07/08, each with the full per-feature
 > discipline (RLS-gate/mechanism review → rehearsal-ready artifacts →
 > policy battery + harness → ephemeral rehearsal r1 → dated apply-approval
 > → apply → dated matrix addendum → env-gated client swap); full gate green
@@ -18,6 +18,15 @@
 > runtime / README 1077 declaration · ledger PASS 115 · policy-battery
 > static `--check` 339/0/0).** **AI is the only remaining deferred path —
 > scope DECIDED at demo-posture 2026-08-11, implementation still deferred.**
+> **FIRST NEW SURFACE SHIPPED 2026-08-11:** beyond the §14 un-deferral
+> program, the **notification feed** (authorized by the owner as a NEW
+> read surface — D-N1; not in the spec) ran the same T1–T8 pipeline
+> end-to-end and closed: scope DECIDED → T1 review → artifacts
+> (`14_notifications` + `.down` + `notifications_select_org`) → battery 14
+> + harness re-scope (13 tables / 13 RLS / 12 policies) → r1 86/0/0 ×2 →
+> dated apply-approval + dev apply → matrix §4 + applied-surface §1b
+> addenda → T8 env-gated client swap (suite 1303) → configured-build E2E
+> walkthrough evidence (`docs/notification_feed_e2e_walkthrough_evidence_2026-08-11.md`).
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
 > **Closed on:** 2026-08-08.
@@ -69,6 +78,7 @@ nothing in the repo was waiting on AI.
 | Row | Gate | Gate status (2026-08-08) |
 |---|---|---|
 | §14 deferred capabilities | **P0 closes (D-02…D-10b) RATIFIED** + policy tests + matrix extension | ✅ **MET — nine of ten un-deferred and SHIPPED** (matters → documents → message_threads → storage → audit surfacing → individual messages/bodies → live delivery → audited send → billing invoices); each slice: review → artifacts → battery + harness (static `--check` 339/0/0, selftest 6/6) → ephemeral r1 genuinely executed → dated apply-approval → apply (dev project) → dated matrix §4/§6 addendum → env-gated client swap. **AI remains deferred as an implementation** (scope DECIDED at demo-posture 2026-08-11 — `docs/ai_scope_decision_2026-08-11.md`; plannable). |
+| **NEW surface (post-§14)** | **Owner-authorized new read surface (D-N1 — the feed is not in the spec)** | ✅ **SHIPPED end-to-end 2026-08-11 — the notification feed**, the first NEW surface through the full T1–T8 pipeline (scope DECIDED → T1 review → artifacts + battery 14 + harness re-scope 13/13/12 → r1 86/0/0 ×2 → dated apply-approval + dev apply → matrix §4 + applied-surface addenda → T8 env-gated `NotificationGateway` swap, suite 1303 → configured-build E2E walkthrough evidence). Feed stays read-only + empty pre-producer (D-N7); delivery/read-flag writes (D-N2/D-N6) remain future slices. |
 
 ## 3. Consolidated §14 evidence index
 
@@ -87,13 +97,15 @@ addendum → client swap → close evidence):
 | Realtime push | `docs/realtime_push_real_data_plan_2026-08-08.md` | `docs/realtime_push_gate_review_2026-08-08.md` | `docs/realtime_push_rehearsal_evidence_r1_2026-08-08.md` | `docs/realtime_push_apply_approval_2026-08-08.md` + `docs/realtime_push_apply_execution_2026-08-08.md` | `docs/realtime_push_real_data_completion_evidence_2026-08-08.md` |
 | Audited send | `docs/send_message_rpc_plan_2026-08-08.md` | `docs/send_message_gate_review_2026-08-08.md` | `docs/send_message_rehearsal_evidence_r1_2026-08-08.md` | `docs/send_message_apply_approval_2026-08-08.md` + `docs/send_message_apply_execution_2026-08-08.md` | `docs/send_message_real_data_completion_evidence_2026-08-08.md` |
 | Billing invoices | `docs/billing_invoices_real_data_plan_2026-08-08.md` | `docs/billing_invoices_gate_review_2026-08-08.md` | `docs/billing_invoices_rehearsal_evidence_r1_2026-08-08.md` | `docs/billing_invoices_apply_approval_2026-08-08.md` + `docs/billing_invoices_apply_execution_2026-08-08.md` | `docs/billing_invoices_real_data_completion_evidence_2026-08-08.md` |
+| **Notification feed (NEW surface — D-N1, not in the spec)** | `docs/notification_feed_slice_plan_2026-08-11.md` | `docs/notification_feed_gate_review_2026-08-11.md` | `docs/notification_feed_rehearsal_evidence_r1_2026-08-11.md` | `docs/notification_feed_apply_approval_2026-08-11.md` + `docs/notification_feed_apply_execution_2026-08-11.md` | `docs/notification_feed_e2e_walkthrough_evidence_2026-08-11.md` (commits `1027f68`…`2be11ce`; T8 swap `1f546fb`, suite 1303) |
 | AI | — | — | — | — | **DEFERRED (implementation) — scope DECIDED 2026-08-11 demo-posture (`docs/ai_scope_decision_2026-08-11.md`), plannable** |
 
 > **Canonical current dev-project state:** `docs/current_applied_surface_2026-08-08.md`
-> (12 tables / 12 RLS / 11 public + 1 storage policy / 19 EXECUTE RPCs /
+> (13 tables / 13 RLS / 12 public + 1 storage policy / 20 EXECUTE RPCs /
 > publication exactly `messages` / `matter-files` bucket / demo rows + the
-> verified apply chronology) — the single source of truth; the owner-side
-> configured-build E2E checklist (D-45.1) is
+> verified apply chronology — the 2026-08-11 notification-feed apply is
+> recorded in §1b + chronology row 10) — the single source of truth; the
+> owner-side configured-build E2E checklist (D-45.1) is
 > `docs/configured_build_e2e_checklist_2026-08-08.md`.
 
 ## 4. What is still NOT done (honest, per INSTRUCTIONS §1.3 #5)
@@ -101,22 +113,37 @@ addendum → client swap → close evidence):
 - **AI** — the only remaining §14 path; **scope DECIDED at demo-posture
   2026-08-11** (`docs/ai_scope_decision_2026-08-11.md`, defaults ratified
   from `docs/d07_d08_ai_scope_questions_2026-08-11.md`); no build,
-  nothing committed — the row is now plannable under T1–T8. Four further
-  planning artifacts landed 2026-08-11 (all planning
-  only, none approved): the Paymob spec
-  `docs/paymob_integration_spec_2026-08-11.md` (D-11 un-block), the
-  notification-feed scope note
-  `docs/notification_feed_scope_2026-08-11.md` (new read surface, no
-  provider), the conflict-check question sheet
-  `docs/d03_d06_conflict_scope_questions_2026-08-11.md` (D-03/D-06), and
-  the video-consultation question sheet
+  nothing committed — the row is now plannable under T1–T8.
+- **Notification feed — SHIPPED end-to-end 2026-08-11** (the first NEW
+  surface; D-N1 authorized): the full T1–T8 chain is in the §3 index row
+  (scope `docs/notification_feed_scope_2026-08-11.md` DECIDED → T1 review
+  → artifacts + battery 14 + harness re-scope 13/13/12 → r1 86/0/0 ×2 →
+  dated apply-approval + dev apply → matrix §4 + applied-surface §1b
+  addenda → T8 env-gated `NotificationGateway` swap `1f546fb` (suite
+  1303) → configured-build E2E walkthrough evidence
+  `docs/notification_feed_e2e_walkthrough_evidence_2026-08-11.md`). Feed
+  renders empty pre-producer (D-N7); delivery (D-N2) and read-flag writes
+  (D-N6) remain future slices.
+- **Remaining planning artifacts (2026-08-11, planning only, none
+  approved):** the Paymob spec `docs/paymob_integration_spec_2026-08-11.md`
+  (D-11 un-block), the conflict-check question sheet
+  `docs/d03_d06_conflict_scope_questions_2026-08-11.md` (D-03/D-06, plus
+  the ratified decision `docs/conflict_scope_decision_2026-08-11.md`), the
+  video-consultation question sheet
   `docs/video_consultation_scope_questions_2026-08-11.md` (spec D-15 —
   renumbered 2026-08-11 to resolve the D-11 label collision with the
-  billing record; tracked_deviations D-T8).
+  billing record; tracked_deviations D-T8, plus the ratified decision
+  `docs/video_scope_decision_2026-08-11.md`), and the AI question sheet
+  (ratified into `docs/ai_scope_decision_2026-08-11.md`).
 - **Owner-side live E2E on configured builds** — the D-45.1 convention: the
   env-gated client swaps (matters/documents/messages/storage/realtime/
-  send/billing) are verified by the typed/fake suite + DI pins + the
-  applied server surfaces; a configured-build device round-trip (`.env`,
+  send/billing/notifications) are verified by the typed/fake suite + DI
+  pins + the applied server surfaces, and the **server-round-trip halves
+  were walked live** — the 2026-08-09 final walkthrough
+  (`docs/final_demo_walkthrough_evidence_2026-08-09.md`) and the
+  2026-08-11 notification-feed walkthrough
+  (`docs/notification_feed_e2e_walkthrough_evidence_2026-08-11.md`); a
+  configured-build device round-trip (`.env`,
   git-ignored) remains **owner-side, now with a dated checklist**:
   `docs/configured_build_e2e_checklist_2026-08-08.md` (per-account
   expected reads keyed to `docs/current_applied_surface_2026-08-08.md`).
@@ -143,3 +170,16 @@ demo-posture 2026-08-11 (`docs/ai_scope_decision_2026-08-11.md`); it
 stays deferred as an implementation until the owner schedules the slice,
 at which point it enters the same per-feature discipline (D-07/D-08
 re-open for a real product).
+
+**Addendum (2026-08-11): the FIRST NEW surface shipped end-to-end.** Beyond
+the §14 un-deferral program, the owner-authorized **notification feed**
+(D-N1 — a new read surface, not in the spec) completed the full T1–T8
+pipeline and closed with live E2E evidence
+(`docs/notification_feed_e2e_walkthrough_evidence_2026-08-11.md`): scope
+ratified → T1 review → artifacts (`14_notifications` + `.down` +
+`notifications_select_org`) → battery 14 + harness re-scope (13 tables /
+13 RLS / 12 public policies) → r1 86/0/0 ×2 → dated apply-approval + dev
+apply → matrix §4 + applied-surface §1b addenda → T8 env-gated
+`NotificationGateway` swap `1f546fb` (suite 1303, ledger PASS 115, `main`
+@ `2be11ce`, pushed). The feed is read-only and renders empty pre-producer
+(D-N7); delivery (D-N2) and read-flag writes (D-N6) stay future slices.
