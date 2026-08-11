@@ -5,9 +5,9 @@
 > (`docs/p3_plan_complete_2026-08-05.md`): one dated record next to each
 > slice's evidence, consolidating the nine SHIPPED rows (gate table §13 of
 > `docs/features_roadmap_2026-08-03.md`, now nine-of-ten green) and
-> recording exactly what is **still NOT done** — the AI path, owner-blocked
-> on D-07/D-08 + undefined scope — with no false assurance
-> (INSTRUCTIONS.md §1.3 #5).
+> recording exactly what is **still NOT done** — the AI implementation
+> path (scope DECIDED at demo-posture 2026-08-11; still not built) — with
+> no false assurance (INSTRUCTIONS.md §1.3 #5).
 >
 > **Status: §14 PLAN CLOSE — nine of ten originally-deferred capabilities
 > un-deferred and SHIPPED 2026-08-07/08, each with the full per-feature
@@ -16,7 +16,8 @@
 > → apply → dated matrix addendum → env-gated client swap); full gate green
 > on `main` @ `dde0c11` (format 0-changed · analyze clean · suite 1080
 > runtime / README 1077 declaration · ledger PASS 115 · policy-battery
-> static `--check` 339/0/0).** **AI is the only remaining deferred path.**
+> static `--check` 339/0/0).** **AI is the only remaining deferred path —
+> scope DECIDED at demo-posture 2026-08-11, implementation still deferred.**
 >
 > **Owner:** Project Owner (github.com/mostafasayed118).
 > **Closed on:** 2026-08-08.
@@ -47,25 +48,27 @@ with a verified gate on `main` (all key commits re-verified against git
 | 7 | Realtime live delivery (publication + subscription + composer) | 2026-08-08 | ✅ EXECUTED (`c96eff7`+`7efb32b`) | `docs/realtime_push_real_data_plan_2026-08-08.md` / `docs/realtime_push_real_data_completion_evidence_2026-08-08.md` | 1045 / 1042 |
 | 8 | Audited send path (`send_message` RPC, §8 audit, D-SM3) | 2026-08-08 | ✅ EXECUTED (`docs/send_message_apply_execution_2026-08-08.md`) | `docs/send_message_rpc_plan_2026-08-08.md` / `docs/send_message_real_data_completion_evidence_2026-08-08.md` | 1047 / 1044 |
 | 9 | Billing invoices read-metadata (D-11, fake-gateway posture) | 2026-08-08 | ✅ EXECUTED (`docs/billing_invoices_apply_execution_2026-08-08.md`) | `docs/billing_invoices_real_data_plan_2026-08-08.md` / `docs/billing_invoices_real_data_completion_evidence_2026-08-08.md` | 1080 / 1077 |
-| 10 | **AI** | — | — | **DEFERRED — owner-blocked (D-07/D-08 + undefined scope)** — decision-ready 2026-08-11: `docs/d07_d08_ai_scope_questions_2026-08-11.md` | — |
+| 10 | **AI** | — | — | **DEFERRED (implementation) — scope DECIDED 2026-08-11 (demo-posture)**: D-07/D-08 closed via `docs/ai_scope_decision_2026-08-11.md` (defaults ratified from `docs/d07_d08_ai_scope_questions_2026-08-11.md`); row now plannable under T1–T8 | — |
 
-**Remaining path (the one not closed):** **AI** stays deferred on
-**D-07/D-08** (`docs/p0_decision_capture.md` — authentication policy and
-organization semantics, both **Decided 2026-07-31** at the decision level)
-**+ undefined scope** — there is no AI feature spec, so there is nothing to
-plan; as of 2026-08-11 the owner has a decision-ready question sheet
-(`docs/d07_d08_ai_scope_questions_2026-08-11.md`) whose answers produce
-that scope note. When/if the owner defines an AI scope, it enters the same
-T1–T8 per-feature discipline behind its own RLS-gate/mechanism review (per
-the reconciliation note in `docs/send_message_rpc_plan_2026-08-08.md`).
-This is a product-scope gate, **not** a codebase blocker — nothing in the
-repo is waiting on AI.
+**Remaining path (the one not closed):** **AI** stays deferred as an
+**implementation** — the scope blocker is now **MET at the demo level**:
+D-07/D-08 closed 2026-08-11 (demo-posture) in
+`docs/ai_scope_decision_2026-08-11.md`, ratified from the question sheet's
+defaults (`docs/d07_d08_ai_scope_questions_2026-08-11.md`) — research
+assistant only, synthetic in-repo corpus, citation metadata on every
+output, no persistence, advisory-only, synthetic `AiGateway` seam. The
+row is now **plannable** and, when the owner schedules the slice, enters
+the same T1–T8 per-feature discipline behind its own RLS-gate/mechanism
+review (per the reconciliation note in
+`docs/send_message_rpc_plan_2026-08-08.md`). D-07/D-08 re-open for a
+real product. This was a product-scope gate, **not** a codebase blocker —
+nothing in the repo was waiting on AI.
 
 ## 2. The last gate table (§13 row — nine of ten green)
 
 | Row | Gate | Gate status (2026-08-08) |
 |---|---|---|
-| §14 deferred capabilities | **P0 closes (D-02…D-10b) RATIFIED** + policy tests + matrix extension | ✅ **MET — nine of ten un-deferred and SHIPPED** (matters → documents → message_threads → storage → audit surfacing → individual messages/bodies → live delivery → audited send → billing invoices); each slice: review → artifacts → battery + harness (static `--check` 339/0/0, selftest 6/6) → ephemeral r1 genuinely executed → dated apply-approval → apply (dev project) → dated matrix §4/§6 addendum → env-gated client swap. **AI remains deferred** (D-07/D-08 + undefined scope). |
+| §14 deferred capabilities | **P0 closes (D-02…D-10b) RATIFIED** + policy tests + matrix extension | ✅ **MET — nine of ten un-deferred and SHIPPED** (matters → documents → message_threads → storage → audit surfacing → individual messages/bodies → live delivery → audited send → billing invoices); each slice: review → artifacts → battery + harness (static `--check` 339/0/0, selftest 6/6) → ephemeral r1 genuinely executed → dated apply-approval → apply (dev project) → dated matrix §4/§6 addendum → env-gated client swap. **AI remains deferred as an implementation** (scope DECIDED at demo-posture 2026-08-11 — `docs/ai_scope_decision_2026-08-11.md`; plannable). |
 
 ## 3. Consolidated §14 evidence index
 
@@ -84,7 +87,7 @@ addendum → client swap → close evidence):
 | Realtime push | `docs/realtime_push_real_data_plan_2026-08-08.md` | `docs/realtime_push_gate_review_2026-08-08.md` | `docs/realtime_push_rehearsal_evidence_r1_2026-08-08.md` | `docs/realtime_push_apply_approval_2026-08-08.md` + `docs/realtime_push_apply_execution_2026-08-08.md` | `docs/realtime_push_real_data_completion_evidence_2026-08-08.md` |
 | Audited send | `docs/send_message_rpc_plan_2026-08-08.md` | `docs/send_message_gate_review_2026-08-08.md` | `docs/send_message_rehearsal_evidence_r1_2026-08-08.md` | `docs/send_message_apply_approval_2026-08-08.md` + `docs/send_message_apply_execution_2026-08-08.md` | `docs/send_message_real_data_completion_evidence_2026-08-08.md` |
 | Billing invoices | `docs/billing_invoices_real_data_plan_2026-08-08.md` | `docs/billing_invoices_gate_review_2026-08-08.md` | `docs/billing_invoices_rehearsal_evidence_r1_2026-08-08.md` | `docs/billing_invoices_apply_approval_2026-08-08.md` + `docs/billing_invoices_apply_execution_2026-08-08.md` | `docs/billing_invoices_real_data_completion_evidence_2026-08-08.md` |
-| AI | — | — | — | — | **DEFERRED — D-07/D-08 + undefined scope** |
+| AI | — | — | — | — | **DEFERRED (implementation) — scope DECIDED 2026-08-11 demo-posture (`docs/ai_scope_decision_2026-08-11.md`), plannable** |
 
 > **Canonical current dev-project state:** `docs/current_applied_surface_2026-08-08.md`
 > (12 tables / 12 RLS / 11 public + 1 storage policy / 19 EXECUTE RPCs /
@@ -95,11 +98,11 @@ addendum → client swap → close evidence):
 
 ## 4. What is still NOT done (honest, per INSTRUCTIONS §1.3 #5)
 
-- **AI** — the only remaining §14 path; owner-blocked on D-07/D-08 +
-  undefined scope. No scope, no build, nothing committed; the
-  decision-ready question sheet `docs/d07_d08_ai_scope_questions_2026-08-11.md`
-  (2026-08-11, planning only) is the first step toward the missing scope
-  note. Four further planning artifacts landed 2026-08-11 (all planning
+- **AI** — the only remaining §14 path; **scope DECIDED at demo-posture
+  2026-08-11** (`docs/ai_scope_decision_2026-08-11.md`, defaults ratified
+  from `docs/d07_d08_ai_scope_questions_2026-08-11.md`); no build,
+  nothing committed — the row is now plannable under T1–T8. Four further
+  planning artifacts landed 2026-08-11 (all planning
   only, none approved): the Paymob spec
   `docs/paymob_integration_spec_2026-08-11.md` (D-11 un-block), the
   notification-feed scope note
@@ -135,8 +138,8 @@ read — with the dev-project applies executed under dated approvals, the
 dated matrix addenda recorded, the env-gated client swaps shipped, and the
 full gate green at every tip (final: suite 1080 runtime / README 1077,
 ledger PASS 115, battery static `--check` 339/0/0, `main` @ `dde0c11`,
-pushed). **AI is the only remaining deferred path** — it stays deferred on
-D-07/D-08 + undefined scope until the owner defines an AI scope, at which
-point it enters the same per-feature discipline; a decision-ready
-question sheet (`docs/d07_d08_ai_scope_questions_2026-08-11.md`, 2026-08-11)
-is the first step toward that scope — planning only.
+pushed). **AI is the only remaining deferred path** — scope DECIDED at
+demo-posture 2026-08-11 (`docs/ai_scope_decision_2026-08-11.md`); it
+stays deferred as an implementation until the owner schedules the slice,
+at which point it enters the same per-feature discipline (D-07/D-08
+re-open for a real product).

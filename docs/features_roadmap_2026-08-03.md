@@ -631,9 +631,11 @@ approval**.
 > holds the last gate table, the full evidence index (plan → review →
 > artifacts → battery → r1 → approval → execution → addendum → client swap
 > → close evidence for all nine slices), and the dated close decision;
-> **AI is the only remaining deferred path** (D-07/D-08 + undefined scope) —
-> decision-ready since 2026-08-11: the owner-answerable question sheet
-> `docs/d07_d08_ai_scope_questions_2026-08-11.md`. Billing planning is
+> **AI is the only remaining deferred path** — scope DECIDED at
+> demo-posture 2026-08-11 (`docs/ai_scope_decision_2026-08-11.md`,
+> defaults ratified from `docs/d07_d08_ai_scope_questions_2026-08-11.md`);
+> the row stays deferred as an implementation but is now plannable under
+> T1–T8. Billing planning is
 > un-blocked (D-11, planning only) by the Paymob spec
 > `docs/paymob_integration_spec_2026-08-11.md`; a new notification-feed
 > read surface (no provider) is designed for owner decision in
@@ -820,12 +822,11 @@ genuinely executed 78/0/0 → dated apply approved + executed (tables/RLS
 env-gated client swap `f116966`; plan
 `docs/billing_invoices_real_data_plan_2026-08-08.md`, evidence
 `docs/billing_invoices_real_data_completion_evidence_2026-08-08.md`).
-**AI is the only remaining deferred path** — it stays deferred on
-D-07/D-08 + undefined scope — see the reconciliation + next-slice plan
-`docs/send_message_rpc_plan_2026-08-08.md`); decision-ready since
-2026-08-11 via the owner-answerable question sheet
-`docs/d07_d08_ai_scope_questions_2026-08-11.md` (planning only — the
-answers produce the missing AI scope note).
+**AI is the only remaining deferred path** — scope DECIDED at demo-posture
+2026-08-11 (`docs/ai_scope_decision_2026-08-11.md`, defaults ratified from
+`docs/d07_d08_ai_scope_questions_2026-08-11.md`); the row stays deferred
+as an implementation (plannable under T1–T8) — see the reconciliation +
+next-slice plan `docs/send_message_rpc_plan_2026-08-08.md`).
 The client-only document-metadata surface shipped as Phase 8 (slices
 8.0–8.2, `22d63e5`/`29fd40a`/`430b62b`) carries no real document data —
 the real documents read path is the second per-feature un-deferral
