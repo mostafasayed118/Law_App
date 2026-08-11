@@ -8,6 +8,13 @@
 > dated apply-approval (INSTRUCTIONS.md §2.1/§5 hard gates). **Branch:
 > `feat/notification-feed-producer`.**
 >
+> **Status: RATIFIED 2026-08-11 by the Project Owner (D-P1…D-P6 — §3
+> decisions accepted as designed, including the minimal v1 event set, the
+> fixed redacted summary map, and the deterministic battery-14 re-pin).
+> The slice is un-blocked to start T1 (mechanism/RLS-gate review).** No
+> code, no live-system effect; the dev-project apply still waits for the
+> dated apply-approval (T5).
+>
 > **Gate state:** the feed surface is fully SHIPPED end-to-end (T1–T8 +
 > walkthrough, `d923940` — 13 tables / 13 RLS / 12 public policies, the
 > `NotificationGateway` client swap, suite 1303). The feed renders **empty
@@ -45,7 +52,9 @@ precedent).
 | Audit rows carry the feed's needs | `audit_events` has `action`, `outcome`, `organization_id`, `redacted_summary`, `server_timestamp` (`supabase/migrations/01_org_schema.sql:75`) — org + redacted posture + timestamp already present at the single write point |
 | Batteries call the write RPCs before battery 14 | `13_matter_write_rls.sql` calls `create_matter` (successful creates) and `10_send_message_rls.sql` calls `send_message` — both run **before** `14_notification_rls.sql`, so a producer **shifts battery 14's absolute count pins** (14.01–14.03) — a harness re-pin is required (see §4/§6) |
 
-## 3. Design decisions (proposed — the mechanism review gates these)
+## 3. Design decisions (**RATIFIED 2026-08-11 by the Project Owner** — the
+mechanism review gates the artifacts against these, not the decisions
+again)
 
 - **D-P1 — the producer is an audit-mirror trigger, not an RPC edit.** A
   new `AFTER INSERT` trigger on `audit_events` maps the two audited actions
@@ -138,7 +147,8 @@ transactional-demo discipline).
 
 1. **This plan ratified + owner authorization** (the producer is a NEW
    server-side write mechanism — the gate; D-N7 explicitly leaves row
-   sources to be "decided slice-by-slice")
+   sources to be "decided slice-by-slice") — **MET 2026-08-11** (D-P1…D-P6
+   ratified); the slice starts at **T1**
 2. **T1 mechanism/RLS-gate review** — dated review note: the trigger
    design (D-P1), the action map (D-P2/D-P3), org resolution from the
    audit row, the battery-14 re-pin (D-P6), and the "not a policy" framing
@@ -208,5 +218,11 @@ transactional-demo discipline).
 ## 9. Ledger
 
 - DRAFTED 2026-08-11 (docs-only; feed surface SHIPPED at `d923940`, suite
-  1303). No code, no live-system effect, nothing applied. The slice runs
-  only after the owner ratifies this plan (step 1) — the gate.
+  1303).
+- **RATIFIED 2026-08-11 by the Project Owner** — §3 D-P1…D-P6 accepted as
+  designed; the §8 open questions resolved in the plan's recommended
+  direction (minimal v1 event set, fixed redacted summary map, battery-14
+  re-pin). No code, no live-system effect, nothing applied. Step 1 MET —
+  the slice starts at **T1 (mechanism/RLS-gate review)**; the dev-project
+  apply waits for the dated apply-approval (T5) and the matrix/applied
+  addenda (T7).
