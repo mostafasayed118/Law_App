@@ -29,6 +29,17 @@
 | **Demo matters** | 4 → **5** | The first §8-audited live matter write `d28f1f05-f95f-46ea-9b15-767f15778c01` (via the RPC as the demo partner; §2 below). **F-12 RESOLVED 2026-08-09:** the pre-existing matter `a6715e17-…` carried the platform-owner id as `assigned_client_id` (seeded 2026-08-07, pre-F-01) — re-assigned onto the demo client (`0c54d251-…`) with a machine audit row; **the owner id now appears in no assignment column** (`docs/f12_data_remediation_2026-08-09.md`). |
 | **Matter write path** | none → **audited RPC + categorical trigger** | `create_matter` is the ONLY matter-write surface (no INSERT/UPDATE grants to clients); every create §8-audited. |
 
+## 1b. Addendum (2026-08-11 — notification-feed read apply)
+
+| Surface | Before → After | Evidence |
+|---|---|---|
+| **Tables (public)** | **12 → 13** / RLS 12 → 13 | `notifications` added (`14_notifications.sql`): `id` PK · `organization_id` FK → organizations, cascade · `category` CHECK (`appointment`/`activity`/`system`, D-N4) · `type` · `summary` (synthetic-only by convention, D-N3) · `server_timestamp` (server clock) · `is_read` (display metadata only, D-N6) + composite index `notifications_org_ts`. **Redaction structural (T1 Q1): no user-identity / content / raw-text column** — PII *cannot* be stored (`docs/notification_feed_apply_execution_2026-08-11.md` §2.1). |
+| **Policies** | **11 public → 12** (+ 1 storage unchanged) | `notifications_select_org` — the single SELECT policy, organizations-gate (`is_active_member(organization_id)`), **no write policies** (D-N2/D-N6); auth SELECT granted, anon denied (`docs/notification_feed_apply_execution_2026-08-11.md` §2.2/§4). |
+| **RPCs** | **20 → 20 EXECUTE** (unchanged) | **No new RPC** — direct PostgREST read (T1 Q5). Harness RPC-EXECUTE pin stays 20. |
+| **Publication** | unchanged — exactly `public.messages` | The feed is not realtime; no publication change (T1 Q4/Q5). |
+| **Bucket** | unchanged — `matter-files` (1) | Untouched. |
+| **Demo rows** | 0 notification rows | No seed on the dev project (D-N7 — feed empty pre-producer; synthetic rows arrive with the T8 client swap's fake gateway or a future producer slice). Live positive = 0 rows; anon denied at the privilege layer. |
+
 ## 2. Demo rows (org `ef43087b-adf4-4480-9bb2-28c26f46ec71`, generic only — no real PII)
 
 | Kind | Rows | Anchors |
@@ -57,6 +68,7 @@ deliberately denies them; recorded as designed, never a defect).
 | 7 | storage `e9a02ac` (18:36) | `07_storage` (bucket + files) + 2 policies + 4 files/objects | **11 tables / 10 public + 1 storage** |
 | 8 | billing `fc7ed1b` (21:31) | `10_billing_invoices` + `invoices_select_assigned` + 4 invoices | **12 tables / 11 public + 1 storage** |
 | 9 | F-01 step 2 `f2e88cc` (08-09) | `create_matter` RPC + `11_matter_write` trigger + demo create `d28f1f05-…` | **12 tables / 11 public + 1 storage / 20 RPC-EXECUTE** (trigger is not a policy) |
+| 10 | notification-feed (08-11, **uncommitted slice — T7 commit pending**) | `14_notifications` + `notifications_select_org` (single SELECT, org gate) + harness re-scope 13/13/12 | **13 tables / 12 public + 1 storage / 20 RPC-EXECUTE unchanged** (no new RPC, T1 Q5) |
 
 > **Baseline-count honesty:** storage's §0 note explicitly records that its
 > approval's "8 → 9 policies" baseline was written before the realtime-push

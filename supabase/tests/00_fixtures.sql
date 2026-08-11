@@ -43,6 +43,7 @@ delete from public.files;
 delete from public.message_threads;
 delete from public.documents;
 delete from public.billing_invoices;
+delete from public.notifications;
 delete from public.matters;
 delete from public.memberships;
 delete from public.invitations;
@@ -443,5 +444,47 @@ begin
   select count(*) into v_cnt from public.billing_invoices;
   if v_cnt <> 6 then
     raise exception 'FIXTURE ERROR: billing_invoices must hold 6 rows, got %', v_cnt;
+  end if;
+end $$;
+
+-- ---- 14. Notifications (notification-feed slice — the 14_notification_rls.sql battery) ------
+-- Five REDACTED-METADATA rows (D-N3 — no user-identity, no content, no
+-- raw-text columns exist on the table at all): four org-a rows across the
+-- three generic categories (D-N4 — appointment/activity/system) + one
+-- org-b row, exercising every branch of notifications_select_org
+-- (docs/notification_feed_gate_review_2026-08-11.md §3 Q2/Q3): the counts
+-- the battery asserts are partner-a AND client-a (org-a, active) each see
+-- the 4 org-a rows — the no-role-hierarchy pin (Q3); partner-b (org-b,
+-- active) sees exactly its 1 org-b row — org scoping by count. types come
+-- from the D-N3 example set (matter_updated / message_received /
+-- invoice_status / appointment_reminder); summaries are generic synthetic
+-- demo copy (D-N7) — never PII by convention. is_read is seeded false and
+-- NEVER mutated (D-N6 — display metadata only in v1; no read-flag RPC).
+insert into public.notifications
+  (id, organization_id, category, type, summary, server_timestamp, is_read)
+values
+  ('b0000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', 'appointment', 'appointment_reminder', 'Demo notification — consultation reminder', now(), false),
+  ('b0000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000001', 'activity',    'matter_updated',       'Demo notification — matter status update', now(), false),
+  ('b0000000-0000-4000-8000-000000000003', '20000000-0000-4000-8000-000000000001', 'system',      'invoice_status',       'Demo notification — invoice issued',       now(), false),
+  ('b0000000-0000-4000-8000-000000000004', '20000000-0000-4000-8000-000000000001', 'system',      'system_maintenance',   'Demo notification — scheduled maintenance', now(), false),
+  ('b0000000-0000-4000-8000-000000000005', '20000000-0000-4000-8000-000000000002', 'activity',    'message_received',     'Demo notification — new message in thread', now(), false);
+
+-- Reserved throwaway ids used by 14_notification_rls.sql (deliberately
+-- NEVER seeded): b0000000-0000-4000-8000-00000000ffff (the category
+-- CHECK-violation insert — fails before any row exists); the org-cascade
+-- pair 20000000-0000-4000-8000-00000000fffe (temp cascade org) +
+-- b0000000-0000-4000-8000-00000000fff1 (its temp notification). Listed
+-- here so the harness's static fixture cross-ref resolves them.
+
+-- Sanity: exactly five notifications seeded (the 14 count expectations
+-- depend on it; the org-delete cascade temp rows are rolled back inside
+-- the battery and never reach the seeded baseline).
+do $$
+declare
+  v_cnt bigint;
+begin
+  select count(*) into v_cnt from public.notifications;
+  if v_cnt <> 5 then
+    raise exception 'FIXTURE ERROR: notifications must hold 5 rows, got %', v_cnt;
   end if;
 end $$;

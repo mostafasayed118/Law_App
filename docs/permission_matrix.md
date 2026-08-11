@@ -590,6 +590,57 @@ there.
 > reads 0 — the `is_active_member` arm) with an owner-side data
 > remediation tracked in the register.
 
+> **§4 addendum (2026-08-11, notification-feed read slice — the first
+> org-scoped metadata read surface, NOT matter content; ratified scope note
+> `docs/notification_feed_scope_2026-08-11.md`, D-N1…D-N7 DECIDED
+> 2026-08-11 — the new-surface authorization):** a **new "View
+> notifications (metadata)" row is added** — the **client / attorney /
+> partner / compliance_officer cells SHIP as any active member of the
+> row's org** (the organizations-gate posture, no role hierarchy in the
+> feed — T1 Q3), granted server-side by the **single SELECT policy
+> `notifications_select_org`** (`supabase/policies/notifications.sql`)
+> using the `is_active_member(organization_id)` gate — org metadata, NOT
+> the matter-assignment exists-subquery (the feed is org-wide, T1 Q2) —
+> and policy-tested by `supabase/tests/14_notification_rls.sql` (10 check
+> blocks; rehearsal r1 **PASSED 2026-08-11, genuinely executed 86/0/0
+> ×2**, evidence `docs/notification_feed_rehearsal_evidence_r1_2026-08-11.md`;
+> static battery `--check` 78/0/0). **Redaction is structural (T1 Q1):**
+> the table carries **no user-identity / content / raw-text column** (the
+> D-BI1 mirror — PII *cannot* be stored, not merely shouldn't; the
+> `summary` is synthetic-only by convention, D-N3). **Deny rows, each
+> battery-pinned:**
+> - **cross-org** (member of org-a only, reading org-b rows) → deny — org
+>   scoping by count (14.04: org-a rows invisible to org-b members);
+> - **`platform_owner_admin`** → deny, always (owner accounts hold no org
+>   membership, so the `is_active_member` arm fails — D-P0C1(a)
+>   deny-always posture, 14.05; an operational invariant, recorded
+>   residual in `docs/notification_feed_gate_review_2026-08-11.md` Q4, the
+>   11.08-style note);
+> - **suspended membership** in the row's org → deny (the
+>   `is_active_member` arm, 14.06);
+> - **unauthenticated** → deny (no grant — `permission denied` at the
+>   privilege layer, 14.07);
+> - **no write cells in v1 (D-N2/D-N6)**: no INSERT/UPDATE/DELETE policy
+>   and no write grant — the read-flag RPC is a future write slice; the
+>   battery also pins the category-CHECK contract (D-N4 —
+>   `appointment`/`activity`/`system`, 14.08), the org-delete cascade
+>   (14.09), and the Q1 structural column-inventory pin (14.10).
+> **Not granted by this addendum:** any write surface (delivery D-N2 /
+> read-flag D-N6 stay future slices); **no new RPC** (direct PostgREST
+> read, T1 Q5); **no publication change** (the feed is not realtime —
+> `public.messages` remains the only publication); no prefs filtering
+> (D-N5). **Basis:** scope DECIDED 2026-08-11 (D-N1…D-N7, `1027f68`) ·
+> T1 mechanism/RLS-gate review PASS (`docs/notification_feed_gate_review_2026-08-11.md`
+> `b9f2b08`) · r1 PASS 86/0/0 ×2 · apply-approval + execution
+> (`docs/notification_feed_apply_approval_2026-08-11.md` §6, **APPLY
+> APPROVED 2026-08-11** signed in-session, + `docs/notification_feed_apply_execution_2026-08-11.md`
+> — dev project: tables/RLS 12→13, public policies 11→12, live positive
+> (member reads the org feed — empty pre-producer, D-N7) + anon denied at
+> the privilege layer, smoke green). Per §7 this extends, not replaces,
+> and widens no other row; **in effect since the apply execution
+> 2026-08-11**, and the client surface (T8, env-gated `NotificationGateway`
+> swap + feed screen + home-shell entry) ships next.
+
 ---
 
 ## 5. `platform_owner_admin` — explicit boundary (contract §2 #2, #4)
