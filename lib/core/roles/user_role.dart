@@ -23,6 +23,7 @@ class RoleCapability extends Equatable {
     required this.canViewMessages,
     required this.canViewFiles,
     required this.canViewAudit,
+    required this.canViewNotifications,
     required this.canViewAlerts,
     required this.canViewTasks,
     required this.canViewApprovals,
@@ -72,6 +73,14 @@ class RoleCapability extends Equatable {
   /// (AC-7, never empty success). Granted to partner only.
   final bool canViewAudit;
 
+  /// Notification-feed slice (D-N1): whether the home dashboard offers the
+  /// org-scoped notification-feed entry. A navigation/visibility hint only,
+  /// like the other flags — the feed is read-only metadata (D-N2/D-N3) and
+  /// the server's `notifications_select_org` admits **any active member**
+  /// (matrix §4 member SHIP — no role hierarchy in the feed, T1 Q3), so the
+  /// flag is true for every authenticated role.
+  final bool canViewNotifications;
+
   /// v1 queue (2026-08-09 scope drafts): whether the home dashboard offers
   /// the compliance-alerts entry. Read-only demo surface — nav hint only.
   final bool canViewAlerts;
@@ -96,6 +105,7 @@ class RoleCapability extends Equatable {
     canViewMessages,
     canViewFiles,
     canViewAudit,
+    canViewNotifications,
     canViewAlerts,
     canViewTasks,
     canViewApprovals,
@@ -114,6 +124,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewMessages: true,
         canViewFiles: true,
         canViewAudit: false,
+        canViewNotifications: true,
         canViewAlerts: true,
         canViewTasks: true,
         canViewApprovals: true,
@@ -128,6 +139,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewMessages: true,
         canViewFiles: true,
         canViewAudit: false,
+        canViewNotifications: true,
         canViewAlerts: true,
         canViewTasks: true,
         canViewApprovals: true,
@@ -144,6 +156,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         // Partner org-audit slice: the only role the server's
         // read_org_audit gate admits (navigation hint only).
         canViewAudit: true,
+        canViewNotifications: true,
         canViewAlerts: true,
         canViewTasks: true,
         canViewApprovals: true,
@@ -158,6 +171,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewMessages: true,
         canViewFiles: true,
         canViewAudit: false,
+        canViewNotifications: true,
         canViewAlerts: true,
         canViewTasks: true,
         canViewApprovals: true,
@@ -172,6 +186,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewMessages: true,
         canViewFiles: true,
         canViewAudit: false,
+        canViewNotifications: true,
         canViewAlerts: true,
         canViewTasks: true,
         canViewApprovals: true,
@@ -186,6 +201,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewMessages: true,
         canViewFiles: true,
         canViewAudit: false,
+        canViewNotifications: true,
         canViewAlerts: true,
         canViewTasks: true,
         canViewApprovals: true,

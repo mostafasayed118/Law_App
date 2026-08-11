@@ -15,6 +15,7 @@ import '../../../features/discovery/presentation/discovery_entry_card.dart';
 import '../../../features/documents/presentation/document_entry_card.dart';
 import '../../../features/matters/presentation/matter_entry_card.dart';
 import '../../../features/messaging/presentation/message_entry_card.dart';
+import '../../../features/notifications/presentation/notification_feed_entry_card.dart';
 import '../../../features/tasks/presentation/task_board_entry_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/widgets.dart';
@@ -163,6 +164,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: LegalHubTheme.spaceMd),
                     BillingInvoicesEntryCard(
                       onTap: () => context.go(AppRoutes.invoices),
+                    ),
+                  ],
+                  // Notification-feed slice (D-N1): the org-scoped feed
+                  // rides its own nav-hint flag, true for every role (matrix
+                  // §4 member SHIP — the organizations gate admits any
+                  // active member; no role hierarchy in the feed).
+                  // Visibility hint only; the RLS gate is server-side and
+                  // `platform_owner_admin` is denied always (D-P0C1(a)).
+                  if (capabilities.canViewNotifications) ...[
+                    const SizedBox(height: LegalHubTheme.spaceMd),
+                    NotificationFeedEntryCard(
+                      onTap: () => context.go(AppRoutes.notificationsFeed),
                     ),
                   ],
                   // v1 queue (2026-08-09 scope drafts): the three read-only

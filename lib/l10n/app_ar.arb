@@ -373,5 +373,14 @@
   "approvalsEntrySubtitle": "استعرض الموافقات التجريبية — عرض تطويري.",
   "approvalStatusPending": "معلّق",
   "approvalStatusApproved": "معتمد",
-  "approvalStatusDenied": "مرفوض"
+  "approvalStatusDenied": "مرفوض",
+  "notificationsFeedTitle": "خلاصة الإشعارات",
+  "notificationsFeedEmpty": "لا توجد إشعارات متاحة.",
+  "notificationsFeedError": "تعذّر تحميل الإشعارات.",
+  "notificationsFeedLocalOnlyNote": "وضع تجريبي — بيانات وصفية اصطناعية للإشعارات فقط. لا يُعرض دفع أو تسليم.",
+  "notificationsFeedEntryTitle": "خلاصة الإشعارات",
+  "notificationsFeedEntrySubtitle": "عرض تنبيهات نشاط المؤسسة — خلاصة تجريبية للقراءة فقط.",
+  "notificationCategoryAppointment": "موعد",
+  "notificationCategoryActivity": "نشاط",
+  "notificationCategorySystem": "النظام"
 }

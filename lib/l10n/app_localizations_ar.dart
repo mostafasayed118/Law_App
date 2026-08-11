@@ -1149,4 +1149,33 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get approvalStatusDenied => 'مرفوض';
+
+  @override
+  String get notificationsFeedTitle => 'خلاصة الإشعارات';
+
+  @override
+  String get notificationsFeedEmpty => 'لا توجد إشعارات متاحة.';
+
+  @override
+  String get notificationsFeedError => 'تعذّر تحميل الإشعارات.';
+
+  @override
+  String get notificationsFeedLocalOnlyNote =>
+      'وضع تجريبي — بيانات وصفية اصطناعية للإشعارات فقط. لا يُعرض دفع أو تسليم.';
+
+  @override
+  String get notificationsFeedEntryTitle => 'خلاصة الإشعارات';
+
+  @override
+  String get notificationsFeedEntrySubtitle =>
+      'عرض تنبيهات نشاط المؤسسة — خلاصة تجريبية للقراءة فقط.';
+
+  @override
+  String get notificationCategoryAppointment => 'موعد';
+
+  @override
+  String get notificationCategoryActivity => 'نشاط';
+
+  @override
+  String get notificationCategorySystem => 'النظام';
 }

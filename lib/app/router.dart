@@ -25,6 +25,7 @@ import '../features/matters/presentation/matter_details_screen.dart';
 import '../features/matters/presentation/matter_list_screen.dart';
 import '../features/messaging/presentation/message_list_screen.dart';
 import '../features/messaging/presentation/message_thread_detail_screen.dart';
+import '../features/notifications/presentation/notification_feed_screen.dart';
 import '../features/notifications/presentation/notification_settings_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/onboarding/presentation/onboarding_success_screen.dart';
@@ -54,6 +55,7 @@ class AppRoutes {
   static const String acceptInvitation = '/accept-invitation';
   static const String profile = '/profile';
   static const String notifications = '/notifications';
+  static const String notificationsFeed = '/notifications/feed';
   static const String platformAdmin = '/platform-admin';
   static const String book = '/book';
   static const String discovery = '/discovery';
@@ -312,6 +314,11 @@ GoRouter createAppRouter(
           path: AppRoutes.notifications,
           builder: (BuildContext context, GoRouterState state) =>
               const NotificationSettingsScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.notificationsFeed,
+          builder: (BuildContext context, GoRouterState state) =>
+              const NotificationFeedScreen(),
         ),
         GoRoute(
           path: AppRoutes.platformAdmin,

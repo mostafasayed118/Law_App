@@ -128,6 +128,7 @@ void main() {
                   canViewMessages: true,
                   canViewFiles: true,
                   canViewAudit: false,
+                  canViewNotifications: true,
                   canViewAlerts: true,
                   canViewTasks: true,
                   canViewApprovals: true,
@@ -183,6 +184,7 @@ void main() {
                   canViewMessages: false,
                   canViewFiles: false,
                   canViewAudit: false,
+                  canViewNotifications: true,
                   canViewAlerts: true,
                   canViewTasks: true,
                   canViewApprovals: true,
@@ -234,6 +236,7 @@ void main() {
                   canViewMessages: true,
                   canViewFiles: true,
                   canViewAudit: false,
+                  canViewNotifications: true,
                   canViewAlerts: true,
                   canViewTasks: true,
                   canViewApprovals: true,
@@ -288,6 +291,7 @@ void main() {
                   canViewMessages: true,
                   canViewFiles: true,
                   canViewAudit: false,
+                  canViewNotifications: true,
                   canViewAlerts: true,
                   canViewTasks: true,
                   canViewApprovals: true,
@@ -343,6 +347,7 @@ void main() {
                   canViewMessages: false,
                   canViewFiles: true,
                   canViewAudit: false,
+                  canViewNotifications: true,
                   canViewAlerts: true,
                   canViewTasks: true,
                   canViewApprovals: true,
@@ -355,6 +360,74 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Messages'), findsNothing);
+    });
+  });
+
+  group('notification-feed entry (notification-feed slice D-N1)', () {
+    testWidgets('renders the entry card with the default capability map', (
+      tester,
+    ) async {
+      await tester.pumpWidget(pumpHome(const Locale('en')));
+      await tester.pumpAndSettle();
+
+      // The feed entry sits below the fold on a default test surface
+      // (slivers only build visible children), so scroll it into view first.
+      await tester.scrollUntilVisible(
+        find.text('Notification feed'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      // Matrix §4 member SHIP: every bootstrap role reads the org feed, so
+      // the default roleCapabilities grant canViewNotifications to all
+      // (nav hint only, never an authorization grant; the server's
+      // notifications_select_org gate is the authority).
+      expect(find.text('Notification feed'), findsOneWidget);
+      expect(find.textContaining('View org activity alerts'), findsOneWidget);
+    });
+
+    testWidgets('hides the entry when the capability is not granted', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        BlocProvider<AuthCubit>.value(
+          value: authCubit,
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: HomeScreen(
+              capabilitiesForRole: <UserRole, RoleCapability>{
+                UserRole.client: const RoleCapability(
+                  canViewHome: true,
+                  canViewSettings: true,
+                  canBookConsultation: true,
+                  canViewAttorneyDiscovery: true,
+                  canViewMatters: true,
+                  canViewDocuments: true,
+                  canViewMessages: true,
+                  canViewFiles: true,
+                  canViewAudit: false,
+                  canViewNotifications: false,
+                  canViewAlerts: true,
+                  canViewTasks: true,
+                  canViewApprovals: true,
+                ),
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // The capability is false, so the entry is not built anywhere in the
+      // list — scroll to where it would be and assert absence.
+      await tester.scrollUntilVisible(
+        find.text('Pending approvals'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('Notification feed'), findsNothing);
     });
   });
 

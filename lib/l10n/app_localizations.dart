@@ -2223,6 +2223,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Denied'**
   String get approvalStatusDenied;
+
+  /// No description provided for @notificationsFeedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification feed'**
+  String get notificationsFeedTitle;
+
+  /// No description provided for @notificationsFeedEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications are available.'**
+  String get notificationsFeedEmpty;
+
+  /// No description provided for @notificationsFeedError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load notifications.'**
+  String get notificationsFeedError;
+
+  /// No description provided for @notificationsFeedLocalOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo mode — synthetic notification metadata only. No push or delivery is shown.'**
+  String get notificationsFeedLocalOnlyNote;
+
+  /// No description provided for @notificationsFeedEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification feed'**
+  String get notificationsFeedEntryTitle;
+
+  /// No description provided for @notificationsFeedEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'View org activity alerts — read-only demo feed.'**
+  String get notificationsFeedEntrySubtitle;
+
+  /// No description provided for @notificationCategoryAppointment.
+  ///
+  /// In en, this message translates to:
+  /// **'Appointment'**
+  String get notificationCategoryAppointment;
+
+  /// No description provided for @notificationCategoryActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity'**
+  String get notificationCategoryActivity;
+
+  /// No description provided for @notificationCategorySystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get notificationCategorySystem;
 }
 
 class _AppLocalizationsDelegate

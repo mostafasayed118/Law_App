@@ -42,6 +42,9 @@ import '../data/messaging/supabase_message_api_impl.dart';
 import '../data/messaging/supabase_message_gateway.dart';
 import '../data/messaging/supabase_message_realtime_api.dart';
 import '../data/messaging/supabase_message_realtime_api_impl.dart';
+import '../data/notifications/supabase_notification_api.dart';
+import '../data/notifications/supabase_notification_api_impl.dart';
+import '../data/notifications/supabase_notification_gateway.dart';
 import '../data/orgs/fake_membership_repository.dart';
 import '../data/orgs/fake_organization_gateway.dart';
 import '../data/orgs/supabase_membership_repository.dart';
@@ -77,8 +80,10 @@ import '../features/matters/domain/matter_gateway.dart';
 import '../features/matters/domain/matter_write_gateway.dart';
 import '../features/messaging/data/fake_message_gateway.dart';
 import '../features/messaging/domain/message_gateway.dart';
+import '../features/notifications/data/fake_notification_gateway.dart';
 import '../features/notifications/data/in_memory_notification_prefs_store.dart';
 import '../features/notifications/data/shared_preferences_notification_prefs_store.dart';
+import '../features/notifications/domain/notification_gateway.dart';
 import '../features/notifications/domain/notification_prefs_store.dart';
 import '../features/orgs/presentation/active_org_store.dart';
 import '../features/storage/data/fake_storage_gateway.dart';
@@ -120,6 +125,7 @@ void configureDependencies({
   SupabaseMessageRealtimeApi Function()? supabaseMessageRealtimeApiFactory,
   SupabaseStorageApi Function()? supabaseStorageApiFactory,
   SupabaseBillingApi Function()? supabaseBillingApiFactory,
+  SupabaseNotificationApi Function()? supabaseNotificationApiFactory,
 }) {
   // Lazy singleton: stateless service, created on first resolution.
   // Per §4.5, stateless services/repositories register as lazy singletons.
@@ -476,6 +482,29 @@ void configureDependencies({
     } else {
       serviceLocator.registerLazySingleton<BillingGateway>(
         FakeBillingGateway.new,
+      );
+    }
+  }
+  if (!serviceLocator.isRegistered<NotificationGateway>()) {
+    // Stateless service: lazy singleton. The notification-feed Cubit is
+    // feature-scoped and created per screen via BlocProvider, so it is NOT
+    // registered here. Like BillingGateway, the flip swaps the dev fake for
+    // the Supabase-backed implementation when the build is configured (Batch
+    // 3.3 env pattern). The real path reads the applied `notifications`
+    // table through the RLS-scoped SELECT (notification-feed slice, T1 Q2/Q5
+    // — `notifications_select_org`, the organizations gate, org-wide
+    // metadata); env-less runs and ALL tests keep the fake (D-N7 — the fake
+    // is the product posture, not a stopgap).
+    if (env.isConfigured) {
+      serviceLocator.registerLazySingleton<NotificationGateway>(
+        () => SupabaseNotificationGateway(
+          (supabaseNotificationApiFactory ??
+              SupabaseNotificationApiImpl.bind)(),
+        ),
+      );
+    } else {
+      serviceLocator.registerLazySingleton<NotificationGateway>(
+        FakeNotificationGateway.new,
       );
     }
   }

@@ -1158,4 +1158,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get approvalStatusDenied => 'Denied';
+
+  @override
+  String get notificationsFeedTitle => 'Notification feed';
+
+  @override
+  String get notificationsFeedEmpty => 'No notifications are available.';
+
+  @override
+  String get notificationsFeedError => 'Unable to load notifications.';
+
+  @override
+  String get notificationsFeedLocalOnlyNote =>
+      'Demo mode — synthetic notification metadata only. No push or delivery is shown.';
+
+  @override
+  String get notificationsFeedEntryTitle => 'Notification feed';
+
+  @override
+  String get notificationsFeedEntrySubtitle =>
+      'View org activity alerts — read-only demo feed.';
+
+  @override
+  String get notificationCategoryAppointment => 'Appointment';
+
+  @override
+  String get notificationCategoryActivity => 'Activity';
+
+  @override
+  String get notificationCategorySystem => 'System';
 }

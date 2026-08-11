@@ -387,5 +387,14 @@
   "approvalsEntrySubtitle": "Browse demo approvals — development demo.",
   "approvalStatusPending": "Pending",
   "approvalStatusApproved": "Approved",
-  "approvalStatusDenied": "Denied"
+  "approvalStatusDenied": "Denied",
+  "notificationsFeedTitle": "Notification feed",
+  "notificationsFeedEmpty": "No notifications are available.",
+  "notificationsFeedError": "Unable to load notifications.",
+  "notificationsFeedLocalOnlyNote": "Demo mode — synthetic notification metadata only. No push or delivery is shown.",
+  "notificationsFeedEntryTitle": "Notification feed",
+  "notificationsFeedEntrySubtitle": "View org activity alerts — read-only demo feed.",
+  "notificationCategoryAppointment": "Appointment",
+  "notificationCategoryActivity": "Activity",
+  "notificationCategorySystem": "System"
 }

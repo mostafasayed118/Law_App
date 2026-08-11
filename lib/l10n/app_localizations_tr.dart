@@ -1162,4 +1162,33 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get approvalStatusDenied => 'Reddedildi';
+
+  @override
+  String get notificationsFeedTitle => 'Bildirim akışı';
+
+  @override
+  String get notificationsFeedEmpty => 'Kullanılabilir bildirim yok.';
+
+  @override
+  String get notificationsFeedError => 'Bildirimler yüklenemedi.';
+
+  @override
+  String get notificationsFeedLocalOnlyNote =>
+      'Demo modu — yalnızca sentetik bildirim meta verileri. Push veya teslimat gösterilmez.';
+
+  @override
+  String get notificationsFeedEntryTitle => 'Bildirim akışı';
+
+  @override
+  String get notificationsFeedEntrySubtitle =>
+      'Kuruluş etkinlik uyarılarını görüntüleyin — salt okunur demo akışı.';
+
+  @override
+  String get notificationCategoryAppointment => 'Randevu';
+
+  @override
+  String get notificationCategoryActivity => 'Etkinlik';
+
+  @override
+  String get notificationCategorySystem => 'Sistem';
 }

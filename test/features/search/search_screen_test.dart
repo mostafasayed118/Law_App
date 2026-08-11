@@ -23,6 +23,7 @@ void main() {
     canViewMessages: true,
     canViewFiles: true,
     canViewAudit: false,
+    canViewNotifications: true,
     canViewAlerts: true,
     canViewTasks: true,
     canViewApprovals: true,

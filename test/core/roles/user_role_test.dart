@@ -28,6 +28,7 @@ void main() {
         canViewMessages: true,
         canViewFiles: true,
         canViewAudit: false,
+        canViewNotifications: true,
         canViewAlerts: true,
         canViewTasks: true,
         canViewApprovals: true,
@@ -42,6 +43,7 @@ void main() {
         canViewMessages: true,
         canViewFiles: true,
         canViewAudit: false,
+        canViewNotifications: true,
         canViewAlerts: true,
         canViewTasks: true,
         canViewApprovals: true,
@@ -56,6 +58,7 @@ void main() {
         canViewMessages: false,
         canViewFiles: false,
         canViewAudit: false,
+        canViewNotifications: false,
         canViewAlerts: true,
         canViewTasks: true,
         canViewApprovals: true,
@@ -102,6 +105,12 @@ void main() {
           // to every bootstrap role — navigation hint only, never
           // authorization (the RLS gate is server-side).
           expect(cap.canViewFiles, isTrue, reason: 'role $role');
+          // Notification-feed slice (D-N1): the org-scoped feed entry is
+          // visible to every bootstrap role — matrix §4 member SHIP (any
+          // active member reads the org feed; no role hierarchy in the
+          // feed, T1 Q3). Nav hint only, never authorization (the
+          // notifications_select_org gate is server-side).
+          expect(cap.canViewNotifications, isTrue, reason: 'role $role');
           // v1 queue (2026-08-09): the three read-only demo surfaces are
           // visible to every bootstrap role — nav hints only, never
           // authorization (no real server authority exists yet).

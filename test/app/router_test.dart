@@ -565,6 +565,7 @@ void main() {
               canViewMessages: true,
               canViewFiles: true,
               canViewAudit: true,
+              canViewNotifications: true,
               canViewAlerts: true,
               canViewTasks: true,
               canViewApprovals: true,
@@ -721,6 +722,7 @@ void main() {
               canViewMessages: true,
               canViewFiles: true,
               canViewAudit: true,
+              canViewNotifications: true,
               canViewAlerts: true,
               canViewTasks: true,
               canViewApprovals: true,
@@ -1276,6 +1278,7 @@ void main() {
               canViewMessages: true,
               canViewFiles: true,
               canViewAudit: false,
+              canViewNotifications: true,
               canViewAlerts: true,
               canViewTasks: true,
               canViewApprovals: true,
@@ -1328,6 +1331,7 @@ void main() {
               canViewMessages: false,
               canViewFiles: false,
               canViewAudit: false,
+              canViewNotifications: true,
               canViewAlerts: true,
               canViewTasks: true,
               canViewApprovals: true,
@@ -1403,6 +1407,7 @@ void main() {
             canViewMessages: false,
             canViewFiles: false,
             canViewAudit: false,
+            canViewNotifications: true,
             canViewAlerts: true,
             canViewTasks: true,
             canViewApprovals: true,
@@ -1554,6 +1559,38 @@ void main() {
     });
   });
 
+  group('notification-feed route (notification-feed slice D-N1)', () {
+    testWidgets(
+      'renders the feed for an authenticated demo session and blocks anon',
+      (tester) async {
+        // NotificationFeedScreen resolves NotificationGateway from the
+        // locator (the dev fake in env-less runs).
+        await resetServiceLocator();
+        configureDependencies();
+        addTearDown(() => resetServiceLocator());
+
+        // Unauthenticated: the feed route stays behind the auth gate like
+        // every shell route (same scoped bypass as the notifications route).
+        router.go(AppRoutes.notificationsFeed);
+        await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+        await tester.pumpAndSettle();
+        expect(find.text('Welcome Back'), findsOneWidget);
+
+        await authCubit.startDemoSession();
+        router.go(AppRoutes.notificationsFeed);
+        await tester.pumpAndSettle();
+        expect(
+          router.routerDelegate.currentConfiguration.uri.path,
+          AppRoutes.notificationsFeed,
+        );
+        // The feed AppBar title renders; the settings screen's three toggles
+        // are NOT on this route (settings stays a sibling surface).
+        expect(find.text('Notification feed'), findsOneWidget);
+        expect(find.byType(SwitchListTile), findsNothing);
+      },
+    );
+  });
+
   group('organizations audit route (partner org-audit slice 2026-08-09)', () {
     testWidgets('hub shows the audit entry for the partner role and tapping '
         'opens /organizations/audit', (tester) async {
@@ -1599,6 +1636,7 @@ void main() {
             canViewMessages: true,
             canViewFiles: true,
             canViewAudit: false,
+            canViewNotifications: true,
             canViewAlerts: true,
             canViewTasks: true,
             canViewApprovals: true,

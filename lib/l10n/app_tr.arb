@@ -373,5 +373,14 @@
   "approvalsEntrySubtitle": "Sentetik onaylara göz atın — geliştirme demosu.",
   "approvalStatusPending": "Bekliyor",
   "approvalStatusApproved": "Onaylandı",
-  "approvalStatusDenied": "Reddedildi"
+  "approvalStatusDenied": "Reddedildi",
+  "notificationsFeedTitle": "Bildirim akışı",
+  "notificationsFeedEmpty": "Kullanılabilir bildirim yok.",
+  "notificationsFeedError": "Bildirimler yüklenemedi.",
+  "notificationsFeedLocalOnlyNote": "Demo modu — yalnızca sentetik bildirim meta verileri. Push veya teslimat gösterilmez.",
+  "notificationsFeedEntryTitle": "Bildirim akışı",
+  "notificationsFeedEntrySubtitle": "Kuruluş etkinlik uyarılarını görüntüleyin — salt okunur demo akışı.",
+  "notificationCategoryAppointment": "Randevu",
+  "notificationCategoryActivity": "Etkinlik",
+  "notificationCategorySystem": "Sistem"
 }
