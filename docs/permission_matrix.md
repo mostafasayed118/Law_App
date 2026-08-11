@@ -641,6 +641,42 @@ there.
 > 2026-08-11**, and the client surface (T8, env-gated `NotificationGateway`
 > swap + feed screen + home-shell entry) ships next.
 
+> **§4 addendum (2026-08-11, notification producer slice — server
+> mechanism, NOT a grant; D-P5, "trigger is not a policy"):** the
+> notification-feed row **stays exactly as written above** — the member
+> SHIP read-only cells are unchanged. The producer is a **data-layer
+> mechanism**: the audit-mirror trigger
+> `mirror_audit_to_notifications` (`supabase/migrations/15_notification_producer.sql`,
+> `AFTER INSERT` on `audit_events`, security definer + `set search_path =
+> public`, D-P1) maps `matter:create` / `message:create` +
+> `outcome='allowed'` audit rows into org-scoped `notifications` rows with
+> **fixed redacted summaries** (D-P3 — never the matter title / message
+> body; structural redaction, the D-N3 mirror). It **grants nothing and
+> revokes nothing beyond its own EXECUTE** (D-P4 — trigger-invoked only,
+> the write_audit precedent: `has_function_privilege('authenticated',
+> 'mirror_audit_to_notifications()', 'EXECUTE')` = false), adds **no
+> policy** (applied counts stay 13/13/12, RPC-EXECUTE stays 20), and **no
+> client path can invoke it** — the read-only posture is unchanged at
+> every layer. **Battery pins:** the re-pinned battery 14 (6/6/1 — battery
+> 10's two committed sends produce exactly 2 org-a producer rows, D-P6,
+> `supabase/tests/14_notification_rls.sql`) + the new battery 15 (14
+> check blocks — the map delta + in-txn atomicity + gate visibility +
+> fixed-summary redaction + the outcome/action/NULL-org filter negatives +
+> EXECUTE-deny, `supabase/tests/15_notification_producer_rls.sql`).
+> **Basis:** plan RATIFIED 2026-08-11 (D-P1…D-P6, `cdd7ab4`) · T1
+> mechanism/RLS-gate review PASS (`docs/notification_feed_producer_gate_review_2026-08-11.md`,
+> `0f95125`) · r1 PASS **88/0/0 ×2** (`docs/notification_feed_producer_rehearsal_r1_2026-08-11.md`)
+> · apply-approval + execution (`docs/notification_feed_producer_apply_approval_2026-08-11.md`
+> §6, **APPLY APPROVED 2026-08-11** signed in-session, +
+> `docs/notification_feed_producer_apply_execution_2026-08-11.md` — dev
+> project: function + trigger live, EXECUTE denied to both client roles,
+> counts unchanged 13/13/12/20 RPC, in-txn live positive (partner
+> `create_matter` → produced org feed row visible via RLS → `ROLLBACK`,
+> zero residue) + anon denied, smoke green). Per §7 this extends, not
+> replaces, and widens no other row; **in effect since the apply
+> execution 2026-08-11** — the feed now fills with real event traffic
+> (the T8 non-vacuous re-verification runs next).
+
 ---
 
 ## 5. `platform_owner_admin` — explicit boundary (contract §2 #2, #4)

@@ -40,6 +40,17 @@
 | **Bucket** | unchanged — `matter-files` (1) | Untouched. |
 | **Demo rows** | 0 notification rows | No seed on the dev project (D-N7 — feed empty pre-producer; synthetic rows arrive with the T8 client swap's fake gateway or a future producer slice). Live positive = 0 rows; anon denied at the privilege layer. |
 
+## 1c. Addendum (2026-08-11 — notification producer apply)
+
+| Surface | Before → After | Evidence |
+|---|---|---|
+| **Functions (mechanism, not a policy)** | **new** — `mirror_audit_to_notifications()` `AFTER INSERT` trigger on `audit_events`, **EXECUTE-revoked** | The audit-mirror producer (D-P1): maps `matter:create`/`message:create` + `outcome='allowed'` audit rows into org-scoped `notifications` rows with **fixed D-P3 summaries** (`Demo notification — matter created` / `new message in thread` — never the matter title / message body). `15_notification_producer.sql` (`docs/notification_feed_producer_apply_execution_2026-08-11.md` §2.1). **Tables/policies row unchanged** (13/13/12 — the trigger is a data-layer mechanism, no RLS arm, D-P5; the F-01 11_matter_write precedent). |
+| **RPCs** | **20 → 20 EXECUTE** (unchanged) | No new RPC — the producer is trigger-invoked only; `has_function_privilege('authenticated', 'mirror_audit_to_notifications()', 'EXECUTE')` = **false** and anon = **false** (D-P4, the write_audit precedent; verified live §2.1). |
+| **Tables (public)** | **13 / 13 RLS — unchanged** | No table change; `notifications` stays read-only for clients (no write grant of any kind). |
+| **Policies** | **12 public + 1 storage — unchanged** | The producer is not a policy; `notifications_select_org` remains the sole feed gate. |
+| **Publication** | unchanged — exactly `public.messages` | Untouched. |
+| **Demo rows** | 0 notification rows (unchanged) | The apply adds no rows; the live smoke ran **in-transaction** (partner `create_matter` → produced org feed row visible via RLS → `ROLLBACK`, **zero residue** — D-P6 atomicity live, execution record §3.2/§3.3). The dev feed fills only with real event traffic after this apply. |
+
 ## 2. Demo rows (org `ef43087b-adf4-4480-9bb2-28c26f46ec71`, generic only — no real PII)
 
 | Kind | Rows | Anchors |
@@ -68,7 +79,8 @@ deliberately denies them; recorded as designed, never a defect).
 | 7 | storage `e9a02ac` (18:36) | `07_storage` (bucket + files) + 2 policies + 4 files/objects | **11 tables / 10 public + 1 storage** |
 | 8 | billing `fc7ed1b` (21:31) | `10_billing_invoices` + `invoices_select_assigned` + 4 invoices | **12 tables / 11 public + 1 storage** |
 | 9 | F-01 step 2 `f2e88cc` (08-09) | `create_matter` RPC + `11_matter_write` trigger + demo create `d28f1f05-…` | **12 tables / 11 public + 1 storage / 20 RPC-EXECUTE** (trigger is not a policy) |
-| 10 | notification-feed (08-11, **uncommitted slice — T7 commit pending**) | `14_notifications` + `notifications_select_org` (single SELECT, org gate) + harness re-scope 13/13/12 | **13 tables / 12 public + 1 storage / 20 RPC-EXECUTE unchanged** (no new RPC, T1 Q5) |
+| 10 | notification-feed `e21f9dd` (08-11) | `14_notifications` + `notifications_select_org` (single SELECT, org gate) + harness re-scope 13/13/12 | **13 tables / 12 public + 1 storage / 20 RPC-EXECUTE unchanged** (no new RPC, T1 Q5) |
+| 11 | notification producer `8dd23c1` (08-11) | `mirror_audit_to_notifications` function + `audit_events_mirror_notifications` trigger (EXECUTE-revoked; **mechanism only**, no table/policy/RPC change) | **13 tables / 12 public + 1 storage / 20 RPC-EXECUTE unchanged** (D-P5 — trigger is not a policy) |
 
 > **Baseline-count honesty:** storage's §0 note explicitly records that its
 > approval's "8 → 9 policies" baseline was written before the realtime-push

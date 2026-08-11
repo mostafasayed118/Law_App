@@ -136,3 +136,106 @@ policies / 0 notification rows**.
   approvals) is decided slice-by-slice — a future producer slice seeds rows
   and the same walkthrough re-runs non-vacuously.
 - Prefs filtering (D-N5) and read-flag writes (D-N6) remain future slices.
+
+---
+
+## 9. T8 re-verification (2026-08-11 — producer live, run non-vacuously)
+
+> The walkthrough re-run mandated by the producer slice plan gate 8
+> (`docs/notification_feed_producer_slice_plan_2026-08-11.md` §6.8): now
+> that the audit-mirror producer is live on the dev project
+> (`15_notification_producer.sql`, apply execution
+> `docs/notification_feed_producer_apply_execution_2026-08-11.md`), the
+> non-vacuous positive comes from the **real producer path** — a partner
+> `create_matter` → the `matter:create`/`allowed` audit row → the trigger
+> → the produced feed row — instead of the manual postgres insert the
+> original P3 used. Re-run 2026-08-11, HEAD `8dd23c1`, same method
+> (`supabase db query --linked`, role impersonation with the demo partner
+> `8fa94af0-7390-4f7a-988a-3965f7da04de`, org
+> `ef43087b-adf4-4480-9bb2-28c26f46ec71`).
+
+### 9.1 Structural + baseline (P1/P5 re-run, now including the producer)
+
+```
+│ notif_table │ notif_rls │ feed_policy │ producer_fn │ producer_trg │ notif_rows │ tables │ pub_policies │
+│ 1           │ 1         │ 1           │ 1           │ 1            │ 0          │ 13     │ 12           │
+```
+
+The T7 applied surface, live: **13 tables / 13 RLS / 12 public policies**
+plus the **producer mechanism** (function + trigger present), and the feed
+holds **0 rows** (no real event traffic has fired since the apply — the
+feed fills only with actual events).
+
+### 9.2 Partner RLS read (P2 re-run)
+
+Impersonated partner → **0 rows** — the grant + organizations-gate still
+resolve; the feed renders its honest empty arm until real traffic flows.
+
+### 9.3 Non-vacuous positive via the PRODUCER path (P3 re-run, in-txn)
+
+Inside `BEGIN … ROLLBACK`, the partner's `create_matter` (attorney = the
+partner, client = null — the only dev member, F2-D5) drove the full
+audit-mirror chain; the produced row was then read through
+`notifications_select_org` under RLS — the exact path the feed gateway
+maps:
+
+```
+┌──────────┬────────────────┬────────────────────────────────────┬─────────┐
+│ category │ type           │ summary                            │ is_read │
+├──────────┼────────────────┼────────────────────────────────────┼─────────┤
+│ activity │ matter_updated │ Demo notification — matter created │ false   │
+└──────────┴────────────────┴────────────────────────────────────┴─────────┘
+```
+
+The probe title ("must never leak") appears nowhere — the D-P3 fixed
+redacted summary held. `ROLLBACK` → **zero residue** (P3b), verified
+stable across three consecutive reads:
+
+```
+notif = 0 · matters = 6 · audit = 16 · matter:create audits = 2
+```
+
+No `Demo notification — matter created` row, no matter row, no
+`matter:create` audit row persisted — **D-P6 atomicity live on dev**.
+
+### 9.4 Anon denied (P4 re-run)
+
+`set role anon; select count(*) from public.notifications;` →
+
+```
+ERROR: 42501: permission denied for table notifications
+HINT:  Grant the required privileges to the current role with:
+GRANT SELECT ON public.notifications TO anon;
+```
+
+Unchanged — the feed's read gate is unaffected by the producer (the
+mirror writes as the trigger, never as a client path).
+
+### 9.5 Concurrent-activity note (observed, honest)
+
+One audit-row delta was observed between the T6 apply evidence and this
+re-run: the audit tally read **15** at the T6 residue check and **16**
+here. The 16th row is an **external** `organization:create`
+(`org "jxjx" 74782db0-71b4-4bdf-b479-648041b8cf49`, audited 2026-08-11
+10:37:11 UTC — "org created; creator made partner") created by a session
+other than these probes (the audited create-org app flow) between T6 and
+T8 — **not** by anything this walkthrough ran (no probe calls
+`create_organization`; `matter:create` audits stayed at 2). A transient
+`notif = 1` in the immediate post-rollback residue read coincided with
+that concurrent session's window and was gone by the next read (stable 0
+across three checks; no active sessions at the final check). The dev DB's
+final state is clean and consistent: **notifications 0 · matters 6 ·
+audit 16 (15 baseline + the one external org:create) · matter:create 2**.
+Flagged so the owner knows the shared project saw concurrent activity;
+it does not affect the slice's evidence (the producer-path positive and
+zero-residue are independently proven above).
+
+### 9.6 Ledger (T8 re-verification)
+
+- HEAD `8dd23c1` (producer slice commit); working tree holds the T6
+  execution evidence + T7 addenda + this appended section (uncommitted).
+- All re-run probes green (P1–P5); **no slice findings** — the
+  non-vacuous path is proven end-to-end with the producer live.
+- Ledger sweep: PASS 115/0/0 (verified on the same tree).
+- The interactive device pass stays owner-reserved per the D-45.1
+  checklist posture; the server-round-trip half is fully evidenced.
