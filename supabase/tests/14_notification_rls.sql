@@ -9,7 +9,11 @@
 -- "View notifications (metadata)" cell split (review Q3):
 --   - every ACTIVE MEMBER of the org (partner AND client — the
 --     no-role-hierarchy pin) -> the ONLY grant (positive count pins:
---     partner-a 4, client-a 4, partner-b 1 — org scoping by count);
+--     partner-a 6, client-a 6, partner-b 1 — org scoping by count;
+--     RE-PINNED for the producer slice, D-P6: battery 10's two committed
+--     sends produce exactly 2 org-a producer rows before this battery
+--     runs — 4+2=6 — battery 13's creates are rolled back, org-b
+--     untouched);
 --   - cross-org (member of org-b only) -> org-a rows denied (count pin);
 --   - non-member / platform_owner_admin (owner 0001, no membership by
 --     construction, D-P0C3) -> denied, always (D-P0C1(a) deny-always);
@@ -118,8 +122,9 @@ set role authenticated;
 -- ############################################################################
 
 -- CHECK 14.01 — POS: partner-a (org-a, partner/active) sees exactly its
--- four org-a notifications and no org-b rows — the organizations-gate
--- grants by membership, not by role breadth.
+-- six org-a notifications (4 seeded + 2 producer rows from battery 10's
+-- committed sends — the D-P6 re-pin) and no org-b rows — the
+-- organizations-gate grants by membership, not by role breadth.
 do $$
 declare
   v_cnt bigint;
@@ -127,15 +132,15 @@ begin
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000002', false);
   perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002"}', false);
   select count(*) into v_cnt from public.notifications;
-  if v_cnt <> 4 then
-    raise exception 'POLICY-BATTERY FAIL 14.01: org-a partner saw % notifications, want 4', v_cnt;
+  if v_cnt <> 6 then
+    raise exception 'POLICY-BATTERY FAIL 14.01: org-a partner saw % notifications, want 6', v_cnt;
   end if;
 end $$;
 
 -- CHECK 14.02 — POS: client-a (org-a, client/active) sees exactly the same
--- four org-a rows — the no-role-hierarchy pin (review Q3: "partner role
--- reads the same as any active member"; there is no role hierarchy in the
--- feed).
+-- six org-a rows (4 seeded + 2 producer rows — the D-P6 re-pin) — the
+-- no-role-hierarchy pin (review Q3: "partner role reads the same as any
+-- active member"; there is no role hierarchy in the feed).
 do $$
 declare
   v_cnt bigint;
@@ -143,8 +148,8 @@ begin
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000003', false);
   perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000003"}', false);
   select count(*) into v_cnt from public.notifications;
-  if v_cnt <> 4 then
-    raise exception 'POLICY-BATTERY FAIL 14.02: org-a client saw % notifications, want 4', v_cnt;
+  if v_cnt <> 6 then
+    raise exception 'POLICY-BATTERY FAIL 14.02: org-a client saw % notifications, want 6', v_cnt;
   end if;
 end $$;
 

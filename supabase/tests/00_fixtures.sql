@@ -476,9 +476,14 @@ values
 -- b0000000-0000-4000-8000-00000000fff1 (its temp notification). Listed
 -- here so the harness's static fixture cross-ref resolves them.
 
--- Sanity: exactly five notifications seeded (the 14 count expectations
--- depend on it; the org-delete cascade temp rows are rolled back inside
--- the battery and never reach the seeded baseline).
+-- Sanity: exactly five notifications seeded at FIXTURE time (the org-
+-- delete cascade temp rows are rolled back inside the battery and never
+-- reach the seeded baseline). Battery 14's count expectations are 6/6/1
+-- at battery time — 5 seeded + 2 producer rows from battery 10's two
+-- COMMITTED sends (the producer-slice D-P6 re-pin, recorded in the
+-- battery-14 header + docs/notification_feed_producer_gate_review_
+-- 2026-08-11.md §3 Q5); battery 13's creates are rolled back and add
+-- nothing.
 do $$
 declare
   v_cnt bigint;

@@ -21,7 +21,7 @@
 #      sixth; live delivery now present as the seventh — re-scoped to pin
 #      messages in the supabase_realtime publication, count 1, nothing
 #      else; billing_invoices present as the ninth; notifications present
-#      as the new-surface feed — the tenth applied table, read-only).
+#      as the new-surface feed — the thirteenth applied table, read-only).
 #   2. THE BEHAVIOR BATTERY — supabase/tests/00_fixtures.sql (deterministic
 #      seed) then 01_identity_session.sql (matrix §2), 02_organization_
 #      membership.sql (matrix §3 + 2026-08-03 hardening guards),
@@ -80,8 +80,16 @@
 #      docs/f01_step2_matter_write_design_2026-08-09.md: create_matter
 #      partner-gate + owner-assignment refusal + active-member assignee guard
 #      + §8 audit rows, the categorical trigger-layer refusal + narrowness,
-#      cross-org / anon / validation denials). Every matrix row has
-#      ≥1 positive + ≥1 negative check (contract §9).
+#      cross-org / anon / validation denials),
+#      14_notification_rls.sql (the notification-feed read battery — the
+#      new-surface feed: notifications_select_org positives by count +
+#      the deny rows + category CHECK + org-delete cascade + the
+#      structural redaction column-inventory pin),
+#      15_notification_producer_rls.sql (the producer battery — the
+#      audit-mirror trigger: delta-based matter/message map positives with
+#      in-txn atomicity + gate visibility, the outcome/action/NULL-org
+#      filters, the EXECUTE-deny, and the fixed-summary redaction pin).
+#      Every matrix row has ≥1 positive + ≥1 negative check (contract §9).
 #
 # The harness NEVER runs against the live dev project — only against a
 # throwaway rehearsal project (the P2 r1–r5 pattern). The project is built
@@ -159,6 +167,7 @@ BATTERY_FILES=(
   "12_owner_assignment.sql"
   "13_matter_write_rls.sql"
   "14_notification_rls.sql"
+  "15_notification_producer_rls.sql"
 )
 
 usage() {
@@ -213,7 +222,8 @@ static_check() {
       "$TESTS_DIR/07_storage_rls.sql" "$TESTS_DIR/08_message_rls.sql" \
       "$TESTS_DIR/09_realtime_push.sql" "$TESTS_DIR/10_send_message_rls.sql" \
       "$TESTS_DIR/11_invoice_rls.sql" "$TESTS_DIR/12_owner_assignment.sql" \
-      "$TESTS_DIR/13_matter_write_rls.sql" "$TESTS_DIR/14_notification_rls.sql" | sort -u)
+      "$TESTS_DIR/13_matter_write_rls.sql" "$TESTS_DIR/14_notification_rls.sql" \
+      "$TESTS_DIR/15_notification_producer_rls.sql" | sort -u)
   for ref in $uuids_from; do
     if grep -q "$ref" "$TESTS_DIR/00_fixtures.sql"; then
       ok "fixture UUID $ref resolves in 00_fixtures.sql"
@@ -224,7 +234,7 @@ static_check() {
 
   note "static check: every battery check block carries the FAIL marker"
   local file blocks
-  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql 11_invoice_rls.sql 12_owner_assignment.sql 13_matter_write_rls.sql 14_notification_rls.sql; do
+  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql 11_invoice_rls.sql 12_owner_assignment.sql 13_matter_write_rls.sql 14_notification_rls.sql 15_notification_producer_rls.sql; do
     blocks=$(grep -c 'POLICY-BATTERY FAIL' "$TESTS_DIR/$f")
     if [ "$blocks" -ge 10 ]; then
       ok "$f: $blocks named check blocks"
@@ -277,6 +287,7 @@ apply_slice() {
   psql_apply "$SUPABASE_DIR/migrations/10_billing_invoices.sql" "apply migrations/10_billing_invoices.sql"
   psql_apply "$SUPABASE_DIR/migrations/11_matter_write.sql" "apply migrations/11_matter_write.sql"
   psql_apply "$SUPABASE_DIR/migrations/14_notifications.sql" "apply migrations/14_notifications.sql"
+  psql_apply "$SUPABASE_DIR/migrations/15_notification_producer.sql" "apply migrations/15_notification_producer.sql"
   # 03_platform_config_seed.sql is deliberately NOT applied: its owner token
   # is an apply-time substitution placeholder for the dev project; the
   # battery's fixtures seed the rehearsal project's own owner row (D-P0C3
@@ -402,6 +413,8 @@ structural_pins() {
     "$(run_sql "select has_function_privilege('authenticated','public.handle_new_user()','EXECUTE');")" "f"
   expect_eq "refuse_platform_owner_assignment denied to authenticated (11_matter_write F2-D3)" \
     "$(run_sql "select has_function_privilege('authenticated','public.refuse_platform_owner_assignment()','EXECUTE');")" "f"
+  expect_eq "mirror_audit_to_notifications denied to authenticated (15 producer D-P4)" \
+    "$(run_sql "select has_function_privilege('authenticated','public.mirror_audit_to_notifications()','EXECUTE');")" "f"
 
   note "--- 1d. RPC EXECUTE grants (client surface intact) ---"
   local sig rpc_list=(
@@ -535,7 +548,7 @@ run_battery() {
   expect_eq "exactly one platform_config row after fixtures" \
     "$(run_sql "select count(*) from public.platform_config;")" "1"
 
-  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql 11_invoice_rls.sql 12_owner_assignment.sql 13_matter_write_rls.sql 14_notification_rls.sql; do
+  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql 11_invoice_rls.sql 12_owner_assignment.sql 13_matter_write_rls.sql 14_notification_rls.sql 15_notification_producer_rls.sql; do
     note "--- 2c. Battery file: $f ---"
     out=$(psql "$SUPABASE_TEST_DB_URL" -X -q -v ON_ERROR_STOP=1 -f "$TESTS_DIR/$f" 2>&1)
     rc=$?
