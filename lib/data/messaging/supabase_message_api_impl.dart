@@ -45,18 +45,20 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
   }
 
   /// Binds the audited `send_message` RPC to the app-level client (D-SM2).
-  /// `rpc<T>` builders implement `Future<dynamic>` (T = the data type), so
-  /// the awaited value is the full PostgrestResponse at runtime — cast,
-  /// not wrap, so errors and status flow through unchanged.
+  /// postgrest 2.8.0 contract: `await rpc<T>()` resolves to the RAW
+  /// decoded data (T), not a PostgrestResponse — the wrapper is only
+  /// produced when a count is requested — so the production binding wraps
+  /// the raw data into the seam's PostgrestResponse shape (the test stubs'
+  /// own shape); PostgrestException still propagates unchanged.
   static Future<PostgrestResponse<dynamic>> _boundRpc(
     String function,
     Map<String, dynamic> params,
   ) async {
-    final dynamic response = await Supabase.instance.client.rpc<dynamic>(
+    final dynamic data = await Supabase.instance.client.rpc<dynamic>(
       function,
       params: params,
     );
-    return response as PostgrestResponse<dynamic>;
+    return PostgrestResponse<dynamic>(data: data, count: 0);
   }
 
   final MessageTableCaller _table;

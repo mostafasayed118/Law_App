@@ -31,19 +31,21 @@ class SupabaseMatterWriteApiImpl implements SupabaseMatterWriteApi {
   factory SupabaseMatterWriteApiImpl.bind() => SupabaseMatterWriteApiImpl();
 
   /// Binds the audited `create_matter` RPC to the app-level client.
-  /// `rpc<T>` builders implement `Future<dynamic>` (T = the data type), so
-  /// the awaited value is the full PostgrestResponse at runtime — cast,
-  /// not wrap, so errors and status flow through unchanged (the
+  /// postgrest 2.8.0 contract: `await rpc<T>()` resolves to the RAW
+  /// decoded data (T), not a PostgrestResponse — the wrapper is only
+  /// produced when a count is requested — so the production binding wraps
+  /// the raw data into the seam's PostgrestResponse shape (the test stubs'
+  /// own shape); PostgrestException still propagates unchanged (the
   /// `MessageRpcCaller._boundRpc` precedent).
   static Future<PostgrestResponse<dynamic>> _boundRpc(
     String function,
     Map<String, dynamic> params,
   ) async {
-    final dynamic response = await Supabase.instance.client.rpc<dynamic>(
+    final dynamic data = await Supabase.instance.client.rpc<dynamic>(
       function,
       params: params,
     );
-    return response as PostgrestResponse<dynamic>;
+    return PostgrestResponse<dynamic>(data: data, count: 0);
   }
 
   final MatterWriteRpcCaller _rpcCaller;

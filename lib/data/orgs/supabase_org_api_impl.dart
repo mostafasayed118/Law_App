@@ -38,14 +38,16 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
     String function,
     Map<String, dynamic> params,
   ) async {
-    // rpc<T> builders implement Future<dynamic> (T = the data type), so the
-    // awaited value is the full PostgrestResponse at runtime — cast, not
-    // wrap, so errors and status flow through unchanged.
-    final dynamic response = await Supabase.instance.client.rpc<dynamic>(
+    // postgrest 2.8.0 contract: `await rpc<T>()` resolves to the RAW
+    // decoded data (T), NOT a PostgrestResponse — the wrapper is only
+    // produced when a count is requested. The seam's callers (and the test
+    // stubs) expect the wrapped shape, so wrap the raw data here;
+    // PostgrestException still propagates from the await unchanged.
+    final dynamic data = await Supabase.instance.client.rpc<dynamic>(
       function,
       params: params,
     );
-    return response as PostgrestResponse<dynamic>;
+    return PostgrestResponse<dynamic>(data: data, count: 0);
   }
 
   /// Binds a table SELECT to the app-level client. The builder's `select`
