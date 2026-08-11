@@ -108,6 +108,24 @@ designed in every smoke). Org `ef43087b-adf4-4480-9bb2-28c26f46ec71`.
 > completes §3 on a device (or supplies the demo partner password for an
 > environment-driven pass), complete this section with the dated signature.
 
+> **Server-half addendum (2026-08-11 — create-org → org-audit round trip,
+> post-RPC-binding-fix):** the create-org flow that crashed on-device
+> (`type 'String' is not a subtype of type 'PostgrestResponse<dynamic>'`,
+> fixed in `f1308cd` — see `docs/rpc_binding_fix_verification_2026-08-11.md`)
+> was re-verified server-side against the dev project, in-transaction and
+> rolled back with **zero residue** (orgs back to 3): the partner's
+> `create_organization('create-org-audit-probe')` returned the new org id
+> `012b62e9-…`, and the same partner's `read_org_audit(<new org>)`
+> returned the org's **`organization:create` row** ("org created; creator
+> made partner") + the `audit:read_org` row — the exact rows the org-audit
+> screen renders. The client halves (create-org screen → `OrgCubit` →
+> `SupabaseOrganizationGateway` → the fixed `SupabaseOrgApiImpl` binding)
+> are pinned by the suite; the RPC round trips (create-org / create-matter /
+> send-message, all uuid scalars) were verified live. **Remaining:
+> the interactive device retry (owner-side)** — rerun step 1 (create a
+> fresh org via the app) and confirm the new org appears in the org-audit
+> view, then sign below.
+
 - [ ] Section 0 prerequisites in place (`.env` = URL + anon key only).
 - [ ] Partner pass (steps 1–4) matches the §1 table exactly.
 - [ ] Client passes (step 5) show the honest empty/denied states.
