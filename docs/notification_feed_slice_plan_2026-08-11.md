@@ -9,10 +9,12 @@
 > gates). **Branch: `feat/notification-feed-read`.**
 >
 > **Gate state (why this slice is now plannable):** the scope note is
-> DRAFT — **step 0 of this plan is the owner ratifying §3 (D-N1…D-N7)
-> and authorizing the new surface (D-N1)**. No provider decision is
-> needed for a read feed (no push/FCM/device delivery — roadmap line 484
-> keeps delivery out; D-N2). The nine shipped slices
+> **DECIDED 2026-08-11** (`docs/notification_feed_scope_2026-08-11.md` —
+> owner ratified §3, D-N1…D-N7; the new surface is authorized, D-N1).
+> **Step 0 is MET** — the slice starts at T1 (mechanism/RLS-gate
+> review). No provider decision is needed for a read feed
+> (no push/FCM/device delivery — roadmap line 484 keeps delivery out;
+> D-N2). The nine shipped slices
 > (matters → billing invoices) established the per-feature pipeline this
 > plan runs. The dev project's applied tables/RLS/policies are the
 > harness baseline to extend.
@@ -128,8 +130,10 @@ later additive slice (D-N5). The matrix gains a §4 "View notifications
 
 ## 8. Risks & open questions
 
-- **D-N1 is the whole gate** — the surface is not in the spec; nothing
-  runs before ratification.
+- **D-N1 is MET (2026-08-11)** — the surface is not in the spec, but the
+  owner ratified the scope note and authorized it; the remaining §8
+  questions (row sources, home-shell entry, server-now-vs-later) are
+  slice-shape choices, not gates.
 - **Row sources:** synthetic-only (D-N7) or should the first slice also
   map real events from shipped surfaces (messages/invoices)?
 - **Home-shell entry:** an icon/badge on the home app bar or an
@@ -140,5 +144,6 @@ later additive slice (D-N5). The matrix gains a §4 "View notifications
 
 ## 9. Ledger
 
-- PLANNED 2026-08-11 (docs-only; zero dev-project effect). Nothing
-  applies without the owner's dated approval of steps 0/5/6/7.
+- PLANNED 2026-08-11; step 0 (scope ratification + D-N1 authorization)
+  **MET 2026-08-11**. Docs-only so far; zero dev-project effect. Nothing
+  applies without the owner's dated approval of steps 5/6/7.

@@ -1,13 +1,17 @@
-# LegalHub — Notification Feed Scope Note (read surface, no provider) — DRAFT (2026-08-11)
+# LegalHub — Notification Feed Scope Note (read surface, no provider) — DECIDED (2026-08-11)
 
 > **Record type:** Spec-lite scope note for a **new surface** (the feed is
 > NOT enumerated in `docs/legalhub_specification.md` — verified below).
-> **Status: DRAFT — NOT approved, NOT scheduled.** Requires owner
-> authorization before any slice runs. **No code, no live-system effect.**
+> **Status: DECIDED 2026-08-11 (owner ratified §3, D-N1…D-N7; the new
+> surface is authorized).** The slice is **un-blocked** to start the
+> T1–T8 pipeline (slice plan `docs/notification_feed_slice_plan_2026-08-11.md`).
+> **No code, no live-system effect in this record** — every external
+> step stays behind the owner's dated approval (INSTRUCTIONS §2.1/§5).
 > The feed is a **read surface** — server-generated notification rows
 > fetched like the shipped read slices; **no push/delivery provider is
 > needed for v1** (delivery stays out, exactly as `docs/features_roadmap_2026-08-03.md`
-> line 484 excludes it from messaging). **Planning owner:** Project Owner.
+> line 484 excludes it from messaging). **Owner:** Project Owner
+> (github.com/mostafasayed118), ratified 2026-08-11.
 
 ---
 
@@ -129,6 +133,7 @@ the owner ratifies §3 and approves the slice.
 
 ## 9. Ledger
 
-- DRAFTED 2026-08-11 (design only); no code, no live-system effect,
-  nothing committed beyond this doc. Status remains DRAFT until the owner
-  ratifies §3 and authorizes the surface.
+- DRAFTED 2026-08-11; **DECIDED 2026-08-11 by the Project Owner**
+  (ratified §3, D-N1…D-N7; new surface authorized). No code, no
+  live-system effect, nothing applied. The slice is un-blocked to start
+  T1 (mechanism/RLS-gate review) per the slice plan.
