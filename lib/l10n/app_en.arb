@@ -1,4 +1,4 @@
-{
+﻿{
   "@@locale": "en",
   "appTitle": "LegalHub",
   "continueAsDemo": "Continue with demo session",
@@ -388,5 +388,15 @@
   "notificationsFeedEntrySubtitle": "View org activity alerts — read-only demo feed.",
   "notificationCategoryAppointment": "Appointment",
   "notificationCategoryActivity": "Activity",
-  "notificationCategorySystem": "System"
+  "notificationCategorySystem": "System",
+  "aiResearchTitle": "AI research",
+  "aiResearchAdvisoryBanner": "AI-suggested — not legal advice. Demo research over synthetic demo data only.",
+  "aiResearchFieldHint": "Ask a research question…",
+  "aiResearchIdlePrompt": "Ask a question to search the demo research corpus.",
+  "aiResearchNoMatches": "No matches in the demo corpus. Try different words.",
+  "aiResearchError": "Unable to run the research query.",
+  "aiResearchLocalOnlyNote": "Demo mode — synthetic findings with citations only. Nothing is stored or sent.",
+  "aiResearchCitationsLabel": "Sources",
+  "aiResearchEntryTitle": "AI research",
+  "aiResearchEntrySubtitle": "Ask the demo research assistant — advisory only."
 }

@@ -1,4 +1,4 @@
-{
+﻿{
   "@@locale": "tr",
   "appTitle": "LegalHub",
   "continueAsDemo": "Demo oturumuyla devam et",
@@ -374,5 +374,15 @@
   "notificationsFeedEntrySubtitle": "Kuruluş etkinlik uyarılarını görüntüleyin — salt okunur demo akışı.",
   "notificationCategoryAppointment": "Randevu",
   "notificationCategoryActivity": "Etkinlik",
-  "notificationCategorySystem": "Sistem"
+  "notificationCategorySystem": "Sistem",
+  "aiResearchTitle": "YZ araştırması",
+  "aiResearchAdvisoryBanner": "YZ önerisi — hukuki tavsiye değildir. Yalnızca sentetik demo verileri üzerinde demo araştırma.",
+  "aiResearchFieldHint": "Bir araştırma sorusu sorun…",
+  "aiResearchIdlePrompt": "Demo araştırma derleminde arama yapmak için bir soru sorun.",
+  "aiResearchNoMatches": "Demo derleminde eşleşme yok. Farklı kelimeler deneyin.",
+  "aiResearchError": "Araştırma sorgusu çalıştırılamadı.",
+  "aiResearchLocalOnlyNote": "Demo modu — yalnızca kaynaklı sentetik bulgular. Hiçbir şey saklanmaz veya gönderilmez.",
+  "aiResearchCitationsLabel": "Kaynaklar",
+  "aiResearchEntryTitle": "YZ araştırması",
+  "aiResearchEntrySubtitle": "Demo araştırma asistanına sorun — yalnızca tavsiye niteliğinde."
 }

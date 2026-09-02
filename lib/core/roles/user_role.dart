@@ -27,6 +27,7 @@ class RoleCapability extends Equatable {
     required this.canViewAlerts,
     required this.canViewTasks,
     required this.canViewApprovals,
+    required this.canUseAiResearch,
   });
 
   final bool canViewHome;
@@ -94,6 +95,14 @@ class RoleCapability extends Equatable {
   /// the pending-approvals entry. Read-only demo surface; nav hint only.
   final bool canViewApprovals;
 
+  /// AI research slice (plan 2026-09-02, owner decision D-R1): whether the
+  /// home dashboard offers the AI research-assistant entry. A
+  /// navigation/visibility hint only, like the other flags — the surface is
+  /// client-side synthetic research (no provider, no server boundary yet,
+  /// D-1). Granted to the legal-facing roles: attorney, researchAnalyst,
+  /// partner; denied to client, complianceOfficer, admin.
+  final bool canUseAiResearch;
+
   @override
   List<Object?> get props => <Object?>[
     canViewHome,
@@ -109,6 +118,7 @@ class RoleCapability extends Equatable {
     canViewAlerts,
     canViewTasks,
     canViewApprovals,
+    canUseAiResearch,
   ];
 }
 
@@ -128,6 +138,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewAlerts: true,
         canViewTasks: true,
         canViewApprovals: true,
+        canUseAiResearch: false,
       ),
       UserRole.attorney: RoleCapability(
         canViewHome: true,
@@ -143,6 +154,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewAlerts: true,
         canViewTasks: true,
         canViewApprovals: true,
+        canUseAiResearch: true,
       ),
       UserRole.partner: RoleCapability(
         canViewHome: true,
@@ -160,6 +172,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewAlerts: true,
         canViewTasks: true,
         canViewApprovals: true,
+        canUseAiResearch: true,
       ),
       UserRole.complianceOfficer: RoleCapability(
         canViewHome: true,
@@ -175,6 +188,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewAlerts: true,
         canViewTasks: true,
         canViewApprovals: true,
+        canUseAiResearch: false,
       ),
       UserRole.researchAnalyst: RoleCapability(
         canViewHome: true,
@@ -190,6 +204,7 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewAlerts: true,
         canViewTasks: true,
         canViewApprovals: true,
+        canUseAiResearch: true,
       ),
       UserRole.admin: RoleCapability(
         canViewHome: true,
@@ -205,5 +220,6 @@ const Map<UserRole, RoleCapability> roleCapabilities =
         canViewAlerts: true,
         canViewTasks: true,
         canViewApprovals: true,
+        canUseAiResearch: false,
       ),
     };

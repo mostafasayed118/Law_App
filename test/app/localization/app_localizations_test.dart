@@ -846,6 +846,60 @@ void main() {
       expect(tr.recoveryErrorNotice, isNot(en.recoveryErrorNotice));
       expect(ar.recoveryErrorNotice, isNot(en.recoveryErrorNotice));
     });
+
+    test('resolves the AI research keys in every locale (AI slice 1.2 pin)', () {
+      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+      final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+      final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+      // AI research slice (plan 2026-09-02): exact copy per locale for the
+      // surface title, the persistent C-3 advisory banner, and the honest
+      // empty copy — plus the no-silent-EN-copy guards.
+      expect(en.aiResearchTitle, 'AI research');
+      expect(ar.aiResearchTitle, 'بحث الذكاء الاصطناعي');
+      expect(tr.aiResearchTitle, 'YZ araştırması');
+
+      expect(
+        en.aiResearchAdvisoryBanner,
+        'AI-suggested — not legal advice. Demo research over synthetic demo '
+        'data only.',
+      );
+      expect(
+        ar.aiResearchAdvisoryBanner,
+        'مقترح بالذكاء الاصطناعي — ليس نصيحة قانونية. بحث تجريبي على بيانات '
+        'تجريبية اصطناعية فقط.',
+      );
+      expect(
+        tr.aiResearchAdvisoryBanner,
+        'YZ önerisi — hukuki tavsiye değildir. Yalnızca sentetik demo verileri '
+        'üzerinde demo araştırma.',
+      );
+
+      expect(
+        en.aiResearchNoMatches,
+        'No matches in the demo corpus. Try different words.',
+      );
+      expect(
+        ar.aiResearchNoMatches,
+        'لا توجد نتائج مطابقة في السجل التجريبي. جرّب كلمات مختلفة.',
+      );
+      expect(
+        tr.aiResearchNoMatches,
+        'Demo derleminde eşleşme yok. Farklı kelimeler deneyin.',
+      );
+
+      expect(en.aiResearchEntryTitle, 'AI research');
+      expect(ar.aiResearchEntryTitle, 'بحث الذكاء الاصطناعي');
+      expect(tr.aiResearchEntryTitle, 'YZ araştırması');
+
+      // Real per-locale wording, not silent copies of EN.
+      expect(tr.aiResearchTitle, isNot(en.aiResearchTitle));
+      expect(ar.aiResearchTitle, isNot(en.aiResearchTitle));
+      expect(tr.aiResearchAdvisoryBanner, isNot(en.aiResearchAdvisoryBanner));
+      expect(ar.aiResearchAdvisoryBanner, isNot(en.aiResearchAdvisoryBanner));
+      expect(tr.aiResearchNoMatches, isNot(en.aiResearchNoMatches));
+      expect(ar.aiResearchNoMatches, isNot(en.aiResearchNoMatches));
+    });
   });
 
   group('AppLocalizations widget rendering', () {

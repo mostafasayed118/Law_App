@@ -62,6 +62,8 @@ import 'package:legalhub/features/matters/domain/matter_write_gateway.dart';
 import 'package:legalhub/features/messaging/data/fake_message_gateway.dart';
 import 'package:legalhub/features/messaging/domain/message_gateway.dart';
 import 'package:legalhub/features/orgs/presentation/active_org_store.dart';
+import 'package:legalhub/features/research/data/synthetic_ai_gateway.dart';
+import 'package:legalhub/features/research/domain/ai_gateway.dart';
 import 'package:legalhub/features/storage/data/fake_storage_gateway.dart';
 import 'package:legalhub/features/storage/domain/storage_gateway.dart';
 
@@ -370,6 +372,7 @@ void main() {
       expect(serviceLocator.isRegistered<DocumentGateway>(), isTrue);
       expect(serviceLocator.isRegistered<MessageGateway>(), isTrue);
       expect(serviceLocator.isRegistered<StorageGateway>(), isTrue);
+      expect(serviceLocator.isRegistered<AiGateway>(), isTrue);
       expect(serviceLocator.isRegistered<AuthCubit>(), isTrue);
     });
 
@@ -630,6 +633,20 @@ void main() {
       // dev fake is the registered seam; a real booking backend is a later
       // approved data-layer slice (data contract deferred).
       expect(serviceLocator<BookingGateway>(), isA<FakeBookingGateway>());
+    });
+
+    test('wires the AI research gateway to the synthetic engine over the '
+        'shipped seams (D-1/D-2)', () {
+      configureDependencies();
+
+      // AI research slice (plan 2026-09-02): D-1 — no model provider, the
+      // synthetic gateway IS the product posture; D-2 — the engine composes
+      // the two shipped read seams, so it follows their env flip. C-1 — no
+      // persistence: no store class is registered for the feature.
+      final SyntheticAiGateway ai =
+          serviceLocator<AiGateway>() as SyntheticAiGateway;
+      expect(ai.documentGateway, same(serviceLocator<DocumentGateway>()));
+      expect(ai.matterGateway, same(serviceLocator<MatterGateway>()));
     });
 
     test('stays on the credential-free fake when no env is injected', () {

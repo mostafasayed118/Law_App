@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+﻿import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/router.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 
@@ -32,6 +32,7 @@ void main() {
         canViewAlerts: true,
         canViewTasks: true,
         canViewApprovals: true,
+        canUseAiResearch: false,
       );
       const RoleCapability b = RoleCapability(
         canViewHome: true,
@@ -47,6 +48,7 @@ void main() {
         canViewAlerts: true,
         canViewTasks: true,
         canViewApprovals: true,
+        canUseAiResearch: false,
       );
       const RoleCapability c = RoleCapability(
         canViewHome: true,
@@ -62,6 +64,7 @@ void main() {
         canViewAlerts: true,
         canViewTasks: true,
         canViewApprovals: true,
+        canUseAiResearch: false,
       );
 
       expect(a, equals(b));
@@ -131,6 +134,25 @@ void main() {
         expect(
           roleCapabilities[role]!.canViewAudit,
           expected,
+          reason: 'role $role',
+        );
+      }
+    });
+
+    test('AI research: legal-facing roles only (D-R1, 2026-09-02)', () {
+      // AI research slice (plan 2026-09-02): the research-assistant entry is
+      // a navigation hint granted to attorney, researchAnalyst, and partner
+      // (owner decision D-R1); client, complianceOfficer, and admin do not
+      // see it. Pinned per-role so a future widening is a deliberate edit.
+      const Set<UserRole> legalRoles = <UserRole>{
+        UserRole.attorney,
+        UserRole.researchAnalyst,
+        UserRole.partner,
+      };
+      for (final UserRole role in UserRole.values) {
+        expect(
+          roleCapabilities[role]!.canUseAiResearch,
+          legalRoles.contains(role),
           reason: 'role $role',
         );
       }

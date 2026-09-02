@@ -33,6 +33,7 @@ import '../features/orgs/presentation/accept_invitation_screen.dart';
 import '../features/orgs/presentation/org_audit_screen.dart';
 import '../features/orgs/presentation/organization_hub_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
+import '../features/research/presentation/ai_research_screen.dart';
 import '../features/search/presentation/search_screen.dart';
 import '../features/tasks/presentation/task_board_screen.dart';
 import '../l10n/app_localizations.dart';
@@ -70,6 +71,7 @@ class AppRoutes {
   static const String alerts = '/alerts';
   static const String tasks = '/tasks';
   static const String approvals = '/approvals';
+  static const String research = '/research';
   static const String search = '/search';
 
   /// The profile route for one attorney (path-param substitution).
@@ -269,6 +271,19 @@ GoRouter createAppRouter(
           path: AppRoutes.approvals,
           builder: (BuildContext context, GoRouterState state) =>
               const ApprovalsScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.research,
+          builder: (BuildContext context, GoRouterState state) {
+            // AI research slice (D-R1): UX-only projection of the active
+            // membership's role (mirrors the shell); the entry is a
+            // navigation hint for the legal-facing roles, never an
+            // authorization grant — the surface itself is client-side
+            // synthetic (D-1).
+            final UserRole role =
+                authCubit.state.session?.primaryRole ?? UserRole.client;
+            return AiResearchScreen(capabilities: capabilitiesForRole[role]!);
+          },
         ),
         GoRoute(
           path: AppRoutes.settings,

@@ -2229,6 +2229,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'System'**
   String get notificationCategorySystem;
+
+  /// No description provided for @aiResearchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI research'**
+  String get aiResearchTitle;
+
+  /// No description provided for @aiResearchAdvisoryBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'AI-suggested — not legal advice. Demo research over synthetic demo data only.'**
+  String get aiResearchAdvisoryBanner;
+
+  /// No description provided for @aiResearchFieldHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask a research question…'**
+  String get aiResearchFieldHint;
+
+  /// No description provided for @aiResearchIdlePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask a question to search the demo research corpus.'**
+  String get aiResearchIdlePrompt;
+
+  /// No description provided for @aiResearchNoMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'No matches in the demo corpus. Try different words.'**
+  String get aiResearchNoMatches;
+
+  /// No description provided for @aiResearchError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to run the research query.'**
+  String get aiResearchError;
+
+  /// No description provided for @aiResearchLocalOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo mode — synthetic findings with citations only. Nothing is stored or sent.'**
+  String get aiResearchLocalOnlyNote;
+
+  /// No description provided for @aiResearchCitationsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sources'**
+  String get aiResearchCitationsLabel;
+
+  /// No description provided for @aiResearchEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI research'**
+  String get aiResearchEntryTitle;
+
+  /// No description provided for @aiResearchEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask the demo research assistant — advisory only.'**
+  String get aiResearchEntrySubtitle;
 }
 
 class _AppLocalizationsDelegate

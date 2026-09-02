@@ -569,6 +569,7 @@ void main() {
               canViewAlerts: true,
               canViewTasks: true,
               canViewApprovals: true,
+              canUseAiResearch: true,
             ),
           },
         );
@@ -726,6 +727,7 @@ void main() {
               canViewAlerts: true,
               canViewTasks: true,
               canViewApprovals: true,
+              canUseAiResearch: true,
             ),
           },
         );
@@ -1282,6 +1284,7 @@ void main() {
               canViewAlerts: true,
               canViewTasks: true,
               canViewApprovals: true,
+              canUseAiResearch: false,
             ),
           },
         );
@@ -1335,6 +1338,7 @@ void main() {
               canViewAlerts: true,
               canViewTasks: true,
               canViewApprovals: true,
+              canUseAiResearch: true,
             ),
           },
         );
@@ -1411,6 +1415,7 @@ void main() {
             canViewAlerts: true,
             canViewTasks: true,
             canViewApprovals: true,
+            canUseAiResearch: false,
           ),
         },
       );
@@ -1640,6 +1645,7 @@ void main() {
             canViewAlerts: true,
             canViewTasks: true,
             canViewApprovals: true,
+            canUseAiResearch: true,
           ),
         },
       );
@@ -1659,6 +1665,94 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('View audit trail'), findsNothing);
+    });
+  });
+
+  group('research route (AI research slice, plan 2026-09-02)', () {
+    testWidgets('renders the research surface for a legal-facing role (D-R1)', (
+      tester,
+    ) async {
+      usePhoneViewport(tester);
+      final UserRole role = UserRole.attorney;
+      final AuthCubit restrictedCubit = AuthCubit(
+        RoleGateway(sessionForRole(role)),
+        InMemoryErrorReporter(),
+        FakeMembershipRepository(),
+      );
+      addTearDown(restrictedCubit.close);
+      final GoRouter restrictedRouter = createAppRouter(
+        restrictedCubit,
+        capabilitiesForRole: <UserRole, RoleCapability>{
+          role: roleCapabilities[role]!,
+        },
+      );
+      addTearDown(restrictedRouter.dispose);
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await restrictedCubit.startDemoSession();
+      restrictedRouter.go(AppRoutes.research);
+      await tester.pumpWidget(
+        harness(
+          child: const SizedBox.shrink(),
+          cubitOverride: restrictedCubit,
+          routerOverride: restrictedRouter,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('AI research'), findsOneWidget);
+      expect(find.textContaining('AI-suggested'), findsOneWidget);
+    });
+
+    testWidgets(
+      'renders the distinct denial for a role without canUseAiResearch (AC-6)',
+      (tester) async {
+        usePhoneViewport(tester);
+        final UserRole role = UserRole.client;
+        final AuthCubit restrictedCubit = AuthCubit(
+          RoleGateway(sessionForRole(role)),
+          InMemoryErrorReporter(),
+          FakeMembershipRepository(),
+        );
+        addTearDown(restrictedCubit.close);
+        final GoRouter restrictedRouter = createAppRouter(
+          restrictedCubit,
+          capabilitiesForRole: <UserRole, RoleCapability>{
+            role: roleCapabilities[role]!,
+          },
+        );
+        addTearDown(restrictedRouter.dispose);
+        await resetServiceLocator();
+        configureDependencies();
+        addTearDown(() => resetServiceLocator());
+
+        await restrictedCubit.startDemoSession();
+        restrictedRouter.go(AppRoutes.research);
+        await tester.pumpWidget(
+          harness(
+            child: const SizedBox.shrink(),
+            cubitOverride: restrictedCubit,
+            routerOverride: restrictedRouter,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Access not available'), findsOneWidget);
+        expect(find.textContaining('AI-suggested'), findsNothing);
+      },
+    );
+
+    testWidgets('blocks unauthenticated access to the research route', (
+      tester,
+    ) async {
+      router.go(AppRoutes.research);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Welcome Back'), findsOneWidget);
+      expect(authCubit.state.isAuthenticated, isFalse);
     });
   });
 }

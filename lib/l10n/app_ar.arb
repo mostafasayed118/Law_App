@@ -1,4 +1,4 @@
-{
+﻿{
   "@@locale": "ar",
   "appTitle": "LegalHub",
   "continueAsDemo": "المتابعة بجلسة تجريبية",
@@ -374,5 +374,15 @@
   "notificationsFeedEntrySubtitle": "عرض تنبيهات نشاط المؤسسة — خلاصة تجريبية للقراءة فقط.",
   "notificationCategoryAppointment": "موعد",
   "notificationCategoryActivity": "نشاط",
-  "notificationCategorySystem": "النظام"
+  "notificationCategorySystem": "النظام",
+  "aiResearchTitle": "بحث الذكاء الاصطناعي",
+  "aiResearchAdvisoryBanner": "مقترح بالذكاء الاصطناعي — ليس نصيحة قانونية. بحث تجريبي على بيانات تجريبية اصطناعية فقط.",
+  "aiResearchFieldHint": "اكتب سؤالاً بحثياً…",
+  "aiResearchIdlePrompt": "اكتب سؤالاً للبحث في سجل البحث التجريبي.",
+  "aiResearchNoMatches": "لا توجد نتائج مطابقة في السجل التجريبي. جرّب كلمات مختلفة.",
+  "aiResearchError": "تعذر تنفيذ استعلام البحث.",
+  "aiResearchLocalOnlyNote": "وضع العرض التجريبي — نتائج اصطناعية بمصادرها فقط. لا يتم تخزين أو إرسال أي شيء.",
+  "aiResearchCitationsLabel": "المصادر",
+  "aiResearchEntryTitle": "بحث الذكاء الاصطناعي",
+  "aiResearchEntrySubtitle": "اسأل مساعد البحث التجريبي — استشارة فقط."
 }

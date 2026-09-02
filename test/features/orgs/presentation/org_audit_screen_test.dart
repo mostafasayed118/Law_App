@@ -47,6 +47,7 @@ void main() {
     canViewAlerts: true,
     canViewTasks: true,
     canViewApprovals: true,
+    canUseAiResearch: false,
   );
 
   Widget harness({String? organizationId, Locale locale = const Locale('en')}) {

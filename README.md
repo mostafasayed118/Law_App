@@ -57,7 +57,7 @@ messaging services.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (1305 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (1334 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), ThemeCubit (mode persistence + restart
   restore), Redactor (password/OTP/email/Bearer redaction with leak guards),
@@ -93,8 +93,21 @@ messaging services.
   in-memory locale store, and the onboarding-success screen. Batch 5 added
   the 800×600 onboarding no-overflow test and the EN/AR/TR localized-fallback
   assertions.
-- Coverage: **1305 tests** (2026-08-11 — the notification-feed client
-  swap (T8, notification-feed slice): 31 new tests — the fake-gateway
+- Coverage: **1334 tests** (2026-09-02 — the AI research slice (plan
+  `docs/ai_research_slice_plan_2026-09-02.md`, demo-posture per the ratified
+  `docs/ai_scope_decision_2026-08-11.md`): the `AiGateway` seam + the
+  deterministic `SyntheticAiGateway` engine reading the shipped
+  document/matter seams (D-2, no AI-only corpus) + the `/research` screen
+  with the persistent "AI-suggested, not legal advice" banner (C-3),
+  unconditional citation rows (C-2), last-answer-only state (D-R2), the
+  `canUseAiResearch` legal-roles gate (D-R1: attorney/researchAnalyst/
+  partner), no save/apply affordances (C-4/D-3), no persistence (C-1) —
+  29 new tests across the gateway (determinism/matching/honest-empty/
+  typed-failure passthrough), cubit (emissions/duplicate-guard/replace),
+  screen (banner/citations/no-affordance/denial), router (legal-role
+  render + denial + unauth block), D-R1 per-role pin, DI composition pin,
+  and EN/AR/TR l10n resolution pins — on top of the notification-feed
+  client swap (T8, notification-feed slice): 31 new tests — the fake-gateway
   contract (deterministic / redacted D-N3 shape / newest-first / D-N4
   categories / no-delivery), the cubit (load/empty/error/retry), the feed
   screen (rows, read-only posture, empty, error+retry, date), the
@@ -339,8 +352,8 @@ HTTP layer and lock the exact postgrest await shape the app depends on —
 (2: `from().select()` plain + chained `.eq()` → raw row list). A future
 postgrest upgrade that changes the await contract fails loudly in CI, not on
 a device (the on-device create-org crash this class caused is recorded in
-`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **1308
-tests passing** (1305 tracked declarations, ledger `verify_ledger.sh` PASS).
+`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **1337
+tests passing** (1334 tracked declarations, ledger `verify_ledger.sh` PASS).
 
 ## Fonts and licenses
 

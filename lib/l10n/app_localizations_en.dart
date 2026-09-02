@@ -1161,4 +1161,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationCategorySystem => 'System';
+
+  @override
+  String get aiResearchTitle => 'AI research';
+
+  @override
+  String get aiResearchAdvisoryBanner =>
+      'AI-suggested — not legal advice. Demo research over synthetic demo data only.';
+
+  @override
+  String get aiResearchFieldHint => 'Ask a research question…';
+
+  @override
+  String get aiResearchIdlePrompt =>
+      'Ask a question to search the demo research corpus.';
+
+  @override
+  String get aiResearchNoMatches =>
+      'No matches in the demo corpus. Try different words.';
+
+  @override
+  String get aiResearchError => 'Unable to run the research query.';
+
+  @override
+  String get aiResearchLocalOnlyNote =>
+      'Demo mode — synthetic findings with citations only. Nothing is stored or sent.';
+
+  @override
+  String get aiResearchCitationsLabel => 'Sources';
+
+  @override
+  String get aiResearchEntryTitle => 'AI research';
+
+  @override
+  String get aiResearchEntrySubtitle =>
+      'Ask the demo research assistant — advisory only.';
 }

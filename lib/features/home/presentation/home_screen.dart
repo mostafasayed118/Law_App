@@ -16,6 +16,7 @@ import '../../../features/documents/presentation/document_entry_card.dart';
 import '../../../features/matters/presentation/matter_entry_card.dart';
 import '../../../features/messaging/presentation/message_entry_card.dart';
 import '../../../features/notifications/presentation/notification_feed_entry_card.dart';
+import '../../../features/research/presentation/ai_research_entry_card.dart';
 import '../../../features/tasks/presentation/task_board_entry_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/widgets.dart';
@@ -198,6 +199,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: LegalHubTheme.spaceMd),
                     ApprovalsEntryCard(
                       onTap: () => context.go(AppRoutes.approvals),
+                    ),
+                  ],
+                  // AI research slice (plan 2026-09-02, D-R1): the
+                  // research-assistant entry rides its own nav-hint flag,
+                  // granted to the legal-facing roles only (attorney /
+                  // researchAnalyst / partner). Visibility hint only — the
+                  // surface itself is client-side synthetic (D-1).
+                  if (capabilities.canUseAiResearch) ...[
+                    const SizedBox(height: LegalHubTheme.spaceMd),
+                    AiResearchEntryCard(
+                      onTap: () => context.go(AppRoutes.research),
                     ),
                   ],
                 ]),

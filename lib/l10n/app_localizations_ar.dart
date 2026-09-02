@@ -1151,4 +1151,38 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get notificationCategorySystem => 'النظام';
+
+  @override
+  String get aiResearchTitle => 'بحث الذكاء الاصطناعي';
+
+  @override
+  String get aiResearchAdvisoryBanner =>
+      'مقترح بالذكاء الاصطناعي — ليس نصيحة قانونية. بحث تجريبي على بيانات تجريبية اصطناعية فقط.';
+
+  @override
+  String get aiResearchFieldHint => 'اكتب سؤالاً بحثياً…';
+
+  @override
+  String get aiResearchIdlePrompt => 'اكتب سؤالاً للبحث في سجل البحث التجريبي.';
+
+  @override
+  String get aiResearchNoMatches =>
+      'لا توجد نتائج مطابقة في السجل التجريبي. جرّب كلمات مختلفة.';
+
+  @override
+  String get aiResearchError => 'تعذر تنفيذ استعلام البحث.';
+
+  @override
+  String get aiResearchLocalOnlyNote =>
+      'وضع العرض التجريبي — نتائج اصطناعية بمصادرها فقط. لا يتم تخزين أو إرسال أي شيء.';
+
+  @override
+  String get aiResearchCitationsLabel => 'المصادر';
+
+  @override
+  String get aiResearchEntryTitle => 'بحث الذكاء الاصطناعي';
+
+  @override
+  String get aiResearchEntrySubtitle =>
+      'اسأل مساعد البحث التجريبي — استشارة فقط.';
 }

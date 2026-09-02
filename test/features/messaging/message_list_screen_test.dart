@@ -187,6 +187,7 @@ void main() {
             canViewAlerts: true,
             canViewTasks: true,
             canViewApprovals: true,
+            canUseAiResearch: false,
           ),
         );
 

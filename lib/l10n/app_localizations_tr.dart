@@ -1164,4 +1164,39 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get notificationCategorySystem => 'Sistem';
+
+  @override
+  String get aiResearchTitle => 'YZ araştırması';
+
+  @override
+  String get aiResearchAdvisoryBanner =>
+      'YZ önerisi — hukuki tavsiye değildir. Yalnızca sentetik demo verileri üzerinde demo araştırma.';
+
+  @override
+  String get aiResearchFieldHint => 'Bir araştırma sorusu sorun…';
+
+  @override
+  String get aiResearchIdlePrompt =>
+      'Demo araştırma derleminde arama yapmak için bir soru sorun.';
+
+  @override
+  String get aiResearchNoMatches =>
+      'Demo derleminde eşleşme yok. Farklı kelimeler deneyin.';
+
+  @override
+  String get aiResearchError => 'Araştırma sorgusu çalıştırılamadı.';
+
+  @override
+  String get aiResearchLocalOnlyNote =>
+      'Demo modu — yalnızca kaynaklı sentetik bulgular. Hiçbir şey saklanmaz veya gönderilmez.';
+
+  @override
+  String get aiResearchCitationsLabel => 'Kaynaklar';
+
+  @override
+  String get aiResearchEntryTitle => 'YZ araştırması';
+
+  @override
+  String get aiResearchEntrySubtitle =>
+      'Demo araştırma asistanına sorun — yalnızca tavsiye niteliğinde.';
 }

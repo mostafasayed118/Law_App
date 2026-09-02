@@ -86,6 +86,8 @@ import '../features/notifications/data/shared_preferences_notification_prefs_sto
 import '../features/notifications/domain/notification_gateway.dart';
 import '../features/notifications/domain/notification_prefs_store.dart';
 import '../features/orgs/presentation/active_org_store.dart';
+import '../features/research/data/synthetic_ai_gateway.dart';
+import '../features/research/domain/ai_gateway.dart';
 import '../features/storage/data/fake_storage_gateway.dart';
 import '../features/storage/domain/storage_gateway.dart';
 import '../features/tasks/data/fake_task_gateway.dart';
@@ -533,6 +535,20 @@ void configureDependencies({
   if (!serviceLocator.isRegistered<ApprovalsGateway>()) {
     serviceLocator.registerLazySingleton<ApprovalsGateway>(
       FakeApprovalsGateway.new,
+    );
+  }
+  // AI research slice (plan 2026-09-02): the synthetic engine composes the
+  // two SHIPPED read seams (ratified scope decision D-2 — shipped gateways
+  // only, no AI-only corpus), so it automatically follows the env flip of
+  // DocumentGateway/MatterGateway. D-1: no model provider — the synthetic
+  // gateway IS the product posture; a real provider would arrive behind the
+  // same AiGateway seam. C-1: no persistence — no store class is registered.
+  if (!serviceLocator.isRegistered<AiGateway>()) {
+    serviceLocator.registerLazySingleton<AiGateway>(
+      () => SyntheticAiGateway(
+        documentGateway: serviceLocator<DocumentGateway>(),
+        matterGateway: serviceLocator<MatterGateway>(),
+      ),
     );
   }
 }
