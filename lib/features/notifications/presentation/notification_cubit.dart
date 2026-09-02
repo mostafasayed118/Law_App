@@ -61,4 +61,31 @@ class NotificationCubit extends Cubit<NotificationState> {
         );
     }
   }
+
+  /// Marks one notification read (D-N6 write slice, D-F6): calls the
+  /// gateway's mark and **reloads** the feed on success — the honest
+  /// refetch re-sorts newest-first and reflects the server's flip (the
+  /// count is informational, never surfaced). A failure renders the
+  /// ViewError arm (the load-failure posture); no optimistic local flip.
+  Future<void> markRead(String id) async {
+    if (isClosed || _loading || id.isEmpty) {
+      return;
+    }
+    _loading = true;
+    final Result<int> result = await _gateway.markNotificationsRead(<String>[
+      id,
+    ]);
+    _loading = false;
+    if (isClosed) {
+      return;
+    }
+    switch (result) {
+      case Success<int>():
+        await load();
+      case Failure<int>(error: final AppError error):
+        emit(
+          state.copyWith(notifications: ViewError<List<Notification>>(error)),
+        );
+    }
+  }
 }

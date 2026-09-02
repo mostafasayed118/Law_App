@@ -14,6 +14,12 @@ library;
 typedef NotificationTableCaller =
     Future<List<Map<String, dynamic>>> Function(String table, String columns);
 
+/// A PostgREST RPC call: function name + params → the raw scalar result
+/// (the read-flag write slice, D-F5 — `mark_notifications_read` returns the
+/// flipped-row count). Plain function type so tests inject a closure.
+typedef NotificationRpcCaller =
+    Future<Object?> Function(String fn, Map<String, dynamic>? params);
+
 /// Typed reasons the notifications read can fail, mapped from the PostgREST
 /// surface. The read path is a plain RLS-scoped SELECT — the RPC-specific
 /// kinds of the organization seam cannot occur here.
@@ -63,4 +69,11 @@ abstract interface class SupabaseNotificationApi {
   /// billing/documents precedent); the `notifications_org_ts` composite
   /// index serves the org gate scan.
   Future<List<Map<String, dynamic>>> fetchNotifications();
+
+  /// Marks the given notification ids read for the caller (D-N6 write
+  /// slice, D-F1): the server-side `mark_notifications_read` RPC flips only
+  /// the caller's own-org, still-unread rows (the in-function
+  /// `is_active_member` gate — foreign-org ids are silently untouched) and
+  /// returns the flipped-row count. §8-audited server-side (D-F2).
+  Future<int> markNotificationsRead(List<String> ids);
 }

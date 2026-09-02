@@ -11,6 +11,9 @@ import 'package:legalhub/features/notifications/domain/notification.dart';
 class _StubSupabaseNotificationApi implements SupabaseNotificationApi {
   List<Map<String, dynamic>> rows = <Map<String, dynamic>>[];
   SupabaseNotificationException? error;
+  SupabaseNotificationException? markError;
+  int markResult = 0;
+  List<String>? markCallIds;
 
   @override
   Future<List<Map<String, dynamic>>> fetchNotifications() async {
@@ -18,6 +21,15 @@ class _StubSupabaseNotificationApi implements SupabaseNotificationApi {
       throw error!;
     }
     return rows;
+  }
+
+  @override
+  Future<int> markNotificationsRead(List<String> ids) async {
+    markCallIds = ids;
+    if (markError != null) {
+      throw markError!;
+    }
+    return markResult;
   }
 }
 
@@ -198,4 +210,91 @@ void main() {
       expect(error.code, 'notification_read_failed');
     });
   });
+
+  group('markNotificationsRead (D-N6 write slice, D-F5)', () {
+    test('delegates to the api seam and returns the flipped count', () async {
+      api.markResult = 2;
+
+      final Result<int> result = await gateway.markNotificationsRead(<String>[
+        'notification-1',
+        'notification-2',
+      ]);
+
+      expect(result.isSuccess, isTrue);
+      expect(result.valueOrNull, 2);
+      expect(api.markCallIds, <String>['notification-1', 'notification-2']);
+    });
+
+    test(
+      'an empty id list short-circuits to an honest 0 (no RPC call)',
+      () async {
+        final Result<int> result = await gateway.markNotificationsRead(
+          const <String>[],
+        );
+
+        expect(result.isSuccess, isTrue);
+        expect(result.valueOrNull, 0);
+        expect(
+          api.markCallIds,
+          isNull,
+          reason: 'no RPC round-trip for nothing',
+        );
+      },
+    );
+
+    test('a mark denial maps to a typed AppError', () async {
+      api.markError = const SupabaseNotificationException(
+        kind: SupabaseNotificationFailureKind.denied,
+        message: 'permission denied',
+      );
+
+      final Result<int> result = await gateway.markNotificationsRead(<String>[
+        'notification-1',
+      ]);
+
+      expect(result.isSuccess, isFalse);
+      expect(result.errorOrNull!.code, 'notification_read_denied');
+    });
+
+    test('a mark provider failure maps to the unavailable AppError', () async {
+      api.markError = const SupabaseNotificationException(
+        kind: SupabaseNotificationFailureKind.providerUnavailable,
+        message: 'timeout',
+      );
+
+      final Result<int> result = await gateway.markNotificationsRead(<String>[
+        'notification-1',
+      ]);
+
+      expect(result.isSuccess, isFalse);
+      expect(result.errorOrNull!.code, 'notification_read_unavailable');
+    });
+
+    test('a non-seam failure maps to the typed unavailable AppError', () async {
+      api.markError = null;
+      // Force a non-seam failure path: a throwing stub (Object branch).
+      final _ThrowingApi throwing = _ThrowingApi();
+      final SupabaseNotificationGateway throwingGateway =
+          SupabaseNotificationGateway(throwing);
+
+      final Result<int> result = await throwingGateway.markNotificationsRead(
+        <String>['notification-1'],
+      );
+
+      expect(result.isSuccess, isFalse);
+      expect(result.errorOrNull!.code, 'notification_mark_unavailable');
+    });
+  });
+}
+
+/// An api stub whose mark call throws a raw non-seam exception (drives the
+/// gateway's defensive Object branch without a provider).
+class _ThrowingApi implements SupabaseNotificationApi {
+  @override
+  Future<List<Map<String, dynamic>>> fetchNotifications() async =>
+      <Map<String, dynamic>>[];
+
+  @override
+  Future<int> markNotificationsRead(List<String> ids) async =>
+      throw StateError('transport down');
 }

@@ -384,5 +384,6 @@
   "aiResearchLocalOnlyNote": "Demo modu — yalnızca kaynaklı sentetik bulgular. Hiçbir şey saklanmaz veya gönderilmez.",
   "aiResearchCitationsLabel": "Kaynaklar",
   "aiResearchEntryTitle": "YZ araştırması",
-  "aiResearchEntrySubtitle": "Demo araştırma asistanına sorun — yalnızca tavsiye niteliğinde."
+  "aiResearchEntrySubtitle": "Demo araştırma asistanına sorun — yalnızca tavsiye niteliğinde.",
+  "notificationsFeedUnreadSemantics": "Okunmamış bildirim. Okundu olarak işaretlemek için dokunun."
 }

@@ -1185,4 +1185,8 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get aiResearchEntrySubtitle =>
       'اسأل مساعد البحث التجريبي — استشارة فقط.';
+
+  @override
+  String get notificationsFeedUnreadSemantics =>
+      'إشعار غير مقروء. اضغط لتعليمه كمقروء.';
 }

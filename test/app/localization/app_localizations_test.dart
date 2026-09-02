@@ -900,6 +900,39 @@ void main() {
       expect(tr.aiResearchNoMatches, isNot(en.aiResearchNoMatches));
       expect(ar.aiResearchNoMatches, isNot(en.aiResearchNoMatches));
     });
+
+    test(
+      'resolves the notification read-flag key in every locale (D-F6 pin)',
+      () {
+        final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+        final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+        final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+        // The D-N6 write slice's unread-row semantics label (D-F6): exact
+        // copy per locale plus the no-silent-EN-copy guards.
+        expect(
+          en.notificationsFeedUnreadSemantics,
+          'Unread notification. Tap to mark as read.',
+        );
+        expect(
+          ar.notificationsFeedUnreadSemantics,
+          'إشعار غير مقروء. اضغط لتعليمه كمقروء.',
+        );
+        expect(
+          tr.notificationsFeedUnreadSemantics,
+          'Okunmamış bildirim. Okundu olarak işaretlemek için dokunun.',
+        );
+
+        expect(
+          tr.notificationsFeedUnreadSemantics,
+          isNot(en.notificationsFeedUnreadSemantics),
+        );
+        expect(
+          ar.notificationsFeedUnreadSemantics,
+          isNot(en.notificationsFeedUnreadSemantics),
+        );
+      },
+    );
   });
 
   group('AppLocalizations widget rendering', () {

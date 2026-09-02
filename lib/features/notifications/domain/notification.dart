@@ -47,9 +47,10 @@ class Notification extends Equatable {
 
   final DateTime serverTimestamp;
 
-  /// Server-tracked read flag — **display metadata only in v1** (D-N6: the
-  /// feed renders rows without mutating; the read-flag RPC is a future
-  /// write slice).
+  /// Server-tracked read flag. **Written only through the D-N6 write slice
+  /// (D-F1)**: the `mark_notifications_read` RPC flips own-org unread rows
+  /// (§8-audited server-side); the feed's unread rows are tappable (D-F6)
+  /// and read rows render non-interactive.
   final bool isRead;
 
   @override

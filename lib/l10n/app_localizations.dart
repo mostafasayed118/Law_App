@@ -2289,6 +2289,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Ask the demo research assistant — advisory only.'**
   String get aiResearchEntrySubtitle;
+
+  /// No description provided for @notificationsFeedUnreadSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Unread notification. Tap to mark as read.'**
+  String get notificationsFeedUnreadSemantics;
 }
 
 class _AppLocalizationsDelegate

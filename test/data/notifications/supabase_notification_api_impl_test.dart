@@ -119,4 +119,100 @@ void main() {
       },
     );
   });
+
+  group('markNotificationsRead (D-N6 write slice, D-F5)', () {
+    late List<(String, Object?)> rpcCalls;
+    late PostgrestException? rpcError;
+    late Object? rpcResult;
+    late SupabaseNotificationApiImpl markApi;
+
+    setUp(() {
+      rpcCalls = <(String, Object?)>[];
+      rpcError = null;
+      rpcResult = 2;
+      markApi = SupabaseNotificationApiImpl(
+        (String table, String columns) async => const <Map<String, dynamic>>[],
+        rpc: (String fn, Map<String, dynamic>? params) async {
+          rpcCalls.add((fn, params));
+          if (rpcError != null) {
+            throw rpcError!;
+          }
+          return rpcResult;
+        },
+      );
+    });
+
+    test(
+      'calls mark_notifications_read with the exact uuid[] param pin',
+      () async {
+        final int flipped = await markApi.markNotificationsRead(<String>[
+          'notification-1',
+          'notification-2',
+        ]);
+
+        expect(flipped, 2);
+        expect(rpcCalls, hasLength(1));
+        expect(rpcCalls.single.$1, 'mark_notifications_read');
+        expect(rpcCalls.single.$2, <String, Object?>{
+          'p_notification_ids': <String>['notification-1', 'notification-2'],
+        });
+      },
+    );
+
+    test('maps a denial PostgrestException to the denied kind', () async {
+      rpcError = const PostgrestException(message: 'permission denied');
+
+      await expectLater(
+        markApi.markNotificationsRead(<String>['notification-1']),
+        throwsA(
+          isA<SupabaseNotificationException>().having(
+            (e) => e.kind,
+            'kind',
+            SupabaseNotificationFailureKind.denied,
+          ),
+        ),
+      );
+    });
+
+    test('maps a non-numeric result to the unknown kind', () async {
+      rpcResult = 'not-a-count';
+
+      await expectLater(
+        markApi.markNotificationsRead(<String>['notification-1']),
+        throwsA(
+          isA<SupabaseNotificationException>().having(
+            (e) => e.kind,
+            'kind',
+            SupabaseNotificationFailureKind.unknown,
+          ),
+        ),
+      );
+    });
+
+    test('maps a non-Postgrest error to providerUnavailable', () async {
+      rpcResult = null;
+      rpcCalls.clear();
+      // A throwing caller that is not a PostgrestException (the impl's
+      // Object branch rethrows the typed seam exception first — verify the
+      // transport branch via a separate throwing closure).
+      final SupabaseNotificationApiImpl throwingApi =
+          SupabaseNotificationApiImpl(
+            (String table, String columns) async =>
+                const <Map<String, dynamic>>[],
+            rpc: (String fn, Map<String, dynamic>? params) async =>
+                throw Exception('transport down'),
+          );
+
+      await expectLater(
+        throwingApi.markNotificationsRead(<String>['notification-1']),
+        throwsA(
+          isA<SupabaseNotificationException>().having(
+            (e) => e.kind,
+            'kind',
+            SupabaseNotificationFailureKind.providerUnavailable,
+          ),
+        ),
+      );
+    });
+  });
 }

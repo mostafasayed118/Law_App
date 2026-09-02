@@ -677,6 +677,31 @@ there.
 > execution 2026-08-11** — the feed now fills with real event traffic
 > (the T8 non-vacuous re-verification runs next).
 
+> **§4 addendum (2026-09-02, notification read-flag write slice — the
+> D-N6 write half):** the "View notifications (metadata)" row gains the
+> **member SHIP write cell**: `mark_notifications_read` (plan
+> `docs/notification_read_flag_slice_plan_2026-09-02.md`, D-F1…D-F7,
+> owner-approved 2026-09-02) — a **single audited write RPC**
+> (`supabase/migrations/16_notification_read_flag.sql`, security definer +
+> `set search_path = public`, the send_message D-SM1 posture): the
+> in-function `is_active_member` gate is the **sole write authorization**
+> (definer bypasses RLS — no UPDATE grant, **no new policy**, applied
+> counts stay **13 tables / 13 RLS / 12 public policies**; the RPC-EXECUTE
+> pin moves **20 → 21**: revoked from `public`/`anon`, granted to
+> `authenticated`). The RPC flips only the caller's **own-org,
+> still-unread** rows (foreign-org ids silently untouched, D-F1),
+> is **idempotent** (D-F4), and §8-audits **one redacted
+> `notification:mark_read` row per distinct org touched** (D-F2 — summary
+> `notification read state updated`, never ids; the action is OUTSIDE the
+> producer's D-P2 map, so a mark never re-produces a feed row).
+> **Battery pins:** `supabase/tests/16_notification_read_flag.sql` (the
+> no-client-write-grant structural pin + the EXECUTE shape + member
+> positive/count/audit + cross-org + non-member/suspended + anon denial).
+> **Basis:** plan RATIFIED 2026-09-02 (owner approval, this session) ·
+> rehearsal + apply on the dev project recorded by the slice's apply
+> record. Per §7 this extends, not replaces, and widens no other row; the
+> write is the ONLY notifications mutation surface.
+
 ---
 
 ## 5. `platform_owner_admin` — explicit boundary (contract §2 #2, #4)

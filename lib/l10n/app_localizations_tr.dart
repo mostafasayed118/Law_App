@@ -1199,4 +1199,8 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get aiResearchEntrySubtitle =>
       'Demo araştırma asistanına sorun — yalnızca tavsiye niteliğinde.';
+
+  @override
+  String get notificationsFeedUnreadSemantics =>
+      'Okunmamış bildirim. Okundu olarak işaretlemek için dokunun.';
 }

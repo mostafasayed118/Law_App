@@ -168,6 +168,7 @@ BATTERY_FILES=(
   "13_matter_write_rls.sql"
   "14_notification_rls.sql"
   "15_notification_producer_rls.sql"
+  "16_notification_read_flag.sql"
 )
 
 usage() {

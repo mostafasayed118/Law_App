@@ -53,19 +53,50 @@ void main() {
       expect(find.text(rows.first.type), findsOneWidget);
     });
 
-    testWidgets('renders read-only metadata — no tap affordance, no actions', (
-      tester,
-    ) async {
-      await pumpFeed(tester);
+    testWidgets(
+      'unread rows are tappable; read rows stay non-interactive (D-F6 re-scope)',
+      (tester) async {
+        await pumpFeed(tester);
 
-      // D-C2 read-only rows: no InkWell, no chevron, no button — the rows
-      // must not read as tappable (D-N2/D-N6: no delivery, no read-flag
-      // mutation).
-      expect(find.byType(InkWell), findsNothing);
-      expect(find.byType(TextButton), findsNothing);
-      expect(find.byType(IconButton), findsNothing);
-      expect(find.byIcon(Icons.chevron_right), findsNothing);
-    });
+        // D-F6 re-scope (2026-09-02): unread rows carry the mark-read tap
+        // (InkWell, chevron-free via the D-MSG1 opt-out); read rows keep the
+        // D-C2 non-interactive shape. The static fake has 3 unread rows
+        // (notification-1/2/5) and 2 read rows (notification-3/4).
+        expect(find.byType(InkWell), findsNWidgets(3));
+        expect(find.byType(TextButton), findsNothing);
+        expect(find.byType(IconButton), findsNothing);
+        // No chevron anywhere — the ripple is the affordance, never a
+        // navigation chevron (the D-MSG1 opt-out on every row).
+        expect(find.byIcon(Icons.chevron_right), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'tapping an unread row marks it read and reloads the feed (D-F6)',
+      (tester) async {
+        final SemanticsHandle semantics = tester.ensureSemantics();
+        await _registerMarkStub();
+        await pumpFeed(tester);
+
+        // The first row (notification-1, unread) — tap marks it read.
+        await tester.tap(find.text('invoice_status').first);
+        await tester.pumpAndSettle();
+
+        expect(_markStub!.markCallIds, <String>['notification-1']);
+        // The cubit reloads after the mark: two fetch rounds total.
+        expect(_markStub!.fetchCalls, 2);
+        // After the reload the row renders read: exactly the two remaining
+        // unread rows carry the Semantics label (checked on the widget tree
+        // shape/affordance, never color alone).
+        final Finder unreadSemantics = find.byWidgetPredicate(
+          (Widget w) =>
+              w is Semantics &&
+              w.properties.label == 'Unread notification. Tap to mark as read.',
+        );
+        expect(unreadSemantics, findsNWidgets(2));
+        semantics.dispose();
+      },
+    );
 
     testWidgets('renders the local-only demo note (D-N7)', (tester) async {
       await pumpFeed(tester);
@@ -136,15 +167,62 @@ Future<void> _registerStub(List<Result<List<Notification>>> results) async {
   );
 }
 
+/// Registers a stub that records mark-read calls (the D-F6 screen pin).
+_StubNotificationGateway? _markStub;
+
+Future<void> _registerMarkStub() async {
+  await resetServiceLocator();
+  // The reloaded feed reflects the server flip deterministically: the
+  // second fetch returns the list with notification-1 read (the D-F5 fake
+  // mirror contract, staged here).
+  final List<Notification> reloaded = FakeNotificationGateway
+      .syntheticNotifications
+      .map(
+        (Notification n) => n.id == 'notification-1'
+            ? Notification(
+                id: n.id,
+                category: n.category,
+                type: n.type,
+                summary: n.summary,
+                serverTimestamp: n.serverTimestamp,
+                isRead: true,
+              )
+            : n,
+      )
+      .toList(growable: false);
+  _markStub = _StubNotificationGateway(<Result<List<Notification>>>[
+    Result<List<Notification>>.success(
+      FakeNotificationGateway.syntheticNotifications,
+    ),
+    Result<List<Notification>>.success(
+      List<Notification>.unmodifiable(reloaded),
+    ),
+  ]);
+  serviceLocator.registerLazySingleton<NotificationGateway>(() => _markStub!);
+}
+
 /// Hand-rolled gateway stub: a queue of results (mirrors the billing screen
 /// test's stub — timing-independent immediate resolution).
 class _StubNotificationGateway implements NotificationGateway {
   _StubNotificationGateway(this._results);
 
   final List<Result<List<Notification>>> _results;
+  int fetchCalls = 0;
+  List<String>? markCallIds;
+  Result<int> markResult = const Result<int>.success(1);
 
   @override
   Future<Result<List<Notification>>> fetchNotifications() async {
-    return _results.length == 1 ? _results.first : _results.removeAt(0);
+    fetchCalls++;
+    final Result<List<Notification>> result = _results.length == 1
+        ? _results.first
+        : _results.removeAt(0);
+    return result;
+  }
+
+  @override
+  Future<Result<int>> markNotificationsRead(List<String> ids) async {
+    markCallIds = ids;
+    return markResult;
   }
 }

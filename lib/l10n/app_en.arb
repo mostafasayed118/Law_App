@@ -398,5 +398,6 @@
   "aiResearchLocalOnlyNote": "Demo mode — synthetic findings with citations only. Nothing is stored or sent.",
   "aiResearchCitationsLabel": "Sources",
   "aiResearchEntryTitle": "AI research",
-  "aiResearchEntrySubtitle": "Ask the demo research assistant — advisory only."
+  "aiResearchEntrySubtitle": "Ask the demo research assistant — advisory only.",
+  "notificationsFeedUnreadSemantics": "Unread notification. Tap to mark as read."
 }

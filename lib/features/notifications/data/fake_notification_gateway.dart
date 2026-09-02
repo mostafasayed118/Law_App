@@ -15,8 +15,12 @@ import '../domain/notification_gateway.dart';
 /// (`appointment_reminder` / `matter_updated` / `invoice_status` /
 /// `system_maintenance` / `message_received`) so the env-less fake and the
 /// configured Supabase surface render the same shape. **No delivery, no
-/// push, no read-flag mutation** (D-N2/D-N6). The list resolves immediately
-/// (no artificial delay) so cubit/widget tests stay timing-independent.
+/// push** (D-N2). The read-flag mark (D-N6 slice, D-F5) mirrors the server
+/// contract per instance: marks flip that instance's view of the rows
+/// deterministically (the static corpus itself stays immutable so tests
+/// stay isolated); re-marking read rows is idempotent (D-F4). The list
+/// resolves immediately (no artificial delay) so cubit/widget tests stay
+/// timing-independent.
 class FakeNotificationGateway implements NotificationGateway {
   /// The fixed synthetic notification-metadata list served by
   /// [fetchNotifications], newest-first.
@@ -63,10 +67,52 @@ class FakeNotificationGateway implements NotificationGateway {
     ),
   ];
 
+  /// This instance's mark state (D-F5 mirror): ids marked read through
+  /// [markNotificationsRead]. Instance-level so the shared static corpus
+  /// stays immutable across tests; unknown ids are silently ignored (the
+  /// D-F1 count-honest posture).
+  final Set<String> _marked = <String>{};
+
   @override
   Future<Result<List<Notification>>> fetchNotifications() async {
-    // Metadata only — the synthetic list is returned as-is; nothing crosses
-    // this boundary but the D-N3 metadata surface (no delivery capability).
-    return Result<List<Notification>>.success(syntheticNotifications);
+    // Metadata only — the synthetic list is returned with this instance's
+    // mark state projected onto the read flags; nothing crosses this
+    // boundary but the D-N3 metadata surface (no delivery capability).
+    final List<Notification> rows = syntheticNotifications
+        .map(
+          (Notification n) => _marked.contains(n.id)
+              ? Notification(
+                  id: n.id,
+                  category: n.category,
+                  type: n.type,
+                  summary: n.summary,
+                  serverTimestamp: n.serverTimestamp,
+                  isRead: true,
+                )
+              : n,
+        )
+        .toList(growable: false);
+    return Result<List<Notification>>.success(
+      List<Notification>.unmodifiable(rows),
+    );
+  }
+
+  @override
+  Future<Result<int>> markNotificationsRead(List<String> ids) async {
+    // D-F4 idempotent count: only the still-unread known ids flip; unknown
+    // ids are silently ignored (the D-F1 count-honest posture).
+    final Map<String, Notification> byId = <String, Notification>{
+      for (final Notification n in syntheticNotifications) n.id: n,
+    };
+    final int flipped = ids
+        .where(
+          (String id) =>
+              byId.containsKey(id) &&
+              !byId[id]!.isRead &&
+              !_marked.contains(id),
+        )
+        .length;
+    _marked.addAll(ids);
+    return Result<int>.success(flipped);
   }
 }

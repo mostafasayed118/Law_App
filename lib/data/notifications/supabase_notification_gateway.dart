@@ -133,4 +133,28 @@ class SupabaseNotificationGateway implements NotificationGateway {
       technicalMessage: e.message,
     );
   }
+
+  @override
+  Future<Result<int>> markNotificationsRead(List<String> ids) async {
+    if (ids.isEmpty) {
+      // D-F5 guard: nothing to mark — no RPC round-trip, an honest 0.
+      return const Result<int>.success(0);
+    }
+    try {
+      final int flipped = await _api.markNotificationsRead(ids);
+      return Result<int>.success(flipped);
+    } on SupabaseNotificationException catch (e) {
+      return Result<int>.failure(_mapFailure(e));
+    } on Object {
+      // A non-seam failure (transport/parse) is a typed unavailable, never
+      // a raw exception across the boundary (the read-path precedent).
+      return const Result<int>.failure(
+        AppError(
+          code: 'notification_mark_unavailable',
+          userMessage:
+              'Notifications are temporarily unavailable. Please try again.',
+        ),
+      );
+    }
+  }
 }

@@ -384,5 +384,6 @@
   "aiResearchLocalOnlyNote": "وضع العرض التجريبي — نتائج اصطناعية بمصادرها فقط. لا يتم تخزين أو إرسال أي شيء.",
   "aiResearchCitationsLabel": "المصادر",
   "aiResearchEntryTitle": "بحث الذكاء الاصطناعي",
-  "aiResearchEntrySubtitle": "اسأل مساعد البحث التجريبي — استشارة فقط."
+  "aiResearchEntrySubtitle": "اسأل مساعد البحث التجريبي — استشارة فقط.",
+  "notificationsFeedUnreadSemantics": "إشعار غير مقروء. اضغط لتعليمه كمقروء."
 }

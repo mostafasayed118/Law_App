@@ -1,4 +1,4 @@
-import 'package:bloc_test/bloc_test.dart';
+﻿import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
@@ -94,8 +94,76 @@ void main() {
       ],
       verify: (_) => expect(gateway.fetchCalls, 2),
     );
+
+    blocTest<NotificationCubit, NotificationState>(
+      'markRead calls the gateway with the single id and reloads (D-F6/AC-3)',
+      setUp: () => gateway = _StubNotificationGateway(
+        results: <Result<List<Notification>>>[
+          Result<List<Notification>>.success(_notifications),
+          Result<List<Notification>>.success(_notifications),
+        ],
+      ),
+      build: () {
+        gateway.markResult = const Result<int>.success(1);
+        return NotificationCubit(gateway);
+      },
+      act: (NotificationCubit cubit) => cubit.markRead('notification-1'),
+      // The cubit's initial state IS ViewLoading, so the post-mark load()
+      // skips the redundant loading frame (the load contract) and goes
+      // straight to the reloaded success.
+      expect: () => <NotificationState>[
+        NotificationState(
+          notifications: ViewSuccess<List<Notification>>(_notifications),
+        ),
+      ],
+      verify: (_) {
+        expect(gateway.markCallIds, <String>['notification-1']);
+        expect(gateway.fetchCalls, 1, reason: 'the reload IS the post-mark fetch');
+      },
+    );
+
+    blocTest<NotificationCubit, NotificationState>(
+      'markRead failure renders the ViewError arm (no silent drop) (AC-3)',
+      setUp: () => gateway = _StubNotificationGateway(
+        results: <Result<List<Notification>>>[
+          Result<List<Notification>>.success(_notifications),
+        ],
+      ),
+      build: () {
+        gateway.markResult = Result<int>.failure(_markFailure);
+        return NotificationCubit(gateway);
+      },
+      act: (NotificationCubit cubit) async {
+        await cubit.load();
+        await cubit.markRead('notification-1');
+      },
+      expect: () => <NotificationState>[
+        NotificationState(
+          notifications: ViewSuccess<List<Notification>>(_notifications),
+        ),
+        NotificationState(
+          notifications: ViewError<List<Notification>>(_markFailure),
+        ),
+      ],
+      verify: (_) =>
+          expect(gateway.fetchCalls, 1, reason: 'no reload on failure'),
+    );
+
+    test('markRead with an empty id is a no-op (no gateway call)', () async {
+      final NotificationCubit cubit = NotificationCubit(gateway);
+      addTearDown(cubit.close);
+
+      await cubit.markRead('');
+
+      expect(gateway.markCallIds, isNull);
+    });
   });
 }
+
+final AppError _markFailure = AppError(
+  code: 'notification_read_denied',
+  userMessage: 'You do not have permission to view these notifications.',
+);
 
 final AppError _loadFailure = AppError(
   code: 'notifications_failed',
@@ -133,10 +201,18 @@ class _StubNotificationGateway implements NotificationGateway {
 
   final List<Result<List<Notification>>> _queue;
   int fetchCalls = 0;
+  List<String>? markCallIds;
+  Result<int>? markResult;
 
   @override
   Future<Result<List<Notification>>> fetchNotifications() async {
     fetchCalls++;
     return _queue.length == 1 ? _queue.first : _queue.removeAt(0);
+  }
+
+  @override
+  Future<Result<int>> markNotificationsRead(List<String> ids) async {
+    markCallIds = ids;
+    return markResult ?? const Result<int>.success(1);
   }
 }

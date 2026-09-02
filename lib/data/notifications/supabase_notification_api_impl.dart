@@ -9,7 +9,8 @@ import 'supabase_notification_api.dart';
 /// and PostgrestExceptions mapped to [SupabaseNotificationException]s at the
 /// seam.
 class SupabaseNotificationApiImpl implements SupabaseNotificationApi {
-  SupabaseNotificationApiImpl(this._table);
+  SupabaseNotificationApiImpl(this._table, {NotificationRpcCaller? rpc})
+    : _rpc = rpc ?? _boundRpc;
 
   /// Binds to the app-level client after `Supabase.initialize`. Kept a
   /// factory so tests can construct the impl with any callable stub.
@@ -25,7 +26,15 @@ class SupabaseNotificationApiImpl implements SupabaseNotificationApi {
     return Supabase.instance.client.from(table).select(columns);
   }
 
+  /// Binds the D-N6 write RPC to the app-level client: the exact function
+  /// name + positional-params shape the migration defines (the
+  /// exact-param pin lives in the impl test).
+  static Future<Object?> _boundRpc(String fn, Map<String, dynamic>? params) {
+    return Supabase.instance.client.rpc(fn, params: params);
+  }
+
   final NotificationTableCaller _table;
+  final NotificationRpcCaller _rpc;
 
   @override
   Future<List<Map<String, dynamic>>> fetchNotifications() async {
@@ -64,5 +73,43 @@ class SupabaseNotificationApiImpl implements SupabaseNotificationApi {
       return SupabaseNotificationFailureKind.denied;
     }
     return SupabaseNotificationFailureKind.unknown;
+  }
+
+  @override
+  Future<int> markNotificationsRead(List<String> ids) async {
+    try {
+      // D-F1: the exact function + param shape the migration pins — a
+      // single uuid[] param. The in-function gate is the sole write
+      // authorization; a Postgrest denial maps to the typed kind below.
+      final Object? result = await _rpc(
+        'mark_notifications_read',
+        <String, Object?>{'p_notification_ids': ids},
+      );
+      if (result is int) {
+        return result;
+      }
+      if (result is num) {
+        return result.toInt();
+      }
+      throw const SupabaseNotificationException(
+        kind: SupabaseNotificationFailureKind.unknown,
+        message: 'mark_notifications_read returned a non-numeric result',
+      );
+    } on PostgrestException catch (e) {
+      throw SupabaseNotificationException(
+        kind: _kindFor(e),
+        message: e.message,
+      );
+    } on SupabaseNotificationException {
+      rethrow;
+    } on Object {
+      // A non-Postgrest provider failure (network/transport) is a typed
+      // unavailable, never a raw exception across the seam (the read-path
+      // defensive-catch precedent).
+      throw const SupabaseNotificationException(
+        kind: SupabaseNotificationFailureKind.providerUnavailable,
+        message: 'Provider unavailable.',
+      );
+    }
   }
 }

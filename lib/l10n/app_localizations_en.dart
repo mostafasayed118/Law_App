@@ -1196,4 +1196,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get aiResearchEntrySubtitle =>
       'Ask the demo research assistant — advisory only.';
+
+  @override
+  String get notificationsFeedUnreadSemantics =>
+      'Unread notification. Tap to mark as read.';
 }
