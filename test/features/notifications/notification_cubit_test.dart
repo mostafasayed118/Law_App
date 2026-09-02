@@ -1,10 +1,12 @@
-﻿import 'package:bloc_test/bloc_test.dart';
+import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/features/notifications/domain/notification.dart';
 import 'package:legalhub/features/notifications/domain/notification_gateway.dart';
+import 'package:legalhub/features/notifications/domain/notification_prefs.dart';
+import 'package:legalhub/features/notifications/domain/notification_prefs_store.dart';
 import 'package:legalhub/features/notifications/presentation/notification_cubit.dart';
 import 'package:legalhub/features/notifications/presentation/notification_state.dart';
 
@@ -118,7 +120,11 @@ void main() {
       ],
       verify: (_) {
         expect(gateway.markCallIds, <String>['notification-1']);
-        expect(gateway.fetchCalls, 1, reason: 'the reload IS the post-mark fetch');
+        expect(
+          gateway.fetchCalls,
+          1,
+          reason: 'the reload IS the post-mark fetch',
+        );
       },
     );
 
@@ -158,6 +164,108 @@ void main() {
       expect(gateway.markCallIds, isNull);
     });
   });
+
+  group('NotificationCubit prefs filtering (D-N5, plan 2026-09-02)', () {
+    test('a disabled category is hidden; others render (AC-1)', () async {
+      final _InMemoryPrefsStore store = _InMemoryPrefsStore(
+        const NotificationPrefs(
+          appointmentReminders: true,
+          activityUpdates: false,
+          systemAlerts: true,
+        ),
+      );
+      final NotificationCubit cubit = NotificationCubit(gateway, store);
+      addTearDown(cubit.close);
+
+      await cubit.load();
+
+      expect(cubit.state.allMuted, isFalse);
+      final List<Notification> visible =
+          (cubit.state.notifications as ViewSuccess<List<Notification>>).data;
+      expect(visible.map((Notification n) => n.id), <String>['n1']);
+    });
+
+    test(
+      'every toggle off hides all rows and sets the muted flag (AC-2)',
+      () async {
+        final _InMemoryPrefsStore store = _InMemoryPrefsStore(
+          const NotificationPrefs(
+            appointmentReminders: false,
+            activityUpdates: false,
+            systemAlerts: false,
+          ),
+        );
+        final NotificationCubit cubit = NotificationCubit(gateway, store);
+        addTearDown(cubit.close);
+
+        await cubit.load();
+
+        expect(cubit.state.notifications, isA<ViewEmpty<List<Notification>>>());
+        expect(
+          cubit.state.allMuted,
+          isTrue,
+          reason: 'rows existed but all hidden',
+        );
+      },
+    );
+
+    test(
+      'a genuinely empty fetch is empty without the muted flag (AC-3)',
+      () async {
+        final _InMemoryPrefsStore store = _InMemoryPrefsStore(
+          const NotificationPrefs(
+            appointmentReminders: false,
+            activityUpdates: false,
+            systemAlerts: false,
+          ),
+        );
+        final _StubNotificationGateway emptyGateway = _StubNotificationGateway(
+          results: <Result<List<Notification>>>[
+            Result<List<Notification>>.success(const <Notification>[]),
+          ],
+        );
+        final NotificationCubit cubit = NotificationCubit(emptyGateway, store);
+        addTearDown(cubit.close);
+
+        await cubit.load();
+
+        expect(cubit.state.notifications, isA<ViewEmpty<List<Notification>>>());
+        expect(
+          cubit.state.allMuted,
+          isFalse,
+          reason: 'no rows were hidden — the feed is truly empty',
+        );
+      },
+    );
+
+    test(
+      'a null store keeps every category enabled (AC-4 default pin)',
+      () async {
+        final NotificationCubit cubit = NotificationCubit(gateway);
+        addTearDown(cubit.close);
+
+        await cubit.load();
+
+        expect(cubit.state.allMuted, isFalse);
+        final List<Notification> visible =
+            (cubit.state.notifications as ViewSuccess<List<Notification>>).data;
+        expect(visible, hasLength(2));
+      },
+    );
+  });
+}
+
+/// In-memory prefs store seeded with one value (the in-memory store's
+/// single-seed variant, mirroring the locale-store test pattern).
+class _InMemoryPrefsStore implements NotificationPrefsStore {
+  _InMemoryPrefsStore(this._prefs);
+  final NotificationPrefs? _prefs;
+
+  @override
+  Future<NotificationPrefs?> read() async => _prefs;
+
+  @override
+  Future<void> write(NotificationPrefs prefs) async {}
 }
 
 final AppError _markFailure = AppError(

@@ -7,6 +7,8 @@ import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/notifications/data/fake_notification_gateway.dart';
 import 'package:legalhub/features/notifications/domain/notification.dart';
 import 'package:legalhub/features/notifications/domain/notification_gateway.dart';
+import 'package:legalhub/features/notifications/domain/notification_prefs.dart';
+import 'package:legalhub/features/notifications/domain/notification_prefs_store.dart';
 import 'package:legalhub/features/notifications/presentation/notification_feed_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
@@ -141,6 +143,32 @@ void main() {
       expect(find.text('invoice_status'), findsOneWidget);
     });
 
+    testWidgets(
+      'an all-muted feed renders the distinct muted note (D-N5/D-PF3)',
+      (tester) async {
+        // Every category toggled off: the stub returns rows, but the feed
+        // cubit hides them all — the screen must render the muted note, not
+        // the plain "No notifications" copy.
+        await resetServiceLocator();
+        serviceLocator.registerLazySingleton<NotificationGateway>(
+          () => _StubNotificationGateway(<Result<List<Notification>>>[
+            Result<List<Notification>>.success(
+              FakeNotificationGateway.syntheticNotifications,
+            ),
+          ]),
+        );
+        serviceLocator.registerLazySingleton<NotificationPrefsStore>(
+          () => _MutedPrefsStore(),
+        );
+        await pumpFeed(tester);
+
+        expect(
+          find.text('Notifications are muted in your notification settings.'),
+          findsOneWidget,
+        );
+        expect(find.text('No notifications are available.'), findsNothing);
+      },
+    );
     testWidgets('rows render the server timestamp via the shared date helper', (
       tester,
     ) async {
@@ -151,6 +179,21 @@ void main() {
       expect(find.text(dateLabel(newest.serverTimestamp)), findsWidgets);
     });
   });
+}
+
+/// Prefs store with every category off (drives the D-PF3 muted note).
+class _MutedPrefsStore implements NotificationPrefsStore {
+  const _MutedPrefsStore();
+
+  @override
+  Future<NotificationPrefs?> read() async => const NotificationPrefs(
+    appointmentReminders: false,
+    activityUpdates: false,
+    systemAlerts: false,
+  );
+
+  @override
+  Future<void> write(NotificationPrefs prefs) async {}
 }
 
 final AppError _loadFailure = AppError(

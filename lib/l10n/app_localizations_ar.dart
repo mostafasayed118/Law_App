@@ -1189,4 +1189,8 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get notificationsFeedUnreadSemantics =>
       'إشعار غير مقروء. اضغط لتعليمه كمقروء.';
+
+  @override
+  String get notificationsFeedMutedEmpty =>
+      'الإشعارات مكتومة من إعدادات الإشعارات لديك.';
 }

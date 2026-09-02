@@ -8,6 +8,7 @@ import '../../../shared/formatting/date_formatting.dart';
 import '../../../shared/widgets/widgets.dart';
 import '../domain/notification.dart';
 import '../domain/notification_gateway.dart';
+import '../domain/notification_prefs_store.dart';
 import 'notification_category_chip.dart';
 import 'notification_cubit.dart';
 import 'notification_state.dart';
@@ -39,8 +40,10 @@ class NotificationFeedScreen extends StatelessWidget {
         title: Text(AppLocalizations.of(context).notificationsFeedTitle),
       ),
       body: BlocProvider<NotificationCubit>(
-        create: (BuildContext context) =>
-            NotificationCubit(serviceLocator<NotificationGateway>()),
+        create: (BuildContext context) => NotificationCubit(
+          serviceLocator<NotificationGateway>(),
+          serviceLocator<NotificationPrefsStore>(),
+        ),
         child: const _FeedSurface(),
       ),
     );
@@ -74,16 +77,23 @@ class _FeedSurfaceState extends State<_FeedSurface> {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
-    final Widget empty = Padding(
-      padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
-      child: Text(
-        l10n.notificationsFeedEmpty,
-        style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-      ),
-    );
     return SafeArea(
       child: BlocBuilder<NotificationCubit, NotificationState>(
         builder: (BuildContext context, NotificationState state) {
+          // D-N5/D-PF3: the honest muted note when rows existed but every
+          // category toggle hid them — never the plain "No notifications"
+          // copy, which would be false.
+          final Widget empty = Padding(
+            padding: const EdgeInsetsDirectional.only(
+              top: LegalHubTheme.spaceMd,
+            ),
+            child: Text(
+              state.allMuted
+                  ? l10n.notificationsFeedMutedEmpty
+                  : l10n.notificationsFeedEmpty,
+              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+          );
           return ViewStateSwitch<List<Notification>>(
             state: state.notifications,
             onRetry: () => context.read<NotificationCubit>().load(),

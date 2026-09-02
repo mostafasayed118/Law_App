@@ -923,16 +923,37 @@ void main() {
           'Okunmamış bildirim. Okundu olarak işaretlemek için dokunun.',
         );
 
-        expect(
-          tr.notificationsFeedUnreadSemantics,
-          isNot(en.notificationsFeedUnreadSemantics),
-        );
-        expect(
-          ar.notificationsFeedUnreadSemantics,
-          isNot(en.notificationsFeedUnreadSemantics),
-        );
-      },
-    );
+      expect(
+        tr.notificationsFeedUnreadSemantics,
+        isNot(en.notificationsFeedUnreadSemantics),
+      );
+      expect(
+        ar.notificationsFeedUnreadSemantics,
+        isNot(en.notificationsFeedUnreadSemantics),
+      );
+
+      // The D-N5 muted-all note (D-PF3): exact copy per locale.
+      expect(
+        en.notificationsFeedMutedEmpty,
+        'Notifications are muted in your notification settings.',
+      );
+      expect(
+        ar.notificationsFeedMutedEmpty,
+        'الإشعارات مكتومة من إعدادات الإشعارات لديك.',
+      );
+      expect(
+        tr.notificationsFeedMutedEmpty,
+        'Bildirimler bildirim ayarlarınızdan sessize alındı.',
+      );
+      expect(
+        tr.notificationsFeedMutedEmpty,
+        isNot(en.notificationsFeedMutedEmpty),
+      );
+      expect(
+        ar.notificationsFeedMutedEmpty,
+        isNot(en.notificationsFeedMutedEmpty),
+      );
+    });
   });
 
   group('AppLocalizations widget rendering', () {

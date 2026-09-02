@@ -399,5 +399,6 @@
   "aiResearchCitationsLabel": "Sources",
   "aiResearchEntryTitle": "AI research",
   "aiResearchEntrySubtitle": "Ask the demo research assistant — advisory only.",
-  "notificationsFeedUnreadSemantics": "Unread notification. Tap to mark as read."
+  "notificationsFeedUnreadSemantics": "Unread notification. Tap to mark as read.",
+  "notificationsFeedMutedEmpty": "Notifications are muted in your notification settings."
 }

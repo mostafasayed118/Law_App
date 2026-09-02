@@ -385,5 +385,6 @@
   "aiResearchCitationsLabel": "Kaynaklar",
   "aiResearchEntryTitle": "YZ araştırması",
   "aiResearchEntrySubtitle": "Demo araştırma asistanına sorun — yalnızca tavsiye niteliğinde.",
-  "notificationsFeedUnreadSemantics": "Okunmamış bildirim. Okundu olarak işaretlemek için dokunun."
+  "notificationsFeedUnreadSemantics": "Okunmamış bildirim. Okundu olarak işaretlemek için dokunun.",
+  "notificationsFeedMutedEmpty": "Bildirimler bildirim ayarlarınızdan sessize alındı."
 }

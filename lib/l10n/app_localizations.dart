@@ -2295,6 +2295,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unread notification. Tap to mark as read.'**
   String get notificationsFeedUnreadSemantics;
+
+  /// No description provided for @notificationsFeedMutedEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are muted in your notification settings.'**
+  String get notificationsFeedMutedEmpty;
 }
 
 class _AppLocalizationsDelegate

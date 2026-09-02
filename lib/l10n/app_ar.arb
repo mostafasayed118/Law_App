@@ -385,5 +385,6 @@
   "aiResearchCitationsLabel": "المصادر",
   "aiResearchEntryTitle": "بحث الذكاء الاصطناعي",
   "aiResearchEntrySubtitle": "اسأل مساعد البحث التجريبي — استشارة فقط.",
-  "notificationsFeedUnreadSemantics": "إشعار غير مقروء. اضغط لتعليمه كمقروء."
+  "notificationsFeedUnreadSemantics": "إشعار غير مقروء. اضغط لتعليمه كمقروء.",
+  "notificationsFeedMutedEmpty": "الإشعارات مكتومة من إعدادات الإشعارات لديك."
 }

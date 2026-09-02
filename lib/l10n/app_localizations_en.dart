@@ -1200,4 +1200,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notificationsFeedUnreadSemantics =>
       'Unread notification. Tap to mark as read.';
+
+  @override
+  String get notificationsFeedMutedEmpty =>
+      'Notifications are muted in your notification settings.';
 }

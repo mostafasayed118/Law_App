@@ -1203,4 +1203,8 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get notificationsFeedUnreadSemantics =>
       'Okunmamış bildirim. Okundu olarak işaretlemek için dokunun.';
+
+  @override
+  String get notificationsFeedMutedEmpty =>
+      'Bildirimler bildirim ayarlarınızdan sessize alındı.';
 }
