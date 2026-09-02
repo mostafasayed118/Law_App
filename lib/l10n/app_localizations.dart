@@ -106,18 +106,6 @@ abstract class AppLocalizations {
   /// **'LegalHub'**
   String get appTitle;
 
-  /// No description provided for @accessTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Access the foundation'**
-  String get accessTitle;
-
-  /// No description provided for @accessBody.
-  ///
-  /// In en, this message translates to:
-  /// **'This bootstrap uses a local demo session only. No credentials are collected or sent.'**
-  String get accessBody;
-
   /// No description provided for @continueAsDemo.
   ///
   /// In en, this message translates to:
@@ -129,18 +117,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Development-only demo session'**
   String get demoSessionNotice;
-
-  /// No description provided for @homeTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Foundation workspace'**
-  String get homeTitle;
-
-  /// No description provided for @homeBody.
-  ///
-  /// In en, this message translates to:
-  /// **'This placeholder proves the theme, localization, RTL wiring, and shared view states. No legal or client data is loaded.'**
-  String get homeBody;
 
   /// No description provided for @settingsTitle.
   ///
@@ -273,12 +249,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Retry'**
   String get retry;
-
-  /// No description provided for @foundationReady.
-  ///
-  /// In en, this message translates to:
-  /// **'Foundation ready'**
-  String get foundationReady;
 
   /// No description provided for @signOut.
   ///
@@ -519,12 +489,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Resend Code'**
   String get resendCode;
-
-  /// No description provided for @resendCodeUnavailable.
-  ///
-  /// In en, this message translates to:
-  /// **'Resend Code (unavailable in demo)'**
-  String get resendCodeUnavailable;
 
   /// No description provided for @resendHelp.
   ///
@@ -819,18 +783,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Strong'**
   String get passwordStrengthStrong;
-
-  /// No description provided for @casesNavigation.
-  ///
-  /// In en, this message translates to:
-  /// **'Cases'**
-  String get casesNavigation;
-
-  /// No description provided for @messagesNavigation.
-  ///
-  /// In en, this message translates to:
-  /// **'Messages'**
-  String get messagesNavigation;
 
   /// No description provided for @profileNavigation.
   ///

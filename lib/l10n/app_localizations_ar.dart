@@ -12,24 +12,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get appTitle => 'LegalHub';
 
   @override
-  String get accessTitle => 'الوصول إلى الأساس';
-
-  @override
-  String get accessBody =>
-      'يستخدم هذا الإصدار جلسة تجريبية محلية فقط. لا يتم جمع بيانات اعتماد أو إرسالها.';
-
-  @override
   String get continueAsDemo => 'المتابعة بجلسة تجريبية';
 
   @override
   String get demoSessionNotice => 'جلسة تجريبية للتطوير فقط';
-
-  @override
-  String get homeTitle => 'مساحة العمل الأساسية';
-
-  @override
-  String get homeBody =>
-      'تثبت هذه الشاشة المؤقتة المظهر والتعريب ودعم الاتجاه من اليمين إلى اليسار وحالات العرض المشتركة. لا يتم تحميل بيانات قانونية أو بيانات عملاء.';
 
   @override
   String get settingsTitle => 'الإعدادات';
@@ -96,9 +82,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get retry => 'إعادة المحاولة';
-
-  @override
-  String get foundationReady => 'الأساس جاهز';
 
   @override
   String get signOut => 'إنهاء الجلسة التجريبية';
@@ -227,10 +210,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get resendCode => 'إعادة إرسال الرمز';
-
-  @override
-  String get resendCodeUnavailable =>
-      'إعادة إرسال الرمز (غير متاح في النسخة التجريبية)';
 
   @override
   String get resendHelp =>
@@ -394,12 +373,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get passwordStrengthStrong => 'قوية';
-
-  @override
-  String get casesNavigation => 'القضايا';
-
-  @override
-  String get messagesNavigation => 'الرسائل';
 
   @override
   String get profileNavigation => 'الملف';

@@ -330,6 +330,18 @@ flutter test
 flutter run --dart-define-from-file=.env
 ```
 
+**Verified against:** postgrest 2.8.0 / supabase-dart 2.14.0. Five contract
+pins in `test/data/orgs/` run against a real `SupabaseClient` with a mocked
+HTTP layer and lock the exact postgrest await shape the app depends on —
+`supabase_rpc_await_contract_test.dart` (3: scalar RPC → raw `String`, not a
+`PostgrestResponse`; set-returning RPC → raw `List`; non-2xx →
+`PostgrestException`) and `supabase_table_select_await_contract_test.dart`
+(2: `from().select()` plain + chained `.eq()` → raw row list). A future
+postgrest upgrade that changes the await contract fails loudly in CI, not on
+a device (the on-device create-org crash this class caused is recorded in
+`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **1308
+tests passing** (1305 tracked declarations, ledger `verify_ledger.sh` PASS).
+
 ## Fonts and licenses
 
 Bundled font files live in `assets/fonts/`. Their SIL Open Font License texts

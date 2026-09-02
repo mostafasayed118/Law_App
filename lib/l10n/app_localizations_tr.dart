@@ -12,24 +12,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get appTitle => 'LegalHub';
 
   @override
-  String get accessTitle => 'Temele erişin';
-
-  @override
-  String get accessBody =>
-      'Bu başlangıç sürümü yalnızca yerel bir demo oturumu kullanır. Kimlik bilgileri toplanmaz veya gönderilmez.';
-
-  @override
   String get continueAsDemo => 'Demo oturumuyla devam et';
 
   @override
   String get demoSessionNotice => 'Yalnızca geliştirme amaçlı demo oturumu';
-
-  @override
-  String get homeTitle => 'Temel çalışma alanı';
-
-  @override
-  String get homeBody =>
-      'Bu yer tutucu tema, yerelleştirme, RTL bağlantısı ve paylaşılan görünüm durumlarını kanıtlar. Hukuki veya müşteri verisi yüklenmez.';
 
   @override
   String get settingsTitle => 'Ayarlar';
@@ -96,9 +82,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get retry => 'Yeniden dene';
-
-  @override
-  String get foundationReady => 'Temel hazır';
 
   @override
   String get signOut => 'Demo oturumunu sonlandır';
@@ -229,10 +212,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get resendCode => 'Kodu Yeniden Gönder';
-
-  @override
-  String get resendCodeUnavailable =>
-      'Kodu Yeniden Gönder (demoda kullanılamıyor)';
 
   @override
   String get resendHelp =>
@@ -397,12 +376,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get passwordStrengthStrong => 'Güçlü';
-
-  @override
-  String get casesNavigation => 'Davalar';
-
-  @override
-  String get messagesNavigation => 'Mesajlar';
 
   @override
   String get profileNavigation => 'Profil';

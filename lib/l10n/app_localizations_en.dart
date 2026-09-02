@@ -12,24 +12,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'LegalHub';
 
   @override
-  String get accessTitle => 'Access the foundation';
-
-  @override
-  String get accessBody =>
-      'This bootstrap uses a local demo session only. No credentials are collected or sent.';
-
-  @override
   String get continueAsDemo => 'Continue with demo session';
 
   @override
   String get demoSessionNotice => 'Development-only demo session';
-
-  @override
-  String get homeTitle => 'Foundation workspace';
-
-  @override
-  String get homeBody =>
-      'This placeholder proves the theme, localization, RTL wiring, and shared view states. No legal or client data is loaded.';
 
   @override
   String get settingsTitle => 'Settings';
@@ -96,9 +82,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get retry => 'Retry';
-
-  @override
-  String get foundationReady => 'Foundation ready';
 
   @override
   String get signOut => 'End demo session';
@@ -228,9 +211,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get resendCode => 'Resend Code';
-
-  @override
-  String get resendCodeUnavailable => 'Resend Code (unavailable in demo)';
 
   @override
   String get resendHelp =>
@@ -395,12 +375,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordStrengthStrong => 'Strong';
-
-  @override
-  String get casesNavigation => 'Cases';
-
-  @override
-  String get messagesNavigation => 'Messages';
 
   @override
   String get profileNavigation => 'Profile';
