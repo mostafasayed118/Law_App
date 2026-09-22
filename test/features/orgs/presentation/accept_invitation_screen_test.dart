@@ -31,6 +31,7 @@ void main() {
       serviceLocator<AuthGateway>(),
       InMemoryErrorReporter(),
       serviceLocator<MembershipRepository>(),
+      serviceLocator<OrganizationGateway>(),
     );
   });
 

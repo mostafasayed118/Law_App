@@ -517,6 +517,7 @@ void configureDependencies({
         serviceLocator<AuthGateway>(),
         serviceLocator<ErrorReporter>(),
         serviceLocator<MembershipRepository>(),
+        serviceLocator<OrganizationGateway>(),
       ),
       dispose: (AuthCubit cubit) => cubit.close(),
     );

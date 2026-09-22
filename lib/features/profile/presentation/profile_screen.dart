@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../app/legalhub_theme.dart';
-import '../../../app/service_locator.dart';
 import '../../../core/auth/auth_state.dart';
 import '../../../core/auth/session.dart';
 import '../../../core/errors/app_error.dart';
@@ -128,21 +127,21 @@ class _ProfileBodyState extends State<_ProfileBody> {
       return;
     }
     setState(() => _deleting = true);
-    final OrgOutcome<void> outcome = await serviceLocator<OrganizationGateway>()
-        .deleteMyAccount();
+    // The destructive call AND the session-ending sign-out live on AuthCubit
+    // (audit 2026-09-21, H-4; owner decision OI-D1) — this screen no longer
+    // touches OrganizationGateway. On success the cubit ends the session, so
+    // the auth gate redirects to sign-in instead of showing a stale identity.
+    final OrgFailureKind? failureKind = await context
+        .read<AuthCubit>()
+        .deleteAccount();
     if (!mounted) {
       return;
     }
     setState(() => _deleting = false);
-    switch (outcome) {
-      case OrgSuccess<void>():
-        // The identity is gone server-side; end the session so the auth
-        // gate redirects to sign-in instead of showing stale identity.
-        await context.read<AuthCubit>().signOut();
-      case OrgFailed<void>(failure: final OrgFailure failure):
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(orgErrorMessage(l10n, failure.kind))),
-        );
+    if (failureKind != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(orgErrorMessage(l10n, failureKind))),
+      );
     }
   }
 

@@ -5,6 +5,7 @@ import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/orgs/fake_membership_repository.dart';
+import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/home/presentation/home_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
@@ -17,6 +18,7 @@ void main() {
       FakeAuthGateway(),
       InMemoryErrorReporter(),
       FakeMembershipRepository(),
+          FakeOrganizationGateway(),
     );
   });
 

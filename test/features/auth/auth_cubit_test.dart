@@ -7,9 +7,11 @@ import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/core/organizations/membership_repository.dart';
+import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/orgs/fake_membership_repository.dart';
+import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 
 /// A fixed contract-§5 session used by the synthetic fakes so expected states
@@ -35,6 +37,7 @@ void main() {
         _NullSessionGateway(),
         InMemoryErrorReporter(),
         FakeMembershipRepository(),
+        FakeOrganizationGateway(),
       );
       addTearDown(cubit.close);
 
@@ -48,6 +51,7 @@ void main() {
         _PreauthenticatedGateway(session),
         InMemoryErrorReporter(),
         FakeMembershipRepository(),
+        FakeOrganizationGateway(),
       );
       addTearDown(cubit.close);
 
@@ -61,6 +65,7 @@ void main() {
         _ExpiredSessionGateway(),
         InMemoryErrorReporter(),
         FakeMembershipRepository(),
+        FakeOrganizationGateway(),
       );
       addTearDown(
         cubit.close,
@@ -79,6 +84,7 @@ void main() {
         FakeAuthGateway(),
         InMemoryErrorReporter(),
         FakeMembershipRepository(),
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) => cubit.startDemoSession(),
       expect: () => <dynamic>[
@@ -121,6 +127,7 @@ void main() {
         _FailingAuthGateway(_gatewayFailure),
         _failingReporter,
         FakeMembershipRepository(),
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) => cubit.startDemoSession(),
       expect: () => <AuthState>[
@@ -142,6 +149,7 @@ void main() {
         _countingAuthGateway,
         InMemoryErrorReporter(),
         FakeMembershipRepository(),
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) async {
         // Fire two startDemoSession calls back-to-back without awaiting
@@ -168,6 +176,7 @@ void main() {
         FakeAuthGateway(),
         InMemoryErrorReporter(),
         FakeMembershipRepository(),
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) =>
           cubit.signIn(email: 'amira@example.com', password: 'any-password'),
@@ -196,6 +205,7 @@ void main() {
         _FailingAuthGateway(_gatewayFailure),
         _failingReporter,
         FakeMembershipRepository(),
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) =>
           cubit.signIn(email: 'amira@example.com', password: 'wrong-password'),
@@ -216,6 +226,7 @@ void main() {
         _countingAuthGateway,
         InMemoryErrorReporter(),
         FakeMembershipRepository(),
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) async {
         final Future<void> first = cubit.signIn(
@@ -245,6 +256,7 @@ void main() {
         _NullSessionGateway(),
         InMemoryErrorReporter(),
         FakeMembershipRepository(),
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) => cubit.restore(),
       expect: () => <AuthState>[
@@ -259,6 +271,7 @@ void main() {
         _PreauthenticatedGateway(demoSession()),
         InMemoryErrorReporter(),
         FakeMembershipRepository(),
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) => cubit.restore(),
       expect: () => <AuthState>[
@@ -274,6 +287,7 @@ void main() {
         _ExpiredSessionGateway(),
         InMemoryErrorReporter(),
         FakeMembershipRepository(),
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) => cubit.restore(),
       expect: () => <AuthState>[
@@ -288,6 +302,7 @@ void main() {
         _FailingAuthGateway(_gatewayFailure),
         InMemoryErrorReporter(),
         FakeMembershipRepository(),
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) => cubit.restore(),
       expect: () => <AuthState>[
@@ -304,6 +319,7 @@ void main() {
         FakeAuthGateway(),
         InMemoryErrorReporter(),
         FakeMembershipRepository(),
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) async {
         await cubit.startDemoSession();
@@ -331,6 +347,7 @@ void main() {
         _streamGateway,
         InMemoryErrorReporter(),
         FakeMembershipRepository(),
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) async {
         // The deep-link PKCE exchange never goes through signIn/restore: the
@@ -354,6 +371,7 @@ void main() {
         gateway,
         InMemoryErrorReporter(),
         FakeMembershipRepository(),
+        FakeOrganizationGateway(),
       );
       addTearDown(cubit.close);
       addTearDown(gateway.dispose);
@@ -398,6 +416,7 @@ void main() {
         _NullSessionGateway(),
         InMemoryErrorReporter(),
         _hydrationRepository,
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) => cubit.startDemoSession(),
       expect: () => <dynamic>[
@@ -435,6 +454,7 @@ void main() {
         _NullSessionGateway(),
         InMemoryErrorReporter(),
         _hydrationRepository,
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) => cubit.startDemoSession(),
       expect: () => <dynamic>[
@@ -467,6 +487,7 @@ void main() {
         _NullSessionGateway(),
         _failingReporter,
         _hydrationRepository,
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) => cubit.startDemoSession(),
       expect: () => <dynamic>[
@@ -506,6 +527,7 @@ void main() {
         _NullSessionGateway(),
         _ThrowingErrorReporter(),
         _hydrationRepository,
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) => cubit.startDemoSession(),
       expect: () => <dynamic>[
@@ -531,6 +553,7 @@ void main() {
         _ExpiredSessionGateway(),
         InMemoryErrorReporter(),
         _hydrationRepository,
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) => cubit.restore(),
       expect: () => <AuthState>[
@@ -568,6 +591,7 @@ void main() {
         _PreauthenticatedGateway(demoSession()),
         InMemoryErrorReporter(),
         _hydrationRepository,
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) => cubit.hydrate(),
       expect: () => <dynamic>[
@@ -598,6 +622,7 @@ void main() {
         _NullSessionGateway(),
         InMemoryErrorReporter(),
         _hydrationRepository,
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) => cubit.hydrate(),
       expect: () => <AuthState>[],
@@ -613,6 +638,7 @@ void main() {
         _CountingAuthGateway(),
         InMemoryErrorReporter(),
         _hydrationRepository,
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) async {
         final Future<void> signIn = cubit.signIn(
@@ -654,6 +680,7 @@ void main() {
         _PreauthenticatedGateway(demoSession()),
         InMemoryErrorReporter(),
         _hydrationRepository,
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) async {
         await Future.wait<void>(<Future<void>>[
@@ -689,6 +716,7 @@ void main() {
         _PreauthenticatedGateway(demoSession()),
         InMemoryErrorReporter(),
         _blockingHydrationRepository,
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) async {
         final Future<void> refresh = cubit.hydrate();
@@ -712,6 +740,7 @@ void main() {
         _PreauthenticatedGateway(demoSession()),
         InMemoryErrorReporter(),
         _stagedHydrationRepository,
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) async {
         // hydrate() blocks on call 1; an explicit restore() then runs its
@@ -760,6 +789,7 @@ void main() {
         _PreauthenticatedGateway(demoSession()),
         _failingReporter,
         _hydrationRepository,
+        FakeOrganizationGateway(),
       ),
       act: (AuthCubit cubit) => cubit.hydrate(),
       expect: () => <AuthState>[],
@@ -773,6 +803,69 @@ void main() {
         );
       },
     );
+  });
+  group('AuthCubit session-level account flows (H-4 move, 2026-09-22)', () {
+    test('deleteAccount ends the session on success', () async {
+      final FakeAuthGateway authGateway = FakeAuthGateway();
+      addTearDown(authGateway.dispose);
+      final AuthCubit cubit = AuthCubit(
+        authGateway,
+        InMemoryErrorReporter(),
+        FakeMembershipRepository(),
+        FakeOrganizationGateway(),
+      );
+      addTearDown(cubit.close);
+      await cubit.startDemoSession();
+      expect(cubit.state.isAuthenticated, isTrue);
+
+      // Session-ending is why this flow lives on AuthCubit (owner decision
+      // OI-D1): a successful delete signs out so the auth gate redirects.
+      expect(await cubit.deleteAccount(), isNull);
+      expect(cubit.state.status, AuthStatus.unauthenticated);
+    });
+
+    test(
+      'acceptInvitation returns the typed failure for an unknown token',
+      () async {
+        final FakeAuthGateway authGateway = FakeAuthGateway();
+        addTearDown(authGateway.dispose);
+        final AuthCubit cubit = AuthCubit(
+          authGateway,
+          InMemoryErrorReporter(),
+          FakeMembershipRepository(),
+          FakeOrganizationGateway(),
+        );
+        addTearDown(cubit.close);
+
+        // The fake mirrors the server's undifferentiated denial for unknown
+        // tokens. The cubit surfaces the kind and leaves the session alone —
+        // the screen owns the post-accept handoff.
+        expect(
+          await cubit.acceptInvitation('not-a-token'),
+          OrgFailureKind.invalidInvitation,
+        );
+      },
+    );
+
+    test('acceptInvitation returns null for a pending invitation', () async {
+      final FakeAuthGateway authGateway = FakeAuthGateway();
+      addTearDown(authGateway.dispose);
+      final FakeOrganizationGateway orgGateway = FakeOrganizationGateway();
+      final AuthCubit cubit = AuthCubit(
+        authGateway,
+        InMemoryErrorReporter(),
+        FakeMembershipRepository(),
+        orgGateway,
+      );
+      addTearDown(cubit.close);
+      final OrgOutcome<InviteResult> invited = await orgGateway.inviteMember(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+        email: FakeOrganizationGateway.demoUserEmail,
+        role: UserRole.attorney,
+      );
+
+      expect(await cubit.acceptInvitation(invited.valueOrNull!.token), isNull);
+    });
   });
 }
 

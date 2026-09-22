@@ -7,6 +7,7 @@ import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/orgs/fake_membership_repository.dart';
+import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/auth/presentation/sign_in_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
@@ -21,6 +22,7 @@ void main() {
       gateway,
       InMemoryErrorReporter(),
       FakeMembershipRepository(),
+          FakeOrganizationGateway(),
     );
     // The forgot-password link test navigates to the recovery email screen,
     // which builds a PasswordRecoveryCubit from the DI-registered dev fake
@@ -113,6 +115,7 @@ void main() {
       unsupportedGateway,
       InMemoryErrorReporter(),
       FakeMembershipRepository(),
+          FakeOrganizationGateway(),
     );
     addTearDown(() async {
       await unsupportedCubit.close();

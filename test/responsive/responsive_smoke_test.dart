@@ -10,6 +10,7 @@ import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/local/in_memory_locale_store.dart';
 import 'package:legalhub/data/local/in_memory_theme_mode_store.dart';
 import 'package:legalhub/data/orgs/fake_membership_repository.dart';
+import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/main.dart';
 
@@ -31,6 +32,7 @@ void main() {
       FakeAuthGateway(),
       InMemoryErrorReporter(),
       FakeMembershipRepository(),
+          FakeOrganizationGateway(),
     );
     localeCubit = LocaleCubit(InMemoryLocaleStore());
     themeCubit = ThemeCubit(InMemoryThemeModeStore());

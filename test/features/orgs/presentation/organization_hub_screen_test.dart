@@ -8,6 +8,7 @@ import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/core/organizations/membership_repository.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/orgs/presentation/organization_hub_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
@@ -129,6 +130,7 @@ void main() {
     _FixedAuthGateway(session),
     InMemoryErrorReporter(),
     _MatchingHydrationRepository(session.memberships),
+      FakeOrganizationGateway(),
   );
 
   testWidgets('shows the create-org form when there is no active membership', (
@@ -180,6 +182,7 @@ void main() {
       _FixedAuthGateway(sessionWith()),
       InMemoryErrorReporter(),
       repository,
+          FakeOrganizationGateway(),
     );
     addTearDown(authCubit.close);
     await authCubit.restore();

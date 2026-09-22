@@ -39,6 +39,7 @@ void main() {
       gateway,
       InMemoryErrorReporter(),
       FakeMembershipRepository(),
+      orgGateway,
     );
   });
 
@@ -48,10 +49,10 @@ void main() {
     await resetServiceLocator();
   });
 
-  Widget pumpScreen({Locale locale = const Locale('en')}) {
+  Widget pumpScreen({Locale locale = const Locale('en'), AuthCubit? cubit}) {
     return MultiBlocProvider(
       providers: <BlocProvider<dynamic>>[
-        BlocProvider<AuthCubit>.value(value: authCubit),
+        BlocProvider<AuthCubit>.value(value: cubit ?? authCubit),
       ],
       child: MaterialApp(
         locale: locale,
@@ -153,14 +154,21 @@ void main() {
   testWidgets('a failed deletion surfaces the localized error and signs out', (
     tester,
   ) async {
-    await resetServiceLocator();
-    serviceLocator.registerLazySingleton<OrganizationGateway>(
-      () => _FailingDeleteOrgGateway(),
+    // The destructive call lives on AuthCubit now (audit 2026-09-21, H-4), so
+    // the failing org gateway is injected through the cubit rather than
+    // re-registered in the locator (which the cubit no longer consults).
+    final FakeAuthGateway deleteAuthGateway = FakeAuthGateway();
+    addTearDown(deleteAuthGateway.dispose);
+    final AuthCubit deleteCubit = AuthCubit(
+      deleteAuthGateway,
+      InMemoryErrorReporter(),
+      FakeMembershipRepository(),
+      _FailingDeleteOrgGateway(),
     );
-    configureDependencies();
-    await authCubit.startDemoSession();
+    addTearDown(deleteCubit.close);
+    await deleteCubit.startDemoSession();
 
-    await tester.pumpWidget(pumpScreen());
+    await tester.pumpWidget(pumpScreen(cubit: deleteCubit));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Delete account'));
     await tester.pumpAndSettle();
@@ -173,7 +181,7 @@ void main() {
       find.text("You don't have permission to perform this action."),
       findsOneWidget,
     );
-    expect(authCubit.state.status, AuthStatus.authenticated);
+    expect(deleteCubit.state.status, AuthStatus.authenticated);
     expect(find.text('Demo user'), findsOneWidget);
   });
 
@@ -193,6 +201,7 @@ void main() {
       failingGateway,
       InMemoryErrorReporter(),
       FakeMembershipRepository(),
+      orgGateway,
     );
     addTearDown(failingCubit.close);
 
@@ -233,6 +242,7 @@ void main() {
         expiredGateway,
         InMemoryErrorReporter(),
         FakeMembershipRepository(),
+        orgGateway,
       );
       addTearDown(expiredCubit.close);
 

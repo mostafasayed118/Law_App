@@ -19,6 +19,7 @@ import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/local/in_memory_locale_store.dart';
 import 'package:legalhub/data/local/in_memory_theme_mode_store.dart';
 import 'package:legalhub/data/orgs/fake_membership_repository.dart';
+import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/matters/data/fake_matter_write_gateway.dart';
 import 'package:legalhub/features/matters/presentation/matter_link_chip.dart';
@@ -37,6 +38,7 @@ void main() {
       gateway,
       InMemoryErrorReporter(),
       FakeMembershipRepository(),
+          FakeOrganizationGateway(),
     );
     localeCubit = LocaleCubit(InMemoryLocaleStore());
     themeCubit = ThemeCubit(InMemoryThemeModeStore());
@@ -1218,6 +1220,7 @@ void main() {
             RoleGateway(sessionForRole(role)),
             InMemoryErrorReporter(),
             FakeMembershipRepository(),
+                      FakeOrganizationGateway(),
           );
           addTearDown(roleCubit.close);
           final GoRouter roleRouter = createAppRouter(roleCubit);
@@ -1265,6 +1268,7 @@ void main() {
           RoleGateway(sessionForRole(UserRole.client)),
           InMemoryErrorReporter(),
           FakeMembershipRepository(),
+                  FakeOrganizationGateway(),
         );
         addTearDown(restrictedCubit.close);
         final GoRouter restrictedRouter = createAppRouter(
@@ -1319,6 +1323,7 @@ void main() {
           RoleGateway(sessionForRole(UserRole.attorney)),
           InMemoryErrorReporter(),
           FakeMembershipRepository(),
+                  FakeOrganizationGateway(),
         );
         addTearDown(restrictedCubit.close);
         final GoRouter restrictedRouter = createAppRouter(
@@ -1396,6 +1401,7 @@ void main() {
         RoleGateway(sessionForRole(UserRole.admin)),
         InMemoryErrorReporter(),
         FakeMembershipRepository(),
+              FakeOrganizationGateway(),
       );
       addTearDown(emptyCubit.close);
       final GoRouter emptyRouter = createAppRouter(
@@ -1678,6 +1684,7 @@ void main() {
         RoleGateway(sessionForRole(role)),
         InMemoryErrorReporter(),
         FakeMembershipRepository(),
+              FakeOrganizationGateway(),
       );
       addTearDown(restrictedCubit.close);
       final GoRouter restrictedRouter = createAppRouter(
@@ -1715,6 +1722,7 @@ void main() {
           RoleGateway(sessionForRole(role)),
           InMemoryErrorReporter(),
           FakeMembershipRepository(),
+                  FakeOrganizationGateway(),
         );
         addTearDown(restrictedCubit.close);
         final GoRouter restrictedRouter = createAppRouter(

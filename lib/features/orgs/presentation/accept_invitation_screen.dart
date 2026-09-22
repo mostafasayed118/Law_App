@@ -68,21 +68,18 @@ class _AcceptInvitationScreenState extends State<AcceptInvitationScreen> {
       _accepting = true;
       _failure = null;
     });
-    final OrgOutcome<String> outcome =
-        await serviceLocator<OrganizationGateway>().acceptInvitation(
-          token: token,
-        );
+    // The gateway call lives on AuthCubit (audit 2026-09-21, H-4; the flow is
+    // session-level, owner decision OI-D1/OI-D2). The post-accept handoff
+    // below stays here: it snapshots the known orgs BEFORE hydrating so it can
+    // diff out the joined one.
+    final OrgFailureKind? failureKind = await auth.acceptInvitation(token);
     if (!mounted) {
       return;
     }
     setState(() {
       _accepting = false;
-      switch (outcome) {
-        case OrgSuccess<String>():
-          _accepted = true;
-        case OrgFailed<String>(failure: final OrgFailure failure):
-          _failure = failure.kind;
-      }
+      _accepted = failureKind == null;
+      _failure = failureKind;
     });
     if (_accepted) {
       // P3.4 D-P33.3 handoff — best-effort; the accepted state is already

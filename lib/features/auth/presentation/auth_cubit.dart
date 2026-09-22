@@ -8,10 +8,15 @@ import '../../../core/auth/auth_state.dart';
 import '../../../core/errors/app_error.dart';
 import '../../../core/observability/error_reporter.dart';
 import '../../../core/organizations/membership_repository.dart';
+import '../../../core/organizations/organization_gateway.dart';
 
 class AuthCubit extends Cubit<AuthState> {
-  AuthCubit(this._gateway, this._reporter, this._membershipRepository)
-    : super(_initialState(_gateway.currentSession)) {
+  AuthCubit(
+    this._gateway,
+    this._reporter,
+    this._membershipRepository,
+    this._organizationGateway,
+  ) : super(_initialState(_gateway.currentSession)) {
     // The provider callback handler (Phase 4.1): a session that arrives
     // through the gateway's stream — e.g. the PKCE exchange of a recovery
     // deep link, which never goes through an explicit cubit call — must
@@ -27,6 +32,11 @@ class AuthCubit extends Cubit<AuthState> {
   /// failure, never on an expired session (AC-3), and by [hydrate] for
   /// background refreshes (P3.3 Slice A).
   final MembershipRepository _membershipRepository;
+
+  /// The organization seam, used by the two session-level account flows that
+  /// used to be driven from the screens: [deleteAccount] and
+  /// [acceptInvitation] (audit 2026-09-21, H-4).
+  final OrganizationGateway _organizationGateway;
   late final StreamSubscription<Session?> _sessionSubscription;
 
   /// True while an explicit operation ([restore], [signIn], [startDemoSession],
@@ -370,6 +380,43 @@ class AuthCubit extends Cubit<AuthState> {
     } finally {
       _explicitOperationInFlight = false;
     }
+  }
+
+  /// Deletes the caller's own account, then ends the session.
+  ///
+  /// Session-ending is exactly why this lives here rather than on a
+  /// profile-scoped cubit (owner decision OI-D1, 2026-09-22). Returns the typed
+  /// failure kind on failure, or null on success.
+  ///
+  /// Moved from `profile_screen.dart`, which was calling
+  /// [OrganizationGateway] directly (audit 2026-09-21, H-4); the
+  /// returning-method shape is owner decision OI-D2. The screen keeps the
+  /// confirmation dialog and the failure affordance.
+  Future<OrgFailureKind?> deleteAccount() async {
+    final OrgOutcome<void> outcome = await _organizationGateway
+        .deleteMyAccount();
+    final OrgFailureKind? kind = outcome.failureOrNull?.kind;
+    if (kind == null) {
+      // The identity is gone server-side; end the session so the auth gate
+      // redirects to sign-in instead of showing a stale identity.
+      await signOut();
+    }
+    return kind;
+  }
+
+  /// Accepts an invitation [token], joining the caller to the organization.
+  /// Returns the typed failure kind on failure, or null on success.
+  ///
+  /// The post-accept handoff (re-hydrate, then switch the local active-org
+  /// context) deliberately stays in the screen: it snapshots the known
+  /// organizations *before* hydrating so it can diff out the joined one, and
+  /// the switch itself is the `ActiveOrgStore` concern the screens already own.
+  /// Moved from `accept_invitation_screen.dart`, which was calling
+  /// [OrganizationGateway] directly (audit 2026-09-21, H-4).
+  Future<OrgFailureKind?> acceptInvitation(String token) async {
+    final OrgOutcome<String> outcome = await _organizationGateway
+        .acceptInvitation(token: token);
+    return outcome.failureOrNull?.kind;
   }
 
   @override

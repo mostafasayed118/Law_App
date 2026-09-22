@@ -131,6 +131,7 @@ void main() {
       _RoleAuthGateway(session),
       InMemoryErrorReporter(),
       _MatchingHydrationRepository(session.memberships),
+          FakeOrganizationGateway(),
     );
     addTearDown(auth.close);
     await auth.restore();
@@ -143,6 +144,7 @@ void main() {
       _RoleAuthGateway(session),
       InMemoryErrorReporter(),
       _MatchingHydrationRepository(session.memberships),
+          FakeOrganizationGateway(),
     );
     addTearDown(auth.close);
     await auth.restore();
