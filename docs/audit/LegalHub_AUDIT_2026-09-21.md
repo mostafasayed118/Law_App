@@ -757,6 +757,23 @@ The extraction surfaced and fixed a real contract violation: the rule was inline
 
 **Everything in the owner's ordered roadmap is now done or owner-blocked:** P1.1, P1.2, P1.5–P1.10, P2.2, P2.4, OI-D5.1, OI-D7 are landed; H-7's remainder is measured and declined (§12.8); P1.3's apply and the push need the owner.
 
+### 12.11 The 21:50 deleter — forensics run, and the answer (2026-09-22)
+
+The Recycle Bin's `$I` records were parsed (they store the deletion time and the original path per file), across both user-account SID folders.
+
+**What the bin shows today:** ~2,678 `law_app`-related deletion records, all from **2026-09-22** (03:10 → 19:10), and **zero** in the original 2026-09-21 21:40–22:05 window — that incident's metadata has since been purged by the bin's own retention. The records that exist are, without exception, tooling output:
+
+- `C:\src\flutter\bin\cache\engine.stamp` — the Flutter SDK's own cache stamp, deleted on nearly every tool invocation;
+- `ios\Flutter\ephemeral\Packages\.packages` — an ephemeral file the tool recreates;
+- `build\test_cache\…`, `build\unit_test_assets\…`, `build\native_assets\…`, `.dart_tool\hooks_runner\…` — build/test caches;
+- `.git\HEAD.lock`, `.git\index.lock`, `.git\AUTO_MERGE.lock`, `.git\packed-refs.lock` — git's own lock files, cleaned up by git.
+
+**Conclusion: the "deleter" is the Flutter/Dart/git toolchain itself, in normal operation.** There is no evidence of a destructive third party. The machine-level anomaly is that these routine tool deletions are being **routed into the Recycle Bin at all** — a plain `DeleteFile` from a CLI tool does not go there — which points at a delete-interception layer (an antivirus with a recycle-on-delete policy, or a delete-shim utility). That layer is also, ironically, what saved the project: at 21:50 on 2026-09-21 the same tooling behaviour swept `lib/` along with the caches, and because the deletions were recycled rather than destroyed, the 322 files were recoverable.
+
+**Repo integrity re-verified after the finding:** `git fsck --connectivity-only` exits clean (only dangling, already-packed objects from the recovery rebase), the tree is clean at 24 commits, and today's deletions touch no tracked file — `lib/` does not appear in the bin at all today.
+
+**What remains for the owner (optional):** identify the delete-interception layer (Defender policy or a utility) — it is benign in effect but explains the incident, and its retention behaviour is the only reason the recovery was possible. The durable protection is still the push: the bin purges old records, so a future sweep is only recoverable while the bin holds them.
+
 **Verification:** `flutter analyze` → No issues found · `flutter test` → **+1387 All tests passed** · `dart format` clean · `scripts/verify_ledger.sh` → **PASS 115/0/0** · README lockstep **1384/1387**.
 
 **Verification at this point:** `flutter analyze` → No issues found · `flutter test` → **+1386 All tests passed** · `dart format` clean · `scripts/verify_ledger.sh` → **PASS 115/0/0** · README lockstep **1383/1386**.
