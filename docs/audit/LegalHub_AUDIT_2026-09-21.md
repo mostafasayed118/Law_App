@@ -595,6 +595,8 @@ Nothing tracked is missing (`git ls-files lib` fully present); the only untracke
 
 The audit slice is committed **first** because the perf slice's api impls depend on `list_query_guards.dart`; committing the perf slice first would have produced a non-compiling commit. Nothing is pushed (`origin/main` is unchanged) — pushing remains owner-gated.
 
+**Consolidated owner hand-off:** everything still needed from the owner — actions, decisions, priorities and optional polish — is collected in **`docs/open_items_for_owner_2026-09-22.md`**.
+
 ### 12.1 P1.10 executed (sealed-state `copyWith`, 2026-09-21 late session)
 
 `PlatformAdminLoaded` (8 fields) and `OrgRosterLoaded` now carry `copyWith` (null = keep — the standard convention). The refactor is **strictly behaviour-preserving**: only the *pure-carry* emit sites were converted, and every site with deliberate *clearing* semantics stays an explicit full construction with a comment naming the dropped fields — because the null-keeps convention cannot express a clear, and a silent keep would have been a behaviour change.
