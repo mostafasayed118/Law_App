@@ -697,6 +697,16 @@ One test needed a real change rather than a mechanical one: `profile_screen_test
 
 **Still to do, in the owner's order:** P1.9 (`CubitListSurface` + the remaining eager lists), H-7's second half (~500 lines of per-feature enums/exceptions), P1.3 (the approved SQL apply slice), the iOS half of P1.2 (`flutter_secure_storage`, approved), and OI-D5.1 (one real use case so §4.1 has a consumer).
 
+### 12.6 P1.9 in progress — M-20's lazy conversion (2026-09-22)
+
+Five more list surfaces now build lazily (commit `3301099`): **documents (vault), messaging (threads), notifications (feed), billing (invoices), research (findings)**. Each replaced `ViewStateSwitch` + an eager `Column` of every tile with `ViewStateList` + `tileBuilder`, and the local-only note moved from a sibling of the results into `ViewStateList.localOnlyNote` — which is why the outer `ListView` disappears rather than wrapping the new list (a nested scrollable has no bounded height).
+
+**A real regression was introduced and caught by the tests.** The research cubit emits `ViewSuccess(<empty>)` for a no-match query — *not* `ViewEmpty` — and the old switch's success arm handled that with `findings.isEmpty ? _IdleOrNoMatch : …`. `ViewStateList` had no such branch, so the no-match copy silently vanished. Fixed in the shared widget: an empty **success** now renders the empty arm. That is the branch every `ViewStateSwitch` call site re-implemented per screen, so owning it centrally is precisely the consolidation M-10/M-20 ask for; pinned by a new widget test.
+
+**Deliberately NOT forced — the two remaining eager surfaces need a different fix.** `matter_list` (filter chips) and `attorney_search` (search field + chips) place a **scrolling header** in the same `ListView` as the results. A bare `ViewStateList` swap would either nest scrollables or pin the header, which is a UX change, so these need a sliver treatment (`CustomScrollView` + header sliver + `SliverList`) — i.e. a `header` parameter on `ViewStateList`, not a mechanical swap. `platform_admin_lists` is not a `ViewState` surface at all (it renders lists passed in as arguments). **M-10's `CubitListSurface<TState, TItem>` extraction is untouched.**
+
+**Verification:** `flutter analyze` → No issues found · `flutter test` → **+1387 All tests passed** · `dart format` clean · `scripts/verify_ledger.sh` → **PASS 115/0/0** · README lockstep **1384/1387**.
+
 **Verification at this point:** `flutter analyze` → No issues found · `flutter test` → **+1386 All tests passed** · `dart format` clean · `scripts/verify_ledger.sh` → **PASS 115/0/0** · README lockstep **1383/1386**.
 
 *Audit produced by five parallel dimension subagents with independent consolidator verification. Raw findings: `docs/audit/_raw/`.*
