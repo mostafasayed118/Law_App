@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../app/deep_link/app_link_parser.dart';
 import '../../../app/legalhub_theme.dart';
-import '../../../app/service_locator.dart';
 import '../../../core/organizations/organization_gateway.dart';
 import '../../../core/roles/user_role.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/forms/validators.dart';
 import '../../../shared/widgets/widgets.dart';
+import 'org_cubit.dart';
 import 'org_error_messages.dart';
 
 /// Opens the invite-member bottom sheet for one organization.
+///
+/// [cubit] is the roster's own [OrgCubit] — passed in and re-provided around
+/// the sheet because a modal's context sits under the Navigator, not under the
+/// caller's provider scope. The sheet mints the invitation through it rather
+/// than calling [OrganizationGateway] itself (audit 2026-09-21, H-4).
 ///
 /// Resolves to `true` when an invitation was minted (the token was shown and
 /// acknowledged), so the roster can reload and the pending invited row
@@ -19,12 +25,15 @@ import 'org_error_messages.dart';
 Future<bool?> showInviteMemberSheet(
   BuildContext context, {
   required String organizationId,
+  required OrgCubit cubit,
 }) {
   return showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
-    builder: (BuildContext context) =>
-        InviteMemberSheet(organizationId: organizationId),
+    builder: (BuildContext context) => BlocProvider<OrgCubit>.value(
+      value: cubit,
+      child: InviteMemberSheet(organizationId: organizationId),
+    ),
   );
 }
 
@@ -200,8 +209,9 @@ class _InviteMemberSheetState extends State<InviteMemberSheet> {
       _sending = true;
       _failure = null;
     });
-    final OrgOutcome<InviteResult> outcome =
-        await serviceLocator<OrganizationGateway>().inviteMember(
+    final OrgOutcome<InviteResult> outcome = await context
+        .read<OrgCubit>()
+        .inviteMember(
           organizationId: widget.organizationId,
           email: _email.text.trim(),
           role: _role,

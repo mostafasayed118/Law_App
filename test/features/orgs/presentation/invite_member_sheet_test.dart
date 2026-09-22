@@ -6,6 +6,7 @@ import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/orgs/presentation/invite_member_sheet.dart';
+import 'package:legalhub/features/orgs/presentation/org_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
 void main() {
@@ -20,6 +21,11 @@ void main() {
   tearDown(() => resetServiceLocator());
 
   Widget harness() {
+    // The sheet mints the invite through the roster's OrgCubit (H-4 move,
+    // 2026-09-21); the harness wraps the locator's gateway so a test that
+    // seeds that same instance still sees its own state.
+    final OrgCubit cubit = OrgCubit(serviceLocator<OrganizationGateway>());
+    addTearDown(cubit.close);
     return MaterialApp(
       locale: const Locale('en'),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -32,6 +38,7 @@ void main() {
                 sheetResult = await showInviteMemberSheet(
                   context,
                   organizationId: FakeOrganizationGateway.demoOrganizationId,
+                  cubit: cubit,
                 );
               },
               child: const Text('open'),

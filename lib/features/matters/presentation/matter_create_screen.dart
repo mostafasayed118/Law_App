@@ -44,8 +44,10 @@ class MatterCreateScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<MatterCreateCubit>(
-      create: (BuildContext context) =>
-          MatterCreateCubit(serviceLocator<MatterWriteGateway>()),
+      create: (BuildContext context) => MatterCreateCubit(
+        serviceLocator<MatterWriteGateway>(),
+        serviceLocator<OrganizationGateway>(),
+      ),
       child: const _CreateSurface(),
     );
   }
@@ -102,24 +104,16 @@ class _CreateSurfaceState extends State<_CreateSurface> {
   }
 
   Future<void> _loadMembers(String organizationId) async {
-    final OrgOutcome<List<OrgMember>> outcome =
-        await serviceLocator<OrganizationGateway>().listMembers(
-          organizationId: organizationId,
-        );
+    // The read lives behind the cubit (audit 2026-09-21, H-4): presentation no
+    // longer touches OrganizationGateway directly. The F2-D4 active-member
+    // filter moved with it.
+    final List<OrgMember> members = await context
+        .read<MatterCreateCubit>()
+        .loadMembers(organizationId);
     if (!mounted) {
       return;
     }
-    setState(() {
-      // F2-D4: only ACTIVE members are offerable as assignees; suspended and
-      // removed rows are excluded client-side (the server re-asserts).
-      _members = switch (outcome) {
-        OrgSuccess<List<OrgMember>>(value: final List<OrgMember> members) =>
-          members
-              .where((OrgMember member) => member.isActive)
-              .toList(growable: false),
-        OrgFailed<List<OrgMember>>() => const <OrgMember>[],
-      };
-    });
+    setState(() => _members = members);
   }
 
   Future<void> _submit() async {

@@ -208,6 +208,28 @@ class OrgCubit extends Cubit<OrgState> {
         _gateway.removeMember(organizationId: organizationId, userId: userId),
   );
 
+  /// Mints an invitation for [email] with [role] (P3 slice 1.3).
+  ///
+  /// Returns the gateway's typed outcome: the sheet needs BOTH the one-time
+  /// token and the invited (server-normalized) email for its success copy, so
+  /// the token-only [OrgInviteActionResult] used by [resendInvitation] does not
+  /// fit here. Deliberately does NOT emit — there is no roster row to mark in
+  /// flight (the pending row appears only when the roster reloads), and the
+  /// sheet owns its ephemeral sending/token state.
+  ///
+  /// Moved here from `invite_member_sheet.dart`, which was calling
+  /// [OrganizationGateway] directly (audit 2026-09-21, H-4). The
+  /// returning-method shape is owner decision OI-D2 (2026-09-22).
+  Future<OrgOutcome<InviteResult>> inviteMember({
+    required String organizationId,
+    required String email,
+    required UserRole role,
+  }) => _gateway.inviteMember(
+    organizationId: organizationId,
+    email: email,
+    role: role,
+  );
+
   /// Rotates a PENDING invite's token (Phase 2 slice 2.1). Returns the fresh
   /// one-time token on success (the roster is refreshed), or the typed
   /// failure kind on failure. On failure the last good roster is restored.

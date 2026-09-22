@@ -139,6 +139,7 @@ class _MemberRosterScreenState extends State<MemberRosterScreen> {
     final bool? invited = await showInviteMemberSheet(
       context,
       organizationId: widget.organizationId,
+      cubit: context.read<OrgCubit>(),
     );
     if (!mounted) {
       return;
