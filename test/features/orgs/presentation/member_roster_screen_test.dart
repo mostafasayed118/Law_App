@@ -37,6 +37,9 @@ class _RoleAuthGateway implements AuthGateway {
   }
 
   @override
+  bool get supportsDemoSession => true;
+
+  @override
   Future<AuthOutcome<Session>> startDemoSession() async {
     return AuthOutcome<Session>.success(_session);
   }

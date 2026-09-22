@@ -71,6 +71,18 @@ final class OrgRosterLoaded extends OrgState {
 
   @override
   List<Object?> get props => <Object?>[members, pendingUserId];
+
+  /// Copies this state with the given fields replaced (null = keep the
+  /// current value). Transitions that deliberately CLEAR [pendingUserId]
+  /// (an action finished, spinner off) stay as explicit full constructions
+  /// at their emit sites — this convention cannot express them (M-2, audit
+  /// 2026-09-21).
+  OrgRosterLoaded copyWith({List<OrgMember>? members, String? pendingUserId}) {
+    return OrgRosterLoaded(
+      members ?? this.members,
+      pendingUserId: pendingUserId ?? this.pendingUserId,
+    );
+  }
 }
 
 /// The member list failed to load. [organizationId] lets the retry re-issue
@@ -208,7 +220,7 @@ class OrgCubit extends Cubit<OrgState> {
     if (current is! OrgRosterLoaded) {
       return const OrgInviteActionResult.failure(null);
     }
-    emit(OrgRosterLoaded(current.members, pendingUserId: email));
+    emit(current.copyWith(pendingUserId: email));
     final OrgOutcome<String> outcome = await _gateway.resendInvitation(
       invitationId: invitationId,
     );
@@ -220,6 +232,9 @@ class OrgCubit extends Cubit<OrgState> {
         await loadRoster(organizationId: organizationId);
         return OrgInviteActionResult.success(token);
       case OrgFailed<String>(failure: final OrgFailure failure):
+        // pendingUserId deliberately cleared: the action finished
+        // (failed), so the row spinner goes. Explicit full construction —
+        // copyWith cannot clear it.
         emit(OrgRosterLoaded(current.members));
         return OrgInviteActionResult.failure(failure.kind);
     }
@@ -249,7 +264,7 @@ class OrgCubit extends Cubit<OrgState> {
     if (current is! OrgRosterLoaded) {
       return null;
     }
-    emit(OrgRosterLoaded(current.members, pendingUserId: userId));
+    emit(current.copyWith(pendingUserId: userId));
     final OrgOutcome<void> outcome = await call();
     if (isClosed) {
       return null;
@@ -259,6 +274,9 @@ class OrgCubit extends Cubit<OrgState> {
         await loadRoster(organizationId: organizationId);
         return null;
       case OrgFailed<void>(failure: final OrgFailure failure):
+        // pendingUserId deliberately cleared: the action finished
+        // (failed), so the row spinner goes. Explicit full construction —
+        // copyWith cannot clear it.
         emit(OrgRosterLoaded(current.members));
         return failure.kind;
     }

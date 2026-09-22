@@ -57,7 +57,7 @@ messaging services.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (1353 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (1367 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), ThemeCubit (mode persistence + restart
   restore), Redactor (password/OTP/email/Bearer redaction with leak guards),
@@ -93,7 +93,14 @@ messaging services.
   in-memory locale store, and the onboarding-success screen. Batch 5 added
   the 800×600 onboarding no-overflow test and the EN/AR/TR localized-fallback
   assertions.
-- Coverage: **1353 tests** (2026-09-02 — the D-N5 prefs-filter client slice + the D-N6 notification read-flag
+- Coverage: **1367 tests** (2026-09-21 — the audit-fix + P1 slice: the bounded-SELECT
+  guard + ordering-table unit tests (`test/data/list_query_guards_test.dart`),
+  the capped message-read chronological reversal + its regression test, the
+  ViewStateList harness repairs, the concurrent roster-resolution fix, the
+  demo-shortcut seam gate (`AuthGateway.supportsDemoSession`) + its
+  hidden-shortcut and unsupported-posture pins, and the Android backup
+  hygiene; prior bump 2026-09-02 — the D-N5 prefs-filter
+  client slice + the D-N6 notification read-flag
   write slice (plan `docs/notification_read_flag_slice_plan_2026-09-02.md`):
   the `mark_notifications_read` RPC artifacts (own-org in-function gate,
   §8-audited per-org, idempotent) + battery 16 + the client write path
@@ -360,8 +367,8 @@ HTTP layer and lock the exact postgrest await shape the app depends on —
 (2: `from().select()` plain + chained `.eq()` → raw row list). A future
 postgrest upgrade that changes the await contract fails loudly in CI, not on
 a device (the on-device create-org crash this class caused is recorded in
-`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **1356
-tests passing** (1353 tracked declarations, ledger `verify_ledger.sh` PASS).
+`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **1370
+tests passing** (1367 tracked declarations, ledger `verify_ledger.sh` PASS).
 
 ## Fonts and licenses
 

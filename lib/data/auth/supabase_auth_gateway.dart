@@ -115,6 +115,11 @@ class SupabaseAuthGateway implements AuthGateway {
     return AuthFailure(kind: kind, message: failure.message);
   }
 
+  /// A real provider must never mint a demo session (contract §5: the demo
+  /// path is bootstrap-only). Deny rather than fabricate an authority.
+  @override
+  bool get supportsDemoSession => false;
+
   @override
   Future<AuthOutcome<Session>> startDemoSession() async {
     // A real provider must never mint a demo session (contract §5: the demo

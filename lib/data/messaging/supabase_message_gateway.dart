@@ -134,8 +134,16 @@ class SupabaseMessageGateway implements MessageGateway {
       final List<Map<String, dynamic>> rows = await _api.fetchMessages(
         threadId,
       );
+      // The bounded read fetches the NEWEST kSupabaseListRowCap rows
+      // (`sent_at` DESC — a cap must keep the newest end of the history,
+      // `list_query_guards.dart`). Reverse the mapped list to
+      // chronological (oldest first) so the detail screen's top-to-bottom
+      // render and the live-append path keep their ascending contract.
+      // Pinned by the gateway test "reverses the newest-first capped
+      // payload to chronological order".
+      final List<Message> messages = rows.map(_messageFromRow).toList();
       return Result<List<Message>>.success(
-        List<Message>.unmodifiable(rows.map(_messageFromRow)),
+        List<Message>.unmodifiable(messages.reversed),
       );
     } on SupabaseMessageException catch (e) {
       return Result<List<Message>>.failure(_mapMessageFailure(e));

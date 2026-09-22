@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/active_org_store.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/errors/app_error.dart';
@@ -12,7 +13,6 @@ import '../../../shared/forms/validators.dart';
 import '../../../shared/widgets/practice_area_label.dart';
 import '../../../shared/widgets/widgets.dart';
 import '../../auth/presentation/auth_cubit.dart';
-import '../../orgs/presentation/active_org_store.dart';
 import '../domain/matter_write_gateway.dart';
 import 'matter_create_cubit.dart';
 import 'matter_create_state.dart';

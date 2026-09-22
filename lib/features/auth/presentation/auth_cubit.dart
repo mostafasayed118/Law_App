@@ -67,6 +67,12 @@ class AuthCubit extends Cubit<AuthState> {
   /// treating it as a normal sign-in. Clears on sign-out.
   bool get recoveryPending => _gateway.recoveryPending;
 
+  /// Whether the sign-in screen should render the demo shortcut: derived
+  /// from the gateway (dev fake → true, configured provider → false), so
+  /// presentation never ships a demo button that can only fail
+  /// (audit 2026-09-21, H-5). Static per seam — never changes per state.
+  bool get supportsDemoSession => _gateway.supportsDemoSession;
+
   /// Bootstrap initial state is derived from the gateway's current session.
   /// There is no provider restore at boot (no session source exists yet), so
   /// a null current session is honestly `unauthenticated`, not `restoring`.

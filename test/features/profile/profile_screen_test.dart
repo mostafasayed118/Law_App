@@ -302,6 +302,9 @@ class FailingAuthGateway implements AuthGateway {
   }
 
   @override
+  bool get supportsDemoSession => true;
+
+  @override
   Future<AuthOutcome<Session>> startDemoSession() async {
     return const AuthOutcome<Session>.failure(
       AuthFailure(kind: AuthFailureKind.providerUnavailable),
@@ -430,6 +433,9 @@ class ExpiredSessionGateway implements AuthGateway {
       AuthFailure(kind: AuthFailureKind.sessionExpired),
     );
   }
+
+  @override
+  bool get supportsDemoSession => true;
 
   @override
   Future<AuthOutcome<Session>> startDemoSession() async {

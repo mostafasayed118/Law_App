@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/core/auth/session.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/local/in_memory_org_selection_store.dart';
 import 'package:legalhub/data/local/org_selection_store.dart';
-import 'package:legalhub/features/orgs/presentation/active_org_store.dart';
 
 /// OrgSelectionStore whose read/write can be forced to fail, proving the
 /// store degrades gracefully (persistence is best-effort UX context, D-08).

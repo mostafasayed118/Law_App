@@ -39,5 +39,12 @@ abstract interface class AuthGateway {
   /// be used as production authorization.
   Future<AuthOutcome<Session>> startDemoSession();
 
+  /// Whether this seam can mint a demo session at all: the dev fake can, a
+  /// real provider's [startDemoSession] always denies. Presentation renders
+  /// the demo shortcut only when this is true, so a configured build never
+  /// ships a primary-looking control that can only ever fail
+  /// (audit 2026-09-21, H-5; contract §5).
+  bool get supportsDemoSession;
+
   Future<void> signOut();
 }

@@ -14,6 +14,13 @@ import '../../core/roles/user_role.dart';
 /// single client-owned `role` on the session), and a [Session.expiresAt]
 /// boundary.
 class FakeAuthGateway implements AuthGateway {
+  /// Defaults to true: the fake IS the demo-capable seam. Test doubles that
+  /// need the unsupported posture pass `supportsDemoSession: false`.
+  FakeAuthGateway({this.supportsDemoSession = true});
+
+  @override
+  final bool supportsDemoSession;
+
   Session? _session;
   bool _recoveryPending = false;
   // Sync delivery: events reach listeners in the caller's zone. Without it,

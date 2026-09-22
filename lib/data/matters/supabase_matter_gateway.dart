@@ -68,18 +68,30 @@ class SupabaseMatterGateway implements MatterGateway {
   /// Builds a userId → displayName map from the roster seam for every
   /// distinct organization the fetched rows reference.
   ///
+  /// Rosters are fetched **concurrently** (`Future.wait` over the deduped
+  /// ids): this helper sits on the hottest read path (matter list, matter
+  /// details, document vault, message list and every debounced search all
+  /// route through `fetchMatters`), so the historical serial per-org
+  /// `await` was the codebase's only N+1 — 1 + N round-trips where N
+  /// round-trips suffice.
+  ///
   /// A roster failure for one org never fails the whole fetch: names for
   /// that org fall back to the raw id (plan §9) while every other org's
-  /// names still resolve. The roster RPC's in-body guard already limits it
+  /// names still resolve. `listMembers` resolves to a typed `OrgOutcome`
+  /// rather than throwing, so `Future.wait` cannot short-circuit on the
+  /// first failure. The roster RPC's in-body guard already limits it
   /// to active members, so this never leaks beyond the shipped seam.
   Future<Map<String, String>> _displayNamesFor(
     Iterable<String> organizationIds,
   ) async {
     final Map<String, String> names = <String, String>{};
-    for (final String organizationId in organizationIds.toSet()) {
-      final OrgOutcome<List<OrgMember>> outcome = await _orgGateway.listMembers(
-        organizationId: organizationId,
-      );
+    final List<OrgOutcome<List<OrgMember>>> outcomes = await Future.wait(
+      organizationIds.toSet().map(
+        (String organizationId) =>
+            _orgGateway.listMembers(organizationId: organizationId),
+      ),
+    );
+    for (final OrgOutcome<List<OrgMember>> outcome in outcomes) {
       if (outcome is OrgFailed<List<OrgMember>>) {
         // Roster unavailable for this org: id fallback, keep the rest.
         continue;

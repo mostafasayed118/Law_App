@@ -101,6 +101,44 @@ void main() {
     expect(authCubit.state.session?.userId, 'demo-user');
   });
 
+  testWidgets('hides the demo shortcut when the seam cannot mint one '
+      '(audit 2026-09-21, H-5)', (tester) async {
+    // A configured provider's startDemoSession always denies, so the seam
+    // reports the unsupported posture and the screen must not render a
+    // primary-looking demo button that can only ever fail.
+    final FakeAuthGateway unsupportedGateway = FakeAuthGateway(
+      supportsDemoSession: false,
+    );
+    final AuthCubit unsupportedCubit = AuthCubit(
+      unsupportedGateway,
+      InMemoryErrorReporter(),
+      FakeMembershipRepository(),
+    );
+    addTearDown(() async {
+      await unsupportedCubit.close();
+      await unsupportedGateway.dispose();
+    });
+
+    await tester.pumpWidget(
+      BlocProvider<AuthCubit>.value(
+        value: unsupportedCubit,
+        child: const MaterialApp(
+          locale: Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: SignInScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.science_outlined), findsNothing);
+    expect(find.text('Continue with demo session'), findsNothing);
+    expect(find.text('Development-only demo session'), findsNothing);
+    // The real sign-in form is unaffected.
+    expect(find.text('Welcome Back'), findsOneWidget);
+  });
+
   testWidgets('valid form submit starts the demo session via the cubit', (
     tester,
   ) async {

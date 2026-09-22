@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../app/active_org_store.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/organizations/organization_gateway.dart';
 import '../../../core/roles/user_role.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/formatting/date_formatting.dart';
-import 'active_org_store.dart';
 import 'org_audit_cubit.dart';
 
 /// Partner org-audit read surface (partner org-audit slice 2026-08-09,

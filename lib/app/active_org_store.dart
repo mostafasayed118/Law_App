@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import '../../../core/auth/session.dart';
-import '../../../data/local/org_selection_store.dart';
+import '../core/auth/session.dart';
+import '../data/local/org_selection_store.dart';
 
 /// Client-side active-organization context (Phase 7 slice 7.0, D-M7/D-08;
 /// persistence added in P3.2, D-P32.2).
@@ -16,6 +16,14 @@ import '../../../data/local/org_selection_store.dart';
 /// persisted **on-device only** ([OrgSelectionStore] — SharedPreferences in
 /// production) so the selection survives restarts; it is never transmitted
 /// and never an authorization claim.
+///
+/// Lives in `lib/app/` — it is an app-scoped session projection (the
+/// sibling of the locale/theme cubits), not presentation: it owns
+/// persistence and encodes the D-08 session-authority rule, so keeping it
+/// under a feature's `presentation/` made the layer boundary read as
+/// one silent exception (audit 2026-09-21, M-6). It deliberately did NOT
+/// move to `core/` — it imports `data/local/`, and `core/ → data/` is a
+/// dependency direction the codebase has never opened (0 imports today).
 ///
 /// Persistence semantics (D-P32.2):
 /// - **Restore:** the persisted id is read once at construction and applied

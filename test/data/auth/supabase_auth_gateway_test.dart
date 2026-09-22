@@ -313,6 +313,15 @@ void main() {
       expect(outcome.failureOrNull?.kind, AuthFailureKind.membershipDenied);
       expect(gateway.currentSession, isNull);
     });
+
+    test('reports the unsupported demo posture (supportsDemoSession false) — '
+        'presentation hides the shortcut (audit 2026-09-21, H-5)', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null);
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      expect(gateway.supportsDemoSession, isFalse);
+    });
   });
 
   group('SupabaseAuthGateway signIn', () {

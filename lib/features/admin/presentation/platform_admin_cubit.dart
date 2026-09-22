@@ -85,6 +85,37 @@ final class PlatformAdminLoaded extends PlatformAdminState {
     auditLoading,
     auditError,
   ];
+
+  /// Copies this state with the given fields replaced (null = keep the
+  /// current value — the standard copyWith convention).
+  ///
+  /// Transitions that deliberately CLEAR an optional field (a fresh fetch
+  /// resetting the error slate, an action finishing removing the row
+  /// spinner) stay as explicit full constructions at their emit sites so
+  /// the drop is visible and reviewable — this convention cannot express
+  /// them, and a silent keep would be a behavior change (M-2, audit
+  /// 2026-09-21).
+  PlatformAdminLoaded copyWith({
+    List<OrganizationSummary>? organizations,
+    List<OrgMember>? members,
+    String? pendingUserId,
+    List<AuditEntry>? platformAudit,
+    List<AuditEntry>? orgAudit,
+    String? selectedAuditOrgId,
+    bool? auditLoading,
+    OrgFailureKind? auditError,
+  }) {
+    return PlatformAdminLoaded(
+      organizations ?? this.organizations,
+      members ?? this.members,
+      pendingUserId: pendingUserId ?? this.pendingUserId,
+      platformAudit: platformAudit ?? this.platformAudit,
+      orgAudit: orgAudit ?? this.orgAudit,
+      selectedAuditOrgId: selectedAuditOrgId ?? this.selectedAuditOrgId,
+      auditLoading: auditLoading ?? this.auditLoading,
+      auditError: auditError ?? this.auditError,
+    );
+  }
 }
 
 /// The owner-only RPCs denied server-side (`permission denied`): the caller
@@ -215,6 +246,10 @@ class PlatformAdminCubit extends Cubit<PlatformAdminState> {
       return;
     }
     emit(
+      // Deliberately re-defaults platformAudit/orgAudit/selectedAuditOrgId/
+      // auditError: the incoming PLATFORM trail replaces any org-scoped
+      // view, and a stale error must not outlive the fresh fetch. Explicit
+      // full construction — copyWith cannot express the clears (M-2).
       PlatformAdminLoaded(
         current.organizations,
         current.members,
@@ -233,16 +268,9 @@ class PlatformAdminCubit extends Cubit<PlatformAdminState> {
         if (s is! PlatformAdminLoaded) {
           return;
         }
-        emit(
-          PlatformAdminLoaded(
-            s.organizations,
-            s.members,
-            pendingUserId: s.pendingUserId,
-            platformAudit: entries,
-            orgAudit: s.orgAudit,
-            selectedAuditOrgId: s.selectedAuditOrgId,
-          ),
-        );
+        // auditError is already null here (the in-flight emission above
+        // cleared it), so carrying it equals the original default.
+        emit(s.copyWith(platformAudit: entries, auditLoading: false));
       case OrgFailed<List<AuditEntry>>(failure: final OrgFailure failure):
         _auditFailure(failure);
     }
@@ -258,6 +286,10 @@ class PlatformAdminCubit extends Cubit<PlatformAdminState> {
     }
     if (organizationId == null) {
       emit(
+        // Deliberately clears orgAudit/selectedAuditOrgId/auditError: a null
+        // scope means back to the platform trail, and a stale org error must
+        // not survive the scope switch. Explicit full construction —
+        // copyWith cannot express the clears (M-2).
         PlatformAdminLoaded(
           current.organizations,
           current.members,
@@ -268,6 +300,8 @@ class PlatformAdminCubit extends Cubit<PlatformAdminState> {
       return;
     }
     emit(
+      // auditError deliberately dropped: a fresh fetch starts with a clean
+      // error slate. Explicit full construction — copyWith cannot clear it.
       PlatformAdminLoaded(
         current.organizations,
         current.members,
@@ -290,14 +324,13 @@ class PlatformAdminCubit extends Cubit<PlatformAdminState> {
         if (s is! PlatformAdminLoaded) {
           return;
         }
+        // auditError is already null here (the in-flight emission above
+        // cleared it), so carrying it equals the original default.
         emit(
-          PlatformAdminLoaded(
-            s.organizations,
-            s.members,
-            pendingUserId: s.pendingUserId,
-            platformAudit: s.platformAudit,
+          s.copyWith(
             orgAudit: entries,
             selectedAuditOrgId: organizationId,
+            auditLoading: false,
           ),
         );
       case OrgFailed<List<AuditEntry>>(failure: final OrgFailure failure):
@@ -317,17 +350,7 @@ class PlatformAdminCubit extends Cubit<PlatformAdminState> {
     if (s is! PlatformAdminLoaded) {
       return;
     }
-    emit(
-      PlatformAdminLoaded(
-        s.organizations,
-        s.members,
-        pendingUserId: s.pendingUserId,
-        platformAudit: s.platformAudit,
-        orgAudit: s.orgAudit,
-        selectedAuditOrgId: s.selectedAuditOrgId,
-        auditError: failure.kind,
-      ),
-    );
+    emit(s.copyWith(auditError: failure.kind, auditLoading: false));
   }
 
   /// Suspends a membership in ANY organization (platform boundary). Returns
@@ -375,18 +398,7 @@ class PlatformAdminCubit extends Cubit<PlatformAdminState> {
     if (current is! PlatformAdminLoaded) {
       return null;
     }
-    emit(
-      PlatformAdminLoaded(
-        current.organizations,
-        current.members,
-        pendingUserId: userId,
-        platformAudit: current.platformAudit,
-        orgAudit: current.orgAudit,
-        selectedAuditOrgId: current.selectedAuditOrgId,
-        auditLoading: current.auditLoading,
-        auditError: current.auditError,
-      ),
-    );
+    emit(current.copyWith(pendingUserId: userId));
     final OrgOutcome<void> outcome = await call();
     if (isClosed) {
       return null;
@@ -397,6 +409,9 @@ class PlatformAdminCubit extends Cubit<PlatformAdminState> {
         return null;
       case OrgFailed<void>(failure: final OrgFailure failure):
         emit(
+          // pendingUserId deliberately cleared: the action finished
+          // (failed), so the row spinner goes. Explicit full construction —
+          // copyWith cannot clear it.
           PlatformAdminLoaded(
             current.organizations,
             current.members,

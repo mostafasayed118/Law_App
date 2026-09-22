@@ -812,6 +812,9 @@ class _NullSessionGateway implements AuthGateway {
       );
 
   @override
+  bool get supportsDemoSession => true;
+
+  @override
   Future<AuthOutcome<Session>> startDemoSession() async =>
       AuthOutcome<Session>.success(demoSession());
 
@@ -842,6 +845,9 @@ class _PreauthenticatedGateway implements AuthGateway {
   @override
   Future<AuthOutcome<Session>> restore() async =>
       AuthOutcome<Session>.success(session);
+
+  @override
+  bool get supportsDemoSession => true;
 
   @override
   Future<AuthOutcome<Session>> startDemoSession() async =>
@@ -886,6 +892,9 @@ class _ExpiredSessionGateway implements AuthGateway {
       );
 
   @override
+  bool get supportsDemoSession => true;
+
+  @override
   Future<AuthOutcome<Session>> startDemoSession() async =>
       AuthOutcome<Session>.success(demoSession());
 
@@ -916,6 +925,9 @@ class _FailingAuthGateway implements AuthGateway {
   @override
   Future<AuthOutcome<Session>> restore() async =>
       AuthOutcome<Session>.failure(failure);
+
+  @override
+  bool get supportsDemoSession => true;
 
   @override
   Future<AuthOutcome<Session>> startDemoSession() async =>
@@ -1035,6 +1047,9 @@ class _CountingAuthGateway implements AuthGateway {
   @override
   Future<AuthOutcome<Session>> restore() async =>
       AuthOutcome<Session>.success(demoSession());
+
+  @override
+  bool get supportsDemoSession => true;
 
   @override
   Future<AuthOutcome<Session>> startDemoSession() async {

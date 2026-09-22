@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/app/deep_link/pending_accept_invite_store.dart';
 import 'package:legalhub/app/localization/locale_cubit.dart';
 import 'package:legalhub/app/service_locator.dart';
@@ -61,7 +62,6 @@ import 'package:legalhub/features/matters/domain/matter_gateway.dart';
 import 'package:legalhub/features/matters/domain/matter_write_gateway.dart';
 import 'package:legalhub/features/messaging/data/fake_message_gateway.dart';
 import 'package:legalhub/features/messaging/domain/message_gateway.dart';
-import 'package:legalhub/features/orgs/presentation/active_org_store.dart';
 import 'package:legalhub/features/research/data/synthetic_ai_gateway.dart';
 import 'package:legalhub/features/research/domain/ai_gateway.dart';
 import 'package:legalhub/features/storage/data/fake_storage_gateway.dart';

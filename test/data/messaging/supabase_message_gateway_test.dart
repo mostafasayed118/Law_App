@@ -346,6 +346,35 @@ void main() {
       expect(result.valueOrNull, isEmpty);
     });
 
+    test(
+      'reverses the newest-first capped payload to chronological order',
+      () async {
+        // The bounded read fetches the NEWEST kSupabaseListRowCap rows
+        // (`sent_at` DESC — a cap must keep the newest end of the history,
+        // `list_query_guards.dart`), so the seam's rows arrive newest-first
+        // exactly as this stub models. The gateway owns the reversal to the
+        // chronological contract the detail screen renders and the
+        // live-append path appends to. Pinning both halves: flipping
+        // `messages` back to ascending in the ordering table, or dropping
+        // the reversal, fails one of the two ends of this pair.
+        api.messageRows = <Map<String, dynamic>>[
+          _messageRow(id: 'msg-new', sentAt: '2026-08-07T11:00:00.000Z'),
+          _messageRow(id: 'msg-mid', sentAt: '2026-08-07T10:00:00.000Z'),
+          _messageRow(id: 'msg-old', sentAt: '2026-08-07T09:00:00.000Z'),
+        ];
+
+        final Result<List<Message>> result = await gateway.fetchMessages(
+          'thread-1',
+        );
+
+        expect(result.isSuccess, isTrue);
+        expect(
+          result.valueOrNull!.map((Message message) => message.id),
+          <String>['msg-old', 'msg-mid', 'msg-new'],
+        );
+      },
+    );
+
     test('a missing id fails the fetch loudly', () async {
       api.messageRows = <Map<String, dynamic>>[
         <String, dynamic>{

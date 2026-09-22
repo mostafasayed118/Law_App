@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/app/deep_link/app_link_listener.dart';
 import 'package:legalhub/app/deep_link/app_link_parser.dart';
 import 'package:legalhub/app/deep_link/app_link_source.dart';
@@ -21,7 +22,6 @@ import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/matters/data/fake_matter_write_gateway.dart';
 import 'package:legalhub/features/matters/presentation/matter_link_chip.dart';
-import 'package:legalhub/features/orgs/presentation/active_org_store.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
 void main() {
@@ -1778,6 +1778,9 @@ class RoleGateway implements AuthGateway {
   Future<AuthOutcome<Session>> restore() async {
     return AuthOutcome<Session>.success(_session);
   }
+
+  @override
+  bool get supportsDemoSession => true;
 
   @override
   Future<AuthOutcome<Session>> startDemoSession() async {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../app/active_org_store.dart';
 import '../../../app/deep_link/pending_accept_invite_store.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
@@ -8,7 +9,6 @@ import '../../../core/auth/session.dart';
 import '../../../core/organizations/organization_gateway.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../auth/presentation/auth_cubit.dart';
-import 'active_org_store.dart';
 import 'org_error_messages.dart';
 
 /// Invitation acceptance screen (Phase 2 slice 2.4, R3; P3.4 handoff).

@@ -91,6 +91,9 @@ class _FailingAuthGateway implements AuthGateway {
       AuthOutcome<Session>.failure(failure);
 
   @override
+  bool get supportsDemoSession => true;
+
+  @override
   Future<AuthOutcome<Session>> startDemoSession() async =>
       AuthOutcome<Session>.failure(failure);
 
