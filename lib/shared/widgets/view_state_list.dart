@@ -26,6 +26,11 @@ import '../../l10n/app_localizations.dart';
 /// mapping the whole data list into children. The inter-tile `spaceSm` gap,
 /// the pre-footer `spaceLg` gap, and the footer note are owned by the
 /// widget; call sites supply only the tile for one item via [tileBuilder].
+///
+/// Optional [header] (audit 2026-09-21, M-20 follow-up): screens that keep a
+/// filter row or search field inside the same scroll view pass it here
+/// instead of wrapping this widget in another scrollable. The header is
+/// prepended to every arm's children, so it scrolls away with the content.
 class ViewStateList<ItemT> extends StatelessWidget {
   const ViewStateList({
     required this.state,
@@ -34,6 +39,7 @@ class ViewStateList<ItemT> extends StatelessWidget {
     required this.empty,
     required this.errorCopy,
     required this.localOnlyNote,
+    this.header = const <Widget>[],
     this.listPadding = const EdgeInsetsDirectional.all(
       LegalHubTheme.marginMobile,
     ),
@@ -61,6 +67,17 @@ class ViewStateList<ItemT> extends StatelessWidget {
   /// The footer note under the empty copy and the success tiles.
   final String localOnlyNote;
 
+  /// Optional widgets that scroll with the content, above every arm — the
+  /// filter chips or search field of screens that keep a header inside the
+  /// same scroll view (matters, discovery).
+  ///
+  /// They are **prepended to the arm's children** rather than wrapped around
+  /// the list: that is exactly how those screens already compose the header
+  /// today, so the header keeps scrolling away with the content instead of
+  /// being pinned, and no nested scrollable is created (an inner `ListView`
+  /// inside a `ListView` would have unbounded height).
+  final List<Widget> header;
+
   /// The ListView padding on the empty, error, and success arms.
   final EdgeInsetsGeometry listPadding;
 
@@ -81,6 +98,7 @@ class ViewStateList<ItemT> extends StatelessWidget {
       ViewEmpty<List<ItemT>>() => ListView(
         padding: listPadding,
         children: <Widget>[
+          ...header,
           empty,
           const SizedBox(height: LegalHubTheme.spaceLg),
           note,
@@ -92,6 +110,7 @@ class ViewStateList<ItemT> extends StatelessWidget {
       ViewOffline<List<ItemT>>() => ListView(
         padding: listPadding,
         children: <Widget>[
+          ...header,
           Text(
             l10n.stateOffline,
             style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
@@ -102,6 +121,7 @@ class ViewStateList<ItemT> extends StatelessWidget {
       ViewUnauthorized<List<ItemT>>() => ListView(
         padding: listPadding,
         children: <Widget>[
+          ...header,
           Text(
             l10n.stateUnauthorized,
             style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
@@ -111,6 +131,7 @@ class ViewStateList<ItemT> extends StatelessWidget {
       ViewError<List<ItemT>>() => ListView(
         padding: listPadding,
         children: <Widget>[
+          ...header,
           Text(
             errorCopy,
             style: text.bodyMedium?.copyWith(color: scheme.error),
@@ -129,6 +150,7 @@ class ViewStateList<ItemT> extends StatelessWidget {
         ListView(
           padding: listPadding,
           children: <Widget>[
+            ...header,
             empty,
             const SizedBox(height: LegalHubTheme.spaceLg),
             note,
@@ -140,6 +162,7 @@ class ViewStateList<ItemT> extends StatelessWidget {
           tileBuilder: tileBuilder,
           localOnlyNote: note,
           listPadding: listPadding,
+          header: header,
         ),
     };
   }
@@ -148,36 +171,45 @@ class ViewStateList<ItemT> extends StatelessWidget {
 /// The success arm as a lazily-built list: [ListView.builder] constructs
 /// only the visible rows. The layout matches the previous eager arm —
 /// tile, `spaceSm` gap, tile, … last tile, `spaceLg` gap, footer note —
-/// expressed as `items.length + 2` rows where the two trailing rows are
-/// the pre-footer gap and the note.
+/// expressed as `header.length + items.length + 2` rows, where the optional
+/// header occupies the leading rows and the two trailing rows are the
+/// pre-footer gap and the note.
 class _SuccessListView<ItemT> extends StatelessWidget {
   const _SuccessListView({
     required this.items,
     required this.tileBuilder,
     required this.localOnlyNote,
     required this.listPadding,
+    required this.header,
   });
 
   final List<ItemT> items;
   final Widget Function(BuildContext context, ItemT item) tileBuilder;
   final Widget localOnlyNote;
   final EdgeInsetsGeometry listPadding;
+  final List<Widget> header;
 
   @override
   Widget build(BuildContext context) {
-    final int itemCount = items.length + 2;
+    final int headerCount = header.length;
+    final int contentCount = items.length + 2;
+    final int itemCount = headerCount + contentCount;
     return ListView.builder(
       padding: listPadding,
       itemCount: itemCount,
       itemBuilder: (BuildContext context, int index) {
-        if (index == itemCount - 1) {
+        if (index < headerCount) {
+          return header[index];
+        }
+        final int i = index - headerCount;
+        if (i == contentCount - 1) {
           return localOnlyNote;
         }
-        if (index == itemCount - 2) {
+        if (i == contentCount - 2) {
           return const SizedBox(height: LegalHubTheme.spaceLg);
         }
-        final Widget tile = tileBuilder(context, items[index]);
-        if (index == itemCount - 3) {
+        final Widget tile = tileBuilder(context, items[i]);
+        if (i == contentCount - 3) {
           return tile;
         }
         return Column(

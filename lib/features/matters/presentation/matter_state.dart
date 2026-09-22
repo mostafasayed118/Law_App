@@ -34,6 +34,17 @@ class MatterState extends Equatable {
     ViewUnauthorized() => const <Matter>[],
   };
 
+  /// [visibleMatters] as a [ViewState], for the lazy list surface: its builder
+  /// consumes the state's data, so the filtered rows have to travel as one.
+  /// A filter that matches nothing becomes an empty [ViewSuccess], which the
+  /// surface renders as the empty arm (the same copy the eager
+  /// `visibleMatters.isEmpty ? empty : …` branch produced).
+  ViewState<List<Matter>> get visibleMattersState => switch (matters) {
+    ViewSuccess<List<Matter>>() =>
+      status == null ? matters : ViewSuccess<List<Matter>>(visibleMatters),
+    final ViewState<List<Matter>> other => other,
+  };
+
   /// Sentinel distinguishing "not provided" from "explicitly null" so
   /// [status] can be cleared (back to "All") through copyWith.
   static const Object _unset = Object();

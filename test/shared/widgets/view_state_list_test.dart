@@ -6,7 +6,11 @@ import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/view_state_list.dart';
 
 void main() {
-  Widget pumpViewState<T>(ViewState<List<T>> state, {VoidCallback? onRetry}) {
+  Widget pumpViewState<T>(
+    ViewState<List<T>> state, {
+    VoidCallback? onRetry,
+    List<Widget> header = const <Widget>[],
+  }) {
     // The error arm's retry label reads `AppLocalizations.of(context)`
     // (view_state_list.dart), so the harness must install the delegates —
     // the same pump contract as every other widget test in the repo.
@@ -23,10 +27,36 @@ void main() {
           empty: const Text('empty copy'),
           errorCopy: 'Error copy',
           localOnlyNote: 'Local-only note',
+          header: header,
         ),
       ),
     );
   }
+
+  testWidgets('the header renders above every arm, empty included', (
+    tester,
+  ) async {
+    // Screens that keep a filter row or search field inside the same scroll
+    // view pass it as `header` instead of wrapping this widget in another
+    // scrollable (audit M-20 follow-up). The header must survive the empty
+    // arm too — it is how the user changes the result in the first place.
+    const List<Widget> header = <Widget>[Text('header copy')];
+
+    await tester.pumpWidget(
+      pumpViewState<String>(
+        const ViewSuccess<List<String>>(<String>['a']),
+        header: header,
+      ),
+    );
+    expect(find.text('header copy'), findsOneWidget);
+    expect(find.text('item:a'), findsOneWidget);
+
+    await tester.pumpWidget(
+      pumpViewState<String>(const ViewEmpty<List<String>>(), header: header),
+    );
+    expect(find.text('header copy'), findsOneWidget);
+    expect(find.text('empty copy'), findsOneWidget);
+  });
 
   testWidgets('loading branch renders the centered spinner', (tester) async {
     await tester.pumpWidget(

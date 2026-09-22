@@ -84,31 +84,11 @@ class _ListSurfaceState extends State<_ListSurface> {
       body: SafeArea(
         child: BlocBuilder<MatterCubit, MatterState>(
           builder: (BuildContext context, MatterState state) {
-            final MatterCubit cubit = context.read<MatterCubit>();
-            return ListView(
-              padding: const EdgeInsetsDirectional.all(
-                LegalHubTheme.marginMobile,
-              ),
-              children: <Widget>[
-                AppFilterChips<MatterStatus>(
-                  values: MatterStatus.values,
-                  selected: state.status,
-                  allLabel: l10n.matterFilterAll,
-                  labelOf: (MatterStatus status) =>
-                      matterStatusLabel(l10n, status),
-                  onSelected: cubit.setStatus,
-                ),
-                const SizedBox(height: LegalHubTheme.spaceLg),
-                _resultsView(context, state, l10n, text, scheme),
-                const SizedBox(height: LegalHubTheme.spaceLg),
-                Text(
-                  l10n.matterLocalOnlyNote,
-                  style: text.bodySmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            );
+            // Lazy list surface (audit 2026-09-21, M-20): the filter chips stay
+            // the header of the same scroll view — passed as `header`, they
+            // keep scrolling away with the rows instead of being pinned, and
+            // no nested scrollable is created.
+            return _resultsView(context, state, l10n, text, scheme);
           },
         ),
       ),
@@ -130,39 +110,39 @@ class _ListSurfaceState extends State<_ListSurface> {
         style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
       ),
     );
-    return ViewStateSwitch<List<Matter>>(
-      state: state.matters,
+    return ViewStateList<Matter>(
+      state: state.visibleMattersState,
       onRetry: cubit.load,
-      builder: (BuildContext context, List<Matter> matters) =>
-          state.visibleMatters.isEmpty
-          ? empty
-          : Column(
-              children: <Widget>[
-                for (final Matter matter in state.visibleMatters) ...<Widget>[
-                  AppTile(
-                    icon: Icons.folder_outlined,
-                    title: matter.title,
-                    subtitles: <String>[
-                      '${practiceAreaLabel(l10n, matter.practiceArea)} · ${matter.assignedAttorneyName}',
-                    ],
-                    trailing: Wrap(
-                      spacing: LegalHubTheme.spaceSm,
-                      runSpacing: LegalHubTheme.spaceSm,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: <Widget>[
-                        MatterStatusChip(
-                          label: matterStatusLabel(l10n, matter.status),
-                        ),
-                      ],
-                    ),
-                    onTap: () => context.go(AppRoutes.matterDetail(matter.id)),
-                  ),
-                  const SizedBox(height: LegalHubTheme.spaceSm),
-                ],
-              ],
-            ),
+      tileBuilder: (BuildContext context, Matter matter) => AppTile(
+        icon: Icons.folder_outlined,
+        title: matter.title,
+        subtitles: <String>[
+          '${practiceAreaLabel(l10n, matter.practiceArea)} · ${matter.assignedAttorneyName}',
+        ],
+        trailing: Wrap(
+          spacing: LegalHubTheme.spaceSm,
+          runSpacing: LegalHubTheme.spaceSm,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: <Widget>[
+            MatterStatusChip(label: matterStatusLabel(l10n, matter.status)),
+          ],
+        ),
+        onTap: () => context.go(AppRoutes.matterDetail(matter.id)),
+      ),
+      header: <Widget>[
+        AppFilterChips<MatterStatus>(
+          values: MatterStatus.values,
+          selected: state.status,
+          allLabel: l10n.matterFilterAll,
+          labelOf: (MatterStatus status) => matterStatusLabel(l10n, status),
+          onSelected: cubit.setStatus,
+        ),
+        const SizedBox(height: LegalHubTheme.spaceLg),
+      ],
       empty: empty,
       errorCopy: l10n.matterError,
+      localOnlyNote: l10n.matterLocalOnlyNote,
+      listPadding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
     );
   }
 }

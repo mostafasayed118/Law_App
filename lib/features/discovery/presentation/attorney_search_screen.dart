@@ -67,32 +67,11 @@ class _SearchSurfaceState extends State<_SearchSurface> {
       body: SafeArea(
         child: BlocBuilder<DiscoveryCubit, DiscoveryState>(
           builder: (BuildContext context, DiscoveryState state) {
-            final DiscoveryCubit cubit = context.read<DiscoveryCubit>();
-            return ListView(
-              padding: const EdgeInsetsDirectional.all(
-                LegalHubTheme.marginMobile,
-              ),
-              children: <Widget>[
-                const _SearchField(),
-                const SizedBox(height: LegalHubTheme.spaceMd),
-                AppFilterChips<PracticeArea>(
-                  values: PracticeArea.values,
-                  selected: state.practiceArea,
-                  allLabel: l10n.discoveryFilterAll,
-                  labelOf: (PracticeArea area) => practiceAreaLabel(l10n, area),
-                  onSelected: cubit.setPracticeArea,
-                ),
-                const SizedBox(height: LegalHubTheme.spaceLg),
-                _resultsView(context, state, l10n, text, scheme),
-                const SizedBox(height: LegalHubTheme.spaceLg),
-                Text(
-                  l10n.discoveryLocalOnlyNote,
-                  style: text.bodySmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            );
+            // Lazy list surface (audit 2026-09-21, M-20): the search field and
+            // the practice-area chips stay the header of the same scroll view —
+            // passed as `header`, they keep scrolling away with the rows
+            // instead of being pinned, and no nested scrollable is created.
+            return _resultsView(context, state, l10n, text, scheme);
           },
         ),
       ),
@@ -114,27 +93,29 @@ class _SearchSurfaceState extends State<_SearchSurface> {
         style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
       ),
     );
-    return ViewStateSwitch<List<Attorney>>(
-      state: state.attorneys,
+    return ViewStateList<Attorney>(
+      state: state.visibleAttorneysState,
       onRetry: cubit.load,
-      builder: (BuildContext context, List<Attorney> attorneys) =>
-          state.visibleAttorneys.isEmpty
-          ? empty
-          : Column(
-              children: <Widget>[
-                for (final Attorney attorney
-                    in state.visibleAttorneys) ...<Widget>[
-                  _AttorneyTile(
-                    attorney: attorney,
-                    onTap: () =>
-                        context.go(AppRoutes.attorneyProfile(attorney.id)),
-                  ),
-                  const SizedBox(height: LegalHubTheme.spaceSm),
-                ],
-              ],
-            ),
+      tileBuilder: (BuildContext context, Attorney attorney) => _AttorneyTile(
+        attorney: attorney,
+        onTap: () => context.go(AppRoutes.attorneyProfile(attorney.id)),
+      ),
+      header: <Widget>[
+        const _SearchField(),
+        const SizedBox(height: LegalHubTheme.spaceMd),
+        AppFilterChips<PracticeArea>(
+          values: PracticeArea.values,
+          selected: state.practiceArea,
+          allLabel: l10n.discoveryFilterAll,
+          labelOf: (PracticeArea area) => practiceAreaLabel(l10n, area),
+          onSelected: cubit.setPracticeArea,
+        ),
+        const SizedBox(height: LegalHubTheme.spaceLg),
+      ],
       empty: empty,
       errorCopy: l10n.discoveryError,
+      localOnlyNote: l10n.discoveryLocalOnlyNote,
+      listPadding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
     );
   }
 }

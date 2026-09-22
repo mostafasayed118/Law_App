@@ -39,6 +39,18 @@ class DiscoveryState extends Equatable {
     ViewUnauthorized() => const <Attorney>[],
   };
 
+  /// [visibleAttorneys] as a [ViewState], for the lazy list surface: its
+  /// builder consumes the state's data, so the filtered rows have to travel as
+  /// one. A query that matches nothing becomes an empty [ViewSuccess], which
+  /// the surface renders as the empty arm (the same copy the eager
+  /// `visibleAttorneys.isEmpty ? empty : …` branch produced).
+  ViewState<List<Attorney>> get visibleAttorneysState => switch (attorneys) {
+    ViewSuccess<List<Attorney>>() => ViewSuccess<List<Attorney>>(
+      visibleAttorneys,
+    ),
+    final ViewState<List<Attorney>> other => other,
+  };
+
   List<Attorney> _filter(List<Attorney> all) {
     final String needle = query.trim().toLowerCase();
     return all
