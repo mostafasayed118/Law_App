@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'secure_session_storage.dart';
 import 'supabase_auth_api.dart';
 
 /// Initializes the app-level Supabase client with build-time config.
@@ -23,12 +24,25 @@ Future<void> initializeSupabase({
   // `detectSessionInUri: true` (the observer that turns an auth-callback
   // URI into a session). `AuthFlowType.implicit` would be the legacy flow
   // and must not be introduced here.
+  //
+  // `secureLocalStorage` moves BOTH the persisted session (the refresh
+  // token) and the PKCE code verifier out of SharedPreferences — plaintext
+  // `NSUserDefaults` on iOS / an XML file on Android — into the platform
+  // Keychain/Keystore (P1.2's iOS half, owner decision OI-D3). It also
+  // migrates a session the default storage had already persisted, so the
+  // upgrade does not sign anyone out.
+  final SecureSupabaseLocalStorage secureLocalStorage =
+      SecureSupabaseLocalStorage(
+        persistSessionKey: SecureSupabaseLocalStorage.defaultKeyFor(url),
+      );
   return Supabase.initialize(
     url: url,
     publishableKey: anonKey,
-    authOptions: const FlutterAuthClientOptions(
+    authOptions: FlutterAuthClientOptions(
       authFlowType: AuthFlowType.pkce,
       detectSessionInUri: true,
+      localStorage: secureLocalStorage,
+      pkceAsyncStorage: secureLocalStorage,
     ),
   );
 }
