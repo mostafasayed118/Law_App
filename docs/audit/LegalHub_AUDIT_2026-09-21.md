@@ -652,4 +652,22 @@ This is a **first slice** of H-7, not the whole finding: the `_mapFailure` bodie
 
 **Verification:** `flutter analyze` → No issues found · `flutter test` → **+1379 All tests passed** (unchanged — a pure refactor, and the 387 data-layer tests pin the classification) · `dart format` clean · `scripts/verify_ledger.sh` → PASS · README lockstep unchanged at 1376/1379.
 
+### 12.4 §12.1's follow-up (the clearing-transition pins) and M-15 (2026-09-22)
+
+**The five deliberate-clearing transitions are now pinned — and three of them already were.** Checking before writing, rather than assuming the gap was total:
+
+| Transition | Status |
+|---|---|
+| `_runAction` failure clears `pendingUserId` (admin) | already pinned (`platform_admin_cubit_test` asserts `pendingUserId, isNull` after a failed action, ×2) |
+| `selectAuditOrg(null)` clears the org trail | already pinned ("selectAuditOrg(null) clears the org trail without a fetch") |
+| `OrgCubit`'s four roster/action clears | already pinned (×4) |
+| **`loadAudit`'s in-flight emission clears the trail + `selectedAuditOrgId`** | **was not pinned — added** |
+| **`selectAuditOrg`'s in-flight emission clears a stale `auditError`** | **was not pinned — added** |
+
+The two new pins exploit a property of the cubit: the in-flight state is emitted *synchronously* before the first `await`, so `cubit.state` can be read straight after an un-awaited call — no stream plumbing needed. Both carry a comment explaining *why* the clear is deliberate and that `copyWith` (null = keep) cannot express it, so a future "helpful" conversion of those two sites to `copyWith` fails a test instead of silently carrying a stale org scope into the platform-trail load. That risk was created by §12.1 itself, which introduced `copyWith` as the idiomatic path.
+
+**M-15 — the dead-code finding, resolved by recording rather than deleting.** `lib/shared/responsive/responsive_breakpoints.dart` (46 lines) has zero references in `lib/` or `test/`; `lib/core/use_cases/use_case.dart` (11 lines) is a layer *named in `INSTRUCTIONS.md` §4.1* with no production consumer. The audit offered deletion or recording. Recording won because both are **declared foundations**, not incidental leftovers — the responsive module was Batch 5 of the codebase-audit plan and `use_cases/` is a named layer — so deletion would silently drop an intended pattern. The actual complaint was legibility ("readers cannot tell which half of the responsive module is live"), and `docs/tracked_deviations.md` **D-T9 (TRACKED 2026-09-22)** fixes that, with explicit trigger conditions for deleting each (`responsive_breakpoints` goes if no feature adopts it by the next responsive slice; `use_cases/` either gets one real implementation or loses its line in §4.1). `sample_service.dart` is explicitly excluded — its docstring declares it intentional and the DI test pins it.
+
+**Verification:** `flutter analyze` → No issues found · `flutter test` → **+1381 All tests passed** (1379 → 1381) · `dart format` clean · `scripts/verify_ledger.sh` → PASS · README lockstep 1376/1379 → 1378/1381.
+
 *Audit produced by five parallel dimension subagents with independent consolidator verification. Raw findings: `docs/audit/_raw/`.*

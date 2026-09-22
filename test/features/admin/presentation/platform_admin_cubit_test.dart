@@ -390,6 +390,66 @@ void main() {
       },
     );
 
+    test("loadAudit's in-flight emission deliberately clears the org scope and "
+        'trail', () async {
+      // Pinned because copyWith (null = keep) cannot express these clears, so
+      // the site stays an explicit full construction (M-2, audit 2026-09-21).
+      // A "helpful" conversion to copyWith would silently carry a stale org
+      // scope and trail into the platform-trail load.
+      final _StubPlatformAdminGateway gateway = _StubPlatformAdminGateway()
+        ..platformAuditOutcome = OrgOutcome<List<AuditEntry>>.success(
+          <AuditEntry>[entry],
+        )
+        ..orgAuditOutcome = OrgOutcome<List<AuditEntry>>.success(<AuditEntry>[
+          entry,
+        ]);
+      final PlatformAdminCubit cubit = await loadedCubit(gateway);
+      addTearDown(cubit.close);
+      await cubit.selectAuditOrg('org-1');
+      final PlatformAdminLoaded scoped = cubit.state as PlatformAdminLoaded;
+      expect(scoped.selectedAuditOrgId, 'org-1');
+      expect(scoped.orgAudit, isNotEmpty);
+
+      final Future<void> pending = cubit.loadAudit();
+
+      // The in-flight state is emitted synchronously, before the await.
+      final PlatformAdminLoaded inFlight = cubit.state as PlatformAdminLoaded;
+      expect(inFlight.auditLoading, isTrue);
+      expect(inFlight.selectedAuditOrgId, isNull);
+      expect(inFlight.orgAudit, isEmpty);
+      await pending;
+    });
+
+    test(
+      "selectAuditOrg's in-flight emission clears a stale section error",
+      () async {
+        // Same reasoning as above: the clear is deliberate, and copyWith
+        // cannot express it.
+        final _StubPlatformAdminGateway gateway = _StubPlatformAdminGateway()
+          ..orgAuditOutcome = const OrgOutcome<List<AuditEntry>>.failure(
+            OrgFailure(kind: OrgFailureKind.unknown, message: 'boom'),
+          );
+        final PlatformAdminCubit cubit = await loadedCubit(gateway);
+        addTearDown(cubit.close);
+        await cubit.selectAuditOrg('org-1');
+        expect(
+          (cubit.state as PlatformAdminLoaded).auditError,
+          OrgFailureKind.unknown,
+        );
+
+        gateway.orgAuditOutcome = OrgOutcome<List<AuditEntry>>.success(
+          <AuditEntry>[entry],
+        );
+        final Future<void> pending = cubit.selectAuditOrg('org-2');
+
+        final PlatformAdminLoaded inFlight = cubit.state as PlatformAdminLoaded;
+        expect(inFlight.auditLoading, isTrue);
+        expect(inFlight.auditError, isNull);
+        expect(inFlight.selectedAuditOrgId, 'org-2');
+        await pending;
+      },
+    );
+
     test('selectAuditOrg fetches and fills the org-scoped trail', () async {
       final _StubPlatformAdminGateway gateway = _StubPlatformAdminGateway()
         ..orgAuditOutcome = OrgOutcome<List<AuditEntry>>.success(<AuditEntry>[

@@ -57,7 +57,7 @@ messaging services.
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (1376 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (1378 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), ThemeCubit (mode persistence + restart
   restore), Redactor (password/OTP/email/Bearer redaction with leak guards),
@@ -93,13 +93,14 @@ messaging services.
   in-memory locale store, and the onboarding-success screen. Batch 5 added
   the 800×600 onboarding no-overflow test and the EN/AR/TR localized-fallback
   assertions.
-- Coverage: **1376 tests** (2026-09-22 — the P1.7 state-honesty slice: a typed
+- Coverage: **1378 tests** (2026-09-22 — the P1.7 state-honesty slice: a typed
   `AppError.kind` (denied / unavailable) populated by the seven gateway failure
   mappers, `viewStateForFailure` selecting the arm, and distinct
   offline/unauthorized rendering in `ViewStateSwitch`/`ViewStateList`/
   `WorkspaceSection` (the folded "empty copy" shortcut is gone), pinned at the
-  mapper, widget and cubit levels; prior 2026-09-21 — the audit-fix + P1 slice:
-  the bounded-SELECT guard + ordering-table unit tests
+  mapper, widget and cubit levels, plus the two deliberate in-flight clears in
+  `PlatformAdminCubit`'s audit section; prior 2026-09-21 — the audit-fix + P1
+  slice: the bounded-SELECT guard + ordering-table unit tests
   (`test/data/list_query_guards_test.dart`),
   the capped message-read chronological reversal + its regression test, the
   ViewStateList harness repairs, the concurrent roster-resolution fix, the
@@ -373,8 +374,8 @@ HTTP layer and lock the exact postgrest await shape the app depends on —
 (2: `from().select()` plain + chained `.eq()` → raw row list). A future
 postgrest upgrade that changes the await contract fails loudly in CI, not on
 a device (the on-device create-org crash this class caused is recorded in
-`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **1379
-tests passing** (1376 tracked declarations, ledger `verify_ledger.sh` PASS).
+`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **1381
+tests passing** (1378 tracked declarations, ledger `verify_ledger.sh` PASS).
 
 ## Fonts and licenses
 

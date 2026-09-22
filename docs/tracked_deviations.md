@@ -228,3 +228,37 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
   `docs/d11_billing_payments_decision_2026-08-08.md`;
   `docs/features_roadmap_2026-08-03.md` §14;
   `docs/p14_plan_complete_2026-08-08.md` §4.
+
+## D-T9: Two declared foundations have zero consumers — **TRACKED (2026-09-22)**
+
+- **Where:**
+  - `lib/shared/responsive/responsive_breakpoints.dart` (46 lines —
+    `ResponsiveBreakpoint`, `isCompact`/`isMedium`,
+    `responsiveHorizontalPadding`) has **zero references** anywhere in `lib/`
+    or `test/` outside its own file. The `responsive.dart` barrel exports it,
+    but that barrel's only consumer uses `responsive_content.dart`.
+  - `lib/core/use_cases/use_case.dart` (11 lines — `UseCase`/`NoInput`) is
+    named as an architectural layer in `INSTRUCTIONS.md` §4.1 but has **no
+    production consumer**; its only reference is
+    `test/core/use_cases/use_case_test.dart`, which defines its own
+    implementations, so the test is self-referential rather than a consumer.
+- **Why it is not simply deleted:** both are *declared* foundations rather
+  than incidental leftovers — the responsive module was Batch 5 of
+  `docs/codebase_audit_plan.md` (completed 2026-08-01), and `use_cases/` is a
+  named layer in the architecture rules. Deleting them would silently drop an
+  intended pattern instead of removing junk. The 2026-09-21 audit (M-15)
+  offered deletion **or** recording; recording is the reversible choice and it
+  fixes the actual complaint, which was legibility: a reader could not tell
+  which half of the responsive module is live.
+- **Decision:** keep and track. If no feature adopts `responsive_breakpoints`
+  by the next responsive slice, delete it (with its barrel export). Either
+  implement one real use case or drop the `use_cases/` line from
+  `INSTRUCTIONS.md` §4.1 — a layer named in the rules and used nowhere is the
+  one place the documented architecture and the code disagree.
+- **Not included:** `lib/core/sample_service.dart` is *not* part of this entry
+  — its own docstring declares it intentional B3 DI-proof scaffolding and
+  `test/service_locator_test.dart` pins it as such.
+- **Status:** **TRACKED (2026-09-22).** No code change in this entry.
+- **Owner:** Project Owner (github.com/mostafasayed118) — decision pending.
+- **Cross-reference:** `docs/audit/LegalHub_AUDIT_2026-09-21.md` §5 (M-15);
+  `docs/codebase_audit_plan.md` Batch 5; `INSTRUCTIONS.md` §4.1.
