@@ -727,6 +727,26 @@ Two design points that the call sites forced:
 
 **P1.9 is complete** (M-10 + M-20). **Verification:** `flutter analyze` → No issues found · `flutter test` → **+1388 All tests passed** · `dart format` clean · `scripts/verify_ledger.sh` → **PASS 115/0/0** · README lockstep unchanged at 1385/1388.
 
+### 12.8 H-7's second half — measured, and declined with evidence (2026-09-22)
+
+The audit estimated ~548 lines of dedupable seam-classification code. Measuring before executing found the trade is worse than estimated, and the work was **not** done:
+
+- **The 9 `Supabase*Exception` classes** are ~70 lines, but their types are referenced **245 times across 46 files** (the api impls throw them, the gateways catch them, the api-impl tests construct and assert on them). Consolidating into one `SupabaseSeamException<K>` would churn 46 files to remove ~70 lines and would replace readable type names (`SupabaseDocumentException`) with instantiated generics (`SupabaseSeamException<SupabaseDocumentFailureKind>`) in stack traces and test failures.
+- **The 10 failure-kind enums cannot be merged**: Dart enums are not extendable, and each carries domain-specific values (`duplicateMember`, `lastPartner`, `invalidRole`, `invalidInvitation`, …) whose type safety the gateways rely on.
+- **The `_mapFailure` bodies are ~60% per-feature data** — the code/user-copy pairs *must* differ per feature (that is the localized, feature-scoped copy). The shared remainder is the 6-line `AppError` construction; extracting it would save ~5 lines per site behind a new indirection.
+
+The genuinely valuable part of H-7 — the security-relevant denial classifier, where a miss silently degrades a denial to `unknown` — was already extracted as the first slice (`isPostgrestDenial`, commit `c4607aa`, 6 of 9 classifiers). **H-7 is therefore closed as "first slice delivered; the remainder measured and declined"** — the evidence is recorded so the owner can overrule it, but churning 46 files for ~70 lines is not a good trade for a portfolio repo.
+
+### 12.9 OI-D5.1 — the `use_cases` layer gets its first real consumer (2026-09-22)
+
+`LoadVisibleNotifications` (commit `51a5bd0`) is the feed's D-N5/D-PF2/D-PF3 visibility rule as a focused domain operation, and the first production consumer of `lib/core/use_cases/use_case.dart` — closing the one place the documented architecture (`INSTRUCTIONS.md` §4.1) and the code disagreed. `tracked_deviations.md` **D-T9's `use_cases` half is now RESOLVED** (the `responsive_breakpoints` half stays tracked).
+
+The extraction surfaced and fixed a real contract violation: the rule was inlined in `NotificationCubit.load`, where it read the prefs store **once per toggle** — three reads per load — while its own comment claimed D-PF2's *"the store is read once per load"*. The contract is now the implementation, pinned by a test that counts the reads. `NotificationPrefs.isEnabled(category)` owns the category→toggle mapping so a new category cannot be added without that switch failing to compile. One interface note for the record: `UseCase` is `abstract interface class`, so implementations use `implements`, not `extends` — the analyzer rejects the latter.
+
+**Verification:** `flutter analyze` → No issues found · `flutter test` → **+1394 All tests passed** (1388 → 1394) · `dart format` clean · `scripts/verify_ledger.sh` → **PASS 115/0/0** · README lockstep **1391/1394**.
+
+**Remaining roadmap:** P1.3 (the approved SQL apply slice — needs the owner's apply path/credentials) and the iOS half of P1.2 (`flutter_secure_storage`, approved — needs `pub add` + platform config + a device to verify the Keychain behaviour).
+
 **Verification:** `flutter analyze` → No issues found · `flutter test` → **+1387 All tests passed** · `dart format` clean · `scripts/verify_ledger.sh` → **PASS 115/0/0** · README lockstep **1384/1387**.
 
 **Verification at this point:** `flutter analyze` → No issues found · `flutter test` → **+1386 All tests passed** · `dart format` clean · `scripts/verify_ledger.sh` → **PASS 115/0/0** · README lockstep **1383/1386**.

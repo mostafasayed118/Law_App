@@ -262,3 +262,20 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
 - **Owner:** Project Owner (github.com/mostafasayed118) — decision pending.
 - **Cross-reference:** `docs/audit/LegalHub_AUDIT_2026-09-21.md` §5 (M-15);
   `docs/codebase_audit_plan.md` Batch 5; `INSTRUCTIONS.md` §4.1.
+
+## D-T9 (UPDATE, 2026-09-22): the `use_cases` half is RESOLVED
+
+Owner decision **OI-D5.1** (`docs/open_items_decisions_2026-09-22.md`) chose
+"implement one real use case", and `LoadVisibleNotifications`
+(`lib/features/notifications/domain/visible_notifications.dart`) is that
+consumer — the feed's D-N5/D-PF2/D-PF3 visibility rule as a focused domain
+operation, wired into `NotificationCubit` and pinned by
+`test/features/notifications/visible_notifications_test.dart`. The
+docs/code mismatch this entry recorded is closed: the §4.1 layer is true.
+
+The extraction also fixed a contract violation it surfaced: the inlined rule
+read the prefs store **once per toggle** (three reads per load) while its own
+comment claimed D-PF2's "the store is read once per load".
+
+**Still tracked:** the `responsive_breakpoints.dart` half — unchanged, delete
+at the next responsive slice if no feature adopts it.
