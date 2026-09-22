@@ -672,4 +672,31 @@ The two new pins exploit a property of the cubit: the in-flight state is emitted
 
 **Verification:** `flutter analyze` → No issues found · `flutter test` → **+1381 All tests passed** (1379 → 1381) · `dart format` clean · `scripts/verify_ledger.sh` → PASS · README lockstep 1376/1379 → 1378/1381.
 
+### 12.5 Execution against the owner decisions (2026-09-22, per OI-D1..OI-D8)
+
+Owner decision capture: `docs/open_items_decisions_2026-09-22.md` (all eight closed). Executed in the owner's stated order (OI-D6: P1.1 → P1.9 → H-7b → P1.3).
+
+**P1.1 — COMPLETE. H-4 is closed.** All four direct `OrganizationGateway` calls are behind cubits; `await serviceLocator<` no longer appears anywhere in `lib/features` (verified by grep). Landed as two commits:
+
+| Flow | Owner | Shape |
+|---|---|---|
+| assignee read (`matter_create_screen:106`) | `MatterCreateCubit` | `Future<List<OrgMember>> loadMembers(id)`, carrying the F2-D4 active-member filter |
+| invite (`invite_member_sheet:204`) | `OrgCubit` | `Future<OrgOutcome<InviteResult>> inviteMember(...)`; the modal receives the roster's cubit via `BlocProvider.value` |
+| accept (`accept_invitation_screen:72`) | `AuthCubit` | `Future<OrgFailureKind?> acceptInvitation(token)`; the post-accept handoff stays in the screen (it snapshots known orgs *before* hydrating) |
+| delete (`profile_screen:131`) | `AuthCubit` | `Future<OrgFailureKind?> deleteAccount()`, which ends the session on success |
+
+`AuthCubit` gained the `OrganizationGateway` as a 4th constructor argument, which required updating **57 construction sites** (52 scripted, 5 hand-fixed). Two scripted attempts failed first — one matched `AuthCubit(` inside a doc comment and in the class's own constructor, the next duplicated insertions through bad index assembly. Both were caught before any file was written, or reverted from the committed state; the final pass inserts backwards from each call's closing paren and asserts the per-file insertion count.
+
+One test needed a real change rather than a mechanical one: `profile_screen_test`'s failed-deletion case re-registered a failing gateway in the locator *after* `setUp`, which the cubit (no longer locator-driven) could not see; it now builds its own cubit around that gateway — the pattern the file already used for its failing and expired cubits.
+
+**OI-D7 — the polish batch landed** (`.gitignore` for the agent/tooling dirs and workspace identity files; a Gate 5 **hard gate** clause rather than a duplicate checklist line, since Gate 5 already required analyze/tests — what it lacked was enforcement, plus the two mechanisms that let the compile error through: the file was untracked, and the tests were never run).
+
+**OI-D7.3 could not be executed as written, with evidence.** An exact `flutter: '3.44.4'` pin fails `flutter pub get` outright on this machine's 3.48.0-pre toolchain ("Because legalhub requires Flutter SDK version 3.44.4, version solving failed"), which blocks every local gate. CI already pins the exact SDK where reproducibility belongs (`.github/workflows/ci.yml:74`), so the range was restored and the finding is recorded in the pubspec comment. **Owner decision needed:** accept losing local verification on this machine, or install the pinned SDK (FVM).
+
+**OI-D8 — the push is authorized but BLOCKED by the environment.** `git push` cannot complete here: the configured credential helper is Git Credential Manager, which needs an interactive/GUI auth flow that this context cannot satisfy (the process hangs and is killed). Reads succeed anonymously (`git ls-remote` works), so the remote is reachable — only the write needs credentials. **The owner must run `git push`** (or pre-authenticate with a PAT/SSH key). 12 commits are pending.
+
+**Still to do, in the owner's order:** P1.9 (`CubitListSurface` + the remaining eager lists), H-7's second half (~500 lines of per-feature enums/exceptions), P1.3 (the approved SQL apply slice), the iOS half of P1.2 (`flutter_secure_storage`, approved), and OI-D5.1 (one real use case so §4.1 has a consumer).
+
+**Verification at this point:** `flutter analyze` → No issues found · `flutter test` → **+1386 All tests passed** · `dart format` clean · `scripts/verify_ledger.sh` → **PASS 115/0/0** · README lockstep **1383/1386**.
+
 *Audit produced by five parallel dimension subagents with independent consolidator verification. Raw findings: `docs/audit/_raw/`.*
