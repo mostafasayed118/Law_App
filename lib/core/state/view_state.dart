@@ -52,3 +52,17 @@ final class ViewUnauthorized<T> extends ViewState<T> {
   @override
   List<Object?> get props => const <Object?>[];
 }
+
+/// Selects the [ViewState] arm for a failed load from the error's typed
+/// [AppError.kind].
+///
+/// A denial renders [ViewUnauthorized] (no retry — retrying cannot help) and a
+/// transport outage renders [ViewOffline] (retryable); everything else keeps
+/// the generic [ViewError]. Before this, every failure became a generic error
+/// with a retry button that could never succeed on a denial, and the two
+/// variants had no producers anywhere in `lib/` (audit 2026-09-21, M-1).
+ViewState<T> viewStateForFailure<T>(AppError error) => switch (error.kind) {
+  AppErrorKind.denied => ViewUnauthorized<T>(),
+  AppErrorKind.unavailable => ViewOffline<T>(),
+  AppErrorKind.unknown => ViewError<T>(error),
+};

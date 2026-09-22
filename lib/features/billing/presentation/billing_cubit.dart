@@ -53,7 +53,7 @@ class BillingCubit extends Cubit<BillingState> {
           ),
         );
       case Failure<List<Invoice>>(error: final AppError error):
-        emit(state.copyWith(invoices: ViewError<List<Invoice>>(error)));
+        emit(state.copyWith(invoices: viewStateForFailure<List<Invoice>>(error)));
     }
   }
 }

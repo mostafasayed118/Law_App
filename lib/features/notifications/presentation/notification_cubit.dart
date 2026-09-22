@@ -83,7 +83,7 @@ class NotificationCubit extends Cubit<NotificationState> {
       case Failure<List<Notification>>(error: final AppError error):
         emit(
           state.copyWith(
-            notifications: ViewError<List<Notification>>(error),
+            notifications: viewStateForFailure<List<Notification>>(error),
             allMuted: false,
           ),
         );
@@ -136,7 +136,7 @@ class NotificationCubit extends Cubit<NotificationState> {
         await load();
       case Failure<int>(error: final AppError error):
         emit(
-          state.copyWith(notifications: ViewError<List<Notification>>(error)),
+          state.copyWith(notifications: viewStateForFailure<List<Notification>>(error)),
         );
     }
   }

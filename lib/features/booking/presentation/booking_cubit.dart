@@ -105,9 +105,14 @@ class BookingCubit extends Cubit<BookingState> {
   /// load failed; a tap during an in-flight reload no-ops (the loading state
   /// replaced the error state).
   Future<void> retryLoadSlots() async {
+    // Retryable failures are the generic error arm AND the offline arm (an
+    // outage is retryable); the unauthorized arm is deliberately excluded —
+    // retrying a denial cannot succeed (audit 2026-09-21, M-1).
+    final ViewState<List<BookingSlot>> slots = state.slots;
     if (isClosed ||
         state.step != BookingStep.dateTime ||
-        state.slots is! ViewError<List<BookingSlot>>) {
+        (slots is! ViewError<List<BookingSlot>> &&
+            slots is! ViewOffline<List<BookingSlot>>)) {
       return;
     }
     emit(state.copyWith(slots: const ViewLoading<List<BookingSlot>>()));
@@ -133,7 +138,9 @@ class BookingCubit extends Cubit<BookingState> {
           ),
         );
       case Failure<List<BookingSlot>>(error: final AppError error):
-        emit(state.copyWith(slots: ViewError<List<BookingSlot>>(error)));
+        emit(
+          state.copyWith(slots: viewStateForFailure<List<BookingSlot>>(error)),
+        );
     }
   }
 

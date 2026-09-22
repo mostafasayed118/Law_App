@@ -8,12 +8,19 @@ import '../../l10n/app_localizations.dart';
 /// the success arm to [builder].
 ///
 /// E3 extraction: the list screens previously duplicated this exact switch —
-/// a `spaceXl`-padded loading spinner, the feature's `empty` copy for both the
-/// empty and the offline/unauthorized variants (a synthetic list has neither
-/// state, so all three render the same copy rather than a distinct offline
-/// surface), and a start-aligned error column with a retry button. Each call
-/// site supplies its feature's empty widget, error copy, retry callback, and
-/// success content; the arms are rendered identically everywhere.
+/// a `spaceXl`-padded loading spinner, the feature's `empty` copy, and a
+/// start-aligned error column with a retry button. Each call site supplies its
+/// feature's empty widget, error copy, retry callback, and success content; the
+/// arms are rendered identically everywhere.
+///
+/// **Arm semantics (revised 2026-09-22, audit M-1):** the offline and
+/// unauthorized arms used to render the feature's `empty` copy — a deliberate
+/// owner-normalized shortcut justified by "a synthetic list has neither state".
+/// Once `AppError` carried a typed kind, the two variants acquired real
+/// producers, and the shortcut became misleading: a denial showed "nothing here
+/// yet" and the offline arm offered no retry. They now render distinct copy:
+/// offline is retryable, unauthorized is not (so it carries no retry
+/// affordance).
 ///
 /// This complements (and is distinct from) [ViewStateView], which renders a
 /// centered full-page status message; this widget renders the state *around*
@@ -44,7 +51,7 @@ class ViewStateSwitch<T> extends StatelessWidget {
   /// Success content; receives the loaded data.
   final Widget Function(BuildContext context, T data) builder;
 
-  /// The feature's empty copy, rendered for empty, offline, and unauthorized.
+  /// The feature's empty copy, rendered for the empty arm only.
   final Widget empty;
 
   /// The feature's error copy, rendered above the retry button.
@@ -64,6 +71,7 @@ class ViewStateSwitch<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
+    final AppLocalizations l10n = AppLocalizations.of(context);
     return switch (state) {
       ViewLoading<T>() => Padding(
         padding: loadingPadding,
@@ -88,7 +96,33 @@ class ViewStateSwitch<T> extends StatelessWidget {
           ],
         ),
       ),
-      ViewOffline<T>() || ViewUnauthorized<T>() => empty,
+      ViewOffline<T>() => Padding(
+        padding: errorPadding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              l10n.stateOffline,
+              style:
+                  errorTextStyle ??
+                  text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+            TextButton(onPressed: onRetry, child: Text(l10n.retry)),
+          ],
+        ),
+      ),
+      // A denial is NOT retryable — no retry affordance, by design. Rendering
+      // this as the feature's empty copy (the pre-2026-09-21 behavior) read as
+      // "nothing here yet" instead of "you may not see this" (audit M-1).
+      ViewUnauthorized<T>() => Padding(
+        padding: errorPadding,
+        child: Text(
+          l10n.stateUnauthorized,
+          style:
+              errorTextStyle ??
+              text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+        ),
+      ),
       ViewSuccess<T>(data: final T data) => builder(context, data),
     };
   }

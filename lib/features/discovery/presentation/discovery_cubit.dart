@@ -56,7 +56,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
           ),
         );
       case Failure<List<Attorney>>(error: final AppError error):
-        emit(state.copyWith(attorneys: ViewError<List<Attorney>>(error)));
+        emit(state.copyWith(attorneys: viewStateForFailure<List<Attorney>>(error)));
     }
   }
 

@@ -55,7 +55,7 @@ class MessageCubit extends Cubit<MessageState> {
           ),
         );
       case Failure<List<MessageThread>>(error: final AppError error):
-        emit(state.copyWith(threads: ViewError<List<MessageThread>>(error)));
+        emit(state.copyWith(threads: viewStateForFailure<List<MessageThread>>(error)));
     }
   }
 }

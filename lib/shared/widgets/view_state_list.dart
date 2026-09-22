@@ -68,6 +68,7 @@ class ViewStateList<ItemT> extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
+    final AppLocalizations l10n = AppLocalizations.of(context);
     final Widget note = Text(
       localOnlyNote,
       style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
@@ -77,14 +78,34 @@ class ViewStateList<ItemT> extends StatelessWidget {
         padding: EdgeInsetsDirectional.all(LegalHubTheme.spaceXl),
         child: Center(child: CircularProgressIndicator()),
       ),
-      ViewEmpty<List<ItemT>>() ||
-      ViewOffline<List<ItemT>>() ||
-      ViewUnauthorized<List<ItemT>>() => ListView(
+      ViewEmpty<List<ItemT>>() => ListView(
         padding: listPadding,
         children: <Widget>[
           empty,
           const SizedBox(height: LegalHubTheme.spaceLg),
           note,
+        ],
+      ),
+      // Offline is retryable; unauthorized is not (no retry affordance).
+      // Both used to render the empty arm (audit M-1) — a denial then read as
+      // "nothing here yet" rather than "you may not see this".
+      ViewOffline<List<ItemT>>() => ListView(
+        padding: listPadding,
+        children: <Widget>[
+          Text(
+            l10n.stateOffline,
+            style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+          ),
+          TextButton(onPressed: onRetry, child: Text(l10n.retry)),
+        ],
+      ),
+      ViewUnauthorized<List<ItemT>>() => ListView(
+        padding: listPadding,
+        children: <Widget>[
+          Text(
+            l10n.stateUnauthorized,
+            style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+          ),
         ],
       ),
       ViewError<List<ItemT>>() => ListView(
@@ -94,10 +115,7 @@ class ViewStateList<ItemT> extends StatelessWidget {
             errorCopy,
             style: text.bodyMedium?.copyWith(color: scheme.error),
           ),
-          TextButton(
-            onPressed: onRetry,
-            child: Text(AppLocalizations.of(context).retry),
-          ),
+          TextButton(onPressed: onRetry, child: Text(l10n.retry)),
         ],
       ),
       ViewSuccess<List<ItemT>>(data: final List<ItemT> data) =>

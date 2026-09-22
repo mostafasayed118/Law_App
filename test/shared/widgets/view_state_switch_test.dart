@@ -8,9 +8,12 @@ import 'package:legalhub/shared/widgets/view_state_switch.dart';
 // ViewStateSwitch is the E3 extraction: the list screens (matters,
 // documents, messaging, search, billing, discovery, and the matter workspace
 // sections) previously duplicated this switch — loading spinner, feature
-// empty copy for empty/offline/unauthorized, error text + retry — and now
-// delegate to it. These tests pin the shared contract so the re-pointed
-// screens keep their exact rendering.
+// empty copy, error text + retry — and now delegate to it. These tests pin the
+// shared contract so the re-pointed screens keep their exact rendering.
+//
+// The offline/unauthorized arms were revised 2026-09-22 (audit M-1): they used
+// to render the feature's empty widget; they now render distinct copy, with a
+// retry only where retrying can help.
 void main() {
   Widget pumpViewState<T>(
     ViewState<T> state, {
@@ -58,16 +61,37 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsNothing);
   });
 
-  testWidgets('offline and unauthorized branches render the empty widget', (
+  testWidgets('offline branch renders the offline copy and a retry', (
     tester,
   ) async {
-    await tester.pumpWidget(pumpViewState<String>(const ViewOffline<String>()));
-    expect(find.text('empty copy'), findsOneWidget);
+    int retries = 0;
+    await tester.pumpWidget(
+      pumpViewState<String>(
+        const ViewOffline<String>(),
+        onRetry: () => retries++,
+      ),
+    );
 
+    // Revised 2026-09-22 (audit M-1): this arm used to render the feature's
+    // empty widget. An outage IS retryable, so it keeps a retry affordance.
+    expect(find.text('Offline'), findsOneWidget);
+    expect(find.text('empty copy'), findsNothing);
+    await tester.tap(find.text('Retry'));
+    expect(retries, 1);
+  });
+
+  testWidgets('unauthorized branch renders the access copy and NO retry', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       pumpViewState<String>(const ViewUnauthorized<String>()),
     );
-    expect(find.text('empty copy'), findsOneWidget);
+
+    // A denial is not retryable, so this arm deliberately carries no retry
+    // affordance — the point of the M-1 fix (no false assurance).
+    expect(find.text('Access not available'), findsOneWidget);
+    expect(find.text('Retry'), findsNothing);
+    expect(find.text('empty copy'), findsNothing);
   });
 
   testWidgets('error branch renders the error copy and fires retry', (

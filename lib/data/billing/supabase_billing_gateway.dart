@@ -132,23 +132,31 @@ class SupabaseBillingGateway implements BillingGateway {
   /// message is the provider's own (denial/availability text) — invoice row
   /// content never crosses into errors.
   AppError _mapFailure(SupabaseBillingException e) {
-    final (String code, String userMessage) = switch (e.kind) {
+    final (
+      String code,
+      String userMessage,
+      AppErrorKind kind,
+    ) = switch (e.kind) {
       SupabaseBillingFailureKind.denied => (
         'invoice_read_denied',
         'You do not have permission to view these invoices.',
+        AppErrorKind.denied,
       ),
       SupabaseBillingFailureKind.providerUnavailable => (
         'invoice_read_unavailable',
         'Invoices are temporarily unavailable. Please try again.',
+        AppErrorKind.unavailable,
       ),
       SupabaseBillingFailureKind.unknown => (
         'invoice_read_failed',
         'Unable to load invoices. Please try again.',
+        AppErrorKind.unknown,
       ),
     };
     return AppError(
       code: code,
       userMessage: userMessage,
+      kind: kind,
       technicalMessage: e.message,
     );
   }

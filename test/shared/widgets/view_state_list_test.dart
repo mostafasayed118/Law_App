@@ -49,19 +49,35 @@ void main() {
     expect(find.text('Local-only note'), findsOneWidget);
   });
 
-  testWidgets('offline and unauthorized render the note-wrapped empty arm '
-      '(owner-normalized)', (tester) async {
+  testWidgets('offline branch renders the offline copy and a retry', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       pumpViewState<String>(const ViewOffline<List<String>>()),
     );
-    expect(find.text('empty copy'), findsOneWidget);
-    expect(find.text('Local-only note'), findsOneWidget);
 
+    // Revised 2026-09-22 (audit M-1): this arm used to render the
+    // note-wrapped empty copy ("owner-normalized"). An outage is retryable, so
+    // it now shows its own copy with a retry and no empty/note content.
+    expect(find.text('Offline'), findsOneWidget);
+    expect(find.text('Retry'), findsOneWidget);
+    expect(find.text('empty copy'), findsNothing);
+    expect(find.text('Local-only note'), findsNothing);
+  });
+
+  testWidgets('unauthorized branch renders the access copy and no retry', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       pumpViewState<String>(const ViewUnauthorized<List<String>>()),
     );
-    expect(find.text('empty copy'), findsOneWidget);
-    expect(find.text('Local-only note'), findsOneWidget);
+
+    // A denial cannot be fixed by retrying, so no retry affordance — the
+    // point of the M-1 fix (no false assurance).
+    expect(find.text('Access not available'), findsOneWidget);
+    expect(find.text('Retry'), findsNothing);
+    expect(find.text('empty copy'), findsNothing);
+    expect(find.text('Local-only note'), findsNothing);
   });
 
   testWidgets('error branch renders the error copy and fires retry', (

@@ -53,7 +53,7 @@ class MatterCubit extends Cubit<MatterState> {
           ),
         );
       case Failure<List<Matter>>(error: final AppError error):
-        emit(state.copyWith(matters: ViewError<List<Matter>>(error)));
+        emit(state.copyWith(matters: viewStateForFailure<List<Matter>>(error)));
     }
   }
 

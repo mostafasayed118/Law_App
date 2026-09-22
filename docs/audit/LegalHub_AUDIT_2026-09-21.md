@@ -618,4 +618,23 @@ The audit slice is committed **first** because the perf slice's api impls depend
 
 **Landed as** `86f6241` (with the rest of the audit slice — see §11.1).
 
+### 12.2 P1.7 executed (the two dead ViewState variants get real producers, 2026-09-22)
+
+The audit's M-1 finding: `ViewOffline`/`ViewUnauthorized` were declared, rendered by `ViewStateView`, and **constructed nowhere in `lib/`** — every consumer folded them into the empty arm, so a denial rendered as "nothing here yet" and the error arm offered a Retry that could never succeed. Owner chose **produce, not delete**.
+
+| Layer | Change |
+|---|---|
+| `core/errors/app_error.dart` | new `AppErrorKind { unknown, denied, unavailable }`; `AppError.kind` defaults to `unknown`, so every existing construction keeps its behavior (and `props` includes it) |
+| the 7 gateway failure mappers (9 mappers, 33 arms) | the `(code, userMessage)` tuple gained the kind: `denied → AppErrorKind.denied`, `providerUnavailable → AppErrorKind.unavailable`, everything else (incl. matter-write's validation/owner-forbidden) → `unknown` |
+| `core/state/view_state.dart` | new `viewStateForFailure<T>(error)` — the single mapping point (denied → `ViewUnauthorized`, unavailable → `ViewOffline`, else `ViewError`) |
+| `ViewStateSwitch` / `ViewStateList` / `WorkspaceSection` | the folded `empty` arm split into three: empty renders the feature's copy; **offline renders `stateOffline` + a retry** (an outage is retryable); **unauthorized renders `stateUnauthorized` with no retry** (a denial cannot be fixed by retrying) |
+| 15 cubit emit sites (13 files) | `ViewError<List<X>>(error)` → `viewStateForFailure<List<X>>(error)` |
+| `BookingCubit.retryLoadSlots` | its `state.slots is! ViewError<…>` guard would have gone dead once an outage became `ViewOffline`; it now accepts error **or** offline and excludes unauthorized |
+
+**A recorded owner decision was reversed.** The fold was deliberate — `ViewStateSwitch`'s own doc said "a synthetic list has neither state, so all three render the same copy", and its test was named "…(owner-normalized)". That rationale held while the variants had no producers; once `AppError` carried a typed kind it became the misleading behavior the audit flagged. The widget doc now records both the old rationale and the revision, and the three folded-arm tests were replaced by six arm-specific ones.
+
+**Verification:** `flutter analyze` → No issues found · `flutter test` → **+1379 All tests passed** (1370 → 1379: mapper ×4, switch ×2, list ×2, workspace ×2, cubit ×2, minus the three folded pins) · `dart format` clean · `scripts/verify_ledger.sh` → PASS · README lockstep 1367/1370 → 1376/1379.
+
+**Landed as** `docs/audit` follow-up commit (see the close-out table in §12).
+
 *Audit produced by five parallel dimension subagents with independent consolidator verification. Raw findings: `docs/audit/_raw/`.*

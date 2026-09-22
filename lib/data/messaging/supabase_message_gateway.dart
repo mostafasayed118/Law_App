@@ -194,23 +194,31 @@ class SupabaseMessageGateway implements MessageGateway {
   /// message is the provider's own (denial/availability text) — message
   /// content never crosses into errors.
   AppError _mapFailure(SupabaseMessageException e) {
-    final (String code, String userMessage) = switch (e.kind) {
+    final (
+      String code,
+      String userMessage,
+      AppErrorKind kind,
+    ) = switch (e.kind) {
       SupabaseMessageFailureKind.denied => (
         'message_read_denied',
         'You do not have permission to view these threads.',
+        AppErrorKind.denied,
       ),
       SupabaseMessageFailureKind.providerUnavailable => (
         'message_read_unavailable',
         'Threads are temporarily unavailable. Please try again.',
+        AppErrorKind.unavailable,
       ),
       SupabaseMessageFailureKind.unknown => (
         'message_read_failed',
         'Unable to load threads. Please try again.',
+        AppErrorKind.unknown,
       ),
     };
     return AppError(
       code: code,
       userMessage: userMessage,
+      kind: kind,
       technicalMessage: e.message,
     );
   }
@@ -304,23 +312,31 @@ class SupabaseMessageGateway implements MessageGateway {
   /// failures separable from the reads' (D-LV1); the technical message is
   /// the provider's own — message content never crosses into errors.
   AppError _mapSendFailure(SupabaseMessageException e) {
-    final (String code, String userMessage) = switch (e.kind) {
+    final (
+      String code,
+      String userMessage,
+      AppErrorKind kind,
+    ) = switch (e.kind) {
       SupabaseMessageFailureKind.denied => (
         'message_send_denied',
         'You do not have permission to send messages on this thread.',
+        AppErrorKind.denied,
       ),
       SupabaseMessageFailureKind.providerUnavailable => (
         'message_send_unavailable',
         'Sending is temporarily unavailable. Please try again.',
+        AppErrorKind.unavailable,
       ),
       SupabaseMessageFailureKind.unknown => (
         'message_send_failed',
         'Unable to send the message. Please try again.',
+        AppErrorKind.unknown,
       ),
     };
     return AppError(
       code: code,
       userMessage: userMessage,
+      kind: kind,
       technicalMessage: e.message,
     );
   }
@@ -331,23 +347,31 @@ class SupabaseMessageGateway implements MessageGateway {
   /// technical message is the provider's own — message content never
   /// crosses into errors.
   AppError _mapMessageFailure(SupabaseMessageException e) {
-    final (String code, String userMessage) = switch (e.kind) {
+    final (
+      String code,
+      String userMessage,
+      AppErrorKind kind,
+    ) = switch (e.kind) {
       SupabaseMessageFailureKind.denied => (
         'message_body_read_denied',
         'You do not have permission to view these messages.',
+        AppErrorKind.denied,
       ),
       SupabaseMessageFailureKind.providerUnavailable => (
         'message_body_read_unavailable',
         'Messages are temporarily unavailable. Please try again.',
+        AppErrorKind.unavailable,
       ),
       SupabaseMessageFailureKind.unknown => (
         'message_body_read_failed',
         'Unable to load messages. Please try again.',
+        AppErrorKind.unknown,
       ),
     };
     return AppError(
       code: code,
       userMessage: userMessage,
+      kind: kind,
       technicalMessage: e.message,
     );
   }

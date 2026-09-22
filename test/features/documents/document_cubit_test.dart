@@ -65,6 +65,38 @@ void main() {
     );
 
     blocTest<DocumentCubit, DocumentState>(
+      'load maps a DENIED failure to ViewUnauthorized, not the retryable error',
+      setUp: () => gateway = _StubDocumentGateway(
+        results: <Result<List<Document>>>[
+          Result<List<Document>>.failure(_deniedFailure),
+        ],
+      ),
+      build: () => DocumentCubit(gateway),
+      act: (DocumentCubit cubit) => cubit.load(),
+      // The M-1 fix (audit 2026-09-21): a denial must not surface as the
+      // generic error arm, whose Retry button can never succeed.
+      expect: () => <DocumentState>[
+        const DocumentState(documents: ViewUnauthorized<List<Document>>()),
+      ],
+      verify: (_) => expect(gateway.fetchCalls, 1),
+    );
+
+    blocTest<DocumentCubit, DocumentState>(
+      'load maps an UNAVAILABLE failure to ViewOffline (retryable)',
+      setUp: () => gateway = _StubDocumentGateway(
+        results: <Result<List<Document>>>[
+          Result<List<Document>>.failure(_unavailableFailure),
+        ],
+      ),
+      build: () => DocumentCubit(gateway),
+      act: (DocumentCubit cubit) => cubit.load(),
+      expect: () => <DocumentState>[
+        const DocumentState(documents: ViewOffline<List<Document>>()),
+      ],
+      verify: (_) => expect(gateway.fetchCalls, 1),
+    );
+
+    blocTest<DocumentCubit, DocumentState>(
       'duplicate load while in flight is ignored',
       setUp: () => gateway = _StubDocumentGateway.withCompleter(),
       build: () => DocumentCubit(gateway),
@@ -123,6 +155,20 @@ final List<Document> _documents = <Document>[
 final AppError _loadFailure = AppError(
   code: 'documents_failed',
   userMessage: 'Could not load documents',
+);
+
+/// A denial as the documents gateway maps it (RLS / permission denied).
+const AppError _deniedFailure = AppError(
+  code: 'document_read_denied',
+  userMessage: 'You do not have permission to view these documents.',
+  kind: AppErrorKind.denied,
+);
+
+/// A transport outage as the documents gateway maps it.
+const AppError _unavailableFailure = AppError(
+  code: 'document_read_unavailable',
+  userMessage: 'Documents are temporarily unavailable. Please try again.',
+  kind: AppErrorKind.unavailable,
 );
 
 /// Hand-rolled gateway stub: queue of results (like the matter/discovery

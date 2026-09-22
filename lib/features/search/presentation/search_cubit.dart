@@ -92,7 +92,7 @@ class SearchCubit extends Cubit<SearchState> {
       _ => null,
     };
     if (error != null) {
-      emit(state.copyWith(results: ViewError<SearchResults>(error)));
+      emit(state.copyWith(results: viewStateForFailure<SearchResults>(error)));
       return;
     }
     final String needle = trimmed.toLowerCase();

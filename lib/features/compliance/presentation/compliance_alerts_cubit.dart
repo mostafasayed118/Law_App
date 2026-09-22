@@ -44,7 +44,7 @@ class ComplianceAlertsCubit extends Cubit<ComplianceAlertsState> {
           ),
         );
       case Failure<List<ComplianceAlert>>(error: final AppError error):
-        emit(state.copyWith(alerts: ViewError<List<ComplianceAlert>>(error)));
+        emit(state.copyWith(alerts: viewStateForFailure<List<ComplianceAlert>>(error)));
     }
   }
 }

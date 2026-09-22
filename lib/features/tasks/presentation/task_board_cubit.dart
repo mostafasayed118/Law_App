@@ -42,7 +42,7 @@ class TaskBoardCubit extends Cubit<TaskBoardState> {
           ),
         );
       case Failure<List<TaskItem>>(error: final AppError error):
-        emit(state.copyWith(tasks: ViewError<List<TaskItem>>(error)));
+        emit(state.copyWith(tasks: viewStateForFailure<List<TaskItem>>(error)));
     }
   }
 }

@@ -117,23 +117,31 @@ class SupabaseDocumentGateway implements DocumentGateway {
   /// message is the provider's own (denial/availability text) — document row
   /// content never crosses into errors.
   AppError _mapFailure(SupabaseDocumentException e) {
-    final (String code, String userMessage) = switch (e.kind) {
+    final (
+      String code,
+      String userMessage,
+      AppErrorKind kind,
+    ) = switch (e.kind) {
       SupabaseDocumentFailureKind.denied => (
         'document_read_denied',
         'You do not have permission to view these documents.',
+        AppErrorKind.denied,
       ),
       SupabaseDocumentFailureKind.providerUnavailable => (
         'document_read_unavailable',
         'Documents are temporarily unavailable. Please try again.',
+        AppErrorKind.unavailable,
       ),
       SupabaseDocumentFailureKind.unknown => (
         'document_read_failed',
         'Unable to load documents. Please try again.',
+        AppErrorKind.unknown,
       ),
     };
     return AppError(
       code: code,
       userMessage: userMessage,
+      kind: kind,
       technicalMessage: e.message,
     );
   }

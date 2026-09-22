@@ -96,16 +96,29 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 
-  testWidgets('offline and unauthorized render the empty copy', (tester) async {
+  testWidgets('offline renders the offline copy with a retry', (tester) async {
+    // Revised 2026-09-22 (audit M-1): this arm used to render the section's
+    // empty copy; the ViewStateSwitch arms now render distinct copy.
     await tester.pumpWidget(
       pumpWorkspaceSection(state: const ViewOffline<List<String>>()),
     );
-    expect(find.text('No rows for this matter'), findsOneWidget);
 
+    expect(find.text('Offline'), findsOneWidget);
+    expect(find.text('Retry'), findsOneWidget);
+    expect(find.text('No rows for this matter'), findsNothing);
+  });
+
+  testWidgets('unauthorized renders the access copy with no retry', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       pumpWorkspaceSection(state: const ViewUnauthorized<List<String>>()),
     );
-    expect(find.text('No rows for this matter'), findsOneWidget);
+
+    // A denial is not retryable — no retry affordance (audit M-1).
+    expect(find.text('Access not available'), findsOneWidget);
+    expect(find.text('Retry'), findsNothing);
+    expect(find.text('No rows for this matter'), findsNothing);
   });
 
   testWidgets('no overflow at 320px under RTL with a long row', (tester) async {

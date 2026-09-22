@@ -48,35 +48,46 @@ class SupabaseMatterWriteGateway implements MatterWriteGateway {
   /// code. The technical message is the provider's own (denial/refusal
   /// text) — the title never crosses into errors.
   AppError _mapFailure(SupabaseMatterWriteException e) {
-    final (String code, String userMessage) = switch (e.kind) {
+    final (
+      String code,
+      String userMessage,
+      AppErrorKind kind,
+    ) = switch (e.kind) {
       SupabaseMatterWriteFailureKind.denied => (
         'matter_write_denied',
         'You do not have permission to create matters in this organization.',
+        AppErrorKind.denied,
       ),
       SupabaseMatterWriteFailureKind.ownerForbidden => (
         'matter_write_owner_forbidden',
         'The platform owner cannot be assigned to a matter.',
+        AppErrorKind.unknown,
       ),
       SupabaseMatterWriteFailureKind.assigneeInvalid => (
         'matter_write_assignee_invalid',
         'The assigned member is not an active member of this organization.',
+        AppErrorKind.unknown,
       ),
       SupabaseMatterWriteFailureKind.validation => (
         'matter_write_validation',
         'A matter title is required.',
+        AppErrorKind.unknown,
       ),
       SupabaseMatterWriteFailureKind.providerUnavailable => (
         'matter_write_unavailable',
         'Matter creation is temporarily unavailable. Please try again.',
+        AppErrorKind.unavailable,
       ),
       SupabaseMatterWriteFailureKind.unknown => (
         'matter_write_failed',
         'Unable to create the matter. Please try again.',
+        AppErrorKind.unknown,
       ),
     };
     return AppError(
       code: code,
       userMessage: userMessage,
+      kind: kind,
       technicalMessage: e.message,
     );
   }

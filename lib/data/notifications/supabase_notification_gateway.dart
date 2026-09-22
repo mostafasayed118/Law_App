@@ -113,23 +113,31 @@ class SupabaseNotificationGateway implements NotificationGateway {
   /// message is the provider's own (denial/availability text) — notification
   /// row content never crosses into errors.
   AppError _mapFailure(SupabaseNotificationException e) {
-    final (String code, String userMessage) = switch (e.kind) {
+    final (
+      String code,
+      String userMessage,
+      AppErrorKind kind,
+    ) = switch (e.kind) {
       SupabaseNotificationFailureKind.denied => (
         'notification_read_denied',
         'You do not have permission to view these notifications.',
+        AppErrorKind.denied,
       ),
       SupabaseNotificationFailureKind.providerUnavailable => (
         'notification_read_unavailable',
         'Notifications are temporarily unavailable. Please try again.',
+        AppErrorKind.unavailable,
       ),
       SupabaseNotificationFailureKind.unknown => (
         'notification_read_failed',
         'Unable to load notifications. Please try again.',
+        AppErrorKind.unknown,
       ),
     };
     return AppError(
       code: code,
       userMessage: userMessage,
+      kind: kind,
       technicalMessage: e.message,
     );
   }

@@ -49,7 +49,7 @@ class AiResearchCubit extends Cubit<AiResearchState> {
       case Success<List<AiFinding>>(value: final List<AiFinding> findings):
         emit(state.copyWith(findings: ViewSuccess<List<AiFinding>>(findings)));
       case Failure<List<AiFinding>>(error: final AppError error):
-        emit(state.copyWith(findings: ViewError<List<AiFinding>>(error)));
+        emit(state.copyWith(findings: viewStateForFailure<List<AiFinding>>(error)));
     }
   }
 }

@@ -109,23 +109,31 @@ class SupabaseStorageGateway implements StorageGateway {
   /// message is the provider's own (denial/availability text) — file row
   /// content never crosses into errors.
   AppError _mapFailure(SupabaseStorageException e) {
-    final (String code, String userMessage) = switch (e.kind) {
+    final (
+      String code,
+      String userMessage,
+      AppErrorKind kind,
+    ) = switch (e.kind) {
       SupabaseStorageFailureKind.denied => (
         'file_read_denied',
         'You do not have permission to view these files.',
+        AppErrorKind.denied,
       ),
       SupabaseStorageFailureKind.providerUnavailable => (
         'file_read_unavailable',
         'Files are temporarily unavailable. Please try again.',
+        AppErrorKind.unavailable,
       ),
       SupabaseStorageFailureKind.unknown => (
         'file_read_failed',
         'Unable to load files. Please try again.',
+        AppErrorKind.unknown,
       ),
     };
     return AppError(
       code: code,
       userMessage: userMessage,
+      kind: kind,
       technicalMessage: e.message,
     );
   }

@@ -182,23 +182,31 @@ class SupabaseMatterGateway implements MatterGateway {
   /// message is the provider's own (denial/availability text) — matter row
   /// content never crosses into errors.
   AppError _mapFailure(SupabaseMatterException e) {
-    final (String code, String userMessage) = switch (e.kind) {
+    final (
+      String code,
+      String userMessage,
+      AppErrorKind kind,
+    ) = switch (e.kind) {
       SupabaseMatterFailureKind.denied => (
         'matter_read_denied',
         'You do not have permission to view these matters.',
+        AppErrorKind.denied,
       ),
       SupabaseMatterFailureKind.providerUnavailable => (
         'matter_read_unavailable',
         'Matters are temporarily unavailable. Please try again.',
+        AppErrorKind.unavailable,
       ),
       SupabaseMatterFailureKind.unknown => (
         'matter_read_failed',
         'Unable to load matters. Please try again.',
+        AppErrorKind.unknown,
       ),
     };
     return AppError(
       code: code,
       userMessage: userMessage,
+      kind: kind,
       technicalMessage: e.message,
     );
   }
