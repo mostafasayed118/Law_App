@@ -211,6 +211,11 @@ Before reporting completion:
 6. inspect `git diff` and `git status` for accidental secrets, fixtures with real data, generated artifacts, unrelated changes, and migration risk;
 7. report commands actually run and concise outcomes, including failures and unverified areas.
 
+**Hard gate (P0.5, audit 2026-09-21).** No slice is complete while `flutter analyze` reports any error, and none is complete while the full `flutter test` suite is red. The audit found a compile error in an **untracked** file (`lib/data/list_query_guards.dart`) that blocked **all 1356 tests** and would have failed CI's second gate — the work was believed done because the tests were never run. Two consequences, both mandatory:
+
+- run `flutter analyze` before claiming completion; it is the cheapest gate and the only one that catches a total build failure in seconds;
+- `git add` every new file before trusting a suite result, and remember that `git grep`-based checks (including `scripts/verify_ledger.sh`) **cannot see untracked files** — an un-added test file is invisible to the count gates.
+
 A feature is **review-ready**, not “production compliant,” unless the required product/security/legal reviews have occurred.
 
 ---

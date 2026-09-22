@@ -6,8 +6,14 @@ version: 1.0.0+1
 environment:
   # B1 target pins; confirm before subsequent backlog tickets.
   sdk: '>=3.12.2 <3.13.0'
-  # Range instead of exact pin: exact pins break `pub get` whenever the local
-  # toolchain moves (e.g. 3.48.0-pre). Dart constraint above still guards API level.
+  # Range, NOT an exact pin — and the exact pin is deliberate at the CI layer:
+  # `.github/workflows/ci.yml` pins `flutter-version: '3.44.4'`, which is where
+  # reproducibility is actually enforced. An exact pin HERE was tried and
+  # measured on 2026-09-22 (owner decision OI-D7.3): `flutter pub get` fails
+  # with "Because legalhub requires Flutter SDK version 3.44.4, version solving
+  # failed" on a 3.48.0-pre local toolchain, which blocks every local gate
+  # (analyze/test/format) for anyone not on the pinned SDK. The Dart constraint
+  # above still guards the API level.
   flutter: '>=3.44.4 <4.0.0'
 
 dependencies:
