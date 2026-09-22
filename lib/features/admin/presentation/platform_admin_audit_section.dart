@@ -56,6 +56,12 @@ class _AuditSectionState extends State<_AuditSection> {
     final List<AuditEntry> rows = widget.selectedAuditOrgId == null
         ? widget.platformAudit
         : widget.orgAudit;
+    // The org-name lookup is a Map, not a scan (audit 2026-09-21, H-8): the
+    // previous version resolved each audit row's org name with a linear scan.
+    final Map<String, String> orgNames = <String, String>{
+      for (final OrganizationSummary org in widget.organizations)
+        org.id: org.name,
+    };
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -101,10 +107,7 @@ class _AuditSectionState extends State<_AuditSection> {
           ...rows.map(
             (AuditEntry entry) => _AuditRow(
               entry: entry,
-              organizationName: _orgNameFor(
-                widget.organizations,
-                entry.organizationId,
-              ),
+              organizationName: orgNames[entry.organizationId],
             ),
           ),
       ],
@@ -136,11 +139,6 @@ class _AuditSectionState extends State<_AuditSection> {
       ],
     );
   }
-
-  static String? _orgNameFor(
-    List<OrganizationSummary> organizations,
-    String? organizationId,
-  ) => _AdminLists._orgNameFor(organizations, organizationId);
 }
 
 /// One redacted audit row: action + redacted summary + scope + date.

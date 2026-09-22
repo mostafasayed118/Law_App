@@ -26,83 +26,103 @@ class _AdminLists extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    return ListView(
+    // The org-name lookup is a Map, not a scan (audit 2026-09-21, H-8): the
+    // previous version resolved each member's org name with a linear scan of
+    // organizations — O(members × orgs) per build over the two collections
+    // the admin RPCs return unbounded.
+    final Map<String, String> orgNames = <String, String>{
+      for (final OrganizationSummary org in organizations) org.id: org.name,
+    };
+
+    // One lazily-built list with a flat index space (the M-20 pattern): rows
+    // are constructed on demand instead of mapping every org and member into
+    // children up front, so row culling applies to the sections the admin RPCs
+    // feed.
+    final int orgSlots = organizations.isEmpty ? 1 : organizations.length;
+    final int memberSlots = members.isEmpty ? 1 : members.length;
+    final int membersGap = 2 + orgSlots; // 0 orgs header, 1 gap
+    final int membersHeader = membersGap + 1;
+    final int memberFirst = membersHeader + 2; // gap, members header
+    final int auditGap = memberFirst + memberSlots;
+
+    return ListView.builder(
       padding: const EdgeInsetsDirectional.fromSTEB(
         LegalHubTheme.marginMobile,
         LegalHubTheme.spaceMd,
         LegalHubTheme.marginMobile,
         LegalHubTheme.spaceXl * 2,
       ),
-      children: <Widget>[
-        Text(
-          l10n.platformAdminOrganizations,
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
-        const SizedBox(height: LegalHubTheme.spaceSm),
-        if (organizations.isEmpty)
-          Text(l10n.stateEmpty)
-        else
-          ...organizations.map(
-            (OrganizationSummary org) => ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.domain_outlined),
-              title: Text(org.name),
-              subtitle: Text(
-                MaterialLocalizations.of(
-                  context,
-                ).formatShortDate(org.createdAt),
-              ),
-            ),
-          ),
-        const SizedBox(height: LegalHubTheme.spaceXl),
-        Text(
-          l10n.platformAdminMembers,
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
-        const SizedBox(height: LegalHubTheme.spaceSm),
-        if (members.isEmpty)
-          Text(l10n.stateEmpty)
-        else
-          ...members.map(
-            (OrgMember member) => _MemberRow(
-              member: member,
-              organizationName: _orgNameFor(
-                organizations,
-                member.organizationId,
-              ),
-              pending: member.userId == pendingUserId,
-            ),
-          ),
-        const SizedBox(height: LegalHubTheme.spaceXl),
-        Text(
-          l10n.platformAdminAudit,
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
-        const SizedBox(height: LegalHubTheme.spaceSm),
-        _AuditSection(
+      itemCount: auditGap + 4, // gap, audit header, gap, audit section
+      itemBuilder: (BuildContext context, int index) {
+        if (index == 0) {
+          return Text(
+            l10n.platformAdminOrganizations,
+            style: Theme.of(context).textTheme.headlineSmall,
+          );
+        }
+        if (index == 1) {
+          return const SizedBox(height: LegalHubTheme.spaceSm);
+        }
+        final int orgIndex = index - 2;
+        if (orgIndex < orgSlots) {
+          return organizations.isEmpty
+              ? Text(l10n.stateEmpty)
+              : _orgTile(organizations[orgIndex], context);
+        }
+        if (index == membersGap) {
+          return const SizedBox(height: LegalHubTheme.spaceXl);
+        }
+        if (index == membersHeader) {
+          return Text(
+            l10n.platformAdminMembers,
+            style: Theme.of(context).textTheme.headlineSmall,
+          );
+        }
+        if (index == membersHeader + 1) {
+          return const SizedBox(height: LegalHubTheme.spaceSm);
+        }
+        final int memberIndex = index - memberFirst;
+        if (memberIndex < memberSlots) {
+          final OrgMember member = members[memberIndex];
+          return members.isEmpty
+              ? Text(l10n.stateEmpty)
+              : _MemberRow(
+                  member: member,
+                  organizationName: orgNames[member.organizationId],
+                  pending: member.userId == pendingUserId,
+                );
+        }
+        final int tail = index - auditGap;
+        if (tail == 0) {
+          return const SizedBox(height: LegalHubTheme.spaceXl);
+        }
+        if (tail == 1) {
+          return Text(
+            l10n.platformAdminAudit,
+            style: Theme.of(context).textTheme.headlineSmall,
+          );
+        }
+        if (tail == 2) {
+          return const SizedBox(height: LegalHubTheme.spaceSm);
+        }
+        return _AuditSection(
           organizations: organizations,
           platformAudit: platformAudit,
           orgAudit: orgAudit,
           selectedAuditOrgId: selectedAuditOrgId,
           auditLoading: auditLoading,
           auditError: auditError,
-        ),
-      ],
+        );
+      },
     );
   }
 
-  static String? _orgNameFor(
-    List<OrganizationSummary> organizations,
-    String? organizationId,
-  ) {
-    if (organizationId == null) {
-      return null;
-    }
-    for (final OrganizationSummary org in organizations) {
-      if (org.id == organizationId) {
-        return org.name;
-      }
-    }
-    return null;
-  }
+  Widget _orgTile(OrganizationSummary org, BuildContext context) => ListTile(
+    contentPadding: EdgeInsets.zero,
+    leading: const Icon(Icons.domain_outlined),
+    title: Text(org.name),
+    subtitle: Text(
+      MaterialLocalizations.of(context).formatShortDate(org.createdAt),
+    ),
+  );
 }

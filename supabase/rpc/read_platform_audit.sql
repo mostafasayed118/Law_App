@@ -1,14 +1,28 @@
--- rpc/read_platform_audit.sql — P2 reviewed RPC (REVIEWED & APPLIED — dev project, 2026-08-01)
--- Source of truth: docs/p2_schema_rls_design.md §5.2 + matrix §6 + README
--- refinement #2.
--- Backout: rpc/_down.sql.
+-- rpc/read_platform_audit.sql — P1.3 bounded (2026-09-22). SUPERSEDES the P2 zero-arg
+-- version (REVIEWED & APPLIED — dev project, 2026-08-01).
 --
--- platform_owner_admin-only cross-org audit read. Matrix §6: "platform_owner
--- _admin reading the audit table is itself an audited action" — impossible
--- with a raw SELECT policy, hence the RPC. The owner's own read is audited
--- with the owner actor (owner is not audit-exempt). Redacted fields only.
+-- **NOT YET APPLIED.** Owner decision OI-D4 authorizes the apply through the
+-- owner's path after the standard rehearsal → apply → battery re-run. Until
+-- this file is applied, the shipped client must keep calling the zero-arg
+-- signature; the client's p_limit/p_offset flip lands in the same release as
+-- the apply (an argument the function does not accept yet is a hard RPC error).
+--
+-- What changed and why (audit 2026-09-21, H-8): the platform-admin RPCs were
+-- the one path meeting the "unbounded query that will grow without limit"
+-- definition — read_platform_audit returned the ENTIRE audit_events table and
+-- is itself self-amplifying (each read appends a row to the table it read).
+-- Every function now takes p_limit/p_offset with a server-side hard cap of
+-- 500: the client cannot ask past the cap, and the server never returns more
+-- than the cap even for a compromised caller.
+--
+-- The old zero-arg signature is DROPPED, not left as an overload — leaving it
+-- would keep the unbounded path callable.
+-- Backout: rpc/_down.sql.
 
-create or replace function public.read_platform_audit()
+create or replace function public.read_platform_audit(
+  p_limit  int default 200,
+  p_offset int default 0
+)
 returns table (
   id               bigint,
   actor_user_id    uuid,
@@ -33,14 +47,22 @@ begin
     p_redacted_summary => 'cross-org audit rows read by platform owner'
   );
 
+  -- Server-side bounds: the client's page size is clamped to the cap, so no
+  -- caller (compromised or buggy) can widen the read.
+  p_limit  := least(greatest(coalesce(p_limit, 200), 1), 500);
+  p_offset := greatest(coalesce(p_offset, 0), 0);
+
   return query
     select a.id, a.actor_user_id, a.action, a.outcome, a.organization_id,
            a.resource_type, a.resource_id, a.correlation_id,
            a.redacted_summary, a.server_timestamp
       from public.audit_events a
-     order by a.server_timestamp desc;
+     order by a.server_timestamp desc
+     limit p_limit offset p_offset;
 end;
 $$;
 
-revoke execute on function public.read_platform_audit() from public, anon;
-grant execute on function public.read_platform_audit() to authenticated;
+drop function if exists public.read_platform_audit();
+
+revoke execute on function public.read_platform_audit(int, int) from public, anon;
+grant execute on function public.read_platform_audit(int, int) to authenticated;
