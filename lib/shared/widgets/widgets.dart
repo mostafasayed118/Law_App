@@ -17,6 +17,7 @@ export 'app_filter_chips.dart';
 export 'app_section_header.dart';
 export 'app_tile.dart';
 export 'confirm_dialog.dart';
+export 'cubit_list_surface.dart';
 export 'directional_icon.dart';
 export 'form_fields/labelled_field.dart';
 export 'form_fields/legalhub_text_field.dart';

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
@@ -23,64 +22,29 @@ class ApprovalsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context).approvalsTitle)),
-      body: BlocProvider<ApprovalsCubit>(
-        create: (BuildContext context) =>
-            ApprovalsCubit(serviceLocator<ApprovalsGateway>()),
-        child: const _ApprovalsSurface(),
-      ),
-    );
-  }
-}
-
-class _ApprovalsSurface extends StatefulWidget {
-  const _ApprovalsSurface();
-
-  @override
-  State<_ApprovalsSurface> createState() => _ApprovalsSurfaceState();
-}
-
-class _ApprovalsSurfaceState extends State<_ApprovalsSurface> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
-      }
-      context.read<ApprovalsCubit>().load();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
-    return SafeArea(
-      child: BlocBuilder<ApprovalsCubit, ApprovalsState>(
-        builder: (BuildContext context, ApprovalsState state) {
-          final Widget empty = Padding(
-            padding: const EdgeInsetsDirectional.only(
-              top: LegalHubTheme.spaceMd,
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.approvalsTitle)),
+      // The shared cubit-scoped list shell (audit 2026-09-21, M-10): the
+      // provider, the post-frame first load, the SafeArea + BlocBuilder and
+      // the ViewStateList wiring used to be repeated in this file verbatim.
+      body: CubitListSurface<ApprovalsCubit, ApprovalsState, PendingApproval>(
+        createCubit: () => ApprovalsCubit(serviceLocator<ApprovalsGateway>()),
+        project: (ApprovalsState state) => state.approvals,
+        load: (ApprovalsCubit cubit) => cubit.load(),
+        tileBuilder: (BuildContext context, PendingApproval approval) =>
+            _ApprovalTile(approval: approval),
+        empty: (BuildContext context, ApprovalsState state) => Padding(
+          padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
+          child: Text(
+            l10n.approvalsEmpty,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
-            child: Text(
-              l10n.approvalsEmpty,
-              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-          );
-          return ViewStateList<PendingApproval>(
-            state: state.approvals,
-            onRetry: () => context.read<ApprovalsCubit>().load(),
-            tileBuilder:
-                (BuildContext context, PendingApproval approval) =>
-                    _ApprovalTile(approval: approval),
-            empty: empty,
-            errorCopy: l10n.approvalsError,
-            localOnlyNote: l10n.approvalsLocalOnlyNote,
-          );
-        },
+          ),
+        ),
+        errorCopy: l10n.approvalsError,
+        localOnlyNote: l10n.approvalsLocalOnlyNote,
       ),
     );
   }

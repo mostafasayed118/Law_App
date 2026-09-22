@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
 import '../../../l10n/app_localizations.dart';
@@ -26,71 +25,29 @@ class BillingInvoicesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context).invoicesTitle)),
-      body: BlocProvider<BillingCubit>(
-        create: (BuildContext context) =>
-            BillingCubit(serviceLocator<BillingGateway>()),
-        child: const _InvoicesSurface(),
-      ),
-    );
-  }
-}
-
-class _InvoicesSurface extends StatefulWidget {
-  const _InvoicesSurface();
-
-  @override
-  State<_InvoicesSurface> createState() => _InvoicesSurfaceState();
-}
-
-class _InvoicesSurfaceState extends State<_InvoicesSurface> {
-  @override
-  void initState() {
-    super.initState();
-    // The cubit's initial state is already loading, so the first frame
-    // settles straight into the fake's immediate list (the vault/messages
-    // pattern).
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
-      }
-      context.read<BillingCubit>().load();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
-    final Widget empty = Padding(
-      padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
-      child: Text(
-        l10n.invoicesEmpty,
-        style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-      ),
-    );
-    return SafeArea(
-      child: BlocBuilder<BillingCubit, BillingState>(
-        builder: (BuildContext context, BillingState state) {
-          // Lazy list surface (audit 2026-09-21, M-20): the success arm was a
-          // Column of every row inside a non-lazy ListView, so row culling
-          // never applied. ViewStateList builds through
-          // SliverChildBuilderDelegate and carries the local-only note.
-          return ViewStateList<Invoice>(
-            state: state.invoices,
-            onRetry: () => context.read<BillingCubit>().load(),
-            tileBuilder: (BuildContext context, Invoice invoice) =>
-                _InvoiceTile(invoice: invoice),
-            empty: empty,
-            errorCopy: l10n.invoicesError,
-            localOnlyNote: l10n.invoicesLocalOnlyNote,
-            listPadding: const EdgeInsetsDirectional.all(
-              LegalHubTheme.marginMobile,
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.invoicesTitle)),
+      // The shared cubit-scoped list shell (audit 2026-09-21, M-10): the
+      // provider, the post-frame first load, the SafeArea + BlocBuilder and
+      // the lazy ViewStateList wiring used to be repeated in this file.
+      body: CubitListSurface<BillingCubit, BillingState, Invoice>(
+        createCubit: () => BillingCubit(serviceLocator<BillingGateway>()),
+        project: (BillingState state) => state.invoices,
+        load: (BillingCubit cubit) => cubit.load(),
+        tileBuilder: (BuildContext context, Invoice invoice) =>
+            _InvoiceTile(invoice: invoice),
+        empty: (BuildContext context, BillingState state) => Padding(
+          padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
+          child: Text(
+            l10n.invoicesEmpty,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
-          );
-        },
+          ),
+        ),
+        errorCopy: l10n.invoicesError,
+        localOnlyNote: l10n.invoicesLocalOnlyNote,
       ),
     );
   }

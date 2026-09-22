@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
@@ -21,64 +20,38 @@ class ComplianceAlertsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context).alertsTitle)),
-      body: BlocProvider<ComplianceAlertsCubit>(
-        create: (BuildContext context) =>
-            ComplianceAlertsCubit(serviceLocator<ComplianceAlertsGateway>()),
-        child: const _AlertsSurface(),
-      ),
-    );
-  }
-}
-
-class _AlertsSurface extends StatefulWidget {
-  const _AlertsSurface();
-
-  @override
-  State<_AlertsSurface> createState() => _AlertsSurfaceState();
-}
-
-class _AlertsSurfaceState extends State<_AlertsSurface> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
-      }
-      context.read<ComplianceAlertsCubit>().load();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
-    return SafeArea(
-      child: BlocBuilder<ComplianceAlertsCubit, ComplianceAlertsState>(
-        builder: (BuildContext context, ComplianceAlertsState state) {
-          final Widget empty = Padding(
-            padding: const EdgeInsetsDirectional.only(
-              top: LegalHubTheme.spaceMd,
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.alertsTitle)),
+      // The shared cubit-scoped list shell (audit 2026-09-21, M-10).
+      body:
+          CubitListSurface<
+            ComplianceAlertsCubit,
+            ComplianceAlertsState,
+            ComplianceAlert
+          >(
+            createCubit: () => ComplianceAlertsCubit(
+              serviceLocator<ComplianceAlertsGateway>(),
             ),
-            child: Text(
-              l10n.alertsEmpty,
-              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-          );
-          return ViewStateList<ComplianceAlert>(
-            state: state.alerts,
-            onRetry: () => context.read<ComplianceAlertsCubit>().load(),
+            project: (ComplianceAlertsState state) => state.alerts,
+            load: (ComplianceAlertsCubit cubit) => cubit.load(),
             tileBuilder: (BuildContext context, ComplianceAlert alert) =>
                 _AlertTile(alert: alert),
-            empty: empty,
+            empty: (BuildContext context, ComplianceAlertsState state) =>
+                Padding(
+                  padding: const EdgeInsetsDirectional.only(
+                    top: LegalHubTheme.spaceMd,
+                  ),
+                  child: Text(
+                    l10n.alertsEmpty,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
             errorCopy: l10n.alertsError,
             localOnlyNote: l10n.alertsLocalOnlyNote,
-          );
-        },
-      ),
+          ),
     );
   }
 }

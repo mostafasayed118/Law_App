@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
@@ -19,63 +18,27 @@ class TaskBoardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context).tasksTitle)),
-      body: BlocProvider<TaskBoardCubit>(
-        create: (BuildContext context) =>
-            TaskBoardCubit(serviceLocator<TaskBoardGateway>()),
-        child: const _TaskSurface(),
-      ),
-    );
-  }
-}
-
-class _TaskSurface extends StatefulWidget {
-  const _TaskSurface();
-
-  @override
-  State<_TaskSurface> createState() => _TaskSurfaceState();
-}
-
-class _TaskSurfaceState extends State<_TaskSurface> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
-      }
-      context.read<TaskBoardCubit>().load();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
-    return SafeArea(
-      child: BlocBuilder<TaskBoardCubit, TaskBoardState>(
-        builder: (BuildContext context, TaskBoardState state) {
-          final Widget empty = Padding(
-            padding: const EdgeInsetsDirectional.only(
-              top: LegalHubTheme.spaceMd,
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.tasksTitle)),
+      // The shared cubit-scoped list shell (audit 2026-09-21, M-10).
+      body: CubitListSurface<TaskBoardCubit, TaskBoardState, TaskItem>(
+        createCubit: () => TaskBoardCubit(serviceLocator<TaskBoardGateway>()),
+        project: (TaskBoardState state) => state.tasks,
+        load: (TaskBoardCubit cubit) => cubit.load(),
+        tileBuilder: (BuildContext context, TaskItem task) =>
+            _TaskTile(task: task),
+        empty: (BuildContext context, TaskBoardState state) => Padding(
+          padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
+          child: Text(
+            l10n.tasksEmpty,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
-            child: Text(
-              l10n.tasksEmpty,
-              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-          );
-          return ViewStateList<TaskItem>(
-            state: state.tasks,
-            onRetry: () => context.read<TaskBoardCubit>().load(),
-            tileBuilder: (BuildContext context, TaskItem task) =>
-                _TaskTile(task: task),
-            empty: empty,
-            errorCopy: l10n.tasksError,
-            localOnlyNote: l10n.tasksLocalOnlyNote,
-          );
-        },
+          ),
+        ),
+        errorCopy: l10n.tasksError,
+        localOnlyNote: l10n.tasksLocalOnlyNote,
       ),
     );
   }

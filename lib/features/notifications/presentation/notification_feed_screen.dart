@@ -35,87 +35,43 @@ class NotificationFeedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context).notificationsFeedTitle),
-      ),
-      body: BlocProvider<NotificationCubit>(
-        create: (BuildContext context) => NotificationCubit(
-          serviceLocator<NotificationGateway>(),
-          serviceLocator<NotificationPrefsStore>(),
-        ),
-        child: const _FeedSurface(),
-      ),
-    );
-  }
-}
-
-class _FeedSurface extends StatefulWidget {
-  const _FeedSurface();
-
-  @override
-  State<_FeedSurface> createState() => _FeedSurfaceState();
-}
-
-class _FeedSurfaceState extends State<_FeedSurface> {
-  @override
-  void initState() {
-    super.initState();
-    // The cubit's initial state is already loading, so the first frame
-    // settles straight into the fake's immediate list (the billing/vault
-    // pattern).
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
-      }
-      context.read<NotificationCubit>().load();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
-    return SafeArea(
-      child: BlocBuilder<NotificationCubit, NotificationState>(
-        builder: (BuildContext context, NotificationState state) {
-          // D-N5/D-PF3: the honest muted note when rows existed but every
-          // category toggle hid them — never the plain "No notifications"
-          // copy, which would be false.
-          final Widget empty = Padding(
-            padding: const EdgeInsetsDirectional.only(
-              top: LegalHubTheme.spaceMd,
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.notificationsFeedTitle)),
+      // The shared cubit-scoped list shell (audit 2026-09-21, M-10). The
+      // empty copy is a state builder here because it depends on the state:
+      // D-N5/D-PF3 render the honest muted note when rows existed but every
+      // category toggle hid them, never the plain "No notifications" copy.
+      body:
+          CubitListSurface<NotificationCubit, NotificationState, Notification>(
+            createCubit: () => NotificationCubit(
+              serviceLocator<NotificationGateway>(),
+              serviceLocator<NotificationPrefsStore>(),
             ),
-            child: Text(
-              state.allMuted
-                  ? l10n.notificationsFeedMutedEmpty
-                  : l10n.notificationsFeedEmpty,
-              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-          );
-          // Lazy list surface (audit 2026-09-21, M-20): the success arm was a
-          // Column of every row inside a non-lazy ListView, so row culling
-          // never applied. ViewStateList builds through
-          // SliverChildBuilderDelegate and carries the local-only note.
-          return ViewStateList<Notification>(
-            state: state.notifications,
-            onRetry: () => context.read<NotificationCubit>().load(),
+            project: (NotificationState state) => state.notifications,
+            load: (NotificationCubit cubit) => cubit.load(),
             tileBuilder: (BuildContext context, Notification notification) =>
                 _NotificationTile(
                   notification: notification,
                   onMarkRead: (String id) =>
                       context.read<NotificationCubit>().markRead(id),
                 ),
-            empty: empty,
+            empty: (BuildContext context, NotificationState state) => Padding(
+              padding: const EdgeInsetsDirectional.only(
+                top: LegalHubTheme.spaceMd,
+              ),
+              child: Text(
+                state.allMuted
+                    ? l10n.notificationsFeedMutedEmpty
+                    : l10n.notificationsFeedEmpty,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
             errorCopy: l10n.notificationsFeedError,
             localOnlyNote: l10n.notificationsFeedLocalOnlyNote,
-            listPadding: const EdgeInsetsDirectional.all(
-              LegalHubTheme.marginMobile,
-            ),
-          );
-        },
-      ),
+          ),
     );
   }
 }
