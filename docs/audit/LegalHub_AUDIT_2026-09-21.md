@@ -711,6 +711,22 @@ Five more list surfaces now build lazily (commit `3301099`): **documents (vault)
 
 **P1.9's remaining half is M-10** — the `CubitListSurface` extraction (shell + post-frame load + empty copy + `ViewStateList`). Scoping note for whoever picks it up: the audit counts ~7 screens with the shell, but **two of them (`document_list_screen`, `message_list_screen`) drive TWO cubits each** (the documents/messages list plus the matter list that resolves the matter-ref chips), so a single-cubit surface cannot absorb them; the extraction fits approvals, compliance, tasks, billing and notifications.
 
+### 12.7 P1.9 COMPLETE — the M-10 extraction (2026-09-22)
+
+`lib/shared/widgets/cubit_list_surface.dart` (commit `6e72b22`, exported by the widgets barrel) owns what the audit found duplicated *around* the switch rather than in it: the cubit provider, the post-frame mount load, the `SafeArea` + `BlocBuilder`, and the `ViewStateList` wiring. `CubitListSurface<C extends Cubit<S>, S, ItemT>` takes the cubit factory, the state→rows projection, the load call, the row tile, the empty builder and the copy.
+
+Adopted by **approvals, compliance alerts, task board, billing invoices and the notification feed** — each shed its private surface `StatefulWidget` + `State` (~340 lines of scaffolding in total) and its now-unused `flutter_bloc` import.
+
+Two design points that the call sites forced:
+- **`empty` is a builder over the state, not a widget** — the notification feed's copy depends on state (the D-N5/D-PF3 muted-empty differs from its plain empty), so a static widget could not express it.
+- **one `load` closure serves both the mount load and the error arm's retry**, which is identical in all five screens and preserves exactly the behavior they had.
+
+**Deliberately not adopted by `document_list_screen` and `message_list_screen`** — each drives two cubits, which a single-cubit surface cannot express. They keep their own shells; a dual-cubit variant would be the way to absorb them if that is ever wanted.
+
+**Test count unchanged (1388):** this is a refactor, and the five screens' existing suites — mount load, every arm, retry, localization — are its coverage rather than a new test.
+
+**P1.9 is complete** (M-10 + M-20). **Verification:** `flutter analyze` → No issues found · `flutter test` → **+1388 All tests passed** · `dart format` clean · `scripts/verify_ledger.sh` → **PASS 115/0/0** · README lockstep unchanged at 1385/1388.
+
 **Verification:** `flutter analyze` → No issues found · `flutter test` → **+1387 All tests passed** · `dart format` clean · `scripts/verify_ledger.sh` → **PASS 115/0/0** · README lockstep **1384/1387**.
 
 **Verification at this point:** `flutter analyze` → No issues found · `flutter test` → **+1386 All tests passed** · `dart format` clean · `scripts/verify_ledger.sh` → **PASS 115/0/0** · README lockstep **1383/1386**.
