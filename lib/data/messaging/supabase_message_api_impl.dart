@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../list_query_guards.dart';
 import 'supabase_message_api.dart';
 
 /// A PostgREST RPC call: function name + named params → response.
@@ -27,21 +28,25 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
   /// factory so tests can construct the impl with any callable stub.
   factory SupabaseMessageApiImpl.bind() => SupabaseMessageApiImpl(_boundTable);
 
-  /// Binds a table SELECT to the app-level client. The builder's `select`
-  /// resolves to the raw row list (PostgrestList) — no cast needed. When a
-  /// `threadId` is given, the SELECT is filtered `.eq('thread_id', …)` — the
-  /// thread-scoped messages read (D-RT5).
+  /// Binds a table SELECT to the app-level client via the shared bounded
+  /// binding (`list_query_guards.dart`): threads ordered newest-activity
+  /// first, messages fetched NEWEST-first (the cap must keep the newest
+  /// end of the history; the gateway reverses to chronological for the
+  /// detail screen's top-to-bottom render), each with a hard row cap
+  /// (audit 2026-09-21, P1). When a `threadId` is given, the SELECT is
+  /// filtered `.eq('thread_id', …)` — the thread-scoped messages read
+  /// (D-RT5).
   static Future<List<Map<String, dynamic>>> _boundTable(
     String table,
     String columns, [
     String? threadId,
   ]) {
-    final PostgrestFilterBuilder<List<Map<String, dynamic>>> query = Supabase
-        .instance
-        .client
-        .from(table)
-        .select(columns);
-    return threadId == null ? query : query.eq('thread_id', threadId);
+    return boundedTableSelect(
+      table,
+      columns,
+      filterColumn: threadId == null ? null : 'thread_id',
+      filterValue: threadId,
+    );
   }
 
   /// Binds the audited `send_message` RPC to the app-level client (D-SM2).

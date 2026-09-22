@@ -66,16 +66,11 @@ class _TaskSurfaceState extends State<_TaskSurface> {
               style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
             ),
           );
-          return ViewStateList<List<TaskItem>>(
+          return ViewStateList<TaskItem>(
             state: state.tasks,
             onRetry: () => context.read<TaskBoardCubit>().load(),
-            itemBuilder: (BuildContext context, List<TaskItem> tasks) =>
-                <Widget>[
-                  for (final TaskItem task in tasks) ...<Widget>[
-                    _TaskTile(task: task),
-                    const SizedBox(height: LegalHubTheme.spaceSm),
-                  ],
-                ],
+            tileBuilder: (BuildContext context, TaskItem task) =>
+                _TaskTile(task: task),
             empty: empty,
             errorCopy: l10n.tasksError,
             localOnlyNote: l10n.tasksLocalOnlyNote,

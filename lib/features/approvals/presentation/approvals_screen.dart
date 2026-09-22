@@ -70,19 +70,12 @@ class _ApprovalsSurfaceState extends State<_ApprovalsSurface> {
               style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
             ),
           );
-          return ViewStateList<List<PendingApproval>>(
+          return ViewStateList<PendingApproval>(
             state: state.approvals,
             onRetry: () => context.read<ApprovalsCubit>().load(),
-            itemBuilder:
-                (
-                  BuildContext context,
-                  List<PendingApproval> approvals,
-                ) => <Widget>[
-                  for (final PendingApproval approval in approvals) ...<Widget>[
+            tileBuilder:
+                (BuildContext context, PendingApproval approval) =>
                     _ApprovalTile(approval: approval),
-                    const SizedBox(height: LegalHubTheme.spaceSm),
-                  ],
-                ],
             empty: empty,
             errorCopy: l10n.approvalsError,
             localOnlyNote: l10n.approvalsLocalOnlyNote,

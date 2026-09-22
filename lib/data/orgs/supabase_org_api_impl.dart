@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../list_query_guards.dart';
 import 'supabase_org_api.dart';
 
 /// A PostgREST RPC call: function name + named params → response.
@@ -50,13 +51,16 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
     return PostgrestResponse<dynamic>(data: data, count: 0);
   }
 
-  /// Binds a table SELECT to the app-level client. The builder's `select`
-  /// resolves to the raw row list (PostgrestList) — no cast needed.
+  /// Binds a table SELECT to the app-level client via the shared bounded
+  /// binding (`list_query_guards.dart`): a hard row cap, no ordering (the
+  /// caller-scoped `memberships` read is bounded by the user's own org
+  /// count; no deterministic column is contractually meaningful)
+  /// (audit 2026-09-21, P1).
   static Future<List<Map<String, dynamic>>> _boundTable(
     String table,
     String columns,
   ) {
-    return Supabase.instance.client.from(table).select(columns);
+    return boundedTableSelect(table, columns);
   }
 
   final OrgRpcCaller _rpc;

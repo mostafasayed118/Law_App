@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../list_query_guards.dart';
 import 'supabase_billing_api.dart';
 
 /// [SupabaseBillingApi] backed by the PostgREST client.
@@ -15,13 +16,14 @@ class SupabaseBillingApiImpl implements SupabaseBillingApi {
   /// factory so tests can construct the impl with any callable stub.
   factory SupabaseBillingApiImpl.bind() => SupabaseBillingApiImpl(_boundTable);
 
-  /// Binds a table SELECT to the app-level client. The builder's `select`
-  /// resolves to the raw row list (PostgrestList) — no cast needed.
+  /// Binds a table SELECT to the app-level client via the shared bounded
+  /// binding (`list_query_guards.dart`): newest-first `.order('issued_at')`
+  /// + a hard row cap (audit 2026-09-21, P1).
   static Future<List<Map<String, dynamic>>> _boundTable(
     String table,
     String columns,
   ) {
-    return Supabase.instance.client.from(table).select(columns);
+    return boundedTableSelect(table, columns);
   }
 
   final BillingTableCaller _table;

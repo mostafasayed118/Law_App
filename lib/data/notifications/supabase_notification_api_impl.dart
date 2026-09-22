@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../list_query_guards.dart';
 import 'supabase_notification_api.dart';
 
 /// [SupabaseNotificationApi] backed by the PostgREST client.
@@ -17,13 +18,16 @@ class SupabaseNotificationApiImpl implements SupabaseNotificationApi {
   factory SupabaseNotificationApiImpl.bind() =>
       SupabaseNotificationApiImpl(_boundTable);
 
-  /// Binds a table SELECT to the app-level client. The builder's `select`
-  /// resolves to the raw row list (PostgrestList) — no cast needed.
+  /// Binds a table SELECT to the app-level client via the shared bounded
+  /// binding (`list_query_guards.dart`): newest-first
+  /// `.order('server_timestamp')` (served by the `notifications_org_ts`
+  /// index) + a hard row cap (audit 2026-09-21, P1). The gateway's
+  /// client-side sort stays as the determinism pin on top.
   static Future<List<Map<String, dynamic>>> _boundTable(
     String table,
     String columns,
   ) {
-    return Supabase.instance.client.from(table).select(columns);
+    return boundedTableSelect(table, columns);
   }
 
   /// Binds the D-N6 write RPC to the app-level client: the exact function

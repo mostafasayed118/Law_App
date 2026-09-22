@@ -19,11 +19,18 @@ import '../../l10n/app_localizations.dart';
 /// note-wrapped empty ListView as the empty arm — normalized per the owner
 /// decision recorded in the design doc's §4 (previously they rendered the
 /// plain empty copy, an inconsistency of the pre-extraction screens).
-class ViewStateList<T> extends StatelessWidget {
+///
+/// Lazy success arm (audit 2026-09-21, P4): the widget is generic over the
+/// **item** type ([ItemT]) and its success arm is a [ListView.builder] —
+/// tiles are built on demand for the visible viewport instead of eagerly
+/// mapping the whole data list into children. The inter-tile `spaceSm` gap,
+/// the pre-footer `spaceLg` gap, and the footer note are owned by the
+/// widget; call sites supply only the tile for one item via [tileBuilder].
+class ViewStateList<ItemT> extends StatelessWidget {
   const ViewStateList({
     required this.state,
     required this.onRetry,
-    required this.itemBuilder,
+    required this.tileBuilder,
     required this.empty,
     required this.errorCopy,
     required this.localOnlyNote,
@@ -33,14 +40,16 @@ class ViewStateList<T> extends StatelessWidget {
     super.key,
   });
 
-  /// The state driving the switch.
-  final ViewState<T> state;
+  /// The state driving the switch. The success payload is the item list.
+  final ViewState<List<ItemT>> state;
 
   /// Retry callback wired to the error arm's `TextButton`.
   final VoidCallback onRetry;
 
-  /// The success arm's tile widgets, including their inter-tile gaps.
-  final List<Widget> Function(BuildContext context, T data) itemBuilder;
+  /// The success arm's tile for one item. Built lazily — only for indices
+  /// inside the visible viewport. The inter-tile gap is rendered by this
+  /// widget, not the builder.
+  final Widget Function(BuildContext context, ItemT item) tileBuilder;
 
   /// The feature's plain empty copy, rendered inside the note-wrapped
   /// ListView for empty, offline, and unauthorized alike.
@@ -64,11 +73,13 @@ class ViewStateList<T> extends StatelessWidget {
       style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
     );
     return switch (state) {
-      ViewLoading<T>() => const Padding(
+      ViewLoading<List<ItemT>>() => const Padding(
         padding: EdgeInsetsDirectional.all(LegalHubTheme.spaceXl),
         child: Center(child: CircularProgressIndicator()),
       ),
-      ViewEmpty<T>() || ViewOffline<T>() || ViewUnauthorized<T>() => ListView(
+      ViewEmpty<List<ItemT>>() ||
+      ViewOffline<List<ItemT>>() ||
+      ViewUnauthorized<List<ItemT>>() => ListView(
         padding: listPadding,
         children: <Widget>[
           empty,
@@ -76,7 +87,7 @@ class ViewStateList<T> extends StatelessWidget {
           note,
         ],
       ),
-      ViewError<T>() => ListView(
+      ViewError<List<ItemT>>() => ListView(
         padding: listPadding,
         children: <Widget>[
           Text(
@@ -89,14 +100,60 @@ class ViewStateList<T> extends StatelessWidget {
           ),
         ],
       ),
-      ViewSuccess<T>(data: final T data) => ListView(
-        padding: listPadding,
-        children: <Widget>[
-          ...itemBuilder(context, data),
-          const SizedBox(height: LegalHubTheme.spaceLg),
-          note,
-        ],
-      ),
+      ViewSuccess<List<ItemT>>(data: final List<ItemT> data) =>
+        _SuccessListView<ItemT>(
+          items: data,
+          tileBuilder: tileBuilder,
+          localOnlyNote: note,
+          listPadding: listPadding,
+        ),
     };
+  }
+}
+
+/// The success arm as a lazily-built list: [ListView.builder] constructs
+/// only the visible rows. The layout matches the previous eager arm —
+/// tile, `spaceSm` gap, tile, … last tile, `spaceLg` gap, footer note —
+/// expressed as `items.length + 2` rows where the two trailing rows are
+/// the pre-footer gap and the note.
+class _SuccessListView<ItemT> extends StatelessWidget {
+  const _SuccessListView({
+    required this.items,
+    required this.tileBuilder,
+    required this.localOnlyNote,
+    required this.listPadding,
+  });
+
+  final List<ItemT> items;
+  final Widget Function(BuildContext context, ItemT item) tileBuilder;
+  final Widget localOnlyNote;
+  final EdgeInsetsGeometry listPadding;
+
+  @override
+  Widget build(BuildContext context) {
+    final int itemCount = items.length + 2;
+    return ListView.builder(
+      padding: listPadding,
+      itemCount: itemCount,
+      itemBuilder: (BuildContext context, int index) {
+        if (index == itemCount - 1) {
+          return localOnlyNote;
+        }
+        if (index == itemCount - 2) {
+          return const SizedBox(height: LegalHubTheme.spaceLg);
+        }
+        final Widget tile = tileBuilder(context, items[index]);
+        if (index == itemCount - 3) {
+          return tile;
+        }
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            tile,
+            const SizedBox(height: LegalHubTheme.spaceSm),
+          ],
+        );
+      },
+    );
   }
 }

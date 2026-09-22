@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../list_query_guards.dart';
 import 'supabase_storage_api.dart';
 
 /// [SupabaseStorageApi] backed by the PostgREST client.
@@ -14,13 +15,15 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
   /// factory so tests can construct the impl with any callable stub.
   factory SupabaseStorageApiImpl.bind() => SupabaseStorageApiImpl(_boundTable);
 
-  /// Binds a table SELECT to the app-level client. The builder's `select`
-  /// resolves to the raw row list (PostgrestList) — no cast needed.
+  /// Binds a table SELECT to the app-level client via the shared bounded
+  /// binding (`list_query_guards.dart`): newest-first `.order('created_at')`
+  /// (a projection-external column that still anchors the newest-first
+  /// scan) + a hard row cap (audit 2026-09-21, P1).
   static Future<List<Map<String, dynamic>>> _boundTable(
     String table,
     String columns,
   ) {
-    return Supabase.instance.client.from(table).select(columns);
+    return boundedTableSelect(table, columns);
   }
 
   final StorageTableCaller _table;

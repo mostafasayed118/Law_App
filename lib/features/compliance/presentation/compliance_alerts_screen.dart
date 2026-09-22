@@ -68,16 +68,11 @@ class _AlertsSurfaceState extends State<_AlertsSurface> {
               style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
             ),
           );
-          return ViewStateList<List<ComplianceAlert>>(
+          return ViewStateList<ComplianceAlert>(
             state: state.alerts,
             onRetry: () => context.read<ComplianceAlertsCubit>().load(),
-            itemBuilder: (BuildContext context, List<ComplianceAlert> alerts) =>
-                <Widget>[
-                  for (final ComplianceAlert alert in alerts) ...<Widget>[
-                    _AlertTile(alert: alert),
-                    const SizedBox(height: LegalHubTheme.spaceSm),
-                  ],
-                ],
+            tileBuilder: (BuildContext context, ComplianceAlert alert) =>
+                _AlertTile(alert: alert),
             empty: empty,
             errorCopy: l10n.alertsError,
             localOnlyNote: l10n.alertsLocalOnlyNote,

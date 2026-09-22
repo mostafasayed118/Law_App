@@ -90,24 +90,30 @@ class _DetailSurfaceState extends State<_DetailSurface> {
         title: Text(widget.threadTitle ?? l10n.messageThreadDetailTitle),
       ),
       body: SafeArea(
-        child: BlocBuilder<MessageThreadDetailCubit, MessageThreadDetailState>(
-          builder: (BuildContext context, MessageThreadDetailState state) {
-            return ListView(
-              padding: const EdgeInsetsDirectional.all(
-                LegalHubTheme.marginMobile,
+        // Column + Expanded (audit 2026-09-21, P4): the transcript is a
+        // lazily-built ListView inside the remaining height, not an eager
+        // Column inside an outer ListView — long threads only build the
+        // visible viewport and the composer keeps its fixed footer slot.
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              child: BlocBuilder<
+                MessageThreadDetailCubit,
+                MessageThreadDetailState
+              >(builder: _bodyFor),
+            ),
+            Padding(
+              padding: const EdgeInsetsDirectional.only(
+                bottom: LegalHubTheme.spaceSm,
               ),
-              children: <Widget>[
-                _resultsView(context, state, l10n, text, scheme),
-                const SizedBox(height: LegalHubTheme.spaceLg),
-                Text(
-                  l10n.messagesLocalOnlyNote,
-                  style: text.bodySmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
+              child: Text(
+                l10n.messagesLocalOnlyNote,
+                style: text.bodySmall?.copyWith(
+                  color: scheme.onSurfaceVariant,
                 ),
-              ],
-            );
-          },
+              ),
+            ),
+          ],
         ),
       ),
       // D-LV1: the insert-only composer — a message field + send. No edit,
@@ -115,6 +121,19 @@ class _DetailSurfaceState extends State<_DetailSurface> {
       bottomNavigationBar: SafeArea(
         child: _Composer(threadId: widget.threadId),
       ),
+    );
+  }
+
+  Widget _bodyFor(
+    BuildContext context,
+    MessageThreadDetailState state,
+  ) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final TextTheme text = Theme.of(context).textTheme;
+    final ColorScheme scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
+      child: _resultsView(context, state, l10n, text, scheme),
     );
   }
 
@@ -140,13 +159,25 @@ class _DetailSurfaceState extends State<_DetailSurface> {
       builder: (BuildContext context, List<Message> messages) =>
           messages.isEmpty
           ? empty
-          : Column(
-              children: <Widget>[
-                for (final Message message in messages) ...<Widget>[
-                  _MessageTile(message: message),
-                  const SizedBox(height: LegalHubTheme.spaceSm),
-                ],
-              ],
+          // Lazy transcript (audit 2026-09-21, P4): rows are constructed
+          // on demand, preserving the tile + `spaceSm` gap rhythm of the
+          // previous eager Column.
+          : ListView.builder(
+              itemCount: messages.length,
+              itemBuilder: (BuildContext context, int index) {
+                final Message message = messages[index];
+                final Widget tile = _MessageTile(message: message);
+                if (index == messages.length - 1) {
+                  return tile;
+                }
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    tile,
+                    const SizedBox(height: LegalHubTheme.spaceSm),
+                  ],
+                );
+              },
             ),
       empty: empty,
       errorCopy: l10n.messagesDetailError,
@@ -267,9 +298,15 @@ class _ComposerState extends State<_Composer> {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
     return BlocBuilder<MessageThreadDetailCubit, MessageThreadDetailState>(
+      // The empty-draft signal is scoped to the send button via a
+      // ValueListenableBuilder on the controller (audit 2026-09-21, P4) —
+      // the composer chrome no longer rebuilds the whole bloc subtree on
+      // every keystroke, and there is no setState/onChange coupling at all.
+      buildWhen: (MessageThreadDetailState previous, MessageThreadDetailState current) {
+        return previous.sending != current.sending ||
+            previous.sendError != current.sendError;
+      },
       builder: (BuildContext context, MessageThreadDetailState state) {
-        final String draft = _controller.text.trim();
-        final bool canSend = draft.isNotEmpty && !state.sending;
         return Material(
           color: scheme.surfaceContainerLowest,
           elevation: 4,
@@ -306,21 +343,37 @@ class _ComposerState extends State<_Composer> {
                             vertical: LegalHubTheme.spaceSm,
                           ),
                         ),
-                        onChanged: (_) => setState(() {}),
                         onSubmitted: (_) => _send(context),
                       ),
                     ),
                     const SizedBox(width: LegalHubTheme.spaceSm),
-                    IconButton.filled(
-                      onPressed: canSend ? () => _send(context) : null,
-                      tooltip: l10n.messageSend,
-                      icon: state.sending
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.send),
+                    // Only the send affordance listens to the draft text:
+                    // typing rebuilds this button, not the composer or the
+                    // thread list.
+                    ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: _controller,
+                      builder:
+                          (
+                            BuildContext context,
+                            TextEditingValue value,
+                            Widget? child,
+                          ) {
+                            final bool canSend =
+                                value.text.trim().isNotEmpty && !state.sending;
+                            return IconButton.filled(
+                              onPressed: canSend ? () => _send(context) : null,
+                              tooltip: l10n.messageSend,
+                              icon: state.sending
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.send),
+                            );
+                          },
                     ),
                   ],
                 ),

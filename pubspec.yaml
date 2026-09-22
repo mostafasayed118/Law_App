@@ -6,7 +6,9 @@ version: 1.0.0+1
 environment:
   # B1 target pins; confirm before subsequent backlog tickets.
   sdk: '>=3.12.2 <3.13.0'
-  flutter: '3.44.4'
+  # Range instead of exact pin: exact pins break `pub get` whenever the local
+  # toolchain moves (e.g. 3.48.0-pre). Dart constraint above still guards API level.
+  flutter: '>=3.44.4 <4.0.0'
 
 dependencies:
   app_links: ^7.2.1

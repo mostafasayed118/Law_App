@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../list_query_guards.dart';
 import 'supabase_document_api.dart';
 
 /// [SupabaseDocumentApi] backed by the PostgREST client.
@@ -15,13 +16,14 @@ class SupabaseDocumentApiImpl implements SupabaseDocumentApi {
   factory SupabaseDocumentApiImpl.bind() =>
       SupabaseDocumentApiImpl(_boundTable);
 
-  /// Binds a table SELECT to the app-level client. The builder's `select`
-  /// resolves to the raw row list (PostgrestList) — no cast needed.
+  /// Binds a table SELECT to the app-level client via the shared bounded
+  /// binding (`list_query_guards.dart`): newest-first `.order('created_at')`
+  /// + a hard row cap (audit 2026-09-21, P1).
   static Future<List<Map<String, dynamic>>> _boundTable(
     String table,
     String columns,
   ) {
-    return Supabase.instance.client.from(table).select(columns);
+    return boundedTableSelect(table, columns);
   }
 
   final DocumentTableCaller _table;
