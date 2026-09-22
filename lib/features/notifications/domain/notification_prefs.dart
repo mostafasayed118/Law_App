@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import 'notification.dart';
+
 /// Device-local notification preferences (user-level, foundation scope).
 ///
 /// These are pure UX preferences persisted on this device; they carry no
@@ -36,6 +38,16 @@ class NotificationPrefs extends Equatable {
   final bool appointmentReminders;
   final bool activityUpdates;
   final bool systemAlerts;
+
+  /// Whether [category]'s toggle is on.
+  ///
+  /// The category→toggle mapping lives here rather than at each call site so
+  /// a new category cannot be added without this switch failing to compile.
+  bool isEnabled(NotificationCategory category) => switch (category) {
+    NotificationCategory.appointment => appointmentReminders,
+    NotificationCategory.activity => activityUpdates,
+    NotificationCategory.system => systemAlerts,
+  };
 
   NotificationPrefs copyWith({
     bool? appointmentReminders,

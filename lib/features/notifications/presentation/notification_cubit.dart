@@ -6,6 +6,7 @@ import '../../../core/state/view_state.dart';
 import '../domain/notification.dart';
 import '../domain/notification_gateway.dart';
 import '../domain/notification_prefs_store.dart';
+import '../domain/visible_notifications.dart';
 import 'notification_state.dart';
 
 /// Owns the notification-feed list surface (notification-feed slice, D-N1).
@@ -27,6 +28,11 @@ class NotificationCubit extends Cubit<NotificationState> {
   /// The device-local prefs store (D-N5/D-PF2) — read-only here; null keeps
   /// the defaults (all categories enabled), which pins AC-4.
   final NotificationPrefsStore? _prefsStore;
+
+  /// The visibility rule (D-N5/D-PF2/D-PF3) as a domain use case —
+  /// the first consumer of the `core/use_cases` layer (§4.1).
+  late final LoadVisibleNotifications _visibleNotifications =
+      LoadVisibleNotifications(_prefsStore);
 
   /// In-flight guard. The initial state IS loading (like [BillingCubit.load]'s
   /// contract), so the flag — not a state check — distinguishes "loading in
@@ -59,27 +65,30 @@ class NotificationCubit extends Cubit<NotificationState> {
     }
     switch (result) {
       case Success<List<Notification>>(value: final List<Notification> list):
-        // D-PF2: the store is read once per load; null store → defaults
-        // (all enabled — AC-4). Each toggle hides its own category.
-        final Set<NotificationCategory> muted = <NotificationCategory>{
-          if (!(await _readAppointmentToggle()))
-            NotificationCategory.appointment,
-          if (!(await _readActivityToggle())) NotificationCategory.activity,
-          if (!(await _readSystemToggle())) NotificationCategory.system,
-        };
-        final List<Notification> visible = muted.isEmpty
-            ? list
-            : list
-                  .where((Notification n) => !muted.contains(n.category))
-                  .toList(growable: false);
-        emit(
-          state.copyWith(
-            notifications: visible.isEmpty
-                ? const ViewEmpty<List<Notification>>()
-                : ViewSuccess<List<Notification>>(visible),
-            allMuted: list.isNotEmpty && visible.isEmpty,
-          ),
-        );
+        // D-N5/D-PF2/D-PF3: the visibility rule lives in the use case — one
+        // store read per load (the inlined version read it once per toggle
+        // while claiming a single read) and the allMuted distinction owned
+        // there rather than reconstructed here.
+        switch (await _visibleNotifications(list)) {
+          case Success<NotificationVisibility>(
+            value: final NotificationVisibility visibility,
+          ):
+            emit(
+              state.copyWith(
+                notifications: visibility.visible.isEmpty
+                    ? const ViewEmpty<List<Notification>>()
+                    : ViewSuccess<List<Notification>>(visibility.visible),
+                allMuted: visibility.allMuted,
+              ),
+            );
+          case Failure<NotificationVisibility>(error: final AppError error):
+            emit(
+              state.copyWith(
+                notifications: viewStateForFailure<List<Notification>>(error),
+                allMuted: false,
+              ),
+            );
+        }
       case Failure<List<Notification>>(error: final AppError error):
         emit(
           state.copyWith(
@@ -88,30 +97,6 @@ class NotificationCubit extends Cubit<NotificationState> {
           ),
         );
     }
-  }
-
-  Future<bool> _readAppointmentToggle() async {
-    final store = _prefsStore;
-    if (store == null) {
-      return true;
-    }
-    return (await store.read())?.appointmentReminders ?? true;
-  }
-
-  Future<bool> _readActivityToggle() async {
-    final store = _prefsStore;
-    if (store == null) {
-      return true;
-    }
-    return (await store.read())?.activityUpdates ?? true;
-  }
-
-  Future<bool> _readSystemToggle() async {
-    final store = _prefsStore;
-    if (store == null) {
-      return true;
-    }
-    return (await store.read())?.systemAlerts ?? true;
   }
 
   /// Marks one notification read (D-N6 write slice, D-F6): calls the
@@ -136,7 +121,9 @@ class NotificationCubit extends Cubit<NotificationState> {
         await load();
       case Failure<int>(error: final AppError error):
         emit(
-          state.copyWith(notifications: viewStateForFailure<List<Notification>>(error)),
+          state.copyWith(
+            notifications: viewStateForFailure<List<Notification>>(error),
+          ),
         );
     }
   }
