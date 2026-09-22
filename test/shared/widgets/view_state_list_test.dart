@@ -49,6 +49,22 @@ void main() {
     expect(find.text('Local-only note'), findsOneWidget);
   });
 
+  testWidgets('an empty SUCCESS renders the empty arm, not a bare list', (
+    tester,
+  ) async {
+    // Some cubits emit ViewSuccess(<empty>) rather than ViewEmpty — the
+    // research slice does, for a no-match query. "Loaded, but there is
+    // nothing" is the empty state either way, and owning the branch here is
+    // what lets the ViewStateSwitch call sites drop their per-screen
+    // `list.isEmpty ? empty : Column(…)` (audit M-10/M-20).
+    await tester.pumpWidget(
+      pumpViewState<String>(const ViewSuccess<List<String>>(<String>[])),
+    );
+
+    expect(find.text('empty copy'), findsOneWidget);
+    expect(find.text('Local-only note'), findsOneWidget);
+  });
+
   testWidgets('offline branch renders the offline copy and a retry', (
     tester,
   ) async {

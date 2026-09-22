@@ -121,20 +121,13 @@ class _ListSurfaceState extends State<_ListSurface> {
                   ViewOffline() ||
                   ViewUnauthorized() => const <Matter>[],
                 };
-                return ListView(
-                  padding: const EdgeInsetsDirectional.all(
-                    LegalHubTheme.marginMobile,
-                  ),
-                  children: <Widget>[
-                    _resultsView(context, state, matters, l10n, text, scheme),
-                    const SizedBox(height: LegalHubTheme.spaceLg),
-                    Text(
-                      l10n.messagesLocalOnlyNote,
-                      style: text.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
+                return _resultsView(
+                  context,
+                  state,
+                  matters,
+                  l10n,
+                  text,
+                  scheme,
                 );
               },
             );
@@ -160,29 +153,27 @@ class _ListSurfaceState extends State<_ListSurface> {
         style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
       ),
     );
-    return ViewStateSwitch<List<MessageThread>>(
+    // Lazy list surface (audit 2026-09-21, M-20): the success arm used to be a
+    // Column of every tile nested in a non-lazy ListView, so row culling never
+    // applied. ViewStateList builds rows through SliverChildBuilderDelegate and
+    // carries the local-only note itself, which is why it replaces the outer
+    // ListView rather than nesting inside it.
+    return ViewStateList<MessageThread>(
       state: state.threads,
       onRetry: cubit.load,
-      builder: (BuildContext context, List<MessageThread> threads) =>
-          threads.isEmpty
-          ? empty
-          : Column(
-              children: <Widget>[
-                for (final MessageThread thread in threads) ...<Widget>[
-                  _MessageThreadTile(
-                    thread: thread,
-                    onOpenThread: () => context.go(
-                      AppRoutes.messageThreadDetailFor(thread.id),
-                      extra: thread.title,
-                    ),
-                    onViewMatter: _matterTap(context, thread, matters),
-                  ),
-                  const SizedBox(height: LegalHubTheme.spaceSm),
-                ],
-              ],
+      tileBuilder: (BuildContext context, MessageThread thread) =>
+          _MessageThreadTile(
+            thread: thread,
+            onOpenThread: () => context.go(
+              AppRoutes.messageThreadDetailFor(thread.id),
+              extra: thread.title,
             ),
+            onViewMatter: _matterTap(context, thread, matters),
+          ),
       empty: empty,
       errorCopy: l10n.messagesError,
+      localOnlyNote: l10n.messagesLocalOnlyNote,
+      listPadding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
     );
   }
 

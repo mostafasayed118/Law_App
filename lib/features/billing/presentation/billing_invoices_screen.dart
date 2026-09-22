@@ -74,29 +74,21 @@ class _InvoicesSurfaceState extends State<_InvoicesSurface> {
     return SafeArea(
       child: BlocBuilder<BillingCubit, BillingState>(
         builder: (BuildContext context, BillingState state) {
-          return ViewStateSwitch<List<Invoice>>(
+          // Lazy list surface (audit 2026-09-21, M-20): the success arm was a
+          // Column of every row inside a non-lazy ListView, so row culling
+          // never applied. ViewStateList builds through
+          // SliverChildBuilderDelegate and carries the local-only note.
+          return ViewStateList<Invoice>(
             state: state.invoices,
             onRetry: () => context.read<BillingCubit>().load(),
-            builder: (BuildContext context, List<Invoice> invoices) => ListView(
-              padding: const EdgeInsetsDirectional.all(
-                LegalHubTheme.marginMobile,
-              ),
-              children: <Widget>[
-                for (final Invoice invoice in invoices) ...<Widget>[
-                  _InvoiceTile(invoice: invoice),
-                  const SizedBox(height: LegalHubTheme.spaceSm),
-                ],
-                const SizedBox(height: LegalHubTheme.spaceLg),
-                Text(
-                  l10n.invoicesLocalOnlyNote,
-                  style: text.bodySmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
+            tileBuilder: (BuildContext context, Invoice invoice) =>
+                _InvoiceTile(invoice: invoice),
             empty: empty,
             errorCopy: l10n.invoicesError,
+            localOnlyNote: l10n.invoicesLocalOnlyNote,
+            listPadding: const EdgeInsetsDirectional.all(
+              LegalHubTheme.marginMobile,
+            ),
           );
         },
       ),

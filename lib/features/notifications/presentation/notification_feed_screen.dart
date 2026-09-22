@@ -94,35 +94,25 @@ class _FeedSurfaceState extends State<_FeedSurface> {
               style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
             ),
           );
-          return ViewStateSwitch<List<Notification>>(
+          // Lazy list surface (audit 2026-09-21, M-20): the success arm was a
+          // Column of every row inside a non-lazy ListView, so row culling
+          // never applied. ViewStateList builds through
+          // SliverChildBuilderDelegate and carries the local-only note.
+          return ViewStateList<Notification>(
             state: state.notifications,
             onRetry: () => context.read<NotificationCubit>().load(),
-            builder: (BuildContext context, List<Notification> notifications) =>
-                ListView(
-                  padding: const EdgeInsetsDirectional.all(
-                    LegalHubTheme.marginMobile,
-                  ),
-                  children: <Widget>[
-                    for (final Notification notification
-                        in notifications) ...<Widget>[
-                      _NotificationTile(
-                        notification: notification,
-                        onMarkRead: (String id) =>
-                            context.read<NotificationCubit>().markRead(id),
-                      ),
-                      const SizedBox(height: LegalHubTheme.spaceSm),
-                    ],
-                    const SizedBox(height: LegalHubTheme.spaceLg),
-                    Text(
-                      l10n.notificationsFeedLocalOnlyNote,
-                      style: text.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
+            tileBuilder: (BuildContext context, Notification notification) =>
+                _NotificationTile(
+                  notification: notification,
+                  onMarkRead: (String id) =>
+                      context.read<NotificationCubit>().markRead(id),
                 ),
             empty: empty,
             errorCopy: l10n.notificationsFeedError,
+            localOnlyNote: l10n.notificationsFeedLocalOnlyNote,
+            listPadding: const EdgeInsetsDirectional.all(
+              LegalHubTheme.marginMobile,
+            ),
           );
         },
       ),

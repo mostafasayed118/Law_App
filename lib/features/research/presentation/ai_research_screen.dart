@@ -165,34 +165,21 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
           Expanded(
             child: BlocBuilder<AiResearchCubit, AiResearchState>(
               builder: (BuildContext context, AiResearchState state) {
-                return ViewStateSwitch<List<AiFinding>>(
+                // Lazy list surface (audit 2026-09-21, M-20): the success arm
+                // was a Column of every card inside a non-lazy ListView, so
+                // card culling never applied.
+                return ViewStateList<AiFinding>(
                   state: state.findings,
                   onRetry: () =>
                       context.read<AiResearchCubit>().research(state.lastQuery),
-                  builder: (BuildContext context, List<AiFinding> findings) =>
-                      findings.isEmpty
-                      ? _IdleOrNoMatch(state: state)
-                      : ListView(
-                          padding: const EdgeInsetsDirectional.symmetric(
-                            horizontal: LegalHubTheme.marginMobile,
-                          ),
-                          children: <Widget>[
-                            for (final AiFinding finding
-                                in findings) ...<Widget>[
-                              _FindingCard(finding: finding),
-                              const SizedBox(height: LegalHubTheme.spaceMd),
-                            ],
-                            const SizedBox(height: LegalHubTheme.spaceLg),
-                            Text(
-                              l10n.aiResearchLocalOnlyNote,
-                              style: text.bodySmall?.copyWith(
-                                color: scheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
+                  tileBuilder: (BuildContext context, AiFinding finding) =>
+                      _FindingCard(finding: finding),
                   empty: _IdleOrNoMatch(state: state),
                   errorCopy: l10n.aiResearchError,
+                  localOnlyNote: l10n.aiResearchLocalOnlyNote,
+                  listPadding: const EdgeInsetsDirectional.symmetric(
+                    horizontal: LegalHubTheme.marginMobile,
+                  ),
                 );
               },
             ),

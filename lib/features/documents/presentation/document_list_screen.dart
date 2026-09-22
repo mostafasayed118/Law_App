@@ -120,20 +120,13 @@ class _ListSurfaceState extends State<_ListSurface> {
                   ViewOffline() ||
                   ViewUnauthorized() => const <Matter>[],
                 };
-                return ListView(
-                  padding: const EdgeInsetsDirectional.all(
-                    LegalHubTheme.marginMobile,
-                  ),
-                  children: <Widget>[
-                    _resultsView(context, state, matters, l10n, text, scheme),
-                    const SizedBox(height: LegalHubTheme.spaceLg),
-                    Text(
-                      l10n.vaultLocalOnlyNote,
-                      style: text.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
+                return _resultsView(
+                  context,
+                  state,
+                  matters,
+                  l10n,
+                  text,
+                  scheme,
                 );
               },
             );
@@ -159,25 +152,22 @@ class _ListSurfaceState extends State<_ListSurface> {
         style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
       ),
     );
-    return ViewStateSwitch<List<Document>>(
+    // Lazy list surface (audit 2026-09-21, M-20): the success arm used to be a
+    // Column of every tile nested in a non-lazy ListView, so row culling never
+    // applied. ViewStateList builds rows through SliverChildBuilderDelegate and
+    // carries the local-only note itself, which is why it replaces the outer
+    // ListView rather than nesting inside it.
+    return ViewStateList<Document>(
       state: state.documents,
       onRetry: cubit.load,
-      builder: (BuildContext context, List<Document> documents) =>
-          documents.isEmpty
-          ? empty
-          : Column(
-              children: <Widget>[
-                for (final Document document in documents) ...<Widget>[
-                  _DocumentTile(
-                    document: document,
-                    onViewMatter: _matterTap(context, document, matters),
-                  ),
-                  const SizedBox(height: LegalHubTheme.spaceSm),
-                ],
-              ],
-            ),
+      tileBuilder: (BuildContext context, Document document) => _DocumentTile(
+        document: document,
+        onViewMatter: _matterTap(context, document, matters),
+      ),
       empty: empty,
       errorCopy: l10n.vaultError,
+      localOnlyNote: l10n.vaultLocalOnlyNote,
+      listPadding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
     );
   }
 

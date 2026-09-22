@@ -118,6 +118,22 @@ class ViewStateList<ItemT> extends StatelessWidget {
           TextButton(onPressed: onRetry, child: Text(l10n.retry)),
         ],
       ),
+      // An empty SUCCESS renders the empty arm. Some cubits emit
+      // `ViewSuccess(<empty>)` rather than `ViewEmpty` — the research slice
+      // does exactly that for a no-match query — and "loaded, but there is
+      // nothing" is the empty state either way. Every ViewStateSwitch call
+      // site used to re-implement this with `list.isEmpty ? empty : Column(…)`;
+      // owning it here is what lets those sites drop the branch (M-10/M-20).
+      ViewSuccess<List<ItemT>>(data: final List<ItemT> data)
+          when data.isEmpty =>
+        ListView(
+          padding: listPadding,
+          children: <Widget>[
+            empty,
+            const SizedBox(height: LegalHubTheme.spaceLg),
+            note,
+          ],
+        ),
       ViewSuccess<List<ItemT>>(data: final List<ItemT> data) =>
         _SuccessListView<ItemT>(
           items: data,
