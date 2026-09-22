@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../list_query_guards.dart';
+import '../postgrest_failures.dart';
 import 'supabase_billing_api.dart';
 
 /// [SupabaseBillingApi] backed by the PostgREST client.
@@ -57,9 +58,7 @@ class SupabaseBillingApiImpl implements SupabaseBillingApi {
   /// The stable RLS denial text is the only fragment matched; everything
   /// else is [SupabaseBillingFailureKind.unknown] with the message preserved.
   SupabaseBillingFailureKind _kindFor(PostgrestException e) {
-    final String message = e.message.toLowerCase();
-    if (message.contains('permission denied') ||
-        message.contains('row-level security')) {
+    if (isPostgrestDenial(e)) {
       return SupabaseBillingFailureKind.denied;
     }
     return SupabaseBillingFailureKind.unknown;

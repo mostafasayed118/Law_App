@@ -635,6 +635,21 @@ The audit's M-1 finding: `ViewOffline`/`ViewUnauthorized` were declared, rendere
 
 **Verification:** `flutter analyze` → No issues found · `flutter test` → **+1379 All tests passed** (1370 → 1379: mapper ×4, switch ×2, list ×2, workspace ×2, cubit ×2, minus the three folded pins) · `dart format` clean · `scripts/verify_ledger.sh` → PASS · README lockstep 1367/1370 → 1376/1379.
 
-**Landed as** `docs/audit` follow-up commit (see the close-out table in §12).
+**Landed as** `1c292ff` — `feat(core,ui): typed AppError kind -> real ViewOffline/ViewUnauthorized producers (suite 1379)`.
+
+### 12.3 H-7 (first slice) and H-2 executed (2026-09-22)
+
+**H-7 — the copy-pasted denial classifier.** The audit reported "the RLS-denial rule is copy-pasted 9×". Verification refined that: **six** of the nine `_kindFor` implementations are byte-identical (`billing`, `documents`, `matters`, `messaging`, `notifications`, `storage`); the other three deliberately extend the rule and forcing them onto a shared helper would have changed behavior —
+- `supabase_platform_admin_api_impl` adds `cannot delete your own account` and does **not** match `row-level security`;
+- `supabase_org_api_impl` adds `cannot remove yourself` plus duplicate-membership arms;
+- `supabase_matter_write_api_impl` classifies only domain validation phrases.
+
+New `lib/data/postgrest_failures.dart` holds `isPostgrestDenial(e)` once, with that rationale in its doc comment; the six uniform classifiers now delegate to it. The rule is a security-relevant one — a provider wording change previously needed six coordinated edits, and a miss silently degraded a denial to `unknown`, which after §12.2 would render as a *retryable* error instead of "access not available". Both phrases are pinned per feature by the api-impl tests.
+
+This is a **first slice** of H-7, not the whole finding: the `_mapFailure` bodies, the ten `Supabase*FailureKind` enums and the nine `Supabase*Exception` classes remain per-feature (~500 lines). They are behaviour-carrying (each feature's codes and user copy differ), so that half wants its own reviewed slice rather than a mechanical sweep.
+
+**H-2 — the undocumented adapter-placement rule.** The audit's verdict was that the *undocumented-ness* is the defect, not the placement itself. `INSTRUCTIONS.md` §4.1 now states the rule explicitly — *feature-owned contract ⇒ `features/<name>/data/`; core-owned contract ⇒ `lib/data/<name>/`; `lib/data/` also holds provider-facing helpers no feature owns* — and records the mid-migration state honestly (`auth`/`orgs`/`admin` already comply; the six feature-owned seams still live in `lib/data/` and move when next touched).
+
+**Verification:** `flutter analyze` → No issues found · `flutter test` → **+1379 All tests passed** (unchanged — a pure refactor, and the 387 data-layer tests pin the classification) · `dart format` clean · `scripts/verify_ledger.sh` → PASS · README lockstep unchanged at 1376/1379.
 
 *Audit produced by five parallel dimension subagents with independent consolidator verification. Raw findings: `docs/audit/_raw/`.*

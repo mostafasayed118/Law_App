@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../list_query_guards.dart';
+import '../postgrest_failures.dart';
 import 'supabase_matter_api.dart';
 
 /// [SupabaseMatterApi] backed by the PostgREST client.
@@ -56,9 +57,7 @@ class SupabaseMatterApiImpl implements SupabaseMatterApi {
   /// The stable RLS denial text is the only fragment matched; everything
   /// else is [SupabaseMatterFailureKind.unknown] with the message preserved.
   SupabaseMatterFailureKind _kindFor(PostgrestException e) {
-    final String message = e.message.toLowerCase();
-    if (message.contains('permission denied') ||
-        message.contains('row-level security')) {
+    if (isPostgrestDenial(e)) {
       return SupabaseMatterFailureKind.denied;
     }
     return SupabaseMatterFailureKind.unknown;

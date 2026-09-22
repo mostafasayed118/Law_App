@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../list_query_guards.dart';
+import '../postgrest_failures.dart';
 import 'supabase_notification_api.dart';
 
 /// [SupabaseNotificationApi] backed by the PostgREST client.
@@ -71,9 +72,7 @@ class SupabaseNotificationApiImpl implements SupabaseNotificationApi {
   /// else is [SupabaseNotificationFailureKind.unknown] with the message
   /// preserved.
   SupabaseNotificationFailureKind _kindFor(PostgrestException e) {
-    final String message = e.message.toLowerCase();
-    if (message.contains('permission denied') ||
-        message.contains('row-level security')) {
+    if (isPostgrestDenial(e)) {
       return SupabaseNotificationFailureKind.denied;
     }
     return SupabaseNotificationFailureKind.unknown;

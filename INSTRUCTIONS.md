@@ -244,6 +244,7 @@ Rules:
 - Use GetIt registrations deliberately: lazy singletons for stateless/shared services and repositories; factories for feature-scoped Cubits unless lifecycle requirements require otherwise.
 - Use GoRouter route names/typed parameters consistently. Redirects improve navigation UX but do not substitute for server authorization.
 - Put code in `shared/` only after a real second use or a demonstrated app-level cross-cutting responsibility.
+- **Adapter placement — the seam's owner decides the home.** A *feature-owned* contract (declared in `features/<name>/domain/`) is implemented in `features/<name>/data/`, next to its fake. A *core-owned* contract (declared in `core/`) is implemented in `lib/data/<name>/`. `lib/data/` also holds provider-facing helpers no single feature owns (`list_query_guards.dart`, `postgrest_failures.dart`, the `local/` stores). This rule was previously unwritten, which let three conventions coexist (audit 2026-09-21, H-2); it is now explicit, and the tree is mid-migration — `auth`, `orgs`, and `admin` already follow it (core-owned seams, adapter + fake both in `lib/data/`), while `matters`, `documents`, `messaging`, `storage`, `billing`, and `notifications` still implement feature-owned contracts from `lib/data/` with the fake already in the feature. New work follows the rule above; those six move when they are next touched.
 
 ### 4.2 State, errors, and async behavior
 
