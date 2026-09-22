@@ -747,6 +747,16 @@ The extraction surfaced and fixed a real contract violation: the rule was inline
 
 **Remaining roadmap:** P1.3 (the approved SQL apply slice — needs the owner's apply path/credentials) and the iOS half of P1.2 (`flutter_secure_storage`, approved — needs `pub add` + platform config + a device to verify the Keychain behaviour).
 
+### 12.10 P1.2 complete, and P1.3 down to its apply (2026-09-22)
+
+**P1.2 is complete** (commit `9b967b2`). `lib/data/auth/secure_session_storage.dart` adds `flutter_secure_storage` ^11.2.0 (OI-D3) and implements **both** persistence seams on the platform Keychain/Keystore: supabase_flutter's `LocalStorage` (the refresh token) *and* gotrue's `GotrueAsyncStorage` (the PKCE code verifier — the default kept that plaintext too, and it is a bearer-grade secret for the flow's duration). Key scheme unchanged (`defaultKeyFor` derives supabase_flutter's own `sb-<host>-auth-token`), plus a one-time best-effort migration from the old plaintext entry so the upgrade does not force a sign-out. iOS accessibility is `first_unlock` so background token refresh survives a reboot; Android uses v11's default Keystore cipher (AES-GCM + RSA-OAEP). The six unit tests run against an in-memory `SecureSessionStore` fake — a platform channel cannot be satisfied in a unit test, so **the Keychain/Keystore behaviour itself is device-verified only**, which is the owner's run.
+
+**P1.3 is down to its apply** (commit `ecdce1b`). Client side, done with no backend dependency: the org-name lookup is a `Map` built once per build — the O(members × orgs) scan is gone from *both* its copies (`_AdminLists` and `_AuditSection`'s delegated helper) — and `_AdminLists` is a `ListView.builder` over a flat index space, so the org and member rows construct on demand. SQL side, written but **not applied**: the three admin RPCs gain `p_limit`/`p_offset` with a server-side hard cap of 500, the old zero-arg signatures are **dropped** (not left as overloads, which would keep the unbounded path callable), and `_down.sql` covers both signatures. Each file's header states the sequencing constraint: until the SQL is applied, the shipped client must keep calling the zero-arg signature — the client's `p_limit/p_offset` flip is a ~10-line follow-up that lands **in the same release as the apply** (an argument the function does not accept yet is a hard RPC error).
+
+**Verification:** `flutter analyze` → No issues found · `flutter test` → **+1400 All tests passed** (1394 → 1400) · `dart format` clean · `scripts/verify_ledger.sh` → **PASS 115/0/0** · README lockstep **1397/1400**.
+
+**Everything in the owner's ordered roadmap is now done or owner-blocked:** P1.1, P1.2, P1.5–P1.10, P2.2, P2.4, OI-D5.1, OI-D7 are landed; H-7's remainder is measured and declined (§12.8); P1.3's apply and the push need the owner.
+
 **Verification:** `flutter analyze` → No issues found · `flutter test` → **+1387 All tests passed** · `dart format` clean · `scripts/verify_ledger.sh` → **PASS 115/0/0** · README lockstep **1384/1387**.
 
 **Verification at this point:** `flutter analyze` → No issues found · `flutter test` → **+1386 All tests passed** · `dart format` clean · `scripts/verify_ledger.sh` → **PASS 115/0/0** · README lockstep **1383/1386**.
