@@ -3,6 +3,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../list_query_guards.dart';
 import 'supabase_org_api.dart';
 
+part 'supabase_org_api_mapping.dart';
+
 /// A PostgREST RPC call: function name + named params → response.
 ///
 /// Kept a plain function type so tests inject a closure and the impl is the
@@ -272,36 +274,5 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
     } on PostgrestException catch (e) {
       throw SupabaseOrgException(kind: _kindFor(e), message: e.message);
     }
-  }
-
-  /// Maps a PostgrestException to the provider-neutral failure kind.
-  /// Message fragments are the stable RPC raise texts; everything else is
-  /// [SupabaseOrgFailureKind.unknown] with the message preserved.
-  SupabaseOrgFailureKind _kindFor(PostgrestException e) {
-    final String message = e.message.toLowerCase();
-    if (message.contains('permission denied') ||
-        message.contains('cannot remove yourself')) {
-      return SupabaseOrgFailureKind.denied;
-    }
-    if (message.contains('user already has a membership')) {
-      return SupabaseOrgFailureKind.duplicateMember;
-    }
-    if (message.contains('retain at least one active partner')) {
-      return SupabaseOrgFailureKind.lastPartner;
-    }
-    if (message.contains('organization name is required')) {
-      return SupabaseOrgFailureKind.invalidName;
-    }
-    if (message.contains('invalid invitation')) {
-      return SupabaseOrgFailureKind.invalidInvitation;
-    }
-    // Invitation-targeted RPCs use the same undifferentiated denial: an
-    // unknown id and a non-pending invite both read as "invalid invitation"
-    // (non-enumerating; matches the token surface).
-    if (message.contains('invitation not found') ||
-        message.contains('only pending invitations')) {
-      return SupabaseOrgFailureKind.invalidInvitation;
-    }
-    return SupabaseOrgFailureKind.unknown;
   }
 }

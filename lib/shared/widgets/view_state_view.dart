@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../core/state/view_state.dart';
 import '../../l10n/app_localizations.dart';
 
+part 'view_state_message.dart';
+
 class ViewStateView<T> extends StatelessWidget {
   const ViewStateView({required this.state, this.onRetry, super.key});
 
@@ -40,43 +42,5 @@ class ViewStateView<T> extends StatelessWidget {
         label: l10n.stateUnauthorized,
       ),
     };
-  }
-}
-
-class _StateMessage extends StatelessWidget {
-  const _StateMessage({
-    required this.icon,
-    required this.label,
-    this.child,
-    this.action,
-  });
-
-  final IconData icon;
-  final String label;
-  final Widget? child;
-  final VoidCallback? action;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      liveRegion: true,
-      label: label,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Icon(icon, size: 32),
-          const SizedBox(height: 8),
-          Text(label, textAlign: TextAlign.center),
-          if (child != null) ...<Widget>[const SizedBox(height: 12), child!],
-          if (action != null) ...<Widget>[
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: action,
-              child: Text(AppLocalizations.of(context).retry),
-            ),
-          ],
-        ],
-      ),
-    );
   }
 }

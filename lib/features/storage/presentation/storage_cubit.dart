@@ -53,7 +53,9 @@ class StorageCubit extends Cubit<StorageState> {
           ),
         );
       case Failure<List<FileMetadata>>(error: final AppError error):
-        emit(state.copyWith(files: viewStateForFailure<List<FileMetadata>>(error)));
+        emit(
+          state.copyWith(files: viewStateForFailure<List<FileMetadata>>(error)),
+        );
     }
   }
 }

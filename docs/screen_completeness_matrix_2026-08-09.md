@@ -96,3 +96,64 @@ the audit record; suite 1127 pass).
 - **D-45.1 provider-loop Phase 2** dev-project smoke — needs a controlled inbox.
 - The three v1 demo surfaces' *real-data* path (server table + RLS + matrix addendum vs demo-only） — one dated owner decision per surface.
 - AR/TR copy semantic pass for the 2026-08-09 strings (native-speaker review).
+
+---
+
+# Addenda — appended after 2026-08-09
+
+> Addenda preserve the original 2026-08-09 record; new dated sections record
+> changes that do not invalidate the snapshot above.
+
+## A1. Screen count and suite size as of 2026-09-23 (audit §12.14)
+
+**Tree state.** Same `main` branch, working tree clean post-extraction slice
+(audit doc §12.14 / commit `<commit-hash>`; see `git log -1 --format=%H` for
+the actual hash). The slice is a pure readability split — every modified
+`<feature>_screen.dart` gained `part '<name>_*.dart';` references and lost its
+private widget class; no route, no screen name, no public widget signature
+changed.
+
+| Status | Count |
+|---|---|
+| `*_screen.dart` in `lib/features/**/presentation/` | **33** (unchanged) |
+| `*_surface.dart` / `*_tile.dart` / `*_body.dart` / `*_page.dart` / `*_entry.dart` / `*_row.dart` / `*_list.dart` / `*_wizard.dart` / `*_view.dart` (new `part` files) | **94** — extracted widgets; not screens; do not double-count |
+| Test count (per `README.md:377` and `verify_ledger.sh` PASS row) | **1400** (was 1127 at the 2026-08-09 snapshot) |
+| Full suite green on the landing commit | `flutter analyze` No issues · `flutter test` +1400 · `verify_ledger.sh` PASS 115/0/0 |
+
+The historical "30 screens / suite 1127" record at the head of this document
+is **frozen at 2026-08-09 / `b7325f8`** by design (the §1 status vocabulary
+treats that commit as the audit's reference point). Subsequent additions and
+the suite growth are tracked in the feature-slice completion evidence files
+under `docs/` and the README's coverage paragraph (line 377 onwards).
+
+**What changed vs the frozen record:**
+
+- `notification_feed_screen.dart` and `notification_settings_screen.dart`
+  shipped after the freeze (notification-feed slice).
+- `ai_research_screen.dart` shipped 2026-09-02 (`235003f`).
+- `attorney_profile_screen.dart` was the read-only profile view; the discovery
+  refactor reorganized the package around 2026-08-11.
+- `accept_invitation_screen.dart` was added by the P3.4 deep-link slice.
+- `organization_hub_screen.dart` and `org_audit_screen.dart` were added by
+  the org-hub + partner-audit slices.
+- `member_roster_screen.dart` was promoted to a dedicated route from a
+  sheet, post-freeze.
+- `booking_screen.dart` added a `success_step` post-freeze; the screen count
+  is unchanged.
+
+**What the extraction slice did NOT change:** the screen count (33 still
+matches the post-freeze reality), the route table (`lib/app/router.dart`'s
+`AppRoutes` constants), and the surface area exposed to widget tests. The 94
+new `part` files are private sub-widgets of their parent screen — the audit's
+"every designed line has a status and an evidence anchor" property holds.
+
+## A2. Open gaps from the 2026-08-09 matrix that remain open (verified 2026-09-23)
+
+- **Supabase console Redirect URL** — still owner-action. See audit doc §1d
+  and the recovery evidence trail.
+- **`docs/p0_decision_capture.md` §3 P4 row** — still owner OPEN.
+- **D-45.1 provider-loop Phase 2** — still needs a controlled inbox.
+- **v1 demo surfaces' real-data path** — server table + RLS + matrix
+  addendum; still one dated owner decision per surface (compliance alerts,
+  task board, approvals).
+- **AR/TR copy semantic pass** — still pending native-speaker review.

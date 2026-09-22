@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+part 'legalhub_text_theme.dart';
+part 'legalhub_color_scheme.dart';
 
 /// The canonical LegalHub design-system tokens, light and dark.
 ///
@@ -181,7 +183,7 @@ class LegalHubTheme {
       colorScheme: scheme,
       scaffoldBackgroundColor: scaffoldBg,
       fontFamily: locale.languageCode == 'ar' ? 'NotoNaskhArabic' : 'NotoSans',
-      textTheme: _textTheme(
+      textTheme: _legalHubTextTheme(
         locale,
         isDark: isDark,
         onSurface: onSurfaceColor,
@@ -246,115 +248,4 @@ class LegalHubTheme {
       dividerTheme: DividerThemeData(color: dividerColor, thickness: 1),
     );
   }
-
-  static TextTheme _textTheme(
-    Locale locale, {
-    required bool isDark,
-    required Color onSurface,
-    required Color onSurfaceVariant,
-  }) {
-    final bool isArabic = locale.languageCode == 'ar';
-    final String bodyFamily = isArabic ? 'NotoNaskhArabic' : 'NotoSans';
-    final String headingFamily = isArabic
-        ? 'NotoNaskhArabic'
-        : 'PlayfairDisplay';
-    final Color headingColor = isDark ? darkPrimary : primary;
-    return TextTheme(
-      displayLarge: TextStyle(
-        fontFamily: headingFamily,
-        fontSize: 48,
-        height: 56 / 48,
-        fontWeight: FontWeight.w700,
-        color: headingColor,
-      ),
-      displayMedium: TextStyle(
-        fontFamily: headingFamily,
-        fontSize: 30,
-        height: 38 / 30,
-        fontWeight: FontWeight.w700,
-        color: headingColor,
-      ),
-      displaySmall: TextStyle(
-        fontFamily: headingFamily,
-        fontSize: 26,
-        height: 32 / 26,
-        fontWeight: FontWeight.w700,
-        color: headingColor,
-      ),
-      headlineMedium: TextStyle(
-        fontFamily: headingFamily,
-        fontSize: 22,
-        height: 28 / 22,
-        fontWeight: FontWeight.w600,
-        color: headingColor,
-      ),
-      bodyLarge: TextStyle(
-        fontFamily: bodyFamily,
-        fontSize: 18,
-        height: 28 / 18,
-        color: onSurface,
-      ),
-      bodyMedium: TextStyle(
-        fontFamily: bodyFamily,
-        fontSize: 16,
-        height: 24 / 16,
-        color: onSurface,
-      ),
-      bodySmall: TextStyle(
-        fontFamily: bodyFamily,
-        fontSize: 14,
-        height: 20 / 14,
-        color: onSurfaceVariant,
-      ),
-      labelLarge: TextStyle(
-        fontFamily: bodyFamily,
-        fontSize: 12,
-        height: 16 / 12,
-        fontWeight: FontWeight.w600,
-        letterSpacing: 0.6,
-        color: onSurfaceVariant,
-      ),
-      labelMedium: TextStyle(
-        fontFamily: bodyFamily,
-        fontSize: 12,
-        height: 16 / 12,
-        fontWeight: FontWeight.w600,
-        letterSpacing: 0.5,
-        color: onSurface,
-      ),
-    );
-  }
-}
-
-/// Semantic status colors for the current brightness.
-///
-/// M3's [ColorScheme] carries `error` natively; the design system's
-/// success / warning / info tokens are exposed here so screens read them
-/// from the theme (never hardcode a status color). Status is still never
-/// communicated by color alone (INSTRUCTIONS §4.5) — these back icons and
-/// labels that already carry text.
-extension LegalHubColorScheme on ColorScheme {
-  Color get success => brightness == Brightness.dark
-      ? LegalHubTheme.darkSuccess
-      : LegalHubTheme.success;
-
-  Color get onSuccess => brightness == Brightness.dark
-      ? LegalHubTheme.darkOnSuccess
-      : LegalHubTheme.onSuccess;
-
-  Color get warning => brightness == Brightness.dark
-      ? LegalHubTheme.darkWarning
-      : LegalHubTheme.warning;
-
-  Color get onWarning => brightness == Brightness.dark
-      ? LegalHubTheme.darkOnWarning
-      : LegalHubTheme.onWarning;
-
-  Color get info => brightness == Brightness.dark
-      ? LegalHubTheme.darkInfo
-      : LegalHubTheme.info;
-
-  Color get onInfo => brightness == Brightness.dark
-      ? LegalHubTheme.darkOnInfo
-      : LegalHubTheme.onInfo;
 }

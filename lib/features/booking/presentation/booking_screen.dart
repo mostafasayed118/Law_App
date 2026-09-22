@@ -14,6 +14,10 @@ import '../domain/booking_prefill.dart';
 import '../domain/booking_slot.dart';
 import 'booking_cubit.dart';
 import 'booking_state.dart';
+part 'booking_wizard.dart';
+part 'booking_topic_field.dart';
+part 'booking_prefill_note.dart';
+part 'booking_summary_row.dart';
 
 part 'booking_category_step.dart';
 part 'booking_datetime_step.dart';
@@ -56,46 +60,6 @@ class BookingScreen extends StatelessWidget {
         return cubit;
       },
       child: const _BookingWizard(),
-    );
-  }
-}
-
-class _BookingWizard extends StatelessWidget {
-  const _BookingWizard();
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.bookingTitle),
-        leading: BackButton(
-          onPressed: () {
-            final BookingState state = context.read<BookingCubit>().state;
-            // The wizard shell's back button steps back one step; on the
-            // first (category) step and the terminal (success) step it exits
-            // to home (scope note D-B4, cubit `back()` semantics).
-            if (state.step == BookingStep.category ||
-                state.step == BookingStep.success) {
-              context.go(AppRoutes.home);
-            } else {
-              context.read<BookingCubit>().back();
-            }
-          },
-        ),
-      ),
-      body: SafeArea(
-        child: BlocBuilder<BookingCubit, BookingState>(
-          builder: (BuildContext context, BookingState state) {
-            return switch (state.step) {
-              BookingStep.category => _CategoryStep(state: state),
-              BookingStep.dateTime => _DateTimeStep(state: state),
-              BookingStep.review => _ReviewStep(state: state),
-              BookingStep.success => _SuccessStep(state: state),
-            };
-          },
-        ),
-      ),
     );
   }
 }

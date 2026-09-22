@@ -9,94 +9,21 @@ import '../../../core/errors/app_error.dart';
 import '../../../core/observability/error_reporter.dart';
 import '../../../core/organizations/membership_repository.dart';
 import '../../../core/organizations/organization_gateway.dart';
+part 'auth_cubit_base.dart';
+part 'auth_cubit_hydration.dart';
 
-class AuthCubit extends Cubit<AuthState> {
+class AuthCubit extends _AuthCubitBase with _AuthHydration {
   AuthCubit(
-    this._gateway,
-    this._reporter,
-    this._membershipRepository,
-    this._organizationGateway,
-  ) : super(_initialState(_gateway.currentSession)) {
+    super.gateway,
+    super.reporter,
+    super.membershipRepository,
+    super.organizationGateway,
+  ) {
     // The provider callback handler (Phase 4.1): a session that arrives
     // through the gateway's stream — e.g. the PKCE exchange of a recovery
     // deep link, which never goes through an explicit cubit call — must
     // reach the app state so the router can react to it.
     _sessionSubscription = _gateway.sessionChanges.listen(_onSessionChange);
-  }
-
-  final AuthGateway _gateway;
-  final ErrorReporter _reporter;
-
-  /// RLS-scoped membership source for [Session.memberships] hydration
-  /// (P3.2): called on every explicit authenticated outcome, never on a
-  /// failure, never on an expired session (AC-3), and by [hydrate] for
-  /// background refreshes (P3.3 Slice A).
-  final MembershipRepository _membershipRepository;
-
-  /// The organization seam, used by the two session-level account flows that
-  /// used to be driven from the screens: [deleteAccount] and
-  /// [acceptInvitation] (audit 2026-09-21, H-4).
-  final OrganizationGateway _organizationGateway;
-  late final StreamSubscription<Session?> _sessionSubscription;
-
-  /// True while an explicit operation ([restore], [signIn], [startDemoSession],
-  /// [signOut]) is awaiting its gateway outcome.
-  ///
-  /// The gateway stream replays the session during these calls, and the
-  /// replay's emission would preempt the explicit outcome mapping. Letting
-  /// the outcome mapping own the emission keeps the state change on the
-  /// caller's zone (widget tests construct the cubit outside the FakeAsync
-  /// zone; a replay emit there would be delivered to nobody). The listener
-  /// therefore only applies provider-initiated changes (the deep-link PKCE
-  /// exchange), which never go through an explicit call.
-  bool _explicitOperationInFlight = false;
-
-  /// True while a background [hydrate] refresh is awaiting the repository.
-  ///
-  /// Distinct from [_explicitOperationInFlight]: hydrate must not suppress
-  /// the provider stream listener (a provider-initiated session must still
-  /// land mid-refresh), but concurrent hydrate calls must not stack — the
-  /// first one owns the emission.
-  bool _hydrationInFlight = false;
-
-  /// Bumped whenever an explicit authenticated operation runs its hydration
-  /// or a sign-out completes (P3.3 Slice A review fix).
-  ///
-  /// [hydrate] captures the epoch when it starts and applies its refresh
-  /// only if the epoch is unchanged: an explicit op that started (or
-  /// completed) while the refresh was awaiting owns the emission — its
-  /// hydration is fresher, so a same-user re-auth must never be clobbered by
-  /// the late-resolving refresh. The provider stream path does not bump it
-  /// (it never hydrates; a refresh enriching a stream session is desirable).
-  int _hydrationEpoch = 0;
-
-  /// True while the current session is a password-recovery session (Phase
-  /// 4.1 deep-link variant). Mirrors the gateway's provider-derived signal
-  /// (GoTrue `passwordRecovery` event or a pending `recovery_sent_at`), so
-  /// the router can land a recovery session on the reset step instead of
-  /// treating it as a normal sign-in. Clears on sign-out.
-  bool get recoveryPending => _gateway.recoveryPending;
-
-  /// Whether the sign-in screen should render the demo shortcut: derived
-  /// from the gateway (dev fake → true, configured provider → false), so
-  /// presentation never ships a demo button that can only fail
-  /// (audit 2026-09-21, H-5). Static per seam — never changes per state.
-  bool get supportsDemoSession => _gateway.supportsDemoSession;
-
-  /// Bootstrap initial state is derived from the gateway's current session.
-  /// There is no provider restore at boot (no session source exists yet), so
-  /// a null current session is honestly `unauthenticated`, not `restoring`.
-  /// An already-expired current session must not boot into `authenticated`
-  /// (contract §5: expiry → re-authentication, never a misleading
-  /// authenticated state).
-  static AuthState _initialState(Session? session) {
-    if (session == null) {
-      return const AuthState.unauthenticated();
-    }
-    if (session.isExpired) {
-      return const AuthState(status: AuthStatus.reauthRequired);
-    }
-    return AuthState(status: AuthStatus.authenticated, session: session);
   }
 
   /// Contract-§5 restore: `restoring` → authenticated / unauthenticated /
@@ -152,65 +79,6 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  /// Public membership re-hydration seam (P3.3 Slice A) — the recorded Task 8
-  /// retry/refresh hook for an already-authenticated session.
-  ///
-  /// Resolves the Task 8 "no first-class `hydrate()` retry seam" limitation:
-  /// after an org mutation (create/invite/accept), presentation calls this so
-  /// the freshly mutated membership joins [Session.memberships] without
-  /// re-authenticating. It is a **background refresh**: the current
-  /// authenticated state is held (no loading/restoring flash — scope §7) and
-  /// only re-emitted when the hydrated memberships actually change
-  /// ([_emitIfChanged] dedupe).
-  ///
-  /// No-ops when: the session is absent or expired (nothing to refresh), an
-  /// explicit operation owns the emission, or another hydrate is in flight
-  /// (first-call-wins). A failure leaves the last-known-good state untouched
-  /// and is surfaced through the diagnostic channel (never invalidating the
-  /// session). The sign-out guard applies the refresh only when the state is
-  /// still authenticated for the same user — a session that changed or
-  /// disappeared mid-refresh is never clobbered.
-  Future<void> hydrate() async {
-    final Session? current = state.session;
-    if (current == null ||
-        current.isExpired ||
-        _explicitOperationInFlight ||
-        _hydrationInFlight) {
-      return;
-    }
-    _hydrationInFlight = true;
-    final int epoch = _hydrationEpoch;
-    try {
-      final MembershipHydrationResult result = await _membershipRepository
-          .loadMemberships(userId: current.userId);
-      switch (result) {
-        case HydrationSucceeded(
-          :final List<OrganizationMembership> memberships,
-        ):
-          // An explicit op that started (or completed) while this refresh
-          // was awaiting owns the emission — its hydration is fresher, so a
-          // same-user re-auth is never clobbered by the stale refresh.
-          if (epoch != _hydrationEpoch) {
-            return;
-          }
-          final Session? now = state.session;
-          if (now == null || now.userId != current.userId || now.isExpired) {
-            return;
-          }
-          _emitIfChanged(
-            AuthState(
-              status: AuthStatus.authenticated,
-              session: _withMemberships(now, memberships),
-            ),
-          );
-        case HydrationFailed(:final MembershipHydrationFailureKind kind):
-          await _reportHydrationFailure(kind);
-      }
-    } finally {
-      _hydrationInFlight = false;
-    }
-  }
-
   Future<void> _applySessionOutcome(AuthOutcome<Session> outcome) async {
     switch (outcome) {
       case AuthSuccess<Session>(value: final Session session):
@@ -218,129 +86,6 @@ class AuthCubit extends Cubit<AuthState> {
       case AuthFailed<Session>(failure: final AuthFailure failure):
         await _handleFailure(failure);
     }
-  }
-
-  /// Contract-§5 authenticated mapping + P3.2 membership hydration.
-  ///
-  /// The loading/restoring status is held until hydration resolves (scope
-  /// §7 mitigation — no intermediate authenticated-with-empty render).
-  /// Hydration is best-effort enrichment of an already-authenticated
-  /// session: a provider-reported empty list stays the honest `[]` (plan
-  /// §6), and a failed read still authenticates the session (it is never
-  /// invalidated) but is surfaced through the diagnostic channel (Task 8
-  /// review inputs). Expiry is honored before hydration (AC-3): an expired
-  /// session re-authenticates and is never hydrated.
-  ///
-  /// The provider stream path (Phase 4.1 deep-link) maps without hydration
-  /// by design. The first-class refresh seam for an already-authenticated
-  /// session is [hydrate] (P3.3) — presentation calls it after an org
-  /// mutation; the next explicit auth op re-hydrates as well.
-  Future<void> _applyAuthenticatedSession(Session session) async {
-    // This explicit hydration is fresher than any in-flight [hydrate]
-    // refresh (Slice A review fix — see [_hydrationEpoch]).
-    _hydrationEpoch += 1;
-    if (session.isExpired) {
-      emit(const AuthState(status: AuthStatus.reauthRequired));
-      return;
-    }
-    final MembershipHydrationResult result = await _membershipRepository
-        .loadMemberships(userId: session.userId);
-    switch (result) {
-      case HydrationSucceeded(:final List<OrganizationMembership> memberships):
-        _emitIfChanged(
-          AuthState(
-            status: AuthStatus.authenticated,
-            session: _withMemberships(session, memberships),
-          ),
-        );
-      case HydrationFailed(:final MembershipHydrationFailureKind kind):
-        // Honest empty — never a fabricated membership; the session stays
-        // authenticated with the gateway snapshot's memberships. The
-        // diagnostic report must never gate this emission (a throwing
-        // reporter must not strand the session in loading), so the state is
-        // emitted first and the report is best-effort.
-        _emitIfChanged(
-          AuthState(
-            status: AuthStatus.authenticated,
-            session: _withMemberships(
-              session,
-              const <OrganizationMembership>[],
-            ),
-          ),
-        );
-        await _reportHydrationFailure(kind);
-    }
-  }
-
-  /// Rebuilds [session] with the hydrated memberships (identity, display
-  /// name, and expiry are carried unchanged — only the RLS-scoped
-  /// membership view is refreshed).
-  Session _withMemberships(
-    Session session,
-    List<OrganizationMembership> memberships,
-  ) => Session(
-    userId: session.userId,
-    displayName: session.displayName,
-    memberships: memberships,
-    expiresAt: session.expiresAt,
-  );
-
-  /// Diagnostic-channel report (Task 8 review input 2 — the ErrorReporter
-  /// seam instead of repository debugPrint). Best-effort by contract: the
-  /// authenticated session is emitted before this runs, and a throwing
-  /// reporter must never surface as a failure, so the report is wrapped.
-  Future<void> _reportHydrationFailure(
-    MembershipHydrationFailureKind kind,
-  ) async {
-    try {
-      await _reporter.report(
-        AppError(
-          code: 'membershipHydrationFailed',
-          userMessage: 'Organization memberships could not be loaded.',
-          context: <String, Object?>{'kind': kind.name},
-        ),
-      );
-    } catch (error) {
-      // Diagnostics must not break the already-emitted authenticated state.
-      debugPrint('AuthCubit: hydration diagnostic report failed: $error');
-    }
-  }
-
-  /// Emits [next] only when it actually differs from the current state.
-  ///
-  /// The gateway stream replays the session after explicit operations (the
-  /// fake emits on `startDemoSession`/`signOut`), so the same [AuthState]
-  /// can arrive from both the stream listener and the outcome mapping;
-  /// re-emitting an equal state would just churn the router refresh.
-  void _emitIfChanged(AuthState next) {
-    if (!isClosed && next != state) {
-      emit(next);
-    }
-  }
-
-  /// Applies a provider-initiated session change (the auth callback handler).
-  ///
-  /// Mirrors the [AuthOutcome] mapping so the app state stays consistent no
-  /// matter how the session arrived: a null session is honestly
-  /// `unauthenticated`, an expired one `reauthRequired`, and a valid one
-  /// `authenticated` (contract §5). Emits only on an actual change; the
-  /// gateway stream also replays the session after explicit operations, and
-  /// re-emitting an equal [AuthState] would just churn the router refresh.
-  void _onSessionChange(Session? session) {
-    if (isClosed || _explicitOperationInFlight) {
-      return;
-    }
-    _emitIfChanged(_stateFor(session));
-  }
-
-  AuthState _stateFor(Session? session) {
-    if (session == null) {
-      return const AuthState.unauthenticated();
-    }
-    if (session.isExpired) {
-      return const AuthState(status: AuthStatus.reauthRequired);
-    }
-    return AuthState(status: AuthStatus.authenticated, session: session);
   }
 
   Future<void> _handleFailure(AuthFailure failure) async {
@@ -382,6 +127,12 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+  @override
+  Future<void> close() async {
+    await _sessionSubscription.cancel();
+    await super.close();
+  }
+
   /// Deletes the caller's own account, then ends the session.
   ///
   /// Session-ending is exactly why this lives here rather than on a
@@ -417,11 +168,5 @@ class AuthCubit extends Cubit<AuthState> {
     final OrgOutcome<String> outcome = await _organizationGateway
         .acceptInvitation(token: token);
     return outcome.failureOrNull?.kind;
-  }
-
-  @override
-  Future<void> close() async {
-    await _sessionSubscription.cancel();
-    await super.close();
   }
 }

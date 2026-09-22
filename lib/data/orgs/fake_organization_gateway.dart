@@ -1,6 +1,12 @@
 import '../../core/auth/session.dart';
 import '../../core/organizations/organization_gateway.dart';
 import '../../core/roles/user_role.dart';
+part 'fake_organization_state.dart';
+part 'fake_organization_invitations.dart';
+part 'fake_organization_admin.dart';
+part 'fake_organization_demo.dart';
+part 'fake_organization_helpers.dart';
+part 'fake_organization_support.dart';
 
 /// Development-only organization implementation.
 ///
@@ -12,7 +18,9 @@ import '../../core/roles/user_role.dart';
 /// last-active-partner guard, and invitations carry ids so Resend/Revoke
 /// target the pending row exactly like `resend_invitation` /
 /// `revoke_invitation` do server-side.
-class FakeOrganizationGateway implements OrganizationGateway {
+class FakeOrganizationGateway extends _FakeOrgState
+    with _FakeOrgInvitations, _FakeOrgAdmin, _FakeOrgDemo
+    implements OrganizationGateway {
   FakeOrganizationGateway() {
     _orgs.addAll(<String, OrganizationSummary>{
       demoOrganizationId: OrganizationSummary(
@@ -50,14 +58,42 @@ class FakeOrganizationGateway implements OrganizationGateway {
 
   static final DateTime _seedTime = DateTime.utc(2026, 7, 25);
 
-  final Map<String, OrganizationSummary> _orgs =
-      <String, OrganizationSummary>{};
-  final Map<String, Map<String, OrgMember>> _members =
-      <String, Map<String, OrgMember>>{};
-  final Map<String, List<AuditEntry>> _audit = <String, List<AuditEntry>>{};
-
-  final Map<String, _FakeInvitation> _invitations = <String, _FakeInvitation>{};
-  int _inviteCounter = 0;
+  /// Deterministic, non-PII demo audit trail for the demo org — mirrors the
+  /// org-scoped RPC's redacted rows (action/outcome/redacted summary/
+  /// correlation id/timestamp only; no content, no credentials, no real
+  /// identity).
+  static List<AuditEntry> demoAuditEntries() => <AuditEntry>[
+    AuditEntry(
+      id: 1,
+      action: 'member:role/change',
+      outcome: 'allowed',
+      resourceType: 'membership',
+      resourceId: 'demo-user',
+      correlationId: 'audit-org-demo-1',
+      redactedSummary: 'role change',
+      serverTimestamp: DateTime.utc(2026, 7, 25, 10, 0),
+    ),
+    AuditEntry(
+      id: 2,
+      action: 'member:invite',
+      outcome: 'allowed',
+      resourceType: 'invitation',
+      resourceId: 'inv-demo-1',
+      correlationId: 'audit-org-demo-2',
+      redactedSummary: 'invitation sent',
+      serverTimestamp: DateTime.utc(2026, 7, 25, 11, 30),
+    ),
+    AuditEntry(
+      id: 3,
+      action: 'member:suspend',
+      outcome: 'denied',
+      resourceType: 'membership',
+      resourceId: 'unknown-user',
+      correlationId: 'audit-org-demo-3',
+      redactedSummary: 'suspension denied',
+      serverTimestamp: DateTime.utc(2026, 7, 25, 12, 45),
+    ),
+  ];
 
   @override
   Future<OrgOutcome<OrganizationSummary>> createOrganization({
@@ -103,67 +139,6 @@ class FakeOrganizationGateway implements OrganizationGateway {
     }
     return OrgOutcome<List<OrgMember>>.success(
       roster.values.toList(growable: false),
-    );
-  }
-
-  @override
-  Future<OrgOutcome<InviteResult>> inviteMember({
-    required String organizationId,
-    required String email,
-    required UserRole role,
-  }) async {
-    final String? roleName = _assignableRoleName(role);
-    if (roleName == null) {
-      return const OrgOutcome<InviteResult>.failure(
-        OrgFailure(kind: OrgFailureKind.invalidRole),
-      );
-    }
-    final Map<String, OrgMember>? roster = _members[organizationId];
-    if (roster == null) {
-      return const OrgOutcome<InviteResult>.failure(
-        OrgFailure(kind: OrgFailureKind.denied),
-      );
-    }
-    final String key = email.trim().toLowerCase();
-    final bool exists = roster.values.any(
-      (OrgMember member) =>
-          member.userId == key || member.displayName.toLowerCase() == key,
-    );
-    if (exists) {
-      return const OrgOutcome<InviteResult>.failure(
-        OrgFailure(kind: OrgFailureKind.duplicateMember),
-      );
-    }
-    // Mirrors the server's membership rows for invited identities (the real
-    // surface stores the sha-256 hash only — the fake keeps the literal for
-    // demo continuity, which is fine because nothing leaves the process).
-    final String token = 'demo-invite-token-${roster.length}';
-    final String invitationId = 'inv-${++_inviteCounter}';
-    _invitations[invitationId] = _FakeInvitation(
-      id: invitationId,
-      organizationId: organizationId,
-      email: key,
-      role: role,
-      status: _FakeInvitationStatus.pending,
-      token: token,
-    );
-    roster[key] = OrgMember(
-      organizationId: organizationId,
-      userId: key,
-      displayName: key,
-      locale: null,
-      role: role,
-      status: MembershipStatus.invited,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-      invitationId: invitationId,
-    );
-    return OrgOutcome<InviteResult>.success(
-      InviteResult(
-        organizationId: organizationId,
-        email: email.trim(),
-        token: token,
-      ),
     );
   }
 
@@ -266,265 +241,4 @@ class FakeOrganizationGateway implements OrganizationGateway {
     roster[userId] = _copy(target, status: MembershipStatus.removed);
     return const OrgOutcome<void>.success(null);
   }
-
-  @override
-  Future<OrgOutcome<String>> resendInvitation({
-    required String invitationId,
-  }) async {
-    final _FakeInvitation? invitation = _invitations[invitationId];
-    if (invitation == null ||
-        invitation.status != _FakeInvitationStatus.pending) {
-      return const OrgOutcome<String>.failure(
-        OrgFailure(kind: OrgFailureKind.invalidInvitation),
-      );
-    }
-    final String token = 'demo-invite-token-resend-${++_inviteCounter}';
-    invitation.token = token;
-    return OrgOutcome<String>.success(token);
-  }
-
-  @override
-  Future<OrgOutcome<void>> revokeInvitation({
-    required String invitationId,
-  }) async {
-    final _FakeInvitation? invitation = _invitations[invitationId];
-    if (invitation == null ||
-        invitation.status != _FakeInvitationStatus.pending) {
-      return const OrgOutcome<void>.failure(
-        OrgFailure(kind: OrgFailureKind.invalidInvitation),
-      );
-    }
-    invitation.status = _FakeInvitationStatus.revoked;
-    // A revoked invite is no longer pending: the invited row leaves the
-    // roster on the next read (revocation is a status transition, never a
-    // DELETE — the fake's registry is the surviving audit trail).
-    _members[invitation.organizationId]?.remove(invitation.email);
-    return const OrgOutcome<void>.success(null);
-  }
-
-  @override
-  Future<OrgOutcome<void>> deleteMyAccount() async {
-    // Mirrors the server cascade: profiles/memberships of the caller vanish;
-    // organizations keep their rows with created_by/actor cleared (the fake
-    // has no cross-entity actor columns beyond the demo identity).
-    for (final Map<String, OrgMember> roster in _members.values) {
-      roster.remove(demoUserId);
-    }
-    return const OrgOutcome<void>.success(null);
-  }
-
-  @override
-  Future<OrgOutcome<List<AuditEntry>>> readOrgAudit({
-    required String organizationId,
-  }) async {
-    // Mirrors the server's member-gate: an org the caller has no membership
-    // in reads as the undifferentiated denied (never empty success — the
-    // P3.5 AC-7 posture). A known org with no events yet is an honest empty
-    // trail (fresh orgs have nothing to audit).
-    if (!_members.containsKey(organizationId)) {
-      return const OrgOutcome<List<AuditEntry>>.failure(
-        OrgFailure(kind: OrgFailureKind.denied),
-      );
-    }
-    return OrgOutcome<List<AuditEntry>>.success(
-      _audit[organizationId] ?? const <AuditEntry>[],
-    );
-  }
-
-  /// Deterministic, non-PII demo audit trail for the demo org — mirrors the
-  /// org-scoped RPC's redacted rows (action/outcome/redacted summary/
-  /// correlation id/timestamp only; no content, no credentials, no real
-  /// identity).
-  static List<AuditEntry> demoAuditEntries() => <AuditEntry>[
-    AuditEntry(
-      id: 1,
-      action: 'member:role/change',
-      outcome: 'allowed',
-      resourceType: 'membership',
-      resourceId: 'demo-user',
-      correlationId: 'audit-org-demo-1',
-      redactedSummary: 'role change',
-      serverTimestamp: DateTime.utc(2026, 7, 25, 10, 0),
-    ),
-    AuditEntry(
-      id: 2,
-      action: 'member:invite',
-      outcome: 'allowed',
-      resourceType: 'invitation',
-      resourceId: 'inv-demo-1',
-      correlationId: 'audit-org-demo-2',
-      redactedSummary: 'invitation sent',
-      serverTimestamp: DateTime.utc(2026, 7, 25, 11, 30),
-    ),
-    AuditEntry(
-      id: 3,
-      action: 'member:suspend',
-      outcome: 'denied',
-      resourceType: 'membership',
-      resourceId: 'unknown-user',
-      correlationId: 'audit-org-demo-3',
-      redactedSummary: 'suspension denied',
-      serverTimestamp: DateTime.utc(2026, 7, 25, 12, 45),
-    ),
-  ];
-
-  @override
-  Future<OrgOutcome<String>> acceptInvitation({required String token}) async {
-    final _FakeInvitation? invitation = _invitations.values
-        .where(
-          (_FakeInvitation inv) =>
-              inv.status == _FakeInvitationStatus.pending && inv.token == token,
-        )
-        .firstOrNull;
-    // Mirrors the server's undifferentiated denial: unknown/expired tokens
-    // and email mismatches all read as "invalid invitation".
-    if (invitation == null || invitation.email != demoUserEmail.toLowerCase()) {
-      return const OrgOutcome<String>.failure(
-        OrgFailure(kind: OrgFailureKind.invalidInvitation),
-      );
-    }
-    invitation.status = _FakeInvitationStatus.accepted;
-    final Map<String, OrgMember> roster = _members[invitation.organizationId]!;
-    // The pending invited row (keyed by email) becomes the real membership
-    // with the SERVER-OWNED role from the invitation.
-    roster.remove(invitation.email);
-    roster[demoUserId] = OrgMember(
-      organizationId: invitation.organizationId,
-      userId: demoUserId,
-      displayName: 'Demo user',
-      locale: 'en',
-      role: invitation.role,
-      status: MembershipStatus.active,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
-    return OrgOutcome<String>.success(
-      'membership-${invitation.organizationId}',
-    );
-  }
-
-  /// Metadata-only cross-org listing (P3.5): every organization in the
-  /// registry — the mirror of `list_organizations_metadata`. Metadata only,
-  /// never content.
-  List<OrganizationSummary> allOrganizations() =>
-      _orgs.values.toList(growable: false);
-
-  /// Metadata-only cross-org member listing (P3.5): every membership across
-  /// orgs as [OrgMember] rows — the mirror of `list_members_metadata`. The
-  /// real RPC joins `profiles`, so invited rows (no profile yet) never
-  /// appear; the fake excludes rows carrying an [OrgMember.invitationId].
-  List<OrgMember> allMembers() {
-    final List<OrgMember> members = <OrgMember>[];
-    for (final Map<String, OrgMember> roster in _members.values) {
-      for (final OrgMember member in roster.values) {
-        if (member.invitationId != null) {
-          continue;
-        }
-        members.add(member);
-      }
-    }
-    return members;
-  }
-
-  /// Mirrors `delete_demo_account`'s cascade (P3.5): removes [userId] from
-  /// every roster (profiles/memberships cascade server-side; audit rows
-  /// survive). Never invoked with the demo identity by the platform fake
-  /// (the RPC refuses `auth.uid()`).
-  void deleteAccount(String userId) {
-    for (final Map<String, OrgMember> roster in _members.values) {
-      roster.remove(userId);
-    }
-  }
-
-  /// Derives the demo user's current memberships from this fake's internal
-  /// state (P3.3 Slice B).
-  ///
-  /// Reads every roster for the demo identity — mirroring the RLS-scoped
-  /// memberships SELECT, which returns the caller's own rows across
-  /// organizations regardless of status — and resolves each org's display
-  /// name from the registry. [FakeMembershipRepository] reads this when
-  /// bound to the same instance, so an org created during an env-less run
-  /// joins the hydrated session without a static re-seed. This is a seam
-  /// for tests and env-less runs; it is not an authorization mechanism.
-  List<OrganizationMembership> demoUserMemberships() {
-    final List<OrganizationMembership> memberships = <OrganizationMembership>[];
-    for (final MapEntry<String, Map<String, OrgMember>> entry
-        in _members.entries) {
-      final OrgMember? me = entry.value[demoUserId];
-      if (me == null) {
-        continue;
-      }
-      memberships.add(
-        OrganizationMembership(
-          organizationId: entry.key,
-          organizationName: _orgs[entry.key]?.name,
-          role: me.role,
-          status: me.status,
-        ),
-      );
-    }
-    return memberships;
-  }
-
-  bool _anotherActivePartnerExists(
-    Map<String, OrgMember> roster,
-    String userId,
-  ) {
-    for (final OrgMember member in roster.values) {
-      if (member.userId != userId &&
-          member.role == UserRole.partner &&
-          member.isActive) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  String? _assignableRoleName(UserRole role) {
-    return switch (role) {
-      UserRole.client => 'client',
-      UserRole.attorney => 'attorney',
-      UserRole.partner => 'partner',
-      _ => null,
-    };
-  }
-
-  OrgMember _copy(
-    OrgMember source, {
-    UserRole? role,
-    MembershipStatus? status,
-  }) => OrgMember(
-    organizationId: source.organizationId,
-    userId: source.userId,
-    displayName: source.displayName,
-    locale: source.locale,
-    role: role ?? source.role,
-    status: status ?? source.status,
-    createdAt: source.createdAt,
-    updatedAt: DateTime.now(),
-    invitationId: source.invitationId,
-  );
-}
-
-enum _FakeInvitationStatus { pending, revoked, accepted }
-
-/// A pending invitation mirror: the literal token is kept for demo
-/// continuity (the real surface stores only the sha-256 hash — nothing
-/// leaves the process, so the literal is safe here).
-class _FakeInvitation {
-  _FakeInvitation({
-    required this.id,
-    required this.organizationId,
-    required this.email,
-    required this.role,
-    required this.status,
-    required this.token,
-  });
-
-  final String id;
-  final String organizationId;
-  final String email;
-  final UserRole role;
-  _FakeInvitationStatus status;
-  String token;
 }

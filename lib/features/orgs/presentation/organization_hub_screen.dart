@@ -15,6 +15,9 @@ import 'create_organization_screen.dart';
 import 'member_roster_screen.dart';
 import 'org_cubit.dart';
 
+part 'organization_hub_audit_entry_tile.dart';
+part 'organization_hub_org_switcher.dart';
+
 /// Hub for the organization surface (P3 slice 1.5 + Phase 2 slice 2.3;
 /// active-org context formalized in Phase 7 slice 7.0).
 ///
@@ -112,122 +115,6 @@ class _OrganizationHubScreenState extends State<OrganizationHubScreen> {
                 ),
               ],
             ),
-    );
-  }
-}
-
-/// Partner-only "Audit trail" entry into `/organizations/audit` (partner
-/// org-audit slice 2026-08-09). Navigation hint only — the `read_org_audit`
-/// RPC enforces the actual authorization.
-class _AuditEntryTile extends StatelessWidget {
-  const _AuditEntryTile({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final AppLocalizations l10n = AppLocalizations.of(context);
-    return Padding(
-      padding: const EdgeInsetsDirectional.fromSTEB(
-        LegalHubTheme.marginMobile,
-        LegalHubTheme.spaceSm,
-        LegalHubTheme.marginMobile,
-        0,
-      ),
-      child: Material(
-        color: scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.all(Radius.circular(LegalHubTheme.radiusLg)),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.all(
-            Radius.circular(LegalHubTheme.radiusLg),
-          ),
-          child: Padding(
-            padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
-            child: Row(
-              children: <Widget>[
-                Icon(
-                  Icons.receipt_long_outlined,
-                  size: 20,
-                  color: scheme.primary,
-                ),
-                const SizedBox(width: LegalHubTheme.spaceSm),
-                Expanded(child: Text(l10n.orgAuditHubEntry)),
-                Icon(Icons.chevron_right, size: 20, color: scheme.outline),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Compact active-org selector over [Session.memberships].
-///
-/// Local UI context only: the selection changes which membership the hub
-/// renders and is never transmitted; the server re-derives membership per
-/// D-08 (matrix §3 "switch active organization" is a UX hint, not an
-/// authority).
-class _OrgSwitcher extends StatelessWidget {
-  const _OrgSwitcher({
-    required this.memberships,
-    required this.selectedOrganizationId,
-    required this.onChanged,
-  });
-
-  final List<OrganizationMembership> memberships;
-  final String selectedOrganizationId;
-  final ValueChanged<String> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final AppLocalizations l10n = AppLocalizations.of(context);
-    return Material(
-      color: scheme.surfaceContainerHighest,
-      child: Padding(
-        padding: const EdgeInsetsDirectional.symmetric(
-          horizontal: LegalHubTheme.marginMobile,
-          vertical: LegalHubTheme.spaceXs,
-        ),
-        child: Row(
-          children: <Widget>[
-            Icon(Icons.apartment_outlined, size: 18, color: scheme.primary),
-            const SizedBox(width: LegalHubTheme.spaceSm),
-            Text(l10n.orgSwitcherLabel),
-            const SizedBox(width: LegalHubTheme.spaceSm),
-            Expanded(
-              child: DropdownButton<String>(
-                value: selectedOrganizationId,
-                isExpanded: true,
-                underline: const SizedBox.shrink(),
-                items: <DropdownMenuItem<String>>[
-                  for (final OrganizationMembership membership in memberships)
-                    DropdownMenuItem<String>(
-                      value: membership.organizationId,
-                      child: Text(
-                        // P3.2 name-resolution note: a suspended/removed
-                        // membership's org name is not resolvable — fall
-                        // back to the org id so the switcher still labels
-                        // the row honestly.
-                        membership.organizationName ??
-                            membership.organizationId,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                ],
-                onChanged: (String? id) {
-                  if (id != null) {
-                    onChanged(id);
-                  }
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

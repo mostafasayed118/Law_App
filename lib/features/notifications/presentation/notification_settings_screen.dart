@@ -8,6 +8,8 @@ import '../domain/notification_prefs.dart';
 import '../domain/notification_prefs_store.dart';
 import 'notification_prefs_cubit.dart';
 
+part 'notification_settings_body.dart';
+
 /// User-level notification preferences (foundation scope).
 ///
 /// Local-only UX preferences: three toggles persisted on this device via the
@@ -25,51 +27,6 @@ class NotificationSettingsScreen extends StatelessWidget {
           NotificationPrefsCubit(serviceLocator<NotificationPrefsStore>())
             ..load(),
       child: const _NotificationSettingsBody(),
-    );
-  }
-}
-
-class _NotificationSettingsBody extends StatelessWidget {
-  const _NotificationSettingsBody();
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context);
-    final NotificationPrefs prefs = context
-        .watch<NotificationPrefsCubit>()
-        .state
-        .prefs;
-    final NotificationPrefsCubit cubit = context.read<NotificationPrefsCubit>();
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n.notificationsTitle)),
-      body: ListView(
-        padding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
-        children: <Widget>[
-          Text(
-            l10n.notificationsNote,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: LegalHubTheme.spaceMd),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(l10n.notifAppointmentReminders),
-            value: prefs.appointmentReminders,
-            onChanged: cubit.setAppointmentReminders,
-          ),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(l10n.notifActivityUpdates),
-            value: prefs.activityUpdates,
-            onChanged: cubit.setActivityUpdates,
-          ),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(l10n.notifSystemAlerts),
-            value: prefs.systemAlerts,
-            onChanged: cubit.setSystemAlerts,
-          ),
-        ],
-      ),
     );
   }
 }
