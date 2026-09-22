@@ -813,11 +813,11 @@ The Recycle Bin's `$I` records were parsed (they store the deletion time and the
 
 **Certification of the in-flight slice (this session):** `flutter analyze` → No issues found · `flutter test` (with `NO_PROXY=localhost,127.0.0.1` per the known proxy fix) → **+1400 All tests passed** in 01:24. The extraction slice compiles and is behaviourally green, so it is safe to commit as-is; only the format verdict is machine-dependent, and CI's pinned 3.44.4 SDK is the authority there. **The push is still owner-gated, but a commit is not** — 25 unpushed commits + this uncommitted slice means the repo is two safety nets behind.
 
-### 12.14 The §12.13 slice was committed — and the documentation drift it exposed was too (2026-09-23)
+### 12.14 The §12.13 slice was committed — and the documentation drift it exposed was too (2026-09-23, commit `0d429b9`)
 
 §12.13's "the slice wants its gate run and then a commit — the push remains owner-gated, but the commit does not have to be" was the explicit authorization to land the work. This session did so.
 
-**What landed.** A single commit, **`<commit-hash>`** (see `git log -1 --format=%H` — the placeholder is filled by the same commit it describes, so the hash lives only in the commit object and in the amend that follows). The commit message records the slice's scope, the certification, and the review notes that survived. Scope (51 modified + 94 untracked = the same 145 files §12.13 enumerated, minus the doc-only changes tracked separately):
+**What landed.** A single commit, **`0d429b9`** — "refactor(lib,docs): the in-flight extraction slice lands + its audit + matrix addenda (suite 1400)". The commit message records the slice's scope, the certification, and the review notes that survived. (A follow-up docs commit tightened this paragraph's wording — `git log --oneline -2` shows both.) Scope (51 modified + 94 untracked = the same 145 files §12.13 enumerated, minus the doc-only changes tracked separately):
 
 - **`lib/app/`** — `legalhub_theme.dart` now `part`-includes `legalhub_color_scheme.dart` and `legalhub_text_theme.dart`; `service_locator.dart` now `part`-includes `service_locator_{core,auth,orgs,features,app}.dart`; `router.dart` now `part`-includes `router_{shell_routes,app_shell,refresh_stream}.dart`. The bootstrap entry-points shrank from 559 + 187 lines to 172 + 187 (router was already small), and the part files carry the implementations verbatim — same methods, same semantics.
 - **`lib/data/auth/supabase_auth_api_impl.dart`** — split to extract the `_toSnapshot` mapping helpers to `supabase_auth_api_mapping.dart` (the only behaviour-preserving carve-out in this group).

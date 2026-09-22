@@ -107,8 +107,8 @@ the audit record; suite 1127 pass).
 ## A1. Screen count and suite size as of 2026-09-23 (audit §12.14)
 
 **Tree state.** Same `main` branch, working tree clean post-extraction slice
-(audit doc §12.14 / commit `<commit-hash>`; see `git log -1 --format=%H` for
-the actual hash). The slice is a pure readability split — every modified
+(audit doc §12.14 / the same commit; see `git log --oneline -1` for the
+commit hash). The slice is a pure readability split — every modified
 `<feature>_screen.dart` gained `part '<name>_*.dart';` references and lost its
 private widget class; no route, no screen name, no public widget signature
 changed.
