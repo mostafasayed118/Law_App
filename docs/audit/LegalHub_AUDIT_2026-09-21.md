@@ -559,7 +559,7 @@ Three P1 items landed after the P0 slice, chosen as small/mechanical and **disjo
 
 **Landed as** `86f6241` — `fix(data,ui,auth): audit 2026-09-21 P0/P1 — …` (32 entries; two renames detected: the store and its test).
 
-**Still open from the P1 list (owner-gated):** P1.1 (four widgets → cubits), P1.3 (admin RPC `LIMIT` + eager render — SQL apply slice), P1.4 (seam-classification dedup, ~548 lines across 18 files), P1.7 (`ViewOffline`/`ViewUnauthorized` delete-or-produce decision + ledger entry), P1.8 (`ActiveOrgStore` move), P1.9 (`CubitListSurface`), P1.10 (sealed-state `copyWith`), and the iOS session-storage half of P1.2.
+**Still open from the P1 list (owner-gated):** P1.1 (four widgets → cubits — **planned, awaiting owner sign-off on the owner-mapping: see `docs/p1_1_gateway_call_migration_plan_2026-09-22.md`**), P1.3 (admin RPC `LIMIT` + eager render — SQL apply slice), P1.4 (seam-classification dedup, ~548 lines across 18 files), P1.7 (`ViewOffline`/`ViewUnauthorized` delete-or-produce decision + ledger entry), P1.8 (`ActiveOrgStore` move), P1.9 (`CubitListSurface`), P1.10 (sealed-state `copyWith`), and the iOS session-storage half of P1.2.
 
 ---
 
