@@ -191,3 +191,16 @@ label `LegalHub`).
 - The launcher icon is generated, not hand-maintained:
   `scripts/gen_launcher_icons.py` regenerates every density from the D-01
   palette (navy `#0B1D2E` tile, Old Gold `#E9C176` scales glyph).
+
+### 5.4 Store-readiness progress (2026-09-23, §12.21)
+
+- **Ready to paste:** EN + AR listing copy with Play's character limits
+  checked — `docs/store_listing_draft_2026-09-23.md`.
+- **Ready to upload:** feature graphic (1024x500) and listing icon (512)
+  in `store_assets/`, both regenerable via
+  `scripts/gen_feature_graphic.py`.
+- **Still on you:** phone screenshots (suggest EN + AR/RTL pairs), a
+  hosted privacy-policy URL, the data-safety form, category, and contact
+  email — checklist in the draft doc.
+- **First live CI exercise:** run #195 (`a5dd29a`) is the first to carry
+  the `release-build-proof` job — check the Actions tab for its outcome.

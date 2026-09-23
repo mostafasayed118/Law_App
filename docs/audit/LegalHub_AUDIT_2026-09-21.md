@@ -1094,3 +1094,28 @@ so `git status` stays clean without committing private working notes.
 
 **Gates:** `verify_ledger.sh` PASS (background run, per the session
 workaround); no Dart changed — analyze/format/test results unaffected.
+
+### 12.21 Store-listing drafts, Play graphics, and a CI execution audit (2026-09-23)
+
+**Store assets.** With the decision-card items done, the next open item was
+the store listing. The copy is now drafted (EN + AR, `docs/
+store_listing_draft_2026-09-23.md`) with Play's character limits checked —
+title ≤ 30, short ≤ 80 — and the app's honesty policy carried into the copy
+itself (both languages carry the demo-data / no-legal-advice disclosure).
+Two required graphics are generated reproducibly by
+`scripts/gen_feature_graphic.py` (companion to the icon generator; same
+D-01 tokens and glyph, wordmark in the bundled Playfair Display, tagline in
+Noto Sans): `store_assets/feature_graphic.png` (1024x500 RGB opaque —
+Play's feature-graphic slot) and `store_assets/play_icon_512.png` (512x512
+— the listing icon). Pixel-region QA confirmed both marks render inside the
+frame with nothing clipped. Screenshots, privacy-policy URL, and the data-
+safety form remain owner-side (checklist in the draft doc).
+
+**CI execution audit — a real finding.** The public GitHub API shows the
+CI workflow **registered and active** (state `active` since 2026-07-31) and
+**249 runs total, run #195 on `a5dd29a`** — every push has executed CI all
+along. (An earlier same-session probe reported "no runs"; that was a
+parsing error — the list endpoint's array is `workflow_runs`, not `runs`.
+The correction is recorded here so the false alarm doesn't circulate.) The
+run on `a5dd29a` is the **first to carry the `release-build-proof` job**
+(§12.20) — its outcome is the first live exercise of the amended B2 scope.
