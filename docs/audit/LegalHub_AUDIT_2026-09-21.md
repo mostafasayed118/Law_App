@@ -855,7 +855,7 @@ Net line count of the diff: **+6,630** across the 93 new files (86 `part of` ext
 - **Audit doc self-contradiction.** §12.11 says "tree is clean at 24 commits"; §12.13 said "git status contradicts §12.11". This is now resolved by §12.13's "**Superseded by §12.14**" callout (added by the same commit) and by this entry.
 - **Screen-completeness matrix (M-4).** The matrix documented at `b7325f8` claims **30 `*_screen.dart` / suite 1127** (frozen 2026-08-09); the tree at audit time held **33 / 1356** (per `docs/audit/_raw/01-maintainability.md:190-196`). The current tree holds **33 / 1400**, and the extraction slice does **not** change the screen count (it only splits each `_screen.dart` into `<screen>_screen + N parts`). A dated addendum was added to `docs/screen_completeness_matrix_2026-08-09.md` in the same commit.
 
-**Push remains owner-gated.** This commit lives in `git log` on `main`; pushing it to `origin/main` is `INSTRUCTIONS.md` §2's "explicit approval" action and is not done here. The durable safety net (the push) is still owner-only.
+**Push remains owner-gated.** This commit lives in `git log` on `main`; pushing it to `origin/main` is `INSTRUCTIONS.md` §2's "explicit approval" action and is not done here. The durable safety net (the push) is still owner-only. *(Resolved the same day — see §12.15.)*
 
 **Environment note carried forward.** The `flutter test` invocation needs `NO_PROXY=localhost,127.0.0.1` on this machine (audit doc §12). A `dart format .` invocation on this machine will create a real CI-visible diff — do not run it locally.
 
@@ -872,3 +872,15 @@ Net line count of the diff: **+6,630** across the 93 new files (86 `part of` ext
 > not resolve against `git diff-tree --numstat` — the exact sums are
 > +6,630 added / +360 −6,457 modified. Figures were corrected in place
 > by the follow-up erratum docs commit; no gate-affecting change.
+
+### 12.15 The push happened (2026-09-23, owner-authorized)
+
+The owner authorized the push at ~03:35 on 2026-09-23. This session recorded the
+push-status docs update and immediately pushed `main` to `origin/main`
+(`github.com/mostafasayed118/Law_App`): `0d429b9` → `2373d91` → `f2c0e3a` →
+`b60f047` → and this commit. §12.14's "push remains owner-gated" status and
+`docs/owner_needs_2026-09-23.md` §1.1 are resolved by this push. The durable
+safety net this audit kept asking for is now in place — every committed line of
+the extraction slice lives on the remote. The untracked local files (`memory/`,
+`MEMORY.md`, `config/`) are not part of any commit and remain an open owner
+decision (commit or gitignore).

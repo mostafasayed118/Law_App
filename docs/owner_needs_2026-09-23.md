@@ -28,6 +28,10 @@ is owner-gated; I have not done it.
 
 *Say the word and I will run `git push` — or push it yourself.*
 
+> **DONE (2026-09-23, ~03:40).** The owner said the word. `main` was pushed to
+> `origin/main` through the erratum commit `b60f047` plus the docs commit that
+> records this line (audit §12.15).
+
 ### 1.2 Identify what deleted `lib/` at 21:50 on 2026-09-21 — still open
 
 The §12.12 finding named WorkBuddyAI's sandbox as the interceptor (it is
