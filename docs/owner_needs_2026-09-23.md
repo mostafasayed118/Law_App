@@ -158,7 +158,10 @@ label `LegalHub`).
 ### 5.1 Actions only you can take
 
 - **Push the two new commits to `origin/main`** — `b6f6ab2` (video slice) and
-  `66fd758` (icon + build gate). Still owner-gated, same as §1.1 was.
+  `66fd758` (icon + build gate). ~~Still owner-gated, same as §1.1 was.~~
+  **DONE (2026-09-23, ~06:00)** — owner authorized ("push"); pushed together
+  with the owner-needs rollup commit (`6bc7c49`) and the §12.18 push-record
+  commit, verified via `git ls-remote` (audit doc §12.18).
 - **Release signing.** `android/app/build.gradle.kts` signs release with the
   debug keys (its own TODO). Before any distribution build: your keystore +
   the standard `key.properties` wiring.

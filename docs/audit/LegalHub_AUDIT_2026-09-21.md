@@ -1012,3 +1012,17 @@ changes can't be exercised from this machine first).
 **Certification:** no Dart or test changes in this slice, so §12.16's
 analyze/test results stand; the ledger was re-run after this section was
 appended (PASS — recorded in the commit that lands this slice).
+
+### 12.18 The push happened — the finish-the-app commits are on the remote (2026-09-23, owner-authorized)
+
+The owner authorized the push ("push") at ~06:00 on 2026-09-23. Per the
+§12.15 convention this session first recorded the push-status docs update
+(this section + the owner-needs §5.1 DONE mark), committed it, and then
+pushed `main` to `origin/main`
+(`github.com/mostafasayed118/Law_App`): `b6f6ab2` → `66fd758` → `6bc7c49` →
+and this commit. The durable safety net is back in place — every committed
+line of the video slice (§12.16), the brand launcher icon + build gate
+(§12.17), and their evidence trail lives on the remote. Verification is
+network-truth only (`git ls-remote origin main`): this sandbox does not
+persist `.git/refs/remotes/*` writes across commands (the §12.15-era quirk),
+so local remote-tracking refs prove nothing.
