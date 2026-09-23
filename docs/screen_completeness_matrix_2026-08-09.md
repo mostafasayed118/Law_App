@@ -106,7 +106,7 @@ the audit record; suite 1127 pass).
 
 ## A1. Screen count and suite size as of 2026-09-23 (audit §12.14)
 
-**Tree state.** Same `main` branch, working tree clean post-extraction slice
+**Tree state.** Same `main` branch, tracked tree clean post-extraction slice
 (audit doc §12.14 / the same commit; see `git log --oneline -1` for the
 commit hash). The slice is a pure readability split — every modified
 `<feature>_screen.dart` gained `part '<name>_*.dart';` references and lost its
@@ -116,7 +116,7 @@ changed.
 | Status | Count |
 |---|---|
 | `*_screen.dart` in `lib/features/**/presentation/` | **33** (unchanged) |
-| `*_surface.dart` / `*_tile.dart` / `*_body.dart` / `*_page.dart` / `*_entry.dart` / `*_row.dart` / `*_list.dart` / `*_wizard.dart` / `*_view.dart` (new `part` files) | **94** — extracted widgets; not screens; do not double-count |
+| new extracted-widget files under `lib/` (86 `part of` extracts — `*_tile/_surface/_body/_state/_row/…` — + 7 standalone widget extractions) | **93** — extracted widgets; not screens; do not double-count |
 | Test count (per `README.md:377` and `verify_ledger.sh` PASS row) | **1400** (was 1127 at the 2026-08-09 snapshot) |
 | Full suite green on the landing commit | `flutter analyze` No issues · `flutter test` +1400 · `verify_ledger.sh` PASS 115/0/0 |
 

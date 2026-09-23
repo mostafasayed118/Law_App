@@ -103,9 +103,10 @@ wording — that commit was made.`. This treats §12.13 as a historical
 record and points the reader forward. Alternative phrasings if you want
 something tighter or more pedantic — say so and I will adjust.
 
-### 3.2 The matrix addendum A1 lists 94 `part` files as "extracted widgets"
+### 3.2 The matrix addendum A1 lists 93 new files (86 `part` extracts + 7 standalone widgets) as "extracted widgets"
 The matrix's vocabulary treats `*_screen.dart` as the only screen
-artifact. The 94 new `part` files are private sub-widgets, not screens,
+artifact. The 93 new files (86 `part of` extracts + 7 standalone widget
+extractions) are private sub-widgets or extracted shared widgets, not screens,
 so they do not appear in the screen count — but the matrix A1 paragraph
 *names* them so a maintainer scanning the tree knows why the file count
 jumped. If you would rather the matrix stay silent on the part files

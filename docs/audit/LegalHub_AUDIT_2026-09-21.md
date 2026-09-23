@@ -817,7 +817,7 @@ The Recycle Bin's `$I` records were parsed (they store the deletion time and the
 
 §12.13's "the slice wants its gate run and then a commit — the push remains owner-gated, but the commit does not have to be" was the explicit authorization to land the work. This session did so.
 
-**What landed.** A single commit, **`0d429b9`** — "refactor(lib,docs): the in-flight extraction slice lands + its audit + matrix addenda (suite 1400)". The commit message records the slice's scope, the certification, and the review notes that survived. (A follow-up docs commit tightened this paragraph's wording — `git log --oneline -2` shows both.) Scope (51 modified + 94 untracked = the same 145 files §12.13 enumerated, minus the doc-only changes tracked separately):
+**What landed.** A single commit, **`0d429b9`** — "refactor(lib,docs): the in-flight extraction slice lands + its audit + matrix addenda (suite 1400)". The commit message records the slice's scope, the certification, and the review notes that survived. (A follow-up docs commit tightened this paragraph's wording — `git log --oneline -2` shows both.) Scope (**52 modified + 93 new** = the 145 files this commit carries — 93 lib/ additions (86 `part of` extracts + 7 standalone widget extractions), 50 lib/ modifications, and the 2 docs/ edits described below; §12.13's mid-flight snapshot had enumerated only 40 files — 19 modified + 21 untracked — and the slice kept growing until it landed):
 
 - **`lib/app/`** — `legalhub_theme.dart` now `part`-includes `legalhub_color_scheme.dart` and `legalhub_text_theme.dart`; `service_locator.dart` now `part`-includes `service_locator_{core,auth,orgs,features,app}.dart`; `router.dart` now `part`-includes `router_{shell_routes,app_shell,refresh_stream}.dart`. The bootstrap entry-points shrank from 559 + 187 lines to 172 + 187 (router was already small), and the part files carry the implementations verbatim — same methods, same semantics.
 - **`lib/data/auth/supabase_auth_api_impl.dart`** — split to extract the `_toSnapshot` mapping helpers to `supabase_auth_api_mapping.dart` (the only behaviour-preserving carve-out in this group).
@@ -830,7 +830,7 @@ The Recycle Bin's `$I` records were parsed (they store the deletion time and the
 - **`lib/shared/widgets/cubit_list_surface.dart`**, **`view_state_list.dart`**, **`view_state_view.dart`** — the file bodies that own the scaffolding moved to `_body.dart` / `_success_list.dart` / `_message.dart` parts so the public class declarations are scannable.
 - **`lib/features/home/presentation/widgets/`** — the four sub-widgets (`identity_card.dart`, `practice_area_card.dart`, `section_header.dart`, `status_chip.dart`) extracted to dedicated files; `home_cards.dart` is now a barrel re-exporting them.
 
-Net line count of the diff: **+250 / −6,456** across the modified files, with the 94 new part files carrying the extracted bodies. **No behaviour changes** — every method's body is verbatim; every private widget preserves its callers.
+Net line count of the diff: **+6,630** across the 93 new files (86 `part of` extracts + 7 standalone widget extractions) carrying the extracted bodies, and **+360 / −6,457** across the 52 modified files (+218 / −6,455 across the 50 lib/ modifications; the 2 docs/ edits add +142 / −2). **No behaviour changes** — every method's body is verbatim; every private widget preserves its callers.
 
 **Certification of the landing commit (this session):**
 
@@ -841,7 +841,7 @@ Net line count of the diff: **+250 / −6,456** across the modified files, with 
 | `scripts/verify_ledger.sh` | **PASS 115/0/0** |
 | `README.md` suite count | **1400** (matches `verify_ledger.sh` PASS row) |
 | `dart format` (local 3.48.0-pre verdict) | **24 changed** — all are formatter-version drift; CI's pinned 3.44.4 considers the same bytes formatted. See the "Format note" in §12.13 for why this is expected and not actionable. |
-| Tree status | clean (post-commit, pre-push) |
+| Tree status | clean (tracked files, post-commit, pre-push; untracked local files present: `memory/`, `MEMORY.md`, `config/`) |
 
 **Why the slice was safe to commit (the explicit §12.13 reasoning still holds):**
 
@@ -858,3 +858,17 @@ Net line count of the diff: **+250 / −6,456** across the modified files, with 
 **Push remains owner-gated.** This commit lives in `git log` on `main`; pushing it to `origin/main` is `INSTRUCTIONS.md` §2's "explicit approval" action and is not done here. The durable safety net (the push) is still owner-only.
 
 **Environment note carried forward.** The `flutter test` invocation needs `NO_PROXY=localhost,127.0.0.1` on this machine (audit doc §12). A `dart format .` invocation on this machine will create a real CI-visible diff — do not run it locally.
+
+> **Erratum (2026-09-23, later review session).** The scope figures this
+> section first carried — "51 modified + 94 untracked = the same 145 files
+> §12.13 enumerated" and "the 94 new part files" — were wrong, and §12.13
+> never enumerated 145 files (its mid-flight snapshot was 19 modified +
+> 21 untracked = 40; the slice kept growing until it landed). The object
+> database is authoritative: `0d429b9` carries **93 added + 52 modified =
+> 145 files**, which matches the slice commit's own message ("52 modified
+> + 93 new = 145 files"); the message's later line ("94 new private")
+> repeats the same typo and stays as written (commit messages are
+> immutable). The message's "+250/−6456 net on the modified" also does
+> not resolve against `git diff-tree --numstat` — the exact sums are
+> +6,630 added / +360 −6,457 modified. Figures were corrected in place
+> by the follow-up erratum docs commit; no gate-affecting change.
