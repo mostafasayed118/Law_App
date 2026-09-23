@@ -142,3 +142,42 @@ override that future sessions will need to remember.
   If you want a §0.1 "stale numbers; see today's owner-needs file" callout
   added, I will do it as a docs-only edit in the same commit (no separate
   PR noise).
+---
+
+## 5. The finish-the-app pass (later 2026-09-23) — what landed, and what is now yours
+
+Recorded in full in the audit doc (§12.16: the D-15 video-consultation slice;
+§12.17: the portfolio-readiness pass). Short version: the last
+designed-but-unbuilt screen shipped in its ratified demo posture, the dead
+home taps are wired, the suite is 1426 green, the brand launcher icon
+replaced the stock Flutter template icon, and `flutter build apk --release`
+is proven (app-release.apk, 59.0 MB; the icon verified inside the artifact
+via `aapt2 dump badging` — `application-icon-*` → the adaptive-icon XML,
+label `LegalHub`).
+
+### 5.1 Actions only you can take
+
+- **Push the two new commits to `origin/main`** — `b6f6ab2` (video slice) and
+  `66fd758` (icon + build gate). Still owner-gated, same as §1.1 was.
+- **Release signing.** `android/app/build.gradle.kts` signs release with the
+  debug keys (its own TODO). Before any distribution build: your keystore +
+  the standard `key.properties` wiring.
+- **Confirm the applicationId.** `com.legalhub.app` is the B1 placeholder the
+  file's comment asks you to confirm before release.
+
+### 5.2 Decisions you may want to make
+
+- **A CI `assembleRelease` job.** `.github/workflows/ci.yml` gates analyze +
+  test only, so the artifact pipeline is proven locally (§12.17) but not in
+  CI. Adding the job was declined blind here (CI can't be exercised from
+  this machine first) — say the word and it lands as its own commit.
+- **The untracked local files** (`memory/`, `MEMORY.md`, `config/`) — commit
+  or gitignore; carried unchanged from the prior pass.
+
+### 5.3 For the record
+
+- Suite: **1426 executed / 1423 tracked declarations**, all gates green
+  (analyze clean, `flutter test` +1426, `verify_ledger.sh` PASS 115/0/0 ×2).
+- The launcher icon is generated, not hand-maintained:
+  `scripts/gen_launcher_icons.py` regenerates every density from the D-01
+  palette (navy `#0B1D2E` tile, Old Gold `#E9C176` scales glyph).
