@@ -386,5 +386,22 @@
   "aiResearchEntryTitle": "YZ araştırması",
   "aiResearchEntrySubtitle": "Demo araştırma asistanına sorun — yalnızca tavsiye niteliğinde.",
   "notificationsFeedUnreadSemantics": "Okunmamış bildirim. Okundu olarak işaretlemek için dokunun.",
-  "notificationsFeedMutedEmpty": "Bildirimler bildirim ayarlarınızdan sessize alındı."
+  "notificationsFeedMutedEmpty": "Bildirimler bildirim ayarlarınızdan sessize alındı.",
+  "videoTitle": "Görüntülü görüşme",
+  "videoEmpty": "Planlanmış görüşme yok.",
+  "videoError": "Görüşmeler yüklenemedi.",
+  "videoLocalOnlyNote": "Demo modu — yalnızca örnek oturumlar. Gerçek çağrı yapılmaz ve hiçbir şey kaydedilmez.",
+  "videoEntryTitle": "Görüntülü görüşme",
+  "videoEntrySubtitle": "Demo arama deneyimini önizleyin — gerçek medya yok.",
+  "videoJoin": "Demo aramaya katıl",
+  "videoCallLiveBadge": "Canlı demo",
+  "videoCallElapsed": "Süre {duration}",
+  "videoCallWith": "{name} ile demo arama",
+  "videoCallYou": "Siz",
+  "videoCallNote": "Gerçek ses veya video yok. Hiçbir şey kaydedilmez veya gönderilmez.",
+  "videoMicOn": "Mikrofon açık (demo)",
+  "videoMicMuted": "Mikrofon kapalı (demo)",
+  "videoCameraOn": "Kamera açık (demo)",
+  "videoCameraOff": "Kamera kapalı (demo)",
+  "videoLeave": "Aramadan ayrıl"
 }

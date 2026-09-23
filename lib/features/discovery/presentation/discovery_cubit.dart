@@ -17,7 +17,13 @@ import 'discovery_state.dart';
 /// no server search RPC exists. Widgets render [DiscoveryState] and dispatch
 /// intents; they never call the gateway directly.
 class DiscoveryCubit extends Cubit<DiscoveryState> {
-  DiscoveryCubit(this._gateway) : super(const DiscoveryState());
+  /// [initialPracticeArea] seeds the practice-area filter chip for a deep
+  /// link from the home dashboard's practice-area cards (`/discovery?area=…`):
+  /// the tapped card's area is active before the first frame, so the list
+  /// opens pre-narrowed. Defaults to null ("All") for the plain `/discovery`
+  /// entries — the shell tile and the home entry card.
+  DiscoveryCubit(this._gateway, {PracticeArea? initialPracticeArea})
+    : super(DiscoveryState(practiceArea: initialPracticeArea));
 
   final AttorneyGateway _gateway;
 

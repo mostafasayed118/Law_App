@@ -11,6 +11,11 @@ List<Widget> _homeEntryCards(
     if (capabilities.canBookConsultation) ...[
       const SizedBox(height: LegalHubTheme.spaceLg),
       BookingEntryCard(onTap: () => context.go(AppRoutes.book)),
+      // Spec D-15 demo-posture: the video entry rides the booking gate
+      // (A-2: "book" → "join call" — the same audience, no new role flag).
+      // Visibility hint only; the demo surface has no backend to authorize.
+      const SizedBox(height: LegalHubTheme.spaceMd),
+      VideoEntryCard(onTap: () => context.go(AppRoutes.video)),
     ],
     if (capabilities.canViewAttorneyDiscovery) ...[
       const SizedBox(height: LegalHubTheme.spaceMd),

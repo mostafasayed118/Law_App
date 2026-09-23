@@ -1204,4 +1204,62 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notificationsFeedMutedEmpty =>
       'Notifications are muted in your notification settings.';
+
+  @override
+  String get videoTitle => 'Video consultation';
+
+  @override
+  String get videoEmpty => 'No consultations are scheduled.';
+
+  @override
+  String get videoError => 'Unable to load consultations.';
+
+  @override
+  String get videoLocalOnlyNote =>
+      'Demo mode — synthetic sessions only. No real call is placed and nothing is recorded.';
+
+  @override
+  String get videoEntryTitle => 'Video consultation';
+
+  @override
+  String get videoEntrySubtitle =>
+      'Preview the demo call experience — no real media.';
+
+  @override
+  String get videoJoin => 'Join demo call';
+
+  @override
+  String get videoCallLiveBadge => 'Live demo';
+
+  @override
+  String videoCallElapsed(String duration) {
+    return 'Elapsed $duration';
+  }
+
+  @override
+  String videoCallWith(String name) {
+    return 'Demo call with $name';
+  }
+
+  @override
+  String get videoCallYou => 'You';
+
+  @override
+  String get videoCallNote =>
+      'No real audio or video. Nothing is recorded or sent.';
+
+  @override
+  String get videoMicOn => 'Microphone on (demo)';
+
+  @override
+  String get videoMicMuted => 'Microphone muted (demo)';
+
+  @override
+  String get videoCameraOn => 'Camera on (demo)';
+
+  @override
+  String get videoCameraOff => 'Camera off (demo)';
+
+  @override
+  String get videoLeave => 'Leave call';
 }

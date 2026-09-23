@@ -160,6 +160,36 @@ void main() {
     });
 
     test(
+      'initialPracticeArea seeds the chip for the home-card deep link '
+      '(the D-S4 wiring)',
+      () async {
+        final DiscoveryCubit cubit = DiscoveryCubit(
+          gateway,
+          initialPracticeArea: PracticeArea.corporate,
+        );
+        addTearDown(cubit.close);
+
+        // The chip is active before the first frame, so the list opens
+        // pre-narrowed to the tapped area.
+        expect(cubit.state.practiceArea, PracticeArea.corporate);
+        await cubit.load();
+        expect(cubit.state.visibleAttorneys, <Attorney>[
+          _attorney('atty-1'),
+          _attorney('atty-5'),
+        ]);
+      },
+    );
+
+    test('the plain constructor opens on All (no seed)', () async {
+      final DiscoveryCubit cubit = DiscoveryCubit(gateway);
+      addTearDown(cubit.close);
+
+      expect(cubit.state.practiceArea, isNull);
+      await cubit.load();
+      expect(cubit.state.visibleAttorneys, hasLength(_attorneys.length));
+    });
+
+    test(
       'a query with no matches yields an empty visible list (AC-2)',
       () async {
         final DiscoveryCubit cubit = DiscoveryCubit(gateway);

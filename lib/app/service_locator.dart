@@ -91,6 +91,8 @@ import '../features/storage/data/fake_storage_gateway.dart';
 import '../features/storage/domain/storage_gateway.dart';
 import '../features/tasks/data/fake_task_gateway.dart';
 import '../features/tasks/domain/task_gateway.dart';
+import '../features/video/data/fake_video_gateway.dart';
+import '../features/video/domain/video_gateway.dart';
 import 'active_org_store.dart';
 import 'deep_link/pending_accept_invite_store.dart';
 import 'localization/locale_cubit.dart';

@@ -22,7 +22,14 @@ List<RouteBase> _shellRoutes(
     GoRoute(
       path: AppRoutes.discovery,
       builder: (BuildContext context, GoRouterState state) =>
-          const AttorneySearchScreen(),
+          AttorneySearchScreen(
+            // The home dashboard's practice-area cards deep-link in with the
+            // area preselected (`?area=…`); an absent/unknown value opens
+            // the plain "All" surface (never an error).
+            initialPracticeArea: AppRoutes.practiceAreaFromQuery(
+              state.uri.queryParameters['area'],
+            ),
+          ),
     ),
     GoRoute(
       path: AppRoutes.discoveryProfile,
@@ -126,6 +133,15 @@ List<RouteBase> _shellRoutes(
       path: AppRoutes.tasks,
       builder: (BuildContext context, GoRouterState state) =>
           const TaskBoardScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.video,
+      // Spec D-15 demo-posture (`docs/video_scope_decision_2026-08-11.md`):
+      // the surface is the synthetic VideoGateway seam — no real media, no
+      // writes. Rides the booking entry's visibility (A-2: "book" → "join
+      // call"); a navigation hint, never an authorization grant.
+      builder: (BuildContext context, GoRouterState state) =>
+          const VideoConsultationScreen(),
     ),
     GoRoute(
       path: AppRoutes.approvals,

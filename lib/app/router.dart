@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../core/practice_area.dart';
 import '../core/roles/user_role.dart';
 import '../features/admin/presentation/platform_admin_screen.dart';
 import '../features/approvals/presentation/approvals_screen.dart';
@@ -36,6 +37,7 @@ import '../features/profile/presentation/profile_screen.dart';
 import '../features/research/presentation/ai_research_screen.dart';
 import '../features/search/presentation/search_screen.dart';
 import '../features/tasks/presentation/task_board_screen.dart';
+import '../features/video/presentation/video_consultation_screen.dart';
 import '../l10n/app_localizations.dart';
 import '../shared/responsive/responsive.dart';
 part 'router_shell_routes.dart';
@@ -76,6 +78,7 @@ class AppRoutes {
   static const String approvals = '/approvals';
   static const String research = '/research';
   static const String search = '/search';
+  static const String video = '/video';
 
   /// The profile route for one attorney (path-param substitution).
   static String attorneyProfile(String attorneyId) => '/discovery/$attorneyId';
@@ -93,6 +96,27 @@ class AppRoutes {
   /// carries real data — local-only demo queries, D-S5).
   static String searchQuery(String query) =>
       '$search?q=${Uri.encodeQueryComponent(query)}';
+
+  /// The discovery route pre-narrowed to one practice area (the home
+  /// dashboard's practice-area cards, the D-S4 wiring). The enum name
+  /// travels as the query value (English token, URL-encoded); an unknown
+  /// value degrades to the plain "All" surface — never a crash.
+  static String discoveryArea(PracticeArea area) =>
+      '$discovery?area=${Uri.encodeQueryComponent(area.name)}';
+
+  /// Parses the `?area=` query value back to a [PracticeArea], or null for
+  /// an absent/unknown value (the plain surface, never an error).
+  static PracticeArea? practiceAreaFromQuery(String? raw) {
+    if (raw == null || raw.isEmpty) {
+      return null;
+    }
+    for (final PracticeArea area in PracticeArea.values) {
+      if (area.name == raw) {
+        return area;
+      }
+    }
+    return null;
+  }
 }
 
 /// Routes are navigation UX only. They do not authorize access to any future

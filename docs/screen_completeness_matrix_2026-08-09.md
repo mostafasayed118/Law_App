@@ -157,3 +157,38 @@ new `part` files are private sub-widgets of their parent screen — the audit's
   addendum; still one dated owner decision per surface (compliance alerts,
   task board, approvals).
 - **AR/TR copy semantic pass** — still pending native-speaker review.
+## A3. The D-15 video-consultation screen lands — 34 screens (2026-09-23, audit §12.16)
+
+**Tree state.** Same `main` branch; this addendum records the
+`video_consultation_screen.dart` slice (audit doc §12.16). The screen was the
+last designed-but-unbuilt surface (§3's `DEFERRED_PHASE: video (v1, D-15
+open)` row) and it lands in the **demo posture ratified by
+`docs/video_scope_decision_2026-08-11.md`**: a synthetic `VideoGateway` seam
+(C-1), zero real media and zero device permissions (C-2), zero writes (C-3),
+living beside booking on the same `canBookConsultation` gate (A-2 — no new
+role flag). The fake IS the product posture; the server table is a future
+owner decision, same class as the other v1 demo surfaces.
+
+| Status | Count |
+|---|---|
+| `*_screen.dart` in `lib/features/**/presentation/` | **34** (was 33 — `video_consultation_screen.dart` lands) |
+| `DEFERRED_PHASE` rows remaining | **0** (D-15 closed in demo posture) |
+| Test count (per `README.md` and `verify_ledger.sh` PASS row) | **1426 executed / 1423 tracked declarations** (was 1400 / 1397 at the A1 snapshot) |
+| Full suite green on the landing commit | `flutter analyze` No issues · `flutter test` +1426 · `verify_ledger.sh` PASS |
+
+**What the slice added beyond the screen:**
+
+- `lib/features/video/` — domain (`ConsultationSession` VO, `VideoGateway`
+  interface), data (`FakeVideoGateway`, 4 deterministic non-PII sessions),
+  presentation (cubit/state/screen + `video_session_tile` /
+  `video_call_surface` parts + `video_entry_card`), all l10n'd in EN/AR/TR.
+- **D-S4 dead taps wired** (the §3 `OUT_OF_SCOPE_MVP` row is closed):
+  notification bell → feed, avatar → profile, all four practice-area cards →
+  discovery pre-filtered via the new `/discovery?area=` deep link (same
+  screen — no count change), booking-success "Join demo call" CTA.
+- Home entry stack: `VideoEntryCard` rides `canBookConsultation` directly
+  under the booking card (A-2 posture).
+
+**Historical frozen records unchanged:** the §1-§3 snapshot at
+2026-08-09 / `b7325f8`, the A1 extraction record — addenda only, per the
+document's own convention.

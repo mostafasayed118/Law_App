@@ -400,5 +400,36 @@
   "aiResearchEntryTitle": "AI research",
   "aiResearchEntrySubtitle": "Ask the demo research assistant — advisory only.",
   "notificationsFeedUnreadSemantics": "Unread notification. Tap to mark as read.",
-  "notificationsFeedMutedEmpty": "Notifications are muted in your notification settings."
+  "notificationsFeedMutedEmpty": "Notifications are muted in your notification settings.",
+  "videoTitle": "Video consultation",
+  "videoEmpty": "No consultations are scheduled.",
+  "videoError": "Unable to load consultations.",
+  "videoLocalOnlyNote": "Demo mode — synthetic sessions only. No real call is placed and nothing is recorded.",
+  "videoEntryTitle": "Video consultation",
+  "videoEntrySubtitle": "Preview the demo call experience — no real media.",
+  "videoJoin": "Join demo call",
+  "videoCallLiveBadge": "Live demo",
+  "videoCallElapsed": "Elapsed {duration}",
+  "@videoCallElapsed": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "videoCallWith": "Demo call with {name}",
+  "@videoCallWith": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "videoCallYou": "You",
+  "videoCallNote": "No real audio or video. Nothing is recorded or sent.",
+  "videoMicOn": "Microphone on (demo)",
+  "videoMicMuted": "Microphone muted (demo)",
+  "videoCameraOn": "Camera on (demo)",
+  "videoCameraOff": "Camera off (demo)",
+  "videoLeave": "Leave call"
 }

@@ -311,6 +311,9 @@ void main() {
         find.text('Demo mode — no consultation is actually booked or sent.'),
         findsOneWidget,
       );
+      // Spec D-15 demo-posture (A-2: "book" → "join call"): the success step
+      // offers the demo video surface beside the Done action.
+      expect(find.text('Join demo call'), findsOneWidget);
       expect(find.text('Done'), findsOneWidget);
     });
 

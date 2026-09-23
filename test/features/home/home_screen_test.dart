@@ -320,6 +320,16 @@ void main() {
       await tester.pumpWidget(pumpHome(const Locale('en')));
       await tester.pumpAndSettle();
 
+      // The D-15 video entry (riding the booking gate) shifted the entry
+      // stack down by one card, so Messages now sits below the fold on a
+      // default test surface (slivers only build visible children) — scroll
+      // it into view before asserting, same as the notification-feed test.
+      await tester.scrollUntilVisible(
+        find.text('Messages'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
       // The default roleCapabilities grants canViewMessages to every
       // bootstrap role (D-MSG5), so the demo client sees the messaging
       // entry on the dashboard (nav hint only, never an authorization

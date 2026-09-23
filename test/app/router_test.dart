@@ -14,6 +14,7 @@ import 'package:legalhub/app/theme/theme_cubit.dart';
 import 'package:legalhub/core/auth/auth_gateway.dart';
 import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
+import 'package:legalhub/core/practice_area.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/local/in_memory_locale_store.dart';
@@ -343,6 +344,72 @@ void main() {
       tester,
     ) async {
       router.go(AppRoutes.discovery);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Welcome Back'), findsOneWidget);
+      expect(authCubit.state.isAuthenticated, isFalse);
+    });
+  });
+
+  group('discovery area deep link (the D-S4 home-card wiring)', () {
+    testWidgets('the ?area= query param pre-narrows the profile list', (
+      tester,
+    ) async {
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      router.go(AppRoutes.discoveryArea(PracticeArea.family));
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // Only the family-area profile survives the pre-applied filter.
+      expect(find.text('Youssef Haddad'), findsOneWidget);
+      expect(find.text('Layla Mansour'), findsNothing);
+    });
+
+    testWidgets('an unknown ?area= value degrades to the plain surface', (
+      tester,
+    ) async {
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      router.go('${AppRoutes.discovery}?area=not-an-area');
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // No crash, no filter — the full synthetic list renders.
+      expect(find.text('Layla Mansour'), findsOneWidget);
+      expect(find.text('Youssef Haddad'), findsOneWidget);
+    });
+  });
+
+  group('video consultation route (spec D-15 demo-posture)', () {
+    testWidgets('renders the demo surface for an authenticated session', (
+      tester,
+    ) async {
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      router.go(AppRoutes.video);
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Video consultation'), findsOneWidget);
+      expect(find.text('Demo attorney — A. Hassan'), findsOneWidget);
+      expect(find.text('Join demo call'), findsWidgets);
+    });
+
+    testWidgets('blocks unauthenticated access to the video route', (
+      tester,
+    ) async {
+      router.go(AppRoutes.video);
       await tester.pumpWidget(harness(child: const SizedBox.shrink()));
       await tester.pumpAndSettle();
 

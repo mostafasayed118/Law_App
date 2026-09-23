@@ -2301,6 +2301,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notifications are muted in your notification settings.'**
   String get notificationsFeedMutedEmpty;
+
+  /// No description provided for @videoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Video consultation'**
+  String get videoTitle;
+
+  /// No description provided for @videoEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No consultations are scheduled.'**
+  String get videoEmpty;
+
+  /// No description provided for @videoError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load consultations.'**
+  String get videoError;
+
+  /// No description provided for @videoLocalOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo mode — synthetic sessions only. No real call is placed and nothing is recorded.'**
+  String get videoLocalOnlyNote;
+
+  /// No description provided for @videoEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Video consultation'**
+  String get videoEntryTitle;
+
+  /// No description provided for @videoEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview the demo call experience — no real media.'**
+  String get videoEntrySubtitle;
+
+  /// No description provided for @videoJoin.
+  ///
+  /// In en, this message translates to:
+  /// **'Join demo call'**
+  String get videoJoin;
+
+  /// No description provided for @videoCallLiveBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Live demo'**
+  String get videoCallLiveBadge;
+
+  /// No description provided for @videoCallElapsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Elapsed {duration}'**
+  String videoCallElapsed(String duration);
+
+  /// No description provided for @videoCallWith.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo call with {name}'**
+  String videoCallWith(String name);
+
+  /// No description provided for @videoCallYou.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get videoCallYou;
+
+  /// No description provided for @videoCallNote.
+  ///
+  /// In en, this message translates to:
+  /// **'No real audio or video. Nothing is recorded or sent.'**
+  String get videoCallNote;
+
+  /// No description provided for @videoMicOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Microphone on (demo)'**
+  String get videoMicOn;
+
+  /// No description provided for @videoMicMuted.
+  ///
+  /// In en, this message translates to:
+  /// **'Microphone muted (demo)'**
+  String get videoMicMuted;
+
+  /// No description provided for @videoCameraOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera on (demo)'**
+  String get videoCameraOn;
+
+  /// No description provided for @videoCameraOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera off (demo)'**
+  String get videoCameraOff;
+
+  /// No description provided for @videoLeave.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave call'**
+  String get videoLeave;
 }
 
 class _AppLocalizationsDelegate

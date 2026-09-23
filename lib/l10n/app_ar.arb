@@ -386,5 +386,22 @@
   "aiResearchEntryTitle": "بحث الذكاء الاصطناعي",
   "aiResearchEntrySubtitle": "اسأل مساعد البحث التجريبي — استشارة فقط.",
   "notificationsFeedUnreadSemantics": "إشعار غير مقروء. اضغط لتعليمه كمقروء.",
-  "notificationsFeedMutedEmpty": "الإشعارات مكتومة من إعدادات الإشعارات لديك."
+  "notificationsFeedMutedEmpty": "الإشعارات مكتومة من إعدادات الإشعارات لديك.",
+  "videoTitle": "مكالمة الفيديو",
+  "videoEmpty": "لا توجد استشارات مجدولة.",
+  "videoError": "تعذر تحميل الاستشارات.",
+  "videoLocalOnlyNote": "وضع العرض التوضيحي — جلسات تجريبية فقط. لا تُجرى مكالمة حقيقية ولا يُسجل أي شيء.",
+  "videoEntryTitle": "مكالمة الفيديو",
+  "videoEntrySubtitle": "معاينة تجربة المكالمة التجريبية — دون وسائط حقيقية.",
+  "videoJoin": "انضم للمكالمة التجريبية",
+  "videoCallLiveBadge": "عرض توضيحي مباشر",
+  "videoCallElapsed": "المدة {duration}",
+  "videoCallWith": "مكالمة تجريبية مع {name}",
+  "videoCallYou": "أنت",
+  "videoCallNote": "لا يوجد صوت أو فيديو حقيقي. لا يُسجل ولا يُرسل أي شيء.",
+  "videoMicOn": "الميكروفون مفتوح (تجريبي)",
+  "videoMicMuted": "الميكروفون مكتوم (تجريبي)",
+  "videoCameraOn": "الكاميرا مفتوحة (تجريبي)",
+  "videoCameraOff": "الكاميرا مغلقة (تجريبي)",
+  "videoLeave": "غادر المكالمة"
 }

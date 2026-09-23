@@ -1207,4 +1207,62 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get notificationsFeedMutedEmpty =>
       'Bildirimler bildirim ayarlarınızdan sessize alındı.';
+
+  @override
+  String get videoTitle => 'Görüntülü görüşme';
+
+  @override
+  String get videoEmpty => 'Planlanmış görüşme yok.';
+
+  @override
+  String get videoError => 'Görüşmeler yüklenemedi.';
+
+  @override
+  String get videoLocalOnlyNote =>
+      'Demo modu — yalnızca örnek oturumlar. Gerçek çağrı yapılmaz ve hiçbir şey kaydedilmez.';
+
+  @override
+  String get videoEntryTitle => 'Görüntülü görüşme';
+
+  @override
+  String get videoEntrySubtitle =>
+      'Demo arama deneyimini önizleyin — gerçek medya yok.';
+
+  @override
+  String get videoJoin => 'Demo aramaya katıl';
+
+  @override
+  String get videoCallLiveBadge => 'Canlı demo';
+
+  @override
+  String videoCallElapsed(String duration) {
+    return 'Süre $duration';
+  }
+
+  @override
+  String videoCallWith(String name) {
+    return '$name ile demo arama';
+  }
+
+  @override
+  String get videoCallYou => 'Siz';
+
+  @override
+  String get videoCallNote =>
+      'Gerçek ses veya video yok. Hiçbir şey kaydedilmez veya gönderilmez.';
+
+  @override
+  String get videoMicOn => 'Mikrofon açık (demo)';
+
+  @override
+  String get videoMicMuted => 'Mikrofon kapalı (demo)';
+
+  @override
+  String get videoCameraOn => 'Kamera açık (demo)';
+
+  @override
+  String get videoCameraOff => 'Kamera kapalı (demo)';
+
+  @override
+  String get videoLeave => 'Aramadan ayrıl';
 }

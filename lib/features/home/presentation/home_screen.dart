@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/legalhub_theme.dart';
 import '../../../app/router.dart';
+import '../../../core/practice_area.dart';
 import '../../../core/roles/user_role.dart';
 import '../../../features/approvals/presentation/approvals_entry_card.dart';
 import '../../../features/auth/presentation/auth_cubit.dart' show AuthCubit;
@@ -18,6 +19,7 @@ import '../../../features/messaging/presentation/message_entry_card.dart';
 import '../../../features/notifications/presentation/notification_feed_entry_card.dart';
 import '../../../features/research/presentation/ai_research_entry_card.dart';
 import '../../../features/tasks/presentation/task_board_entry_card.dart';
+import '../../../features/video/presentation/video_entry_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/widgets.dart';
 import 'widgets/home_cards.dart';
@@ -84,20 +86,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsetsDirectional.only(
                   start: LegalHubTheme.spaceSm,
                 ),
-                child: CircleAvatar(
-                  radius: 16,
-                  backgroundColor: scheme.primaryContainer,
-                  child: Icon(
-                    Icons.person,
-                    size: 18,
-                    color: scheme.onPrimaryContainer,
+                child: IconButton(
+                  // The avatar opens the profile surface. A navigation hint
+                  // only — no new capability is granted.
+                  tooltip: l10n.profileNavigation,
+                  onPressed: () => context.go(AppRoutes.profile),
+                  icon: CircleAvatar(
+                    radius: 16,
+                    backgroundColor: scheme.primaryContainer,
+                    child: Icon(
+                      Icons.person,
+                      size: 18,
+                      color: scheme.onPrimaryContainer,
+                    ),
                   ),
                 ),
               ),
               actions: <Widget>[
                 IconButton(
                   icon: const Icon(Icons.notifications_outlined),
-                  onPressed: () {},
+                  // The bell opens the org-scoped notification feed — the
+                  // same surface the home entry card reaches (D-N1). A
+                  // navigation hint only, never an authorization grant.
+                  tooltip: l10n.notificationsFeedTitle,
+                  onPressed: () => context.go(AppRoutes.notificationsFeed),
                 ),
               ],
             ),
@@ -164,25 +176,33 @@ class _HomeScreenState extends State<HomeScreen> {
                     PracticeAreaCard(
                       icon: Icons.gavel,
                       label: l10n.areaCriminal,
-                      onTap: () {},
+                      // D-S4 wiring: a practice-area card opens discovery
+                      // pre-narrowed to that area (`/discovery?area=…`). A
+                      // navigation hint only, never an authorization grant.
+                      onTap: () =>
+                          context.go(AppRoutes.discoveryArea(PracticeArea.criminal)),
                     ),
                     const SizedBox(width: LegalHubTheme.spaceMd),
                     PracticeAreaCard(
                       icon: Icons.balance,
                       label: l10n.areaCivil,
-                      onTap: () {},
+                      onTap: () =>
+                          context.go(AppRoutes.discoveryArea(PracticeArea.civil)),
                     ),
                     const SizedBox(width: LegalHubTheme.spaceMd),
                     PracticeAreaCard(
                       icon: Icons.domain_outlined,
                       label: l10n.areaCorporate,
-                      onTap: () {},
+                      onTap: () => context.go(
+                        AppRoutes.discoveryArea(PracticeArea.corporate),
+                      ),
                     ),
                     const SizedBox(width: LegalHubTheme.spaceMd),
                     PracticeAreaCard(
                       icon: Icons.family_restroom,
                       label: l10n.areaFamily,
-                      onTap: () {},
+                      onTap: () =>
+                          context.go(AppRoutes.discoveryArea(PracticeArea.family)),
                     ),
                   ],
                 ),

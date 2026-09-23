@@ -8,6 +8,17 @@ void _registerBookingSeams() {
       FakeBookingGateway.new,
     );
   }
+  if (!serviceLocator.isRegistered<VideoGateway>()) {
+    // Spec D-15 demo-posture (`docs/video_scope_decision_2026-08-11.md`):
+    // the synthetic VideoGateway seam, registered unconditionally — there is
+    // no env flip because there is no server-side video table to flip to;
+    // the fake IS the product posture for the demo (C-1), with zero media
+    // and zero writes anywhere downstream (C-2/C-3). Stateless service:
+    // lazy singleton; the video Cubit is feature-scoped and created per
+    // screen via BlocProvider, so it is NOT registered here. Sits beside
+    // the booking seam (A-2: "book" → "join call").
+    serviceLocator.registerLazySingleton<VideoGateway>(FakeVideoGateway.new);
+  }
   if (!serviceLocator.isRegistered<PendingAcceptInviteStore>()) {
     // Transient app-scoped holder (Phase 4.1 D-P34.2): buffers a
     // deep-linked one-time accept token until the accept screen consumes it

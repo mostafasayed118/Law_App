@@ -884,3 +884,77 @@ safety net this audit kept asking for is now in place — every committed line o
 the extraction slice lives on the remote. The untracked local files (`memory/`,
 `MEMORY.md`, `config/`) are not part of any commit and remain an open owner
 decision (commit or gitignore).
+
+### 12.16 The last designed-but-unbuilt screen lands — D-15 video consultation in demo posture (2026-09-23)
+
+The owner's standing directive for this session was "finish the app to a high,
+portfolio-ready standard." The app was already green at 1400 (§12.14's
+certification); the genuinely missing surface was the D-15 video-consultation
+screen — the only designed-but-unbuilt screen left (matrix §3's
+`DEFERRED_PHASE: video (v1, D-15 open)` row). It was built in the demo posture
+the repo had already ratified (`docs/video_scope_decision_2026-08-11.md`),
+plus the D-S4 dead-tap wiring the same matrix marked `OUT_OF_SCOPE_MVP`.
+
+**What landed (the video slice):**
+
+- **`lib/features/video/`** — a new feature package in the repo's
+  feature-first shape: domain (`consultation_session.dart` — an Equatable VO
+  carrying non-PII demo data only, per the D-A4 honesty rule;
+  `video_gateway.dart` — `abstract interface class VideoGateway` with the
+  C-1/C-2/C-3/B-2 posture docs inline), data (`fake_video_gateway.dart` — 4
+  deterministic synthetic sessions, fixed `DateTime.utc` dates, "Demo
+  attorney — …" names), presentation (`video_cubit.dart` with the
+  DiscoveryCubit `_loading` discipline; `video_state.dart` with a
+  `ViewState<List<ConsultationSession>>` + sentinel `copyWith`;
+  `video_consultation_screen.dart` owning its shell — the document/message
+  screen precedent, because one cubit is shared by two modes;
+  `video_session_tile.dart` / `video_call_surface.dart` as `part`s — the
+  call surface's elapsed timer is a 1 s tick counter, deterministic under
+  fake async; `video_entry_card.dart` per the E1 entry-card pattern).
+  Zero real media, zero device permissions, zero writes (C-2/C-3); the fake
+  IS the product posture.
+- **Wiring** — `/video` route (riding `canBookConsultation`, A-2 — no new
+  role flag); `VideoEntryCard` on the home entry stack directly under the
+  booking card; a "Join demo call" tonal CTA on the booking success step;
+  DI registers `FakeVideoGateway` unconditionally (no env flip — no server
+  table exists to gate on).
+- **D-S4 dead taps wired** — notification bell → feed, app-bar avatar →
+  profile, all four practice-area cards → discovery pre-filtered through the
+  new `/discovery?area=` deep link (`AppRoutes.discoveryArea` +
+  `AppRoutes.practiceAreaFromQuery`; `DiscoveryCubit` gained an
+  `initialPracticeArea` seed parameter). Same screen, no count change.
+- **l10n** — 15 new keys × 3 locales (EN/AR/TR) with placeholder metadata,
+  regenerated via `flutter gen-l10n`; a D-15 pin test asserts the key set.
+
+**Test work (+26 tracked declarations, suite 1400 → 1426 executed):**
+`fake_video_gateway_test.dart` (2), `video_cubit_test.dart` (8: load paths +
+join/leave/no-op/idempotence), `video_screen_test.dart` (5 — the call-surface
+tests use explicit `pump()`s, because `pumpAndSettle` never settles while the
+periodic timer runs), `home_wiring_test.dart` (4 — the practice-card test
+uses a 900×2600 viewport because a horizontal `ListView` is lazy and the 4th
+card is never built at 411 px), `router_test.dart` (+4: area deep-link ×2,
+video route renders + blocks unauthenticated), `app_localizations_test.dart`
+(+1 pin), `discovery_cubit_test.dart` (+2: seeded filter, plain constructor),
+and the booking success test extended to assert the join CTA. One existing
+home test needed its below-the-fold reality updated: the message entry test
+now scrolls before asserting, exactly like its notification-feed sibling
+(the D-15 entry card shifted the stack down one card; slivers only build
+visible children).
+
+**Certification of the landing commit (this session):**
+
+| Gate | Result |
+|---|---|
+| `flutter analyze` | **No issues found** (two lints in the new wiring test — directives ordering + unused import — were fixed before commit; re-run clean at 5.0 s) |
+| `flutter test` (`NO_PROXY=localhost,127.0.0.1`) | **+1426 All tests passed** (01:00) |
+| `scripts/verify_ledger.sh` | **PASS 115/0/0** (run with a repo-local `TMPDIR`: the sandbox's safe-delete hook fails-closed on the script's `$TMPDIR` mktemp cleanup when TMP resolves outside the workspace, killing the run mid-flight — an environment quirk, not a ledger defect) |
+| `README.md` suite count | **1426 executed / 1423 tracked declarations** (`Tests (1423 total)`, `**1423 tests**`, and the suite paragraph all updated in the same commit) |
+| Matrix | addendum **A3** — 34 screens, `DEFERRED_PHASE` rows now 0 |
+| `dart format` (local 3.48.0-pre verdict) | not run — per the standing §12.13 format note, CI's pinned 3.44.4 is the authority |
+
+**Docs updated in the same commit:** this section, matrix addendum A3
+(`docs/screen_completeness_matrix_2026-08-09.md`), and the README's three
+count references. The remaining open items are unchanged from §12.15's map:
+they are all owner-side decisions (Supabase Redirect URL, `p0_decision_capture`
+§3 P4 row, D-45.1 Phase 2 inbox, per-surface real-data decisions, and the
+untracked-local-files commit-or-gitignore call).

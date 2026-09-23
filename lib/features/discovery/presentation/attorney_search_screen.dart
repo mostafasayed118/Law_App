@@ -26,13 +26,21 @@ part 'attorney_search_tile.dart';
 /// navigation lands in slice 6.2, so the list rows are not tappable yet; the
 /// tile's tap affordance (and chevron) arrives with profile navigation.
 class AttorneySearchScreen extends StatelessWidget {
-  const AttorneySearchScreen({super.key});
+  /// [initialPracticeArea] seeds the practice-area chip from the home
+  /// dashboard's practice-area cards (`/discovery?area=…`, the D-S4 wiring):
+  /// the list opens pre-filtered to the tapped area. Null (the plain
+  /// `/discovery` entries) opens on "All".
+  const AttorneySearchScreen({this.initialPracticeArea, super.key});
+
+  final PracticeArea? initialPracticeArea;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<DiscoveryCubit>(
-      create: (BuildContext context) =>
-          DiscoveryCubit(serviceLocator<AttorneyGateway>()),
+      create: (BuildContext context) => DiscoveryCubit(
+        serviceLocator<AttorneyGateway>(),
+        initialPracticeArea: initialPracticeArea,
+      ),
       child: const _SearchSurface(),
     );
   }

@@ -954,6 +954,38 @@ void main() {
         isNot(en.notificationsFeedMutedEmpty),
       );
     });
+
+    test(
+      'resolves the video-consultation keys in every locale (D-15 pin)',
+      () {
+        final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+        final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+        final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+        // The D-15 demo-posture surface: exact copy per locale for the
+        // screen title, the join affordance, and the posture note, plus the
+        // no-silent-EN-copy guards.
+        expect(en.videoTitle, 'Video consultation');
+        expect(ar.videoTitle, 'مكالمة الفيديو');
+        expect(tr.videoTitle, 'Görüntülü görüşme');
+        expect(en.videoJoin, 'Join demo call');
+        expect(ar.videoJoin, 'انضم للمكالمة التجريبية');
+        expect(tr.videoJoin, 'Demo aramaya katıl');
+        expect(
+          en.videoLocalOnlyNote,
+          contains('Demo mode — synthetic sessions only'),
+        );
+        expect(ar.videoLocalOnlyNote, isNot(en.videoLocalOnlyNote));
+        expect(tr.videoLocalOnlyNote, isNot(en.videoLocalOnlyNote));
+        // The parameterized call copy resolves per locale.
+        expect(en.videoCallWith('Demo attorney'), 'Demo call with Demo attorney');
+        expect(tr.videoCallWith('Demo attorney'), 'Demo attorney ile demo arama');
+        expect(
+          ar.videoCallWith('Demo attorney'),
+          'مكالمة تجريبية مع Demo attorney',
+        );
+      },
+    );
   });
 
   group('AppLocalizations widget rendering', () {

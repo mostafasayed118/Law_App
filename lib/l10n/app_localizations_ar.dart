@@ -1193,4 +1193,62 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get notificationsFeedMutedEmpty =>
       'الإشعارات مكتومة من إعدادات الإشعارات لديك.';
+
+  @override
+  String get videoTitle => 'مكالمة الفيديو';
+
+  @override
+  String get videoEmpty => 'لا توجد استشارات مجدولة.';
+
+  @override
+  String get videoError => 'تعذر تحميل الاستشارات.';
+
+  @override
+  String get videoLocalOnlyNote =>
+      'وضع العرض التوضيحي — جلسات تجريبية فقط. لا تُجرى مكالمة حقيقية ولا يُسجل أي شيء.';
+
+  @override
+  String get videoEntryTitle => 'مكالمة الفيديو';
+
+  @override
+  String get videoEntrySubtitle =>
+      'معاينة تجربة المكالمة التجريبية — دون وسائط حقيقية.';
+
+  @override
+  String get videoJoin => 'انضم للمكالمة التجريبية';
+
+  @override
+  String get videoCallLiveBadge => 'عرض توضيحي مباشر';
+
+  @override
+  String videoCallElapsed(String duration) {
+    return 'المدة $duration';
+  }
+
+  @override
+  String videoCallWith(String name) {
+    return 'مكالمة تجريبية مع $name';
+  }
+
+  @override
+  String get videoCallYou => 'أنت';
+
+  @override
+  String get videoCallNote =>
+      'لا يوجد صوت أو فيديو حقيقي. لا يُسجل ولا يُرسل أي شيء.';
+
+  @override
+  String get videoMicOn => 'الميكروفون مفتوح (تجريبي)';
+
+  @override
+  String get videoMicMuted => 'الميكروفون مكتوم (تجريبي)';
+
+  @override
+  String get videoCameraOn => 'الكاميرا مفتوحة (تجريبي)';
+
+  @override
+  String get videoCameraOff => 'الكاميرا مغلقة (تجريبي)';
+
+  @override
+  String get videoLeave => 'غادر المكالمة';
 }

@@ -40,6 +40,16 @@ class _SuccessStep extends StatelessWidget {
             style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
           ),
           const SizedBox(height: LegalHubTheme.spaceXl),
+          // Spec D-15 demo-posture (A-2: "book" → "join call"): the natural
+          // host for the video surface is the booking flow's success step. A
+          // navigation hint only — the demo call requests no media and
+          // records nothing.
+          FilledButton.tonalIcon(
+            icon: const Icon(Icons.video_call_outlined),
+            label: Text(l10n.videoJoin),
+            onPressed: () => context.go(AppRoutes.video),
+          ),
+          const SizedBox(height: LegalHubTheme.spaceMd),
           ElevatedButton(
             onPressed: () => context.go(AppRoutes.home),
             child: Text(l10n.bookingDone),
