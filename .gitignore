@@ -91,3 +91,9 @@ USER.md
 android/key.properties
 *.jks
 *.keystore
+
+# Session working state (audit doc §12.20): memory notes and local tool
+# config are working files, not product source — keep them out of the repo.
+memory/
+MEMORY.md
+config/
