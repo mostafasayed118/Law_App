@@ -1095,6 +1095,46 @@ so `git status` stays clean without committing private working notes.
 **Gates:** `verify_ledger.sh` PASS (background run, per the session
 workaround); no Dart changed — analyze/format/test results unaffected.
 
+### 12.22 The red CI window: formatter drift diagnosed and fixed under the pinned SDK (2026-09-23)
+
+**The finding.** GitHub Actions run #195 (`a5dd29a`) failed at the
+`Verify formatting` step; the three preceding pushes (#192 `7bfb943`,
+#193 `60c92d2`, #194 `4ae398b`) failed identically. The format gate has been
+red since the local toolchain moved to Flutter 3.48.0-pre, and because
+`dart format` is the first Flutter-toolchain step after the static gates,
+`flutter analyze` and `flutter test` were **skipped** in every one of those
+runs — their CI status was unproven, not failing. (An earlier "no CI runs"
+reading in this session was a parsing error on the probe, corrected in
+§12.21: the workflow is active with 249 runs.)
+
+**Root cause.** CI pins Flutter 3.44.4 / Dart 3.12.2 (`ci.yml`), but the
+Dart written and locally formatted in recent sessions carries Flutter
+3.48.0-pre formatter style. Reproduced exactly by installing the pinned
+Dart 3.12.2 SDK locally (standalone SDK, kept **outside** the repo) and
+running the CI command verbatim:
+`dart format --output=none --set-exit-if-changed .` → **31 files flagged
+(12 `lib/`, 19 `test/`)**.
+
+**The fix.** `dart format .` under the pinned 3.12.2 SDK: 31 files changed,
+164 insertions / 164 deletions; the re-check now exits 0 —
+`Formatted 547 files (0 changed)`. Semantics verified unchanged:
+`git diff -w` leaves only 16 files / 71 lines, and every residual hunk was
+inspected as dart format's line-wrapping plus trailing-comma insertion (the
+other 15 files are pure whitespace). No token-level semantics changed.
+
+**Verification limits, recorded honestly.** The pinned Flutter 3.44.4 tool
+cannot execute in this session: every `flutter` command — and even the
+standalone `dart analyze` — dies with
+`ProcessException: All pipe instances are busy (process_win.cc:742, OS
+error 231)` when spawning a child process (`git`, `where`, `cmd`, `adb`).
+The condition persisted both sandboxed and unsandboxed, with no stray
+Dart/Flutter processes present, so it is an environment (Windows
+pipe/desktop-heap) limitation, not a project defect. The Dart-only gate —
+the one CI actually failed on — is unaffected and is verified green under
+the exact pinned formatter. `analyze` and `test` stand verified by the
+local toolchain as of `a5dd29a` (analyze clean, 1426/1426 green, minutes
+before the reformat) and will be exercised by CI on the next push.
+
 ### 12.21 Store-listing drafts, Play graphics, and a CI execution audit (2026-09-23)
 
 **Store assets.** With the decision-card items done, the next open item was

@@ -32,7 +32,9 @@ class VideoCubit extends Cubit<VideoState> {
     _loading = true;
     if (state.sessions is! ViewLoading<List<ConsultationSession>>) {
       emit(
-        state.copyWith(sessions: const ViewLoading<List<ConsultationSession>>()),
+        state.copyWith(
+          sessions: const ViewLoading<List<ConsultationSession>>(),
+        ),
       );
     }
     final Result<List<ConsultationSession>> result = await _gateway
@@ -69,7 +71,9 @@ class VideoCubit extends Cubit<VideoState> {
       return;
     }
     final bool known = switch (state.sessions) {
-      ViewSuccess<List<ConsultationSession>>(data: final List<ConsultationSession> sessions) =>
+      ViewSuccess<List<ConsultationSession>>(
+        data: final List<ConsultationSession> sessions,
+      ) =>
         sessions.any((ConsultationSession s) => s.id == sessionId),
       ViewLoading() ||
       ViewEmpty() ||

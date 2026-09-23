@@ -159,26 +159,23 @@ void main() {
       expect(cubit.state.visibleAttorneys, <Attorney>[_attorney('atty-5')]);
     });
 
-    test(
-      'initialPracticeArea seeds the chip for the home-card deep link '
-      '(the D-S4 wiring)',
-      () async {
-        final DiscoveryCubit cubit = DiscoveryCubit(
-          gateway,
-          initialPracticeArea: PracticeArea.corporate,
-        );
-        addTearDown(cubit.close);
+    test('initialPracticeArea seeds the chip for the home-card deep link '
+        '(the D-S4 wiring)', () async {
+      final DiscoveryCubit cubit = DiscoveryCubit(
+        gateway,
+        initialPracticeArea: PracticeArea.corporate,
+      );
+      addTearDown(cubit.close);
 
-        // The chip is active before the first frame, so the list opens
-        // pre-narrowed to the tapped area.
-        expect(cubit.state.practiceArea, PracticeArea.corporate);
-        await cubit.load();
-        expect(cubit.state.visibleAttorneys, <Attorney>[
-          _attorney('atty-1'),
-          _attorney('atty-5'),
-        ]);
-      },
-    );
+      // The chip is active before the first frame, so the list opens
+      // pre-narrowed to the tapped area.
+      expect(cubit.state.practiceArea, PracticeArea.corporate);
+      await cubit.load();
+      expect(cubit.state.visibleAttorneys, <Attorney>[
+        _attorney('atty-1'),
+        _attorney('atty-5'),
+      ]);
+    });
 
     test('the plain constructor opens on All (no seed)', () async {
       final DiscoveryCubit cubit = DiscoveryCubit(gateway);

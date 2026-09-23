@@ -18,7 +18,7 @@ void main() {
       FakeAuthGateway(),
       InMemoryErrorReporter(),
       FakeMembershipRepository(),
-          FakeOrganizationGateway(),
+      FakeOrganizationGateway(),
     );
   });
 

@@ -89,7 +89,7 @@ void main() {
         authGateway,
         InMemoryErrorReporter(),
         FakeMembershipRepository(),
-              FakeOrganizationGateway(),
+        FakeOrganizationGateway(),
       );
       addTearDown(authCubit.close);
       addTearDown(authGateway.dispose);

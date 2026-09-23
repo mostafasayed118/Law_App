@@ -29,7 +29,7 @@ void main() {
       FakeAuthGateway(),
       InMemoryErrorReporter(),
       FakeMembershipRepository(),
-          FakeOrganizationGateway(),
+      FakeOrganizationGateway(),
     );
     localeCubit = LocaleCubit(InMemoryLocaleStore());
     themeCubit = ThemeCubit(InMemoryThemeModeStore());

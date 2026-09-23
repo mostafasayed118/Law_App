@@ -34,7 +34,7 @@ void main() {
       gateway,
       InMemoryErrorReporter(),
       FakeMembershipRepository(),
-          FakeOrganizationGateway(),
+      FakeOrganizationGateway(),
     );
     localeCubit = LocaleCubit(InMemoryLocaleStore());
     await localeCubit.load();

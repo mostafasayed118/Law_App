@@ -22,7 +22,7 @@ void main() {
       gateway,
       InMemoryErrorReporter(),
       FakeMembershipRepository(),
-          FakeOrganizationGateway(),
+      FakeOrganizationGateway(),
     );
     // The forgot-password link test navigates to the recovery email screen,
     // which builds a PasswordRecoveryCubit from the DI-registered dev fake
@@ -115,7 +115,7 @@ void main() {
       unsupportedGateway,
       InMemoryErrorReporter(),
       FakeMembershipRepository(),
-          FakeOrganizationGateway(),
+      FakeOrganizationGateway(),
     );
     addTearDown(() async {
       await unsupportedCubit.close();

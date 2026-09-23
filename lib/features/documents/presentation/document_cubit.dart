@@ -52,7 +52,9 @@ class DocumentCubit extends Cubit<DocumentState> {
           ),
         );
       case Failure<List<Document>>(error: final AppError error):
-        emit(state.copyWith(documents: viewStateForFailure<List<Document>>(error)));
+        emit(
+          state.copyWith(documents: viewStateForFailure<List<Document>>(error)),
+        );
     }
   }
 }

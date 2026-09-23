@@ -15,10 +15,12 @@ void main() {
       // Same deterministic list both times (the booking-slots R3 rule).
       expect(first, FakeVideoGateway.syntheticSessions);
       expect(first.length, 4);
-      expect(
-        first.map((ConsultationSession s) => s.id).toList(),
-        <String>['video-1', 'video-2', 'video-3', 'video-4'],
-      );
+      expect(first.map((ConsultationSession s) => s.id).toList(), <String>[
+        'video-1',
+        'video-2',
+        'video-3',
+        'video-4',
+      ]);
       // Second call is byte-identical — no drift, no state.
       expect(second, first);
     });

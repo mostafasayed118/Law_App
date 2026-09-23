@@ -39,7 +39,7 @@ void main() {
       gateway,
       InMemoryErrorReporter(),
       FakeMembershipRepository(),
-          FakeOrganizationGateway(),
+      FakeOrganizationGateway(),
     );
     localeCubit = LocaleCubit(InMemoryLocaleStore());
     themeCubit = ThemeCubit(InMemoryThemeModeStore());
@@ -1287,7 +1287,7 @@ void main() {
             RoleGateway(sessionForRole(role)),
             InMemoryErrorReporter(),
             FakeMembershipRepository(),
-                      FakeOrganizationGateway(),
+            FakeOrganizationGateway(),
           );
           addTearDown(roleCubit.close);
           final GoRouter roleRouter = createAppRouter(roleCubit);
@@ -1335,7 +1335,7 @@ void main() {
           RoleGateway(sessionForRole(UserRole.client)),
           InMemoryErrorReporter(),
           FakeMembershipRepository(),
-                  FakeOrganizationGateway(),
+          FakeOrganizationGateway(),
         );
         addTearDown(restrictedCubit.close);
         final GoRouter restrictedRouter = createAppRouter(
@@ -1390,7 +1390,7 @@ void main() {
           RoleGateway(sessionForRole(UserRole.attorney)),
           InMemoryErrorReporter(),
           FakeMembershipRepository(),
-                  FakeOrganizationGateway(),
+          FakeOrganizationGateway(),
         );
         addTearDown(restrictedCubit.close);
         final GoRouter restrictedRouter = createAppRouter(
@@ -1468,7 +1468,7 @@ void main() {
         RoleGateway(sessionForRole(UserRole.admin)),
         InMemoryErrorReporter(),
         FakeMembershipRepository(),
-              FakeOrganizationGateway(),
+        FakeOrganizationGateway(),
       );
       addTearDown(emptyCubit.close);
       final GoRouter emptyRouter = createAppRouter(
@@ -1751,7 +1751,7 @@ void main() {
         RoleGateway(sessionForRole(role)),
         InMemoryErrorReporter(),
         FakeMembershipRepository(),
-              FakeOrganizationGateway(),
+        FakeOrganizationGateway(),
       );
       addTearDown(restrictedCubit.close);
       final GoRouter restrictedRouter = createAppRouter(
@@ -1789,7 +1789,7 @@ void main() {
           RoleGateway(sessionForRole(role)),
           InMemoryErrorReporter(),
           FakeMembershipRepository(),
-                  FakeOrganizationGateway(),
+          FakeOrganizationGateway(),
         );
         addTearDown(restrictedCubit.close);
         final GoRouter restrictedRouter = createAppRouter(

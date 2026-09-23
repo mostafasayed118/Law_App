@@ -130,7 +130,7 @@ void main() {
     _FixedAuthGateway(session),
     InMemoryErrorReporter(),
     _MatchingHydrationRepository(session.memberships),
-      FakeOrganizationGateway(),
+    FakeOrganizationGateway(),
   );
 
   testWidgets('shows the create-org form when there is no active membership', (
@@ -182,7 +182,7 @@ void main() {
       _FixedAuthGateway(sessionWith()),
       InMemoryErrorReporter(),
       repository,
-          FakeOrganizationGateway(),
+      FakeOrganizationGateway(),
     );
     addTearDown(authCubit.close);
     await authCubit.restore();

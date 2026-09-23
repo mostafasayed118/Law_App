@@ -25,7 +25,7 @@ void main() {
       ),
       InMemoryErrorReporter(),
       FakeMembershipRepository(),
-          FakeOrganizationGateway(),
+      FakeOrganizationGateway(),
     );
   });
 

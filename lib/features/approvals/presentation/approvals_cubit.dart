@@ -48,7 +48,9 @@ class ApprovalsCubit extends Cubit<ApprovalsState> {
         );
       case Failure<List<PendingApproval>>(error: final AppError error):
         emit(
-          state.copyWith(approvals: viewStateForFailure<List<PendingApproval>>(error)),
+          state.copyWith(
+            approvals: viewStateForFailure<List<PendingApproval>>(error),
+          ),
         );
     }
   }

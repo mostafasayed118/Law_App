@@ -36,7 +36,7 @@ void main() {
       gateway,
       InMemoryErrorReporter(),
       FakeMembershipRepository(),
-          FakeOrganizationGateway(),
+      FakeOrganizationGateway(),
     );
   });
 

@@ -68,7 +68,9 @@ class _CallSurfaceState extends State<_CallSurface> {
                 l10n.videoCallElapsed(_elapsed),
                 style: text.bodyMedium?.copyWith(
                   color: scheme.onSurfaceVariant,
-                  fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+                  fontFeatures: const <FontFeature>[
+                    FontFeature.tabularFigures(),
+                  ],
                 ),
               ),
             ],
@@ -84,10 +86,7 @@ class _CallSurfaceState extends State<_CallSurface> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              _ParticipantTile(
-                icon: Icons.person,
-                label: l10n.videoCallYou,
-              ),
+              _ParticipantTile(icon: Icons.person, label: l10n.videoCallYou),
               const SizedBox(width: LegalHubTheme.spaceLg),
               _ParticipantTile(
                 icon: Icons.person_outline,
@@ -109,9 +108,7 @@ class _CallSurfaceState extends State<_CallSurface> {
               IconButton.filledTonal(
                 tooltip: _cameraOff ? l10n.videoCameraOff : l10n.videoCameraOn,
                 onPressed: () => setState(() => _cameraOff = !_cameraOff),
-                icon: Icon(
-                  _cameraOff ? Icons.videocam_off : Icons.videocam,
-                ),
+                icon: Icon(_cameraOff ? Icons.videocam_off : Icons.videocam),
               ),
             ],
           ),

@@ -32,9 +32,7 @@ final AppError _loadFailure = AppError(
 /// shape, without the queue — the video cubit loads once per surface).
 class _StubVideoGateway implements VideoGateway {
   _StubVideoGateway({Result<List<ConsultationSession>>? result})
-    : _result =
-          result ??
-          Result<List<ConsultationSession>>.success(_sessions);
+    : _result = result ?? Result<List<ConsultationSession>>.success(_sessions);
 
   final Result<List<ConsultationSession>> _result;
   int fetchCalls = 0;
@@ -71,21 +69,18 @@ void main() {
       build: () => VideoCubit(gateway),
       act: (VideoCubit cubit) => cubit.load(),
       expect: () => <VideoState>[
-        VideoState(
-          sessions: ViewSuccess<List<ConsultationSession>>(_sessions),
-        ),
+        VideoState(sessions: ViewSuccess<List<ConsultationSession>>(_sessions)),
       ],
       verify: (_) => expect(gateway.fetchCalls, 1),
     );
 
     blocTest<VideoCubit, VideoState>(
       'load maps an empty list to ViewEmpty',
-      setUp:
-          () => gateway = _StubVideoGateway(
-            result: Result<List<ConsultationSession>>.success(
-              const <ConsultationSession>[],
-            ),
-          ),
+      setUp: () => gateway = _StubVideoGateway(
+        result: Result<List<ConsultationSession>>.success(
+          const <ConsultationSession>[],
+        ),
+      ),
       build: () => VideoCubit(gateway),
       act: (VideoCubit cubit) => cubit.load(),
       expect: () => <VideoState>[
@@ -95,10 +90,9 @@ void main() {
 
     blocTest<VideoCubit, VideoState>(
       'load maps a failure to ViewError via the shared failure mapping',
-      setUp:
-          () => gateway = _StubVideoGateway(
-            result: Result<List<ConsultationSession>>.failure(_loadFailure),
-          ),
+      setUp: () => gateway = _StubVideoGateway(
+        result: Result<List<ConsultationSession>>.failure(_loadFailure),
+      ),
       build: () => VideoCubit(gateway),
       act: (VideoCubit cubit) => cubit.load(),
       expect: () => <VideoState>[
@@ -117,9 +111,7 @@ void main() {
         cubit.join('video-1');
       },
       expect: () => <VideoState>[
-        VideoState(
-          sessions: ViewSuccess<List<ConsultationSession>>(_sessions),
-        ),
+        VideoState(sessions: ViewSuccess<List<ConsultationSession>>(_sessions)),
         VideoState(
           sessions: ViewSuccess<List<ConsultationSession>>(_sessions),
           joinedSessionId: 'video-1',
@@ -140,9 +132,7 @@ void main() {
         cubit.join('does-not-exist');
       },
       expect: () => <VideoState>[
-        VideoState(
-          sessions: ViewSuccess<List<ConsultationSession>>(_sessions),
-        ),
+        VideoState(sessions: ViewSuccess<List<ConsultationSession>>(_sessions)),
       ],
       verify: (VideoCubit cubit) => expect(cubit.state.inCall, isFalse),
     );
@@ -156,9 +146,7 @@ void main() {
         cubit.join('video-2');
       },
       expect: () => <VideoState>[
-        VideoState(
-          sessions: ViewSuccess<List<ConsultationSession>>(_sessions),
-        ),
+        VideoState(sessions: ViewSuccess<List<ConsultationSession>>(_sessions)),
         VideoState(
           sessions: ViewSuccess<List<ConsultationSession>>(_sessions),
           joinedSessionId: 'video-1',
@@ -178,16 +166,12 @@ void main() {
         cubit.leave();
       },
       expect: () => <VideoState>[
-        VideoState(
-          sessions: ViewSuccess<List<ConsultationSession>>(_sessions),
-        ),
+        VideoState(sessions: ViewSuccess<List<ConsultationSession>>(_sessions)),
         VideoState(
           sessions: ViewSuccess<List<ConsultationSession>>(_sessions),
           joinedSessionId: 'video-1',
         ),
-        VideoState(
-          sessions: ViewSuccess<List<ConsultationSession>>(_sessions),
-        ),
+        VideoState(sessions: ViewSuccess<List<ConsultationSession>>(_sessions)),
       ],
       verify: (VideoCubit cubit) => expect(cubit.state.inCall, isFalse),
     );

@@ -21,10 +21,5 @@ class ConsultationSession extends Equatable {
   final DateTime scheduledAt;
 
   @override
-  List<Object?> get props => <Object?>[
-    id,
-    participantName,
-    topic,
-    scheduledAt,
-  ];
+  List<Object?> get props => <Object?>[id, participantName, topic, scheduledAt];
 }

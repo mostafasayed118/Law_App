@@ -179,15 +179,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       // D-S4 wiring: a practice-area card opens discovery
                       // pre-narrowed to that area (`/discovery?area=…`). A
                       // navigation hint only, never an authorization grant.
-                      onTap: () =>
-                          context.go(AppRoutes.discoveryArea(PracticeArea.criminal)),
+                      onTap: () => context.go(
+                        AppRoutes.discoveryArea(PracticeArea.criminal),
+                      ),
                     ),
                     const SizedBox(width: LegalHubTheme.spaceMd),
                     PracticeAreaCard(
                       icon: Icons.balance,
                       label: l10n.areaCivil,
-                      onTap: () =>
-                          context.go(AppRoutes.discoveryArea(PracticeArea.civil)),
+                      onTap: () => context.go(
+                        AppRoutes.discoveryArea(PracticeArea.civil),
+                      ),
                     ),
                     const SizedBox(width: LegalHubTheme.spaceMd),
                     PracticeAreaCard(
@@ -201,8 +203,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     PracticeAreaCard(
                       icon: Icons.family_restroom,
                       label: l10n.areaFamily,
-                      onTap: () =>
-                          context.go(AppRoutes.discoveryArea(PracticeArea.family)),
+                      onTap: () => context.go(
+                        AppRoutes.discoveryArea(PracticeArea.family),
+                      ),
                     ),
                   ],
                 ),
