@@ -1135,6 +1135,61 @@ the exact pinned formatter. `analyze` and `test` stand verified by the
 local toolchain as of `a5dd29a` (analyze clean, 1426/1426 green, minutes
 before the reformat) and will be exercised by CI on the next push.
 
+### 12.23 Live on-device E2E pass — the release build on a real emulator (2026-09-23, owner-requested)
+
+The owner asked for live end-to-end testing on their emulator. The release
+APK was installed on `emulator-5554` (AVD `Pixel_9_Pro`, Android 17,
+x86_64) and driven through adb + the `uiautomator` semantics tree (an
+accessibility service enabled so Flutter exposes semantics), with taps by
+`content-desc`, screenshot pixel analysis for theming, and logcat
+monitoring for `FATAL`/`E/flutter` after every step. Full report with
+per-area steps, observed-vs-expected, and evidence:
+**`docs/e2e_live_test_report_2026-09-23.md`**.
+
+**Defects found (all reproduced on device, causes verified in source):**
+
+- **BUG-1 (High) — system BACK exits the app from every feature screen.**
+  All 19 home-entry navigations use `context.go` and none use
+  `context.push` (`home_entry_cards.dart`, `home_screen.dart`), so Home is
+  never on the stack beneath a feature screen. Reproduced from Messages,
+  Recover Password, and the booking wizard. The bottom-nav Home tab still
+  works, so the app is usable but BACK is broken app-wide.
+- **BUG-2 (Medium-High) — "Continue with Google/Apple" opens Create
+  Account.** `sign_in_screen.dart:173,181` wire both `SocialButton`s to
+  `context.go(AppRoutes.signUp)`.
+- **BUG-3 (Low) — stale validation error.** "Passwords do not match."
+  persists while the user corrects the fields; it clears only on the next
+  submit.
+- **BUG-4 (Low, needs confirmation) — empty OTP submit is silent.**
+- **INFRA-1 (High, build artifact) — the debug APK cannot run on x86_64.**
+  Its `lib/x86_64/` is missing `libflutter.so` (ELF inspection of both
+  APKs: the release APK is complete), so the loader falls back to ReLinker,
+  extracts the arm64 copy, and dies with `EM_AARCH64 (183) instead of
+  EM_X86_64 (62)`. Reproduced after a clean uninstall/reinstall, so it is
+  not stale app data. This blocks debug-mode testing on x86_64 emulators;
+  the release build was used for this pass.
+
+**Verified working (18 areas):** cold start (incl. offline), sign-in
+validation (empty/invalid/valid), demo-session entry, all 12 feature
+screens and their content, booking wizard end-to-end (reference
+`LH-DEMO-0001` issued), video demo call (live timer 00:03→00:54, mic and
+camera toggles, leave), theme Light/Dark (screenshot luminance 246 vs 34),
+language EN→AR with verified RTL mirroring (bottom-nav tabs swap sides),
+profile, delete account (dialog, cancel, confirm → session cleared),
+sign-out ("End demo session"), forgot password → 6-box OTP → reset with
+strength meter and mismatch validation → success, discovery/matters
+filters, rotation, and force-stop mid-wizard with a clean relaunch. No
+crash or `E/flutter` line in any passing scenario.
+
+**Environment notes:** the AVD's `/data` was 94% full, so PackageManager
+refused installs until the low-storage threshold was lowered on the device
+(reverted after the pass); the demo session not persisting across restarts
+is by design (`service_locator.dart:122` — the credential-free
+`FakeAuthGateway` keeps the session in memory; secure persistence exists
+only on the Supabase path). The Flutter CLI remained pipe-blocked
+throughout, so this pass could not use `integration_test` and did not
+re-run the 1426-test suite.
+
 ### 12.21 Store-listing drafts, Play graphics, and a CI execution audit (2026-09-23)
 
 **Store assets.** With the decision-card items done, the next open item was
