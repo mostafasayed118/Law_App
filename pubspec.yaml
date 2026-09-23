@@ -1,5 +1,5 @@
 name: legalhub
-description: LegalHub Flutter application bootstrap.
+description: LegalHub - a Flutter legal-services app covering consultations, matter discovery, documents, messaging, and organization workflows.
 publish_to: none
 version: 1.0.0+1
 
