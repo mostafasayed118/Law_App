@@ -6,6 +6,34 @@ contract (`SignUpRequest`). It is not a production legal platform and does not
 connect to authentication, legal data, payments, AI, document storage, or
 messaging services.
 
+## At a glance
+
+LegalHub is a legal-services client app: consultation booking, attorney
+discovery (with practice-area deep links), matter management, a document
+vault, messaging, approvals, task/compliance boards, organization +
+membership administration (create / roster / invites / roles), a
+platform-admin surface, and a demo-posture video-consultation room — 34
+screens behind an auth-aware GoRouter shell.
+
+- **Architecture** — feature-first Clean Architecture (domain / data /
+  presentation per feature), Cubit state management, GetIt wiring, and a
+  seam-flip pattern: Supabase implementations live behind the same interfaces
+  as the credential-free fakes, and env-configured builds flip per seam.
+- **Localization** — full EN / AR / TR with RTL layouts and generated
+  localizations.
+- **Quality gates** — 1426 tests, analyzer-clean, `dart format` pinned to the
+  CI toolchain, a hash-pinned governance ledger (`scripts/verify_ledger.sh`)
+  reconciling docs claims against the git object database, and
+  `docs/audit/LegalHub_AUDIT_2026-09-21.md` as the running build journal.
+- **Release pipeline** — release signing with an upload keystore;
+  `flutter build apk --release` and `flutter build appbundle --release` are
+  both proven and signature-verified; the applicationId doubles as the
+  deep-link scheme.
+
+Server-backed features run against credential-free demo data until the
+recorded prerequisites are approved — see
+[Deferred work](#deferred-work).
+
 ## Implemented foundation
 
 - Pinned Flutter/Dart toolchain and committed dependency lockfile.
