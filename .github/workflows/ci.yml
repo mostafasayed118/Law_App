@@ -1,5 +1,5 @@
 # LegalHub — B2 CI quality gates.
-# Bootstrap specification §7 (row B2) + §3.11: run `dart format` (check),
+# Bootstrap specification §7 (row B2; + §7.1 owner-approved amendment) + §3.11: run `dart format` (check),
 # `flutter analyze`, and `flutter test` on pushes to main and pull requests
 # targeting main.
 # Plus two repo-local static gates (beyond B2), each needing only bash + git
@@ -11,7 +11,12 @@
 #    the P0C.1 gate's DB-free structural mode): battery file presence, every
 #    fixture UUID resolving in 00_fixtures.sql, every check block carrying the
 #    FAIL marker, harness self-syntax + doc hooks.
-# No build, deploy, publish, signing, or release steps are authorized at B2.
+# No deploy, publish, store upload, artifact distribution, or secret-based
+# signing is authorized at B2. Amended 2026-09-23 (owner-approved; spec §7.1,
+# audit §12.20): one extra job compiles the release app bundle as a build
+# proof after the quality gates pass. CI holds no signing secrets, so the
+# bundle uses the documented debug-signing fallback in build.gradle.kts and
+# is explicitly not a store artifact.
 name: CI
 
 on:
@@ -91,3 +96,47 @@ jobs:
 
       - name: Run tests
         run: flutter test
+
+  release-build-proof:
+    # B2 amendment (spec §7.1, audit §12.20, owner-approved 2026-09-23):
+    # prove the release app bundle still compiles on a clean machine after
+    # every change that lands. CI holds no signing secrets, so the bundle is
+    # debug-signed via the documented build.gradle.kts fallback — a compile/
+    # size proof, not a store artifact (store AABs are owner-side builds
+    # signed with the upload keystore, per audit §12.19).
+    name: release AAB compiles
+    needs: quality-gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      # The Android Gradle build requires JDK 17 (AGP requirement); the
+      # runner default does not reliably satisfy it, so pin it the same way
+      # the official Flutter deploy workflows do.
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.4'
+          channel: stable
+          # Cache keyed on pubspec.* — same rationale as the gates job above.
+          cache: true
+
+      - name: Download dependencies
+        run: flutter pub get
+
+      - name: Build release app bundle
+        run: flutter build appbundle --release
+
+      - name: Assert bundle exists and report size
+        run: |
+          test -s build/app/outputs/bundle/release/app-release.aab
+          du -h build/app/outputs/bundle/release/app-release.aab

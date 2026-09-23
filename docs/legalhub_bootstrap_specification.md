@@ -146,6 +146,19 @@ All spacing via `EdgeInsetsDirectional`/`AlignmentDirectional`; directional icon
 | B12 | Observability boundary | `ErrorReporter` abstraction + redaction rules | Errors routed; test asserts no PII/secret leakage | B4 | ✅ **Done + tested** — `core/observability/error_reporter.dart` + tests (Batch 1.9) |
 | B13 | Placeholder screen | One screen proving theme + l10n + RTL + a state view | Manual EN/AR check; widget test | B5, B7, B8, B11 | ✅ **Done + tested** — onboarding placeholder screen |
 
+## 7.1 Amendment (2026-09-23, owner-approved) — B2 gains a release-build proof job
+
+The owner approved (2026-09-23 decision card; recorded in audit §12.20)
+extending B2's CI scope with one additional job: after the quality gates
+pass, CI compiles `flutter build appbundle --release` on a clean machine and
+asserts the bundle exists. Scope limits:
+
+- **In:** the `release-build-proof` job — a compile + size proof. CI holds no
+  signing secrets, so the bundle uses the documented debug-signing fallback
+  (`build.gradle.kts`, audit §12.19) and is explicitly not a store artifact.
+- **Still out:** deploy, publish, store upload, artifact distribution, and
+  secret-based signing — each needs a further owner-approved amendment.
+
 ---
 
 # 8. Test plan and definition of done

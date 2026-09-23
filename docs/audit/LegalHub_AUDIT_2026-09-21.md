@@ -1068,3 +1068,29 @@ password must be backed up (losing either permanently forfeits the ability to
 update a published app). Distribution builds should use
 `flutter build appbundle --release` (AAB) — same signing path, proven by the
 APK build here.
+
+### 12.20 CI gains a release-build proof job — B2 amended with owner approval (2026-09-23)
+
+Owner-needs §5.2 carried two open decisions from this pass; the owner
+resolved both on the decision card (2026-09-23 session): add the CI build
+job, and gitignore the untracked local files. Both landed this session.
+
+**The B2 boundary, amended.** The bootstrap spec defined B2 as
+format+analyze+test only, and the `ci.yml` header recorded the corollary —
+no build steps at B2. The owner's approval amends that scope (spec §7.1): a
+second job, `release-build-proof`, runs `flutter build appbundle --release`
+on `ubuntu-latest` **after** the quality gates pass (`needs: quality-gates`),
+pins JDK 17 (the AGP requirement, per the official Flutter deploy workflows),
+and asserts the bundle exists (`test -s`) with its size logged. CI holds no
+signing secrets, so the bundle is debug-signed via the documented fallback
+(§12.19) — a compile/size proof, not a store artifact. Deploy, publish,
+store upload, artifact distribution, and secret-based signing remain out of
+B2 absent a further owner-approved amendment.
+
+**The untracked local files.** `memory/`, `MEMORY.md`, and `config/` are
+session notes, curated memory, and local tool config — working state, not
+product source. `.gitignore` now excludes them (comment cites this section),
+so `git status` stays clean without committing private working notes.
+
+**Gates:** `verify_ledger.sh` PASS (background run, per the session
+workaround); no Dart changed — analyze/format/test results unaffected.

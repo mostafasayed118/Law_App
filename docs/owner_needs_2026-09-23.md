@@ -178,12 +178,11 @@ label `LegalHub`).
 
 ### 5.2 Decisions you may want to make
 
-- **A CI `assembleRelease` job.** `.github/workflows/ci.yml` gates analyze +
-  test only, so the artifact pipeline is proven locally (§12.17) but not in
-  CI. Adding the job was declined blind here (CI can't be exercised from
-  this machine first) — say the word and it lands as its own commit.
-- **The untracked local files** (`memory/`, `MEMORY.md`, `config/`) — commit
-  or gitignore; carried unchanged from the prior pass.
+- **A CI `assembleRelease` job** — **DECIDED + DONE (2026-09-23)**: the owner
+  approved amending B2's scope (spec §7.1); the `release-build-proof` job now
+  compiles the release AAB in CI after the quality gates (audit §12.20).
+- **The untracked local files** (`memory/`, `MEMORY.md`, `config/`) —
+  **DECIDED + DONE (2026-09-23)**: gitignored (audit §12.20).
 
 ### 5.3 For the record
 
