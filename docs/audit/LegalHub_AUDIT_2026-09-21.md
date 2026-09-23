@@ -958,3 +958,57 @@ count references. The remaining open items are unchanged from §12.15's map:
 they are all owner-side decisions (Supabase Redirect URL, `p0_decision_capture`
 §3 P4 row, D-45.1 Phase 2 inbox, per-surface real-data decisions, and the
 untracked-local-files commit-or-gitignore call).
+
+### 12.17 Portfolio-readiness pass — the release build is proven, and the brand launcher icon lands (2026-09-23, post-`b6f6ab2`)
+
+With the slice suite green (§12.16), the one gate this repo had never
+exercised was the artifact itself: CI (`.github/workflows/ci.yml`) gates
+analyze + test only — no job ever assembles the app, so the Gradle / Kotlin /
+AAPT2 / AOT pipeline was unproven. This pass closed that gap and replaced the
+stock Flutter template launcher icon (never customized in any decision doc;
+the template PNGs had sat untouched since scaffold creation) with a brand
+mark — the last objectively "unfinished" signal a portfolio install could
+show.
+
+**The icon.** A scales-of-justice glyph drawn programmatically from the D-01
+palette — `#0B1D2E` (canonical primary) tile, `#E9C176` (Old Gold) glyph — by
+the committed generator `scripts/gen_launcher_icons.py` (pillow; every
+density regenerates from one source of truth, no hand-maintained binary
+assets):
+
+- **Android legacy** — `ic_launcher.png` at mdpi→xxxhdpi (48/72/96/144/192).
+- **Android adaptive** — `mipmap-anydpi-v26/ic_launcher.xml` +
+  `values/colors.xml` (`ic_launcher_background`) + per-density
+  `ic_launcher_foreground.png` with the glyph inside the 66 dp safe zone.
+- **iOS** — all 15 `Icon-App-*.png` sizes regenerated; `Contents.json`
+  untouched (same filenames, same structure).
+
+**Build gate (the new certification line this section adds):**
+
+| Run | Result |
+|---|---|
+| `flutter build apk --release` (pre-icon baseline) | **√ Built `app-release.apk` (59.0 MB)** — 418.8 s, rc=0 |
+| `flutter build apk --release` (post-icon) | **√ Built `app-release.apk` (59.0 MB)** — 151.2 s, rc=0 — the adaptive-icon XML + color resource resolve through AAPT2's merge/link |
+
+**Build-log notes (both benign, recorded for the next person):**
+
+- Tree-shaking info line "Expected to find fonts for
+  (packages/cupertino_icons/CupertinoIcons …)" — cosmetic: neither
+  `pubspec.yaml`, `pubspec.lock`, nor `lib/` reference cupertino_icons, and
+  the MaterialIcons font tree-shook 99.2 % (1.6 MB → 13 KB).
+- `llvm-strip … libdartjni.so: Permission denied` (armeabi-v7a) — this
+  Windows machine's strip step hits a file lock; the build exits 0 and the
+  `.so` ships unstripped. CI would strip normally.
+- 59.0 MB is the fat-APK figure (all ABIs); `--split-per-abi` is available
+  when distribution size matters.
+
+**Still owner-side (recorded here, not decided here):** release signing
+still uses debug keys (`build.gradle.kts`'s TODO — needs the owner's
+keystore), `com.legalhub.app` remains the B1 placeholder applicationId
+pending the file's own comment's confirmation, and a CI `assembleRelease`
+job is an option the owner may want (adding it blind was declined — CI
+changes can't be exercised from this machine first).
+
+**Certification:** no Dart or test changes in this slice, so §12.16's
+analyze/test results stand; the ledger was re-run after this section was
+appended (PASS — recorded in the commit that lands this slice).
