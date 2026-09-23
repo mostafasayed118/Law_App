@@ -164,9 +164,17 @@ label `LegalHub`).
   commit, verified via `git ls-remote` (audit doc §12.18).
 - **Release signing.** `android/app/build.gradle.kts` signs release with the
   debug keys (its own TODO). Before any distribution build: your keystore +
-  the standard `key.properties` wiring.
+  the standard `key.properties` wiring. — **DONE (2026-09-23, §12.19)**:
+  keystore generated outside the repo (`C:/Users/ASUS/keystores/legalhub-upload.jks`,
+  alias `upload`), `android/key.properties` wired + gitignored, release build
+  verified with `apksigner` (Signer #1 = the owner's cert, SHA-256
+  `f551aa06…`). **Back up the keystore file and its password — losing either
+  permanently forfeits app updates.**
 - **Confirm the applicationId.** `com.legalhub.app` is the B1 placeholder the
-  file's comment asks you to confirm before release.
+  file's comment asks you to confirm before release. — **CONFIRMED
+  (2026-09-23, §12.19)**: it is the deep-link scheme host
+  (`app_link_parser.dart`'s `appScheme`), so it must stay; the placeholder
+  comment was replaced with the confirmation record.
 
 ### 5.2 Decisions you may want to make
 

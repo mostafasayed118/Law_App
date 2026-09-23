@@ -84,3 +84,10 @@ IDENTITY.md
 SOUL.md
 TOOLS.md
 USER.md
+
+# Release signing secrets (audit doc §12.19): the keystore lives outside the
+# repo (C:/Users/ASUS/keystores/); these rules stop any local copy or the
+# credentials file from ever being committed by accident.
+android/key.properties
+*.jks
+*.keystore

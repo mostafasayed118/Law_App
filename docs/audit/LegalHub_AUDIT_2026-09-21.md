@@ -1026,3 +1026,45 @@ line of the video slice (§12.16), the brand launcher icon + build gate
 network-truth only (`git ls-remote origin main`): this sandbox does not
 persist `.git/refs/remotes/*` writes across commands (the §12.15-era quirk),
 so local remote-tracking refs prove nothing.
+
+### 12.19 Release signing lands, and the applicationId is confirmed (2026-09-23, owner-directed)
+
+The owner asked for the two pre-distribution items from owner-needs §5.1 to be
+done ("explain what's required and do it"). Both landed this session.
+
+**Release signing.** An upload keystore was generated and wired in the
+standard Flutter pattern:
+
+- Keystore: `C:/Users/ASUS/keystores/legalhub-upload.jks` — **outside the
+  repo** so no VCS accident can ever carry it; alias `upload`, RSA 2048,
+  validity 10,000 days (Play requirement), subject
+  `CN=LegalHub, OU=Mobile, O=Mustafa Sayed, L=Cairo, C=EG`, SHA-256
+  `f551aa06ffb12a4a7190e8647e13825147c130bb6a514043af926a4aa2fb45f3`.
+- Credentials: `android/key.properties` (storePassword / keyPassword /
+  keyAlias / storeFile) — **gitignored** (verified via `git check-ignore`;
+  `.gitignore` also gained `*.jks` / `*.keystore` defensive rules).
+- `android/app/build.gradle.kts`: loads the properties file and, when it
+  exists, signs release with a `release` signing config built from it;
+  **falls back to debug signing when the file is absent** — CI and
+  keystore-less clones keep building (the previous behaviour, preserved).
+- **Gate:** `flutter build apk --release` rc=0 (154.5 s), and
+  `apksigner verify --print-certs` on the artifact shows Signer #1
+  `CN=LegalHub …` with the SHA-256 digest **exactly matching** the keystore's
+  — the APK ships the owner's key, not the debug key.
+
+**applicationId confirmed: `com.legalhub.app`.** The decision writes itself:
+the string is not just a package name — it is the deep-link scheme
+(`lib/app/deep_link/app_link_parser.dart:54`,
+`static const String appScheme = 'com.legalhub.app'`, carrying the
+accept-invite and Supabase auth-callback URIs), so changing it after a store
+upload would break auth callbacks and invites **and** fork the store listing.
+The B1 placeholder comment in `build.gradle.kts` was replaced with the
+confirmation record (dated, citing this section).
+
+**Security notes carried to the owner:** the keystore password now lives in
+plaintext in the gitignored `android/key.properties` (the standard Flutter
+trade-off) and was shown to the owner in-session; the keystore file and
+password must be backed up (losing either permanently forfeits the ability to
+update a published app). Distribution builds should use
+`flutter build appbundle --release` (AAB) — same signing path, proven by the
+APK build here.
