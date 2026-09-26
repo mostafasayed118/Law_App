@@ -124,6 +124,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get continueWithApple => 'Apple';
 
   @override
+  String get socialSignInUnavailable =>
+      'Sosyal medya ile giriş henüz kullanılamıyor. E-postayı veya demo oturumunu kullanın.';
+
+  @override
   String get newToLegalHub => 'LegalHub\'te yeni misiniz?';
 
   @override
@@ -209,6 +213,219 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get verifyAndContinueButton => 'Doğrula ve Devam Et';
+
+  @override
+  String get otpIncompleteHint => 'Devam etmek için 6 haneli kodu girin.';
+
+  @override
+  String get notifTypeInvoiceStatus => 'Fatura oluşturuldu';
+
+  @override
+  String get notifTypeMatterUpdated => 'Dosya güncellendi';
+
+  @override
+  String get notifTypeAppointmentReminder => 'Randevu hatırlatması';
+
+  @override
+  String get notifTypeMessageReceived => 'Yeni mesaj alındı';
+
+  @override
+  String get notifTypeSystemMaintenance => 'Sistem bakımı';
+
+  @override
+  String get notifSummaryInvoiceStatus => 'Demo bildirim — fatura oluşturuldu';
+
+  @override
+  String get notifSummaryMatterUpdated =>
+      'Demo bildirim — dosya durumu güncellendi';
+
+  @override
+  String get notifSummaryAppointmentReminder =>
+      'Demo bildirim — danışmanlık hatırlatıcısı';
+
+  @override
+  String get notifSummaryMessageReceived =>
+      'Demo bildirim — konuşmada yeni mesaj';
+
+  @override
+  String get notifSummarySystemMaintenance => 'Demo bildirim — planlı bakım';
+
+  @override
+  String get demoMatterTitle1 => 'Demo satın alma incelemesi';
+
+  @override
+  String get demoMatterTitle2 => 'Ticari kira danışmanlığı';
+
+  @override
+  String get demoMatterTitle3 => 'Usul inceleme dosyası';
+
+  @override
+  String get demoMatterTitle4 => 'Aile hukuku danışmanlığı';
+
+  @override
+  String get demoMatterTitle5 => 'Girişim kuruluş danışmanlığı';
+
+  @override
+  String get demoAttorneyBio1 => 'Şirket işlemleri ve yönetişim danışmanı.';
+
+  @override
+  String get demoAttorneyBio2 => 'Medeni davalar ve sözleşmeler.';
+
+  @override
+  String get demoAttorneyBio3 => 'Ceza savunması ve usul.';
+
+  @override
+  String get demoAttorneyBio4 => 'Aile hukuku ve kişisel durum davaları.';
+
+  @override
+  String get demoAttorneyBio5 => 'Girişim kuruluşu ve danışmanlık çalışmaları.';
+
+  @override
+  String get demoThreadTitle1 => 'Demo dosya güncellemeleri';
+
+  @override
+  String get demoThreadTitle2 => 'Danışmanlık takibi — demo';
+
+  @override
+  String get demoThreadTitle3 => 'Demo usul notları';
+
+  @override
+  String get demoThreadTitle4 => 'Aile dosyası konuşması — demo';
+
+  @override
+  String get demoThreadTitle5 => 'Girişim danışmanlığı — demo';
+
+  @override
+  String demoMessageBody(int count) {
+    return 'Demo mesaj $count — genel demo içeriği, gerçek müvekkil veya hukuk verisi yok.';
+  }
+
+  @override
+  String get demoAuthorAttorney => 'Demo avukat';
+
+  @override
+  String get demoAuthorClient => 'Demo müvekkil';
+
+  @override
+  String get demoDocumentTitle1 => 'Demo iş kabul mektubu';
+
+  @override
+  String get demoDocumentTitle2 => 'Örnek dosya özeti — demo';
+
+  @override
+  String get demoDocumentTitle3 => 'Demo delil dizini';
+
+  @override
+  String get demoDocumentTitle4 => 'Yazışma kaydı — demo';
+
+  @override
+  String get demoDocumentTitle5 => 'Demo uzlaşma taslağı';
+
+  @override
+  String get demoFileName1 => 'Demo vekaletname taraması';
+
+  @override
+  String get demoFileName2 => 'Demo kira eki';
+
+  @override
+  String get demoFileName3 => 'Demo delil kaydı';
+
+  @override
+  String get demoFileName4 => 'Demo yazışma kopyası';
+
+  @override
+  String get demoFileName5 => 'Demo kuruluş kontrol listesi';
+
+  @override
+  String get demoAlertTitle1 => 'Demo: bekleyen davetleri incele';
+
+  @override
+  String get demoAlertTitle2 => 'Demo: veri erişim incelemesi gerekli';
+
+  @override
+  String get demoAlertTitle3 => 'Demo: örnek uyarı — yüksek trafik';
+
+  @override
+  String get demoAlertTitle4 => 'Demo: saklama süresi doluyor';
+
+  @override
+  String get demoAlertTitle5 => 'Demo: inceleme tamamlandı';
+
+  @override
+  String get demoTaskTitle1 => 'Demo: yanıt taslağı kontrol listesi';
+
+  @override
+  String get demoTaskTitle2 => 'Demo: belgeleri topla';
+
+  @override
+  String get demoTaskTitle3 => 'Demo: müvekkil notlarını incele';
+
+  @override
+  String get demoTaskTitle4 => 'Demo: takip planla';
+
+  @override
+  String get demoTaskTitle5 => 'Demo: dosya zaman çizelgesini güncelle';
+
+  @override
+  String get demoApprovalRefInviteReview => 'Demo davet — inceleme';
+
+  @override
+  String get demoApprovalRefRoleChange => 'Demo rol değişikliği';
+
+  @override
+  String get demoApprovalRefInviteExpired => 'Örnek davet — süresi dolmuş';
+
+  @override
+  String get demoApprovalRefSuspension => 'Demo uzaklaştırma incelemesi';
+
+  @override
+  String get demoApprovalEntityInvitation => 'Davet';
+
+  @override
+  String get demoApprovalEntityMembership => 'Üyelik';
+
+  @override
+  String get demoApprovalEntityDocument => 'Belge';
+
+  @override
+  String get demoVideoTopic1 => 'Sözleşme incelemesi — başlangıç';
+
+  @override
+  String get demoVideoTopic2 => 'Şirket kuruluş turu';
+
+  @override
+  String get demoVideoTopic3 => 'İş uyuşmazlığı — takip';
+
+  @override
+  String get demoVideoTopic4 => 'Aile hukuku danışmanlığı';
+
+  @override
+  String researchHeadline(String title) {
+    return 'Araştırma notu — $title';
+  }
+
+  @override
+  String researchSummaryDoc(String title, String ref) {
+    return 'Sentetik derlem satırı \"$title\" ($ref) temel alınarak derlenen demo araştırma notu. Bu, demo derlemi için üretilmiş statik demo metindir — hukuki analiz değildir.';
+  }
+
+  @override
+  String researchSummaryMatter(String title, String area) {
+    return 'Sentetik derlem satırı \"$title\" ($area) temel alınarak derlenen demo araştırma notu. Bu, demo derlemi için üretilmiş statik demo metindir — hukuki analiz değildir.';
+  }
+
+  @override
+  String researchExcerptDoc(String type, String ref) {
+    return 'Derlem alıntısı: $type meta veri satırı, dosya ref \"$ref\".';
+  }
+
+  @override
+  String researchExcerptMatter(String area) {
+    return 'Derlem alıntısı: dosya satırı, alan \"$area\".';
+  }
+
+  @override
+  String get researchRelatedMatter => 'ilgili demo dosya';
 
   @override
   String get resendCode => 'Kodu Yeniden Gönder';

@@ -9,6 +9,7 @@ class _MemberRow extends StatelessWidget {
     required this.isPartner,
     required this.pending,
     required this.onAction,
+    super.key,
   });
 
   final OrgMember member;

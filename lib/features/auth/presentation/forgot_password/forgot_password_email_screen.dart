@@ -60,7 +60,9 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
           // Thread the entered email to the OTP step via in-memory `extra`
           // (never via the URL — email is PII and must not appear in
           // history/logs). The OTP is unknown at this step.
-          context.go(
+          // E2E BUG-1 fix: forward step of the recovery wizard — push so
+          // BACK steps back to this screen instead of exiting the app.
+          context.push(
             AppRoutes.forgotPasswordOtp,
             extra: RecoveryRoutingContext(email: _email.text.trim(), otp: ''),
           );

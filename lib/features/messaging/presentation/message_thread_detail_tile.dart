@@ -33,7 +33,7 @@ class _MessageTile extends StatelessWidget {
               children: <Widget>[
                 Expanded(
                   child: Text(
-                    message.authorDisplayName,
+                    demoAuthorName(l10n, message.authorDisplayName),
                     style: text.bodySmall?.copyWith(
                       color: scheme.primary,
                       fontWeight: FontWeight.w600,
@@ -49,7 +49,7 @@ class _MessageTile extends StatelessWidget {
               ],
             ),
             const SizedBox(height: LegalHubTheme.spaceSm),
-            Text(message.body, style: text.bodyMedium),
+            Text(demoMessageBody(l10n, message.body), style: text.bodyMedium),
           ],
         ),
       ),

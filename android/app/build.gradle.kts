@@ -3,13 +3,20 @@ import java.util.Properties
 
 // Release signing (audit doc §12.19): credentials live in android/key.properties
 // (gitignored); the keystore itself lives outside the repo. When the file is
-// absent (e.g. CI without secrets) the build falls back to debug signing so
-// `flutter build/run --release` still works.
+// absent the build falls back to debug signing ONLY behind an explicit
+// opt-in (R4, 2026-09-24): `-PallowDebugSigning=true` on the Gradle command
+// line or `ALLOW_DEBUG_SIGNING=true` in the environment (the CI
+// release-build-proof job sets the env var). A store AAB built on a machine
+// missing the keystore without the flag FAILS loudly instead of silently
+// shipping debug-signed bytes.
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("key.properties")
 if (keystorePropertiesFile.exists()) {
     keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
 }
+val allowDebugSigning =
+    project.hasProperty("allowDebugSigning") ||
+        System.getenv("ALLOW_DEBUG_SIGNING") == "true"
 
 plugins {
     id("com.android.application")
@@ -41,7 +48,8 @@ android {
     buildTypes {
         release {
             // Real upload keystore when android/key.properties exists (the
-            // standard Flutter release-signing pattern); debug keys otherwise.
+            // standard Flutter release-signing pattern); debug keys otherwise
+            // ONLY with the explicit R4 opt-in above.
             signingConfig = if (keystorePropertiesFile.exists()) {
                 signingConfigs.create("release") {
                     storeFile = file(keystoreProperties["storeFile"] as String)
@@ -49,9 +57,32 @@ android {
                     keyAlias = keystoreProperties["keyAlias"] as String
                     keyPassword = keystoreProperties["keyPassword"] as String
                 }
-            } else {
+            } else if (allowDebugSigning) {
                 signingConfigs.getByName("debug")
+            } else {
+                throw GradleException(
+                    "android/key.properties is missing and neither " +
+                        "-PallowDebugSigning nor ALLOW_DEBUG_SIGNING=true " +
+                        "was provided. Refusing to build a release with " +
+                        "debug keys: provide the upload keystore (audit " +
+                        "doc §12.19) or opt in explicitly for a local/CI " +
+                        "compile proof (never a store artifact).",
+                )
             }
+            // R3 (2026-09-24): R8 minification + resource shrinking so
+            // release binaries ship hardened and lean. Rules live in
+            // proguard-rules.pro (Flutter engine/plugin keep-rules).
+            // Store AABs are additionally built with Dart obfuscation:
+            // flutter build appbundle --release --obfuscate
+            //   --split-debug-info=build/symbols
+            // (symbols kept per release for crash-symbolication; CI's
+            // compile proof below stays non-obfuscated on purpose).
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 }

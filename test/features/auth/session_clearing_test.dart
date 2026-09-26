@@ -45,10 +45,7 @@ void main() {
 
     expect(gateway.currentSession, isNull);
     expect(cubit.recoveryPending, isFalse);
-    expect(
-      cubit.state.status,
-      AuthStatus.unauthenticated,
-    );
+    expect(cubit.state.status, AuthStatus.unauthenticated);
   });
 
   test('signOut emits null on the session stream', () async {
@@ -63,8 +60,7 @@ void main() {
     expect(events.last, isNull);
   });
 
-  test('deleteAccount success ends the session (no stale identity)',
-      () async {
+  test('deleteAccount success ends the session (no stale identity)', () async {
     await cubit.startDemoSession();
     expect(gateway.currentSession, isNotNull);
 
@@ -74,9 +70,6 @@ void main() {
     expect(await cubit.deleteAccount(), isNull);
 
     expect(gateway.currentSession, isNull);
-    expect(
-      cubit.state.status,
-      AuthStatus.unauthenticated,
-    );
+    expect(cubit.state.status, AuthStatus.unauthenticated);
   });
 }

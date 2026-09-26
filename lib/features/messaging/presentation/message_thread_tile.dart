@@ -35,7 +35,7 @@ class _MessageThreadTile extends StatelessWidget {
     final String date = formatMediumDate(l10n, thread.lastActivityAt);
     return AppTile(
       icon: Icons.forum_outlined,
-      title: thread.title,
+      title: demoThreadTitle(l10n, thread.title),
       subtitles: <String>['${thread.participants.join(', ')} · $date'],
       // The chips wrap beneath the metadata line (the roster pattern); the
       // link chip stays a secondary tap target in the row (D-C2). The row

@@ -16,7 +16,7 @@ class _SessionTile extends StatelessWidget {
     return AppTile(
       icon: Icons.videocam_outlined,
       title: session.participantName,
-      subtitles: <String>['${session.topic} · $date'],
+      subtitles: <String>['${demoVideoTopic(l10n, session.topic)} · $date'],
       showChevron: false,
       trailing: Padding(
         padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceSm),

@@ -26,7 +26,7 @@ class _DocumentTile extends StatelessWidget {
     final String date = formatMediumDate(l10n, document.createdAt);
     return AppTile(
       icon: Icons.folder_outlined,
-      title: document.title,
+      title: demoDocumentTitle(l10n, document.title),
       subtitles: <String>['${documentTypeLabel(l10n, document.type)} · $date'],
       // The chips wrap beneath the metadata line (the roster pattern); the
       // link chip stays the only tap target in the row (D-C2), so the card

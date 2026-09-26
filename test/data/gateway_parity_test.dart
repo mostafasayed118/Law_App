@@ -186,31 +186,33 @@ void main() {
       );
     });
 
-    test('foreign-org roster read → denied on both (never empty-success)',
-        () async {
-      final FakeOrganizationGateway fake = FakeOrganizationGateway();
-      final _StubOrgApi stub = _StubOrgApi()
-        ..error = const SupabaseOrgException(
-          kind: SupabaseOrgFailureKind.denied,
-          message: 'permission denied',
+    test(
+      'foreign-org roster read → denied on both (never empty-success)',
+      () async {
+        final FakeOrganizationGateway fake = FakeOrganizationGateway();
+        final _StubOrgApi stub = _StubOrgApi()
+          ..error = const SupabaseOrgException(
+            kind: SupabaseOrgFailureKind.denied,
+            message: 'permission denied',
+          );
+        final SupabaseOrganizationGateway remote = SupabaseOrganizationGateway(
+          stub,
         );
-      final SupabaseOrganizationGateway remote = SupabaseOrganizationGateway(
-        stub,
-      );
 
-      expect(
-        (await fake.listMembers(organizationId: 'org-foreign'))
-            .failureOrNull
-            ?.kind,
-        OrgFailureKind.denied,
-      );
-      expect(
-        (await remote.listMembers(organizationId: 'org-foreign'))
-            .failureOrNull
-            ?.kind,
-        OrgFailureKind.denied,
-      );
-    });
+        expect(
+          (await fake.listMembers(
+            organizationId: 'org-foreign',
+          )).failureOrNull?.kind,
+          OrgFailureKind.denied,
+        );
+        expect(
+          (await remote.listMembers(
+            organizationId: 'org-foreign',
+          )).failureOrNull?.kind,
+          OrgFailureKind.denied,
+        );
+      },
+    );
 
     test('denial is never collapsed into unknown on the remote side', () async {
       final _StubOrgApi stub = _StubOrgApi()

@@ -35,12 +35,16 @@ void main() {
       await pumpApprovals(tester);
 
       expect(find.text('Pending approvals'), findsWidgets);
-      for (final PendingApproval approval
-          in FakeApprovalsGateway.syntheticApprovals) {
-        expect(
-          find.text('${approval.entityType} · ${approval.reference}'),
-          findsOneWidget,
-        );
+      // Demo localization (2026-09-24): rows render the mapped display
+      // strings, not the raw wire values (`invitation` → `Invitation`).
+      for (final String row in <String>[
+        'Invitation · Demo invite — review',
+        'Membership · Demo role change',
+        'Document · Demo engagement letter',
+        'Invitation · Sample invite — expired',
+        'Membership · Demo suspension review',
+      ]) {
+        expect(find.text(row), findsOneWidget);
       }
     });
 
@@ -49,7 +53,7 @@ void main() {
     ) async {
       await pumpApprovals(tester);
 
-      expect(find.text('invitation · Demo invite — review'), findsOneWidget);
+      expect(find.text('Invitation · Demo invite — review'), findsOneWidget);
       expect(find.textContaining('Pending ·'), findsNWidgets(3));
       expect(find.textContaining('Approved ·'), findsOneWidget);
       expect(find.textContaining('Denied ·'), findsOneWidget);

@@ -63,7 +63,8 @@ class _SearchSurfaceState extends State<_SearchSurface> {
       onRetry: cubit.load,
       tileBuilder: (BuildContext context, Attorney attorney) => _AttorneyTile(
         attorney: attorney,
-        onTap: () => context.go(AppRoutes.attorneyProfile(attorney.id)),
+        // E2E BUG-1 fix: search result → attorney profile is a forward nav.
+        onTap: () => context.push(AppRoutes.attorneyProfile(attorney.id)),
       ),
       header: <Widget>[
         const _SearchField(),

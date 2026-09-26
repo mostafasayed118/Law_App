@@ -8,6 +8,7 @@ import '../../../app/router.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/roles/user_role.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/demo_labels.dart';
 import '../../../shared/formatting/date_formatting.dart';
 import '../../../shared/widgets/widgets.dart';
 import '../../discovery/domain/attorney.dart';

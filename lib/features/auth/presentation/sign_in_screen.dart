@@ -166,13 +166,21 @@ class _SignInScreenState extends State<SignInScreen> {
               const SizedBox(height: LegalHubTheme.spaceXl),
               EditorialDivider(label: l10n.orContinueWith),
               const SizedBox(height: LegalHubTheme.spaceMd),
+              // E2E BUG-2 fix: no social provider is wired yet, but both
+              // buttons used `context.go(AppRoutes.signUp)` — tapping
+              // "Continue with Google/Apple" silently opened the Create
+              // Account form, which misrepresents what happened. They are
+              // now genuinely DISABLED (`onTap: null`) with an honest
+              // disclosure beneath, mirroring the demo-session notice
+              // pattern used above. Wiring a real provider is a separate
+              // slice; this keeps the surface truthful until then.
               Row(
                 children: <Widget>[
                   Expanded(
                     child: SocialButton(
                       label: l10n.continueWithGoogle,
                       icon: Icons.g_mobiledata_outlined,
-                      onTap: () => context.go(AppRoutes.signUp),
+                      onTap: null,
                     ),
                   ),
                   const SizedBox(width: LegalHubTheme.spaceMd),
@@ -180,10 +188,16 @@ class _SignInScreenState extends State<SignInScreen> {
                     child: SocialButton(
                       label: l10n.continueWithApple,
                       icon: Icons.apple,
-                      onTap: () => context.go(AppRoutes.signUp),
+                      onTap: null,
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: LegalHubTheme.spaceXs),
+              Text(
+                l10n.socialSignInUnavailable,
+                textAlign: TextAlign.center,
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
               ),
               const SizedBox(height: LegalHubTheme.spaceXl),
               Center(

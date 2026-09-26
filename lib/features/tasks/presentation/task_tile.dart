@@ -18,8 +18,10 @@ class _TaskTile extends StatelessWidget {
     };
     return AppTile(
       leading: Icon(status.$1, size: 20, color: scheme.onSurfaceVariant),
-      title: task.title,
-      subtitles: <String>['${task.matterRef} · ${status.$2}'],
+      title: demoTaskTitle(l10n, task.title),
+      subtitles: <String>[
+        '${demoMatterTitle(l10n, task.matterRef)} · ${status.$2}',
+      ],
     );
   }
 }

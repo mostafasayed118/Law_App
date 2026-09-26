@@ -1,6 +1,5 @@
-import 'package:flutter/foundation.dart';
-
 import '../../core/auth/session.dart';
+import '../../core/observability/app_log.dart';
 import '../../core/organizations/membership_repository.dart';
 import '../../core/organizations/organization_models.dart';
 import '../../core/roles/user_role.dart';
@@ -41,6 +40,15 @@ class SupabaseMembershipRepository implements MembershipRepository {
       return HydrationSucceeded(memberships);
     } on SupabaseOrgException catch (e) {
       return HydrationFailed(_mapFailureKind(e.kind));
+    } on Object {
+      // R6 (2026-09-24): a transport failure (timeout/offline/closed client)
+      // is a typed unavailable, never a raw exception across the seam (the
+      // matter/document/message api impls' defensive-catch precedent). The
+      // cubit treats it as best-effort enrichment, so the session is never
+      // invalidated by a network blip.
+      return const HydrationFailed(
+        MembershipHydrationFailureKind.providerUnavailable,
+      );
     }
   }
 
@@ -63,9 +71,9 @@ class SupabaseMembershipRepository implements MembershipRepository {
     if (role == null) {
       // D-P32.1: unknown schema role → drop loudly, never project a
       // capability hint for a role the client does not understand.
-      debugPrint(
+      AppLog.diagnostic(
         'membership hydration: dropping row with unknown role '
-        '${row['role']}',
+        "${row['role']}",
       );
       return null;
     }
@@ -73,15 +81,17 @@ class SupabaseMembershipRepository implements MembershipRepository {
       row['status'] as String?,
     );
     if (status == null) {
-      debugPrint(
+      AppLog.diagnostic(
         'membership hydration: dropping row with unknown status '
-        '${row['status']}',
+        "${row['status']}",
       );
       return null;
     }
     final Object? organizationId = row['organization_id'];
     if (organizationId is! String || organizationId.isEmpty) {
-      debugPrint('membership hydration: dropping row without organization id');
+      AppLog.diagnostic(
+        'membership hydration: dropping row without organization id',
+      );
       return null;
     }
     // The embedded organizations(name) join is null for suspended/removed

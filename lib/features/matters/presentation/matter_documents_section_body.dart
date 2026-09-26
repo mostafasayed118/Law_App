@@ -36,7 +36,7 @@ class _DocumentsSectionBodyState extends State<_DocumentsSectionBody> {
           matterRef: widget.matterRef,
           matterRefOf: (Document document) => document.matterRef,
           itemBuilder: (BuildContext context, Document document) => AppTile(
-            title: document.title,
+            title: demoDocumentTitle(l10n, document.title),
             subtitles: <String>[
               '${documentTypeLabel(l10n, document.type)} · '
                   '${formatMediumDate(l10n, document.createdAt)}',

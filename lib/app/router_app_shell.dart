@@ -90,8 +90,19 @@ class _AppShell extends StatelessWidget {
           ? null
           : NavigationBar(
               selectedIndex: safeIndex,
-              onDestinationSelected: (int value) =>
-                  context.go(destinations[value].$1),
+              onDestinationSelected: (int value) {
+                // Tab switches are stack resets (E2E BUG-1 follow-up,
+                // 2026-09-24): pop pushed pages first so re-tapping the
+                // current tab returns to the tab root. A bare `go` is a
+                // no-op when the base URI already matches, which left the
+                // pushed page stuck on top with a dead tab beneath it.
+                // `go` then replaces any remainder.
+                final GoRouter router = GoRouter.of(context);
+                while (router.canPop()) {
+                  router.pop();
+                }
+                context.go(destinations[value].$1);
+              },
               destinations: <Widget>[
                 for (final (String, NavigationDestination) destination
                     in destinations)

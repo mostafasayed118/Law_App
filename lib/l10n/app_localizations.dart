@@ -328,6 +328,12 @@ abstract class AppLocalizations {
   /// **'Apple'**
   String get continueWithApple;
 
+  /// No description provided for @socialSignInUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Social sign-in is not available yet. Use email or the demo session.'**
+  String get socialSignInUnavailable;
+
   /// No description provided for @newToLegalHub.
   ///
   /// In en, this message translates to:
@@ -483,6 +489,402 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Verify & Continue'**
   String get verifyAndContinueButton;
+
+  /// No description provided for @otpIncompleteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 6-digit code to continue.'**
+  String get otpIncompleteHint;
+
+  /// No description provided for @notifTypeInvoiceStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice issued'**
+  String get notifTypeInvoiceStatus;
+
+  /// No description provided for @notifTypeMatterUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Matter updated'**
+  String get notifTypeMatterUpdated;
+
+  /// No description provided for @notifTypeAppointmentReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Appointment reminder'**
+  String get notifTypeAppointmentReminder;
+
+  /// No description provided for @notifTypeMessageReceived.
+  ///
+  /// In en, this message translates to:
+  /// **'Message received'**
+  String get notifTypeMessageReceived;
+
+  /// No description provided for @notifTypeSystemMaintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'System maintenance'**
+  String get notifTypeSystemMaintenance;
+
+  /// No description provided for @notifSummaryInvoiceStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo notification — invoice issued'**
+  String get notifSummaryInvoiceStatus;
+
+  /// No description provided for @notifSummaryMatterUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo notification — matter status update'**
+  String get notifSummaryMatterUpdated;
+
+  /// No description provided for @notifSummaryAppointmentReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo notification — consultation reminder'**
+  String get notifSummaryAppointmentReminder;
+
+  /// No description provided for @notifSummaryMessageReceived.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo notification — new message in thread'**
+  String get notifSummaryMessageReceived;
+
+  /// No description provided for @notifSummarySystemMaintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo notification — scheduled maintenance'**
+  String get notifSummarySystemMaintenance;
+
+  /// No description provided for @demoMatterTitle1.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo acquisition review'**
+  String get demoMatterTitle1;
+
+  /// No description provided for @demoMatterTitle2.
+  ///
+  /// In en, this message translates to:
+  /// **'Commercial lease consultation'**
+  String get demoMatterTitle2;
+
+  /// No description provided for @demoMatterTitle3.
+  ///
+  /// In en, this message translates to:
+  /// **'Procedural review matter'**
+  String get demoMatterTitle3;
+
+  /// No description provided for @demoMatterTitle4.
+  ///
+  /// In en, this message translates to:
+  /// **'Family status consultation'**
+  String get demoMatterTitle4;
+
+  /// No description provided for @demoMatterTitle5.
+  ///
+  /// In en, this message translates to:
+  /// **'Startup formation advisory'**
+  String get demoMatterTitle5;
+
+  /// No description provided for @demoAttorneyBio1.
+  ///
+  /// In en, this message translates to:
+  /// **'Corporate transactions and governance counsel.'**
+  String get demoAttorneyBio1;
+
+  /// No description provided for @demoAttorneyBio2.
+  ///
+  /// In en, this message translates to:
+  /// **'Civil litigation and contracts.'**
+  String get demoAttorneyBio2;
+
+  /// No description provided for @demoAttorneyBio3.
+  ///
+  /// In en, this message translates to:
+  /// **'Criminal defense and procedure.'**
+  String get demoAttorneyBio3;
+
+  /// No description provided for @demoAttorneyBio4.
+  ///
+  /// In en, this message translates to:
+  /// **'Family law and personal status matters.'**
+  String get demoAttorneyBio4;
+
+  /// No description provided for @demoAttorneyBio5.
+  ///
+  /// In en, this message translates to:
+  /// **'Startup formation and advisory work.'**
+  String get demoAttorneyBio5;
+
+  /// No description provided for @demoThreadTitle1.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo matter updates'**
+  String get demoThreadTitle1;
+
+  /// No description provided for @demoThreadTitle2.
+  ///
+  /// In en, this message translates to:
+  /// **'Consultation follow-up — demo'**
+  String get demoThreadTitle2;
+
+  /// No description provided for @demoThreadTitle3.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo procedural notes'**
+  String get demoThreadTitle3;
+
+  /// No description provided for @demoThreadTitle4.
+  ///
+  /// In en, this message translates to:
+  /// **'Family matter thread — demo'**
+  String get demoThreadTitle4;
+
+  /// No description provided for @demoThreadTitle5.
+  ///
+  /// In en, this message translates to:
+  /// **'Startup advisory — demo'**
+  String get demoThreadTitle5;
+
+  /// No description provided for @demoMessageBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo message {count} — generic demo content, no real client or legal data.'**
+  String demoMessageBody(int count);
+
+  /// No description provided for @demoAuthorAttorney.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo attorney'**
+  String get demoAuthorAttorney;
+
+  /// No description provided for @demoAuthorClient.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo client'**
+  String get demoAuthorClient;
+
+  /// No description provided for @demoDocumentTitle1.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo engagement letter'**
+  String get demoDocumentTitle1;
+
+  /// No description provided for @demoDocumentTitle2.
+  ///
+  /// In en, this message translates to:
+  /// **'Sample matter brief — demo'**
+  String get demoDocumentTitle2;
+
+  /// No description provided for @demoDocumentTitle3.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo evidence index'**
+  String get demoDocumentTitle3;
+
+  /// No description provided for @demoDocumentTitle4.
+  ///
+  /// In en, this message translates to:
+  /// **'Correspondence log — demo'**
+  String get demoDocumentTitle4;
+
+  /// No description provided for @demoDocumentTitle5.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo settlement draft'**
+  String get demoDocumentTitle5;
+
+  /// No description provided for @demoFileName1.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo retainer scan'**
+  String get demoFileName1;
+
+  /// No description provided for @demoFileName2.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo lease annex'**
+  String get demoFileName2;
+
+  /// No description provided for @demoFileName3.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo evidence register'**
+  String get demoFileName3;
+
+  /// No description provided for @demoFileName4.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo correspondence copy'**
+  String get demoFileName4;
+
+  /// No description provided for @demoFileName5.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo formation checklist'**
+  String get demoFileName5;
+
+  /// No description provided for @demoAlertTitle1.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo: review pending invitations'**
+  String get demoAlertTitle1;
+
+  /// No description provided for @demoAlertTitle2.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo: data-access review due'**
+  String get demoAlertTitle2;
+
+  /// No description provided for @demoAlertTitle3.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo: sample alert — high traffic'**
+  String get demoAlertTitle3;
+
+  /// No description provided for @demoAlertTitle4.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo: retention window expiring'**
+  String get demoAlertTitle4;
+
+  /// No description provided for @demoAlertTitle5.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo: review completed'**
+  String get demoAlertTitle5;
+
+  /// No description provided for @demoTaskTitle1.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo: draft response checklist'**
+  String get demoTaskTitle1;
+
+  /// No description provided for @demoTaskTitle2.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo: gather documents'**
+  String get demoTaskTitle2;
+
+  /// No description provided for @demoTaskTitle3.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo: review client notes'**
+  String get demoTaskTitle3;
+
+  /// No description provided for @demoTaskTitle4.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo: schedule follow-up'**
+  String get demoTaskTitle4;
+
+  /// No description provided for @demoTaskTitle5.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo: update matter timeline'**
+  String get demoTaskTitle5;
+
+  /// No description provided for @demoApprovalRefInviteReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo invite — review'**
+  String get demoApprovalRefInviteReview;
+
+  /// No description provided for @demoApprovalRefRoleChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo role change'**
+  String get demoApprovalRefRoleChange;
+
+  /// No description provided for @demoApprovalRefInviteExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Sample invite — expired'**
+  String get demoApprovalRefInviteExpired;
+
+  /// No description provided for @demoApprovalRefSuspension.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo suspension review'**
+  String get demoApprovalRefSuspension;
+
+  /// No description provided for @demoApprovalEntityInvitation.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation'**
+  String get demoApprovalEntityInvitation;
+
+  /// No description provided for @demoApprovalEntityMembership.
+  ///
+  /// In en, this message translates to:
+  /// **'Membership'**
+  String get demoApprovalEntityMembership;
+
+  /// No description provided for @demoApprovalEntityDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Document'**
+  String get demoApprovalEntityDocument;
+
+  /// No description provided for @demoVideoTopic1.
+  ///
+  /// In en, this message translates to:
+  /// **'Contract review — kickoff'**
+  String get demoVideoTopic1;
+
+  /// No description provided for @demoVideoTopic2.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorporation walkthrough'**
+  String get demoVideoTopic2;
+
+  /// No description provided for @demoVideoTopic3.
+  ///
+  /// In en, this message translates to:
+  /// **'Employment dispute — follow-up'**
+  String get demoVideoTopic3;
+
+  /// No description provided for @demoVideoTopic4.
+  ///
+  /// In en, this message translates to:
+  /// **'Family law consultation'**
+  String get demoVideoTopic4;
+
+  /// No description provided for @researchHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Research note — {title}'**
+  String researchHeadline(String title);
+
+  /// No description provided for @researchSummaryDoc.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo research note compiled from the synthetic corpus row \"{title}\" ({ref}). This is static demo copy generated for the demo corpus — not legal analysis.'**
+  String researchSummaryDoc(String title, String ref);
+
+  /// No description provided for @researchSummaryMatter.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo research note compiled from the synthetic corpus row \"{title}\" ({area}). This is static demo copy generated for the demo corpus — not legal analysis.'**
+  String researchSummaryMatter(String title, String area);
+
+  /// No description provided for @researchExcerptDoc.
+  ///
+  /// In en, this message translates to:
+  /// **'Corpus excerpt: {type} metadata row, matter ref \"{ref}\".'**
+  String researchExcerptDoc(String type, String ref);
+
+  /// No description provided for @researchExcerptMatter.
+  ///
+  /// In en, this message translates to:
+  /// **'Corpus excerpt: matter row, practice area \"{area}\".'**
+  String researchExcerptMatter(String area);
+
+  /// No description provided for @researchRelatedMatter.
+  ///
+  /// In en, this message translates to:
+  /// **'related demo matter'**
+  String get researchRelatedMatter;
 
   /// No description provided for @resendCode.
   ///

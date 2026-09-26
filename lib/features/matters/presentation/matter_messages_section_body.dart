@@ -37,7 +37,7 @@ class _MessagesSectionBodyState extends State<_MessagesSectionBody> {
           matterRef: widget.matterRef,
           matterRefOf: (MessageThread thread) => thread.matterRef,
           itemBuilder: (BuildContext context, MessageThread thread) => AppTile(
-            title: thread.title,
+            title: demoThreadTitle(l10n, thread.title),
             subtitles: <String>[
               '${thread.participants.join(', ')} · '
                   '${formatMediumDate(l10n, thread.lastActivityAt)}',

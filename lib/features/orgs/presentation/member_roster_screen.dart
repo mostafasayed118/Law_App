@@ -92,6 +92,12 @@ class _MemberRosterScreenState extends State<MemberRosterScreen> {
                 itemBuilder: (BuildContext context, int index) {
                   final OrgMember member = members[index];
                   return _MemberRow(
+                    // CR-02 fix: key by member id. Without a stable key
+                    // Flutter reconciles rows positionally, so a roster
+                    // reorder or removal could carry the previous member's
+                    // widget state (e.g. a stale `pending` spinner) onto the
+                    // wrong person.
+                    key: ValueKey<String>(member.userId),
                     member: member,
                     isSelf: member.userId == session?.userId,
                     isPartner: isPartner,

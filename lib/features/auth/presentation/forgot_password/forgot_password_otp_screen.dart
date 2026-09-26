@@ -73,10 +73,12 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
             current is ViewSuccess<void> && previous is! ViewSuccess<void>,
         listener: (BuildContext context, ViewState<void> state) {
           if (_lastAction == _OtpAction.verify) {
-            // Verified: thread email + OTP onward. In-memory `extra` only —
+            // Thread email + OTP onward. In-memory `extra` only —
             // the OTP is a short-lived credential and must not appear in the
             // URL.
-            context.go(
+            // E2E BUG-1 fix: forward step of the recovery wizard — push so
+            // BACK steps back to the OTP screen instead of exiting the app.
+            context.push(
               AppRoutes.forgotPasswordReset,
               extra: RecoveryRoutingContext(
                 email: incoming.email,
@@ -154,6 +156,22 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
                                   )
                                 : Text(l10n.verifyAndContinueButton),
                           ),
+                          // R2 (2026-09-24): the disabled state is
+                          // intentional (no partial-code submit) — make the
+                          // intent visible instead of a silent dead button.
+                          if (!complete && !loading)
+                            Padding(
+                              padding: const EdgeInsetsDirectional.only(
+                                top: LegalHubTheme.spaceXs,
+                              ),
+                              child: Text(
+                                l10n.otpIncompleteHint,
+                                textAlign: TextAlign.center,
+                                style: text.bodySmall?.copyWith(
+                                  color: scheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
                         ],
                       );
                     },

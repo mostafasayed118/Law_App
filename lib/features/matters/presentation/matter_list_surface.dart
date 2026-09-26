@@ -35,7 +35,8 @@ class _ListSurfaceState extends State<_ListSurface> {
       // a FAB over the read-first list. The server re-asserts F2-D1.
       floatingActionButton: widget.canCreateMatter
           ? FloatingActionButton.extended(
-              onPressed: () => context.go(AppRoutes.matterCreate),
+              // E2E BUG-1 fix: forward navigation to the create screen.
+              onPressed: () => context.push(AppRoutes.matterCreate),
               icon: const Icon(Icons.add),
               label: Text(l10n.matterCreateFab),
             )
@@ -74,7 +75,7 @@ class _ListSurfaceState extends State<_ListSurface> {
       onRetry: cubit.load,
       tileBuilder: (BuildContext context, Matter matter) => AppTile(
         icon: Icons.folder_outlined,
-        title: matter.title,
+        title: demoMatterTitle(l10n, matter.title),
         subtitles: <String>[
           '${practiceAreaLabel(l10n, matter.practiceArea)} · ${matter.assignedAttorneyName}',
         ],
@@ -86,7 +87,8 @@ class _ListSurfaceState extends State<_ListSurface> {
             MatterStatusChip(label: matterStatusLabel(l10n, matter.status)),
           ],
         ),
-        onTap: () => context.go(AppRoutes.matterDetail(matter.id)),
+        // E2E BUG-1 fix: list → detail is a forward navigation.
+        onTap: () => context.push(AppRoutes.matterDetail(matter.id)),
       ),
       header: <Widget>[
         AppFilterChips<MatterStatus>(

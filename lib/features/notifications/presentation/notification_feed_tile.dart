@@ -22,8 +22,11 @@ class _NotificationTile extends StatelessWidget {
       icon: notification.isRead
           ? Icons.notifications_none_outlined
           : Icons.notifications,
-      title: notification.type,
-      subtitles: <String>[notification.summary, date],
+      title: demoNotificationType(l10n, notification.type),
+      subtitles: <String>[
+        demoNotificationSummary(l10n, notification.type, notification.summary),
+        date,
+      ],
       trailing: NotificationCategoryChip(category: notification.category),
       // D-F6: only the unread row carries the mark-read tap; the chevron
       // stays off (the D-MSG1 metadata-first opt-out — the ripple is the

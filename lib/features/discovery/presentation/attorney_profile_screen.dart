@@ -8,6 +8,7 @@ import '../../../app/service_locator.dart';
 import '../../../core/state/view_state.dart';
 import '../../../features/booking/domain/booking_prefill.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/demo_labels.dart';
 import '../../../shared/widgets/widgets.dart';
 import '../domain/attorney.dart';
 import '../domain/attorney_gateway.dart';

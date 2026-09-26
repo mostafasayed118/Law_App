@@ -21,7 +21,7 @@ screens behind an auth-aware GoRouter shell.
   as the credential-free fakes, and env-configured builds flip per seam.
 - **Localization** — full EN / AR / TR with RTL layouts and generated
   localizations.
-- **Quality gates** — 1426 tests, analyzer-clean, `dart format` pinned to the
+- **Quality gates** — 1477 tests, analyzer-clean, `dart format` pinned to the
   CI toolchain, a hash-pinned governance ledger (`scripts/verify_ledger.sh`)
   reconciling docs claims against the git object database, and
   `docs/audit/LegalHub_AUDIT_2026-09-21.md` as the running build journal.
@@ -85,7 +85,7 @@ recorded prerequisites are approved — see
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (1423 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (1477 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), ThemeCubit (mode persistence + restart
   restore), Redactor (password/OTP/email/Bearer redaction with leak guards),
@@ -410,8 +410,9 @@ HTTP layer and lock the exact postgrest await shape the app depends on —
 (2: `from().select()` plain + chained `.eq()` → raw row list). A future
 postgrest upgrade that changes the await contract fails loudly in CI, not on
 a device (the on-device create-org crash this class caused is recorded in
-`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **1426
-tests passing** (1423 tracked declarations, ledger `verify_ledger.sh` PASS).
+`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **1477 tests**
+passing (1477 tracked declarations + 3 loop-generated, 1480 at runtime,
+ledger `verify_ledger.sh` PASS).
 
 ## Fonts and licenses
 

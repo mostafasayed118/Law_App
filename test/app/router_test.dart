@@ -101,6 +101,31 @@ void main() {
   int selectedIndex(WidgetTester tester) =>
       tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex;
 
+  /// The URI of the top-most page (E2E BUG-1 follow-up, 2026-09-24).
+  ///
+  /// Forward navigation uses `context.push`, whose imperative pages go_router
+  /// keeps out of `currentConfiguration.uri` (that URI stays at the base
+  /// location by design). The pushed destination lives in the top
+  /// [ImperativeRouteMatch] — nested inside the [ShellRouteMatch] for shell
+  /// children, top-level otherwise — so drill the way
+  /// `GoRouterDelegate.canPop` does. For declarative (`go`) navigation there
+  /// is no imperative match and this returns the configuration URI
+  /// unchanged, so pre-existing assertions keep working.
+  Uri topUri(GoRouter router) {
+    final RouteMatchList config = router.routerDelegate.currentConfiguration;
+    if (config.matches.isEmpty) {
+      return config.uri;
+    }
+    RouteMatchBase top = config.matches.last;
+    while (top is ShellRouteMatch && top.matches.isNotEmpty) {
+      top = top.matches.last;
+    }
+    if (top is ImperativeRouteMatch) {
+      return top.matches.uri;
+    }
+    return config.uri;
+  }
+
   group('router redirect logic', () {
     testWidgets('keeps an unauthenticated user on the sign-in route', (
       tester,
@@ -154,10 +179,7 @@ void main() {
 
       // The reset step renders (recovery intent), not home — the deep
       // link must not boot as a normal authenticated session.
-      expect(
-        router.routerDelegate.currentConfiguration.uri.path,
-        AppRoutes.forgotPasswordReset,
-      );
+      expect(topUri(router).path, AppRoutes.forgotPasswordReset);
       expect(authCubit.state.isAuthenticated, isTrue);
       expect(authCubit.recoveryPending, isTrue);
     });
@@ -176,10 +198,7 @@ void main() {
         router.go(AppRoutes.forgotPasswordReset);
         await tester.pumpAndSettle();
 
-        expect(
-          router.routerDelegate.currentConfiguration.uri.path,
-          AppRoutes.forgotPasswordReset,
-        );
+        expect(topUri(router).path, AppRoutes.forgotPasswordReset);
       },
     );
 
@@ -201,14 +220,8 @@ void main() {
       expect(authCubit.state.isAuthenticated, isFalse);
       // Without the recovery marker, the authenticated-on-auth-route
       // bounce is gone: the router no longer forces any destination.
-      expect(
-        router.routerDelegate.currentConfiguration.uri.path,
-        AppRoutes.forgotPasswordReset,
-      );
-      expect(
-        router.routerDelegate.currentConfiguration.uri.path,
-        isNot(AppRoutes.home),
-      );
+      expect(topUri(router).path, AppRoutes.forgotPasswordReset);
+      expect(topUri(router).path, isNot(AppRoutes.home));
     });
 
     testWidgets('a plain (non-recovery) session still routes to home', (
@@ -458,10 +471,7 @@ void main() {
 
         // The wizard's category step renders the prefill note — proof the
         // draft carries the optional attorneyId (D-A3).
-        expect(
-          router.routerDelegate.currentConfiguration.uri.path,
-          AppRoutes.book,
-        );
+        expect(topUri(router).path, AppRoutes.book);
         expect(find.text('Booking with Layla Mansour'), findsOneWidget);
       },
     );
@@ -484,10 +494,7 @@ void main() {
       await tester.tap(find.text('Layla Mansour'));
       await tester.pumpAndSettle();
 
-      expect(
-        router.routerDelegate.currentConfiguration.uri.path,
-        AppRoutes.attorneyProfile('atty-1'),
-      );
+      expect(topUri(router).path, AppRoutes.attorneyProfile('atty-1'));
       expect(find.text('Attorney profile'), findsOneWidget);
       expect(find.text('Book with this attorney'), findsOneWidget);
     });
@@ -605,10 +612,7 @@ void main() {
       await tester.tap(find.text('View matter').first);
       await tester.pumpAndSettle();
 
-      expect(
-        router.routerDelegate.currentConfiguration.uri.path,
-        AppRoutes.matterDetail('matter-1'),
-      );
+      expect(topUri(router).path, AppRoutes.matterDetail('matter-1'));
       expect(find.text('Matter details'), findsOneWidget);
     });
 
@@ -725,10 +729,7 @@ void main() {
       await tester.tap(find.text('View matter').first);
       await tester.pumpAndSettle();
 
-      expect(
-        router.routerDelegate.currentConfiguration.uri.path,
-        AppRoutes.matterDetail('matter-1'),
-      );
+      expect(topUri(router).path, AppRoutes.matterDetail('matter-1'));
       expect(find.text('Matter details'), findsOneWidget);
     });
 
@@ -752,7 +753,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(
-          router.routerDelegate.currentConfiguration.uri.path,
+          topUri(router).path,
           AppRoutes.messageThreadDetailFor('thread-1'),
         );
         // The detail surface renders the tapped title and the read-only
@@ -861,10 +862,7 @@ void main() {
       await tester.tap(find.text('Demo acquisition review'));
       await tester.pumpAndSettle();
 
-      expect(
-        router.routerDelegate.currentConfiguration.uri.path,
-        AppRoutes.matterDetail('matter-1'),
-      );
+      expect(topUri(router).path, AppRoutes.matterDetail('matter-1'));
       expect(find.text('Matter details'), findsOneWidget);
     });
 
@@ -885,10 +883,7 @@ void main() {
       await tester.tap(find.text('Demo engagement letter'));
       await tester.pumpAndSettle();
 
-      expect(
-        router.routerDelegate.currentConfiguration.uri.path,
-        AppRoutes.vault,
-      );
+      expect(topUri(router).path, AppRoutes.vault);
     });
 
     testWidgets('tapping a thread row opens the messages route (AC-3)', (
@@ -908,10 +903,7 @@ void main() {
       await tester.tap(find.text('Demo matter updates'));
       await tester.pumpAndSettle();
 
-      expect(
-        router.routerDelegate.currentConfiguration.uri.path,
-        AppRoutes.messages,
-      );
+      expect(topUri(router).path, AppRoutes.messages);
     });
 
     testWidgets('tapping an attorney row opens its profile (AC-3)', (
@@ -931,10 +923,7 @@ void main() {
       await tester.tap(find.text('Layla Mansour'));
       await tester.pumpAndSettle();
 
-      expect(
-        router.routerDelegate.currentConfiguration.uri.path,
-        AppRoutes.attorneyProfile('atty-1'),
-      );
+      expect(topUri(router).path, AppRoutes.attorneyProfile('atty-1'));
       expect(find.text('Attorney profile'), findsOneWidget);
     });
 
@@ -955,14 +944,8 @@ void main() {
       await tester.testTextInput.receiveAction(TextInputAction.search);
       await tester.pumpAndSettle();
 
-      expect(
-        router.routerDelegate.currentConfiguration.uri.path,
-        AppRoutes.search,
-      );
-      expect(
-        router.routerDelegate.currentConfiguration.uri.queryParameters['q'],
-        'Demo',
-      );
+      expect(topUri(router).path, AppRoutes.search);
+      expect(topUri(router).queryParameters['q'], 'Demo');
       // The search surface seeds and renders the grouped results.
       expect(find.text('Search'), findsOneWidget);
       expect(find.text('Demo acquisition review'), findsOneWidget);
@@ -1020,10 +1003,7 @@ void main() {
       await tester.tap(find.text('Demo acquisition review'));
       await tester.pumpAndSettle();
 
-      expect(
-        router.routerDelegate.currentConfiguration.uri.path,
-        AppRoutes.matterDetail('matter-1'),
-      );
+      expect(topUri(router).path, AppRoutes.matterDetail('matter-1'));
       expect(find.text('Matter details'), findsOneWidget);
       expect(find.text('Layla Mansour'), findsOneWidget);
     });
@@ -1137,10 +1117,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // The listener drove the real router onto the accept surface.
-        expect(
-          router.routerDelegate.currentConfiguration.uri.path,
-          AppRoutes.acceptInvitation,
-        );
+        expect(topUri(router).path, AppRoutes.acceptInvitation);
         // The paste field is pre-filled with the one-time token (D-P41.3:
         // pre-fill, never auto-submit — no accepted confirmation).
         final TextField field = tester.widget<TextField>(
@@ -1183,10 +1160,7 @@ void main() {
 
         // The accept route sits behind the auth gate: the redirect bounces
         // to sign-in, never exposing the paste surface signed out.
-        expect(
-          router.routerDelegate.currentConfiguration.uri.path,
-          AppRoutes.signIn,
-        );
+        expect(topUri(router).path, AppRoutes.signIn);
         expect(find.text('Welcome Back'), findsOneWidget);
         // The token is buffered in-memory, not lost (cold-start / signed-out
         // race, D-P41.4).
@@ -1201,10 +1175,7 @@ void main() {
         router.go(AppRoutes.acceptInvitation);
         await tester.pumpAndSettle();
 
-        expect(
-          router.routerDelegate.currentConfiguration.uri.path,
-          AppRoutes.acceptInvitation,
-        );
+        expect(topUri(router).path, AppRoutes.acceptInvitation);
         final TextField field = tester.widget<TextField>(
           find.byType(TextField),
         );
@@ -1446,19 +1417,13 @@ void main() {
       // tapping it must navigate via its route, not a hardcoded index.
       await tester.tap(find.byIcon(Icons.settings_outlined));
       await tester.pumpAndSettle();
-      expect(
-        router.routerDelegate.currentConfiguration.uri.path,
-        AppRoutes.settings,
-      );
+      expect(topUri(router).path, AppRoutes.settings);
 
       // Back on /settings, the home destination is unselected; tapping it
       // returns to /home.
       await tester.tap(find.byIcon(Icons.home_outlined));
       await tester.pumpAndSettle();
-      expect(
-        router.routerDelegate.currentConfiguration.uri.path,
-        AppRoutes.home,
-      );
+      expect(topUri(router).path, AppRoutes.home);
     });
 
     testWidgets('renders no NavigationBar when no destination is visible', (
@@ -1527,10 +1492,7 @@ void main() {
         //    bottom NavigationBar (the shell's tap target, not router.go).
         await tester.tap(find.byIcon(Icons.settings_outlined));
         await tester.pumpAndSettle();
-        expect(
-          router.routerDelegate.currentConfiguration.uri.path,
-          AppRoutes.settings,
-        );
+        expect(topUri(router).path, AppRoutes.settings);
         expect(find.text('Language'), findsWidgets);
 
         // 2. Notifications tile → the notification-settings screen (scroll
@@ -1542,10 +1504,7 @@ void main() {
         );
         await tester.tap(find.text('Notifications'));
         await tester.pumpAndSettle();
-        expect(
-          router.routerDelegate.currentConfiguration.uri.path,
-          AppRoutes.notifications,
-        );
+        expect(topUri(router).path, AppRoutes.notifications);
         expect(find.byType(SwitchListTile), findsNWidgets(3));
         // The settings destination stays highlighted on the descendant route
         // (the 768127b/32803ae behavior).
@@ -1560,18 +1519,12 @@ void main() {
         //    realistic way back: tap the highlighted settings destination.
         await tester.tap(find.byIcon(Icons.settings));
         await tester.pumpAndSettle();
-        expect(
-          router.routerDelegate.currentConfiguration.uri.path,
-          AppRoutes.settings,
-        );
+        expect(topUri(router).path, AppRoutes.settings);
 
         // 4. Profile tile → the profile screen.
         await tester.tap(find.text('Profile'));
         await tester.pumpAndSettle();
-        expect(
-          router.routerDelegate.currentConfiguration.uri.path,
-          AppRoutes.profile,
-        );
+        expect(topUri(router).path, AppRoutes.profile);
         expect(find.text('Demo user'), findsOneWidget);
         expect(
           tester
@@ -1580,13 +1533,19 @@ void main() {
           1,
         );
 
-        // 5. Back to /settings via the shell nav bar.
+        // 5. Back to /settings via the shell nav bar (which pops the
+        //    pushed profile page first — a bare `go` is a no-op when the
+        //    base URI already matches).
         await tester.tap(find.byIcon(Icons.settings));
         await tester.pumpAndSettle();
-        expect(
-          router.routerDelegate.currentConfiguration.uri.path,
-          AppRoutes.settings,
-        );
+        expect(topUri(router).path, AppRoutes.settings);
+        // The revealed settings page retains the step-2 scroll offset, so
+        // the Language section sits outside the built viewport window
+        // (children outside the window are not built): drag back to the
+        // top before asserting. A direct drag — `scrollUntilVisible`
+        // needs its target built to begin dragging toward it.
+        await tester.drag(find.byType(ListView), const Offset(0, 500));
+        await tester.pumpAndSettle();
         expect(find.text('Language'), findsWidgets);
       },
     );
@@ -1608,10 +1567,7 @@ void main() {
       //    bottom NavigationBar (the shell's tap target, not router.go).
       await tester.tap(find.byIcon(Icons.settings_outlined));
       await tester.pumpAndSettle();
-      expect(
-        router.routerDelegate.currentConfiguration.uri.path,
-        AppRoutes.settings,
-      );
+      expect(topUri(router).path, AppRoutes.settings);
 
       // 2. The platform-admin tile (below the fold in the settings ListView)
       //    → the admin screen renders its sections.
@@ -1622,10 +1578,7 @@ void main() {
       );
       await tester.tap(find.text('Platform admin'));
       await tester.pumpAndSettle();
-      expect(
-        router.routerDelegate.currentConfiguration.uri.path,
-        AppRoutes.platformAdmin,
-      );
+      expect(topUri(router).path, AppRoutes.platformAdmin);
       expect(find.text('Organizations'), findsOneWidget);
       expect(find.text('Demo Firm'), findsOneWidget);
       expect(find.text('Members'), findsOneWidget);
@@ -1657,10 +1610,7 @@ void main() {
         await authCubit.startDemoSession();
         router.go(AppRoutes.notificationsFeed);
         await tester.pumpAndSettle();
-        expect(
-          router.routerDelegate.currentConfiguration.uri.path,
-          AppRoutes.notificationsFeed,
-        );
+        expect(topUri(router).path, AppRoutes.notificationsFeed);
         // The feed AppBar title renders; the settings screen's three toggles
         // are NOT on this route (settings stays a sibling surface).
         expect(find.text('Notification feed'), findsOneWidget);
@@ -1689,10 +1639,7 @@ void main() {
       await tester.tap(find.text('View audit trail'));
       await tester.pumpAndSettle();
 
-      expect(
-        router.routerDelegate.currentConfiguration.uri.path,
-        AppRoutes.orgAudit,
-      );
+      expect(topUri(router).path, AppRoutes.orgAudit);
       // The audit surface scaffold renders (AppBar title); the org store is
       // empty in this harness so no load fires — no crash, no endless
       // spinner.

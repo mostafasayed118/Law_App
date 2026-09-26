@@ -7,6 +7,7 @@ import '../../../app/service_locator.dart';
 import '../../../core/roles/user_role.dart';
 import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/demo_labels.dart';
 import '../../../shared/formatting/date_formatting.dart';
 import '../../../shared/widgets/widgets.dart';
 import '../../matters/domain/matter.dart';
@@ -166,7 +167,8 @@ class _ListSurfaceState extends State<_ListSurface> {
       tileBuilder: (BuildContext context, MessageThread thread) =>
           _MessageThreadTile(
             thread: thread,
-            onOpenThread: () => context.go(
+            // E2E BUG-1 fix: list → thread detail is a forward navigation.
+            onOpenThread: () => context.push(
               AppRoutes.messageThreadDetailFor(thread.id),
               extra: thread.title,
             ),
@@ -194,6 +196,7 @@ class _ListSurfaceState extends State<_ListSurface> {
     if (matter == null) {
       return null;
     }
-    return () => context.go(AppRoutes.matterDetail(matter.id));
+    // E2E BUG-1 fix: reverse cross-link is a forward navigation.
+    return () => context.push(AppRoutes.matterDetail(matter.id));
   }
 }

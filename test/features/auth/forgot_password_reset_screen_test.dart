@@ -65,6 +65,19 @@ void main() {
     },
   );
 
+  // R1 (2026-09-24): stale validation errors must clear while editing.
+  // Without AutovalidateMode.onUserInteraction the reset form kept showing
+  // the old error until the next submit attempt.
+  testWidgets('reset form revalidates while editing (no stale errors)', (
+    tester,
+  ) async {
+    await tester.pumpWidget(pumpScreen(const Locale('en')));
+    await tester.pumpAndSettle();
+
+    final Form form = tester.widget<Form>(find.byType(Form));
+    expect(form.autovalidateMode, AutovalidateMode.onUserInteraction);
+  });
+
   testWidgets('confirm-password validator passes when values match', (
     tester,
   ) async {

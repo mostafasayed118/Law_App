@@ -112,7 +112,7 @@ class _ProfileSurfaceState extends State<_ProfileSurface> {
           ),
         ),
         const SizedBox(height: LegalHubTheme.spaceSm),
-        Text(attorney.bio, style: text.bodyMedium),
+        Text(demoAttorneyBio(l10n, attorney.bio), style: text.bodyMedium),
         const SizedBox(height: LegalHubTheme.spaceLg),
         Text(
           l10n.discoveryLocalOnlyNote,
@@ -126,7 +126,8 @@ class _ProfileSurfaceState extends State<_ProfileSurface> {
             final BookingPrefill prefill = serviceLocator<BookingPrefill>();
             prefill.attorneyId = attorney.id;
             prefill.attorneyName = attorney.name;
-            context.go(AppRoutes.book);
+            // E2E BUG-1 fix: forward navigation to the booking wizard.
+            context.push(AppRoutes.book);
           },
           icon: const Icon(Icons.event_available_outlined),
           label: Text(l10n.discoveryProfileBook),

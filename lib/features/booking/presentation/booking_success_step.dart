@@ -44,12 +44,18 @@ class _SuccessStep extends StatelessWidget {
           // host for the video surface is the booking flow's success step. A
           // navigation hint only — the demo call requests no media and
           // records nothing.
+          // E2E BUG-1 fix: forward navigation from the success step must
+          // push, so BACK returns to the booking surface rather than
+          // exiting the app.
           FilledButton.tonalIcon(
             icon: const Icon(Icons.video_call_outlined),
             label: Text(l10n.videoJoin),
-            onPressed: () => context.go(AppRoutes.video),
+            onPressed: () => context.push(AppRoutes.video),
           ),
           const SizedBox(height: LegalHubTheme.spaceMd),
+          // "Done" deliberately RESETS to the root Home tab (the booking
+          // flow is complete; there is nothing to return to), so `go` is
+          // correct here and must stay.
           ElevatedButton(
             onPressed: () => context.go(AppRoutes.home),
             child: Text(l10n.bookingDone),

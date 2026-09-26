@@ -10,6 +10,7 @@ import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/auth/presentation/sign_in_screen.dart';
+import 'package:legalhub/features/auth/presentation/widgets/social_button.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
 void main() {
@@ -199,5 +200,40 @@ void main() {
     // "Recover Password" and which shows the lock-reset hero badge.
     expect(find.text('Recover Password'), findsOneWidget);
     expect(find.byIcon(Icons.lock_reset_outlined), findsOneWidget);
+  });
+
+  // E2E BUG-2 regression (2026-09-24): both social buttons were wired
+  // `onTap: () => context.go(AppRoutes.signUp)`, so tapping "Continue with
+  // Google/Apple" silently opened the Create Account form. No provider is
+  // wired yet, so the honest posture is a genuinely DISABLED button plus a
+  // disclosure — never a misleading navigation. This pin fails on the
+  // pre-fix code (onTap non-null) and passes once they are disabled.
+  testWidgets('the social buttons are disabled and disclose unavailability', (
+    tester,
+  ) async {
+    await tester.pumpWidget(pumpIsolated());
+    await tester.pumpAndSettle();
+
+    final Iterable<SocialButton> socials = tester.widgetList<SocialButton>(
+      find.byType(SocialButton),
+    );
+    expect(socials, isNotEmpty, reason: 'both social buttons should render');
+    for (final SocialButton button in socials) {
+      expect(
+        button.onTap,
+        isNull,
+        reason:
+            'A social button with no wired provider must be disabled — it must '
+            'never navigate to the sign-up form (E2E BUG-2).',
+      );
+    }
+
+    // The honest disclosure is present so the disabled state is explained.
+    expect(
+      find.text(
+        'Social sign-in is not available yet. Use email or the demo session.',
+      ),
+      findsOneWidget,
+    );
   });
 }

@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/auth/auth_gateway.dart';
 import '../../../core/auth/auth_state.dart';
 import '../../../core/errors/app_error.dart';
+import '../../../core/observability/app_log.dart';
 import '../../../core/observability/error_reporter.dart';
 import '../../../core/organizations/membership_repository.dart';
 import '../../../core/organizations/organization_gateway.dart';

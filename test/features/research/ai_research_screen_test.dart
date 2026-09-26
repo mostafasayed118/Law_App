@@ -138,9 +138,11 @@ void main() {
           findsOneWidget,
         );
         // The citation row renders unconditionally under the finding (C-2).
+        // Demo localization (2026-09-24): the detail resolves through the
+        // document-type label (`contract` → `Contract`).
         expect(find.text('Sources'), findsOneWidget);
         expect(
-          find.textContaining('Demo settlement draft — contract'),
+          find.textContaining('Demo settlement draft — Contract'),
           findsOneWidget,
         );
       },

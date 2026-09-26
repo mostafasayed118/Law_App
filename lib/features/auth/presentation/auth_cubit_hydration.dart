@@ -144,7 +144,9 @@ mixin _AuthHydration on _AuthCubitBase {
       );
     } catch (error) {
       // Diagnostics must not break the already-emitted authenticated state.
-      debugPrint('AuthCubit: hydration diagnostic report failed: $error');
+      AppLog.diagnostic(
+        'AuthCubit: hydration diagnostic report failed: $error',
+      );
     }
   }
 

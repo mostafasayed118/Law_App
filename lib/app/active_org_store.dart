@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../core/auth/session.dart';
+import '../core/observability/app_log.dart';
 import '../data/local/org_selection_store.dart';
 
 /// Client-side active-organization context (Phase 7 slice 7.0, D-M7/D-08;
@@ -86,7 +87,9 @@ class ActiveOrgStore extends ChangeNotifier {
     try {
       restored = await _orgSelectionStore.read();
     } catch (error) {
-      debugPrint('ActiveOrgStore: failed to read persisted selection: $error');
+      AppLog.diagnostic(
+        'ActiveOrgStore: failed to read persisted selection: $error',
+      );
     }
     if (restored == null) {
       return;
@@ -177,7 +180,7 @@ class ActiveOrgStore extends ChangeNotifier {
     try {
       await _orgSelectionStore.write(organizationId);
     } catch (error) {
-      debugPrint('ActiveOrgStore: failed to persist selection: $error');
+      AppLog.diagnostic('ActiveOrgStore: failed to persist selection: $error');
     }
   }
 }

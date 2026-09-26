@@ -28,7 +28,9 @@ class _ApprovalTile extends StatelessWidget {
     final String date = formatMediumDate(l10n, approval.createdAt);
     return AppTile(
       leading: Icon(status.$1, size: 20, color: scheme.onSurfaceVariant),
-      title: '${approval.entityType} · ${approval.reference}',
+      title:
+          '${demoApprovalEntityType(l10n, approval.entityType)} · '
+          '${demoApprovalReference(l10n, approval.reference)}',
       subtitles: <String>['${status.$2} · $date'],
     );
   }

@@ -176,6 +176,34 @@ void main() {
     );
 
     testWidgets(
+      'R2: shows the incomplete-code hint while disabled, hides it when complete',
+      (tester) async {
+        await tester.pumpWidget(pumpAt(AppRoutes.forgotPasswordOtp));
+        await tester.pumpAndSettle();
+
+        // Empty code: button disabled AND the explicit hint is visible (the
+        // disabled state is intentional — no partial-code submit — so the
+        // intent must read on-screen, never a silent dead button).
+        expect(
+          find.text('Enter the 6-digit code to continue.'),
+          findsOneWidget,
+        );
+
+        for (int i = 0; i < 6; i++) {
+          await tester.enterText(find.byType(TextField).at(i), '$i');
+          await tester.pump();
+        }
+
+        // Complete: hint gone, button enabled.
+        expect(find.text('Enter the 6-digit code to continue.'), findsNothing);
+        final ElevatedButton button = tester.widget<ElevatedButton>(
+          find.byType(ElevatedButton).first,
+        );
+        expect(button.onPressed, isNotNull);
+      },
+    );
+
+    testWidgets(
       'enables Verify & Continue once all 6 digits cells are filled and routes to reset',
       (tester) async {
         await tester.pumpWidget(pumpAt(AppRoutes.forgotPasswordOtp));

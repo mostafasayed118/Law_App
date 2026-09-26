@@ -109,7 +109,10 @@ class _OrganizationHubScreenState extends State<OrganizationHubScreen> {
                     onChanged: _activeOrgStore.select,
                   ),
                 if (widget.capabilities?.canViewAudit ?? false)
-                  _AuditEntryTile(onTap: () => context.go(AppRoutes.orgAudit)),
+                  // E2E BUG-1 fix: hub → audit trail is a forward nav.
+                  _AuditEntryTile(
+                    onTap: () => context.push(AppRoutes.orgAudit),
+                  ),
                 Expanded(
                   child: MemberRosterScreen(organizationId: organizationId),
                 ),

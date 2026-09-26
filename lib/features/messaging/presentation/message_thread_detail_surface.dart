@@ -37,7 +37,11 @@ class _DetailSurfaceState extends State<_DetailSurface> {
     final TextTheme text = Theme.of(context).textTheme;
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.threadTitle ?? l10n.messageThreadDetailTitle),
+        title: Text(
+          widget.threadTitle == null
+              ? l10n.messageThreadDetailTitle
+              : demoThreadTitle(l10n, widget.threadTitle!),
+        ),
       ),
       body: SafeArea(
         // Column + Expanded (audit 2026-09-21, P4): the transcript is a

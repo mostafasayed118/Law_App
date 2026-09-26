@@ -22,7 +22,7 @@ class _InvoiceTile extends StatelessWidget {
       title: invoice.invoiceNumber,
       subtitles: <String>[
         '${invoice.currency} $amount · $status',
-        '${invoice.matterRef} · $issued',
+        '${demoMatterTitle(l10n, invoice.matterRef)} · $issued',
       ],
     );
   }

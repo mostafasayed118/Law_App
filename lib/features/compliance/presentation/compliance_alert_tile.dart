@@ -41,7 +41,7 @@ class _AlertTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    alert.title,
+                    demoAlertTitle(l10n, alert.title),
                     style: text.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),

@@ -5,6 +5,7 @@ import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/roles/user_role.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/demo_labels.dart';
 import '../../../shared/widgets/widgets.dart';
 import '../domain/ai_finding.dart';
 import '../domain/ai_gateway.dart';

@@ -15,8 +15,11 @@
 # signing is authorized at B2. Amended 2026-09-23 (owner-approved; spec §7.1,
 # audit §12.20): one extra job compiles the release app bundle as a build
 # proof after the quality gates pass. CI holds no signing secrets, so the
-# bundle uses the documented debug-signing fallback in build.gradle.kts and
-# is explicitly not a store artifact.
+# bundle uses the documented debug-signing fallback in build.gradle.kts —
+# which is gated behind the explicit R4 opt-in (ALLOW_DEBUG_SIGNING=true,
+# set on the build steps below) — and is explicitly not a store artifact.
+# Extended 2026-09-24 (pre-launch R3/R4/B5): the job also asserts the debug
+# APK carries the full native ABI set (the B5 x86_64 libflutter.so guard).
 name: CI
 
 on:
@@ -60,6 +63,13 @@ jobs:
         # fast and cheap.
         run: bash scripts/verify_ledger.sh
 
+      - name: Verify ARB key parity (R9)
+        # Pre-launch gate (2026-09-24): en/ar/tr must carry identical message
+        # keys — a missing key ships as an untranslated fallback on-device.
+        # Python-only, no Flutter needed, so it runs with the other static
+        # gates to fail fast.
+        run: bash scripts/verify_arb_parity.sh
+
       - name: Verify policy battery (static --check)
         # Static validation of the P0-closure policy battery (scripts/README.md
         # — the P0C.1 gate, D-P0C2): battery file presence, every fixture UUID
@@ -88,6 +98,19 @@ jobs:
       - name: Download dependencies
         run: flutter pub get
 
+      - name: Audit dependencies (R11)
+        # Surfaces resolvable-upgrade drift in the log (informational — the
+        # gate itself never fails on staleness; Dependabot, via
+        # .github/dependabot.yml, files the update + advisory PRs).
+        # All deps are registry-hosted with SHA256 pins (pubspec.lock), so
+        # this step also fails loudly if a git/path-sourced dep ever lands.
+        run: |
+          flutter pub outdated
+          if grep -qE '^\s+(git|path):' pubspec.yaml; then
+            echo "R11 guard: git/path-sourced dependencies are not allowed"
+            exit 1
+          fi
+
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
 
@@ -101,10 +124,14 @@ jobs:
     # B2 amendment (spec §7.1, audit §12.20, owner-approved 2026-09-23):
     # prove the release app bundle still compiles on a clean machine after
     # every change that lands. CI holds no signing secrets, so the bundle is
-    # debug-signed via the documented build.gradle.kts fallback — a compile/
-    # size proof, not a store artifact (store AABs are owner-side builds
-    # signed with the upload keystore, per audit §12.19).
-    name: release AAB compiles
+    # debug-signed via the documented build.gradle.kts fallback — behind the
+    # explicit R4 opt-in (ALLOW_DEBUG_SIGNING=true) — a compile/size proof,
+    # not a store artifact (store AABs are owner-side builds signed with the
+    # upload keystore, per audit §12.19).
+    # Pre-launch extension (2026-09-24, R3/R4/B5): the same job also builds
+    # the debug APK and asserts its native ABI set, guarding the B5 class
+    # (corrupt/stale local builds shipping without lib/x86_64/libflutter.so).
+    name: release bundle + debug APK ABI
     needs: quality-gates
     runs-on: ubuntu-latest
     timeout-minutes: 25
@@ -134,9 +161,29 @@ jobs:
         run: flutter pub get
 
       - name: Build release app bundle
+        env:
+          # R4 opt-in: CI holds no signing secrets, so the compile proof is
+          # explicitly (not silently) debug-signed. Never a store artifact.
+          ALLOW_DEBUG_SIGNING: 'true'
         run: flutter build appbundle --release
 
       - name: Assert bundle exists and report size
         run: |
           test -s build/app/outputs/bundle/release/app-release.aab
           du -h build/app/outputs/bundle/release/app-release.aab
+
+      - name: Build debug APK (B5 ABI guard)
+        run: flutter build apk --debug
+
+      - name: Assert debug APK carries the full ABI set (B5)
+        run: |
+          APK=build/app/outputs/flutter-apk/app-debug.apk
+          test -s "$APK"
+          for ABI in arm64-v8a armeabi-v7a x86_64; do
+            if ! unzip -l "$APK" | grep -q "lib/$ABI/libflutter.so"; then
+              echo "B5 guard: missing lib/$ABI/libflutter.so in $APK"
+              exit 1
+            fi
+          done
+          echo "B5 guard: debug APK ABI set complete (arm64-v8a, armeabi-v7a, x86_64)"
+          du -h "$APK"

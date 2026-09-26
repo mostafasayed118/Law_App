@@ -96,6 +96,10 @@ class _ForgotPasswordResetScreenState extends State<ForgotPasswordResetScreen> {
               },
               child: Form(
                 key: _formKey,
+                // R1 (2026-09-24): stale validation errors cleared while
+                // editing — without this the reset screen kept showing the
+                // old error until the next submit attempt.
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[

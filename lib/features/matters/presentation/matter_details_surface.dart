@@ -78,7 +78,7 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
     return ListView(
       padding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
       children: <Widget>[
-        Text(matter.title, style: text.headlineSmall),
+        Text(demoMatterTitle(l10n, matter.title), style: text.headlineSmall),
         const SizedBox(height: LegalHubTheme.spaceMd),
         Align(
           alignment: AlignmentDirectional.centerStart,

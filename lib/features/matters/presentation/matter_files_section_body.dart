@@ -36,7 +36,7 @@ class _FilesSectionBodyState extends State<_FilesSectionBody> {
           matterRef: widget.matterRef,
           matterRefOf: (FileMetadata file) => file.matterRef,
           itemBuilder: (BuildContext context, FileMetadata file) => AppTile(
-            title: file.name,
+            title: demoFileName(l10n, file.name),
             subtitles: <String>[fileSizeLabel(file.sizeBytes)],
           ),
         );

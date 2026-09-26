@@ -124,6 +124,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get continueWithApple => 'Apple';
 
   @override
+  String get socialSignInUnavailable =>
+      'Social sign-in is not available yet. Use email or the demo session.';
+
+  @override
   String get newToLegalHub => 'New to LegalHub?';
 
   @override
@@ -208,6 +212,221 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get verifyAndContinueButton => 'Verify & Continue';
+
+  @override
+  String get otpIncompleteHint => 'Enter the 6-digit code to continue.';
+
+  @override
+  String get notifTypeInvoiceStatus => 'Invoice issued';
+
+  @override
+  String get notifTypeMatterUpdated => 'Matter updated';
+
+  @override
+  String get notifTypeAppointmentReminder => 'Appointment reminder';
+
+  @override
+  String get notifTypeMessageReceived => 'Message received';
+
+  @override
+  String get notifTypeSystemMaintenance => 'System maintenance';
+
+  @override
+  String get notifSummaryInvoiceStatus => 'Demo notification — invoice issued';
+
+  @override
+  String get notifSummaryMatterUpdated =>
+      'Demo notification — matter status update';
+
+  @override
+  String get notifSummaryAppointmentReminder =>
+      'Demo notification — consultation reminder';
+
+  @override
+  String get notifSummaryMessageReceived =>
+      'Demo notification — new message in thread';
+
+  @override
+  String get notifSummarySystemMaintenance =>
+      'Demo notification — scheduled maintenance';
+
+  @override
+  String get demoMatterTitle1 => 'Demo acquisition review';
+
+  @override
+  String get demoMatterTitle2 => 'Commercial lease consultation';
+
+  @override
+  String get demoMatterTitle3 => 'Procedural review matter';
+
+  @override
+  String get demoMatterTitle4 => 'Family status consultation';
+
+  @override
+  String get demoMatterTitle5 => 'Startup formation advisory';
+
+  @override
+  String get demoAttorneyBio1 =>
+      'Corporate transactions and governance counsel.';
+
+  @override
+  String get demoAttorneyBio2 => 'Civil litigation and contracts.';
+
+  @override
+  String get demoAttorneyBio3 => 'Criminal defense and procedure.';
+
+  @override
+  String get demoAttorneyBio4 => 'Family law and personal status matters.';
+
+  @override
+  String get demoAttorneyBio5 => 'Startup formation and advisory work.';
+
+  @override
+  String get demoThreadTitle1 => 'Demo matter updates';
+
+  @override
+  String get demoThreadTitle2 => 'Consultation follow-up — demo';
+
+  @override
+  String get demoThreadTitle3 => 'Demo procedural notes';
+
+  @override
+  String get demoThreadTitle4 => 'Family matter thread — demo';
+
+  @override
+  String get demoThreadTitle5 => 'Startup advisory — demo';
+
+  @override
+  String demoMessageBody(int count) {
+    return 'Demo message $count — generic demo content, no real client or legal data.';
+  }
+
+  @override
+  String get demoAuthorAttorney => 'Demo attorney';
+
+  @override
+  String get demoAuthorClient => 'Demo client';
+
+  @override
+  String get demoDocumentTitle1 => 'Demo engagement letter';
+
+  @override
+  String get demoDocumentTitle2 => 'Sample matter brief — demo';
+
+  @override
+  String get demoDocumentTitle3 => 'Demo evidence index';
+
+  @override
+  String get demoDocumentTitle4 => 'Correspondence log — demo';
+
+  @override
+  String get demoDocumentTitle5 => 'Demo settlement draft';
+
+  @override
+  String get demoFileName1 => 'Demo retainer scan';
+
+  @override
+  String get demoFileName2 => 'Demo lease annex';
+
+  @override
+  String get demoFileName3 => 'Demo evidence register';
+
+  @override
+  String get demoFileName4 => 'Demo correspondence copy';
+
+  @override
+  String get demoFileName5 => 'Demo formation checklist';
+
+  @override
+  String get demoAlertTitle1 => 'Demo: review pending invitations';
+
+  @override
+  String get demoAlertTitle2 => 'Demo: data-access review due';
+
+  @override
+  String get demoAlertTitle3 => 'Demo: sample alert — high traffic';
+
+  @override
+  String get demoAlertTitle4 => 'Demo: retention window expiring';
+
+  @override
+  String get demoAlertTitle5 => 'Demo: review completed';
+
+  @override
+  String get demoTaskTitle1 => 'Demo: draft response checklist';
+
+  @override
+  String get demoTaskTitle2 => 'Demo: gather documents';
+
+  @override
+  String get demoTaskTitle3 => 'Demo: review client notes';
+
+  @override
+  String get demoTaskTitle4 => 'Demo: schedule follow-up';
+
+  @override
+  String get demoTaskTitle5 => 'Demo: update matter timeline';
+
+  @override
+  String get demoApprovalRefInviteReview => 'Demo invite — review';
+
+  @override
+  String get demoApprovalRefRoleChange => 'Demo role change';
+
+  @override
+  String get demoApprovalRefInviteExpired => 'Sample invite — expired';
+
+  @override
+  String get demoApprovalRefSuspension => 'Demo suspension review';
+
+  @override
+  String get demoApprovalEntityInvitation => 'Invitation';
+
+  @override
+  String get demoApprovalEntityMembership => 'Membership';
+
+  @override
+  String get demoApprovalEntityDocument => 'Document';
+
+  @override
+  String get demoVideoTopic1 => 'Contract review — kickoff';
+
+  @override
+  String get demoVideoTopic2 => 'Incorporation walkthrough';
+
+  @override
+  String get demoVideoTopic3 => 'Employment dispute — follow-up';
+
+  @override
+  String get demoVideoTopic4 => 'Family law consultation';
+
+  @override
+  String researchHeadline(String title) {
+    return 'Research note — $title';
+  }
+
+  @override
+  String researchSummaryDoc(String title, String ref) {
+    return 'Demo research note compiled from the synthetic corpus row \"$title\" ($ref). This is static demo copy generated for the demo corpus — not legal analysis.';
+  }
+
+  @override
+  String researchSummaryMatter(String title, String area) {
+    return 'Demo research note compiled from the synthetic corpus row \"$title\" ($area). This is static demo copy generated for the demo corpus — not legal analysis.';
+  }
+
+  @override
+  String researchExcerptDoc(String type, String ref) {
+    return 'Corpus excerpt: $type metadata row, matter ref \"$ref\".';
+  }
+
+  @override
+  String researchExcerptMatter(String area) {
+    return 'Corpus excerpt: matter row, practice area \"$area\".';
+  }
+
+  @override
+  String get researchRelatedMatter => 'related demo matter';
 
   @override
   String get resendCode => 'Resend Code';

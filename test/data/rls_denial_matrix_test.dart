@@ -110,21 +110,27 @@ class _DeniedOrgApi implements SupabaseOrgApi {
 /// presentation seam maps `AppErrorKind.denied` to `ViewUnauthorized`
 /// (never a retryable error).
 void main() {
+  // The optional third positional keeps the tear-off assignable to every
+  // table-caller typedef, including MessageTableCaller's `[String?
+  // threadId]` (a 2-param function is NOT assignable where 3 args may be
+  // passed). Messages are static: `const` cannot interpolate parameters.
   Future<List<Map<String, dynamic>>> deniedTable(
     String table,
-    String columns,
-  ) async {
+    String columns, [
+    String? threadId,
+  ]) async {
     throw const PostgrestException(
-      message: 'permission denied for table $table',
+      message: 'permission denied for table matters',
     );
   }
 
   Future<List<Map<String, dynamic>>> rlsDeniedTable(
     String table,
-    String columns,
-  ) async {
+    String columns, [
+    String? threadId,
+  ]) async {
     throw const PostgrestException(
-      message: 'new row violates row-level security policy for table $table',
+      message: 'new row violates row-level security policy for table matters',
     );
   }
 
@@ -132,7 +138,9 @@ void main() {
     test('permission denied (cross-org / suspended / owner reads)', () {
       expect(
         isPostgrestDenial(
-          const PostgrestException(message: 'permission denied for table matters'),
+          const PostgrestException(
+            message: 'permission denied for table matters',
+          ),
         ),
         isTrue,
       );
@@ -262,20 +270,22 @@ void main() {
   });
 
   group('membership seam: denied read → HydrationFailed(denied)', () {
-    test('suspended caller sees denied, never fabricated memberships',
-        () async {
-      final SupabaseMembershipRepository repo = SupabaseMembershipRepository(
-        _DeniedOrgApi(),
-      );
-      final MembershipHydrationResult result = await repo.loadMemberships(
-        userId: 'suspended-user',
-      );
-      expect(result, isA<HydrationFailed>());
-      expect(
-        (result as HydrationFailed).kind,
-        MembershipHydrationFailureKind.denied,
-      );
-    });
+    test(
+      'suspended caller sees denied, never fabricated memberships',
+      () async {
+        final SupabaseMembershipRepository repo = SupabaseMembershipRepository(
+          _DeniedOrgApi(),
+        );
+        final MembershipHydrationResult result = await repo.loadMemberships(
+          userId: 'suspended-user',
+        );
+        expect(result, isA<HydrationFailed>());
+        expect(
+          (result as HydrationFailed).kind,
+          MembershipHydrationFailureKind.denied,
+        );
+      },
+    );
   });
 
   group('presentation seam: denied renders unauthorized, never retry', () {

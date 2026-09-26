@@ -124,6 +124,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get continueWithApple => 'Apple';
 
   @override
+  String get socialSignInUnavailable =>
+      'تسجيل الدخول عبر وسائل التواصل غير متاح بعد. استخدم البريد الإلكتروني أو الجلسة التجريبية.';
+
+  @override
   String get newToLegalHub => 'جديد على LegalHub؟';
 
   @override
@@ -207,6 +211,218 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get verifyAndContinueButton => 'تأكيد ومتابعة';
+
+  @override
+  String get otpIncompleteHint => 'أدخل الرمز المكوّن من ٦ أرقام للمتابعة.';
+
+  @override
+  String get notifTypeInvoiceStatus => 'صدور فاتورة';
+
+  @override
+  String get notifTypeMatterUpdated => 'تحديث القضية';
+
+  @override
+  String get notifTypeAppointmentReminder => 'تذكير بالموعد';
+
+  @override
+  String get notifTypeMessageReceived => 'استلام رسالة';
+
+  @override
+  String get notifTypeSystemMaintenance => 'صيانة النظام';
+
+  @override
+  String get notifSummaryInvoiceStatus => 'إشعار تجريبي — صدور فاتورة';
+
+  @override
+  String get notifSummaryMatterUpdated => 'إشعار تجريبي — تحديث حالة القضية';
+
+  @override
+  String get notifSummaryAppointmentReminder =>
+      'إشعار تجريبي — تذكير بموعد الاستشارة';
+
+  @override
+  String get notifSummaryMessageReceived =>
+      'إشعار تجريبي — رسالة جديدة في المحادثة';
+
+  @override
+  String get notifSummarySystemMaintenance => 'إشعار تجريبي — صيانة مجدولة';
+
+  @override
+  String get demoMatterTitle1 => 'مراجعة استحواذ تجريبية';
+
+  @override
+  String get demoMatterTitle2 => 'استشارة إيجار تجاري';
+
+  @override
+  String get demoMatterTitle3 => 'قضية مراجعة إجرائية';
+
+  @override
+  String get demoMatterTitle4 => 'استشارة أحوال شخصية';
+
+  @override
+  String get demoMatterTitle5 => 'استشارة تأسيس شركة ناشئة';
+
+  @override
+  String get demoAttorneyBio1 => 'مستشار معاملات الشركات والحوكمة.';
+
+  @override
+  String get demoAttorneyBio2 => 'التقاضي المدني والعقود.';
+
+  @override
+  String get demoAttorneyBio3 => 'الدفاع الجنائي والإجراءات.';
+
+  @override
+  String get demoAttorneyBio4 => 'قانون الأسرة ومسائل الأحوال الشخصية.';
+
+  @override
+  String get demoAttorneyBio5 => 'تأسيس الشركات الناشئة والعمل الاستشاري.';
+
+  @override
+  String get demoThreadTitle1 => 'تحديثات قضية تجريبية';
+
+  @override
+  String get demoThreadTitle2 => 'متابعة استشارة — تجريبي';
+
+  @override
+  String get demoThreadTitle3 => 'ملاحظات إجرائية تجريبية';
+
+  @override
+  String get demoThreadTitle4 => 'محادثة قضية أسرية — تجريبي';
+
+  @override
+  String get demoThreadTitle5 => 'استشارة شركة ناشئة — تجريبي';
+
+  @override
+  String demoMessageBody(int count) {
+    return 'رسالة تجريبية $count — محتوى تجريبي عام، لا توجد بيانات عميل أو قانونية حقيقية.';
+  }
+
+  @override
+  String get demoAuthorAttorney => 'محامٍ تجريبي';
+
+  @override
+  String get demoAuthorClient => 'عميل تجريبي';
+
+  @override
+  String get demoDocumentTitle1 => 'خطاب تكليف تجريبي';
+
+  @override
+  String get demoDocumentTitle2 => 'مذكرة قضية نموذجية — تجريبي';
+
+  @override
+  String get demoDocumentTitle3 => 'فهرس أدلة تجريبي';
+
+  @override
+  String get demoDocumentTitle4 => 'سجل المراسلات — تجريبي';
+
+  @override
+  String get demoDocumentTitle5 => 'مسودة تسوية تجريبية';
+
+  @override
+  String get demoFileName1 => 'مسح توكيل تجريبي';
+
+  @override
+  String get demoFileName2 => 'ملحق إيجار تجريبي';
+
+  @override
+  String get demoFileName3 => 'سجل أدلة تجريبي';
+
+  @override
+  String get demoFileName4 => 'نسخة مراسلات تجريبية';
+
+  @override
+  String get demoFileName5 => 'قائمة تأسيس تجريبية';
+
+  @override
+  String get demoAlertTitle1 => 'تجريبي: مراجعة الدعوات المعلقة';
+
+  @override
+  String get demoAlertTitle2 => 'تجريبي: مراجعة الوصول إلى البيانات مستحقة';
+
+  @override
+  String get demoAlertTitle3 => 'تجريبي: تنبيه عينة — حركة مرتفعة';
+
+  @override
+  String get demoAlertTitle4 => 'تجريبي: نافذة الاحتفاظ أوشكت على الانتهاء';
+
+  @override
+  String get demoAlertTitle5 => 'تجريبي: اكتملت المراجعة';
+
+  @override
+  String get demoTaskTitle1 => 'تجريبي: قائمة صياغة الرد';
+
+  @override
+  String get demoTaskTitle2 => 'تجريبي: جمع المستندات';
+
+  @override
+  String get demoTaskTitle3 => 'تجريبي: مراجعة ملاحظات العميل';
+
+  @override
+  String get demoTaskTitle4 => 'تجريبي: جدولة متابعة';
+
+  @override
+  String get demoTaskTitle5 => 'تجريبي: تحديث الجدول الزمني للقضية';
+
+  @override
+  String get demoApprovalRefInviteReview => 'دعوة تجريبية — مراجعة';
+
+  @override
+  String get demoApprovalRefRoleChange => 'تغيير دور تجريبي';
+
+  @override
+  String get demoApprovalRefInviteExpired => 'دعوة نموذجية — منتهية الصلاحية';
+
+  @override
+  String get demoApprovalRefSuspension => 'مراجعة إيقاف تجريبية';
+
+  @override
+  String get demoApprovalEntityInvitation => 'دعوة';
+
+  @override
+  String get demoApprovalEntityMembership => 'عضوية';
+
+  @override
+  String get demoApprovalEntityDocument => 'مستند';
+
+  @override
+  String get demoVideoTopic1 => 'مراجعة عقد — اجتماع البدء';
+
+  @override
+  String get demoVideoTopic2 => 'جولة تأسيس الشركة';
+
+  @override
+  String get demoVideoTopic3 => 'نزاع عمالي — متابعة';
+
+  @override
+  String get demoVideoTopic4 => 'استشارة قانون الأسرة';
+
+  @override
+  String researchHeadline(String title) {
+    return 'ملاحظة بحثية — $title';
+  }
+
+  @override
+  String researchSummaryDoc(String title, String ref) {
+    return 'ملاحظة بحثية تجريبية مُجمّعة من الصف التجريبي \"$title\" ($ref). هذه نسخة تجريبية ثابتة مُعدّة للمدونة التجريبية — ليست تحليلاً قانونياً.';
+  }
+
+  @override
+  String researchSummaryMatter(String title, String area) {
+    return 'ملاحظة بحثية تجريبية مُجمّعة من الصف التجريبي \"$title\" ($area). هذه نسخة تجريبية ثابتة مُعدّة للمدونة التجريبية — ليست تحليلاً قانونياً.';
+  }
+
+  @override
+  String researchExcerptDoc(String type, String ref) {
+    return 'مقتطف المدونة: صف بيانات وصفية $type، مرجع القضية \"$ref\".';
+  }
+
+  @override
+  String researchExcerptMatter(String area) {
+    return 'مقتطف المدونة: صف قضية، المجال \"$area\".';
+  }
+
+  @override
+  String get researchRelatedMatter => 'قضية تجريبية مرتبطة';
 
   @override
   String get resendCode => 'إعادة إرسال الرمز';

@@ -692,4 +692,42 @@ void main() {
       expect(find.text('AKTİF'), findsOneWidget);
     });
   });
+
+  // CR-02 regression (2026-09-24): roster rows were built WITHOUT a key
+  // inside a `ListView.separated`. Flutter reconciles unkeyed children
+  // positionally, so on a roster reorder or removal a row could inherit the
+  // previous member's widget state (e.g. a stale `pending` spinner bound to
+  // the wrong person). Each row must now carry a stable per-member key.
+  group('MemberRosterScreen row identity', () {
+    testWidgets('each member row carries a stable key', (tester) async {
+      await tester.pumpWidget(harness(authCubit: await partnerAuth()));
+      await tester.pumpAndSettle();
+
+      // Every roster row is a ListTile-bearing subtree; collect the keys of
+      // the direct children the separated list builds.
+      final Iterable<Widget> rows = tester.widgetList<Widget>(
+        find.byWidgetPredicate((Widget widget) => widget.key != null),
+      );
+      final Iterable<Key> keys = rows.map((Widget widget) => widget.key!);
+
+      expect(
+        keys.whereType<ValueKey<String>>(),
+        isNotEmpty,
+        reason:
+            'Roster rows must be keyed by member id so a reorder/removal '
+            'cannot carry state onto the wrong row (CR-02).',
+      );
+
+      // Keys must be unique — duplicates would defeat the reconciliation.
+      final List<String> values = keys
+          .whereType<ValueKey<String>>()
+          .map((ValueKey<String> key) => key.value)
+          .toList();
+      expect(
+        values.toSet().length,
+        values.length,
+        reason: 'each member row key must be unique',
+      );
+    });
+  });
 }

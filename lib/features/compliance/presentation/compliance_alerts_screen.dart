@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/demo_labels.dart';
 import '../../../shared/widgets/widgets.dart';
 import '../domain/compliance_alert.dart';
 import '../domain/compliance_gateway.dart';

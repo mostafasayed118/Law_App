@@ -31,7 +31,10 @@ class _SearchSurfaceState extends State<_SearchSurface> {
         return;
       }
       if (widget.initialQuery.trim().isNotEmpty) {
-        context.read<SearchCubit>().search(widget.initialQuery);
+        context.read<SearchCubit>().search(
+          widget.initialQuery,
+          l10n: AppLocalizations.of(context),
+        );
       }
     });
   }
@@ -40,14 +43,20 @@ class _SearchSurfaceState extends State<_SearchSurface> {
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 300), () {
       if (mounted) {
-        context.read<SearchCubit>().search(value);
+        context.read<SearchCubit>().search(
+          value,
+          l10n: AppLocalizations.of(context),
+        );
       }
     });
   }
 
   void _submit(String value) {
     _debounce?.cancel();
-    context.read<SearchCubit>().search(value);
+    context.read<SearchCubit>().search(
+      value,
+      l10n: AppLocalizations.of(context),
+    );
   }
 
   @override
@@ -125,7 +134,7 @@ class _SearchSurfaceState extends State<_SearchSurface> {
     }
     return ViewStateSwitch<SearchResults>(
       state: state.results,
-      onRetry: () => cubit.search(state.query),
+      onRetry: () => cubit.search(state.query, l10n: l10n),
       builder: (BuildContext context, SearchResults results) =>
           _grouped(context, results, l10n, empty),
       empty: empty,
@@ -148,7 +157,7 @@ class _SearchSurfaceState extends State<_SearchSurface> {
             for (final Matter matter in results.matters) ...<Widget>[
               AppTile(
                 icon: Icons.folder_outlined,
-                title: matter.title,
+                title: demoMatterTitle(l10n, matter.title),
                 subtitles: <String>[
                   '${practiceAreaLabel(l10n, matter.practiceArea)} · ${matter.assignedAttorneyName}',
                 ],
@@ -162,7 +171,8 @@ class _SearchSurfaceState extends State<_SearchSurface> {
                     ),
                   ],
                 ),
-                onTap: () => context.go(AppRoutes.matterDetail(matter.id)),
+                // E2E BUG-1 fix: search result → detail is a forward nav.
+                onTap: () => context.push(AppRoutes.matterDetail(matter.id)),
               ),
               const SizedBox(height: LegalHubTheme.spaceSm),
             ],
@@ -178,7 +188,7 @@ class _SearchSurfaceState extends State<_SearchSurface> {
             for (final Document document in results.documents) ...<Widget>[
               AppTile(
                 icon: Icons.folder_outlined,
-                title: document.title,
+                title: demoDocumentTitle(l10n, document.title),
                 subtitles: <String>[
                   '${documentTypeLabel(l10n, document.type)} · ${formatMediumDate(l10n, document.createdAt)}',
                 ],
@@ -192,7 +202,7 @@ class _SearchSurfaceState extends State<_SearchSurface> {
                     ),
                   ],
                 ),
-                onTap: () => context.go(AppRoutes.vault),
+                onTap: () => context.push(AppRoutes.vault),
               ),
               const SizedBox(height: LegalHubTheme.spaceSm),
             ],
@@ -208,7 +218,7 @@ class _SearchSurfaceState extends State<_SearchSurface> {
             for (final MessageThread thread in results.threads) ...<Widget>[
               AppTile(
                 icon: Icons.forum_outlined,
-                title: thread.title,
+                title: demoThreadTitle(l10n, thread.title),
                 subtitles: <String>[
                   '${thread.participants.join(', ')} · ${formatMediumDate(l10n, thread.lastActivityAt)}',
                 ],
@@ -222,7 +232,7 @@ class _SearchSurfaceState extends State<_SearchSurface> {
                     ),
                   ],
                 ),
-                onTap: () => context.go(AppRoutes.messages),
+                onTap: () => context.push(AppRoutes.messages),
               ),
               const SizedBox(height: LegalHubTheme.spaceSm),
             ],
@@ -255,7 +265,8 @@ class _SearchSurfaceState extends State<_SearchSurface> {
                 subtitles: <String>[
                   '${practiceAreaLabel(l10n, attorney.practiceArea)} · ${attorney.locale}',
                 ],
-                onTap: () => context.go(AppRoutes.attorneyProfile(attorney.id)),
+                onTap: () =>
+                    context.push(AppRoutes.attorneyProfile(attorney.id)),
               ),
               const SizedBox(height: LegalHubTheme.spaceSm),
             ],

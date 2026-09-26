@@ -64,6 +64,48 @@ void main() {
     });
   });
 
+  group('CompositeErrorReporter (R7 remote-sink seam)', () {
+    test('fans out to every delegate', () async {
+      final InMemoryErrorReporter first = InMemoryErrorReporter();
+      final InMemoryErrorReporter second = InMemoryErrorReporter();
+
+      await CompositeErrorReporter(<ErrorReporter>[
+        first,
+        second,
+      ]).report(const AppError(code: 'x', userMessage: 'm'));
+
+      expect(first.reports, hasLength(1));
+      expect(second.reports, hasLength(1));
+    });
+
+    test('a throwing delegate never blocks the others', () async {
+      final InMemoryErrorReporter survivor = InMemoryErrorReporter();
+
+      await CompositeErrorReporter(<ErrorReporter>[
+        _ThrowingReporter(),
+        survivor,
+      ]).report(const AppError(code: 'x', userMessage: 'm'));
+
+      expect(survivor.reports, hasLength(1));
+    });
+
+    test('delegates keep Redactor on their own write path', () async {
+      final InMemoryErrorReporter inner = InMemoryErrorReporter();
+
+      await CompositeErrorReporter(<ErrorReporter>[inner]).report(
+        const AppError(
+          code: 'x',
+          userMessage: 'm',
+          context: <String, Object?>{'password': 'super-secret-123'},
+        ),
+      );
+
+      final Map<String, Object?> context =
+          inner.reports.single['context']! as Map<String, Object?>;
+      expect(context['password'], '[REDACTED]');
+    });
+  });
+
   group('ConsoleErrorReporter', () {
     // print() forwards to Zone.current.print, so running report() inside a
     // zone whose print handler captures lines lets us assert the exact output
@@ -91,4 +133,11 @@ void main() {
       expect(printed.single, isNot(contains('super-secret-123')));
     });
   });
+}
+
+class _ThrowingReporter implements ErrorReporter {
+  @override
+  Future<void> report(AppError error) async {
+    throw StateError('sink down');
+  }
 }

@@ -61,6 +61,35 @@ class _ProfileBodyState extends State<_ProfileBody> {
     }
   }
 
+  /// One grouped section card (design review P1b, 2026-09-24): the flat
+  /// row list read as ungrouped rows with dead space below. Identity,
+  /// session, and danger-zone rows now sit in matching cards in the
+  /// AppTile surface language — every existing text is preserved.
+  Widget _sectionCard(BuildContext context, List<Widget> children) {
+    final ColorScheme scheme = Theme.of(context).colorScheme;
+    return Material(
+      color: scheme.surfaceContainerLowest,
+      shape: RoundedRectangleBorder(
+        borderRadius: const BorderRadius.all(
+          Radius.circular(LegalHubTheme.radiusLg),
+        ),
+        side: BorderSide(color: scheme.outlineVariant),
+      ),
+      child: Padding(
+        padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            for (int i = 0; i < children.length; i++) ...<Widget>[
+              if (i > 0) const SizedBox(height: LegalHubTheme.spaceSm),
+              children[i],
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
@@ -68,56 +97,58 @@ class _ProfileBodyState extends State<_ProfileBody> {
     return ListView(
       padding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
       children: <Widget>[
-        ListTile(
-          contentPadding: EdgeInsets.zero,
-          leading: const Icon(Icons.person_outline),
-          title: Text(session.displayName),
-          subtitle: Text(l10n.profileNameLabel),
-        ),
-        const SizedBox(height: LegalHubTheme.spaceSm),
-        ListTile(
-          contentPadding: EdgeInsets.zero,
-          leading: const Icon(Icons.badge_outlined),
-          title: Text(session.userId),
-          subtitle: Text(l10n.profileAccountIdLabel),
-        ),
-        const SizedBox(height: LegalHubTheme.spaceSm),
-        ListTile(
-          contentPadding: EdgeInsets.zero,
-          leading: const Icon(Icons.work_outline),
-          title: RoleLabel(role: session.primaryRole),
-          subtitle: Text(l10n.profileRoleLabel),
-        ),
-        const SizedBox(height: LegalHubTheme.spaceSm),
-        ListTile(
-          contentPadding: EdgeInsets.zero,
-          leading: const Icon(Icons.schedule_outlined),
-          title: Text(formatMediumDateTime(l10n, session.expiresAt)),
-          subtitle: Text(l10n.profileExpiresLabel),
-        ),
-        const SizedBox(height: LegalHubTheme.spaceLg),
-        const Divider(),
-        const SizedBox(height: LegalHubTheme.spaceSm),
+        _sectionCard(context, <Widget>[
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.person_outline),
+            title: Text(session.displayName),
+            subtitle: Text(l10n.profileNameLabel),
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.badge_outlined),
+            title: Text(session.userId),
+            subtitle: Text(l10n.profileAccountIdLabel),
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.work_outline),
+            title: RoleLabel(role: session.primaryRole),
+            subtitle: Text(l10n.profileRoleLabel),
+          ),
+        ]),
+        const SizedBox(height: LegalHubTheme.spaceMd),
+        _sectionCard(context, <Widget>[
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.schedule_outlined),
+            title: Text(formatMediumDateTime(l10n, session.expiresAt)),
+            subtitle: Text(l10n.profileExpiresLabel),
+          ),
+        ]),
+        const SizedBox(height: LegalHubTheme.spaceMd),
         // Account deletion is irreversible and scoped out of the read-only
         // identity surface above; the error-tinted row makes it unmistakable.
-        ListTile(
-          contentPadding: EdgeInsets.zero,
-          enabled: !_deleting,
-          leading: _deleting
-              ? const SizedBox.square(
-                  dimension: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : Icon(
-                  Icons.delete_outline,
-                  color: Theme.of(context).colorScheme.error,
-                ),
-          title: Text(
-            l10n.deleteAccountAction,
-            style: TextStyle(color: Theme.of(context).colorScheme.error),
+        _sectionCard(context, <Widget>[
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            enabled: !_deleting,
+            leading: _deleting
+                ? const SizedBox.square(
+                    dimension: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Icon(
+                    Icons.delete_outline,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+            title: Text(
+              l10n.deleteAccountAction,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+            onTap: _deleting ? null : _deleteAccount,
           ),
-          onTap: _deleting ? null : _deleteAccount,
-        ),
+        ]),
       ],
     );
   }

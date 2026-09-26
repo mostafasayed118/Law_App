@@ -96,8 +96,13 @@ class _FailingOrgApi implements SupabaseOrgApi {
 }
 
 void main() {
-  Future<List<Map<String, dynamic>>> tableFor(Object error) {
-    return (String table, String columns) async => throw error;
+  // Explicit function type with the optional third positional, so the stub
+  // satisfies every table-caller typedef (see rls_denial_matrix_test.dart).
+  Future<List<Map<String, dynamic>>> Function(String, String, [String?])
+  tableFor(Object error) {
+    return (String table, String columns, [String? threadId]) async {
+      throw error;
+    };
   }
 
   group('401/403-shaped denials → denied (never retryable)', () {
@@ -180,9 +185,7 @@ void main() {
   group('500-shaped failures → unknown with the message preserved', () {
     test('matters: internal error stays unknown (not a denial)', () async {
       final SupabaseMatterApiImpl api = SupabaseMatterApiImpl(
-        tableFor(
-          const PostgrestException(message: 'internal server error'),
-        ),
+        tableFor(const PostgrestException(message: 'internal server error')),
       );
       await expectLater(
         api.fetchMatters(),
