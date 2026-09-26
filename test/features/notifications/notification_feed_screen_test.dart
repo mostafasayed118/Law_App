@@ -11,6 +11,7 @@ import 'package:legalhub/features/notifications/domain/notification_prefs.dart';
 import 'package:legalhub/features/notifications/domain/notification_prefs_store.dart';
 import 'package:legalhub/features/notifications/presentation/notification_feed_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/demo_labels.dart';
 
 void main() {
   tearDown(resetServiceLocator);
@@ -40,19 +41,34 @@ void main() {
       await pumpFeed(tester);
 
       expect(find.text('Notification feed'), findsOneWidget);
+      final AppLocalizations en = await AppLocalizations.delegate.load(
+        const Locale('en'),
+      );
       for (final Notification notification
           in FakeNotificationGateway.syntheticNotifications) {
-        expect(find.text(notification.type), findsOneWidget);
-        expect(find.text(notification.summary), findsOneWidget);
+        // Demo localization (2026-09-24): rows render the mapped display
+        // strings, not the raw wire values.
+        expect(
+          find.text(demoNotificationType(en, notification.type)),
+          findsOneWidget,
+        );
+        expect(
+          find.text(
+            demoNotificationSummary(
+              en,
+              notification.type,
+              notification.summary,
+            ),
+          ),
+          findsOneWidget,
+        );
       }
       // Category chips render the localized D-N4 labels.
       expect(find.text('System'), findsNWidgets(2));
       expect(find.text('Activity'), findsNWidgets(2));
       expect(find.text('Appointment'), findsOneWidget);
       // The newest row renders first.
-      final List<Notification> rows =
-          FakeNotificationGateway.syntheticNotifications;
-      expect(find.text(rows.first.type), findsOneWidget);
+      expect(find.text('Invoice issued'), findsOneWidget);
     });
 
     testWidgets(
@@ -81,7 +97,7 @@ void main() {
         await pumpFeed(tester);
 
         // The first row (notification-1, unread) — tap marks it read.
-        await tester.tap(find.text('invoice_status').first);
+        await tester.tap(find.text('Invoice issued').first);
         await tester.pumpAndSettle();
 
         expect(_markStub!.markCallIds, <String>['notification-1']);
@@ -119,7 +135,7 @@ void main() {
       await pumpFeed(tester);
 
       expect(find.text('No notifications are available.'), findsOneWidget);
-      expect(find.text('invoice_status'), findsNothing);
+      expect(find.text('Invoice issued'), findsNothing);
     });
 
     testWidgets('failure renders the error state with a working retry', (
@@ -134,13 +150,13 @@ void main() {
       await pumpFeed(tester);
 
       expect(find.text('Unable to load notifications.'), findsOneWidget);
-      expect(find.text('invoice_status'), findsNothing);
+      expect(find.text('Invoice issued'), findsNothing);
 
       await tester.tap(find.text('Retry'));
       await tester.pumpAndSettle();
 
       expect(find.text('Unable to load notifications.'), findsNothing);
-      expect(find.text('invoice_status'), findsOneWidget);
+      expect(find.text('Invoice issued'), findsOneWidget);
     });
 
     testWidgets(

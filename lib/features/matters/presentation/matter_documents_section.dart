@@ -7,6 +7,7 @@ import '../../../features/documents/presentation/document_cubit.dart';
 import '../../../features/documents/presentation/document_labels.dart';
 import '../../../features/documents/presentation/document_state.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/demo_labels.dart';
 import '../../../shared/formatting/date_formatting.dart';
 import '../../../shared/widgets/widgets.dart';
 
@@ -23,16 +24,26 @@ part 'matter_documents_section_body.dart';
 /// — no preview, no download, no open action, no tap affordance (D-W4). An
 /// empty per-matter subset renders the localized empty copy (AC-3).
 class MatterDocumentsSection extends StatelessWidget {
-  const MatterDocumentsSection({required this.matterRef, super.key});
+  const MatterDocumentsSection({
+    required this.matterRef,
+    this.gateway,
+    super.key,
+  });
 
   /// The matter title to filter by (matches [Document.matterRef], D-W2).
   final String matterRef;
+
+  /// Injected seam for tests and composition-root wiring. Defaults to the
+  /// service locator so existing call sites behave exactly as before; pass
+  /// a fake to drive the section without the global (DIP: the section no
+  /// longer hard-requires the locator, only falls back to it).
+  final DocumentGateway? gateway;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<DocumentCubit>(
       create: (BuildContext context) =>
-          DocumentCubit(serviceLocator<DocumentGateway>()),
+          DocumentCubit(gateway ?? serviceLocator<DocumentGateway>()),
       child: _DocumentsSectionBody(matterRef: matterRef),
     );
   }

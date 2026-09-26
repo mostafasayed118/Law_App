@@ -50,6 +50,22 @@ class BookingDraft extends Equatable {
   /// sets both together; the fallback only guards consistency.
   String? get attorneyDisplayName => attorneyName ?? attorneyId;
 
+  BookingDraft copyWith({
+    BookingCategory? Function()? category,
+    String? Function()? topic,
+    BookingSlot? Function()? slot,
+    String? Function()? attorneyId,
+    String? Function()? attorneyName,
+  }) {
+    return BookingDraft(
+      category: category != null ? category() : this.category,
+      topic: topic != null ? topic() : this.topic,
+      slot: slot != null ? slot() : this.slot,
+      attorneyId: attorneyId != null ? attorneyId() : this.attorneyId,
+      attorneyName: attorneyName != null ? attorneyName() : this.attorneyName,
+    );
+  }
+
   @override
   List<Object?> get props => <Object?>[
     category,

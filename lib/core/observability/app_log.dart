@@ -13,6 +13,11 @@ class AppLog {
   AppLog._();
 
   /// Writes a sanitized diagnostic line (debug builds only, via
-  /// [debugPrint]).
-  static void diagnostic(String message) => debugPrint(message);
+  /// [debugPrint]). Never pass credentials, tokens, or PII — interpolate
+  /// only pre-sanitized values.
+  static void diagnostic(String message) {
+    if (kDebugMode) {
+      debugPrint(message);
+    }
+  }
 }

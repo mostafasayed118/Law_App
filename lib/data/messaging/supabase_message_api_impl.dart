@@ -1,7 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../list_query_guards.dart';
 import '../postgrest_failures.dart';
+import '../supabase_seam.dart';
 import 'supabase_message_api.dart';
 
 /// A PostgREST RPC call: function name + named params → response.
@@ -37,12 +37,14 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
   /// (audit 2026-09-21, P1). When a `threadId` is given, the SELECT is
   /// filtered `.eq('thread_id', …)` — the thread-scoped messages read
   /// (D-RT5).
+  /// Shared seam bindings ([SupabaseSeam.boundFilteredTable] for the
+  /// `thread_id`-scoped read, [SupabaseSeam.boundRpc] for `send_message`).
   static Future<List<Map<String, dynamic>>> _boundTable(
     String table,
     String columns, [
     String? threadId,
   ]) {
-    return boundedTableSelect(
+    return SupabaseSeam.boundFilteredTable(
       table,
       columns,
       filterColumn: threadId == null ? null : 'thread_id',
@@ -51,20 +53,11 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
   }
 
   /// Binds the audited `send_message` RPC to the app-level client (D-SM2).
-  /// postgrest 2.8.0 contract: `await rpc<T>()` resolves to the RAW
-  /// decoded data (T), not a PostgrestResponse — the wrapper is only
-  /// produced when a count is requested — so the production binding wraps
-  /// the raw data into the seam's PostgrestResponse shape (the test stubs'
-  /// own shape); PostgrestException still propagates unchanged.
   static Future<PostgrestResponse<dynamic>> _boundRpc(
     String function,
     Map<String, dynamic> params,
-  ) async {
-    final dynamic data = await Supabase.instance.client.rpc<dynamic>(
-      function,
-      params: params,
-    );
-    return PostgrestResponse<dynamic>(data: data, count: 0);
+  ) {
+    return SupabaseSeam.boundRpc(function, params);
   }
 
   final MessageTableCaller _table;

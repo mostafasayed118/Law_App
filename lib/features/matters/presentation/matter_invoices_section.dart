@@ -24,16 +24,25 @@ part 'matter_invoices_section_body.dart';
 /// in MVP; the D-BI1 line is structural). An empty per-matter subset renders
 /// the localized empty copy.
 class MatterInvoicesSection extends StatelessWidget {
-  const MatterInvoicesSection({required this.matterRef, super.key});
+  const MatterInvoicesSection({
+    required this.matterRef,
+    this.gateway,
+    super.key,
+  });
 
   /// The matter title to filter by (matches [Invoice.matterRef], D-BI5).
   final String matterRef;
+
+  /// Injected seam for tests and composition-root wiring. Defaults to the
+  /// service locator so existing call sites behave exactly as before; pass
+  /// a fake to drive the section without the global (DIP).
+  final BillingGateway? gateway;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<BillingCubit>(
       create: (BuildContext context) =>
-          BillingCubit(serviceLocator<BillingGateway>()),
+          BillingCubit(gateway ?? serviceLocator<BillingGateway>()),
       child: _InvoicesSectionBody(matterRef: matterRef),
     );
   }

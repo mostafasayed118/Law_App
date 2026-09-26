@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../supabase_seam.dart';
 import 'supabase_platform_admin_api.dart';
 
 /// A PostgREST RPC call: function name + named params → response.
@@ -25,20 +26,13 @@ class SupabasePlatformAdminApiImpl implements SupabasePlatformAdminApi {
   /// factory so tests can construct the impl with any callable stub.
   factory SupabasePlatformAdminApiImpl.bind() =>
       SupabasePlatformAdminApiImpl(_boundRpc);
+
+  /// Shared seam binding ([SupabaseSeam.boundRpc]).
   static Future<PostgrestResponse<dynamic>> _boundRpc(
     String function,
     Map<String, dynamic> params,
-  ) async {
-    // postgrest 2.8.0 contract: `await rpc<T>()` resolves to the RAW
-    // decoded data (T), NOT a PostgrestResponse — the wrapper is only
-    // produced when a count is requested. The seam's callers (and the test
-    // stubs) expect the wrapped shape, so wrap the raw data here;
-    // PostgrestException still propagates from the await unchanged.
-    final dynamic data = await Supabase.instance.client.rpc<dynamic>(
-      function,
-      params: params,
-    );
-    return PostgrestResponse<dynamic>(data: data, count: 0);
+  ) {
+    return SupabaseSeam.boundRpc(function, params);
   }
 
   final PlatformAdminRpcCaller _rpc;

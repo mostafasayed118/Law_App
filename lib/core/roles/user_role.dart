@@ -9,26 +9,75 @@ enum UserRole {
   admin,
 }
 
+/// The single capability tokens behind [RoleCapability].
+///
+/// Adding a capability is now a two-line change: one enum value here plus
+/// one optional constructor parameter with its default below — the
+/// `roleCapabilities` map only mentions roles that differ from the default.
+/// Prefer [RoleCapability.has] over the legacy `canX` getters in new code;
+/// the getters stay as the backward-compatible read path (24 pinned test
+/// call sites construct them explicitly).
+enum Capability {
+  viewHome,
+  viewSettings,
+  bookConsultation,
+  viewAttorneyDiscovery,
+  viewMatters,
+  viewDocuments,
+  viewMessages,
+  viewFiles,
+  viewAudit,
+  viewNotifications,
+  viewAlerts,
+  viewTasks,
+  viewApprovals,
+  useAiResearch,
+}
+
 /// Capabilities in bootstrap are navigation/visibility hints only.
 /// They are NOT authorization. Consequential access must be enforced by the
 /// future server/data boundary and tested there before real data is added.
 class RoleCapability extends Equatable {
   const RoleCapability({
-    required this.canViewHome,
-    required this.canViewSettings,
-    required this.canBookConsultation,
-    required this.canViewAttorneyDiscovery,
-    required this.canViewMatters,
-    required this.canViewDocuments,
-    required this.canViewMessages,
-    required this.canViewFiles,
-    required this.canViewAudit,
-    required this.canViewNotifications,
-    required this.canViewAlerts,
-    required this.canViewTasks,
-    required this.canViewApprovals,
-    required this.canUseAiResearch,
+    this.canViewHome = true,
+    this.canViewSettings = true,
+    this.canBookConsultation = true,
+    this.canViewAttorneyDiscovery = true,
+    this.canViewMatters = true,
+    this.canViewDocuments = true,
+    this.canViewMessages = true,
+    this.canViewFiles = true,
+    this.canViewAudit = false,
+    this.canViewNotifications = true,
+    this.canViewAlerts = true,
+    this.canViewTasks = true,
+    this.canViewApprovals = true,
+    this.canUseAiResearch = false,
   });
+
+  /// Builds the capability set from a [Set] of granted [Capability]s.
+  /// Exact decode: only members of [granted] are true. Round-trips with
+  /// [asSet] — `RoleCapability.fromSet(cap.asSet) == cap` for any [cap].
+  factory RoleCapability.fromSet(Set<Capability> granted) {
+    return RoleCapability(
+      canViewHome: granted.contains(Capability.viewHome),
+      canViewSettings: granted.contains(Capability.viewSettings),
+      canBookConsultation: granted.contains(Capability.bookConsultation),
+      canViewAttorneyDiscovery: granted.contains(
+        Capability.viewAttorneyDiscovery,
+      ),
+      canViewMatters: granted.contains(Capability.viewMatters),
+      canViewDocuments: granted.contains(Capability.viewDocuments),
+      canViewMessages: granted.contains(Capability.viewMessages),
+      canViewFiles: granted.contains(Capability.viewFiles),
+      canViewAudit: granted.contains(Capability.viewAudit),
+      canViewNotifications: granted.contains(Capability.viewNotifications),
+      canViewAlerts: granted.contains(Capability.viewAlerts),
+      canViewTasks: granted.contains(Capability.viewTasks),
+      canViewApprovals: granted.contains(Capability.viewApprovals),
+      canUseAiResearch: granted.contains(Capability.useAiResearch),
+    );
+  }
 
   final bool canViewHome;
   final bool canViewSettings;
@@ -103,6 +152,98 @@ class RoleCapability extends Equatable {
   /// partner; denied to client, complianceOfficer, admin.
   final bool canUseAiResearch;
 
+  /// Set-membership read path for new code: `cap.has(Capability.viewAudit)`.
+  /// Equivalent to the matching `canX` getter; backed by the same fields so
+  /// both reads can never disagree.
+  bool has(Capability capability) {
+    switch (capability) {
+      case Capability.viewHome:
+        return canViewHome;
+      case Capability.viewSettings:
+        return canViewSettings;
+      case Capability.bookConsultation:
+        return canBookConsultation;
+      case Capability.viewAttorneyDiscovery:
+        return canViewAttorneyDiscovery;
+      case Capability.viewMatters:
+        return canViewMatters;
+      case Capability.viewDocuments:
+        return canViewDocuments;
+      case Capability.viewMessages:
+        return canViewMessages;
+      case Capability.viewFiles:
+        return canViewFiles;
+      case Capability.viewAudit:
+        return canViewAudit;
+      case Capability.viewNotifications:
+        return canViewNotifications;
+      case Capability.viewAlerts:
+        return canViewAlerts;
+      case Capability.viewTasks:
+        return canViewTasks;
+      case Capability.viewApprovals:
+        return canViewApprovals;
+      case Capability.useAiResearch:
+        return canUseAiResearch;
+    }
+  }
+
+  /// The granted capabilities as a set. Round-trips:
+  /// `RoleCapability.fromSet(cap.asSet) == cap`.
+  Set<Capability> get asSet => <Capability>{
+    if (canViewHome) Capability.viewHome,
+    if (canViewSettings) Capability.viewSettings,
+    if (canBookConsultation) Capability.bookConsultation,
+    if (canViewAttorneyDiscovery) Capability.viewAttorneyDiscovery,
+    if (canViewMatters) Capability.viewMatters,
+    if (canViewDocuments) Capability.viewDocuments,
+    if (canViewMessages) Capability.viewMessages,
+    if (canViewFiles) Capability.viewFiles,
+    if (canViewAudit) Capability.viewAudit,
+    if (canViewNotifications) Capability.viewNotifications,
+    if (canViewAlerts) Capability.viewAlerts,
+    if (canViewTasks) Capability.viewTasks,
+    if (canViewApprovals) Capability.viewApprovals,
+    if (canUseAiResearch) Capability.useAiResearch,
+  };
+
+  /// Copies this capability set with selective overrides. New flags only
+  /// need a nullable parameter here — no map-wide churn.
+  RoleCapability copyWith({
+    bool? canViewHome,
+    bool? canViewSettings,
+    bool? canBookConsultation,
+    bool? canViewAttorneyDiscovery,
+    bool? canViewMatters,
+    bool? canViewDocuments,
+    bool? canViewMessages,
+    bool? canViewFiles,
+    bool? canViewAudit,
+    bool? canViewNotifications,
+    bool? canViewAlerts,
+    bool? canViewTasks,
+    bool? canViewApprovals,
+    bool? canUseAiResearch,
+  }) {
+    return RoleCapability(
+      canViewHome: canViewHome ?? this.canViewHome,
+      canViewSettings: canViewSettings ?? this.canViewSettings,
+      canBookConsultation: canBookConsultation ?? this.canBookConsultation,
+      canViewAttorneyDiscovery:
+          canViewAttorneyDiscovery ?? this.canViewAttorneyDiscovery,
+      canViewMatters: canViewMatters ?? this.canViewMatters,
+      canViewDocuments: canViewDocuments ?? this.canViewDocuments,
+      canViewMessages: canViewMessages ?? this.canViewMessages,
+      canViewFiles: canViewFiles ?? this.canViewFiles,
+      canViewAudit: canViewAudit ?? this.canViewAudit,
+      canViewNotifications: canViewNotifications ?? this.canViewNotifications,
+      canViewAlerts: canViewAlerts ?? this.canViewAlerts,
+      canViewTasks: canViewTasks ?? this.canViewTasks,
+      canViewApprovals: canViewApprovals ?? this.canViewApprovals,
+      canUseAiResearch: canUseAiResearch ?? this.canUseAiResearch,
+    );
+  }
+
   @override
   List<Object?> get props => <Object?>[
     canViewHome,
@@ -122,104 +263,21 @@ class RoleCapability extends Equatable {
   ];
 }
 
-const Map<UserRole, RoleCapability> roleCapabilities =
-    <UserRole, RoleCapability>{
-      UserRole.client: RoleCapability(
-        canViewHome: true,
-        canViewSettings: true,
-        canBookConsultation: true,
-        canViewAttorneyDiscovery: true,
-        canViewMatters: true,
-        canViewDocuments: true,
-        canViewMessages: true,
-        canViewFiles: true,
-        canViewAudit: false,
-        canViewNotifications: true,
-        canViewAlerts: true,
-        canViewTasks: true,
-        canViewApprovals: true,
-        canUseAiResearch: false,
-      ),
-      UserRole.attorney: RoleCapability(
-        canViewHome: true,
-        canViewSettings: true,
-        canBookConsultation: true,
-        canViewAttorneyDiscovery: true,
-        canViewMatters: true,
-        canViewDocuments: true,
-        canViewMessages: true,
-        canViewFiles: true,
-        canViewAudit: false,
-        canViewNotifications: true,
-        canViewAlerts: true,
-        canViewTasks: true,
-        canViewApprovals: true,
-        canUseAiResearch: true,
-      ),
-      UserRole.partner: RoleCapability(
-        canViewHome: true,
-        canViewSettings: true,
-        canBookConsultation: true,
-        canViewAttorneyDiscovery: true,
-        canViewMatters: true,
-        canViewDocuments: true,
-        canViewMessages: true,
-        canViewFiles: true,
-        // Partner org-audit slice: the only role the server's
-        // read_org_audit gate admits (navigation hint only).
-        canViewAudit: true,
-        canViewNotifications: true,
-        canViewAlerts: true,
-        canViewTasks: true,
-        canViewApprovals: true,
-        canUseAiResearch: true,
-      ),
-      UserRole.complianceOfficer: RoleCapability(
-        canViewHome: true,
-        canViewSettings: true,
-        canBookConsultation: true,
-        canViewAttorneyDiscovery: true,
-        canViewMatters: true,
-        canViewDocuments: true,
-        canViewMessages: true,
-        canViewFiles: true,
-        canViewAudit: false,
-        canViewNotifications: true,
-        canViewAlerts: true,
-        canViewTasks: true,
-        canViewApprovals: true,
-        canUseAiResearch: false,
-      ),
-      UserRole.researchAnalyst: RoleCapability(
-        canViewHome: true,
-        canViewSettings: true,
-        canBookConsultation: true,
-        canViewAttorneyDiscovery: true,
-        canViewMatters: true,
-        canViewDocuments: true,
-        canViewMessages: true,
-        canViewFiles: true,
-        canViewAudit: false,
-        canViewNotifications: true,
-        canViewAlerts: true,
-        canViewTasks: true,
-        canViewApprovals: true,
-        canUseAiResearch: true,
-      ),
-      UserRole.admin: RoleCapability(
-        canViewHome: true,
-        canViewSettings: true,
-        canBookConsultation: true,
-        canViewAttorneyDiscovery: true,
-        canViewMatters: true,
-        canViewDocuments: true,
-        canViewMessages: true,
-        canViewFiles: true,
-        canViewAudit: false,
-        canViewNotifications: true,
-        canViewAlerts: true,
-        canViewTasks: true,
-        canViewApprovals: true,
-        canUseAiResearch: false,
-      ),
-    };
+/// The role → navigation-hint matrix. Only deviations from the
+/// [RoleCapability] defaults are spelled out: twelve flags are true for
+/// every role, so each entry names at most the two varying flags —
+/// [RoleCapability.canViewAudit] (partner only, the server's
+/// `read_org_audit` gate is the authorization) and
+/// [RoleCapability.canUseAiResearch] (legal-facing roles attorney /
+/// researchAnalyst / partner, owner decision D-R1).
+const Map<UserRole, RoleCapability>
+roleCapabilities = <UserRole, RoleCapability>{
+  UserRole.client: RoleCapability(),
+  UserRole.attorney: RoleCapability(canUseAiResearch: true),
+  // Partner org-audit slice: the only role the server's
+  // read_org_audit gate admits (navigation hint only).
+  UserRole.partner: RoleCapability(canViewAudit: true, canUseAiResearch: true),
+  UserRole.complianceOfficer: RoleCapability(),
+  UserRole.researchAnalyst: RoleCapability(canUseAiResearch: true),
+  UserRole.admin: RoleCapability(),
+};

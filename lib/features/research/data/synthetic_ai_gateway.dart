@@ -81,9 +81,11 @@ class SyntheticAiGateway implements AiGateway {
     );
   }
 
+  static final RegExp _tokenSplitPattern = RegExp(r'[\s,.;:!?()\-_/]+');
+
   static List<String> _tokenize(String query) => query
       .toLowerCase()
-      .split(RegExp(r'[\s,.;:!?()\-_/]+'))
+      .split(_tokenSplitPattern)
       .where((token) => token.length >= 3)
       .toList(growable: false);
 

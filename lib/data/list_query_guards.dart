@@ -9,10 +9,16 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 /// an entire RLS-visible table into memory.
 ///
 /// The cap is intentionally conservative — 200 rows covers any realistic
-/// matter/document/invoice/notification list — and is a cap, not
-/// pagination: cursor/`.range()` paging remains a separate slice (perf
-/// backlog).
+/// matter/document/invoice/notification list — and is a cap, not a page:
+/// callers that render unbounded surfaces (search, feeds) page through
+/// [pagedTableSelect] with [.range] windows of [kSearchPageSize] rows.
 const int kSupabaseListRowCap = 200;
+
+/// Default page size for paged reads (unified search fan-out, feeds).
+///
+/// Four parallel page reads of 30 rows bound a search to ~120 rows instead
+/// of 4 × 200, and bound the eager tile build on the results surface.
+const int kSearchPageSize = 30;
 
 /// Deterministic server-side ordering per table: `(column, descending)`.
 ///
@@ -51,7 +57,8 @@ const Map<String, (String, bool)> kSupabaseListOrderings =
 
 /// The production table-SELECT binding shared by every Supabase api impl:
 /// a bounded, deterministically ordered table SELECT with an optional
-/// equality filter.
+/// equality filter, an optional case-insensitive substring filter, and an
+/// optional `.range()` page window.
 ///
 /// Ordering by a column that is not in the SELECT list is a PostgREST
 /// no-op for the projection (used by `files`, whose `created_at` is not
@@ -60,18 +67,26 @@ const Map<String, (String, bool)> kSupabaseListOrderings =
 /// Unlisted tables are capped without ordering (never fail): an unknown
 /// table falling back to a guessed column would turn a SELECT into a
 /// 400 — the cap alone still bounds the payload.
+///
+/// Defaults preserve the pre-pagination contract exactly (cap 200, no
+/// offset, no ilike), so every existing caller keeps its behavior until it
+/// opts into paging.
 Future<List<Map<String, dynamic>>> boundedTableSelect(
   String table,
   String columns, {
   String? filterColumn,
   Object? filterValue,
+  int? limit,
+  int? offset,
+  String? ilikeColumn,
+  String? ilikeValue,
 }) {
-  // postgrest 2.8.0 type ladder: `.select()`/`.eq()` live on
-  // `PostgrestFilterBuilder`, but `.order()`/`.limit()` are declared on its
-  // SUPERTYPE `PostgrestTransformBuilder` and widen the static type — so
-  // the filter chain is built first, then widened once for order+limit.
-  // Declaring the variable as the filter builder (the previous shape) made
-  // the ordered re-assignment a compile error.
+  // postgrest 2.8.0 type ladder: `.select()`/`.eq()`/`.ilike()` live on
+  // `PostgrestFilterBuilder`, but `.order()`/`.limit()`/`.range()` are
+  // declared on its SUPERTYPE `PostgrestTransformBuilder` and widen the
+  // static type — so the filter chain is built first, then widened once
+  // for order+limit/range. Declaring the variable as the filter builder
+  // (the previous shape) made the ordered re-assignment a compile error.
   PostgrestFilterBuilder<List<Map<String, dynamic>>> filtered = Supabase
       .instance
       .client
@@ -80,10 +95,50 @@ Future<List<Map<String, dynamic>>> boundedTableSelect(
   if (filterColumn != null && filterValue != null) {
     filtered = filtered.eq(filterColumn, filterValue);
   }
+  if (ilikeColumn != null && ilikeValue != null && ilikeValue.isNotEmpty) {
+    filtered = filtered.ilike(ilikeColumn, '%${_escapeIlike(ilikeValue)}%');
+  }
   PostgrestTransformBuilder<List<Map<String, dynamic>>> query = filtered;
   final (String orderColumn, bool descending)? ordering = orderingFor(table);
   if (ordering != null) {
     query = query.order(ordering.$1, ascending: !ordering.$2);
   }
-  return query.limit(kSupabaseListRowCap);
+  final int effectiveLimit = limit ?? kSupabaseListRowCap;
+  if (offset != null) {
+    return query.range(offset, offset + effectiveLimit - 1);
+  }
+  return query.limit(effectiveLimit);
 }
+
+/// Explicit pagination over [boundedTableSelect]: page [page] (0-based) of
+/// [pageSize] rows with the table's deterministic ordering.
+///
+/// A dedicated name (rather than bare `offset:`) so call sites read as
+/// paging and the range math (`from`/`to` inclusive on PostgREST) lives in
+/// exactly one place.
+Future<List<Map<String, dynamic>>> pagedTableSelect(
+  String table,
+  String columns, {
+  int page = 0,
+  int pageSize = kSearchPageSize,
+  String? filterColumn,
+  Object? filterValue,
+  String? ilikeColumn,
+  String? ilikeValue,
+}) {
+  return boundedTableSelect(
+    table,
+    columns,
+    filterColumn: filterColumn,
+    filterValue: filterValue,
+    limit: pageSize,
+    offset: page * pageSize,
+    ilikeColumn: ilikeColumn,
+    ilikeValue: ilikeValue,
+  );
+}
+
+/// Escapes PostgREST `like` wildcards (`%`, `_`, `\`) in user input so a
+/// literal search for `100%` cannot become a wildcard match.
+String _escapeIlike(String value) =>
+    value.replaceAll(r'\', r'\\').replaceAll('%', r'\%').replaceAll('_', r'\_');

@@ -1,7 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../list_query_guards.dart';
 import '../postgrest_failures.dart';
+import '../supabase_seam.dart';
 import 'supabase_billing_api.dart';
 
 /// [SupabaseBillingApi] backed by the PostgREST client.
@@ -20,11 +20,12 @@ class SupabaseBillingApiImpl implements SupabaseBillingApi {
   /// Binds a table SELECT to the app-level client via the shared bounded
   /// binding (`list_query_guards.dart`): newest-first `.order('issued_at')`
   /// + a hard row cap (audit 2026-09-21, P1).
+  /// Shared seam binding ([SupabaseSeam.boundTable]).
   static Future<List<Map<String, dynamic>>> _boundTable(
     String table,
     String columns,
   ) {
-    return boundedTableSelect(table, columns);
+    return SupabaseSeam.boundTable(table, columns);
   }
 
   final BillingTableCaller _table;

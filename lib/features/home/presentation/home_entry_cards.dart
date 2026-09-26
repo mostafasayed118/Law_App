@@ -3,82 +3,44 @@ part of 'home_screen.dart';
 /// The capability-gated dashboard entry cards, returned as one flat list
 /// so the sliver delegate keeps receiving the same eagerly-built literal
 /// it did before the readability split.
+///
+/// Data-driven over [homeEntriesFor]: the entries (order, gates, routes,
+/// copy keys) live in `home/domain/home_entries.dart`, which imports no
+/// feature presentation library. This builder renders the shared
+/// [AppEntryCard] directly, so `home_screen.dart` no longer imports the
+/// twelve feature `*_entry_card.dart` widgets (audit: cross-feature
+/// `presentation → presentation` coupling). The thin feature wrappers stay
+/// in their features as compatibility shells rendering the identical card
+/// with identical parameters — visuals and copy are byte-identical either
+/// way.
+///
+/// Navigation contract (E2E BUG-1, 2026-09-24): every entry here is a
+/// FORWARD navigation away from Home, so it must `push` — never `go`.
+/// `go` replaces the whole stack, which left Home with nothing beneath it
+/// and made the system BACK button exit the app from every feature screen
+/// (`context.push` was used zero times before this fix). Tab switches in
+/// `router_app_shell.dart` keep `go` deliberately: tabs are siblings, not
+/// a parent/child relationship.
 List<Widget> _homeEntryCards(
   BuildContext context,
   RoleCapability capabilities,
 ) {
-  return <Widget>[
-    if (capabilities.canBookConsultation) ...[
-      const SizedBox(height: LegalHubTheme.spaceLg),
-      BookingEntryCard(onTap: () => context.go(AppRoutes.book)),
-      // Spec D-15 demo-posture: the video entry rides the booking gate
-      // (A-2: "book" → "join call" — the same audience, no new role flag).
-      // Visibility hint only; the demo surface has no backend to authorize.
-      const SizedBox(height: LegalHubTheme.spaceMd),
-      VideoEntryCard(onTap: () => context.go(AppRoutes.video)),
-    ],
-    if (capabilities.canViewAttorneyDiscovery) ...[
-      const SizedBox(height: LegalHubTheme.spaceMd),
-      DiscoveryEntryCard(onTap: () => context.go(AppRoutes.discovery)),
-    ],
-    if (capabilities.canViewMatters) ...[
-      const SizedBox(height: LegalHubTheme.spaceMd),
-      MatterEntryCard(onTap: () => context.go(AppRoutes.matters)),
-    ],
-    if (capabilities.canViewDocuments) ...[
-      const SizedBox(height: LegalHubTheme.spaceMd),
-      DocumentEntryCard(onTap: () => context.go(AppRoutes.vault)),
-    ],
-    if (capabilities.canViewMessages) ...[
-      const SizedBox(height: LegalHubTheme.spaceMd),
-      MessageEntryCard(onTap: () => context.go(AppRoutes.messages)),
-    ],
-    // Billing slice (D-BI5): the standalone invoices list rides
-    // the same canViewDocuments gate as the per-matter invoices
-    // section — no new role flag (matrix §4: invoices are
-    // matter-scoped content with client/attorney SHIP, same as
-    // documents). Visibility hint only; the RLS gate is
-    // server-side.
-    if (capabilities.canViewDocuments) ...[
-      const SizedBox(height: LegalHubTheme.spaceMd),
-      BillingInvoicesEntryCard(onTap: () => context.go(AppRoutes.invoices)),
-    ],
-    // Notification-feed slice (D-N1): the org-scoped feed
-    // rides its own nav-hint flag, true for every role (matrix
-    // §4 member SHIP — the organizations gate admits any
-    // active member; no role hierarchy in the feed).
-    // Visibility hint only; the RLS gate is server-side and
-    // `platform_owner_admin` is denied always (D-P0C1(a)).
-    if (capabilities.canViewNotifications) ...[
-      const SizedBox(height: LegalHubTheme.spaceMd),
-      NotificationFeedEntryCard(
-        onTap: () => context.go(AppRoutes.notificationsFeed),
+  final AppLocalizations l10n = AppLocalizations.of(context);
+  final List<HomeEntry> entries = homeEntriesFor(capabilities);
+  final List<Widget> cards = <Widget>[];
+  for (int i = 0; i < entries.length; i++) {
+    final HomeEntry entry = entries[i];
+    cards.add(
+      SizedBox(height: i == 0 ? LegalHubTheme.spaceLg : LegalHubTheme.spaceMd),
+    );
+    cards.add(
+      AppEntryCard(
+        icon: entry.icon,
+        title: entry.title(l10n),
+        subtitle: entry.subtitle(l10n),
+        onTap: () => context.push(entry.route),
       ),
-    ],
-    // v1 queue (2026-08-09 scope drafts): the three read-only
-    // demo surfaces ride their own nav-hint flags; visibility
-    // hints only, never authorization (pages render demo
-    // data; the server/authority does not exist yet).
-    if (capabilities.canViewAlerts) ...[
-      const SizedBox(height: LegalHubTheme.spaceMd),
-      ComplianceAlertsEntryCard(onTap: () => context.go(AppRoutes.alerts)),
-    ],
-    if (capabilities.canViewTasks) ...[
-      const SizedBox(height: LegalHubTheme.spaceMd),
-      TaskBoardEntryCard(onTap: () => context.go(AppRoutes.tasks)),
-    ],
-    if (capabilities.canViewApprovals) ...[
-      const SizedBox(height: LegalHubTheme.spaceMd),
-      ApprovalsEntryCard(onTap: () => context.go(AppRoutes.approvals)),
-    ],
-    // AI research slice (plan 2026-09-02, D-R1): the
-    // research-assistant entry rides its own nav-hint flag,
-    // granted to the legal-facing roles only (attorney /
-    // researchAnalyst / partner). Visibility hint only — the
-    // surface itself is client-side synthetic (D-1).
-    if (capabilities.canUseAiResearch) ...[
-      const SizedBox(height: LegalHubTheme.spaceMd),
-      AiResearchEntryCard(onTap: () => context.go(AppRoutes.research)),
-    ],
-  ];
+    );
+  }
+  return cards;
 }

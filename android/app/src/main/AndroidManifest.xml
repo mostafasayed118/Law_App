@@ -6,7 +6,8 @@
         android:label="LegalHub"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:allowBackup="false">
+        android:allowBackup="false"
+        android:usesCleartextTraffic="false">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -30,13 +31,30 @@
             </intent-filter>
             <!-- Phase 4.1: deep-link entry for the link-based + PKCE
                  recovery variant (and any future auth deep links). The
-                 scheme matches the Supabase dashboard Redirect URL
-                 `com.legalhub.app://auth/v1/callback`. -->
+                 custom scheme matches the Supabase dashboard Redirect URL
+                 `com.legalhub.app://auth/v1/callback` and stays as the
+                 fallback. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="com.legalhub.app"/>
+            </intent-filter>
+            <!-- Verified App Links (audit: custom-scheme hijack): the OS
+                 verifies `legalhub.app` against
+                 `https://legalhub.app/.well-known/assetlinks.json` before
+                 routing here, so a third-party app claiming the custom
+                 scheme cannot intercept invite/recovery links.
+                 `autoVerify` is what promotes this filter to verified;
+                 without it the link opens the disambiguation dialog.
+                 OWNER STEP: deploy `web/.well-known/assetlinks.json` with
+                 the real release signing-cert SHA-256 to legalhub.app. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="https" android:host="legalhub.app" android:pathPrefix="/accept-invite"/>
+                <data android:scheme="https" android:host="legalhub.app" android:pathPrefix="/auth/v1/callback"/>
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

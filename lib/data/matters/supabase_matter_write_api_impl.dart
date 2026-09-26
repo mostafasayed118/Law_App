@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../supabase_seam.dart';
 import 'supabase_matter_write_api.dart';
 
 /// A PostgREST RPC call: function name + named params → response.
@@ -30,22 +31,13 @@ class SupabaseMatterWriteApiImpl implements SupabaseMatterWriteApi {
   /// factory so tests can construct the impl with any callable stub.
   factory SupabaseMatterWriteApiImpl.bind() => SupabaseMatterWriteApiImpl();
 
-  /// Binds the audited `create_matter` RPC to the app-level client.
-  /// postgrest 2.8.0 contract: `await rpc<T>()` resolves to the RAW
-  /// decoded data (T), not a PostgrestResponse — the wrapper is only
-  /// produced when a count is requested — so the production binding wraps
-  /// the raw data into the seam's PostgrestResponse shape (the test stubs'
-  /// own shape); PostgrestException still propagates unchanged (the
-  /// `MessageRpcCaller._boundRpc` precedent).
+  /// Binds the audited `create_matter` RPC to the app-level client via the
+  /// shared seam ([SupabaseSeam.boundRpc]).
   static Future<PostgrestResponse<dynamic>> _boundRpc(
     String function,
     Map<String, dynamic> params,
-  ) async {
-    final dynamic data = await Supabase.instance.client.rpc<dynamic>(
-      function,
-      params: params,
-    );
-    return PostgrestResponse<dynamic>(data: data, count: 0);
+  ) {
+    return SupabaseSeam.boundRpc(function, params);
   }
 
   final MatterWriteRpcCaller _rpcCaller;

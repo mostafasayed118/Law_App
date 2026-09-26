@@ -1,7 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../list_query_guards.dart';
 import '../postgrest_failures.dart';
+import '../supabase_seam.dart';
 import 'supabase_matter_api.dart';
 
 /// [SupabaseMatterApi] backed by the PostgREST client.
@@ -20,11 +20,12 @@ class SupabaseMatterApiImpl implements SupabaseMatterApi {
   /// binding (`list_query_guards.dart`): newest-first `.order('created_at')`
   /// + a hard row cap, so a single read can never pull an entire
   /// RLS-visible table (audit 2026-09-21, P1).
+  /// Shared seam binding ([SupabaseSeam.boundTable]).
   static Future<List<Map<String, dynamic>>> _boundTable(
     String table,
     String columns,
   ) {
-    return boundedTableSelect(table, columns);
+    return SupabaseSeam.boundTable(table, columns);
   }
 
   final MatterTableCaller _table;

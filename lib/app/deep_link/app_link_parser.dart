@@ -53,6 +53,14 @@ class AppLinkParser {
   /// Supabase dashboard Redirect URL).
   static const String appScheme = 'com.legalhub.app';
 
+  /// The verified https host for OS-verified App Links / Universal Links
+  /// (Android `autoVerify` + `assetlinks.json`, iOS `applinks` +
+  /// `apple-app-site-association`, both served from
+  /// `https://legalhub.app/.well-known/`). The custom scheme above stays
+  /// as the fallback for environments without the site association; both
+  /// shapes classify identically below.
+  static const String verifiedHost = 'legalhub.app';
+
   /// The accept-invitation share-link host.
   static const String acceptInviteHost = 'accept-invite';
 
@@ -83,11 +91,43 @@ class AppLinkParser {
     );
   }
 
+  /// Verified-link twin of [acceptInviteUri]:
+  /// `https://legalhub.app/accept-invite?token=<one-time-token>`.
+  ///
+  /// Prefer this producer once the site association is deployed (see
+  /// `web/.well-known/`); `parse` round-trips both shapes to the identical
+  /// `AcceptInviteIntent`.
+  static Uri acceptInviteHttpsUri(String token) {
+    final String trimmed = token.trim();
+    if (trimmed.isEmpty) {
+      throw ArgumentError.value(token, 'token', 'must be a non-empty token');
+    }
+    return Uri(
+      scheme: 'https',
+      host: verifiedHost,
+      path: '/$acceptInviteHost',
+      queryParameters: <String, String>{'token': trimmed},
+    );
+  }
+
   AppLinkIntent parse(Uri uri) {
+    // Verified https shape first: `https://legalhub.app/accept-invite?...`
+    // and `https://legalhub.app/auth/v1/callback...` classify exactly like
+    // their custom-scheme twins (OS-verified, not interceptable by a
+    // third-party app claiming the scheme). Any other https host stays
+    // foreign.
+    if (uri.scheme == 'https' && uri.host == verifiedHost) {
+      return _parsePath(uri);
+    }
     if (uri.scheme != appScheme) {
       return const NoAppLinkIntent();
     }
-    if (uri.host == acceptInviteHost) {
+    return _parsePath(uri);
+  }
+
+  AppLinkIntent _parsePath(Uri uri) {
+    if (uri.host == acceptInviteHost ||
+        (uri.scheme == 'https' && uri.path == '/$acceptInviteHost')) {
       final String? token = uri.queryParameters['token'];
       if (token == null || token.trim().isEmpty) {
         // Never mint an empty-token intent: an accept link without its
@@ -98,6 +138,10 @@ class AppLinkParser {
     }
     if (uri.host == authCallbackHost &&
         uri.path.startsWith(authCallbackPathPrefix)) {
+      return const RecoveryIntent();
+    }
+    if (uri.scheme == 'https' &&
+        uri.path.startsWith('/$authCallbackHost$authCallbackPathPrefix')) {
       return const RecoveryIntent();
     }
     return const NoAppLinkIntent();

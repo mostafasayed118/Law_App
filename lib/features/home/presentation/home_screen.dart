@@ -7,21 +7,10 @@ import '../../../app/legalhub_theme.dart';
 import '../../../app/router.dart';
 import '../../../core/practice_area.dart';
 import '../../../core/roles/user_role.dart';
-import '../../../features/approvals/presentation/approvals_entry_card.dart';
 import '../../../features/auth/presentation/auth_cubit.dart' show AuthCubit;
-import '../../../features/billing/presentation/billing_invoices_entry_card.dart';
-import '../../../features/booking/presentation/booking_entry_card.dart';
-import '../../../features/compliance/presentation/compliance_alerts_entry_card.dart';
-import '../../../features/discovery/presentation/discovery_entry_card.dart';
-import '../../../features/documents/presentation/document_entry_card.dart';
-import '../../../features/matters/presentation/matter_entry_card.dart';
-import '../../../features/messaging/presentation/message_entry_card.dart';
-import '../../../features/notifications/presentation/notification_feed_entry_card.dart';
-import '../../../features/research/presentation/ai_research_entry_card.dart';
-import '../../../features/tasks/presentation/task_board_entry_card.dart';
-import '../../../features/video/presentation/video_entry_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/widgets.dart';
+import '../domain/home_entries.dart';
 import 'widgets/home_cards.dart';
 part 'home_entry_cards.dart';
 part 'home_activity_cards.dart';
@@ -90,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   // The avatar opens the profile surface. A navigation hint
                   // only — no new capability is granted.
                   tooltip: l10n.profileNavigation,
-                  onPressed: () => context.go(AppRoutes.profile),
+                  onPressed: () => context.push(AppRoutes.profile),
                   icon: CircleAvatar(
                     radius: 16,
                     backgroundColor: scheme.primaryContainer,
@@ -109,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   // same surface the home entry card reaches (D-N1). A
                   // navigation hint only, never an authorization grant.
                   tooltip: l10n.notificationsFeedTitle,
-                  onPressed: () => context.go(AppRoutes.notificationsFeed),
+                  onPressed: () => context.push(AppRoutes.notificationsFeed),
                 ),
               ],
             ),
@@ -143,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (query.isEmpty) {
                         return;
                       }
-                      context.go(AppRoutes.searchQuery(query));
+                      context.push(AppRoutes.searchQuery(query));
                     },
                   ),
                   ..._homeEntryCards(context, capabilities),
@@ -179,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       // D-S4 wiring: a practice-area card opens discovery
                       // pre-narrowed to that area (`/discovery?area=…`). A
                       // navigation hint only, never an authorization grant.
-                      onTap: () => context.go(
+                      onTap: () => context.push(
                         AppRoutes.discoveryArea(PracticeArea.criminal),
                       ),
                     ),
@@ -187,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     PracticeAreaCard(
                       icon: Icons.balance,
                       label: l10n.areaCivil,
-                      onTap: () => context.go(
+                      onTap: () => context.push(
                         AppRoutes.discoveryArea(PracticeArea.civil),
                       ),
                     ),
@@ -195,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     PracticeAreaCard(
                       icon: Icons.domain_outlined,
                       label: l10n.areaCorporate,
-                      onTap: () => context.go(
+                      onTap: () => context.push(
                         AppRoutes.discoveryArea(PracticeArea.corporate),
                       ),
                     ),
@@ -203,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     PracticeAreaCard(
                       icon: Icons.family_restroom,
                       label: l10n.areaFamily,
-                      onTap: () => context.go(
+                      onTap: () => context.push(
                         AppRoutes.discoveryArea(PracticeArea.family),
                       ),
                     ),

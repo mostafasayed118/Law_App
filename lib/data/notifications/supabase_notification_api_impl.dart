@@ -1,7 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../list_query_guards.dart';
 import '../postgrest_failures.dart';
+import '../supabase_seam.dart';
 import 'supabase_notification_api.dart';
 
 /// [SupabaseNotificationApi] backed by the PostgREST client.
@@ -24,18 +24,19 @@ class SupabaseNotificationApiImpl implements SupabaseNotificationApi {
   /// `.order('server_timestamp')` (served by the `notifications_org_ts`
   /// index) + a hard row cap (audit 2026-09-21, P1). The gateway's
   /// client-side sort stays as the determinism pin on top.
+  /// Shared seam bindings ([SupabaseSeam.boundTable] for the
+  /// `server_timestamp`-ordered read, [SupabaseSeam.boundRawRpc] for the
+  /// D-N6 write RPC — the exact function name + positional-params shape
+  /// the migration defines; the exact-param pin lives in the impl test).
   static Future<List<Map<String, dynamic>>> _boundTable(
     String table,
     String columns,
   ) {
-    return boundedTableSelect(table, columns);
+    return SupabaseSeam.boundTable(table, columns);
   }
 
-  /// Binds the D-N6 write RPC to the app-level client: the exact function
-  /// name + positional-params shape the migration defines (the
-  /// exact-param pin lives in the impl test).
   static Future<Object?> _boundRpc(String fn, Map<String, dynamic>? params) {
-    return Supabase.instance.client.rpc(fn, params: params);
+    return SupabaseSeam.boundRawRpc(fn, params);
   }
 
   final NotificationTableCaller _table;

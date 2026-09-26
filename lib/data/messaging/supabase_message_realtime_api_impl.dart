@@ -32,11 +32,30 @@ class SupabaseMessageRealtimeApiImpl implements SupabaseMessageRealtimeApi {
 
   @override
   Stream<SupabaseMessageRealtimeEvent> watchMessages(String threadId) {
-    if (_threadId == null) {
+    if (_closed) {
+      return _events.stream;
+    }
+    if (_threadId != threadId) {
+      final bool isFirstOpen = _threadId == null;
       _threadId = threadId;
-      _open(threadId);
+      if (isFirstOpen) {
+        _open(threadId);
+      } else {
+        // Thread switch: tear down the previous channel before opening the
+        // new one. Previously the old channel leaked and the new thread
+        // never received live events (stale-thread bug).
+        unawaited(_switchThread(threadId));
+      }
     }
     return _events.stream;
+  }
+
+  Future<void> _switchThread(String threadId) async {
+    await _handle?.close();
+    _handle = null;
+    if (!_closed) {
+      _open(threadId);
+    }
   }
 
   /// Opens the subscription for one thread. The binding resolves

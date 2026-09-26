@@ -6,6 +6,7 @@ import '../../../features/messaging/domain/message_thread.dart';
 import '../../../features/messaging/presentation/message_cubit.dart';
 import '../../../features/messaging/presentation/message_state.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/demo_labels.dart';
 import '../../../shared/formatting/date_formatting.dart';
 import '../../../shared/widgets/widgets.dart';
 
@@ -23,17 +24,26 @@ part 'matter_messages_section_body.dart';
 /// affordance, no composer (D-W4 body-less line). An empty per-matter subset
 /// renders the localized empty copy (AC-3).
 class MatterMessagesSection extends StatelessWidget {
-  const MatterMessagesSection({required this.matterRef, super.key});
+  const MatterMessagesSection({
+    required this.matterRef,
+    this.gateway,
+    super.key,
+  });
 
   /// The matter title to filter by (matches [MessageThread.matterRef],
   /// D-MSG4/D-W2).
   final String matterRef;
 
+  /// Injected seam for tests and composition-root wiring. Defaults to the
+  /// service locator so existing call sites behave exactly as before; pass
+  /// a fake to drive the section without the global (DIP).
+  final MessageGateway? gateway;
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider<MessageCubit>(
       create: (BuildContext context) =>
-          MessageCubit(serviceLocator<MessageGateway>()),
+          MessageCubit(gateway ?? serviceLocator<MessageGateway>()),
       child: _MessagesSectionBody(matterRef: matterRef),
     );
   }

@@ -1,7 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../list_query_guards.dart';
 import '../postgrest_failures.dart';
+import '../supabase_seam.dart';
 import 'supabase_storage_api.dart';
 
 /// [SupabaseStorageApi] backed by the PostgREST client.
@@ -20,11 +20,12 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
   /// binding (`list_query_guards.dart`): newest-first `.order('created_at')`
   /// (a projection-external column that still anchors the newest-first
   /// scan) + a hard row cap (audit 2026-09-21, P1).
+  /// Shared seam binding ([SupabaseSeam.boundTable]).
   static Future<List<Map<String, dynamic>>> _boundTable(
     String table,
     String columns,
   ) {
-    return boundedTableSelect(table, columns);
+    return SupabaseSeam.boundTable(table, columns);
   }
 
   final StorageTableCaller _table;

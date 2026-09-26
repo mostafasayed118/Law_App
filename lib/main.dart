@@ -36,17 +36,17 @@ Future<void> main() async {
   final SharedPreferences preferences = await SharedPreferences.getInstance();
   configureDependencies(preferences: preferences);
   final LocaleCubit localeCubit = serviceLocator<LocaleCubit>();
-  await localeCubit.load();
   final ThemeCubit themeCubit = serviceLocator<ThemeCubit>();
-  // Restore the persisted theme mode before the first frame so the app
-  // starts on the user's choice (light/dark/system) instead of the default.
-  await themeCubit.load();
   final AuthCubit authCubit = serviceLocator<AuthCubit>();
-  // Contract-§5: restore any persisted provider session before the first
-  // frame so the router starts on the true auth state instead of a
-  // misleading default. Harmless with the fake (resolves to signed-out);
-  // meaningful once a real provider gateway is configured (Batch 3.3).
-  await authCubit.restore();
+  // Parallelize independent restores to shorten time-to-first-frame.
+  // Contract-§5 still holds: all complete before the router is created.
+  await Future.wait(<Future<void>>[
+    localeCubit.load(),
+    // Restore the persisted theme mode before the first frame so the app
+    // starts on the user's choice (light/dark/system) instead of the default.
+    themeCubit.load(),
+    authCubit.restore(),
+  ]);
   final GoRouter router = createAppRouter(authCubit);
   // Phase 4.1 completion (D-P34.2 hook): the app-level deep-link listener
   // bridges OS intents — an accept-invitation share link buffers its
@@ -90,7 +90,7 @@ class LegalHubApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: <BlocProvider<dynamic>>[
+      providers: [
         BlocProvider<AuthCubit>.value(value: authCubit),
         BlocProvider<LocaleCubit>.value(value: localeCubit),
         BlocProvider<ThemeCubit>.value(value: themeCubit),

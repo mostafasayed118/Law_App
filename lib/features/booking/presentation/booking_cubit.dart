@@ -46,18 +46,7 @@ class BookingCubit extends Cubit<BookingState> {
     if (isClosed || state.step != BookingStep.category) {
       return;
     }
-    final BookingDraft draft = state.draft;
-    emit(
-      state.copyWith(
-        draft: BookingDraft(
-          category: category,
-          topic: draft.topic,
-          slot: draft.slot,
-          attorneyId: draft.attorneyId,
-          attorneyName: draft.attorneyName,
-        ),
-      ),
-    );
+    emit(state.copyWith(draft: state.draft.copyWith(category: () => category)));
   }
 
   /// Stores the free-text topic verbatim (no trim here — trimming happens at
@@ -66,18 +55,7 @@ class BookingCubit extends Cubit<BookingState> {
     if (isClosed || state.step != BookingStep.category) {
       return;
     }
-    final BookingDraft draft = state.draft;
-    emit(
-      state.copyWith(
-        draft: BookingDraft(
-          category: draft.category,
-          topic: topic,
-          slot: draft.slot,
-          attorneyId: draft.attorneyId,
-          attorneyName: draft.attorneyName,
-        ),
-      ),
-    );
+    emit(state.copyWith(draft: state.draft.copyWith(topic: () => topic)));
   }
 
   /// Step-1 → step-2: advances only when a category is selected, then loads
@@ -148,18 +126,7 @@ class BookingCubit extends Cubit<BookingState> {
     if (isClosed || state.step != BookingStep.dateTime) {
       return;
     }
-    final BookingDraft draft = state.draft;
-    emit(
-      state.copyWith(
-        draft: BookingDraft(
-          category: draft.category,
-          topic: draft.topic,
-          slot: slot,
-          attorneyId: draft.attorneyId,
-          attorneyName: draft.attorneyName,
-        ),
-      ),
-    );
+    emit(state.copyWith(draft: state.draft.copyWith(slot: () => slot)));
   }
 
   /// Step-2 → step-3: advances only when a slot is selected.

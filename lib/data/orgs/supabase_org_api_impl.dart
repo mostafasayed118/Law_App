@@ -1,6 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../list_query_guards.dart';
+import '../supabase_seam.dart';
 import 'supabase_org_api.dart';
 
 part 'supabase_org_api_mapping.dart';
@@ -37,32 +37,24 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
   /// factory so tests can construct the impl with any callable stub.
   factory SupabaseOrgApiImpl.bind() =>
       SupabaseOrgApiImpl(_boundRpc, _boundTable);
+
+  /// Shared seam binding ([SupabaseSeam.boundRpc]).
   static Future<PostgrestResponse<dynamic>> _boundRpc(
     String function,
     Map<String, dynamic> params,
-  ) async {
-    // postgrest 2.8.0 contract: `await rpc<T>()` resolves to the RAW
-    // decoded data (T), NOT a PostgrestResponse — the wrapper is only
-    // produced when a count is requested. The seam's callers (and the test
-    // stubs) expect the wrapped shape, so wrap the raw data here;
-    // PostgrestException still propagates from the await unchanged.
-    final dynamic data = await Supabase.instance.client.rpc<dynamic>(
-      function,
-      params: params,
-    );
-    return PostgrestResponse<dynamic>(data: data, count: 0);
+  ) {
+    return SupabaseSeam.boundRpc(function, params);
   }
 
-  /// Binds a table SELECT to the app-level client via the shared bounded
-  /// binding (`list_query_guards.dart`): a hard row cap, no ordering (the
-  /// caller-scoped `memberships` read is bounded by the user's own org
-  /// count; no deterministic column is contractually meaningful)
-  /// (audit 2026-09-21, P1).
+  /// Shared seam binding ([SupabaseSeam.boundTable]): a hard row cap, no
+  /// ordering (the caller-scoped `memberships` read is bounded by the
+  /// user's own org count; no deterministic column is contractually
+  /// meaningful) (audit 2026-09-21, P1).
   static Future<List<Map<String, dynamic>>> _boundTable(
     String table,
     String columns,
   ) {
-    return boundedTableSelect(table, columns);
+    return SupabaseSeam.boundTable(table, columns);
   }
 
   final OrgRpcCaller _rpc;

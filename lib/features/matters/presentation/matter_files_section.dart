@@ -7,6 +7,7 @@ import '../../../features/storage/domain/storage_gateway.dart';
 import '../../../features/storage/presentation/storage_cubit.dart';
 import '../../../features/storage/presentation/storage_state.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/demo_labels.dart';
 import '../../../shared/widgets/widgets.dart';
 
 part 'matter_files_section_body.dart';
@@ -23,17 +24,22 @@ part 'matter_files_section_body.dart';
 /// a flagged follow-up). An empty per-matter subset renders the localized
 /// empty copy.
 class MatterFilesSection extends StatelessWidget {
-  const MatterFilesSection({required this.matterRef, super.key});
+  const MatterFilesSection({required this.matterRef, this.gateway, super.key});
 
   /// The matter title to filter by (matches [FileMetadata.matterRef],
   /// D-STR5/D-W2).
   final String matterRef;
 
+  /// Injected seam for tests and composition-root wiring. Defaults to the
+  /// service locator so existing call sites behave exactly as before; pass
+  /// a fake to drive the section without the global (DIP).
+  final StorageGateway? gateway;
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider<StorageCubit>(
       create: (BuildContext context) =>
-          StorageCubit(serviceLocator<StorageGateway>()),
+          StorageCubit(gateway ?? serviceLocator<StorageGateway>()),
       child: _FilesSectionBody(matterRef: matterRef),
     );
   }

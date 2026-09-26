@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -60,10 +62,37 @@ class _InviteMemberSheetState extends State<InviteMemberSheet> {
   InviteResult? _invite;
   OrgFailureKind? _failure;
 
+  /// Lifecycle-bound clipboard auto-clear timer (OWASP A02). Stored (not
+  /// fire-and-forget) so `dispose` cancels it: a pending timer at widget
+  /// teardown fails the flutter_test invariant, and a clear firing after
+  /// the sheet is gone would erase a paste the user made elsewhere.
+  Timer? _clipboardClearTimer;
+
   @override
   void dispose() {
+    _clipboardClearTimer?.cancel();
+    _clipboardClearTimer = null;
     _email.dispose();
     super.dispose();
+  }
+
+  /// Schedules a best-effort clipboard clear of [expected] after 30s.
+  /// Only clears when the clipboard still holds our payload, and is
+  /// cancelled by [dispose] (see [_clipboardClearTimer]).
+  void _scheduleClipboardClear(String expected) {
+    _clipboardClearTimer?.cancel();
+    _clipboardClearTimer = Timer(const Duration(seconds: 30), () async {
+      try {
+        final ClipboardData? current = await Clipboard.getData(
+          Clipboard.kTextPlain,
+        );
+        if (current?.text == expected) {
+          await Clipboard.setData(const ClipboardData(text: ''));
+        }
+      } catch (_) {
+        // Clipboard unavailable — nothing to clear.
+      }
+    });
   }
 
   @override
@@ -230,6 +259,9 @@ class _InviteMemberSheetState extends State<InviteMemberSheet> {
 
   Future<void> _copyToken(String token) async {
     await Clipboard.setData(ClipboardData(text: token));
+    // Bearer-grade one-time token: auto-clear after 30s to limit
+    // clipboard-snooping window (OWASP A02). Best-effort only.
+    _scheduleClipboardClear(token);
     if (!mounted) {
       return;
     }
@@ -247,7 +279,9 @@ class _InviteMemberSheetState extends State<InviteMemberSheet> {
   /// `_invite` state.
   Future<void> _copyShareLink(String token) async {
     final Uri link = AppLinkParser.acceptInviteUri(token);
-    await Clipboard.setData(ClipboardData(text: link.toString()));
+    final String linkText = link.toString();
+    await Clipboard.setData(ClipboardData(text: linkText));
+    _scheduleClipboardClear(linkText);
     if (!mounted) {
       return;
     }

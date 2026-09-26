@@ -104,12 +104,23 @@ class LegalHubTheme {
   static ThemeData forLocale(Locale locale) =>
       _build(brightness: Brightness.light, locale: locale);
 
+  static final Map<String, ThemeData> _themeCache = <String, ThemeData>{};
+
   /// Theme for a brightness/locale pair. Locale selects font families so
   /// Arabic uses Noto Naskh and Latin uses Playfair/Inter.
+  /// Results are cached per (brightness, languageCode) to avoid rebuilding
+  /// a full ThemeData on every locale/theme emit (perf: LegalHubApp.build
+  /// calls this twice per emit).
   static ThemeData forBrightness(
     Brightness brightness, {
     Locale locale = const Locale('en'),
-  }) => _build(brightness: brightness, locale: locale);
+  }) {
+    final String key = '${brightness.name}_${locale.languageCode}';
+    return _themeCache.putIfAbsent(
+      key,
+      () => _build(brightness: brightness, locale: locale),
+    );
+  }
 
   static ThemeData _build({
     required Brightness brightness,
