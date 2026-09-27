@@ -148,11 +148,14 @@ SUPABASE_TEST_DB_URL=postgresql://postgres:***@host:5432/postgres scripts/verify
 scripts/verify_policy_tests.sh --check        # static validation, no database
 ```
 
-- `--apply` applies `migrations/01`, `02`, `04_matters.sql`,
-  `05_documents.sql`, `06_message_threads.sql`, `07_storage.sql`,
-  `08_messages.sql` (the five §14 un-deferral slices — `07_storage.sql`
-  requires the platform storage schema, present on the rehearsal host),
-  `policies/*.sql`, `rpc/*.sql` in the apply order above.
+- `--apply` applies `migrations/01_org_schema.sql`, `02_rls_functions.sql`,
+  `04_matters.sql`, `05_documents.sql`, `06_message_threads.sql`,
+  `07_storage.sql`, `08_messages.sql` (the five §14 un-deferral slices —
+  `07_storage.sql` requires the platform storage schema, present on the
+  rehearsal host), `09_realtime_push.sql`, `10_billing_invoices.sql`,
+  `11_matter_write.sql`, `14_notifications.sql`,
+  `15_notification_producer.sql`, `16_notification_read_flag.sql`,
+  `17_tasks.sql`, then `policies/*.sql`, `rpc/*.sql` in the apply order above.
   **`03_platform_config_seed.sql` is NOT applied**: its owner token is an
   apply-time substitution placeholder for the dev project; the battery seeds
   its own fixture owner row and proves the single-account bound (D-P0C3)

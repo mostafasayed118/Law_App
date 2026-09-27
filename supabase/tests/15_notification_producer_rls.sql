@@ -124,7 +124,7 @@ set role authenticated;
 begin;
 do $$
 declare
-  v_id    uuid;
+  v_row   jsonb;
   v_base  bigint;
   v_after bigint;
   v_cat   text;
@@ -134,10 +134,12 @@ begin
   v_base := current_setting('b15.msg_base', true)::bigint;
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000002', false);
   perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002"}', false);
+  -- send_message returns the persisted row as jsonb (audit follow-up
+  -- 2026-09-27 — battery 10 pattern); extract the id for the null check.
   select public.send_message(
     '60000000-0000-4000-8000-000000000001', '15.02 body probe — must never leak')
-    into v_id;
-  if v_id is null then
+    into v_row;
+  if v_row is null or v_row ->> 'id' is null then
     raise exception 'POLICY-BATTERY FAIL 15.02: send_message returned null';
   end if;
 

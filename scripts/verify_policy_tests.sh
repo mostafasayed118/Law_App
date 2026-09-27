@@ -89,6 +89,18 @@
 #      audit-mirror trigger: delta-based matter/message map positives with
 #      in-txn atomicity + gate visibility, the outcome/action/NULL-org
 #      filters, the EXECUTE-deny, and the fixed-summary redaction pin).
+#      16_notification_read_flag.sql (the read-flag write battery — the
+#      D-N6 mark-as-read RPC: own-org unread-only flips with the exact-count
+#      return, per-org mark_read audit rows, idempotency, the no-reproduce
+#      interplay with the 15 producer map, and the RPC-only write path pin).
+#      17_task_rls.sql (the task-writes battery — the Gate 3 task slice:
+#      create/advance/assign/acknowledge positives with the §8 audit-row
+#      positives, the in-function assignment-gate deny rows
+#      (org-role-alone / cross-org / suspended / owner / anon), the
+#      check_violation validation denies (title / transition / terminal /
+#      dead-assignee / owner-assignee / unknown-status), the
+#      assignee-only acknowledge deny, the read-policy rows, the
+#      org-mismatch invariant, and the §8 negative).
 #      Every matrix row has ≥1 positive + ≥1 negative check (contract §9).
 #
 # The harness NEVER runs against the live dev project — only against a
@@ -169,6 +181,7 @@ BATTERY_FILES=(
   "14_notification_rls.sql"
   "15_notification_producer_rls.sql"
   "16_notification_read_flag.sql"
+  "17_task_rls.sql"
 )
 
 usage() {
@@ -224,7 +237,7 @@ static_check() {
       "$TESTS_DIR/09_realtime_push.sql" "$TESTS_DIR/10_send_message_rls.sql" \
       "$TESTS_DIR/11_invoice_rls.sql" "$TESTS_DIR/12_owner_assignment.sql" \
       "$TESTS_DIR/13_matter_write_rls.sql" "$TESTS_DIR/14_notification_rls.sql" \
-      "$TESTS_DIR/15_notification_producer_rls.sql" | sort -u)
+      "$TESTS_DIR/15_notification_producer_rls.sql" "$TESTS_DIR/17_task_rls.sql" | sort -u)
   for ref in $uuids_from; do
     if grep -q "$ref" "$TESTS_DIR/00_fixtures.sql"; then
       ok "fixture UUID $ref resolves in 00_fixtures.sql"
@@ -235,7 +248,7 @@ static_check() {
 
   note "static check: every battery check block carries the FAIL marker"
   local file blocks
-  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql 11_invoice_rls.sql 12_owner_assignment.sql 13_matter_write_rls.sql 14_notification_rls.sql 15_notification_producer_rls.sql; do
+  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql 11_invoice_rls.sql 12_owner_assignment.sql 13_matter_write_rls.sql 14_notification_rls.sql 15_notification_producer_rls.sql 16_notification_read_flag.sql 17_task_rls.sql; do
     blocks=$(grep -c 'POLICY-BATTERY FAIL' "$TESTS_DIR/$f")
     if [ "$blocks" -ge 10 ]; then
       ok "$f: $blocks named check blocks"
@@ -289,19 +302,21 @@ apply_slice() {
   psql_apply "$SUPABASE_DIR/migrations/11_matter_write.sql" "apply migrations/11_matter_write.sql"
   psql_apply "$SUPABASE_DIR/migrations/14_notifications.sql" "apply migrations/14_notifications.sql"
   psql_apply "$SUPABASE_DIR/migrations/15_notification_producer.sql" "apply migrations/15_notification_producer.sql"
+  psql_apply "$SUPABASE_DIR/migrations/16_notification_read_flag.sql" "apply migrations/16_notification_read_flag.sql"
+  psql_apply "$SUPABASE_DIR/migrations/17_tasks.sql" "apply migrations/17_tasks.sql"
   # 03_platform_config_seed.sql is deliberately NOT applied: its owner token
   # is an apply-time substitution placeholder for the dev project; the
   # battery's fixtures seed the rehearsal project's own owner row (D-P0C3
   # proves the bound; the seed itself is a trusted migration, not a client
   # reachable path).
   note "apply: 03_platform_config_seed.sql skipped by design (apply-time token; fixtures seed the rehearsal owner)"
-  # The structural pins (12 tables/RLS, 11 policies + the storage-surface
+  # The structural pins (14 tables/RLS, 13 policies + the storage-surface
   # pins + the publication pin) and 00_fixtures' matters + documents +
   # message_threads + files + storage.objects + messages +
-  # billing_invoices resets require all seven un-deferral slices — applied
+  # billing_invoices + tasks resets require all eight un-deferral slices — applied
   # above via 04_matters.sql + 05_documents.sql + 06_message_threads.sql +
   # 07_storage.sql + 08_messages.sql + 09_realtime_push.sql +
-  # 10_billing_invoices.sql.
+  # 10_billing_invoices.sql + 17_tasks.sql.
   # policies/matters.sql + policies/documents.sql + policies/message_threads.sql
   # + policies/files.sql + policies/storage_objects.sql + policies/messages.sql
   # + policies/messages_insert.sql + policies/invoices.sql are applied in
@@ -344,10 +359,10 @@ expect_tf() { # $1 label, $2 actual ('t'/'f')
 
 structural_pins() {
   note "--- 1a. Tables + RLS ---"
-  expect_eq "thirteen public tables present" \
-    "$(run_sql "select count(*) from pg_tables where schemaname='public' and tablename in ('profiles','organizations','memberships','invitations','audit_events','platform_config','matters','documents','message_threads','files','messages','billing_invoices','notifications');")" "13"
-  expect_eq "RLS enabled on all thirteen" \
-    "$(run_sql "select count(*) from pg_tables where schemaname='public' and tablename in ('profiles','organizations','memberships','invitations','audit_events','platform_config','matters','documents','message_threads','files','messages','billing_invoices','notifications') and rowsecurity;")" "13"
+  expect_eq "fourteen public tables present" \
+    "$(run_sql "select count(*) from pg_tables where schemaname='public' and tablename in ('profiles','organizations','memberships','invitations','audit_events','platform_config','matters','documents','message_threads','files','messages','billing_invoices','notifications','tasks');")" "14"
+  expect_eq "RLS enabled on all fourteen" \
+    "$(run_sql "select count(*) from pg_tables where schemaname='public' and tablename in ('profiles','organizations','memberships','invitations','audit_events','platform_config','matters','documents','message_threads','files','messages','billing_invoices','notifications','tasks') and rowsecurity;")" "14"
 
   note "--- 1b. Narrow SELECT grants (01_org_schema.sql) ---"
   expect_tf "authenticated SELECT on profiles" \
@@ -396,6 +411,10 @@ structural_pins() {
     "$(run_sql "select has_table_privilege('authenticated','public.notifications','SELECT');")"
   expect_eq "anon SELECT on notifications ABSENT (default-deny)" \
     "$(run_sql "select has_table_privilege('anon','public.notifications','SELECT');")" "f"
+  expect_tf "authenticated SELECT on tasks (17_tasks.sql)" \
+    "$(run_sql "select has_table_privilege('authenticated','public.tasks','SELECT');")"
+  expect_eq "anon SELECT on tasks ABSENT (default-deny)" \
+    "$(run_sql "select has_table_privilege('anon','public.tasks','SELECT');")" "f"
 
   note "--- 1c. Function EXECUTE surface (02_rls_functions.sql R-3/R-4) ---"
   expect_tf "policy helper is_active_member granted (R-4)" \
@@ -430,15 +449,19 @@ structural_pins() {
     "remove_membership(uuid, uuid)"
     "delete_my_account()"
     "list_organizations_metadata()"
-    "list_members_metadata()"
+    "list_members_metadata(integer, integer)"
     "suspend_membership_platform(uuid, uuid)"
     "reactivate_membership_platform(uuid, uuid)"
     "delete_demo_account(uuid)"
-    "read_org_audit(uuid)"
-    "read_platform_audit()"
+    "read_org_audit(uuid, integer, integer)"
+    "read_platform_audit(integer, integer)"
     "list_org_members_metadata(uuid)"
     "send_message(uuid, text)"
     "create_matter(uuid, text, text, uuid, uuid)"
+    "create_task(uuid, text, uuid)"
+    "advance_task_status(uuid, text)"
+    "assign_task(uuid, uuid)"
+    "acknowledge_task(uuid)"
   )
   for sig in "${rpc_list[@]}"; do
     expect_tf "authenticated EXECUTE on public.$sig" \
@@ -447,15 +470,17 @@ structural_pins() {
   expect_eq "anon EXECUTE on invite_member ABSENT" \
     "$(run_sql "select has_function_privilege('anon','public.invite_member(uuid, text, public.org_role)','EXECUTE');")" "f"
   expect_eq "anon EXECUTE on list_members_metadata ABSENT" \
-    "$(run_sql "select has_function_privilege('anon','public.list_members_metadata()','EXECUTE');")" "f"
+    "$(run_sql "select has_function_privilege('anon','public.list_members_metadata(integer, integer)','EXECUTE');")" "f"
+  expect_eq "anon EXECUTE on create_task ABSENT (task RPCs grant authenticated only)" \
+    "$(run_sql "select has_function_privilege('anon','public.create_task(uuid, text, uuid)','EXECUTE');")" "f"
 
   note "--- 1e. Policy inventory (D-P0C4: audit/platform_config RPC-only) ---"
   expect_eq "zero policies on audit_events" \
     "$(run_sql "select count(*) from pg_policies where schemaname='public' and tablename='audit_events';")" "0"
   expect_eq "zero policies on platform_config" \
     "$(run_sql "select count(*) from pg_policies where schemaname='public' and tablename='platform_config';")" "0"
-  expect_eq "exactly twelve policies across the client tables (12 minus the D-SM3 messages_insert_assigned drop, plus the notifications_select_org policy)" \
-    "$(run_sql "select count(*) from pg_policies where schemaname='public';")" "12"
+  expect_eq "exactly thirteen policies across the client tables (12 minus the D-SM3 messages_insert_assigned drop, plus the notifications_select_org policy, plus the tasks_select_assigned policy)" \
+    "$(run_sql "select count(*) from pg_policies where schemaname='public';")" "13"
 
   note "--- 1f. Forward pin re-scoped (2026-08-08): matters, documents, message_threads, files + messages are the FIRST FIVE §14 un-deferrals ---"
   # D-P0C1(b) originally pinned 'no matter/document/message tables exist'. The
@@ -505,9 +530,16 @@ structural_pins() {
   # policy (redacted-metadata rows only — the NEW-surface feed, the tenth
   # applied table; review Q1: redaction is structural, no user-identity /
   # content / raw-text columns) and re-scopes the table/RLS pins to 13 and
-  # the public-policy pin to 12.
+  # the public-policy pin to 12. The task-writes slice (Gate 3 spec
+  # 2026-09-27) ships the tasks table + tasks_select_assigned policy (an
+  # assigned-member read on an org+matter-scoped row — the eleventh
+  # applied table; writes are RPC-only, no INSERT/UPDATE/DELETE policy)
+  # and re-scopes the table/RLS pins to 14 and the public-policy pin
+  # to 13.
   expect_eq "notifications present (new-surface feed)" \
     "$(run_sql "select count(*) from information_schema.tables where table_schema='public' and table_name = 'notifications';")" "1"
+  expect_eq "tasks present (task-writes slice: org+matter-scoped, RPC-only writes)" \
+    "$(run_sql "select count(*) from information_schema.tables where table_schema='public' and table_name = 'tasks';")" "1"
   expect_eq "live delivery PRESENT (messages in supabase_realtime — seventh un-deferral)" \
     "$(run_sql "select count(*) from pg_publication_tables where schemaname = 'public' and tablename = 'messages';")" "1"
   expect_eq "exactly one table in the publication (nothing else, D-P0C1(b) teeth)" \
@@ -549,7 +581,7 @@ run_battery() {
   expect_eq "exactly one platform_config row after fixtures" \
     "$(run_sql "select count(*) from public.platform_config;")" "1"
 
-  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql 11_invoice_rls.sql 12_owner_assignment.sql 13_matter_write_rls.sql 14_notification_rls.sql 15_notification_producer_rls.sql; do
+  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql 11_invoice_rls.sql 12_owner_assignment.sql 13_matter_write_rls.sql 14_notification_rls.sql 15_notification_producer_rls.sql 16_notification_read_flag.sql 17_task_rls.sql; do
     note "--- 2c. Battery file: $f ---"
     out=$(psql "$SUPABASE_TEST_DB_URL" -X -q -v ON_ERROR_STOP=1 -f "$TESTS_DIR/$f" 2>&1)
     rc=$?
