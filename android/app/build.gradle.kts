@@ -37,12 +37,45 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    // Required: product flavors below set per-flavor `resValue`s (app_name).
+    // AGP refuses custom flavor resource values while this is disabled.
+    buildFeatures {
+        resValues = true
+    }
+
     defaultConfig {
         applicationId = "com.legalhub.app"
         minSdk = 24
         targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        // Default deep-link scheme (== applicationId, audit doc §12.19).
+        // Each product flavor below overrides it so a dev install owns
+        // `com.legalhub.app.dev://` and can never intercept prod links.
+        manifestPlaceholders["deepLinkScheme"] = "com.legalhub.app"
+    }
+
+    // Build flavors: `development` (daily loop) vs `production` (store).
+    // Select with `--flavor development|production` on every flutter
+    // run/build invocation. Production keeps the original applicationId
+    // byte-for-byte (audit doc §12.19: it must not change after a store
+    // upload); development appends `.dev` so both installs coexist on one
+    // device. `flutter run`/`flutter build` without `--flavor` builds every
+    // flavor — always pass `--flavor` explicitly.
+    flavorDimensions += "environment"
+    productFlavors {
+        create("development") {
+            dimension = "environment"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            resValue("string", "app_name", "LegalHub Dev")
+            manifestPlaceholders["deepLinkScheme"] = "com.legalhub.app.dev"
+        }
+        create("production") {
+            dimension = "environment"
+            resValue("string", "app_name", "LegalHub")
+            manifestPlaceholders["deepLinkScheme"] = "com.legalhub.app"
+        }
     }
 
     buildTypes {

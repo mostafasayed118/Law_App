@@ -85,7 +85,7 @@ recorded prerequisites are approved — see
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (1477 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (1488 total): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), ThemeCubit (mode persistence + restart
   restore), Redactor (password/OTP/email/Bearer redaction with leak guards),
@@ -120,7 +120,9 @@ recorded prerequisites are approved — see
   onboarding bypass, the reset-screen success path, the dev gateways, the
   in-memory locale store, and the onboarding-success screen. Batch 5 added
   the 800×600 onboarding no-overflow test and the EN/AR/TR localized-fallback
-  assertions.
+   assertions, and the build-flavor configuration (`AppFlavor` parsing,
+   flavor application-ID / deep-link-scheme separation, Supabase-seam
+   adaptation, and flavor-pinned entrypoint defaults).
 - Coverage: **1423 tests** (2026-09-23 — the D-15 video-consultation demo
   slice: the synthetic `VideoGateway` seam + 4-session deterministic fake
   (zero real media, zero writes, posture doc
@@ -395,11 +397,36 @@ flutter gen-l10n
 dart format --output=none --set-exit-if-changed lib test
 flutter analyze
 flutter test
-# With real Supabase config (Batch 3.3): the anon public key + URL come from
-# the git-ignored .env file at build time. Omitting the flag runs the fake
-# gateway (env-less local runs and tests keep working).
+# Build flavors: development (LegalHub Dev, com.legalhub.app.dev) vs
+# production (LegalHub, com.legalhub.app). Copy the matching example file to
+# the git-ignored env file first (cp .env.development.example
+# .env.development) and fill in real values — names only in version control,
+# and only the anon public key on the client. Always pass --flavor AND -t
+# together; omitting --flavor builds every flavor.
+# Development (daily loop, debug banner on):
+flutter run --flavor development -t lib/main_development.dart --dart-define-from-file=.env.development
+# Production:
+flutter run --flavor production -t lib/main_production.dart --dart-define-from-file=.env.production
+# Builds install side-by-side (distinct application IDs) and own distinct
+# deep-link schemes (com.legalhub.app.dev:// vs com.legalhub.app://).
+# Legacy flavor-less entry (resolves to production config):
 flutter run --dart-define-from-file=.env
+# Release examples:
+flutter build apk --release --flavor production -t lib/main_production.dart --dart-define-from-file=.env.production
+flutter build appbundle --release --flavor production -t lib/main_production.dart --dart-define-from-file=.env.production
+flutter build ipa --release --flavor production -t lib/main_production.dart --dart-define-from-file=.env.production
 ```
+
+Flavor-to-native mapping: Android `productFlavors` in
+`android/app/build.gradle.kts` (`applicationIdSuffix .dev`, per-flavor
+`app_name`, per-flavor `${deepLinkScheme}` manifest placeholder); iOS
+`development` / `production` schemes plus per-flavor build configurations
+(bundle ID, `APP_DISPLAY_NAME`, `APP_BUNDLE_ID`, `DEEP_LINK_SCHEME`) in the
+Xcode project. Dart-side defaults live in `lib/app/flavor.dart`
+(`AppConfig.developmentFromEnvironment()` /
+`AppConfig.productionFromEnvironment()`), shared startup in
+`bootstrap()` (`lib/main.dart`). With no Supabase pair injected, any flavor
+runs env-less on the credential-free fakes.
 
 **Verified against:** postgrest 2.8.0 / supabase-dart 2.14.0. Five contract
 pins in `test/data/orgs/` run against a real `SupabaseClient` with a mocked
@@ -410,8 +437,8 @@ HTTP layer and lock the exact postgrest await shape the app depends on —
 (2: `from().select()` plain + chained `.eq()` → raw row list). A future
 postgrest upgrade that changes the await contract fails loudly in CI, not on
 a device (the on-device create-org crash this class caused is recorded in
-`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **1477 tests**
-passing (1477 tracked declarations + 3 loop-generated, 1480 at runtime,
+`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **1488 tests**
+passing (1488 tracked declarations + 3 loop-generated, 1491 at runtime,
 ledger `verify_ledger.sh` PASS).
 
 ## Fonts and licenses

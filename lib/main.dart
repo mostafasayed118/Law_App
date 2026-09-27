@@ -9,6 +9,7 @@ import 'app/deep_link/app_link_listener.dart';
 import 'app/deep_link/app_link_parser.dart';
 import 'app/deep_link/app_links_adapter.dart';
 import 'app/deep_link/pending_accept_invite_store.dart';
+import 'app/flavor.dart';
 import 'app/legalhub_theme.dart';
 import 'app/localization/locale_cubit.dart';
 import 'app/router.dart';
@@ -20,12 +21,21 @@ import 'features/auth/presentation/auth_cubit.dart';
 import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
+  await bootstrap(AppConfig.fromEnvironment());
+}
+
+/// Shared bootstrap for every flavor entrypoint
+/// (`lib/main_development.dart`, `lib/main_production.dart`, and this
+/// default entry).
+///
+/// Batch 3.3: build-time config comes from the [config] (itself fed by
+/// `--dart-define-from-file`). When no env file is injected, the DI flip
+/// stays on the fake gateway and no provider is initialized — env-less runs
+/// and tests keep working.
+Future<void> bootstrap(AppConfig config) async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Batch 3.3: consume build-time config (`--dart-define-from-file=.env`).
-  // When no env file is injected, the DI flip stays on the fake gateway and
-  // no provider is initialized — env-less runs and tests keep working.
-  final SupabaseEnv supabaseEnv = SupabaseEnv.fromEnvironment();
-  if (supabaseEnv.isConfigured) {
+  final SupabaseEnv supabaseEnv = config.toSupabaseEnv();
+  if (config.isConfigured) {
     // Anon-key guard: refuse a non-anon key before any provider is wired.
     SupabaseEnv.ensureAnonKey(supabaseEnv.anonKey);
     await initializeSupabase(
@@ -66,6 +76,9 @@ Future<void> main() async {
       authCubit: authCubit,
       localeCubit: localeCubit,
       themeCubit: themeCubit,
+      // The debug banner marks dev-flavor builds on-device so a dev install
+      // is never mistaken for production. Production stays banner-free.
+      debugBanner: config.flavor == AppFlavor.development,
     ),
   );
   // Start after runApp so the router is attached; the plugin holds the
@@ -79,6 +92,7 @@ class LegalHubApp extends StatelessWidget {
     required this.authCubit,
     required this.localeCubit,
     required this.themeCubit,
+    this.debugBanner = false,
     super.key,
   });
 
@@ -86,6 +100,11 @@ class LegalHubApp extends StatelessWidget {
   final AuthCubit authCubit;
   final LocaleCubit localeCubit;
   final ThemeCubit themeCubit;
+
+  /// Shows the Flutter debug banner. Enabled by bootstrap for the
+  /// development flavor; defaults to off so existing callers (and tests)
+  /// keep the production look.
+  final bool debugBanner;
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +123,7 @@ class LegalHubApp extends StatelessWidget {
               return MaterialApp.router(
                 onGenerateTitle: (BuildContext context) =>
                     AppLocalizations.of(context).appTitle,
-                debugShowCheckedModeBanner: false,
+                debugShowCheckedModeBanner: debugBanner,
                 theme: LegalHubTheme.forBrightness(
                   Brightness.light,
                   locale: state.locale,

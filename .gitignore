@@ -52,6 +52,8 @@ app.*.map.json
 *.env.*
 !.env.example
 !*.env.example
+!.env.development.example
+!.env.production.example
 
 # Design reference archives (visual reference only; not part of B1 source)
 /stitch_legalhub_mobile_app/

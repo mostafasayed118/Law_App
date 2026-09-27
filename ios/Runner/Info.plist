@@ -7,7 +7,10 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>LegalHub</string>
+	<!-- Flavor-resolved (build flavors): development → "LegalHub Dev",
+	     production → "LegalHub". Resolved from the APP_DISPLAY_NAME build
+	     setting defined per configuration in the Xcode project. -->
+	<string>$(APP_DISPLAY_NAME)</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -34,10 +37,14 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>com.legalhub.app</string>
+			<string>$(APP_BUNDLE_ID)</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.legalhub.app</string>
+				<!-- Flavor-resolved custom scheme (== bundle ID per flavor):
+				     development → com.legalhub.app.dev, production →
+				     com.legalhub.app. Matches the Supabase dashboard
+				     Redirect URL `<scheme>://auth/v1/callback`. -->
+				<string>$(DEEP_LINK_SCHEME)</string>
 			</array>
 		</dict>
 	</array>

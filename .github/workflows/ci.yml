@@ -165,19 +165,23 @@ jobs:
           # R4 opt-in: CI holds no signing secrets, so the compile proof is
           # explicitly (not silently) debug-signed. Never a store artifact.
           ALLOW_DEBUG_SIGNING: 'true'
-        run: flutter build appbundle --release
+        # Production flavor pinned explicitly: with productFlavors defined,
+        # an unflavored build would emit one artifact per flavor and the
+        # assert below would not resolve. The store path is always the
+        # production flavor (audit doc §12.19: its applicationId is frozen).
+        run: flutter build appbundle --release --flavor production -t lib/main_production.dart
 
       - name: Assert bundle exists and report size
         run: |
-          test -s build/app/outputs/bundle/release/app-release.aab
-          du -h build/app/outputs/bundle/release/app-release.aab
+          test -s build/app/outputs/bundle/productionRelease/app-production-release.aab
+          du -h build/app/outputs/bundle/productionRelease/app-production-release.aab
 
       - name: Build debug APK (B5 ABI guard)
-        run: flutter build apk --debug
+        run: flutter build apk --debug --flavor production -t lib/main_production.dart
 
       - name: Assert debug APK carries the full ABI set (B5)
         run: |
-          APK=build/app/outputs/flutter-apk/app-debug.apk
+          APK=build/app/outputs/flutter-apk/app-production-debug.apk
           test -s "$APK"
           for ABI in arm64-v8a armeabi-v7a x86_64; do
             if ! unzip -l "$APK" | grep -q "lib/$ABI/libflutter.so"; then
