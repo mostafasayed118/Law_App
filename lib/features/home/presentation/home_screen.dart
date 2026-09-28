@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/legalhub_theme.dart';
 import '../../../app/router.dart';
+import '../../../core/auth/session.dart';
 import '../../../core/practice_area.dart';
 import '../../../core/roles/user_role.dart';
 import '../../../features/auth/presentation/auth_cubit.dart' show AuthCubit;
@@ -47,14 +48,20 @@ class _HomeScreenState extends State<HomeScreen> {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
-    final AuthCubit authCubit = context.watch<AuthCubit>();
-    final String name =
-        authCubit.state.session?.displayName ?? l10n.homeFallbackName;
+    // Island rebuild: only a session change rebuilds the home scroll view —
+    // auth status/error transitions (restore failures, reauth prompts)
+    // don't touch it.
+    final Session? session = context.select<AuthCubit, Session?>(
+      (AuthCubit cubit) => cubit.state.session,
+    );
+    final String name = session?.displayName ?? l10n.homeFallbackName;
     // UX-only projection of the active membership's role (mirrors the shell);
     // the booking entry is a navigation hint, never an authorization grant.
-    final UserRole role =
-        authCubit.state.session?.primaryRole ?? UserRole.client;
-    final RoleCapability capabilities = widget.capabilitiesForRole[role]!;
+    final UserRole role = session?.primaryRole ?? UserRole.client;
+    final RoleCapability capabilities = capabilityForRole(
+      widget.capabilitiesForRole,
+      role,
+    );
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(

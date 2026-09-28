@@ -22,6 +22,7 @@ drop function if exists public.reactivate_membership(uuid, uuid);
 drop function if exists public.remove_membership(uuid, uuid);
 drop function if exists public.delete_my_account();
 drop function if exists public.list_organizations_metadata();
+drop function if exists public.list_organizations_metadata(int, int);
 drop function if exists public.list_members_metadata();
 drop function if exists public.list_members_metadata(int, int);
 drop function if exists public.suspend_membership_platform(uuid, uuid);
@@ -34,6 +35,10 @@ drop function if exists public.read_platform_audit(int, int);
 drop function if exists public.list_org_members_metadata(uuid);
 drop function if exists public.send_message(uuid, text);
 drop function if exists public.create_matter(uuid, text, text, uuid, uuid);
+drop function if exists public.create_task(uuid, text, uuid);
+drop function if exists public.advance_task_status(uuid, text);
+drop function if exists public.assign_task(uuid, uuid);
+drop function if exists public.acknowledge_task(uuid);
 
 -- The revokes above run first so the drops below are the final privilege
 -- reset: functions are gone and no execute grant survives in any role.

@@ -1,5 +1,6 @@
 import '../../core/errors/app_error.dart';
 import '../../core/errors/result.dart';
+import '../../core/observability/app_log.dart';
 import '../../core/organizations/organization_gateway.dart';
 import '../../core/practice_area.dart';
 import '../../features/matters/domain/matter.dart';
@@ -37,9 +38,21 @@ class SupabaseMatterGateway implements MatterGateway {
   static const String unassignedAttorneyName = 'Unassigned';
 
   @override
-  Future<Result<List<Matter>>> fetchMatters() async {
+  Future<Result<List<Matter>>> fetchMatters() => _run(_api.fetchMatters);
+
+  @override
+  Future<Result<List<Matter>>> searchMatters(String query, {int limit = 30}) =>
+      _run(() => _api.searchMatters(query, limit: limit));
+
+  /// Runs a row read (full fetch or title-prefiltered search) through the
+  /// identical mapping path: roster display names + VO construction. The
+  /// search prefilter only shrinks the transfer — mapping and failure
+  /// semantics never diverge between the two reads.
+  Future<Result<List<Matter>>> _run(
+    Future<List<Map<String, dynamic>>> Function() read,
+  ) async {
     try {
-      final List<Map<String, dynamic>> rows = await _api.fetchMatters();
+      final List<Map<String, dynamic>> rows = await read();
       final Map<String, String> displayNames = await _displayNamesFor(
         rows.map(_organizationIdOf),
       );
@@ -71,7 +84,7 @@ class SupabaseMatterGateway implements MatterGateway {
   /// Rosters are fetched **concurrently** (`Future.wait` over the deduped
   /// ids): this helper sits on the hottest read path (matter list, matter
   /// details, document vault, message list and every debounced search all
-  /// route through `fetchMatters`), so the historical serial per-org
+  /// route through the fetch/search reads), so the historical serial per-org
   /// `await` was the codebase's only N+1 — 1 + N round-trips where N
   /// round-trips suffice.
   ///
@@ -94,6 +107,14 @@ class SupabaseMatterGateway implements MatterGateway {
     for (final OrgOutcome<List<OrgMember>> outcome in outcomes) {
       if (outcome is OrgFailed<List<OrgMember>>) {
         // Roster unavailable for this org: id fallback, keep the rest.
+        // Logged (not swallowed): a denied roster RPC is the first symptom
+        // of an RLS regression on the member seam (audit 2026-09-27, Q-Q3).
+        // Routed through AppLog (the sanitized diagnostic seam) rather than
+        // a bare debugPrint — the payload is only the failure-kind enum.
+        AppLog.diagnostic(
+          'supabase_matter_gateway: roster read failed '
+          '(${outcome.failure.kind}); falling back to raw ids.',
+        );
         continue;
       }
       // On the success branch the value is never null (the failure branch

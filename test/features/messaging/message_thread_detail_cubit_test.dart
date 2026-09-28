@@ -202,6 +202,52 @@ void main() {
           expect(gateway.fetchCalls, <String>['thread-1', 'thread-1']),
     );
 
+    blocTest<MessageThreadDetailCubit, MessageThreadDetailState>(
+      'a live insert during error is buffered and merged on retry',
+      // First load fails (error state), the live row arrives mid-error, then
+      // the retry succeeds — the merged list holds both, deduped by id.
+      setUp: () => gateway = _StubMessageGateway(
+        results: <Result<List<Message>>>[
+          Result<List<Message>>.failure(_loadFailure),
+          Result<List<Message>>.success(_messages),
+        ],
+      ),
+      build: () => MessageThreadDetailCubit(gateway),
+      act: (MessageThreadDetailCubit cubit) async {
+        await cubit.load('thread-1');
+        await cubit.subscribe('thread-1');
+        gateway.live.add(
+          MessageLiveInsert(
+            Message(
+              id: 'thread-1-msg-live',
+              authorDisplayName: 'Demo attorney',
+              body: 'Demo live body',
+              sentAt: DateTime.utc(2026, 8, 8),
+            ),
+          ),
+        );
+        await Future<void>.delayed(Duration.zero);
+        await cubit.load('thread-1');
+      },
+      expect: () => <MessageThreadDetailState>[
+        MessageThreadDetailState(
+          messages: ViewError<List<Message>>(_loadFailure),
+        ),
+        const MessageThreadDetailState(messages: ViewLoading<List<Message>>()),
+        MessageThreadDetailState(
+          messages: ViewSuccess<List<Message>>(<Message>[
+            ..._messages,
+            Message(
+              id: 'thread-1-msg-live',
+              authorDisplayName: 'Demo attorney',
+              body: 'Demo live body',
+              sentAt: DateTime.utc(2026, 8, 8),
+            ),
+          ]),
+        ),
+      ],
+    );
+
     test('subscribe then close cancels the live subscription', () async {
       final MessageThreadDetailCubit cubit = MessageThreadDetailCubit(gateway);
       await cubit.load('thread-1');
@@ -299,6 +345,40 @@ void main() {
         ),
       ],
     );
+
+    blocTest<MessageThreadDetailCubit, MessageThreadDetailState>(
+      'a whitespace-only send never hits the gateway',
+      build: () => MessageThreadDetailCubit(gateway),
+      act: (MessageThreadDetailCubit cubit) async {
+        await cubit.load('thread-1');
+        await cubit.send('thread-1', '   ');
+      },
+      expect: () => <MessageThreadDetailState>[
+        MessageThreadDetailState(
+          messages: ViewSuccess<List<Message>>(_messages),
+        ),
+      ],
+      verify: (_) => expect(gateway.sendCalls, 0),
+    );
+
+    blocTest<MessageThreadDetailCubit, MessageThreadDetailState>(
+      'an oversized send surfaces sendError without a round-trip',
+      build: () => MessageThreadDetailCubit(gateway),
+      act: (MessageThreadDetailCubit cubit) async {
+        await cubit.load('thread-1');
+        await cubit.send('thread-1', 'x' * 2001);
+      },
+      expect: () => <MessageThreadDetailState>[
+        MessageThreadDetailState(
+          messages: ViewSuccess<List<Message>>(_messages),
+        ),
+        MessageThreadDetailState(
+          messages: ViewSuccess<List<Message>>(_messages),
+          sendError: 'Message is too long (max 2000 characters).',
+        ),
+      ],
+      verify: (_) => expect(gateway.sendCalls, 0),
+    );
   });
 }
 
@@ -369,6 +449,12 @@ class _StubMessageGateway implements MessageGateway {
     // Not exercised by the detail cubit tests.
     return const Result<List<MessageThread>>.success(<MessageThread>[]);
   }
+
+  @override
+  Future<Result<List<MessageThread>>> searchThreads(
+    String query, {
+    int limit = 30,
+  }) => fetchThreads();
 
   @override
   Future<Result<List<Message>>> fetchMessages(String threadId) {

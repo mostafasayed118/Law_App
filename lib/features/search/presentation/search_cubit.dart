@@ -31,12 +31,18 @@ import 'search_state.dart';
 /// they never call the gateways directly.
 ///
 /// Each group is truncated to [searchPageSize] rows so the results surface
-/// (an eager tile build) never renders more than 4 pages of tiles: the
-/// fan-out is bounded even though the gateways return capped full lists.
-/// Server-side `ilike`/FTS push-down stays a follow-up for the configured
-/// build (the data seam now exposes `ilike` + `.range()` via
-/// `boundedTableSelect`/`pagedTableSelect`); the client contract here is
-/// "top-N per group", which that migration preserves.
+/// (an eager tile build) never renders more than 4 pages of tiles — and the
+/// same bound caps the transfer: the three Supabase-backed gateways receive
+/// it as their server-side title-prefilter page size, so a query moves at
+/// most 4 pages of candidate rows, not four capped full lists (audit:
+/// search fan-out). The exact full-matching pass below stays the arbiter
+/// client-side, so the "top-N per group" contract is preserved.
+///
+/// Recall caveat callers must know: on a real backend the prefilter is
+/// title-only, so a label-only match (e.g. a matter whose title does NOT
+/// contain the query but whose localized status does) reaches the refiner
+/// only when its title also matched the prefilter. Fakes (dev/tests) show
+/// the ideal — full-list candidates, exact results.
 ///
 /// Metadata only: matching fields are matter title/status/practice-area,
 /// document title/type/`matterRef`, thread title/participants/`matterRef`,
@@ -51,8 +57,9 @@ class SearchCubit extends Cubit<SearchState> {
   ) : super(const SearchState());
 
   /// Maximum rows kept per result group (bounds the eager tile build to
-  /// 4 × 30 tiles). Mirrors `kSearchPageSize` without importing the data
-  /// layer — presentation must never depend on `lib/data/` (layer rule).
+  /// 4 × 30 tiles AND the server-side prefilter page per gateway).
+  /// Mirrors `kSearchPageSize` without importing the data layer —
+  /// presentation must never depend on `lib/data/` (layer rule).
   static const int searchPageSize = 30;
 
   final MatterGateway _matterGateway;
@@ -69,9 +76,19 @@ class SearchCubit extends Cubit<SearchState> {
   /// A blank/whitespace-only query emits the no-query state ([ViewEmpty])
   /// **without touching any gateway** (D-S4). A non-blank query loads all
   /// four lists in parallel, and:
-  /// - any gateway failure → [ViewError];
-  /// - no matches in any group → [ViewEmpty];
-  /// - otherwise → [ViewSuccess] with the grouped D-S1 subsets.
+  /// - every gateway fails → [ViewError] (total outage; first failure in
+  ///   record order wins, preserving the retry path);
+  /// - at least one gateway answers → [ViewSuccess] with the grouped D-S1
+  ///   subsets; failed groups contribute an empty subset and are recorded
+  ///   in [SearchResults.failedGroups] so the surface renders the
+  ///   partial-results notice (audit: fail-fast search — the old
+  ///   any-failure-fails-all contract dropped good rows on a single flaky
+  ///   seam);
+  /// - no matches in any answering group (and no failures) → [ViewEmpty].
+  ///   Failures with zero matches still return [ViewSuccess] (empty groups
+  ///   + [SearchResults.failedGroups]) rather than a clean empty, so the
+  ///   surface can say "no results AND a source was down" instead of
+  ///   silently hiding the outage.
   ///
   /// When [l10n] is provided, matching additionally runs against the
   /// localized demo labels, so an Arabic query finds the Arabic titles the
@@ -101,56 +118,99 @@ class SearchCubit extends Cubit<SearchState> {
     if (state.results is! ViewLoading<SearchResults>) {
       emit(state.copyWith(results: const ViewLoading<SearchResults>()));
     }
+    // Server-side prefilter + client-side refine (audit: search fan-out):
+    // the three Supabase-backed gateways push a recall-oriented title
+    // prefilter to the server (first page of ilike matches, newest-first)
+    // bounded by the same effective limit that bounds the rendered groups;
+    // in-memory backends return their full list at no transfer cost. The
+    // exact full-matching pass below (raw needle AND localized
+    // projections) stays the arbiter, so "top-N per group" semantics are
+    // preserved.
+    final int effectiveLimit = limit <= 0 ? searchPageSize : limit;
     final (
       Result<List<Matter>> matters,
       Result<List<Document>> documents,
       Result<List<MessageThread>> threads,
       Result<List<Attorney>> attorneys,
     ) = await (
-      _matterGateway.fetchMatters(),
-      _documentGateway.fetchDocuments(),
-      _messageGateway.fetchThreads(),
+      _matterGateway.searchMatters(trimmed, limit: effectiveLimit),
+      _documentGateway.searchDocuments(trimmed, limit: effectiveLimit),
+      _messageGateway.searchThreads(trimmed, limit: effectiveLimit),
       _attorneyGateway.fetchAttorneys(),
     ).wait;
     if (isClosed || seq != _requestSeq) {
       return;
     }
-    // Any single gateway failure fails the whole search (fail-fast
-    // composition): the first Failure in record order wins.
-    final AppError? error = switch ((matters, documents, threads, attorneys)) {
-      (Failure<List<Matter>>(error: final AppError e), _, _, _) => e,
-      (_, Failure<List<Document>>(error: final AppError e), _, _) => e,
-      (_, _, Failure<List<MessageThread>>(error: final AppError e), _) => e,
-      (_, _, _, Failure<List<Attorney>>(error: final AppError e)) => e,
-      _ => null,
-    };
-    if (error != null) {
-      emit(state.copyWith(results: viewStateForFailure<SearchResults>(error)));
+    // Partial-results composition: each group is collected independently; a
+    // failed group contributes an empty subset and is recorded instead of
+    // failing the whole search. Matches are filtered per group exactly as
+    // before, so "top-N per group" semantics are preserved on the good
+    // groups while a flaky seam degrades one section, not the surface.
+    final Set<SearchGroup> failedGroups = <SearchGroup>{};
+    AppError? firstError;
+    List<Matter> matterRows = const <Matter>[];
+    List<Document> documentRows = const <Document>[];
+    List<MessageThread> threadRows = const <MessageThread>[];
+    List<Attorney> attorneyRows = const <Attorney>[];
+    final String needle = trimmed.toLowerCase();
+    switch (matters) {
+      case Success<List<Matter>>(value: final List<Matter> value):
+        matterRows = value
+            .where((Matter m) => _matterMatches(m, needle, l10n))
+            .take(effectiveLimit)
+            .toList(growable: false);
+      case Failure<List<Matter>>(error: final AppError error):
+        failedGroups.add(SearchGroup.matters);
+        firstError ??= error;
+    }
+    switch (documents) {
+      case Success<List<Document>>(value: final List<Document> value):
+        documentRows = value
+            .where((Document d) => _documentMatches(d, needle, l10n))
+            .take(effectiveLimit)
+            .toList(growable: false);
+      case Failure<List<Document>>(error: final AppError error):
+        failedGroups.add(SearchGroup.documents);
+        firstError ??= error;
+    }
+    switch (threads) {
+      case Success<List<MessageThread>>(value: final List<MessageThread> value):
+        threadRows = value
+            .where((MessageThread t) => _threadMatches(t, needle, l10n))
+            .take(effectiveLimit)
+            .toList(growable: false);
+      case Failure<List<MessageThread>>(error: final AppError error):
+        failedGroups.add(SearchGroup.threads);
+        firstError ??= error;
+    }
+    switch (attorneys) {
+      case Success<List<Attorney>>(value: final List<Attorney> value):
+        attorneyRows = value
+            .where((Attorney a) => _attorneyMatches(a, needle, l10n))
+            .take(effectiveLimit)
+            .toList(growable: false);
+      case Failure<List<Attorney>>(error: final AppError error):
+        failedGroups.add(SearchGroup.attorneys);
+        firstError ??= error;
+    }
+    if (failedGroups.length == SearchGroup.values.length) {
+      emit(
+        state.copyWith(
+          results: viewStateForFailure<SearchResults>(firstError!),
+        ),
+      );
       return;
     }
-    final String needle = trimmed.toLowerCase();
-    final int effectiveLimit = limit <= 0 ? searchPageSize : limit;
     final SearchResults grouped = SearchResults(
-      matters: (matters as Success<List<Matter>>).value
-          .where((Matter m) => _matterMatches(m, needle, l10n))
-          .take(effectiveLimit)
-          .toList(growable: false),
-      documents: (documents as Success<List<Document>>).value
-          .where((Document d) => _documentMatches(d, needle, l10n))
-          .take(effectiveLimit)
-          .toList(growable: false),
-      threads: (threads as Success<List<MessageThread>>).value
-          .where((MessageThread t) => _threadMatches(t, needle, l10n))
-          .take(effectiveLimit)
-          .toList(growable: false),
-      attorneys: (attorneys as Success<List<Attorney>>).value
-          .where((Attorney a) => _attorneyMatches(a, needle, l10n))
-          .take(effectiveLimit)
-          .toList(growable: false),
+      matters: matterRows,
+      documents: documentRows,
+      threads: threadRows,
+      attorneys: attorneyRows,
+      failedGroups: failedGroups,
     );
     emit(
       state.copyWith(
-        results: grouped.isEmpty
+        results: grouped.isEmpty && failedGroups.isEmpty
             ? const ViewEmpty<SearchResults>()
             : ViewSuccess<SearchResults>(grouped),
       ),

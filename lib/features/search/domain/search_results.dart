@@ -5,6 +5,10 @@ import '../../documents/domain/document.dart';
 import '../../matters/domain/matter.dart';
 import '../../messaging/domain/message_thread.dart';
 
+/// One result group of the unified search — also the unit a partial
+/// failure is recorded against (audit: fail-fast search).
+enum SearchGroup { matters, documents, threads, attorneys }
+
 /// Grouped unified-search results (Phase 11, slice 11.0, owner decision D-S1).
 ///
 /// A pure client-side aggregation view over the four existing synthetic
@@ -22,12 +26,22 @@ class SearchResults extends Equatable {
     required this.documents,
     required this.threads,
     required this.attorneys,
+    this.failedGroups = const <SearchGroup>{},
   });
 
   final List<Matter> matters;
   final List<Document> documents;
   final List<MessageThread> threads;
   final List<Attorney> attorneys;
+
+  /// Groups whose gateway failed for this query: their subset is empty and
+  /// the surface renders the partial-results notice. Empty in the common
+  /// all-green case (and in every test fixture built before M8).
+  final Set<SearchGroup> failedGroups;
+
+  /// True when at least one group failed but the search still returned
+  /// (partial results instead of the old fail-fast ViewError).
+  bool get isPartial => failedGroups.isNotEmpty;
 
   /// True when every group has no matches (the no-match empty projection).
   bool get isEmpty =>
@@ -37,5 +51,11 @@ class SearchResults extends Equatable {
       attorneys.isEmpty;
 
   @override
-  List<Object?> get props => <Object?>[matters, documents, threads, attorneys];
+  List<Object?> get props => <Object?>[
+    matters,
+    documents,
+    threads,
+    attorneys,
+    failedGroups,
+  ];
 }

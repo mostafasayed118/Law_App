@@ -1168,6 +1168,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get searchError => 'تعذّر تشغيل البحث.';
 
   @override
+  String get searchPartialUnavailable =>
+      'بعض المصادر غير متوفرة — قد تكون النتائج غير مكتملة.';
+
+  @override
   String get searchLocalOnlyNote =>
       'وضع تجريبي — النتائج من قوائم اصطناعية فقط. لا يتم البحث في أي بيانات حقيقية.';
 
@@ -1231,6 +1235,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get orgAuditEmpty => 'لم يتم تسجيل أي أحداث تدقيق حتى الآن.';
+
+  @override
+  String get orgAuditNoOrganization => 'لم يتم اختيار منظمة.';
 
   @override
   String get orgAuditDenied =>
@@ -1309,6 +1316,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get taskStatusDone => 'مكتمل';
+
+  @override
+  String get taskAcknowledge => 'إقرار';
+
+  @override
+  String get taskAcknowledged => 'تم الإقرار';
 
   @override
   String get approvalsTitle => 'موافقات معلّقة';

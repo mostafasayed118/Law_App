@@ -67,7 +67,12 @@ class _OrganizationHubScreenState extends State<OrganizationHubScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Session? session = context.watch<AuthCubit>().state.session;
+    // Island rebuild: the hub re-seeds only on session-identity changes —
+    // auth status/error transitions don't rebuild the OrgCubit provider
+    // subtree below.
+    final Session? session = context.select<AuthCubit, Session?>(
+      (AuthCubit cubit) => cubit.state.session,
+    );
     // The store re-seeds itself when the session identity changes (and is a
     // no-op for the same session, preserving a user selection); calling it
     // here keeps the hub in sync on sign-out / user switch.

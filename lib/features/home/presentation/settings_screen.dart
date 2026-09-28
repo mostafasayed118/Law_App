@@ -29,7 +29,11 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final LocaleState localeState = context.watch<LocaleCubit>().state;
+    // Island rebuilds: each row watches only the slice it renders — a
+    // locale change doesn't rebuild the theme row and vice versa.
+    final Locale locale = context.select<LocaleCubit, Locale>(
+      (LocaleCubit cubit) => cubit.state.locale,
+    );
     final AuthState authState = context.watch<AuthCubit>().state;
     final ThemeMode themeMode = context.watch<ThemeCubit>().state;
     return Scaffold(
@@ -43,7 +47,7 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: LegalHubTheme.spaceSm),
           DropdownButtonFormField<Locale>(
-            initialValue: localeState.locale,
+            initialValue: locale,
             decoration: InputDecoration(labelText: l10n.languageLabel),
             items: _locales
                 .map(

@@ -61,6 +61,11 @@ class SupabaseOrganizationGateway implements OrganizationGateway {
       return OrgOutcome<List<OrgMember>>.failure(
         OrgFailure(kind: OrgFailureKind.unknown, message: e.message),
       );
+    } on TypeError catch (e) {
+      // Defense-in-depth: no raw TypeError ever crosses the boundary.
+      return OrgOutcome<List<OrgMember>>.failure(
+        OrgFailure(kind: OrgFailureKind.unknown, message: e.toString()),
+      );
     }
   }
 
@@ -209,6 +214,11 @@ class SupabaseOrganizationGateway implements OrganizationGateway {
       // silently wrong audit entry.
       return OrgOutcome<List<AuditEntry>>.failure(
         OrgFailure(kind: OrgFailureKind.unknown, message: e.message),
+      );
+    } on TypeError catch (e) {
+      // Defense-in-depth: no raw TypeError ever crosses the boundary.
+      return OrgOutcome<List<AuditEntry>>.failure(
+        OrgFailure(kind: OrgFailureKind.unknown, message: e.toString()),
       );
     }
   }

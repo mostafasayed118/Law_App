@@ -65,7 +65,7 @@ List<RouteBase> _shellRoutes(
             authCubit.state.session?.primaryRole ?? UserRole.client;
         return MatterDetailsScreen(
           matterId: state.pathParameters['matterId'] ?? '',
-          capabilities: capabilitiesForRole[role]!,
+          capabilities: capabilityForRole(capabilitiesForRole, role),
         );
       },
     ),
@@ -77,7 +77,9 @@ List<RouteBase> _shellRoutes(
         // never an authorization grant (D-C4).
         final UserRole role =
             authCubit.state.session?.primaryRole ?? UserRole.client;
-        return DocumentListScreen(capabilities: capabilitiesForRole[role]!);
+        return DocumentListScreen(
+          capabilities: capabilityForRole(capabilitiesForRole, role),
+        );
       },
     ),
     GoRoute(
@@ -88,7 +90,9 @@ List<RouteBase> _shellRoutes(
         // never an authorization grant (D-C4).
         final UserRole role =
             authCubit.state.session?.primaryRole ?? UserRole.client;
-        return MessageListScreen(capabilities: capabilitiesForRole[role]!);
+        return MessageListScreen(
+          capabilities: capabilityForRole(capabilitiesForRole, role),
+        );
       },
     ),
     GoRoute(
@@ -115,7 +119,7 @@ List<RouteBase> _shellRoutes(
             authCubit.state.session?.primaryRole ?? UserRole.client;
         return SearchScreen(
           initialQuery: state.uri.queryParameters['q'] ?? '',
-          capabilities: capabilitiesForRole[role]!,
+          capabilities: capabilityForRole(capabilitiesForRole, role),
         );
       },
     ),
@@ -158,7 +162,9 @@ List<RouteBase> _shellRoutes(
         // synthetic (D-1).
         final UserRole role =
             authCubit.state.session?.primaryRole ?? UserRole.client;
-        return AiResearchScreen(capabilities: capabilitiesForRole[role]!);
+        return AiResearchScreen(
+          capabilities: capabilityForRole(capabilitiesForRole, role),
+        );
       },
     ),
     GoRoute(
@@ -175,7 +181,9 @@ List<RouteBase> _shellRoutes(
         // read_org_audit RPC gates server-side).
         final UserRole role =
             authCubit.state.session?.primaryRole ?? UserRole.client;
-        return OrganizationHubScreen(capabilities: capabilitiesForRole[role]!);
+        return OrganizationHubScreen(
+          capabilities: capabilityForRole(capabilitiesForRole, role),
+        );
       },
     ),
     GoRoute(
@@ -186,7 +194,9 @@ List<RouteBase> _shellRoutes(
         // denial for non-partners — never empty success (AC-7).
         final UserRole role =
             authCubit.state.session?.primaryRole ?? UserRole.client;
-        return OrgAuditScreen(capabilities: capabilitiesForRole[role]!);
+        return OrgAuditScreen(
+          capabilities: capabilityForRole(capabilitiesForRole, role),
+        );
       },
     ),
     GoRoute(

@@ -281,3 +281,18 @@ roleCapabilities = <UserRole, RoleCapability>{
   UserRole.researchAnalyst: RoleCapability(canUseAiResearch: true),
   UserRole.admin: RoleCapability(),
 };
+
+/// Resolves the navigation hints for [role] from [capabilitiesForRole],
+/// failing closed to least privilege (every entry hidden) when the map has
+/// no entry for the role. Capabilities are UX-only navigation hints — the
+/// server/data boundary is the authorization — so an unknown role must hide
+/// surfaces, never throw a `_CastError` from a `!` unwrap. The router's
+/// `capabilitiesForRole` parameter is an explicit test seam for restricted
+/// roles, where partial maps are the normal case.
+RoleCapability capabilityForRole(
+  Map<UserRole, RoleCapability> capabilitiesForRole,
+  UserRole role,
+) {
+  return capabilitiesForRole[role] ??
+      RoleCapability.fromSet(const <Capability>{});
+}

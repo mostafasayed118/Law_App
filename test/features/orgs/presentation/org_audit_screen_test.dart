@@ -137,6 +137,20 @@ void main() {
     expect(find.text('Unable to load the audit trail.'), findsNothing);
   });
 
+  testWidgets('shows the no-organization state when no org is active', (
+    WidgetTester tester,
+  ) async {
+    // No explicit org id and no seeded session — the store has no active
+    // org, so the screen renders the no-context arm instead of a blank
+    // surface (and never issues a load).
+    await tester.pumpWidget(harness());
+    await tester.pumpAndSettle();
+
+    expect(find.text('No organization selected.'), findsOneWidget);
+    expect(find.text('No audit events recorded yet.'), findsNothing);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+  });
+
   testWidgets('renders Arabic RTL without overflow and strings resolve', (
     WidgetTester tester,
   ) async {

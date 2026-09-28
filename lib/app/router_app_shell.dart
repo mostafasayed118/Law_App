@@ -20,7 +20,10 @@ class _AppShell extends StatelessWidget {
     // navigation hint, never an authorization grant.
     final UserRole role =
         authCubit.state.session?.primaryRole ?? UserRole.client;
-    final RoleCapability capabilities = capabilitiesForRole[role]!;
+    final RoleCapability capabilities = capabilityForRole(
+      capabilitiesForRole,
+      role,
+    );
 
     // Destinations are rendered from capabilities in a fixed order (home,
     // then settings). The selected index and the tap target are derived from

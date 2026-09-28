@@ -13,6 +13,11 @@ Future<OrgOutcome<void>> _runVoid(Future<void> Function() call) async {
     return OrgOutcome<void>.failure(
       OrgFailure(kind: _mapKind(e.kind), message: e.message),
     );
+  } on TypeError catch (e) {
+    // Defense-in-depth: no raw TypeError ever crosses the boundary.
+    return OrgOutcome<void>.failure(
+      OrgFailure(kind: OrgFailureKind.unknown, message: e.toString()),
+    );
   }
 }
 
@@ -49,15 +54,33 @@ OrgMember _memberFromRow(Map<String, dynamic> row) {
     throw FormatException('Member row has neither user_id nor email');
   }
   final String identity = userId ?? email!;
+  // Guarded casts (the _auditEntryFromRow discipline): a missing or
+  // wrong-typed organization_id/timestamp is a loud FormatException
+  // (caught → unknown), never a raw TypeError crossing the boundary.
+  final Object? organizationId = row['organization_id'];
+  if (organizationId is! String || organizationId.isEmpty) {
+    throw FormatException('Member row has no organization_id');
+  }
+  final Object? createdAt = row['created_at'];
+  final Object? updatedAt = row['updated_at'];
+  final DateTime? createdParsed = createdAt is String
+      ? DateTime.tryParse(createdAt)
+      : null;
+  final DateTime? updatedParsed = updatedAt is String
+      ? DateTime.tryParse(updatedAt)
+      : null;
+  if (createdParsed == null || updatedParsed == null) {
+    throw FormatException('Member row has unparseable created_at/updated_at');
+  }
   return OrgMember(
-    organizationId: row['organization_id'] as String,
+    organizationId: organizationId,
     userId: identity,
     displayName: (row['display_name'] as String?) ?? identity,
     locale: row['locale'] as String?,
     role: role,
     status: status,
-    createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
-    updatedAt: DateTime.parse(row['updated_at'] as String).toLocal(),
+    createdAt: createdParsed.toLocal(),
+    updatedAt: updatedParsed.toLocal(),
     // The member-facing surface exposes the invitation id for invited
     // rows (R1), so Resend/Revoke target a real id; member rows stay null.
     invitationId: row['invitation_id'] as String?,

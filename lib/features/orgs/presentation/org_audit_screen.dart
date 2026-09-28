@@ -21,7 +21,9 @@ part 'org_audit_centered_state.dart';
 /// never content, credentials, or a raw `audit_events` SELECT (D-P0C4).
 /// No export affordance. A non-partner (or cross-org) caller sees the
 /// distinct denied state (AC-7 — never empty success); an org with no
-/// events shows an honest empty state.
+/// events shows an honest empty state. With no active org at all (signed
+/// out / memberships not hydrated) the screen shows the no-organization
+/// state instead of a blank surface.
 class OrgAuditScreen extends StatefulWidget {
   const OrgAuditScreen({
     super.key,
@@ -45,13 +47,18 @@ class _OrgAuditScreenState extends State<OrgAuditScreen> {
   final ActiveOrgStore _activeOrgStore = serviceLocator<ActiveOrgStore>();
   late final OrgAuditCubit _cubit;
 
+  /// The resolved org context for this visit (null when no org is active —
+  /// the no-context arm below, never a blank screen).
+  String? _organizationId;
+
   @override
   void initState() {
     super.initState();
     final OrganizationGateway gateway = serviceLocator<OrganizationGateway>();
     _cubit = OrgAuditCubit(gateway);
-    final String? organizationId =
+    _organizationId =
         widget.organizationId ?? _activeOrgStore.activeOrganizationId;
+    final String? organizationId = _organizationId;
     if (organizationId != null) {
       _cubit.load(organizationId: organizationId);
     }
@@ -66,6 +73,19 @@ class _OrgAuditScreenState extends State<OrgAuditScreen> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    // No active org (signed out, or membership not yet hydrated): an honest
+    // no-context state instead of the old blank screen — the cubit never
+    // loads, so the Initial arm below would render nothing.
+    if (_organizationId == null) {
+      return Scaffold(
+        appBar: AppBar(title: Text(l10n.orgAuditTitle)),
+        body: _CenteredState(
+          icon: Icons.business_outlined,
+          iconColor: Theme.of(context).colorScheme.outline,
+          message: l10n.orgAuditNoOrganization,
+        ),
+      );
+    }
     return Scaffold(
       appBar: AppBar(title: Text(l10n.orgAuditTitle)),
       body: BlocProvider<OrgAuditCubit>.value(

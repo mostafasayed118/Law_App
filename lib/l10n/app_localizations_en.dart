@@ -1179,6 +1179,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchError => 'Unable to run the search.';
 
   @override
+  String get searchPartialUnavailable =>
+      'Some sources were unavailable — results may be incomplete.';
+
+  @override
   String get searchLocalOnlyNote =>
       'Demo mode — results come from synthetic lists only. No real data is searched.';
 
@@ -1244,6 +1248,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get orgAuditEmpty => 'No audit events recorded yet.';
+
+  @override
+  String get orgAuditNoOrganization => 'No organization selected.';
 
   @override
   String get orgAuditDenied =>
@@ -1322,6 +1329,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get taskStatusDone => 'Done';
+
+  @override
+  String get taskAcknowledge => 'Acknowledge';
+
+  @override
+  String get taskAcknowledged => 'Acknowledged';
 
   @override
   String get approvalsTitle => 'Pending approvals';

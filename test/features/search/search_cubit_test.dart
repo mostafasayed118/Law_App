@@ -226,44 +226,127 @@ void main() {
       },
     );
 
-    group('any single gateway failure maps to ViewError', () {
-      for (final _GatewayKind kind in _GatewayKind.values) {
-        blocTest<SearchCubit, SearchState>(
-          '${kind.name} fails',
-          setUp: () {
-            switch (kind) {
-              case _GatewayKind.matters:
-                matters = _StubMatterGateway(
-                  results: <Result<List<Matter>>>[
-                    Result<List<Matter>>.failure(_loadFailure),
-                  ],
-                );
-              case _GatewayKind.documents:
-                documents = _StubDocumentGateway(<Result<List<Document>>>[
-                  Result<List<Document>>.failure(_loadFailure),
-                ]);
-              case _GatewayKind.threads:
-                threads = _StubMessageGateway(<Result<List<MessageThread>>>[
-                  Result<List<MessageThread>>.failure(_loadFailure),
-                ]);
-              case _GatewayKind.attorneys:
-                attorneys = _StubAttorneyGateway(<Result<List<Attorney>>>[
-                  Result<List<Attorney>>.failure(_loadFailure),
-                ]);
-            }
-          },
-          build: build,
-          act: (SearchCubit cubit) => cubit.search('Demo'),
-          expect: () => <SearchState>[
-            const SearchState(query: 'Demo'),
-            SearchState(
-              query: 'Demo',
-              results: ViewError<SearchResults>(_loadFailure),
-            ),
+    group(
+      'a single gateway failure keeps the other groups (partial results)',
+      () {
+        for (final _GatewayKind kind in _GatewayKind.values) {
+          blocTest<SearchCubit, SearchState>(
+            '${kind.name} fails',
+            setUp: () {
+              switch (kind) {
+                case _GatewayKind.matters:
+                  matters = _StubMatterGateway(
+                    results: <Result<List<Matter>>>[
+                      Result<List<Matter>>.failure(_loadFailure),
+                    ],
+                  );
+                case _GatewayKind.documents:
+                  documents = _StubDocumentGateway(<Result<List<Document>>>[
+                    Result<List<Document>>.failure(_loadFailure),
+                  ]);
+                case _GatewayKind.threads:
+                  threads = _StubMessageGateway(<Result<List<MessageThread>>>[
+                    Result<List<MessageThread>>.failure(_loadFailure),
+                  ]);
+                case _GatewayKind.attorneys:
+                  attorneys = _StubAttorneyGateway(<Result<List<Attorney>>>[
+                    Result<List<Attorney>>.failure(_loadFailure),
+                  ]);
+              }
+            },
+            build: build,
+            act: (SearchCubit cubit) => cubit.search('Demo'),
+            expect: () => <SearchState>[
+              const SearchState(query: 'Demo'),
+              SearchState(
+                query: 'Demo',
+                results: ViewSuccess<SearchResults>(
+                  SearchResults(
+                    matters: kind == _GatewayKind.matters
+                        ? <Matter>[]
+                        : <Matter>[_m1],
+                    documents: kind == _GatewayKind.documents
+                        ? <Document>[]
+                        : <Document>[_d1, _d2],
+                    threads: kind == _GatewayKind.threads
+                        ? <MessageThread>[]
+                        : <MessageThread>[_t1, _t2],
+                    attorneys: <Attorney>[],
+                    failedGroups: <SearchGroup>{
+                      switch (kind) {
+                        _GatewayKind.matters => SearchGroup.matters,
+                        _GatewayKind.documents => SearchGroup.documents,
+                        _GatewayKind.threads => SearchGroup.threads,
+                        _GatewayKind.attorneys => SearchGroup.attorneys,
+                      },
+                    },
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+      },
+    );
+
+    blocTest<SearchCubit, SearchState>(
+      'all four gateways failing maps to ViewError (total outage keeps the '
+      'retry path)',
+      setUp: () {
+        matters = _StubMatterGateway(
+          results: <Result<List<Matter>>>[
+            Result<List<Matter>>.failure(_loadFailure),
           ],
         );
-      }
-    });
+        documents = _StubDocumentGateway(<Result<List<Document>>>[
+          Result<List<Document>>.failure(_loadFailure),
+        ]);
+        threads = _StubMessageGateway(<Result<List<MessageThread>>>[
+          Result<List<MessageThread>>.failure(_loadFailure),
+        ]);
+        attorneys = _StubAttorneyGateway(<Result<List<Attorney>>>[
+          Result<List<Attorney>>.failure(_loadFailure),
+        ]);
+      },
+      build: build,
+      act: (SearchCubit cubit) => cubit.search('Demo'),
+      expect: () => <SearchState>[
+        const SearchState(query: 'Demo'),
+        SearchState(
+          query: 'Demo',
+          results: ViewError<SearchResults>(_loadFailure),
+        ),
+      ],
+    );
+
+    blocTest<SearchCubit, SearchState>(
+      'failures with zero matches return partial success, never a clean '
+      'empty (the outage stays visible)',
+      setUp: () {
+        matters = _StubMatterGateway(
+          results: <Result<List<Matter>>>[
+            Result<List<Matter>>.failure(_loadFailure),
+          ],
+        );
+      },
+      build: build,
+      act: (SearchCubit cubit) => cubit.search('zzz'),
+      expect: () => <SearchState>[
+        const SearchState(query: 'zzz'),
+        SearchState(
+          query: 'zzz',
+          results: ViewSuccess<SearchResults>(
+            SearchResults(
+              matters: <Matter>[],
+              documents: <Document>[],
+              threads: <MessageThread>[],
+              attorneys: <Attorney>[],
+              failedGroups: <SearchGroup>{SearchGroup.matters},
+            ),
+          ),
+        ),
+      ],
+    );
 
     blocTest<SearchCubit, SearchState>(
       'a stale in-flight search cannot overwrite a newer one (latest wins)',
@@ -441,6 +524,13 @@ class _StubMatterGateway implements MatterGateway {
     }
     return Future<Result<List<Matter>>>.value(results.removeAt(0));
   }
+
+  @override
+  Future<Result<List<Matter>>> searchMatters(String query, {int limit = 30}) {
+    // The search path serves the same scripted results (the cubit refines
+    // either identically in these hermetic tests), so call-count pins hold.
+    return fetchMatters();
+  }
 }
 
 class _StubDocumentGateway implements DocumentGateway {
@@ -456,6 +546,15 @@ class _StubDocumentGateway implements DocumentGateway {
   Future<Result<List<Document>>> fetchDocuments() {
     calls += 1;
     return Future<Result<List<Document>>>.value(results.removeAt(0));
+  }
+
+  @override
+  Future<Result<List<Document>>> searchDocuments(
+    String query, {
+    int limit = 30,
+  }) {
+    // Same scripted-results discipline as the matter stub.
+    return fetchDocuments();
   }
 }
 
@@ -474,6 +573,15 @@ class _StubMessageGateway implements MessageGateway {
   Future<Result<List<MessageThread>>> fetchThreads() {
     calls += 1;
     return Future<Result<List<MessageThread>>>.value(results.removeAt(0));
+  }
+
+  @override
+  Future<Result<List<MessageThread>>> searchThreads(
+    String query, {
+    int limit = 30,
+  }) {
+    // Same scripted-results discipline as the matter stub.
+    return fetchThreads();
   }
 
   @override

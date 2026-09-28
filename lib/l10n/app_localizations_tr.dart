@@ -1178,6 +1178,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get searchError => 'Arama çalıştırılamadı.';
 
   @override
+  String get searchPartialUnavailable =>
+      'Bazı kaynaklara ulaşılamadı — sonuçlar eksik olabilir.';
+
+  @override
   String get searchLocalOnlyNote =>
       'Demo modu — sonuçlar yalnızca sentetik listelerden gelir. Gerçek veri aranmaz.';
 
@@ -1243,6 +1247,9 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get orgAuditEmpty => 'Henüz hiçbir denetim olayı kaydedilmedi.';
+
+  @override
+  String get orgAuditNoOrganization => 'Kuruluş seçilmedi.';
 
   @override
   String get orgAuditDenied =>
@@ -1323,6 +1330,12 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get taskStatusDone => 'Tamamlandı';
+
+  @override
+  String get taskAcknowledge => 'Onayla';
+
+  @override
+  String get taskAcknowledged => 'Onaylandı';
 
   @override
   String get approvalsTitle => 'Bekleyen onaylar';

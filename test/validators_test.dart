@@ -38,6 +38,13 @@ void main() {
         LegalHubValidators.email(l10n, 'space in@domain.com'),
         l10n.validatorEmailInvalid,
       );
+      // RFC 5321: an address longer than 254 characters is rejected even
+      // when its shape matches.
+      final String overlong = '${'a' * 250}@b.co';
+      expect(
+        LegalHubValidators.email(l10n, overlong),
+        l10n.validatorEmailInvalid,
+      );
     });
 
     test('accepts well-formed addresses after trimming', () {
@@ -56,12 +63,15 @@ void main() {
       expect(v(null), l10n.validatorMinLength(8));
       expect(v(''), l10n.validatorMinLength(8));
       expect(v('1234567'), l10n.validatorMinLength(8));
+      // Measured trimmed (the documented contract): padding never counts.
+      expect(v('  1234567  '), l10n.validatorMinLength(8));
     });
 
     test('accepts values at or beyond the threshold', () {
       final v = LegalHubValidators.minLength(l10n, 8);
       expect(v('12345678'), isNull);
       expect(v('123456789'), isNull);
+      expect(v('  12345678  '), isNull);
     });
   });
 
@@ -87,6 +97,9 @@ void main() {
       expect(v('Abc12!Xy'), l10n.validatorPasswordLength(12));
       // 11 chars — still under the floor.
       expect(v('1234567890a'), l10n.validatorPasswordLength(12));
+      // Padding spaces never count toward the floor: 11 real chars + 2
+      // spaces is still under 12.
+      expect(v(' 1234567890a '), l10n.validatorPasswordLength(12));
     });
 
     test('rejects values with fewer than 3 of 4 classes', () {

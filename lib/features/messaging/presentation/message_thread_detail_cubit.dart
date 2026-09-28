@@ -38,6 +38,13 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
   StreamSubscription<MessageRealtimeEvent>? _live;
   String? _threadId;
 
+  /// Live rows delivered while the list is not loaded (error/loading/
+  /// empty): buffered and merged into the next successful load instead of
+  /// dropped. Bounded — a backfill re-reads the thread anyway, so the
+  /// buffer is a loss-window shrinker, never a store.
+  final List<Message> _pendingLive = <Message>[];
+  static const int _maxPendingLive = 100;
+
   /// Loads one thread's messages. The initial state is already loading, so
   /// the first open never re-emits a redundant loading frame; a retry after
   /// an error re-enters loading. An empty list maps to [ViewEmpty]; a
@@ -61,9 +68,9 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
       case Success<List<Message>>(value: final List<Message> messages):
         emit(
           state.copyWith(
-            messages: messages.isEmpty
+            messages: messages.isEmpty && _pendingLive.isEmpty
                 ? const ViewEmpty<List<Message>>()
-                : ViewSuccess<List<Message>>(messages),
+                : ViewSuccess<List<Message>>(_mergePending(messages)),
           ),
         );
       case Failure<List<Message>>(error: final AppError error):
@@ -82,6 +89,10 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
     }
     await unsubscribe();
     _threadId = threadId;
+    // A new subscription is a new thread context — stale buffered rows
+    // belong to the previous thread. (Re-subscribing the same thread
+    // early-returns above and keeps the buffer.)
+    _pendingLive.clear();
     _live = _gateway.watchMessages(threadId).listen(_onLiveEvent);
   }
 
@@ -106,12 +117,13 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
 
   /// Appends a delivered/sent row to the loaded list, deduped by id (the
   /// writer's own send arrives on the live channel too — the double-add is
-  /// the expected case). Rows only append once the list is loaded; a
-  /// delivered row before/after an error state is dropped until the next
-  /// backfill re-reads it.
+  /// the expected case). A delivered row before the list is loaded is
+  /// buffered (bounded, deduped) and merged into the next successful load
+  /// instead of dropped until backfill.
   void _appendLive(Message message) {
     final ViewState<List<Message>> current = state.messages;
     if (current is! ViewSuccess<List<Message>>) {
+      _bufferLive(message);
       return;
     }
     final List<Message> messages = current.data;
@@ -125,6 +137,35 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
     );
   }
 
+  /// Buffers one live row for the next successful load (dedupe by id,
+  /// oldest-evicted past the cap).
+  void _bufferLive(Message message) {
+    if (_pendingLive.any((Message m) => m.id == message.id)) {
+      return;
+    }
+    if (_pendingLive.length >= _maxPendingLive) {
+      _pendingLive.removeAt(0);
+    }
+    _pendingLive.add(message);
+  }
+
+  /// Merges buffered live rows into a freshly fetched list (dedupe by id —
+  /// the backfill may already contain them), then drains the buffer.
+  List<Message> _mergePending(List<Message> fetched) {
+    if (_pendingLive.isEmpty) {
+      return fetched;
+    }
+    final Set<String> ids = fetched.map((Message m) => m.id).toSet();
+    final List<Message> merged = <Message>[...fetched];
+    for (final Message pending in _pendingLive) {
+      if (ids.add(pending.id)) {
+        merged.add(pending);
+      }
+    }
+    _pendingLive.clear();
+    return merged;
+  }
+
   /// Sends one message on the thread (D-LV1, insert-only). While in flight
   /// the composer disables; a failure surfaces [MessageThreadDetailState.sendError]
   /// inline and the composer keeps the draft for a retry.
@@ -136,10 +177,23 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
     if (state.sending || isClosed) {
       return;
     }
+    // Batch B client guard (mirrors the send_message RPC validation):
+    // whitespace-only never hits the gateway (the composer already
+    // disables it); oversized surfaces sendError without a round-trip.
+    final String trimmed = body.trim();
+    if (trimmed.isEmpty) {
+      return;
+    }
+    if (trimmed.length > 2000) {
+      emit(
+        state.copyWith(sendError: 'Message is too long (max 2000 characters).'),
+      );
+      return;
+    }
     emit(state.copyWith(sending: true, sendError: null));
     final Result<Message> result = await _gateway.sendMessage(
       threadId,
-      body,
+      trimmed,
       authorDisplayName: authorDisplayName,
     );
     if (isClosed) {
@@ -158,7 +212,8 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
   }
 
   /// The post-send state: the persisted row appended to a loaded list (when
-  /// not already present), with the in-flight flag cleared.
+  /// not already present), with the in-flight flag cleared. When the list
+  /// is not loaded the row joins the live buffer instead of vanishing.
   MessageThreadDetailState _appendedSendState(Message message) {
     final ViewState<List<Message>> current = state.messages;
     if (current is ViewSuccess<List<Message>> &&
@@ -171,6 +226,9 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
         sending: false,
         sendError: null,
       );
+    }
+    if (current is! ViewSuccess<List<Message>>) {
+      _bufferLive(message);
     }
     return state.copyWith(sending: false, sendError: null);
   }

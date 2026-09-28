@@ -155,27 +155,50 @@ void main() {
       },
     );
 
-    testWidgets('an error renders the retry affordance that re-searches', (
-      tester,
-    ) async {
-      // A flaky matter gateway (failure then success) registered before
-      // configureDependencies so the fake registration is skipped.
-      await resetServiceLocator();
-      serviceLocator.registerLazySingleton<MatterGateway>(
-        _FlakyMatterGateway.new,
-      );
+    testWidgets(
+      'a single-group failure shows partial results with an unavailable '
+      'notice, and re-search recovers',
+      (tester) async {
+        // A flaky matter gateway (failure then success) registered before
+        // configureDependencies so the fake registration is skipped.
+        await resetServiceLocator();
+        serviceLocator.registerLazySingleton<MatterGateway>(
+          _FlakyMatterGateway.new,
+        );
 
-      await pumpSearch(tester);
+        await pumpSearch(tester);
 
-      expect(find.text('Unable to run the search.'), findsOneWidget);
-      expect(find.text('Retry'), findsOneWidget);
+        // The good groups still render; the failed matters group drops its
+        // section and the partial-results notice says results may be
+        // incomplete (audit: fail-fast search).
+        expect(
+          find.text(
+            'Some sources were unavailable — results may be incomplete.',
+          ),
+          findsOneWidget,
+        );
+        expect(find.text('Matters'), findsNothing);
+        expect(find.text('Demo acquisition review'), findsNothing);
+        expect(find.text('Demo engagement letter'), findsOneWidget);
+        expect(find.text('Demo matter updates'), findsOneWidget);
 
-      await tester.tap(find.text('Retry'));
-      await tester.pumpAndSettle();
+        // Re-running the search hits the recovered gateway: the notice
+        // clears and the matters section returns. The trailing space keeps
+        // the trimmed query identical while still firing onChanged (an
+        // identical enterText is a no-op in the field).
+        await tester.enterText(find.byType(TextField), 'Demo ');
+        await tester.pump(const Duration(milliseconds: 300));
+        await tester.pumpAndSettle();
 
-      expect(find.text('Unable to run the search.'), findsNothing);
-      expect(find.text('Demo acquisition review'), findsOneWidget);
-    });
+        expect(
+          find.text(
+            'Some sources were unavailable — results may be incomplete.',
+          ),
+          findsNothing,
+        );
+        expect(find.text('Demo acquisition review'), findsOneWidget);
+      },
+    );
   });
 }
 
@@ -199,6 +222,10 @@ class _FlakyMatterGateway implements MatterGateway {
     }
     return Result<List<Matter>>.success(_syntheticMatters);
   }
+
+  @override
+  Future<Result<List<Matter>>> searchMatters(String query, {int limit = 30}) =>
+      fetchMatters();
 }
 
 final List<Matter> _syntheticMatters = <Matter>[

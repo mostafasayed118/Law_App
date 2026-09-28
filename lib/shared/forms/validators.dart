@@ -17,10 +17,14 @@ class LegalHubValidators {
     return text.isEmpty ? l10n.validatorRequired : null;
   }
 
-  /// Valid email shape.
+  /// Valid email shape. Overlong values are rejected outright (RFC 5321 caps
+  /// an address at 254 characters) so an oversize string never reaches the
+  /// regex or the auth seam.
   static String? email(AppLocalizations l10n, String? value) {
     final String text = value?.trim() ?? '';
-    if (text.isEmpty || !_emailRegex.hasMatch(text)) {
+    if (text.isEmpty ||
+        text.length > _emailMaxLength ||
+        !_emailRegex.hasMatch(text)) {
       return l10n.validatorEmailInvalid;
     }
     return null;
@@ -35,7 +39,7 @@ class LegalHubValidators {
       throw ArgumentError('minLength must be non-negative: $minLength');
     }
     return (String? value) {
-      final String text = value ?? '';
+      final String text = (value ?? '').trim();
       return text.length < minLength
           ? l10n.validatorMinLength(minLength)
           : null;
@@ -69,7 +73,11 @@ class LegalHubValidators {
     String? email,
   }) {
     return (String? value) {
-      final String text = value ?? '';
+      // Scored trimmed: padding spaces must never count toward the 12-char
+      // floor (the symbol class already excludes whitespace, so only the
+      // length needed the guard). Trimming only ever rejects more — a padded
+      // value that passes here still submits verbatim to the auth seam.
+      final String text = (value ?? '').trim();
       if (text.length < _passwordMinLength) {
         return l10n.validatorPasswordLength(_passwordMinLength);
       }
@@ -86,14 +94,16 @@ class LegalHubValidators {
   /// Scores a candidate password into a coarse strength level for the live
   /// strength indicator on the auth forms. Pure and deterministic so it is
   /// unit-testable in isolation. The label/icon — never color alone — is what
-  /// carries the meaning in the UI.
+  /// carries the meaning in the UI. Scored trimmed so the indicator agrees
+  /// with [strongPassword] on padded input.
   static PasswordStrength passwordStrength(String value) {
-    final int classes = classCount(value);
+    final String text = value.trim();
+    final int classes = classCount(text);
     int score = classes;
-    if (value.length >= _passwordMinLength) {
+    if (text.length >= _passwordMinLength) {
       score += 1;
     }
-    if (value.length >= _passwordStrongLength) {
+    if (text.length >= _passwordStrongLength) {
       score += 1;
     }
     if (score >= _strongThreshold) {
@@ -138,6 +148,7 @@ class LegalHubValidators {
   static const int _passwordMinLength = 12;
   static const int _passwordMinClasses = 3;
   static const int _passwordStrongLength = 16;
+  static const int _emailMaxLength = 254;
   static const int _fairThreshold = 4;
   static const int _strongThreshold = 6;
 

@@ -1,4 +1,4 @@
-﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/router.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 
@@ -198,6 +198,31 @@ void main() {
           reason: 'role $role grants a destination the shell does not render',
         );
       }
+    });
+
+    test(
+      'capabilityForRole fails closed to least privilege on unknown roles',
+      () {
+        // The router's capabilitiesForRole parameter is a test seam for
+        // restricted roles — partial maps are the normal case there. An
+        // unknown role must hide every surface (the server is the
+        // authorization), never throw from a map unwrap.
+        final RoleCapability fallback = capabilityForRole(
+          const <UserRole, RoleCapability>{UserRole.client: RoleCapability()},
+          UserRole.partner,
+        );
+        expect(fallback.asSet, isEmpty);
+      },
+    );
+
+    test('capabilityForRole returns the mapped entry for known roles', () {
+      const RoleCapability partner = RoleCapability(canViewAudit: true);
+      expect(
+        capabilityForRole(const <UserRole, RoleCapability>{
+          UserRole.partner: partner,
+        }, UserRole.partner),
+        partner,
+      );
     });
   });
 }

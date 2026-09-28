@@ -1,5 +1,20 @@
 part of 'service_locator.dart';
 
+/// Registers one env-gated gateway seam: the Supabase-backed implementation
+/// when the build is configured, the dev fake otherwise (Batch 3.3 env
+/// pattern — env-less runs and ALL tests keep the fake). One helper for all
+/// flips so a flip-rule change lands in one place instead of N coordinated
+/// copy-pasted `if (env.isConfigured)` blocks.
+void _registerSeam<T extends Object>(
+  SupabaseEnv env, {
+  required T Function() supabase,
+  required T Function() fake,
+}) {
+  if (!serviceLocator.isRegistered<T>()) {
+    serviceLocator.registerLazySingleton<T>(env.isConfigured ? supabase : fake);
+  }
+}
+
 void _registerBookingSeams() {
   if (!serviceLocator.isRegistered<BookingGateway>()) {
     // Stateless service: lazy singleton. The booking Cubit is feature-scoped
@@ -60,49 +75,37 @@ void _registerMatterSeams(
   SupabaseMatterApi Function()? supabaseMatterApiFactory,
   SupabaseMatterWriteApi Function()? supabaseMatterWriteApiFactory,
 }) {
-  if (!serviceLocator.isRegistered<MatterGateway>()) {
-    // Stateless service: lazy singleton. The matter Cubit is feature-scoped
-    // and created per screen via BlocProvider, so it is NOT registered here.
-    // Like OrganizationGateway, the flip swaps the dev fake for the
-    // Supabase-backed implementation when the build is configured (Batch 3.3
-    // env pattern). The real path reads the applied `matters` table through
-    // the RLS-scoped SELECT (plan D-MR1/D-MR7) and resolves display names
-    // via the roster seam (D-MR4); env-less runs and ALL tests keep the
-    // fake.
-    if (env.isConfigured) {
-      serviceLocator.registerLazySingleton<MatterGateway>(
-        () => SupabaseMatterGateway(
-          (supabaseMatterApiFactory ?? SupabaseMatterApiImpl.bind)(),
-          serviceLocator<OrganizationGateway>(),
-        ),
-      );
-    } else {
-      serviceLocator.registerLazySingleton<MatterGateway>(
-        FakeMatterGateway.new,
-      );
-    }
-  }
-  if (!serviceLocator.isRegistered<MatterWriteGateway>()) {
-    // Stateless service: lazy singleton. The create cubit is feature-scoped
-    // and created per screen via BlocProvider, so it is NOT registered here.
-    // F-01 step 2 client swap (C-D5): like MatterGateway, the flip swaps the
-    // dev fake for the Supabase-backed implementation when the build is
-    // configured (Batch 3.3 env pattern). The real path calls the applied
-    // `create_matter` RPC (RPC-EXECUTE 20) — the server re-derives the
-    // partner/owner/member gates in-function (F2-D1/D2/D4, F-11); env-less
-    // runs and ALL tests keep the fake (C-D3).
-    if (env.isConfigured) {
-      serviceLocator.registerLazySingleton<MatterWriteGateway>(
-        () => SupabaseMatterWriteGateway(
-          (supabaseMatterWriteApiFactory ?? SupabaseMatterWriteApiImpl.bind)(),
-        ),
-      );
-    } else {
-      serviceLocator.registerLazySingleton<MatterWriteGateway>(
-        FakeMatterWriteGateway.new,
-      );
-    }
-  }
+  // Stateless service: lazy singleton. The matter Cubit is feature-scoped
+  // and created per screen via BlocProvider, so it is NOT registered here.
+  // Like OrganizationGateway, the flip swaps the dev fake for the
+  // Supabase-backed implementation when the build is configured (Batch 3.3
+  // env pattern). The real path reads the applied `matters` table through
+  // the RLS-scoped SELECT (plan D-MR1/D-MR7) and resolves display names
+  // via the roster seam (D-MR4); env-less runs and ALL tests keep the
+  // fake.
+  _registerSeam<MatterGateway>(
+    env,
+    supabase: () => SupabaseMatterGateway(
+      (supabaseMatterApiFactory ?? SupabaseMatterApiImpl.bind)(),
+      serviceLocator<OrganizationGateway>(),
+    ),
+    fake: FakeMatterGateway.new,
+  );
+  // Stateless service: lazy singleton. The create cubit is feature-scoped
+  // and created per screen via BlocProvider, so it is NOT registered here.
+  // F-01 step 2 client swap (C-D5): like MatterGateway, the flip swaps the
+  // dev fake for the Supabase-backed implementation when the build is
+  // configured (Batch 3.3 env pattern). The real path calls the applied
+  // `create_matter` RPC (RPC-EXECUTE 20) — the server re-derives the
+  // partner/owner/member gates in-function (F2-D1/D2/D4, F-11); env-less
+  // runs and ALL tests keep the fake (C-D3).
+  _registerSeam<MatterWriteGateway>(
+    env,
+    supabase: () => SupabaseMatterWriteGateway(
+      (supabaseMatterWriteApiFactory ?? SupabaseMatterWriteApiImpl.bind)(),
+    ),
+    fake: FakeMatterWriteGateway.new,
+  );
 }
 
 void _registerContentSeams(
@@ -113,118 +116,105 @@ void _registerContentSeams(
   SupabaseStorageApi Function()? supabaseStorageApiFactory,
   SupabaseBillingApi Function()? supabaseBillingApiFactory,
   SupabaseNotificationApi Function()? supabaseNotificationApiFactory,
+  SupabaseTaskApi Function()? supabaseTaskApiFactory,
 }) {
-  if (!serviceLocator.isRegistered<DocumentGateway>()) {
-    // Stateless service: lazy singleton. The vault Cubit is feature-scoped
-    // and created per screen via BlocProvider, so it is NOT registered here.
-    // Like MatterGateway, the flip swaps the dev fake for the
-    // Supabase-backed implementation when the build is configured (Batch 3.3
-    // env pattern). The real path reads the applied `documents` table through
-    // the RLS-scoped SELECT (plan D-DR1/D-DR7) and resolves matterRef via the
-    // embedded matters(title) select (D-DR4); env-less runs and ALL tests
-    // keep the fake.
-    if (env.isConfigured) {
-      serviceLocator.registerLazySingleton<DocumentGateway>(
-        () => SupabaseDocumentGateway(
-          (supabaseDocumentApiFactory ?? SupabaseDocumentApiImpl.bind)(),
-        ),
-      );
-    } else {
-      serviceLocator.registerLazySingleton<DocumentGateway>(
-        FakeDocumentGateway.new,
-      );
-    }
-  }
-  if (!serviceLocator.isRegistered<MessageGateway>()) {
-    // Stateless service: lazy singleton. The messaging Cubit is feature-scoped
-    // and created per screen via BlocProvider, so it is NOT registered here.
-    // Like DocumentGateway, the flip swaps the dev fake for the
-    // Supabase-backed implementation when the build is configured (Batch 3.3
-    // env pattern). The real path reads the applied `message_threads` +
-    // `messages` tables through the RLS-scoped SELECTs (plan D-MSR1/D-MSR7/
-    // D-RT5) and resolves matterRef via the embedded matters(title) select
-    // (D-MSR4); the send path (D-LV1) resolves the thread's org under the
-    // same gate and inserts, and the live path (D-LV4) binds the
-    // postgres_changes subscription; env-less runs and ALL tests keep the
-    // fake.
-    if (env.isConfigured) {
-      serviceLocator.registerLazySingleton<MessageGateway>(
-        () => SupabaseMessageGateway(
-          (supabaseMessageApiFactory ?? SupabaseMessageApiImpl.bind)(),
-          (supabaseMessageRealtimeApiFactory ??
-              SupabaseMessageRealtimeApiImpl.bind)(),
-        ),
-      );
-    } else {
-      serviceLocator.registerLazySingleton<MessageGateway>(
-        FakeMessageGateway.new,
-      );
-    }
-  }
-  if (!serviceLocator.isRegistered<StorageGateway>()) {
-    // Stateless service: lazy singleton. The storage Cubit is feature-scoped
-    // and created per section via BlocProvider, so it is NOT registered here.
-    // Like MessageGateway, the flip swaps the dev fake for the
-    // Supabase-backed implementation when the build is configured (Batch 3.3
-    // env pattern). The real path reads the applied `files` table through
-    // the RLS-scoped SELECT (plan D-STR1/D-STR7) and resolves matterRef via
-    // the embedded matters(title) select (D-STR5); env-less runs and ALL
-    // tests keep the fake.
-    if (env.isConfigured) {
-      serviceLocator.registerLazySingleton<StorageGateway>(
-        () => SupabaseStorageGateway(
-          (supabaseStorageApiFactory ?? SupabaseStorageApiImpl.bind)(),
-        ),
-      );
-    } else {
-      serviceLocator.registerLazySingleton<StorageGateway>(
-        FakeStorageGateway.new,
-      );
-    }
-  }
-  if (!serviceLocator.isRegistered<BillingGateway>()) {
-    // Stateless service: lazy singleton. The billing Cubit is feature-scoped
-    // and created per section via BlocProvider, so it is NOT registered here.
-    // Like StorageGateway, the flip swaps the dev fake for the
-    // Supabase-backed implementation when the build is configured (Batch 3.3
-    // env pattern). The real path reads the applied `billing_invoices` table
-    // through the RLS-scoped SELECT (plan D-BI2/D-BI5) and resolves matterRef
-    // via the embedded matters(title) select (D-BI5); env-less runs and ALL
-    // tests keep the fake (D-BI4 — the fake is the product posture, not a
-    // stopgap).
-    if (env.isConfigured) {
-      serviceLocator.registerLazySingleton<BillingGateway>(
-        () => SupabaseBillingGateway(
-          (supabaseBillingApiFactory ?? SupabaseBillingApiImpl.bind)(),
-        ),
-      );
-    } else {
-      serviceLocator.registerLazySingleton<BillingGateway>(
-        FakeBillingGateway.new,
-      );
-    }
-  }
-  if (!serviceLocator.isRegistered<NotificationGateway>()) {
-    // Stateless service: lazy singleton. The notification-feed Cubit is
-    // feature-scoped and created per screen via BlocProvider, so it is NOT
-    // registered here. Like BillingGateway, the flip swaps the dev fake for
-    // the Supabase-backed implementation when the build is configured (Batch
-    // 3.3 env pattern). The real path reads the applied `notifications`
-    // table through the RLS-scoped SELECT (notification-feed slice, T1 Q2/Q5
-    // — `notifications_select_org`, the organizations gate, org-wide
-    // metadata); env-less runs and ALL tests keep the fake (D-N7 — the fake
-    // is the product posture, not a stopgap).
-    if (env.isConfigured) {
-      serviceLocator.registerLazySingleton<NotificationGateway>(
-        () => SupabaseNotificationGateway(
-          (supabaseNotificationApiFactory ??
-              SupabaseNotificationApiImpl.bind)(),
-        ),
-      );
-    } else {
-      serviceLocator.registerLazySingleton<NotificationGateway>(
-        FakeNotificationGateway.new,
-      );
-    }
-  }
+  // Stateless service: lazy singleton. The vault Cubit is feature-scoped
+  // and created per screen via BlocProvider, so it is NOT registered here.
+  // Like MatterGateway, the flip swaps the dev fake for the
+  // Supabase-backed implementation when the build is configured (Batch 3.3
+  // env pattern). The real path reads the applied `documents` table through
+  // the RLS-scoped SELECT (plan D-DR1/D-DR7) and resolves matterRef via the
+  // embedded matters(title) select (D-DR4); env-less runs and ALL tests
+  // keep the fake.
+  _registerSeam<DocumentGateway>(
+    env,
+    supabase: () => SupabaseDocumentGateway(
+      (supabaseDocumentApiFactory ?? SupabaseDocumentApiImpl.bind)(),
+    ),
+    fake: FakeDocumentGateway.new,
+  );
+  // Stateless service: lazy singleton. The messaging Cubit is feature-scoped
+  // and created per screen via BlocProvider, so it is NOT registered here.
+  // Like DocumentGateway, the flip swaps the dev fake for the
+  // Supabase-backed implementation when the build is configured (Batch 3.3
+  // env pattern). The real path reads the applied `message_threads` +
+  // `messages` tables through the RLS-scoped SELECTs (plan D-MSR1/D-MSR7/
+  // D-RT5) and resolves matterRef via the embedded matters(title) select
+  // (D-MSR4); the send path (D-LV1) resolves the thread's org under the
+  // same gate and inserts, and the live path (D-LV4) binds the
+  // postgres_changes subscription; env-less runs and ALL tests keep the
+  // fake.
+  _registerSeam<MessageGateway>(
+    env,
+    supabase: () => SupabaseMessageGateway(
+      (supabaseMessageApiFactory ?? SupabaseMessageApiImpl.bind)(),
+      (supabaseMessageRealtimeApiFactory ??
+          SupabaseMessageRealtimeApiImpl.bind)(),
+    ),
+    fake: FakeMessageGateway.new,
+  );
+  // Stateless service: lazy singleton. The storage Cubit is feature-scoped
+  // and created per section via BlocProvider, so it is NOT registered here.
+  // Like MessageGateway, the flip swaps the dev fake for the
+  // Supabase-backed implementation when the build is configured (Batch 3.3
+  // env pattern). The real path reads the applied `files` table through
+  // the RLS-scoped SELECT (plan D-STR1/D-STR7) and resolves matterRef via
+  // the embedded matters(title) select (D-STR5); env-less runs and ALL
+  // tests keep the fake.
+  _registerSeam<StorageGateway>(
+    env,
+    supabase: () => SupabaseStorageGateway(
+      (supabaseStorageApiFactory ?? SupabaseStorageApiImpl.bind)(),
+    ),
+    fake: FakeStorageGateway.new,
+  );
+  // Stateless service: lazy singleton. The billing Cubit is feature-scoped
+  // and created per section via BlocProvider, so it is NOT registered here.
+  // Like StorageGateway, the flip swaps the dev fake for the
+  // Supabase-backed implementation when the build is configured (Batch 3.3
+  // env pattern). The real path reads the applied `billing_invoices` table
+  // through the RLS-scoped SELECT (plan D-BI2/D-BI5) and resolves matterRef
+  // via the embedded matters(title) select (D-BI5); env-less runs and ALL
+  // tests keep the fake (D-BI4 — the fake is the product posture, not a
+  // stopgap).
+  _registerSeam<BillingGateway>(
+    env,
+    supabase: () => SupabaseBillingGateway(
+      (supabaseBillingApiFactory ?? SupabaseBillingApiImpl.bind)(),
+    ),
+    fake: FakeBillingGateway.new,
+  );
+  // Stateless service: lazy singleton. The notification-feed Cubit is
+  // feature-scoped and created per screen via BlocProvider, so it is NOT
+  // registered here. Like BillingGateway, the flip swaps the dev fake for
+  // the Supabase-backed implementation when the build is configured (Batch
+  // 3.3 env pattern). The real path reads the applied `notifications`
+  // table through the RLS-scoped SELECT (notification-feed slice, T1 Q2/Q5
+  // — `notifications_select_org`, the organizations gate, org-wide
+  // metadata); env-less runs and ALL tests keep the fake (D-N7 — the fake
+  // is the product posture, not a stopgap).
+  _registerSeam<NotificationGateway>(
+    env,
+    supabase: () => SupabaseNotificationGateway(
+      (supabaseNotificationApiFactory ?? SupabaseNotificationApiImpl.bind)(),
+    ),
+    fake: FakeNotificationGateway.new,
+  );
+  // Stateless service: lazy singleton. The task-board Cubit is
+  // feature-scoped and created per screen via BlocProvider, so it is NOT
+  // registered here. Like NotificationGateway, the flip swaps the dev fake
+  // for the Supabase-backed implementation when the build is configured
+  // (Batch 3.3 env pattern). The real path reads the applied `tasks`
+  // table through the RLS-scoped SELECT (`tasks_select_assigned`) and
+  // resolves matterRef via the embedded matters(title) select (D-MSR4),
+  // and writes through the four audited RPCs (`create_task` /
+  // `advance_task_status` / `assign_task` / `acknowledge_task` — Gate 3
+  // spec 2026-09-27); env-less runs and ALL tests keep the fake.
+  _registerSeam<TaskBoardGateway>(
+    env,
+    supabase: () => SupabaseTaskGateway(
+      (supabaseTaskApiFactory ?? SupabaseTaskApiImpl.bind)(),
+    ),
+    fake: FakeTaskGateway.new,
+  );
 }

@@ -2254,6 +2254,12 @@ abstract class AppLocalizations {
   /// **'Unable to run the search.'**
   String get searchError;
 
+  /// No description provided for @searchPartialUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Some sources were unavailable — results may be incomplete.'**
+  String get searchPartialUnavailable;
+
   /// No description provided for @searchLocalOnlyNote.
   ///
   /// In en, this message translates to:
@@ -2373,6 +2379,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No audit events recorded yet.'**
   String get orgAuditEmpty;
+
+  /// No description provided for @orgAuditNoOrganization.
+  ///
+  /// In en, this message translates to:
+  /// **'No organization selected.'**
+  String get orgAuditNoOrganization;
 
   /// No description provided for @orgAuditDenied.
   ///
@@ -2523,6 +2535,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Done'**
   String get taskStatusDone;
+
+  /// No description provided for @taskAcknowledge.
+  ///
+  /// In en, this message translates to:
+  /// **'Acknowledge'**
+  String get taskAcknowledge;
+
+  /// No description provided for @taskAcknowledged.
+  ///
+  /// In en, this message translates to:
+  /// **'Acknowledged'**
+  String get taskAcknowledged;
 
   /// No description provided for @approvalsTitle.
   ///

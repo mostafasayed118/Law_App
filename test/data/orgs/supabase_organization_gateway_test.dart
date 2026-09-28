@@ -297,6 +297,49 @@ void main() {
 
       expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
     });
+
+    test('surfaces a wrong-typed organization_id as a loud failure, '
+        'never a raw TypeError', () async {
+      api.listRows = <Map<String, dynamic>>[
+        <String, dynamic>{
+          // Provider drift: the column arrives as an int, not a String.
+          'organization_id': 7,
+          'user_id': 'u-1',
+          'display_name': 'X',
+          'role': 'client',
+          'status': 'active',
+          'created_at': '2026-07-25T10:00:00.000Z',
+          'updated_at': '2026-07-25T10:00:00.000Z',
+        },
+      ];
+
+      final OrgOutcome<List<OrgMember>> outcome = await gateway.listMembers(
+        organizationId: 'org-1',
+      );
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
+    });
+
+    test('surfaces an unparseable created_at as a loud failure, '
+        'never a raw TypeError', () async {
+      api.listRows = <Map<String, dynamic>>[
+        <String, dynamic>{
+          'organization_id': 'org-1',
+          'user_id': 'u-1',
+          'display_name': 'X',
+          'role': 'client',
+          'status': 'active',
+          'created_at': 'not-a-timestamp',
+          'updated_at': '2026-07-25T10:00:00.000Z',
+        },
+      ];
+
+      final OrgOutcome<List<OrgMember>> outcome = await gateway.listMembers(
+        organizationId: 'org-1',
+      );
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
+    });
   });
 
   group('inviteMember', () {
