@@ -18,11 +18,14 @@ import 'package:legalhub/l10n/app_localizations.dart';
 /// empty, and error arms are reachable in a widget test (the error arm's
 /// retry re-fetches through the cubit's `retryLoadSlots`).
 class _MutableSlotsGateway implements BookingGateway {
-  _MutableSlotsGateway({List<BookingSlot>? slots})
+  _MutableSlotsGateway({List<BookingSlot>? slots, this.isLocalOnly = true})
     : slots = slots ?? FakeBookingGateway.syntheticSlots;
 
   List<BookingSlot> slots;
   AppError? slotError;
+
+  @override
+  final bool isLocalOnly;
 
   /// When set, [fetchSlots] awaits it first — the loading arm stays visible
   /// until the test completes the gate.
@@ -51,6 +54,9 @@ class _MutableSlotsGateway implements BookingGateway {
 /// review-step error surface (AC-4) is reachable in a widget test.
 class _FailingConfirmGateway implements BookingGateway {
   @override
+  bool get isLocalOnly => true;
+
+  @override
   Future<Result<List<BookingSlot>>> fetchSlots() async {
     return Result<List<BookingSlot>>.success(FakeBookingGateway.syntheticSlots);
   }
@@ -59,6 +65,31 @@ class _FailingConfirmGateway implements BookingGateway {
   Future<Result<BookingConfirmation>> confirm(BookingRequest request) async {
     return Result<BookingConfirmation>.failure(
       const AppError(code: 'booking.unavailable', userMessage: 'Unavailable'),
+    );
+  }
+}
+
+/// Gateway whose slot race is lost at confirm: the review step must render
+/// the conflict copy and the "choose another time" recovery action.
+class _ConflictGateway implements BookingGateway {
+  int fetchSlotsCalls = 0;
+
+  @override
+  bool get isLocalOnly => true;
+
+  @override
+  Future<Result<List<BookingSlot>>> fetchSlots() async {
+    fetchSlotsCalls += 1;
+    return Result<List<BookingSlot>>.success(FakeBookingGateway.syntheticSlots);
+  }
+
+  @override
+  Future<Result<BookingConfirmation>> confirm(BookingRequest request) async {
+    return Result<BookingConfirmation>.failure(
+      const AppError(
+        code: 'booking_slot_unavailable',
+        userMessage: 'That time is no longer available. Choose another time.',
+      ),
     );
   }
 }
@@ -91,7 +122,7 @@ void main() {
 
   Future<void> goToReview(WidgetTester tester) async {
     await goToDateTime(tester);
-    await tester.tap(find.text('9:00 AM'));
+    await tester.tap(find.textContaining('9:00 AM'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
@@ -124,6 +155,8 @@ void main() {
         find.text('Demo mode — no consultation is actually booked or sent.'),
         findsOneWidget,
       );
+      // The fake must never render the real-backend no-payment note.
+      expect(find.text('No payment is taken at this step.'), findsNothing);
     });
 
     testWidgets('a category selection enables Continue and loads slots', (
@@ -133,9 +166,9 @@ void main() {
       await goToDateTime(tester);
 
       // The date-time step renders the fake's deterministic slot list
-      // (AC-3 success path): slot-1 at 9:00 AM.
+      // (AC-3 success path): slot-1 on Nov 10 at 9:00 AM.
       expect(find.text('Select date & time'), findsOneWidget);
-      expect(find.text('9:00 AM'), findsOneWidget);
+      expect(find.text('Tue, Nov 10 · 9:00 AM'), findsOneWidget);
       expect(find.text('30 min'), findsOneWidget);
     });
 
@@ -172,7 +205,7 @@ void main() {
       await tester.tap(find.text('Back'));
       await tester.pumpAndSettle();
       expect(find.text('Select date & time'), findsOneWidget);
-      expect(find.text('9:00 AM'), findsOneWidget);
+      expect(find.textContaining('9:00 AM'), findsOneWidget);
 
       // dateTime -> category: the chosen category survives (selection state
       // is re-derivable from the draft, which is preserved).
@@ -225,6 +258,69 @@ void main() {
     });
 
     testWidgets(
+      'a lost slot race shows the conflict copy and the recovery action',
+      (tester) async {
+        final _ConflictGateway gateway = _ConflictGateway();
+        serviceLocator.registerLazySingleton<BookingGateway>(() => gateway);
+        await pumpBooking(tester);
+        await goToReview(tester);
+
+        await tester.tap(find.text('Confirm booking'));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('That time is no longer available. Choose another time.'),
+          findsOneWidget,
+        );
+        expect(find.text('Choose another time'), findsOneWidget);
+        // The generic failure copy must not replace the specific conflict.
+        expect(find.text('Unable to confirm. Please try again.'), findsNothing);
+
+        await tester.tap(find.text('Choose another time'));
+        await tester.pumpAndSettle();
+
+        // Recovery returns to the date-time step and reloads the catalogue.
+        expect(find.text('Select date & time'), findsOneWidget);
+        expect(find.textContaining('9:00 AM'), findsOneWidget);
+        expect(gateway.fetchSlotsCalls, 2);
+      },
+    );
+
+    testWidgets(
+      'a real gateway renders the no-payment note, never demo wording',
+      (tester) async {
+        final _MutableSlotsGateway gateway = _MutableSlotsGateway(
+          isLocalOnly: false,
+        );
+        serviceLocator.registerLazySingleton<BookingGateway>(() => gateway);
+        await pumpBooking(tester);
+
+        expect(find.text('No payment is taken at this step.'), findsOneWidget);
+        expect(
+          find.text('Demo mode — no consultation is actually booked or sent.'),
+          findsNothing,
+        );
+
+        await goToReview(tester);
+        expect(find.text('No payment is taken at this step.'), findsOneWidget);
+        expect(
+          find.text('Demo mode — no consultation is actually booked or sent.'),
+          findsNothing,
+        );
+
+        await tester.tap(find.text('Confirm booking'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Booking confirmed'), findsOneWidget);
+        expect(find.text('No payment is taken at this step.'), findsOneWidget);
+        expect(
+          find.text('Demo mode — no consultation is actually booked or sent.'),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets(
       'date-time step shows a loading indicator while slots resolve',
       (tester) async {
         final _MutableSlotsGateway gateway = _MutableSlotsGateway()
@@ -238,12 +334,12 @@ void main() {
 
         // The fetch is gated: the loading arm renders, not the slot list.
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
-        expect(find.text('9:00 AM'), findsNothing);
+        expect(find.textContaining('9:00 AM'), findsNothing);
 
         gateway.slotGate!.complete();
         await tester.pumpAndSettle();
 
-        expect(find.text('9:00 AM'), findsOneWidget);
+        expect(find.textContaining('9:00 AM'), findsOneWidget);
       },
     );
 
@@ -258,7 +354,7 @@ void main() {
       await goToDateTime(tester);
 
       expect(find.text('No times available.'), findsOneWidget);
-      expect(find.text('9:00 AM'), findsNothing);
+      expect(find.textContaining('9:00 AM'), findsNothing);
     });
 
     testWidgets('date-time step shows the slot error and retry re-fetches', (
@@ -284,7 +380,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Unable to load available times.'), findsNothing);
-      expect(find.text('9:00 AM'), findsOneWidget);
+      expect(find.textContaining('9:00 AM'), findsOneWidget);
     });
 
     testWidgets('success step pins the confirmation content and demo note', (

@@ -37,6 +37,7 @@ class BookingCubit extends Cubit<BookingState> {
             attorneyId: attorneyId,
             attorneyName: attorneyName,
           ),
+          isLocalOnly: _gateway.isLocalOnly,
         ),
       );
 
@@ -168,6 +169,7 @@ class BookingCubit extends Cubit<BookingState> {
         draft: state.draft,
         slots: state.slots,
         submitStatus: BookingSubmitStatus.idle,
+        isLocalOnly: state.isLocalOnly,
       ),
     );
   }
@@ -190,8 +192,37 @@ class BookingCubit extends Cubit<BookingState> {
         draft: state.draft,
         slots: state.slots,
         submitStatus: BookingSubmitStatus.idle,
+        isLocalOnly: state.isLocalOnly,
       ),
     );
+  }
+
+  /// The review step's conflict recovery: the selected slot was claimed
+  /// between the catalogue read and the confirm call.
+  ///
+  /// Only valid from review after that exact typed conflict; it clears the
+  /// lost slot, returns to the date-time step in its loading state, resets
+  /// the submit lifecycle, and re-reads the availability catalogue. The
+  /// category, topic, and attorney prefill are preserved. An in-flight
+  /// confirm that lands after this switch is dropped by the confirm stale
+  /// guard (the step is no longer review).
+  Future<void> chooseAnotherTime() async {
+    if (isClosed || state.step != BookingStep.review) {
+      return;
+    }
+    if (state.submitError?.code != 'booking_slot_unavailable') {
+      return;
+    }
+    emit(
+      state.copyWith(
+        step: BookingStep.dateTime,
+        draft: state.draft.copyWith(slot: () => null),
+        slots: const ViewLoading<List<BookingSlot>>(),
+        submitStatus: BookingSubmitStatus.idle,
+        submitError: null,
+      ),
+    );
+    await _loadSlots();
   }
 
   /// Step-3 → step-4: awaits the gateway and maps the result. A success
@@ -252,6 +283,7 @@ class BookingCubit extends Cubit<BookingState> {
             slots: latest.slots,
             submitStatus: BookingSubmitStatus.success,
             confirmation: c,
+            isLocalOnly: latest.isLocalOnly,
           ),
         );
       case Failure<BookingConfirmation>(error: final AppError error):

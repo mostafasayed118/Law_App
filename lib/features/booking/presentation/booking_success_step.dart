@@ -35,7 +35,9 @@ class _SuccessStep extends StatelessWidget {
           ),
           const SizedBox(height: LegalHubTheme.spaceMd),
           Text(
-            l10n.bookingLocalOnlyNote,
+            state.isLocalOnly
+                ? l10n.bookingLocalOnlyNote
+                : l10n.bookingNoPaymentNote,
             textAlign: TextAlign.center,
             style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
           ),

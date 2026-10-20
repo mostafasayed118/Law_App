@@ -30,6 +30,17 @@ void main() {
       expect(cubit.state.slots, const ViewEmpty<List<BookingSlot>>());
       expect(cubit.state.submitStatus, BookingSubmitStatus.idle);
       expect(cubit.state.submitError, isNull);
+      // The fake is the default seam, so the wizard renders demo wording.
+      expect(cubit.state.isLocalOnly, isTrue);
+    });
+
+    test('resolves isLocalOnly from the registered gateway', () {
+      final BookingCubit real = BookingCubit(
+        _StubBookingGateway(isLocalOnly: false),
+      );
+      addTearDown(real.close);
+
+      expect(real.state.isLocalOnly, isFalse);
     });
 
     test('selectCategory stores the category in the draft', () {
@@ -754,6 +765,89 @@ void main() {
       verify: (_) => expect(gateway.confirmCalls, 1),
     );
 
+    test(
+      'chooseAnotherTime clears the lost slot, reloads, keeps the draft',
+      () async {
+        gateway = _StubBookingGateway(
+          confirmResults: <Result<BookingConfirmation>>[
+            Result<BookingConfirmation>.failure(_slotConflictFailure),
+          ],
+        );
+        final BookingCubit cubit = BookingCubit(
+          gateway,
+          attorneyId: 'atty-1',
+          attorneyName: 'Layla Mansour',
+        );
+        addTearDown(cubit.close);
+
+        cubit.selectCategory(BookingCategory.general);
+        cubit.updateTopic('estate matter');
+        await cubit.continueFromCategory();
+        cubit.selectSlot(_slot);
+        cubit.continueFromDateTime();
+        await cubit.confirm();
+
+        expect(cubit.state.submitError?.code, 'booking_slot_unavailable');
+
+        gateway.slotsResult = Result<List<BookingSlot>>.success(<BookingSlot>[
+          _otherSlot,
+        ]);
+        await cubit.chooseAnotherTime();
+
+        expect(cubit.state.step, BookingStep.dateTime);
+        expect(cubit.state.draft.slot, isNull);
+        // Category, topic, and attorney prefill survive the conflict recovery.
+        expect(cubit.state.draft.category, BookingCategory.general);
+        expect(cubit.state.draft.topic, 'estate matter');
+        expect(cubit.state.draft.attorneyId, 'atty-1');
+        expect(cubit.state.draft.attorneyName, 'Layla Mansour');
+        expect(cubit.state.submitStatus, BookingSubmitStatus.idle);
+        expect(cubit.state.submitError, isNull);
+        expect(
+          cubit.state.slots,
+          ViewSuccess<List<BookingSlot>>(<BookingSlot>[_otherSlot]),
+        );
+        // Initial load + the post-conflict reload.
+        expect(gateway.fetchSlotsCalls, 2);
+      },
+    );
+
+    test('chooseAnotherTime is ignored for a non-conflict failure', () async {
+      gateway = _StubBookingGateway(
+        confirmResults: <Result<BookingConfirmation>>[
+          Result<BookingConfirmation>.failure(_confirmFailure),
+        ],
+      );
+      final BookingCubit cubit = BookingCubit(gateway);
+      addTearDown(cubit.close);
+
+      cubit.selectCategory(BookingCategory.general);
+      await cubit.continueFromCategory();
+      cubit.selectSlot(_slot);
+      cubit.continueFromDateTime();
+      await cubit.confirm();
+
+      await cubit.chooseAnotherTime();
+
+      expect(cubit.state.step, BookingStep.review);
+      expect(cubit.state.draft.slot, _slot);
+      expect(cubit.state.submitError, _confirmFailure);
+      expect(gateway.fetchSlotsCalls, 1);
+    });
+
+    test('chooseAnotherTime is ignored off the review step', () async {
+      final BookingCubit cubit = BookingCubit(gateway);
+      addTearDown(cubit.close);
+
+      cubit.selectCategory(BookingCategory.general);
+      await cubit.continueFromCategory();
+
+      await cubit.chooseAnotherTime();
+
+      expect(cubit.state.step, BookingStep.dateTime);
+      expect(gateway.fetchSlotsCalls, 1);
+    });
+
     test('seeds the attorney prefill into the initial draft (D-A3)', () {
       final BookingCubit prefilled = BookingCubit(
         gateway,
@@ -804,6 +898,11 @@ final BookingSlot _slot = BookingSlot(
   durationMinutes: 30,
 );
 final List<BookingSlot> _slots = <BookingSlot>[_slot];
+final BookingSlot _otherSlot = BookingSlot(
+  id: 'slot-2',
+  startsAt: DateTime(2026, 11, 10, 11, 30),
+  durationMinutes: 45,
+);
 
 const BookingConfirmation _confirmation = BookingConfirmation(
   referenceId: 'LH-DEMO-TEST',
@@ -819,6 +918,11 @@ final AppError _confirmFailure = AppError(
   userMessage: 'Could not confirm the booking',
 );
 
+const AppError _slotConflictFailure = AppError(
+  code: 'booking_slot_unavailable',
+  userMessage: 'That time is no longer available. Choose another time.',
+);
+
 /// Hand-rolled gateway stub: fixed slot result by default, queue of confirm
 /// results, or a Completer for in-flight tests.
 class _StubBookingGateway implements BookingGateway {
@@ -826,6 +930,7 @@ class _StubBookingGateway implements BookingGateway {
     List<BookingSlot>? slots,
     Result<List<BookingSlot>>? slotsResult,
     List<Result<BookingConfirmation>>? confirmResults,
+    this.isLocalOnly = true,
   }) : slotsResult =
            slotsResult ?? Result<List<BookingSlot>>.success(slots ?? _slots) {
     this.confirmResults =
@@ -837,10 +942,13 @@ class _StubBookingGateway implements BookingGateway {
 
   _StubBookingGateway.withCompleter()
     : slotsResult = Result<List<BookingSlot>>.success(_slots),
-      confirmResults = null {
+      confirmResults = null,
+      isLocalOnly = true {
     completer = Completer<Result<BookingConfirmation>>();
   }
 
+  @override
+  bool isLocalOnly;
   Result<List<BookingSlot>> slotsResult;
   List<Result<BookingConfirmation>>? confirmResults;
   Completer<Result<BookingConfirmation>>? completer;

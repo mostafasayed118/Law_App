@@ -87,6 +87,9 @@ class BookingDraft extends Equatable {
 ///   retry; only meaningful while [submitStatus] is [BookingSubmitStatus.error].
 /// - [confirmation] — the synthetic confirmation returned by the gateway,
 ///   set when a confirm succeeds; the success step renders its reference id.
+/// - [isLocalOnly] — whether the registered gateway is the in-memory fake;
+///   the wizard renders demo wording only for the fake and the no-payment
+///   note for the real backend. Resolved once at cubit creation.
 class BookingState extends Equatable {
   const BookingState({
     this.step = BookingStep.category,
@@ -95,6 +98,7 @@ class BookingState extends Equatable {
     this.submitStatus = BookingSubmitStatus.idle,
     this.submitError,
     this.confirmation,
+    this.isLocalOnly = true,
   });
 
   final BookingStep step;
@@ -103,6 +107,7 @@ class BookingState extends Equatable {
   final BookingSubmitStatus submitStatus;
   final AppError? submitError;
   final BookingConfirmation? confirmation;
+  final bool isLocalOnly;
 
   /// Sentinel distinguishing "not provided" from "explicitly null" so
   /// [submitError] can be cleared through copyWith.
@@ -115,6 +120,7 @@ class BookingState extends Equatable {
     BookingSubmitStatus? submitStatus,
     Object? submitError = _unset,
     BookingConfirmation? confirmation,
+    bool? isLocalOnly,
   }) {
     return BookingState(
       step: step ?? this.step,
@@ -125,6 +131,7 @@ class BookingState extends Equatable {
           ? this.submitError
           : submitError as AppError?,
       confirmation: confirmation ?? this.confirmation,
+      isLocalOnly: isLocalOnly ?? this.isLocalOnly,
     );
   }
 
@@ -136,5 +143,6 @@ class BookingState extends Equatable {
     submitStatus,
     submitError,
     confirmation,
+    isLocalOnly,
   ];
 }

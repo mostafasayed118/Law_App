@@ -45,7 +45,9 @@ class _CategoryStep extends StatelessWidget {
         ],
         const SizedBox(height: LegalHubTheme.spaceLg),
         Text(
-          l10n.bookingLocalOnlyNote,
+          state.isLocalOnly
+              ? l10n.bookingLocalOnlyNote
+              : l10n.bookingNoPaymentNote,
           style: text.bodySmall?.copyWith(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),

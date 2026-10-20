@@ -45,6 +45,11 @@ const Map<String, (String, bool)> kSupabaseListOrderings =
       // `messages_thread_sent (thread_id, sent_at)` index serves both.
       'messages': ('sent_at', true),
       'tasks': ('created_at', true),
+      // Availability catalogue: ascending is deliberate — the cap must keep
+      // the SOONEST bookable slots, not the furthest-out ones. This is not a
+      // content feed, so the newest-end invariant does not apply; the
+      // ordering test carries an explicit ascending allowlist for this table.
+      'consultation_slots': ('starts_at', false),
     };
 
 /// The deterministic server-side ordering for `table`, or `null` when the

@@ -55,6 +55,12 @@ void main() {
       expect(orderingFor('messages'), ('sent_at', true));
     });
 
+    test('consultation_slots is soonest-first on starts_at', () {
+      // Availability window, not a content feed: the cap must keep the
+      // soonest bookable slots. This is the one deliberate ascending entry.
+      expect(orderingFor('consultation_slots'), ('starts_at', false));
+    });
+
     test('an unmapped table is capped without ordering (never 400s)', () {
       // Caller-scoped reads (e.g. memberships) get the cap only; a guessed
       // column for an unknown table would turn the SELECT into a 400.
@@ -65,18 +71,17 @@ void main() {
   });
 
   group('orderingFor — the cap keeps the newest end', () {
-    test('every mapped table is fetched DESCENDING', () {
+    test('every content table is fetched DESCENDING', () {
       // A hard cap without pagination keeps the FIRST rows of the
       // ordering — so every content list must be newest-first or it
       // silently drops its newest rows. This is the invariant the messages
-      // regression violated; if a table genuinely needs ascending order,
-      // the consuming gateway must reverse (and say so in a test), and the
-      // table entry moves behind an explicit allowlist here.
+      // regression violated. The availability catalogue is the explicit
+      // exception: ascending keeps the soonest bookable slots.
       final List<String> ascendingTables = kSupabaseListOrderings.entries
           .where((MapEntry<String, (String, bool)> entry) => !entry.value.$2)
           .map((MapEntry<String, (String, bool)> entry) => entry.key)
           .toList(growable: false);
-      expect(ascendingTables, isEmpty);
+      expect(ascendingTables, <String>['consultation_slots']);
     });
   });
 

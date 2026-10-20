@@ -17,26 +17,31 @@ import '../domain/booking_slot.dart';
 ///
 /// R3: slot dates are fixed `DateTime` literals for test determinism; their
 /// cosmetic staleness (they do not advance with the wall clock) is accepted
-/// for a synthetic demo and must not grow into availability logic.
+/// for a synthetic demo and must not grow into availability logic. They are
+/// deliberately in the future so the demo never offers a past date.
 class FakeBookingGateway implements BookingGateway {
   /// The fixed synthetic slot list served by [fetchSlots].
   static final List<BookingSlot> syntheticSlots = <BookingSlot>[
     BookingSlot(
       id: 'slot-1',
-      startsAt: DateTime(2026, 8, 10, 9, 0),
+      startsAt: DateTime(2026, 11, 10, 9, 0),
       durationMinutes: 30,
     ),
     BookingSlot(
       id: 'slot-2',
-      startsAt: DateTime(2026, 8, 10, 11, 30),
+      startsAt: DateTime(2026, 11, 10, 11, 30),
       durationMinutes: 45,
     ),
     BookingSlot(
       id: 'slot-3',
-      startsAt: DateTime(2026, 8, 11, 14, 0),
+      startsAt: DateTime(2026, 11, 11, 14, 0),
       durationMinutes: 60,
     ),
   ];
+
+  /// The fake never touches a backend; the wizard must render demo wording.
+  @override
+  bool get isLocalOnly => true;
 
   final List<BookingConfirmation> _confirmed = <BookingConfirmation>[];
   int _nextReference = 1;

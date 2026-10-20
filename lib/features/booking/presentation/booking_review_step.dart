@@ -40,19 +40,31 @@ class _ReviewStep extends StatelessWidget {
           label: l10n.bookingSummaryTime,
           value: draft.slot == null
               ? l10n.bookingSummaryNotSet
-              : '${_slotTime(context, draft.slot!)} (${l10n.bookingDurationMinutes(draft.slot!.durationMinutes)})',
+              : '${_slotDateTime(context, draft.slot!)} (${l10n.bookingDurationMinutes(draft.slot!.durationMinutes)})',
         ),
         const SizedBox(height: LegalHubTheme.spaceMd),
         Text(
-          l10n.bookingLocalOnlyNote,
+          state.isLocalOnly
+              ? l10n.bookingLocalOnlyNote
+              : l10n.bookingNoPaymentNote,
           style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
         ),
         const SizedBox(height: LegalHubTheme.spaceLg),
         if (state.submitStatus == BookingSubmitStatus.error) ...[
-          Text(
-            l10n.bookingConfirmFailed,
-            style: text.bodyMedium?.copyWith(color: scheme.error),
-          ),
+          if (state.submitError?.code == 'booking_slot_unavailable') ...[
+            Text(
+              l10n.bookingSlotUnavailable,
+              style: text.bodyMedium?.copyWith(color: scheme.error),
+            ),
+            TextButton(
+              onPressed: cubit.chooseAnotherTime,
+              child: Text(l10n.bookingChooseAnotherTime),
+            ),
+          ] else
+            Text(
+              l10n.bookingConfirmFailed,
+              style: text.bodyMedium?.copyWith(color: scheme.error),
+            ),
           const SizedBox(height: LegalHubTheme.spaceMd),
         ],
         ElevatedButton.icon(
