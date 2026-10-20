@@ -177,6 +177,10 @@ jobs:
           du -h build/app/outputs/bundle/productionRelease/app-production-release.aab
 
       - name: Build debug APK (B5 ABI guard)
+        env:
+          # Same R4 opt-in as the bundle proof: Gradle configures the release
+          # signing block even for a debug task, so the flag is required here.
+          ALLOW_DEBUG_SIGNING: 'true'
         run: flutter build apk --debug --flavor production -t lib/main_production.dart
 
       - name: Assert debug APK carries the full ABI set (B5)
