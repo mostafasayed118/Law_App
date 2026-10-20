@@ -14,10 +14,11 @@ enum InvoiceStatus { issued, paid }
 /// Carries **non-PII metadata only**: a stable id, a matter reference, a
 /// generic invoice number, an amount in cents, a currency, a status, and the
 /// issued/due dates. **There is no card data, no payment method, no billing
-/// address, no payer identity, and no pay affordance anywhere on the type**
-/// (D-11 — the D-BI1 metadata-only line is enforced structurally, so the
-/// surface can never render payment data; raw PAN/CVV cannot even exist in
-/// the applied table). Invoices come from the fake gateway's fixed synthetic
+/// address, no payer identity, and no payment method on the type** (the
+/// D-BI1 metadata-only line is enforced structurally; the pay affordance is
+/// a separate presentation widget gated by `PAYMENTS_MODE`, and raw PAN/CVV
+/// cannot even exist in the applied table). Invoices come from the fake
+/// gateway's fixed synthetic
 /// list in env-less runs — synthetic EGP amounts, no real charges, no PII
 /// (D-BI4 — the fake is the product posture, not a stopgap).
 class Invoice extends Equatable {

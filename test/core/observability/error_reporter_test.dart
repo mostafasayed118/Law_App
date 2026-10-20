@@ -62,6 +62,39 @@ void main() {
       expect(context['email'], '[REDACTED]');
       expect((context['nested']! as Map<String, Object?>)['otp'], '[REDACTED]');
     });
+
+    test(
+      'redacts payment provider and card-shaped context before storing',
+      () async {
+        final InMemoryErrorReporter reporter = InMemoryErrorReporter();
+        const Set<String> keys = <String>{
+          'payment_token',
+          'checkout_url',
+          'provider_order_id',
+          'provider_transaction_id',
+          'hmac',
+          'pan',
+          'cvv',
+          'card_number',
+        };
+
+        await reporter.report(
+          AppError(
+            code: 'payment_failed',
+            userMessage: 'Payment failed',
+            context: <String, Object?>{
+              for (final String key in keys) key: 'sensitive-value',
+            },
+          ),
+        );
+
+        final Map<String, Object?> context =
+            reporter.reports.single['context']! as Map<String, Object?>;
+        for (final String key in keys) {
+          expect(context[key], '[REDACTED]', reason: key);
+        }
+      },
+    );
   });
 
   group('CompositeErrorReporter (R7 remote-sink seam)', () {

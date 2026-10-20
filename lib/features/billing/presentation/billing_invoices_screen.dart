@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
 import '../../../l10n/app_localizations.dart';
@@ -6,10 +8,14 @@ import '../../../shared/demo_labels.dart';
 import '../../../shared/formatting/date_formatting.dart';
 import '../../../shared/widgets/widgets.dart';
 import '../domain/billing_gateway.dart';
+import '../domain/checkout_launcher.dart';
 import '../domain/invoice.dart';
+import '../domain/payment_gateway.dart';
+import '../domain/payment_mode.dart';
 import 'billing_cubit.dart';
 import 'billing_state.dart';
 import 'invoice_labels.dart';
+import 'invoice_pay_action.dart';
 
 part 'billing_invoice_tile.dart';
 
@@ -18,17 +24,20 @@ part 'billing_invoice_tile.dart';
 ///
 /// The `/invoices` route renders the assignment-scoped invoice-metadata list
 /// (the dev fake in env-less runs, the env-gated `SupabaseBillingGateway`
-/// with `invoices_select_assigned` server-side). **Metadata only** — rows
-/// render the D-BI1 fields (invoice number, amount, currency, status, matter
-/// reference, issued/due dates) and nothing else: no body, no payer
-/// identity, **no pay affordance and no row tap** (D-11 — no live payment in
-/// MVP; the D-BI1 line is structural).
+/// with `invoices_select_assigned` server-side). Rows render the D-BI1
+/// fields (invoice number, amount, currency, status, matter reference,
+/// issued/due dates) plus the shared pay action for `issued` invoices when
+/// `PAYMENTS_MODE` is enabled. The rows stay non-tappable and render no
+/// card/payer data — the provider-hosted checkout owns all of it.
 class BillingInvoicesScreen extends StatelessWidget {
   const BillingInvoicesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final PaymentMode mode = serviceLocator<PaymentMode>();
+    final PaymentGateway paymentGateway = serviceLocator<PaymentGateway>();
+    final CheckoutLauncher launcher = serviceLocator<CheckoutLauncher>();
     return Scaffold(
       appBar: AppBar(title: Text(l10n.invoicesTitle)),
       // The shared cubit-scoped list shell (audit 2026-09-21, M-10): the
@@ -38,8 +47,13 @@ class BillingInvoicesScreen extends StatelessWidget {
         createCubit: () => BillingCubit(serviceLocator<BillingGateway>()),
         project: (BillingState state) => state.invoices,
         load: (BillingCubit cubit) => cubit.load(),
-        tileBuilder: (BuildContext context, Invoice invoice) =>
-            _InvoiceTile(invoice: invoice),
+        tileBuilder: (BuildContext context, Invoice invoice) => _InvoiceTile(
+          invoice: invoice,
+          mode: mode,
+          paymentGateway: paymentGateway,
+          launcher: launcher,
+          onSettled: () => context.read<BillingCubit>().load(),
+        ),
         empty: (BuildContext context, BillingState state) => Padding(
           padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
           child: Text(

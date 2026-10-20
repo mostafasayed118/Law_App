@@ -29,6 +29,16 @@ class Redactor {
     'pwd',
     'email',
     'phone',
+    // Payments: provider handles/tokens and card data must never be retained
+    // in diagnostics (PCI surface stays structural).
+    'payment_token',
+    'checkout_url',
+    'provider_order_id',
+    'provider_transaction_id',
+    'hmac',
+    'pan',
+    'cvv',
+    'card_number',
   };
 
   static final RegExp _emailPattern = RegExp(r'[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}');

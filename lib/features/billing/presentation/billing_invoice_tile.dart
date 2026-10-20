@@ -1,12 +1,23 @@
 part of 'billing_invoices_screen.dart';
 
-/// A read-only invoice-metadata row. Carries **no onTap, no TapTarget, and
-/// no trailing action** — the D-BI1 metadata-only line: rows must not read as
-/// tappable and no pay affordance exists (D-11).
+/// An invoice-metadata row with the optional shared pay affordance.
+///
+/// The row stays non-tappable (no row `onTap`, no chevron); the only action is
+/// the [InvoicePayAction] for an `issued` invoice when payments are enabled.
 class _InvoiceTile extends StatelessWidget {
-  const _InvoiceTile({required this.invoice});
+  const _InvoiceTile({
+    required this.invoice,
+    required this.mode,
+    required this.paymentGateway,
+    required this.launcher,
+    required this.onSettled,
+  });
 
   final Invoice invoice;
+  final PaymentMode mode;
+  final PaymentGateway paymentGateway;
+  final CheckoutLauncher launcher;
+  final Future<void> Function() onSettled;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +35,16 @@ class _InvoiceTile extends StatelessWidget {
         '${invoice.currency} $amount · $status',
         '${demoMatterTitle(l10n, invoice.matterRef)} · $issued',
       ],
+      trailing: Align(
+        alignment: AlignmentDirectional.centerEnd,
+        child: InvoicePayAction(
+          invoice: invoice,
+          mode: mode,
+          gateway: paymentGateway,
+          launcher: launcher,
+          onSettled: onSettled,
+        ),
+      ),
     );
   }
 }
