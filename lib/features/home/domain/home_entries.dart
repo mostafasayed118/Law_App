@@ -1,6 +1,3 @@
-import 'package:flutter/material.dart';
-
-import '../../../app/router.dart';
 import '../../../core/roles/user_role.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -13,6 +10,14 @@ import '../../../l10n/app_localizations.dart';
 /// The builder renders the shared `AppEntryCard` from these descriptors, so
 /// `home_screen.dart` depends on no feature presentation library — only on
 /// this domain file, the router, and shared widgets.
+///
+/// This file is Flutter-free and routing-free by contract: [icon] is a
+/// [HomeEntryIcon] token and [route] a [HomeEntryRoute] token (audit:
+/// domain-layer Flutter import). The presentation boundary
+/// (`home_entry_cards.dart`) resolves both tokens to [IconData] and route
+/// strings through exhaustive switches, so adding an entry is a domain
+/// token plus one arm per resolver — a missed arm is a compile error, never
+/// a silent desync.
 ///
 /// The twelve thin `*EntryCard` widget classes stay in their features as
 /// compatibility wrappers (existing tests construct them by type); they
@@ -31,18 +36,59 @@ class HomeEntry {
   /// Stable id for tests and analytics (e.g. `'matters'`).
   final String id;
 
-  /// Leading bubble icon (mirrors the feature wrapper's icon exactly).
-  final IconData icon;
+  /// Leading bubble icon token (resolved to [IconData] at the presentation
+  /// boundary; mirrors the feature wrapper's icon exactly).
+  final HomeEntryIcon icon;
 
   /// Localized title/subtitle getters (mirror the wrapper's l10n keys).
   final String Function(AppLocalizations l10n) title;
   final String Function(AppLocalizations l10n) subtitle;
 
-  /// Forward-navigation route (the builder always `push`es — E2E BUG-1).
-  final String route;
+  /// Forward-navigation route token (resolved to the `AppRoutes.*` string
+  /// at the presentation boundary; the builder always `push`es — E2E BUG-1).
+  final HomeEntryRoute route;
 
   /// Capability gate (navigation hint only, never authorization).
   final bool Function(RoleCapability capabilities) isVisible;
+}
+
+/// Presentation-boundary icon token for a [HomeEntry].
+///
+/// One value per dashboard entry; the resolver in `home_entry_cards.dart`
+/// maps each to the `Icons.*` constant the feature wrapper uses.
+enum HomeEntryIcon {
+  booking,
+  video,
+  discovery,
+  matters,
+  documents,
+  messages,
+  invoices,
+  notifications,
+  alerts,
+  tasks,
+  approvals,
+  research,
+}
+
+/// Presentation-boundary route token for a [HomeEntry].
+///
+/// One value per dashboard entry; the resolver in `home_entry_cards.dart`
+/// maps each to its `AppRoutes.*` string. The token keeps the domain free
+/// of the app router: renaming a route touches the resolver only.
+enum HomeEntryRoute {
+  book,
+  video,
+  discovery,
+  matters,
+  vault,
+  messages,
+  invoices,
+  notificationsFeed,
+  alerts,
+  tasks,
+  approvals,
+  research,
 }
 
 /// The dashboard entries in render order, with their capability gates.
@@ -56,98 +102,98 @@ List<HomeEntry> homeEntriesFor(RoleCapability capabilities) {
   const List<HomeEntry> all = <HomeEntry>[
     HomeEntry(
       id: 'booking',
-      icon: Icons.event_available_outlined,
+      icon: HomeEntryIcon.booking,
       title: _bookingTitle,
       subtitle: _bookingSubtitle,
-      route: AppRoutes.book,
+      route: HomeEntryRoute.book,
       isVisible: _canBook,
     ),
     HomeEntry(
       id: 'video',
-      icon: Icons.video_call_outlined,
+      icon: HomeEntryIcon.video,
       title: _videoTitle,
       subtitle: _videoSubtitle,
-      route: AppRoutes.video,
+      route: HomeEntryRoute.video,
       isVisible: _canBook,
     ),
     HomeEntry(
       id: 'discovery',
-      icon: Icons.person_search_outlined,
+      icon: HomeEntryIcon.discovery,
       title: _discoveryTitle,
       subtitle: _discoverySubtitle,
-      route: AppRoutes.discovery,
+      route: HomeEntryRoute.discovery,
       isVisible: _canDiscover,
     ),
     HomeEntry(
       id: 'matters',
-      icon: Icons.folder_copy_outlined,
+      icon: HomeEntryIcon.matters,
       title: _mattersTitle,
       subtitle: _mattersSubtitle,
-      route: AppRoutes.matters,
+      route: HomeEntryRoute.matters,
       isVisible: _canViewMatters,
     ),
     HomeEntry(
       id: 'documents',
-      icon: Icons.description_outlined,
+      icon: HomeEntryIcon.documents,
       title: _vaultTitle,
       subtitle: _vaultSubtitle,
-      route: AppRoutes.vault,
+      route: HomeEntryRoute.vault,
       isVisible: _canViewDocuments,
     ),
     HomeEntry(
       id: 'messages',
-      icon: Icons.forum_outlined,
+      icon: HomeEntryIcon.messages,
       title: _messagesTitle,
       subtitle: _messagesSubtitle,
-      route: AppRoutes.messages,
+      route: HomeEntryRoute.messages,
       isVisible: _canViewMessages,
     ),
     HomeEntry(
       id: 'invoices',
-      icon: Icons.request_quote_outlined,
+      icon: HomeEntryIcon.invoices,
       title: _invoicesTitle,
       subtitle: _invoicesSubtitle,
-      route: AppRoutes.invoices,
+      route: HomeEntryRoute.invoices,
       isVisible: _canViewDocuments,
     ),
     HomeEntry(
       id: 'notifications',
-      icon: Icons.notifications_none_outlined,
+      icon: HomeEntryIcon.notifications,
       title: _notificationsTitle,
       subtitle: _notificationsSubtitle,
-      route: AppRoutes.notificationsFeed,
+      route: HomeEntryRoute.notificationsFeed,
       isVisible: _canViewNotifications,
     ),
     HomeEntry(
       id: 'alerts',
-      icon: Icons.shield_outlined,
+      icon: HomeEntryIcon.alerts,
       title: _alertsTitle,
       subtitle: _alertsSubtitle,
-      route: AppRoutes.alerts,
+      route: HomeEntryRoute.alerts,
       isVisible: _canViewAlerts,
     ),
     HomeEntry(
       id: 'tasks',
-      icon: Icons.checklist_outlined,
+      icon: HomeEntryIcon.tasks,
       title: _tasksTitle,
       subtitle: _tasksSubtitle,
-      route: AppRoutes.tasks,
+      route: HomeEntryRoute.tasks,
       isVisible: _canViewTasks,
     ),
     HomeEntry(
       id: 'approvals',
-      icon: Icons.approval_outlined,
+      icon: HomeEntryIcon.approvals,
       title: _approvalsTitle,
       subtitle: _approvalsSubtitle,
-      route: AppRoutes.approvals,
+      route: HomeEntryRoute.approvals,
       isVisible: _canViewApprovals,
     ),
     HomeEntry(
       id: 'research',
-      icon: Icons.auto_awesome_outlined,
+      icon: HomeEntryIcon.research,
       title: _researchTitle,
       subtitle: _researchSubtitle,
-      route: AppRoutes.research,
+      route: HomeEntryRoute.research,
       isVisible: _canUseAiResearch,
     ),
   ];

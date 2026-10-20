@@ -35,12 +35,53 @@ List<Widget> _homeEntryCards(
     );
     cards.add(
       AppEntryCard(
-        icon: entry.icon,
+        icon: _iconFor(entry.icon),
         title: entry.title(l10n),
         subtitle: entry.subtitle(l10n),
-        onTap: () => context.push(entry.route),
+        onTap: () => context.push(_routeFor(entry.route)),
       ),
     );
   }
   return cards;
 }
+
+/// Resolves a domain [HomeEntryIcon] token to its `Icons.*` constant.
+///
+/// Audit (domain-layer Flutter import): the domain owns the token, the
+/// presentation owns this table. Exhaustive by construction — a new token
+/// without an arm is a compile error. Values mirror the feature wrappers'
+/// icons exactly, so both card paths stay byte-identical.
+IconData _iconFor(HomeEntryIcon icon) => switch (icon) {
+  HomeEntryIcon.booking => Icons.event_available_outlined,
+  HomeEntryIcon.video => Icons.video_call_outlined,
+  HomeEntryIcon.discovery => Icons.person_search_outlined,
+  HomeEntryIcon.matters => Icons.folder_copy_outlined,
+  HomeEntryIcon.documents => Icons.description_outlined,
+  HomeEntryIcon.messages => Icons.forum_outlined,
+  HomeEntryIcon.invoices => Icons.request_quote_outlined,
+  HomeEntryIcon.notifications => Icons.notifications_none_outlined,
+  HomeEntryIcon.alerts => Icons.shield_outlined,
+  HomeEntryIcon.tasks => Icons.checklist_outlined,
+  HomeEntryIcon.approvals => Icons.approval_outlined,
+  HomeEntryIcon.research => Icons.auto_awesome_outlined,
+};
+
+/// Resolves a domain [HomeEntryRoute] token to its `AppRoutes.*` string.
+///
+/// Same contract as [_iconFor]: the domain names the destination, the
+/// presentation maps it to the router. A renamed route touches this table
+/// only — the domain never imports the router.
+String _routeFor(HomeEntryRoute route) => switch (route) {
+  HomeEntryRoute.book => AppRoutes.book,
+  HomeEntryRoute.video => AppRoutes.video,
+  HomeEntryRoute.discovery => AppRoutes.discovery,
+  HomeEntryRoute.matters => AppRoutes.matters,
+  HomeEntryRoute.vault => AppRoutes.vault,
+  HomeEntryRoute.messages => AppRoutes.messages,
+  HomeEntryRoute.invoices => AppRoutes.invoices,
+  HomeEntryRoute.notificationsFeed => AppRoutes.notificationsFeed,
+  HomeEntryRoute.alerts => AppRoutes.alerts,
+  HomeEntryRoute.tasks => AppRoutes.tasks,
+  HomeEntryRoute.approvals => AppRoutes.approvals,
+  HomeEntryRoute.research => AppRoutes.research,
+};

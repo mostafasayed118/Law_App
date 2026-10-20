@@ -172,6 +172,33 @@ end $$;
 reset role;
 rollback;
 
+-- CHECK 07.13 — NEG (Batch B safe-cast, matrix §6 row 1 — non-uuid org
+-- segment): a temp object's path org segment is not a uuid. Pre-fix the
+-- bare ::uuid cast raised 22P02 and aborted the query; post-fix the CASE
+-- guard yields NULL so is_active_member(NULL) = false -> denied (count 0).
+-- partner-a is an active org-a member, so the deny is the safe-cast arm,
+-- not blanket non-access. Rolls back.
+begin;
+insert into storage.objects (id, bucket_id, name, metadata, created_at, updated_at)
+values
+  ('80000000-0000-4000-8000-00000000fffb', 'matter-files', 'not-a-uuid/40000000-0000-4000-8000-000000000001/evil.pdf', '{"size":1,"mimetype":"application/pdf"}', now(), now());
+set role authenticated;
+do $$
+declare
+  v_cnt bigint;
+begin
+  perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000002', false);
+  perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002"}', false);
+  select count(*) into v_cnt
+    from storage.objects
+   where id = '80000000-0000-4000-8000-00000000fffb';
+  if v_cnt <> 0 then
+    raise exception 'POLICY-BATTERY FAIL 07.13: non-uuid-org-segment object was readable (safe-cast deny broken)';
+  end if;
+end $$;
+reset role;
+rollback;
+
 set role authenticated;
 
 -- ############################################################################

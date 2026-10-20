@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../errors/app_error.dart';
 
 abstract interface class ErrorReporter {
@@ -19,6 +21,12 @@ class Redactor {
     'authorization',
     'secret',
     'anon_key',
+    'api_key',
+    'supabase_url',
+    'supabase_anon_key',
+    'service_role',
+    'pass',
+    'pwd',
     'email',
     'phone',
   };
@@ -44,14 +52,15 @@ class Redactor {
           .replaceAll(_emailPattern, '[REDACTED_EMAIL]')
           .replaceAll(_bearerPattern, 'Bearer [REDACTED]');
     }
-    if (value is Map<String, Object?>) {
-      return map(value);
+    if (value is Map) {
+      return <String, Object?>{
+        for (final MapEntry<dynamic, dynamic> entry in value.entries)
+          '${entry.key}': _value('${entry.key}', entry.value),
+      };
     }
-    if (value is List<Object?>) {
+    if (value is List) {
       return value
-          .map(
-            (Object? item) => item is Map<String, Object?> ? map(item) : item,
-          )
+          .map((dynamic item) => item is Map ? _value('', item) : item)
           .toList();
     }
     return value;
@@ -59,12 +68,16 @@ class Redactor {
 }
 
 class ConsoleErrorReporter implements ErrorReporter {
+  ConsoleErrorReporter({void Function(String? message, {int? wrapWidth})? sink})
+    : sink = sink ?? debugPrint;
+
+  final void Function(String? message, {int? wrapWidth}) sink;
+
   @override
   Future<void> report(AppError error) async {
     // Keep diagnostics limited to the sanitized map. Sentry/Supabase are
     // future integrations and must not be wired into the Flutter client here.
-    // ignore: avoid_print
-    print('LegalHub error: ${Redactor.map(error.toLogMap())}');
+    sink('LegalHub error: ${Redactor.map(error.toLogMap())}');
   }
 }
 
@@ -82,6 +95,9 @@ class CompositeErrorReporter implements ErrorReporter {
 
   final List<ErrorReporter> _delegates;
 
+  /// Sinks that threw during fan-out. Best-effort must stay observable.
+  int droppedReports = 0;
+
   @override
   Future<void> report(AppError error) async {
     for (final ErrorReporter delegate in _delegates) {
@@ -89,6 +105,7 @@ class CompositeErrorReporter implements ErrorReporter {
         await delegate.report(error);
       } on Object {
         // Best-effort: a failing sink must not break error reporting.
+        droppedReports++;
       }
     }
   }

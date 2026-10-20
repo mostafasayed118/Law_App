@@ -55,13 +55,15 @@ class SupabaseBillingApiImpl implements SupabaseBillingApi {
     }
   }
 
-  /// Maps a PostgrestException to the provider-neutral failure kind.
-  /// The stable RLS denial text is the only fragment matched; everything
-  /// else is [SupabaseBillingFailureKind.unknown] with the message preserved.
+  /// Maps a PostgrestException to the provider-neutral failure kind via the
+  /// shared two-kind classifier ([postgrestKindFor] — audit 2026-09-27,
+  /// Q-Q1): this impl supplies only its enum values, the match-once logic
+  /// lives in `postgrest_failures.dart`.
   SupabaseBillingFailureKind _kindFor(PostgrestException e) {
-    if (isPostgrestDenial(e)) {
-      return SupabaseBillingFailureKind.denied;
-    }
-    return SupabaseBillingFailureKind.unknown;
+    return postgrestKindFor(
+      e,
+      denied: SupabaseBillingFailureKind.denied,
+      unknown: SupabaseBillingFailureKind.unknown,
+    );
   }
 }

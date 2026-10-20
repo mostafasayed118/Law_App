@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -38,9 +39,21 @@ Future<void> bootstrap(AppConfig config) async {
   if (config.isConfigured) {
     // Anon-key guard: refuse a non-anon key before any provider is wired.
     SupabaseEnv.ensureAnonKey(supabaseEnv.anonKey);
+    // HTTPS guard (audit A02): refuse a cleartext Supabase URL before any
+    // credential crosses the network.
+    SupabaseEnv.ensureHttpsUrl(supabaseEnv.url);
     await initializeSupabase(
       url: supabaseEnv.url,
       anonKey: supabaseEnv.anonKey,
+    );
+  } else if (config.flavor == AppFlavor.production && kReleaseMode) {
+    // Audit A07: a production release build must never silently run on the
+    // credential-free fakes — a missing `.env` at build time is a hard
+    // configuration error, not a demo session. Debug runs and tests still
+    // fall through to the fakes below.
+    throw StateError(
+      'Production release build is missing SUPABASE_URL/SUPABASE_ANON_KEY. '
+      'Rebuild with --dart-define-from-file pointing at the production env.',
     );
   }
   final SharedPreferences preferences = await SharedPreferences.getInstance();

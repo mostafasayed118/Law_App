@@ -72,4 +72,22 @@ class SupabaseEnv {
       );
     }
   }
+
+  /// Refuses a Supabase URL that does not use HTTPS.
+  ///
+  /// Audit guard (A02:2021): without this, a `SUPABASE_URL` misconfigured
+  /// with `http://` would still connect, exposing the auth token and all
+  /// data over cleartext — even though the Android shell blocks cleartext
+  /// traffic, desktop/test builds have no such backstop. Like
+  /// [ensureAnonKey] this is a configuration guard: fail fast at startup
+  /// rather than transmitting credentials insecurely.
+  static void ensureHttpsUrl(String url) {
+    final Uri? parsed = Uri.tryParse(url);
+    if (parsed == null || parsed.scheme != 'https' || parsed.host.isEmpty) {
+      throw StateError(
+        'SUPABASE_URL must be an https:// URL '
+        '(found "${url.isEmpty ? '<empty>' : url}").',
+      );
+    }
+  }
 }

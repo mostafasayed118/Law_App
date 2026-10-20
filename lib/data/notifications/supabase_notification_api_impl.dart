@@ -68,15 +68,16 @@ class SupabaseNotificationApiImpl implements SupabaseNotificationApi {
     }
   }
 
-  /// Maps a PostgrestException to the provider-neutral failure kind.
-  /// The stable RLS denial text is the only fragment matched; everything
-  /// else is [SupabaseNotificationFailureKind.unknown] with the message
-  /// preserved.
+  /// Maps a PostgrestException to the provider-neutral failure kind via the
+  /// shared two-kind classifier ([postgrestKindFor] — audit 2026-09-27,
+  /// Q-Q1): this impl supplies only its enum values, the match-once logic
+  /// lives in `postgrest_failures.dart`.
   SupabaseNotificationFailureKind _kindFor(PostgrestException e) {
-    if (isPostgrestDenial(e)) {
-      return SupabaseNotificationFailureKind.denied;
-    }
-    return SupabaseNotificationFailureKind.unknown;
+    return postgrestKindFor(
+      e,
+      denied: SupabaseNotificationFailureKind.denied,
+      unknown: SupabaseNotificationFailureKind.unknown,
+    );
   }
 
   @override

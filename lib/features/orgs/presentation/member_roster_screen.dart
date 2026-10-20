@@ -57,7 +57,13 @@ class _MemberRosterScreenState extends State<MemberRosterScreen> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final Session? session = context.watch<AuthCubit>().state.session;
+    // Narrow watch: the chrome needs only the session, not every AuthState
+    // emission (status-only transitions such as restoring/loading must not
+    // rebuild the whole scaffold + roster list). Session is Equatable, so
+    // select rebuilds solely on real session changes.
+    final Session? session = context.select<AuthCubit, Session?>(
+      (AuthCubit cubit) => cubit.state.session,
+    );
     final bool isPartner = session?.primaryRole == UserRole.partner;
     final String? orgName = _orgNameFor(session, widget.organizationId);
     return Scaffold(

@@ -71,6 +71,30 @@ void main() {
     });
   });
 
+  group('SupabaseEnv.ensureHttpsUrl', () {
+    test('accepts an https URL', () {
+      expect(
+        () => SupabaseEnv.ensureHttpsUrl('https://x.supabase.co'),
+        returnsNormally,
+      );
+    });
+
+    test('refuses a cleartext http URL', () {
+      expect(
+        () => SupabaseEnv.ensureHttpsUrl('http://x.supabase.co'),
+        throwsStateError,
+      );
+    });
+
+    test('refuses an empty or malformed URL', () {
+      expect(() => SupabaseEnv.ensureHttpsUrl(''), throwsStateError);
+      expect(
+        () => SupabaseEnv.ensureHttpsUrl('not a url at all ///'),
+        throwsStateError,
+      );
+    });
+  });
+
   group('SupabaseEnv configuration', () {
     test('isConfigured requires both url and anon key', () {
       expect(const SupabaseEnv(url: '', anonKey: '').isConfigured, isFalse);

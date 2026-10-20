@@ -11,6 +11,9 @@ void _registerAuthSeams(
       // Batch 3.3 anon-key guard: refuse a non-anon key before wiring any
       // provider, so a service-role key can never reach the client build.
       SupabaseEnv.ensureAnonKey(env.anonKey);
+      // Audit A02: refuse a cleartext URL on the same path (defense in
+      // depth alongside the bootstrap guard — tests inject env directly).
+      SupabaseEnv.ensureHttpsUrl(env.url);
       serviceLocator.registerLazySingleton<AuthGateway>(
         () => SupabaseAuthGateway(
           (supabaseAuthApiFactory ?? SupabaseAuthApiImpl.bind)(),

@@ -54,13 +54,15 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
     }
   }
 
-  /// Maps a PostgrestException to the provider-neutral failure kind.
-  /// The stable RLS denial text is the only fragment matched; everything
-  /// else is [SupabaseStorageFailureKind.unknown] with the message preserved.
+  /// Maps a PostgrestException to the provider-neutral failure kind via the
+  /// shared two-kind classifier ([postgrestKindFor] — audit 2026-09-27,
+  /// Q-Q1): this impl supplies only its enum values, the match-once logic
+  /// lives in `postgrest_failures.dart`.
   SupabaseStorageFailureKind _kindFor(PostgrestException e) {
-    if (isPostgrestDenial(e)) {
-      return SupabaseStorageFailureKind.denied;
-    }
-    return SupabaseStorageFailureKind.unknown;
+    return postgrestKindFor(
+      e,
+      denied: SupabaseStorageFailureKind.denied,
+      unknown: SupabaseStorageFailureKind.unknown,
+    );
   }
 }

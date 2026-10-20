@@ -18,8 +18,10 @@
 --     (m.organization_id::text = segment 1) — the org-mismatch invariant,
 --     path-encoded, so an object is never readable when its matter is not;
 --   - a GUESSED PATH (unknown/foreign matter id, mismatched org segment,
---     or a non-uuid org segment whose ::uuid cast fails) finds no matching
---     assigned matter -> denied for every role (matrix §6 row 1).
+--     or a non-uuid org segment) finds no matching assigned matter ->
+--     denied for every role (matrix §6 row 1; Batch B: the org segment
+--     is safe-cast via CASE so a non-uuid yields NULL -> deny, never
+--     a 22P02 abort).
 -- Path segments compare as canonical lowercase hyphenated uuid::text
 -- (review §5 pin). is_active_member is public-schema + EXECUTE-granted to
 -- authenticated (R-4); storage policy expressions may call public.*
@@ -31,7 +33,15 @@ create policy files_storage_select on storage.objects
   for select
   using (
     bucket_id = 'matter-files'
-    and public.is_active_member((storage.foldername(name))[1]::uuid)
+    -- Batch B safe-cast: a non-uuid org segment used to raise 22P02 and
+    -- abort the query; the CASE guard yields NULL instead so
+    -- is_active_member(NULL) = false -> deny (matrix §6 row 1 holds).
+    and public.is_active_member(
+      case when (storage.foldername(name))[1] ~
+        '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+        then (storage.foldername(name))[1]::uuid
+        else null end
+    )
     and exists (
       select 1
       from public.matters m
