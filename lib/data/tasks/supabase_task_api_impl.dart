@@ -115,7 +115,7 @@ class SupabaseTaskApiImpl implements SupabaseTaskApi {
   }
 
   @override
-  Future<Map<String, dynamic>> assignTask(String taskId, String assigneeId) {
+  Future<Map<String, dynamic>> assignTask(String taskId, String? assigneeId) {
     return _callRpc('assign_task', <String, dynamic>{
       'p_task_id': taskId,
       'p_assignee_id': assigneeId,

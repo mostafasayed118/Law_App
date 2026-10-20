@@ -79,8 +79,9 @@ abstract interface class SupabaseTaskApi {
   );
 
   /// Re-assigns a task through the audited `assign_task` RPC and returns
-  /// the persisted row.
-  Future<Map<String, dynamic>> assignTask(String taskId, String assigneeId);
+  /// the persisted row. A null [assigneeId] unassigns the task (the RPC
+  /// accepts a null `p_assignee_id`).
+  Future<Map<String, dynamic>> assignTask(String taskId, String? assigneeId);
 
   /// Acknowledges a task through the audited `acknowledge_task` RPC and
   /// returns the persisted row.

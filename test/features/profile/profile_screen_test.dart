@@ -352,6 +352,13 @@ class _FailingDeleteOrgGateway implements OrganizationGateway {
   );
 
   @override
+  Future<OrgOutcome<List<AssignableMember>>> listAssignableMembers({
+    required String matterId,
+  }) async => const OrgOutcome<List<AssignableMember>>.failure(
+    OrgFailure(kind: OrgFailureKind.denied),
+  );
+
+  @override
   Future<OrgOutcome<InviteResult>> inviteMember({
     required String organizationId,
     required String email,

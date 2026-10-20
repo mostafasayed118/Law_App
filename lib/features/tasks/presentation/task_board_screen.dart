@@ -3,13 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
+import '../../../core/organizations/organization_gateway.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/demo_labels.dart';
 import '../../../shared/widgets/widgets.dart';
+import '../../matters/domain/matter_gateway.dart';
 import '../domain/task_gateway.dart';
 import '../domain/task_item.dart';
+import 'task_assign_sheet.dart';
 import 'task_board_cubit.dart';
 import 'task_board_state.dart';
+import 'task_create_sheet.dart';
 
 part 'task_tile.dart';
 
@@ -20,8 +24,8 @@ part 'task_tile.dart';
 /// The task-writes slice (Gate 3 spec 2026-09-27) adds the row-level
 /// affordances (advance one legal step, acknowledge) plus an inline
 /// action-error banner (the sendError precedent) that clears on the next
-/// write attempt. No create/assign affordances yet — those gateway methods
-/// are implemented and unit-tested, the pickers arrive in a follow-up.
+/// write attempt. The create/assign slice adds the header's "New task" sheet
+/// and the row's assign sheet; both drive the same board cubit.
 class TaskBoardScreen extends StatelessWidget {
   const TaskBoardScreen({super.key});
 
@@ -32,10 +36,29 @@ class TaskBoardScreen extends StatelessWidget {
       appBar: AppBar(title: Text(l10n.tasksTitle)),
       // The shared cubit-scoped list shell (audit 2026-09-21, M-10).
       body: CubitListSurface<TaskBoardCubit, TaskBoardState, TaskItem>(
-        createCubit: () => TaskBoardCubit(serviceLocator<TaskBoardGateway>()),
+        createCubit: () => TaskBoardCubit(
+          serviceLocator<TaskBoardGateway>(),
+          serviceLocator<MatterGateway>(),
+          serviceLocator<OrganizationGateway>(),
+        ),
         project: (TaskBoardState state) => state.tasks,
         load: (TaskBoardCubit cubit) => cubit.load(),
         header: <Widget>[
+          Builder(
+            builder: (BuildContext context) {
+              return Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: FilledButton.icon(
+                  onPressed: () => showTaskCreateSheet(
+                    context,
+                    cubit: context.read<TaskBoardCubit>(),
+                  ),
+                  icon: const Icon(Icons.add, size: 18),
+                  label: Text(l10n.taskCreateAction),
+                ),
+              );
+            },
+          ),
           BlocBuilder<TaskBoardCubit, TaskBoardState>(
             buildWhen: (TaskBoardState previous, TaskBoardState current) =>
                 previous.actionError != current.actionError,

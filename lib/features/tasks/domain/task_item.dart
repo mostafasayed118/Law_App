@@ -23,6 +23,8 @@ enum TaskStatus { todo, inProgress, blocked, done }
 class TaskItem extends Equatable {
   const TaskItem({
     required this.id,
+    required this.organizationId,
+    required this.matterId,
     required this.title,
     required this.matterRef,
     required this.status,
@@ -32,6 +34,8 @@ class TaskItem extends Equatable {
   });
 
   final String id;
+  final String organizationId;
+  final String matterId;
   final String title;
   final String matterRef;
   final TaskStatus status;
@@ -42,6 +46,8 @@ class TaskItem extends Equatable {
   @override
   List<Object?> get props => <Object?>[
     id,
+    organizationId,
+    matterId,
     title,
     matterRef,
     status,

@@ -25,6 +25,15 @@ abstract interface class OrganizationGateway {
     required String organizationId,
   });
 
+  /// Lists the members assignable to a task on [matterId]
+  /// (`list_matter_assignable_members`): active members of the matter's org
+  /// excluding the platform owner. The caller must be an active member of the
+  /// matter's org and assigned client or attorney on the matter; a failed gate
+  /// is an empty, denied outcome rather than an existence oracle.
+  Future<OrgOutcome<List<AssignableMember>>> listAssignableMembers({
+    required String matterId,
+  });
+
   /// Invites an email to an organization. Only [serverAssignableRoles] may be
   /// requested; the one-time token is returned for out-of-band delivery.
   Future<OrgOutcome<InviteResult>> inviteMember({

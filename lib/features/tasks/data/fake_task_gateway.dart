@@ -15,9 +15,24 @@ import '../domain/task_item.dart';
 /// `blocked` synthetic-only and never advanceable.
 class FakeTaskGateway implements TaskBoardGateway {
   FakeTaskGateway() : _tasks = List<TaskItem>.of(syntheticTasks);
+
+  static const String demoOrganizationId = 'org-demo';
+
+  /// The synthetic matter titles the fake board references (no cross-feature
+  /// fake import — the title map is local to this fake).
+  static const Map<String, String> matterTitles = <String, String>{
+    'matter-1': 'Demo acquisition review',
+    'matter-2': 'Commercial lease consultation',
+    'matter-3': 'Procedural review matter',
+    'matter-4': 'Family status consultation',
+    'matter-5': 'Startup formation advisory',
+  };
+
   static final List<TaskItem> syntheticTasks = <TaskItem>[
     TaskItem(
       id: 'task-1',
+      organizationId: demoOrganizationId,
+      matterId: 'matter-1',
       title: 'Demo: draft response checklist',
       matterRef: 'Demo acquisition review',
       status: TaskStatus.todo,
@@ -26,6 +41,8 @@ class FakeTaskGateway implements TaskBoardGateway {
     ),
     TaskItem(
       id: 'task-2',
+      organizationId: demoOrganizationId,
+      matterId: 'matter-2',
       title: 'Demo: gather documents',
       matterRef: 'Commercial lease consultation',
       status: TaskStatus.inProgress,
@@ -33,6 +50,8 @@ class FakeTaskGateway implements TaskBoardGateway {
     ),
     TaskItem(
       id: 'task-3',
+      organizationId: demoOrganizationId,
+      matterId: 'matter-4',
       title: 'Demo: review client notes',
       matterRef: 'Family status consultation',
       status: TaskStatus.blocked,
@@ -40,6 +59,8 @@ class FakeTaskGateway implements TaskBoardGateway {
     ),
     TaskItem(
       id: 'task-4',
+      organizationId: demoOrganizationId,
+      matterId: 'matter-5',
       title: 'Demo: schedule follow-up',
       matterRef: 'Startup formation advisory',
       status: TaskStatus.done,
@@ -47,6 +68,8 @@ class FakeTaskGateway implements TaskBoardGateway {
     ),
     TaskItem(
       id: 'task-5',
+      organizationId: demoOrganizationId,
+      matterId: 'matter-2',
       title: 'Demo: update matter timeline',
       matterRef: 'Commercial lease consultation',
       status: TaskStatus.inProgress,
@@ -86,8 +109,10 @@ class FakeTaskGateway implements TaskBoardGateway {
     _createdCount++;
     final TaskItem created = TaskItem(
       id: 'task-local-$_createdCount',
+      organizationId: demoOrganizationId,
+      matterId: matterId,
       title: trimmed,
-      matterRef: matterId,
+      matterRef: matterTitles[matterId] ?? matterId,
       status: TaskStatus.todo,
       dueAt: DateTime.utc(2026, 9, 30),
       assigneeId: assigneeId,
@@ -123,6 +148,8 @@ class FakeTaskGateway implements TaskBoardGateway {
     }
     final TaskItem updated = TaskItem(
       id: current.id,
+      organizationId: current.organizationId,
+      matterId: current.matterId,
       title: current.title,
       matterRef: current.matterRef,
       status: to,
@@ -145,7 +172,7 @@ class FakeTaskGateway implements TaskBoardGateway {
   }
 
   @override
-  Future<Result<TaskItem>> assignTask(String taskId, String assigneeId) async {
+  Future<Result<TaskItem>> assignTask(String taskId, String? assigneeId) async {
     final int index = _tasks.indexWhere((TaskItem task) => task.id == taskId);
     if (index < 0) {
       return Result<TaskItem>.failure(
@@ -162,6 +189,8 @@ class FakeTaskGateway implements TaskBoardGateway {
     // outstanding, never inherited).
     final TaskItem updated = TaskItem(
       id: current.id,
+      organizationId: current.organizationId,
+      matterId: current.matterId,
       title: current.title,
       matterRef: current.matterRef,
       status: current.status,
@@ -187,6 +216,8 @@ class FakeTaskGateway implements TaskBoardGateway {
     final TaskItem current = _tasks[index];
     final TaskItem updated = TaskItem(
       id: current.id,
+      organizationId: current.organizationId,
+      matterId: current.matterId,
       title: current.title,
       matterRef: current.matterRef,
       status: current.status,

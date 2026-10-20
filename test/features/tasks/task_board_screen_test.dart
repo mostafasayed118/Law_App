@@ -129,6 +129,31 @@ void main() {
       expect(find.byTooltip('Done'), findsNWidgets(2));
       expect(find.byTooltip('In progress'), findsOneWidget);
     });
+
+    testWidgets('the header action opens the create-task sheet', (
+      tester,
+    ) async {
+      await pumpTasks(tester);
+
+      await tester.tap(find.text('New task'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Create task'), findsOneWidget);
+      expect(find.text('Task title'), findsOneWidget);
+      expect(find.text('Demo acquisition review'), findsOneWidget);
+    });
+
+    testWidgets('the row assign action opens the member sheet', (tester) async {
+      await pumpTasks(tester);
+
+      expect(find.byTooltip('Assign'), findsNWidgets(5));
+      await tester.tap(find.byTooltip('Assign').first);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Assign task'), findsOneWidget);
+      // task-1 is assigned to the demo attorney, so the sheet preselects it.
+      expect(find.text('Demo attorney'), findsOneWidget);
+    });
   });
 }
 
@@ -169,7 +194,7 @@ class _StubTaskGateway implements TaskBoardGateway {
   }
 
   @override
-  Future<Result<TaskItem>> assignTask(String taskId, String assigneeId) async {
+  Future<Result<TaskItem>> assignTask(String taskId, String? assigneeId) async {
     throw UnimplementedError('assignTask is not stubbed');
   }
 

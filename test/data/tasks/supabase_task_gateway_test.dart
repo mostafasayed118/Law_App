@@ -26,6 +26,8 @@ void main() {
         expect(result, isA<Success<List<TaskItem>>>());
         final TaskItem task = (result as Success<List<TaskItem>>).value.single;
         expect(task.id, 'task-1');
+        expect(task.organizationId, 'org-1');
+        expect(task.matterId, 'matter-1');
         expect(task.title, 'Draft checklist');
         expect(task.matterRef, 'Demo acquisition review');
         expect(task.status, TaskStatus.inProgress);
@@ -199,8 +201,19 @@ void main() {
       );
 
       expect((result as Success<TaskItem>).value.assigneeId, 'user-2');
-      expect(api.assignCalls, <List<String>>[
-        <String>['task-1', 'user-2'],
+      expect(api.assignCalls, <List<String?>>[
+        <String?>['task-1', 'user-2'],
+      ]);
+    });
+
+    test('assignTask forwards a null assignee to unassign', () async {
+      api.rowResult = _row(assigneeId: null);
+
+      final Result<TaskItem> result = await gateway.assignTask('task-1', null);
+
+      expect((result as Success<TaskItem>).value.assigneeId, isNull);
+      expect(api.assignCalls, <List<String?>>[
+        <String?>['task-1', null],
       ]);
     });
 
@@ -252,7 +265,7 @@ void main() {
 Map<String, dynamic> _row({
   String status = 'in_progress',
   String? matters = 'Demo acquisition review',
-  String assigneeId = 'user-3',
+  String? assigneeId = 'user-3',
   String? acknowledgedAt,
 }) {
   return <String, dynamic>{
@@ -276,7 +289,7 @@ class _StubTaskApi implements SupabaseTaskApi {
 
   final List<Map<String, dynamic>> createCalls = <Map<String, dynamic>>[];
   final List<List<String>> advanceCalls = <List<String>>[];
-  final List<List<String>> assignCalls = <List<String>>[];
+  final List<List<String?>> assignCalls = <List<String?>>[];
   final List<String> acknowledgeCalls = <String>[];
 
   @override
@@ -314,9 +327,9 @@ class _StubTaskApi implements SupabaseTaskApi {
   @override
   Future<Map<String, dynamic>> assignTask(
     String taskId,
-    String assigneeId,
+    String? assigneeId,
   ) async {
-    assignCalls.add(<String>[taskId, assigneeId]);
+    assignCalls.add(<String?>[taskId, assigneeId]);
     return _rowOrThrow();
   }
 

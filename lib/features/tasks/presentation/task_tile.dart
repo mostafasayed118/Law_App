@@ -5,11 +5,12 @@ part of 'task_board_screen.dart';
 /// The task-writes slice (Gate 3 spec 2026-09-27) adds the two row-level
 /// affordances the server authorizes for any assigned member: advance one
 /// legal step ([TaskBoardCubit.advanceTask]) and acknowledge
-/// ([TaskBoardCubit.acknowledgeTask]). Only the single legal next step is
-/// ever offered (`todo` → `in_progress` → `done`; `done` terminal and the
-/// synthetic-only `blocked` offer nothing), so the client can never send an
-/// illegal transition. The row's buttons disable while its write is in
-/// flight ([TaskBoardState.actingTaskId]).
+/// ([TaskBoardCubit.acknowledgeTask]). The create/assign slice adds the
+/// assign affordance, which opens the matter-scoped member sheet. Only the
+/// single legal next step is ever offered (`todo` → `in_progress` → `done`;
+/// `done` terminal and the synthetic-only `blocked` offer nothing), so the
+/// client can never send an illegal transition. The row's buttons disable
+/// while its write is in flight ([TaskBoardState.actingTaskId]).
 class _TaskTile extends StatelessWidget {
   const _TaskTile({required this.task});
 
@@ -47,9 +48,18 @@ class _TaskTile extends StatelessWidget {
         '${demoMatterTitle(l10n, task.matterRef)} · ${status.$2}',
         if (task.acknowledged) l10n.taskAcknowledged,
       ],
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
+      trailing: Wrap(
+        alignment: WrapAlignment.end,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: LegalHubTheme.spaceXs,
         children: <Widget>[
+          IconButton(
+            tooltip: l10n.taskAssignAction,
+            onPressed: acting
+                ? null
+                : () => showTaskAssignSheet(context, cubit: cubit, task: task),
+            icon: const Icon(Icons.person_add),
+          ),
           // Unassigned rows have no one who can acknowledge them: the
           // server's first-person gate only accepts the assignee, so hiding
           // the affordance keeps the board honest. (A non-assignee still

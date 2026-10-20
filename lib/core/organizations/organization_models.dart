@@ -52,6 +52,21 @@ MembershipStatus? membershipStatusFromServerName(String? name) {
   };
 }
 
+/// A member the matter's task assignment picker may offer.
+///
+/// The server resolves the roster through `list_matter_assignable_members`:
+/// active memberships of the matter's org only, with the platform owner
+/// excluded. [displayName] is the server's redacted label (never an email).
+class AssignableMember extends Equatable {
+  const AssignableMember({required this.userId, required this.displayName});
+
+  final String userId;
+  final String displayName;
+
+  @override
+  List<Object?> get props => <Object?>[userId, displayName];
+}
+
 /// A member of an organization as returned by the metadata read surface:
 /// identity (display name, locale) + membership metadata (role, status,
 /// timestamps) only — never matter/document/message content (contract §5.3).

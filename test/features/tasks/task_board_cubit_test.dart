@@ -2,7 +2,11 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
+import 'package:legalhub/features/matters/data/fake_matter_gateway.dart';
+import 'package:legalhub/features/matters/domain/matter.dart';
 import 'package:legalhub/features/tasks/domain/task_gateway.dart';
 import 'package:legalhub/features/tasks/domain/task_item.dart';
 import 'package:legalhub/features/tasks/presentation/task_board_cubit.dart';
@@ -10,10 +14,17 @@ import 'package:legalhub/features/tasks/presentation/task_board_state.dart';
 
 void main() {
   late _StubTaskBoardGateway gateway;
+  late _StubMatterGateway matterGateway;
+  late _StubOrgGateway organizationGateway;
 
   setUp(() {
     gateway = _StubTaskBoardGateway();
+    matterGateway = _StubMatterGateway();
+    organizationGateway = _StubOrgGateway();
   });
+
+  TaskBoardCubit buildCubit() =>
+      TaskBoardCubit(gateway, matterGateway, organizationGateway);
 
   TaskItem task({
     required String id,
@@ -23,6 +34,8 @@ void main() {
   }) {
     return TaskItem(
       id: id,
+      organizationId: 'org-1',
+      matterId: 'matter-1',
       title: 'Task $id',
       matterRef: 'Demo acquisition review',
       status: status,
@@ -43,7 +56,7 @@ void main() {
           ),
         ],
       ),
-      build: () => TaskBoardCubit(gateway),
+      build: buildCubit,
       seed: () => TaskBoardState(
         tasks: ViewSuccess<List<TaskItem>>(<TaskItem>[task(id: 'task-1')]),
       ),
@@ -77,7 +90,7 @@ void main() {
           ),
         ],
       ),
-      build: () => TaskBoardCubit(gateway),
+      build: buildCubit,
       seed: () => TaskBoardState(
         tasks: ViewSuccess<List<TaskItem>>(<TaskItem>[task(id: 'task-1')]),
       ),
@@ -108,7 +121,7 @@ void main() {
           ),
         ],
       ),
-      build: () => TaskBoardCubit(gateway),
+      build: buildCubit,
       seed: () => TaskBoardState(
         tasks: ViewSuccess<List<TaskItem>>(<TaskItem>[
           task(id: 'task-1', status: TaskStatus.inProgress),
@@ -135,21 +148,33 @@ void main() {
     );
 
     blocTest<TaskBoardCubit, TaskBoardState>(
-      'createTask with a whitespace-only title surfaces actionError '
-      'without a round-trip',
-      build: () => TaskBoardCubit(gateway),
+      'createTask returns the failure and surfaces its message inline',
+      setUp: () => gateway = _StubTaskBoardGateway(
+        createResults: <Result<TaskItem>>[
+          Result<TaskItem>.failure(
+            const AppError(
+              code: 'task_create_denied',
+              userMessage:
+                  'You do not have permission to create tasks on this matter.',
+              kind: AppErrorKind.denied,
+            ),
+          ),
+        ],
+      ),
+      build: buildCubit,
       seed: () => TaskBoardState(
         tasks: ViewSuccess<List<TaskItem>>(<TaskItem>[task(id: 'task-1')]),
       ),
       act: (TaskBoardCubit cubit) =>
-          cubit.createTask(matterId: 'matter-1', title: '   '),
+          cubit.createTask(matterId: 'matter-1', title: 'Draft'),
       expect: () => <TaskBoardState>[
         TaskBoardState(
           tasks: ViewSuccess<List<TaskItem>>(<TaskItem>[task(id: 'task-1')]),
-          actionError: 'Enter a task title.',
+          actionError:
+              'You do not have permission to create tasks on this matter.',
         ),
       ],
-      verify: (_) => expect(gateway.createTitles, isEmpty),
+      verify: (_) => expect(gateway.createTitles, <String>['Draft']),
     );
 
     blocTest<TaskBoardCubit, TaskBoardState>(
@@ -159,7 +184,7 @@ void main() {
           Result<TaskItem>.success(task(id: 'task-9')),
         ],
       ),
-      build: () => TaskBoardCubit(gateway),
+      build: buildCubit,
       seed: () => TaskBoardState(
         tasks: ViewSuccess<List<TaskItem>>(<TaskItem>[task(id: 'task-1')]),
       ),
@@ -179,13 +204,31 @@ void main() {
     );
 
     blocTest<TaskBoardCubit, TaskBoardState>(
+      'createTask on an empty board becomes a one-row success',
+      setUp: () => gateway = _StubTaskBoardGateway(
+        createResults: <Result<TaskItem>>[
+          Result<TaskItem>.success(task(id: 'task-9')),
+        ],
+      ),
+      build: buildCubit,
+      seed: () => const TaskBoardState(tasks: ViewEmpty<List<TaskItem>>()),
+      act: (TaskBoardCubit cubit) =>
+          cubit.createTask(matterId: 'matter-1', title: 'Draft'),
+      expect: () => <TaskBoardState>[
+        TaskBoardState(
+          tasks: ViewSuccess<List<TaskItem>>(<TaskItem>[task(id: 'task-9')]),
+        ),
+      ],
+    );
+
+    blocTest<TaskBoardCubit, TaskBoardState>(
       'assignTask patches the re-assigned row',
       setUp: () => gateway = _StubTaskBoardGateway(
         assignResults: <Result<TaskItem>>[
           Result<TaskItem>.success(task(id: 'task-1', assigneeId: 'user-2')),
         ],
       ),
-      build: () => TaskBoardCubit(gateway),
+      build: buildCubit,
       seed: () => TaskBoardState(
         tasks: ViewSuccess<List<TaskItem>>(<TaskItem>[task(id: 'task-1')]),
       ),
@@ -201,7 +244,65 @@ void main() {
           ]),
         ),
       ],
+      verify: (_) => expect(gateway.assigneeCalls, <String?>['user-2']),
     );
+
+    blocTest<TaskBoardCubit, TaskBoardState>(
+      'assignTask forwards a null assignee to unassign',
+      setUp: () => gateway = _StubTaskBoardGateway(
+        assignResults: <Result<TaskItem>>[
+          Result<TaskItem>.success(task(id: 'task-1')),
+        ],
+      ),
+      build: buildCubit,
+      seed: () => TaskBoardState(
+        tasks: ViewSuccess<List<TaskItem>>(<TaskItem>[
+          task(id: 'task-1', assigneeId: 'user-2'),
+        ]),
+      ),
+      act: (TaskBoardCubit cubit) => cubit.assignTask('task-1', null),
+      expect: () => <TaskBoardState>[
+        TaskBoardState(
+          tasks: ViewSuccess<List<TaskItem>>(<TaskItem>[
+            task(id: 'task-1', assigneeId: 'user-2'),
+          ]),
+          actingTaskId: 'task-1',
+        ),
+        TaskBoardState(
+          tasks: ViewSuccess<List<TaskItem>>(<TaskItem>[task(id: 'task-1')]),
+        ),
+      ],
+      verify: (_) => expect(gateway.assigneeCalls, <String?>[null]),
+    );
+  });
+
+  group('TaskBoardCubit picker reads', () {
+    test('loadMatters returns the gateway result unchanged', () async {
+      final Result<List<Matter>> failure = Result<List<Matter>>.failure(
+        const AppError(code: 'matters_failed', userMessage: 'offline'),
+      );
+      matterGateway.result = failure;
+      final TaskBoardCubit cubit = buildCubit();
+      addTearDown(cubit.close);
+
+      expect(await cubit.loadMatters(), same(failure));
+    });
+
+    test('loadAssignableMembers forwards the matter id and outcome', () async {
+      const OrgOutcome<List<AssignableMember>> success =
+          OrgOutcome<List<AssignableMember>>.success(<AssignableMember>[
+            AssignableMember(userId: 'user-2', displayName: 'Amira'),
+          ]);
+      organizationGateway.result = success;
+      final TaskBoardCubit cubit = buildCubit();
+      addTearDown(cubit.close);
+
+      final OrgOutcome<List<AssignableMember>> outcome = await cubit
+          .loadAssignableMembers('matter-7');
+
+      expect(outcome, same(success));
+      expect(organizationGateway.matterCalls, <String>['matter-7']);
+    });
   });
 }
 
@@ -225,6 +326,7 @@ class _StubTaskBoardGateway implements TaskBoardGateway {
 
   final List<String> createTitles = <String>[];
   final List<List<String>> advanceCalls = <List<String>>[];
+  final List<String?> assigneeCalls = <String?>[];
 
   @override
   Future<Result<List<TaskItem>>> fetchTasks() async {
@@ -248,12 +350,43 @@ class _StubTaskBoardGateway implements TaskBoardGateway {
   }
 
   @override
-  Future<Result<TaskItem>> assignTask(String taskId, String assigneeId) async {
+  Future<Result<TaskItem>> assignTask(String taskId, String? assigneeId) async {
+    assigneeCalls.add(assigneeId);
     return _assignResults.removeAt(0);
   }
 
   @override
   Future<Result<TaskItem>> acknowledgeTask(String taskId) async {
     return _acknowledgeResults.removeAt(0);
+  }
+}
+
+class _StubMatterGateway extends FakeMatterGateway {
+  Result<List<Matter>>? result;
+
+  @override
+  Future<Result<List<Matter>>> fetchMatters() async {
+    final Result<List<Matter>>? stub = result;
+    if (stub != null) {
+      return stub;
+    }
+    return super.fetchMatters();
+  }
+}
+
+class _StubOrgGateway extends FakeOrganizationGateway {
+  OrgOutcome<List<AssignableMember>>? result;
+  final List<String> matterCalls = <String>[];
+
+  @override
+  Future<OrgOutcome<List<AssignableMember>>> listAssignableMembers({
+    required String matterId,
+  }) async {
+    matterCalls.add(matterId);
+    final OrgOutcome<List<AssignableMember>>? stub = result;
+    if (stub != null) {
+      return stub;
+    }
+    return super.listAssignableMembers(matterId: matterId);
   }
 }

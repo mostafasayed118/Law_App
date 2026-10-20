@@ -52,6 +52,9 @@ class FakeOrganizationGateway extends _FakeOrgState
   static const String demoUserId = 'demo-user';
   static const String demoOrganizationId = 'org-demo';
 
+  /// The fake task board's demo attorney identity (synthetic only).
+  static const String demoAttorneyId = 'demo-attorney';
+
   /// The demo identity's email, mirroring the fake auth session's claim (the
   /// server matches `accept_invitation` against the JWT email claim).
   static const String demoUserEmail = 'demo@firm.com';
@@ -140,6 +143,18 @@ class FakeOrganizationGateway extends _FakeOrgState
     return OrgOutcome<List<OrgMember>>.success(
       roster.values.toList(growable: false),
     );
+  }
+
+  @override
+  Future<OrgOutcome<List<AssignableMember>>> listAssignableMembers({
+    required String matterId,
+  }) async {
+    // Synthetic roster mirroring `list_matter_assignable_members`: active
+    // org members only (the platform owner is never in this fake's roster).
+    return const OrgOutcome<List<AssignableMember>>.success(<AssignableMember>[
+      AssignableMember(userId: demoUserId, displayName: 'Demo user'),
+      AssignableMember(userId: demoAttorneyId, displayName: 'Demo attorney'),
+    ]);
   }
 
   @override

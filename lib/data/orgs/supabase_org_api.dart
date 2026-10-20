@@ -54,6 +54,14 @@ abstract interface class SupabaseOrgApi {
     required String organizationId,
   });
 
+  /// `list_matter_assignable_members(p_matter_id)` rows for one matter
+  /// (read-only roster for the task-assignment picker). Returns only active
+  /// memberships of the matter's org (platform owner excluded) with
+  /// `user_id` + `display_name`; a failed gate returns zero rows.
+  Future<List<Map<String, dynamic>>> listAssignableMembers({
+    required String matterId,
+  });
+
   /// RLS-scoped SELECT of the caller's own `memberships` rows, embedded with
   /// the joined `organizations` name (P3.2 membership hydration).
   ///

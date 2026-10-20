@@ -194,6 +194,18 @@ void main() {
       ]);
     });
 
+    test('assignTask sends an explicit null assignee to unassign', () async {
+      rpcData['assign_task'] = <String, dynamic>{'id': 'task-1'};
+
+      await api.assignTask('task-1', null);
+
+      // The RPC accepts a null p_assignee_id (unassign); the key is always
+      // sent so the param shape never drifts between assign and unassign.
+      expect(rpcCalls, <String>[
+        'assign_task:p_task_id,p_assignee_id:task-1,null',
+      ]);
+    });
+
     test('acknowledgeTask calls the RPC with the task id only', () async {
       // First-person by construction: the stamper derives from the session
       // in-function, so no user id ever crosses (F2-D5).

@@ -70,6 +70,35 @@ class SupabaseOrganizationGateway implements OrganizationGateway {
   }
 
   @override
+  Future<OrgOutcome<List<AssignableMember>>> listAssignableMembers({
+    required String matterId,
+  }) async {
+    try {
+      final List<Map<String, dynamic>> rows = await _api.listAssignableMembers(
+        matterId: matterId,
+      );
+      return OrgOutcome<List<AssignableMember>>.success(
+        rows.map(_assignableMemberFromRow).toList(growable: false),
+      );
+    } on SupabaseOrgException catch (e) {
+      return OrgOutcome<List<AssignableMember>>.failure(
+        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+      );
+    } on FormatException catch (e) {
+      // Provider drift (unexpected row shape) surfaces loudly, never as a
+      // silently wrong assignee.
+      return OrgOutcome<List<AssignableMember>>.failure(
+        OrgFailure(kind: OrgFailureKind.unknown, message: e.message),
+      );
+    } on TypeError catch (e) {
+      // Defense-in-depth: no raw TypeError ever crosses the boundary.
+      return OrgOutcome<List<AssignableMember>>.failure(
+        OrgFailure(kind: OrgFailureKind.unknown, message: e.toString()),
+      );
+    }
+  }
+
+  @override
   Future<OrgOutcome<InviteResult>> inviteMember({
     required String organizationId,
     required String email,

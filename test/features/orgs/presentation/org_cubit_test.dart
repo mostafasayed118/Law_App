@@ -32,6 +32,11 @@ class _GatedOrgGateway implements OrganizationGateway {
   }) => _inner.listMembers(organizationId: organizationId);
 
   @override
+  Future<OrgOutcome<List<AssignableMember>>> listAssignableMembers({
+    required String matterId,
+  }) => _inner.listAssignableMembers(matterId: matterId);
+
+  @override
   Future<OrgOutcome<InviteResult>> inviteMember({
     required String organizationId,
     required String email,

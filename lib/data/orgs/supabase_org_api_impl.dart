@@ -100,6 +100,25 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
   }
 
   @override
+  Future<List<Map<String, dynamic>>> listAssignableMembers({
+    required String matterId,
+  }) async {
+    try {
+      final PostgrestResponse<dynamic> response = await _rpc(
+        'list_matter_assignable_members',
+        <String, dynamic>{'p_matter_id': matterId},
+      );
+      final Object? data = response.data;
+      if (data is! List<dynamic>) {
+        return const <Map<String, dynamic>>[];
+      }
+      return data.whereType<Map<String, dynamic>>().toList(growable: false);
+    } on PostgrestException catch (e) {
+      throw SupabaseOrgException(kind: _kindFor(e), message: e.message);
+    }
+  }
+
+  @override
   Future<List<Map<String, dynamic>>> listMyMemberships() async {
     try {
       // RLS-scoped: memberships policy = own-row OR active-member; the

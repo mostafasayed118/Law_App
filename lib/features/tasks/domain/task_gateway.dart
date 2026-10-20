@@ -30,8 +30,9 @@ abstract interface class TaskBoardGateway {
   Future<Result<TaskItem>> advanceTask(String taskId, TaskStatus to);
 
   /// Re-points [taskId] at [assigneeId] (must be an active member of the
-  /// task's org, never the platform owner — F2-D2/D4).
-  Future<Result<TaskItem>> assignTask(String taskId, String assigneeId);
+  /// task's org, never the platform owner — F2-D2/D4). A null [assigneeId]
+  /// unassigns the task.
+  Future<Result<TaskItem>> assignTask(String taskId, String? assigneeId);
 
   /// Stamps [taskId] acknowledged as the caller (assignee-only,
   /// first-person — the server derives the stamper from the session).

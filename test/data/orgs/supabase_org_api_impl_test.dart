@@ -169,6 +169,53 @@ void main() {
     });
 
     test(
+      'listAssignableMembers sends the matter id and returns only map rows',
+      () async {
+        data['list_matter_assignable_members'] = <dynamic>[
+          <String, dynamic>{'user_id': 'u-1', 'display_name': 'Amira'},
+          'not-a-map',
+        ];
+
+        final List<Map<String, dynamic>> rows = await api.listAssignableMembers(
+          matterId: 'matter-1',
+        );
+
+        expect(rows, hasLength(1));
+        expect(calls, <String>['list_matter_assignable_members:matter-1']);
+      },
+    );
+
+    test('listAssignableMembers maps a denial to the denied kind', () async {
+      errors['list_matter_assignable_members'] = const PostgrestException(
+        message: 'permission denied',
+      );
+
+      await expectLater(
+        api.listAssignableMembers(matterId: 'matter-1'),
+        throwsA(
+          isA<SupabaseOrgException>().having(
+            (e) => e.kind,
+            'kind',
+            SupabaseOrgFailureKind.denied,
+          ),
+        ),
+      );
+    });
+
+    test(
+      'listAssignableMembers maps an empty response to an empty list',
+      () async {
+        data['list_matter_assignable_members'] = null;
+
+        final List<Map<String, dynamic>> rows = await api.listAssignableMembers(
+          matterId: 'matter-1',
+        );
+
+        expect(rows, isEmpty);
+      },
+    );
+
+    test(
       'listMyMemberships selects memberships with the org name embed',
       () async {
         tableData['memberships'] = <Map<String, dynamic>>[

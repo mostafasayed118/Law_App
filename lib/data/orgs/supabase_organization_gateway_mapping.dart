@@ -33,6 +33,18 @@ String? _assignableRoleName(UserRole role) {
   };
 }
 
+AssignableMember _assignableMemberFromRow(Map<String, dynamic> row) {
+  final Object? userId = row['user_id'];
+  if (userId is! String || userId.isEmpty) {
+    throw FormatException('Assignable member row has no user_id');
+  }
+  final Object? displayName = row['display_name'];
+  if (displayName is! String || displayName.isEmpty) {
+    throw FormatException('Assignable member row has no display_name');
+  }
+  return AssignableMember(userId: userId, displayName: displayName);
+}
+
 OrgMember _memberFromRow(Map<String, dynamic> row) {
   final UserRole? role = userRoleFromServerName(row['role'] as String?);
   if (role == null) {

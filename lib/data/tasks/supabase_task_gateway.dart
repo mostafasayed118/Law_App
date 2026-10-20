@@ -104,7 +104,7 @@ class SupabaseTaskGateway implements TaskBoardGateway {
   }
 
   @override
-  Future<Result<TaskItem>> assignTask(String taskId, String assigneeId) {
+  Future<Result<TaskItem>> assignTask(String taskId, String? assigneeId) {
     return _runWrite(
       () => _api.assignTask(taskId, assigneeId),
       codePrefix: 'task_assign',
@@ -183,6 +183,14 @@ class SupabaseTaskGateway implements TaskBoardGateway {
     if (title is! String || title.isEmpty) {
       throw FormatException('Task row has no title');
     }
+    final Object? organizationId = row['organization_id'];
+    if (organizationId is! String || organizationId.isEmpty) {
+      throw FormatException('Task row has no organization_id');
+    }
+    final Object? matterId = row['matter_id'];
+    if (matterId is! String || matterId.isEmpty) {
+      throw FormatException('Task row has no matter_id');
+    }
     final Object? status = row['status'];
     final TaskStatus mapped = switch (status) {
       'todo' => TaskStatus.todo,
@@ -191,11 +199,12 @@ class SupabaseTaskGateway implements TaskBoardGateway {
       'done' => TaskStatus.done,
       _ => throw FormatException('Task row has unknown status: $status'),
     };
-    final Object? matterId = row['matter_id'];
     final Object? assignee = row['assignee_id'];
     final Object? acknowledgedAt = row['acknowledged_at'];
     return TaskItem(
       id: id,
+      organizationId: organizationId,
+      matterId: matterId,
       title: title,
       // D-MSR4: the embedded matters(title) join resolves under the same
       // RLS gate; an absent embed falls back to the raw matter id, never a

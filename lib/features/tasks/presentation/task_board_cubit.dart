@@ -2,7 +2,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/errors/app_error.dart';
 import '../../../core/errors/result.dart';
+import '../../../core/organizations/organization_gateway.dart';
 import '../../../core/state/view_state.dart';
+import '../../matters/domain/matter.dart';
+import '../../matters/domain/matter_gateway.dart';
 import '../domain/task_gateway.dart';
 import '../domain/task_item.dart';
 import 'task_board_state.dart';
@@ -19,12 +22,31 @@ import 'task_board_state.dart';
 /// (the RPC returns the server's own persisted row — no follow-up re-read,
 /// the D-SM2 convention); failures surface [TaskBoardState.actionError]
 /// inline and keep the list untouched.
+///
+/// The create/assign slice adds the two picker reads: [loadMatters] feeds the
+/// create sheet's matter dropdown and [loadAssignableMembers] feeds the assign
+/// sheet's roster. Both return the seam outcome unchanged (the sheets own
+/// their loading/error presentation).
 class TaskBoardCubit extends Cubit<TaskBoardState> {
-  TaskBoardCubit(this._gateway) : super(const TaskBoardState());
+  TaskBoardCubit(this._gateway, this._matterGateway, this._organizationGateway)
+    : super(const TaskBoardState());
 
   final TaskBoardGateway _gateway;
+  final MatterGateway _matterGateway;
+  final OrganizationGateway _organizationGateway;
 
   bool _loading = false;
+
+  /// The matter choices for the create sheet (the gateway's own failure is
+  /// returned, never swallowed into an empty list).
+  Future<Result<List<Matter>>> loadMatters() => _matterGateway.fetchMatters();
+
+  /// The assignable roster for one matter (`list_matter_assignable_members`).
+  Future<OrgOutcome<List<AssignableMember>>> loadAssignableMembers(
+    String matterId,
+  ) {
+    return _organizationGateway.listAssignableMembers(matterId: matterId);
+  }
 
   Future<void> load() async {
     if (isClosed || _loading) {
@@ -60,23 +82,18 @@ class TaskBoardCubit extends Cubit<TaskBoardState> {
     }
   }
 
-  /// Creates a task on [matterId]. The title is trimmed here (the composer
-  /// owns the empty-disable, Batch B send() precedent); a whitespace-only
-  /// title surfaces actionError without a round-trip.
-  Future<void> createTask({
+  /// Creates a task on [matterId]. The title is trimmed here (the sheet
+  /// validates non-empty before submitting). Returns null on success or the
+  /// failure's [AppError] so the sheet can render localized inline copy.
+  Future<AppError?> createTask({
     required String matterId,
     required String title,
     String? assigneeId,
-  }) async {
-    final String trimmed = title.trim();
-    if (trimmed.isEmpty) {
-      emit(state.copyWith(actionError: 'Enter a task title.'));
-      return;
-    }
-    await _runWrite(
+  }) {
+    return _runWrite(
       () => _gateway.createTask(
         matterId: matterId,
-        title: trimmed,
+        title: title.trim(),
         assigneeId: assigneeId,
       ),
       taskId: null,
@@ -91,9 +108,10 @@ class TaskBoardCubit extends Cubit<TaskBoardState> {
     await _runWrite(() => _gateway.advanceTask(taskId, to), taskId: taskId);
   }
 
-  /// Re-points [taskId] at [assigneeId].
-  Future<void> assignTask(String taskId, String assigneeId) async {
-    await _runWrite(
+  /// Re-points [taskId] at [assigneeId], or unassigns it when null. Returns
+  /// null on success or the failure's [AppError] for the sheet's inline copy.
+  Future<AppError?> assignTask(String taskId, String? assigneeId) {
+    return _runWrite(
       () => _gateway.assignTask(taskId, assigneeId),
       taskId: taskId,
     );
@@ -107,33 +125,41 @@ class TaskBoardCubit extends Cubit<TaskBoardState> {
   /// Runs one write: marks the row acting (a global act for create),
   /// clears the previous error, then patches the returned row into the
   /// list on success or surfaces the failure's user message on denial.
-  Future<void> _runWrite(
+  /// Returns the [AppError] on failure, null on success.
+  Future<AppError?> _runWrite(
     Future<Result<TaskItem>> Function() write, {
     required String? taskId,
   }) async {
     if (isClosed) {
-      return;
+      return null;
     }
     emit(state.copyWith(actionError: null, actingTaskId: taskId));
     final Result<TaskItem> result = await write();
     if (isClosed) {
-      return;
+      return null;
     }
     switch (result) {
       case Success<TaskItem>(value: final TaskItem updated):
         emit(state.copyWith(tasks: _patchedTasks(updated), actingTaskId: null));
+        return null;
       case Failure<TaskItem>(error: final AppError error):
         emit(
           state.copyWith(actionError: error.userMessage, actingTaskId: null),
         );
+        return error;
     }
   }
 
   /// Returns the current success list with [updated] patched in by id
-  /// (created rows append). A non-success list passes through untouched —
-  /// the write still landed server-side and the next load() re-reads it.
+  /// (created rows append). An empty board becomes a one-row success — the
+  /// create that landed must appear even when the board was empty. Other
+  /// non-success lists pass through untouched — the write still landed
+  /// server-side and the next load() re-reads it.
   ViewState<List<TaskItem>> _patchedTasks(TaskItem updated) {
     final ViewState<List<TaskItem>> current = state.tasks;
+    if (current is ViewEmpty<List<TaskItem>>) {
+      return ViewSuccess<List<TaskItem>>(<TaskItem>[updated]);
+    }
     if (current is! ViewSuccess<List<TaskItem>>) {
       return current;
     }

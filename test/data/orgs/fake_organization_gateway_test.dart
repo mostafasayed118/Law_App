@@ -327,6 +327,26 @@ void main() {
       expect(memberships.last.role, UserRole.partner);
       expect(memberships.last.isActive, isTrue);
     });
+
+    test(
+      'listAssignableMembers returns the demo user and demo attorney',
+      () async {
+        final OrgOutcome<List<AssignableMember>> outcome = await gateway
+            .listAssignableMembers(matterId: 'matter-1');
+
+        expect(outcome.isSuccess, isTrue);
+        expect(outcome.valueOrNull, const <AssignableMember>[
+          AssignableMember(
+            userId: FakeOrganizationGateway.demoUserId,
+            displayName: 'Demo user',
+          ),
+          AssignableMember(
+            userId: FakeOrganizationGateway.demoAttorneyId,
+            displayName: 'Demo attorney',
+          ),
+        ]);
+      },
+    );
   });
 
   group('readOrgAudit', () {

@@ -12,6 +12,8 @@ class _StubSupabaseOrgApi implements SupabaseOrgApi {
   SupabaseOrgException? createError;
   List<Map<String, dynamic>> listRows = <Map<String, dynamic>>[];
   SupabaseOrgException? listError;
+  List<Map<String, dynamic>> assignableRows = <Map<String, dynamic>>[];
+  SupabaseOrgException? assignableError;
   String? inviteToken;
   SupabaseOrgException? inviteError;
   SupabaseOrgException? voidError;
@@ -42,6 +44,17 @@ class _StubSupabaseOrgApi implements SupabaseOrgApi {
   @override
   Future<List<Map<String, dynamic>>> listMyMemberships() async =>
       <Map<String, dynamic>>[];
+
+  @override
+  Future<List<Map<String, dynamic>>> listAssignableMembers({
+    required String matterId,
+  }) async {
+    calls.add('assignable:$matterId');
+    if (assignableError != null) {
+      throw assignableError!;
+    }
+    return assignableRows;
+  }
 
   @override
   Future<String> inviteMember({
@@ -339,6 +352,48 @@ void main() {
       );
 
       expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
+    });
+  });
+
+  group('listAssignableMembers', () {
+    test('maps user_id/display_name rows to AssignableMember', () async {
+      api.assignableRows = <Map<String, dynamic>>[
+        <String, dynamic>{'user_id': 'u-1', 'display_name': 'Amira Hassan'},
+        <String, dynamic>{'user_id': 'u-2', 'display_name': 'Member'},
+      ];
+
+      final OrgOutcome<List<AssignableMember>> outcome = await gateway
+          .listAssignableMembers(matterId: 'matter-1');
+
+      expect(outcome.isSuccess, isTrue);
+      expect(api.calls, <String>['assignable:matter-1']);
+      expect(outcome.valueOrNull, const <AssignableMember>[
+        AssignableMember(userId: 'u-1', displayName: 'Amira Hassan'),
+        AssignableMember(userId: 'u-2', displayName: 'Member'),
+      ]);
+    });
+
+    test('surfaces a malformed row as a loud unknown failure', () async {
+      api.assignableRows = <Map<String, dynamic>>[
+        <String, dynamic>{'user_id': 'u-1'},
+      ];
+
+      final OrgOutcome<List<AssignableMember>> outcome = await gateway
+          .listAssignableMembers(matterId: 'matter-1');
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
+    });
+
+    test('maps a provider denial to the denied kind', () async {
+      api.assignableError = const SupabaseOrgException(
+        kind: SupabaseOrgFailureKind.denied,
+        message: 'permission denied',
+      );
+
+      final OrgOutcome<List<AssignableMember>> outcome = await gateway
+          .listAssignableMembers(matterId: 'matter-1');
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.denied);
     });
   });
 
