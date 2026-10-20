@@ -68,7 +68,10 @@ class _ForgotPasswordResetScreenState extends State<ForgotPasswordResetScreen> {
       routing = extra is RecoveryRoutingContext
           ? extra
           : RecoveryRoutingContext.empty;
-    } on Object catch (_) {
+    } on Error {
+      // Outside a router (unit-test pump GoError, deep-link refresh
+      // StateError): fall back to empty context, same as no `extra`.
+      assert(true, 'forgot-password reset built outside GoRouter');
       routing = RecoveryRoutingContext.empty;
     }
     return BlocProvider<PasswordRecoveryCubit>(
@@ -82,7 +85,13 @@ class _ForgotPasswordResetScreenState extends State<ForgotPasswordResetScreen> {
                 icon: Icons.arrow_back,
                 mirroredIcon: Icons.arrow_forward,
               ),
-              onPressed: () => context.go(AppRoutes.forgotPasswordOtp),
+              onPressed: () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go(AppRoutes.forgotPasswordOtp);
+                }
+              },
             ),
             child: BlocListener<PasswordRecoveryCubit, ViewState<void>>(
               listenWhen: (ViewState<void> previous, ViewState<void> current) =>

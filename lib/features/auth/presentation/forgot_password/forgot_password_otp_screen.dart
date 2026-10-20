@@ -100,7 +100,13 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
               icon: Icons.arrow_back,
               mirroredIcon: Icons.arrow_forward,
             ),
-            onPressed: () => context.go(AppRoutes.forgotPassword),
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go(AppRoutes.forgotPassword);
+              }
+            },
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

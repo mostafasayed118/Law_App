@@ -75,7 +75,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 icon: Icons.arrow_back,
                 mirroredIcon: Icons.arrow_forward,
               ),
-              onPressed: () => context.go(AppRoutes.signIn),
+              onPressed: () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go(AppRoutes.signIn);
+                }
+              },
             ),
             maxWidth: 520,
             scrollPadding: const EdgeInsetsDirectional.fromSTEB(
@@ -226,7 +232,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
               children: <Widget>[
                 Text(l10n.alreadyHaveAccount, style: text.bodySmall),
                 TextButton(
-                  onPressed: () => context.go(AppRoutes.signIn),
+                  onPressed: () {
+                    if (context.canPop()) {
+                      context.pop();
+                    } else {
+                      context.go(AppRoutes.signIn);
+                    }
+                  },
                   child: Text(
                     l10n.signInLink,
                     style: text.bodySmall?.copyWith(

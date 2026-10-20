@@ -16,7 +16,7 @@ import 'widgets/auth_buttons.dart';
 /// The primary "Sign In" action starts the local demo session via
 /// [AuthCubit.startDemoSession] — no real credentials are sent. Social buttons
 /// are presentational placeholders pending a provider integration (later
-/// slice); tapping them routes to sign-up for now.
+/// slice); they are disabled with an honest disclosure.
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
@@ -98,7 +98,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 textInputAction: TextInputAction.done,
                 validator: (v) => LegalHubValidators.required(l10n, v),
                 trailing: TextButton(
-                  onPressed: () => context.go(AppRoutes.forgotPassword),
+                  onPressed: () => context.push(AppRoutes.forgotPassword),
                   style: TextButton.styleFrom(
                     padding: EdgeInsets.zero,
                     minimumSize: Size.zero,
@@ -206,7 +206,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   children: <Widget>[
                     Text(l10n.newToLegalHub, style: text.bodySmall),
                     TextButton(
-                      onPressed: () => context.go(AppRoutes.signUp),
+                      onPressed: () => context.push(AppRoutes.signUp),
                       child: Text(
                         l10n.createAccount,
                         style: text.bodySmall?.copyWith(

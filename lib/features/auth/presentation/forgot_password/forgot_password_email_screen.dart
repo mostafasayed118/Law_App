@@ -73,7 +73,13 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
               icon: Icons.arrow_back,
               mirroredIcon: Icons.arrow_forward,
             ),
-            onPressed: () => context.go(AppRoutes.signIn),
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go(AppRoutes.signIn);
+              }
+            },
           ),
           child: Form(
             key: _formKey,
@@ -155,7 +161,13 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
                 const SizedBox(height: LegalHubTheme.spaceXl),
                 Center(
                   child: TextButton.icon(
-                    onPressed: () => context.go(AppRoutes.signIn),
+                    onPressed: () {
+                      if (context.canPop()) {
+                        context.pop();
+                      } else {
+                        context.go(AppRoutes.signIn);
+                      }
+                    },
                     icon: const DirectionalIcon(
                       icon: Icons.arrow_back,
                       mirroredIcon: Icons.arrow_forward,
