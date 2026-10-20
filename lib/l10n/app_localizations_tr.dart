@@ -848,6 +848,9 @@ class AppLocalizationsTr extends AppLocalizations {
       'Demo modu — hiçbir danışma fiilen rezerve edilmez veya gönderilmez.';
 
   @override
+  String get bookingNoPaymentNote => 'Bu adımda herhangi bir ödeme alınmaz.';
+
+  @override
   String get bookingCategoryStepTitle => 'Danışma türü';
 
   @override
@@ -905,6 +908,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get bookingConfirmFailed => 'Onaylanamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get bookingSlotUnavailable =>
+      'Bu saat artık müsait değil. Başka bir saat seçin.';
+
+  @override
+  String get bookingChooseAnotherTime => 'Başka bir saat seç';
 
   @override
   String get bookingSuccessTitle => 'Rezervasyon onaylandı';
@@ -1210,6 +1220,36 @@ class AppLocalizationsTr extends AppLocalizations {
   String get filesError => 'Dosyalar yüklenemedi.';
 
   @override
+  String get fileUploadAction => 'Dosya yükle';
+
+  @override
+  String fileUploading(String fileName) {
+    return '$fileName yükleniyor…';
+  }
+
+  @override
+  String get fileUploadSuccess => 'Dosya yüklendi.';
+
+  @override
+  String get fileUploadFailed => 'Dosya yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get fileUploadTooLarge =>
+      'Bu dosya çok büyük. En fazla 25 MB olabilir.';
+
+  @override
+  String get fileUploadUnsupportedType => 'Bu dosya türü desteklenmiyor.';
+
+  @override
+  String get fileUploadDenied => 'Bu davaya dosya yükleme izniniz yok.';
+
+  @override
+  String get fileOpenAction => 'Aç';
+
+  @override
+  String get fileOpenFailed => 'Dosya açılamadı. Lütfen tekrar deneyin.';
+
+  @override
   String get matterWorkspaceInvoicesTitle => 'Faturalar';
 
   @override
@@ -1241,6 +1281,78 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get invoiceStatusPaid => 'Ödendi';
+
+  @override
+  String get invoicePayAction => 'Öde';
+
+  @override
+  String get paymentSheetTitle => 'Fatura ödemesi';
+
+  @override
+  String get paymentPreparing => 'Güvenli ödeme hazırlanıyor…';
+
+  @override
+  String get paymentWaiting => 'Ödeme onayı bekleniyor…';
+
+  @override
+  String get paymentSuccessTitle => 'Ödeme başarılı';
+
+  @override
+  String get paymentSuccessBody =>
+      'Ödemeniz onaylandı. Fatura ödendi olarak işaretlenecek.';
+
+  @override
+  String get paymentFailedTitle => 'Ödeme başarısız';
+
+  @override
+  String get paymentFailedBody =>
+      'Ödeme tamamlanamadı. Tekrar deneyebilirsiniz.';
+
+  @override
+  String get paymentCancelledTitle => 'Ödeme iptal edildi';
+
+  @override
+  String get paymentCancelledBody =>
+      'Ödeme iptal edildi. Tekrar deneyebilirsiniz.';
+
+  @override
+  String get paymentExpiredTitle => 'Ödemenin süresi doldu';
+
+  @override
+  String get paymentExpiredBody =>
+      'Ödeme oturumunun süresi doldu. Yeni bir ödeme başlatabilirsiniz.';
+
+  @override
+  String get paymentCheckStatus => 'Durumu kontrol et';
+
+  @override
+  String get paymentRetry => 'Tekrar dene';
+
+  @override
+  String get paymentClose => 'Kapat';
+
+  @override
+  String get paymentOpenCheckout => 'Ödeme sayfasını aç';
+
+  @override
+  String get paymentUnavailable =>
+      'Ödemeler şu anda kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get paymentDemoNote => 'Yalnızca demo — gerçek ücret alınmaz.';
+
+  @override
+  String get paymentHostedCheckoutNote =>
+      'Ödemeyi güvenli barındırılan ödeme sayfasında tamamlayın, ardından bu ekrana dönün.';
+
+  @override
+  String get paymentDemoSuccess => 'Başarıyı simüle et';
+
+  @override
+  String get paymentDemoFailure => 'Başarısızlığı simüle et';
+
+  @override
+  String get paymentDemoCancel => 'İptali simüle et';
 
   @override
   String get orgAuditTitle => 'Denetim kaydı';
@@ -1336,6 +1448,70 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get taskAcknowledged => 'Onaylandı';
+
+  @override
+  String get taskCreateAction => 'Yeni görev';
+
+  @override
+  String get taskCreateTitle => 'Yeni görev';
+
+  @override
+  String get taskCreateTitleLabel => 'Görev başlığı';
+
+  @override
+  String get taskCreateTitleHint => 'örn. Yanıt kontrol listesi';
+
+  @override
+  String get taskCreateMatterLabel => 'Dosya';
+
+  @override
+  String get taskCreateMatterHint => 'Bir dosya seçin';
+
+  @override
+  String get taskCreateSubmit => 'Görevi oluştur';
+
+  @override
+  String get taskCreateNoMatters => 'Görev oluşturulabilecek dosya yok.';
+
+  @override
+  String get taskCreateMattersError =>
+      'Dosyalar yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get taskAssignAction => 'Ata';
+
+  @override
+  String get taskAssignTitle => 'Görevi ata';
+
+  @override
+  String get taskAssignMemberLabel => 'Atanan kişi';
+
+  @override
+  String get taskAssignUnassigned => 'Atanmamış';
+
+  @override
+  String get taskAssignSubmit => 'Atamayı kaydet';
+
+  @override
+  String get taskAssignMembersError =>
+      'Üyeler yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get taskAssigneeUnavailable => 'Mevcut atanan kişi kullanılamıyor';
+
+  @override
+  String get taskErrorDenied => 'Bunu yapma izniniz yok.';
+
+  @override
+  String get taskErrorUnavailable =>
+      'Bu özellik geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get taskErrorInvalid =>
+      'Bu değişiklik geçerli değil. Ayrıntıları kontrol edip tekrar deneyin.';
+
+  @override
+  String get taskErrorFailed => 'Bir şeyler ters gitti. Lütfen tekrar deneyin.';
 
   @override
   String get approvalsTitle => 'Bekleyen onaylar';

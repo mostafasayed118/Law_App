@@ -15,14 +15,24 @@ void _registerSeam<T extends Object>(
   }
 }
 
-void _registerBookingSeams() {
-  if (!serviceLocator.isRegistered<BookingGateway>()) {
-    // Stateless service: lazy singleton. The booking Cubit is feature-scoped
-    // and created per screen via BlocProvider, so it is NOT registered here.
-    serviceLocator.registerLazySingleton<BookingGateway>(
-      FakeBookingGateway.new,
-    );
-  }
+void _registerBookingSeams(
+  SupabaseEnv env, {
+  SupabaseBookingApi Function()? supabaseBookingApiFactory,
+}) {
+  // Stateless service: lazy singleton. The booking Cubit is feature-scoped
+  // and created per screen via BlocProvider, so it is NOT registered here.
+  // Like TaskBoardGateway, the flip swaps the dev fake for the Supabase-backed
+  // implementation when the build is configured (Batch 3.3 env pattern). The
+  // real path reads the RLS-scoped available-slot catalogue and books through
+  // the audited `book_consultation` RPC; env-less runs and ALL tests keep the
+  // fake.
+  _registerSeam<BookingGateway>(
+    env,
+    supabase: () => SupabaseBookingGateway(
+      (supabaseBookingApiFactory ?? SupabaseBookingApiImpl.bind)(),
+    ),
+    fake: FakeBookingGateway.new,
+  );
   if (!serviceLocator.isRegistered<VideoGateway>()) {
     // Spec D-15 demo-posture (`docs/video_scope_decision_2026-08-11.md`):
     // the synthetic VideoGateway seam, registered unconditionally — there is
@@ -108,6 +118,40 @@ void _registerMatterSeams(
   );
 }
 
+/// Registers the payments slice seams.
+///
+/// The mode is a build-time value (default `disabled`). The gateway is the
+/// fake unless the build is in `live` mode AND the Supabase env is fully
+/// configured; a live build with no env keeps the fake (`isLive == false`) so
+/// the UI's demo wording stays honest. The checkout launcher is an OS seam and
+/// registers unconditionally (tests may pre-register their own).
+void _registerPaymentSeams(
+  SupabaseEnv env, {
+  required PaymentMode mode,
+  SupabasePaymentApi Function()? supabasePaymentApiFactory,
+}) {
+  if (!serviceLocator.isRegistered<PaymentMode>()) {
+    serviceLocator.registerSingleton<PaymentMode>(mode);
+  }
+  if (!serviceLocator.isRegistered<PaymentGateway>()) {
+    final PaymentMode effectiveMode = serviceLocator<PaymentMode>();
+    final bool useSupabase =
+        effectiveMode == PaymentMode.live && env.isConfigured;
+    serviceLocator.registerLazySingleton<PaymentGateway>(
+      useSupabase
+          ? () => SupabasePaymentGateway(
+              (supabasePaymentApiFactory ?? SupabasePaymentApiImpl.bind)(),
+            )
+          : FakePaymentGateway.new,
+    );
+  }
+  if (!serviceLocator.isRegistered<CheckoutLauncher>()) {
+    serviceLocator.registerLazySingleton<CheckoutLauncher>(
+      UrlLauncherCheckoutLauncher.new,
+    );
+  }
+}
+
 void _registerContentSeams(
   SupabaseEnv env, {
   SupabaseDocumentApi Function()? supabaseDocumentApiFactory,
@@ -118,6 +162,17 @@ void _registerContentSeams(
   SupabaseNotificationApi Function()? supabaseNotificationApiFactory,
   SupabaseTaskApi Function()? supabaseTaskApiFactory,
 }) {
+  // Platform seams are unconditional: the file picker and external URI
+  // opener are OS integrations, not env-gated providers. Tests register
+  // their own fakes before configureDependencies.
+  if (!serviceLocator.isRegistered<FilePicker>()) {
+    serviceLocator.registerLazySingleton<FilePicker>(
+      FileSelectorFilePicker.new,
+    );
+  }
+  if (!serviceLocator.isRegistered<UriOpener>()) {
+    serviceLocator.registerLazySingleton<UriOpener>(UrlLauncherUriOpener.new);
+  }
   // Stateless service: lazy singleton. The vault Cubit is feature-scoped
   // and created per screen via BlocProvider, so it is NOT registered here.
   // Like MatterGateway, the flip swaps the dev fake for the

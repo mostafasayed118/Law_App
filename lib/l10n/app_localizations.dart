@@ -1654,6 +1654,12 @@ abstract class AppLocalizations {
   /// **'Demo mode — no consultation is actually booked or sent.'**
   String get bookingLocalOnlyNote;
 
+  /// No description provided for @bookingNoPaymentNote.
+  ///
+  /// In en, this message translates to:
+  /// **'No payment is taken at this step.'**
+  String get bookingNoPaymentNote;
+
   /// No description provided for @bookingCategoryStepTitle.
   ///
   /// In en, this message translates to:
@@ -1767,6 +1773,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unable to confirm. Please try again.'**
   String get bookingConfirmFailed;
+
+  /// No description provided for @bookingSlotUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'That time is no longer available. Choose another time.'**
+  String get bookingSlotUnavailable;
+
+  /// No description provided for @bookingChooseAnotherTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose another time'**
+  String get bookingChooseAnotherTime;
 
   /// No description provided for @bookingSuccessTitle.
   ///
@@ -2308,6 +2326,60 @@ abstract class AppLocalizations {
   /// **'Unable to load files.'**
   String get filesError;
 
+  /// No description provided for @fileUploadAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload file'**
+  String get fileUploadAction;
+
+  /// No description provided for @fileUploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading {fileName}…'**
+  String fileUploading(String fileName);
+
+  /// No description provided for @fileUploadSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'File uploaded.'**
+  String get fileUploadSuccess;
+
+  /// No description provided for @fileUploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to upload the file. Please try again.'**
+  String get fileUploadFailed;
+
+  /// No description provided for @fileUploadTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'This file is too large. The maximum size is 25 MB.'**
+  String get fileUploadTooLarge;
+
+  /// No description provided for @fileUploadUnsupportedType.
+  ///
+  /// In en, this message translates to:
+  /// **'This file type is not supported.'**
+  String get fileUploadUnsupportedType;
+
+  /// No description provided for @fileUploadDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to upload files to this matter.'**
+  String get fileUploadDenied;
+
+  /// No description provided for @fileOpenAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get fileOpenAction;
+
+  /// No description provided for @fileOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open the file. Please try again.'**
+  String get fileOpenFailed;
+
   /// No description provided for @matterWorkspaceInvoicesTitle.
   ///
   /// In en, this message translates to:
@@ -2367,6 +2439,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Paid'**
   String get invoiceStatusPaid;
+
+  /// No description provided for @invoicePayAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay'**
+  String get invoicePayAction;
+
+  /// No description provided for @paymentSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice payment'**
+  String get paymentSheetTitle;
+
+  /// No description provided for @paymentPreparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing secure checkout…'**
+  String get paymentPreparing;
+
+  /// No description provided for @paymentWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for payment confirmation…'**
+  String get paymentWaiting;
+
+  /// No description provided for @paymentSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment successful'**
+  String get paymentSuccessTitle;
+
+  /// No description provided for @paymentSuccessBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your payment was confirmed. The invoice will be marked as paid.'**
+  String get paymentSuccessBody;
+
+  /// No description provided for @paymentFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment failed'**
+  String get paymentFailedTitle;
+
+  /// No description provided for @paymentFailedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The payment did not go through. You can try again.'**
+  String get paymentFailedBody;
+
+  /// No description provided for @paymentCancelledTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment cancelled'**
+  String get paymentCancelledTitle;
+
+  /// No description provided for @paymentCancelledBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The payment was cancelled. You can try again.'**
+  String get paymentCancelledBody;
+
+  /// No description provided for @paymentExpiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment expired'**
+  String get paymentExpiredTitle;
+
+  /// No description provided for @paymentExpiredBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The checkout session expired. You can start a new payment.'**
+  String get paymentExpiredBody;
+
+  /// No description provided for @paymentCheckStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Check status'**
+  String get paymentCheckStatus;
+
+  /// No description provided for @paymentRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get paymentRetry;
+
+  /// No description provided for @paymentClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get paymentClose;
+
+  /// No description provided for @paymentOpenCheckout.
+  ///
+  /// In en, this message translates to:
+  /// **'Open checkout'**
+  String get paymentOpenCheckout;
+
+  /// No description provided for @paymentUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Payments are unavailable right now. Please try again.'**
+  String get paymentUnavailable;
+
+  /// No description provided for @paymentDemoNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo only — no real charge.'**
+  String get paymentDemoNote;
+
+  /// No description provided for @paymentHostedCheckoutNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete the payment in the secure hosted checkout, then come back to this screen.'**
+  String get paymentHostedCheckoutNote;
+
+  /// No description provided for @paymentDemoSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Simulate success'**
+  String get paymentDemoSuccess;
+
+  /// No description provided for @paymentDemoFailure.
+  ///
+  /// In en, this message translates to:
+  /// **'Simulate failure'**
+  String get paymentDemoFailure;
+
+  /// No description provided for @paymentDemoCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Simulate cancel'**
+  String get paymentDemoCancel;
 
   /// No description provided for @orgAuditTitle.
   ///
@@ -2547,6 +2751,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Acknowledged'**
   String get taskAcknowledged;
+
+  /// Button label that opens the create-task sheet from the task board header.
+  ///
+  /// In en, this message translates to:
+  /// **'New task'**
+  String get taskCreateAction;
+
+  /// Title of the create-task bottom sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'New task'**
+  String get taskCreateTitle;
+
+  /// Label above the task title field in the create-task sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Task title'**
+  String get taskCreateTitleLabel;
+
+  /// Placeholder example for the task title field.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Draft response checklist'**
+  String get taskCreateTitleHint;
+
+  /// Label for the matter dropdown in the create-task sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Matter'**
+  String get taskCreateMatterLabel;
+
+  /// Placeholder shown when no matter is selected.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a matter'**
+  String get taskCreateMatterHint;
+
+  /// Submit button of the create-task sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Create task'**
+  String get taskCreateSubmit;
+
+  /// Honest empty state when the matter list is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No matters are available to create a task on.'**
+  String get taskCreateNoMatters;
+
+  /// Inline error when the matter list fails to load.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load matters. Please try again.'**
+  String get taskCreateMattersError;
+
+  /// Tooltip of a task row's assign button.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign'**
+  String get taskAssignAction;
+
+  /// Title of the assign-task bottom sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign task'**
+  String get taskAssignTitle;
+
+  /// Label for the assignee dropdown in the assign-task sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Assignee'**
+  String get taskAssignMemberLabel;
+
+  /// Dropdown option that clears the task assignee.
+  ///
+  /// In en, this message translates to:
+  /// **'Unassigned'**
+  String get taskAssignUnassigned;
+
+  /// Submit button of the assign-task sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Save assignment'**
+  String get taskAssignSubmit;
+
+  /// Inline error when the assignable roster fails to load.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load members. Please try again.'**
+  String get taskAssignMembersError;
+
+  /// Neutral row shown when the task's current assignee is not in the active roster.
+  ///
+  /// In en, this message translates to:
+  /// **'Current assignee unavailable'**
+  String get taskAssigneeUnavailable;
+
+  /// Localized task action denial.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to do that.'**
+  String get taskErrorDenied;
+
+  /// Localized task action outage.
+  ///
+  /// In en, this message translates to:
+  /// **'This is temporarily unavailable. Please try again.'**
+  String get taskErrorUnavailable;
+
+  /// Localized task action validation refusal.
+  ///
+  /// In en, this message translates to:
+  /// **'That change is not valid. Check the details and try again.'**
+  String get taskErrorInvalid;
+
+  /// Localized generic task action failure.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get taskErrorFailed;
 
   /// No description provided for @approvalsTitle.
   ///

@@ -842,6 +842,9 @@ class AppLocalizationsAr extends AppLocalizations {
       'وضع تجريبي — لا يتم حجز أي استشارة أو إرسالها فعليًا.';
 
   @override
+  String get bookingNoPaymentNote => 'لا يتم تحصيل أي دفعة في هذه الخطوة.';
+
+  @override
   String get bookingCategoryStepTitle => 'نوع الاستشارة';
 
   @override
@@ -899,6 +902,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get bookingConfirmFailed => 'تعذّر التأكيد. حاول مرة أخرى.';
+
+  @override
+  String get bookingSlotUnavailable =>
+      'هذا الوقت لم يعد متاحًا. اختر وقتًا آخر.';
+
+  @override
+  String get bookingChooseAnotherTime => 'اختر وقتًا آخر';
 
   @override
   String get bookingSuccessTitle => 'تم تأكيد الحجز';
@@ -1199,6 +1209,36 @@ class AppLocalizationsAr extends AppLocalizations {
   String get filesError => 'تعذّر تحميل الملفات.';
 
   @override
+  String get fileUploadAction => 'رفع ملف';
+
+  @override
+  String fileUploading(String fileName) {
+    return 'جارٍ رفع $fileName…';
+  }
+
+  @override
+  String get fileUploadSuccess => 'تم رفع الملف.';
+
+  @override
+  String get fileUploadFailed => 'تعذّر رفع الملف. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get fileUploadTooLarge =>
+      'هذا الملف كبير جدًا. الحد الأقصى 25 ميجابايت.';
+
+  @override
+  String get fileUploadUnsupportedType => 'نوع هذا الملف غير مدعوم.';
+
+  @override
+  String get fileUploadDenied => 'ليس لديك إذن لرفع ملفات إلى هذه القضية.';
+
+  @override
+  String get fileOpenAction => 'فتح';
+
+  @override
+  String get fileOpenFailed => 'تعذّر فتح الملف. يرجى المحاولة مرة أخرى.';
+
+  @override
   String get matterWorkspaceInvoicesTitle => 'الفواتير';
 
   @override
@@ -1229,6 +1269,77 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get invoiceStatusPaid => 'مدفوعة';
+
+  @override
+  String get invoicePayAction => 'دفع';
+
+  @override
+  String get paymentSheetTitle => 'دفع الفاتورة';
+
+  @override
+  String get paymentPreparing => 'جارٍ تجهيز الدفع الآمن…';
+
+  @override
+  String get paymentWaiting => 'في انتظار تأكيد الدفع…';
+
+  @override
+  String get paymentSuccessTitle => 'تم الدفع بنجاح';
+
+  @override
+  String get paymentSuccessBody => 'تم تأكيد دفعتك. ستُعلَّم الفاتورة كمدفوعة.';
+
+  @override
+  String get paymentFailedTitle => 'تعذّر الدفع';
+
+  @override
+  String get paymentFailedBody =>
+      'لم تكتمل عملية الدفع. يمكنك المحاولة مرة أخرى.';
+
+  @override
+  String get paymentCancelledTitle => 'تم إلغاء الدفع';
+
+  @override
+  String get paymentCancelledBody =>
+      'تم إلغاء عملية الدفع. يمكنك المحاولة مرة أخرى.';
+
+  @override
+  String get paymentExpiredTitle => 'انتهت صلاحية الدفع';
+
+  @override
+  String get paymentExpiredBody =>
+      'انتهت صلاحية جلسة الدفع. يمكنك بدء دفعة جديدة.';
+
+  @override
+  String get paymentCheckStatus => 'التحقق من الحالة';
+
+  @override
+  String get paymentRetry => 'إعادة المحاولة';
+
+  @override
+  String get paymentClose => 'إغلاق';
+
+  @override
+  String get paymentOpenCheckout => 'فتح صفحة الدفع';
+
+  @override
+  String get paymentUnavailable =>
+      'الدفع غير متاح حاليًا. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get paymentDemoNote => 'وضع تجريبي فقط — لا يتم تحصيل أي مبلغ حقيقي.';
+
+  @override
+  String get paymentHostedCheckoutNote =>
+      'أكمل الدفع في صفحة الدفع الآمنة ثم عُد إلى هذه الشاشة.';
+
+  @override
+  String get paymentDemoSuccess => 'محاكاة النجاح';
+
+  @override
+  String get paymentDemoFailure => 'محاكاة الفشل';
+
+  @override
+  String get paymentDemoCancel => 'محاكاة الإلغاء';
 
   @override
   String get orgAuditTitle => 'سجل التدقيق';
@@ -1322,6 +1433,70 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get taskAcknowledged => 'تم الإقرار';
+
+  @override
+  String get taskCreateAction => 'مهمة جديدة';
+
+  @override
+  String get taskCreateTitle => 'مهمة جديدة';
+
+  @override
+  String get taskCreateTitleLabel => 'عنوان المهمة';
+
+  @override
+  String get taskCreateTitleHint => 'مثال: قائمة تحقق للرد';
+
+  @override
+  String get taskCreateMatterLabel => 'الملف';
+
+  @override
+  String get taskCreateMatterHint => 'اختر ملفاً';
+
+  @override
+  String get taskCreateSubmit => 'إنشاء المهمة';
+
+  @override
+  String get taskCreateNoMatters => 'لا توجد ملفات متاحة لإنشاء مهمة عليها.';
+
+  @override
+  String get taskCreateMattersError =>
+      'تعذر تحميل الملفات. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get taskAssignAction => 'إسناد';
+
+  @override
+  String get taskAssignTitle => 'إسناد المهمة';
+
+  @override
+  String get taskAssignMemberLabel => 'المكلَّف';
+
+  @override
+  String get taskAssignUnassigned => 'غير مُسندة';
+
+  @override
+  String get taskAssignSubmit => 'حفظ الإسناد';
+
+  @override
+  String get taskAssignMembersError =>
+      'تعذر تحميل الأعضاء. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get taskAssigneeUnavailable => 'المكلَّف الحالي غير متاح';
+
+  @override
+  String get taskErrorDenied => 'ليس لديك إذن للقيام بذلك.';
+
+  @override
+  String get taskErrorUnavailable =>
+      'هذه الخدمة غير متاحة مؤقتاً. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get taskErrorInvalid =>
+      'هذا التغيير غير صالح. تحقق من التفاصيل وحاول مرة أخرى.';
+
+  @override
+  String get taskErrorFailed => 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
 
   @override
   String get approvalsTitle => 'موافقات معلّقة';

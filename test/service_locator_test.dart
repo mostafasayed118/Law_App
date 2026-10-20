@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/active_org_store.dart';
@@ -20,10 +21,18 @@ import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/auth/supabase_auth_api.dart';
 import 'package:legalhub/data/auth/supabase_auth_gateway.dart';
 import 'package:legalhub/data/auth/supabase_env.dart';
+import 'package:legalhub/data/billing/fake_payment_gateway.dart';
 import 'package:legalhub/data/billing/supabase_billing_api.dart';
 import 'package:legalhub/data/billing/supabase_billing_gateway.dart';
+import 'package:legalhub/data/billing/supabase_payment_api.dart';
+import 'package:legalhub/data/billing/supabase_payment_gateway.dart';
+import 'package:legalhub/data/billing/url_launcher_checkout_launcher.dart';
+import 'package:legalhub/data/booking/supabase_booking_api.dart';
+import 'package:legalhub/data/booking/supabase_booking_gateway.dart';
 import 'package:legalhub/data/documents/supabase_document_api.dart';
 import 'package:legalhub/data/documents/supabase_document_gateway.dart';
+import 'package:legalhub/data/files/file_selector_file_picker.dart';
+import 'package:legalhub/data/files/url_launcher_uri_opener.dart';
 import 'package:legalhub/data/local/in_memory_org_selection_store.dart';
 import 'package:legalhub/data/local/locale_store.dart';
 import 'package:legalhub/data/local/org_selection_store.dart';
@@ -49,6 +58,9 @@ import 'package:legalhub/features/auth/domain/sign_up_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/billing/data/fake_billing_gateway.dart';
 import 'package:legalhub/features/billing/domain/billing_gateway.dart';
+import 'package:legalhub/features/billing/domain/checkout_launcher.dart';
+import 'package:legalhub/features/billing/domain/payment_gateway.dart';
+import 'package:legalhub/features/billing/domain/payment_mode.dart';
 import 'package:legalhub/features/booking/data/fake_booking_gateway.dart';
 import 'package:legalhub/features/booking/domain/booking_gateway.dart';
 import 'package:legalhub/features/booking/domain/booking_prefill.dart';
@@ -65,7 +77,9 @@ import 'package:legalhub/features/messaging/domain/message_gateway.dart';
 import 'package:legalhub/features/research/data/synthetic_ai_gateway.dart';
 import 'package:legalhub/features/research/domain/ai_gateway.dart';
 import 'package:legalhub/features/storage/data/fake_storage_gateway.dart';
+import 'package:legalhub/features/storage/domain/file_picker.dart';
 import 'package:legalhub/features/storage/domain/storage_gateway.dart';
+import 'package:legalhub/features/storage/domain/uri_opener.dart';
 
 /// Hand-rolled fake of the [SupabaseAuthApi] seam for the DI flip test.
 /// The real `SupabaseAuthApiImpl.bind()` needs a running `Supabase.instance`,
@@ -125,6 +139,11 @@ class _FakeSupabaseOrgApi implements SupabaseOrgApi {
   @override
   Future<List<Map<String, dynamic>>> listMembers({
     required String organizationId,
+  }) async => <Map<String, dynamic>>[];
+
+  @override
+  Future<List<Map<String, dynamic>>> listAssignableMembers({
+    required String matterId,
   }) async => <Map<String, dynamic>>[];
 
   @override
@@ -308,6 +327,33 @@ class _FakeSupabaseStorageApi implements SupabaseStorageApi {
   @override
   Future<List<Map<String, dynamic>>> fetchFiles() async =>
       <Map<String, dynamic>>[];
+
+  @override
+  Future<Map<String, dynamic>> fetchMatterForUpload(String matterId) async =>
+      <String, dynamic>{};
+
+  @override
+  Future<void> uploadObject(
+    String path,
+    Uint8List bytes,
+    String contentType,
+  ) async {}
+
+  @override
+  Future<String> createSignedUrl(String path, int expiresInSeconds) async =>
+      'https://example.supabase.co/storage/v1/object/sign/matter-files/demo';
+
+  @override
+  Future<void> removeObject(String path) async {}
+
+  @override
+  Future<Map<String, dynamic>> registerMatterFile({
+    required String matterId,
+    required String name,
+    required String mimeType,
+    required int sizeBytes,
+    required String storagePath,
+  }) async => <String, dynamic>{};
 }
 
 /// Hand-rolled fake of the [SupabaseBillingApi] seam for the DI flip test
@@ -316,6 +362,32 @@ class _FakeSupabaseBillingApi implements SupabaseBillingApi {
   @override
   Future<List<Map<String, dynamic>>> fetchInvoices() async =>
       <Map<String, dynamic>>[];
+}
+
+/// Hand-rolled fake of the [SupabasePaymentApi] seam for the DI flip test.
+class _FakeSupabasePaymentApi implements SupabasePaymentApi {
+  @override
+  Future<Map<String, dynamic>> initiate(String invoiceId) async =>
+      <String, dynamic>{'payment_id': 'p-1'};
+
+  @override
+  Future<Map<String, dynamic>?> fetchStatus(String invoiceId) async => null;
+}
+
+/// Hand-rolled fake of the [SupabaseBookingApi] seam for the DI flip test
+/// (same discipline as [_FakeSupabaseBillingApi]).
+class _FakeSupabaseBookingApi implements SupabaseBookingApi {
+  @override
+  Future<List<Map<String, dynamic>>> fetchSlots() async =>
+      <Map<String, dynamic>>[];
+
+  @override
+  Future<Map<String, dynamic>> bookConsultation({
+    required String slotId,
+    required String category,
+    String? topic,
+    String? attorneyRef,
+  }) async => <String, dynamic>{'reference_id': 'LH-TEST0001'};
 }
 
 /// Builds a JWT-shaped string whose payload carries the given role claim.
@@ -399,6 +471,11 @@ void main() {
       expect(serviceLocator.isRegistered<DocumentGateway>(), isTrue);
       expect(serviceLocator.isRegistered<MessageGateway>(), isTrue);
       expect(serviceLocator.isRegistered<StorageGateway>(), isTrue);
+      expect(serviceLocator.isRegistered<PaymentMode>(), isTrue);
+      expect(serviceLocator.isRegistered<PaymentGateway>(), isTrue);
+      expect(serviceLocator.isRegistered<CheckoutLauncher>(), isTrue);
+      expect(serviceLocator.isRegistered<FilePicker>(), isTrue);
+      expect(serviceLocator.isRegistered<UriOpener>(), isTrue);
       expect(serviceLocator.isRegistered<AiGateway>(), isTrue);
       expect(serviceLocator.isRegistered<AuthCubit>(), isTrue);
     });
@@ -615,6 +692,23 @@ void main() {
       expect(serviceLocator<StorageGateway>(), isA<FakeStorageGateway>());
     });
 
+    test('wires the file-transfer platform seams unconditionally', () {
+      configureDependencies();
+
+      // Platform integrations, not env-gated providers: the picker and the
+      // external URI opener resolve as stable lazy singletons in every build.
+      expect(serviceLocator<FilePicker>(), isA<FileSelectorFilePicker>());
+      expect(serviceLocator<UriOpener>(), isA<UrlLauncherUriOpener>());
+      expect(
+        identical(serviceLocator<FilePicker>(), serviceLocator<FilePicker>()),
+        isTrue,
+      );
+      expect(
+        identical(serviceLocator<UriOpener>(), serviceLocator<UriOpener>()),
+        isTrue,
+      );
+    });
+
     test('flips StorageGateway when env carries an anon key (plan T7)', () {
       configureDependencies(
         supabaseEnv: SupabaseEnv(
@@ -653,13 +747,87 @@ void main() {
       expect(serviceLocator<BillingGateway>(), isA<SupabaseBillingGateway>());
     });
 
+    test(
+      'defaults payments to disabled with the fake gateway and launcher',
+      () {
+        configureDependencies();
+
+        expect(serviceLocator<PaymentMode>(), PaymentMode.disabled);
+        final PaymentGateway gateway = serviceLocator<PaymentGateway>();
+        expect(gateway, isA<FakePaymentGateway>());
+        expect(gateway.isLive, isFalse);
+        expect(gateway.supportsDemoSimulation, isTrue);
+        expect(
+          serviceLocator<CheckoutLauncher>(),
+          isA<UrlLauncherCheckoutLauncher>(),
+        );
+      },
+    );
+
+    test('demo mode keeps the fake even when the env is configured', () {
+      configureDependencies(
+        paymentMode: PaymentMode.demo,
+        supabaseEnv: SupabaseEnv(
+          url: 'https://example.supabase.co',
+          anonKey: _anonJwt(),
+        ),
+        supabasePaymentApiFactory: _FakeSupabasePaymentApi.new,
+      );
+
+      final PaymentGateway gateway = serviceLocator<PaymentGateway>();
+      expect(gateway, isA<FakePaymentGateway>());
+      expect(gateway.isLive, isFalse);
+    });
+
+    test('live mode without a configured env keeps the honest fake', () {
+      configureDependencies(paymentMode: PaymentMode.live);
+
+      final PaymentGateway gateway = serviceLocator<PaymentGateway>();
+      expect(gateway, isA<FakePaymentGateway>());
+      expect(gateway.isLive, isFalse);
+    });
+
+    test('live mode with a configured env flips to the Supabase gateway', () {
+      configureDependencies(
+        paymentMode: PaymentMode.live,
+        supabaseEnv: SupabaseEnv(
+          url: 'https://example.supabase.co',
+          anonKey: _anonJwt(),
+        ),
+        supabasePaymentApiFactory: _FakeSupabasePaymentApi.new,
+      );
+
+      final PaymentGateway gateway = serviceLocator<PaymentGateway>();
+      expect(gateway, isA<SupabasePaymentGateway>());
+      expect(gateway.isLive, isTrue);
+      expect(gateway.supportsDemoSimulation, isFalse);
+    });
+
     test('wires the booking gateway to the fake dev implementation', () {
       configureDependencies();
 
-      // F2: same boundary discipline as the recovery/sign-up gateways — the
-      // dev fake is the registered seam; a real booking backend is a later
-      // approved data-layer slice (data contract deferred).
-      expect(serviceLocator<BookingGateway>(), isA<FakeBookingGateway>());
+      // F2/Batch 3.3: same boundary discipline as the recovery/sign-up
+      // gateways — the dev fake is the registered seam in env-less runs.
+      final BookingGateway gateway = serviceLocator<BookingGateway>();
+      expect(gateway, isA<FakeBookingGateway>());
+      expect(gateway.isLocalOnly, isTrue);
+    });
+
+    test('flips BookingGateway when env carries an anon key', () {
+      configureDependencies(
+        supabaseEnv: SupabaseEnv(
+          url: 'https://example.supabase.co',
+          anonKey: _anonJwt(),
+        ),
+        // The real bind() needs a running Supabase.instance; tests inject
+        // the seam instead (the flip's test seam, not production code).
+        supabaseBookingApiFactory: _FakeSupabaseBookingApi.new,
+      );
+
+      final BookingGateway gateway = serviceLocator<BookingGateway>();
+      expect(gateway, isA<SupabaseBookingGateway>());
+      // The real path must never render the demo/local-only wording.
+      expect(gateway.isLocalOnly, isFalse);
     });
 
     test('wires the AI research gateway to the synthetic engine over the '

@@ -273,6 +273,7 @@
 ,
   "bookingTitle": "Book a Consultation",
   "bookingLocalOnlyNote": "Demo mode — no consultation is actually booked or sent.",
+  "bookingNoPaymentNote": "No payment is taken at this step.",
   "bookingCategoryStepTitle": "Consultation type",
   "bookingCategoryGeneral": "General",
   "bookingCategoryFollowUp": "Follow-up",
@@ -299,6 +300,8 @@
   "bookingEditCategory": "Edit category",
   "bookingConfirm": "Confirm booking",
   "bookingConfirmFailed": "Unable to confirm. Please try again.",
+  "bookingSlotUnavailable": "That time is no longer available. Choose another time.",
+  "bookingChooseAnotherTime": "Choose another time",
   "bookingSuccessTitle": "Booking confirmed",
   "bookingSuccessBody": "Reference: {referenceId}",
   "@bookingSuccessBody": {
@@ -408,6 +411,22 @@
   "matterWorkspaceFilesTitle": "Files",
   "matterWorkspaceFilesEmpty": "No files are available for this matter.",
   "filesError": "Unable to load files.",
+  "fileUploadAction": "Upload file",
+  "fileUploading": "Uploading {fileName}…",
+  "@fileUploading": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  "fileUploadSuccess": "File uploaded.",
+  "fileUploadFailed": "Unable to upload the file. Please try again.",
+  "fileUploadTooLarge": "This file is too large. The maximum size is 25 MB.",
+  "fileUploadUnsupportedType": "This file type is not supported.",
+  "fileUploadDenied": "You do not have permission to upload files to this matter.",
+  "fileOpenAction": "Open",
+  "fileOpenFailed": "Unable to open the file. Please try again.",
   "matterWorkspaceInvoicesTitle": "Invoices",
   "matterWorkspaceInvoicesEmpty": "No invoices are available for this matter.",
   "invoicesTitle": "Invoices",
@@ -418,6 +437,28 @@
   "invoicesEntrySubtitle": "Browse demo invoice metadata — development demo.",
   "invoiceStatusIssued": "Issued",
   "invoiceStatusPaid": "Paid",
+  "invoicePayAction": "Pay",
+  "paymentSheetTitle": "Invoice payment",
+  "paymentPreparing": "Preparing secure checkout…",
+  "paymentWaiting": "Waiting for payment confirmation…",
+  "paymentSuccessTitle": "Payment successful",
+  "paymentSuccessBody": "Your payment was confirmed. The invoice will be marked as paid.",
+  "paymentFailedTitle": "Payment failed",
+  "paymentFailedBody": "The payment did not go through. You can try again.",
+  "paymentCancelledTitle": "Payment cancelled",
+  "paymentCancelledBody": "The payment was cancelled. You can try again.",
+  "paymentExpiredTitle": "Payment expired",
+  "paymentExpiredBody": "The checkout session expired. You can start a new payment.",
+  "paymentCheckStatus": "Check status",
+  "paymentRetry": "Try again",
+  "paymentClose": "Close",
+  "paymentOpenCheckout": "Open checkout",
+  "paymentUnavailable": "Payments are unavailable right now. Please try again.",
+  "paymentDemoNote": "Demo only — no real charge.",
+  "paymentHostedCheckoutNote": "Complete the payment in the secure hosted checkout, then come back to this screen.",
+  "paymentDemoSuccess": "Simulate success",
+  "paymentDemoFailure": "Simulate failure",
+  "paymentDemoCancel": "Simulate cancel",
   "orgAuditTitle": "Audit trail",
   "orgAuditEmpty": "No audit events recorded yet.",
   "orgAuditNoOrganization": "No organization selected.",
@@ -448,6 +489,86 @@
   "taskStatusDone": "Done",
   "taskAcknowledge": "Acknowledge",
   "taskAcknowledged": "Acknowledged",
+  "taskCreateAction": "New task",
+  "@taskCreateAction": {
+    "description": "Button label that opens the create-task sheet from the task board header."
+  },
+  "taskCreateTitle": "New task",
+  "@taskCreateTitle": {
+    "description": "Title of the create-task bottom sheet."
+  },
+  "taskCreateTitleLabel": "Task title",
+  "@taskCreateTitleLabel": {
+    "description": "Label above the task title field in the create-task sheet."
+  },
+  "taskCreateTitleHint": "e.g. Draft response checklist",
+  "@taskCreateTitleHint": {
+    "description": "Placeholder example for the task title field."
+  },
+  "taskCreateMatterLabel": "Matter",
+  "@taskCreateMatterLabel": {
+    "description": "Label for the matter dropdown in the create-task sheet."
+  },
+  "taskCreateMatterHint": "Select a matter",
+  "@taskCreateMatterHint": {
+    "description": "Placeholder shown when no matter is selected."
+  },
+  "taskCreateSubmit": "Create task",
+  "@taskCreateSubmit": {
+    "description": "Submit button of the create-task sheet."
+  },
+  "taskCreateNoMatters": "No matters are available to create a task on.",
+  "@taskCreateNoMatters": {
+    "description": "Honest empty state when the matter list is empty."
+  },
+  "taskCreateMattersError": "Unable to load matters. Please try again.",
+  "@taskCreateMattersError": {
+    "description": "Inline error when the matter list fails to load."
+  },
+  "taskAssignAction": "Assign",
+  "@taskAssignAction": {
+    "description": "Tooltip of a task row's assign button."
+  },
+  "taskAssignTitle": "Assign task",
+  "@taskAssignTitle": {
+    "description": "Title of the assign-task bottom sheet."
+  },
+  "taskAssignMemberLabel": "Assignee",
+  "@taskAssignMemberLabel": {
+    "description": "Label for the assignee dropdown in the assign-task sheet."
+  },
+  "taskAssignUnassigned": "Unassigned",
+  "@taskAssignUnassigned": {
+    "description": "Dropdown option that clears the task assignee."
+  },
+  "taskAssignSubmit": "Save assignment",
+  "@taskAssignSubmit": {
+    "description": "Submit button of the assign-task sheet."
+  },
+  "taskAssignMembersError": "Unable to load members. Please try again.",
+  "@taskAssignMembersError": {
+    "description": "Inline error when the assignable roster fails to load."
+  },
+  "taskAssigneeUnavailable": "Current assignee unavailable",
+  "@taskAssigneeUnavailable": {
+    "description": "Neutral row shown when the task's current assignee is not in the active roster."
+  },
+  "taskErrorDenied": "You do not have permission to do that.",
+  "@taskErrorDenied": {
+    "description": "Localized task action denial."
+  },
+  "taskErrorUnavailable": "This is temporarily unavailable. Please try again.",
+  "@taskErrorUnavailable": {
+    "description": "Localized task action outage."
+  },
+  "taskErrorInvalid": "That change is not valid. Check the details and try again.",
+  "@taskErrorInvalid": {
+    "description": "Localized task action validation refusal."
+  },
+  "taskErrorFailed": "Something went wrong. Please try again.",
+  "@taskErrorFailed": {
+    "description": "Localized generic task action failure."
+  },
   "approvalsTitle": "Pending approvals",
   "approvalsEmpty": "No pending approvals are available.",
   "approvalsError": "Unable to load approvals.",

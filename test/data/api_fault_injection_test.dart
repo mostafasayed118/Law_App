@@ -43,6 +43,11 @@ class _FailingOrgApi implements SupabaseOrgApi {
   }) async => throw UnimplementedError();
 
   @override
+  Future<List<Map<String, dynamic>>> listAssignableMembers({
+    required String matterId,
+  }) async => throw UnimplementedError();
+
+  @override
   Future<String> inviteMember({
     required String organizationId,
     required String email,

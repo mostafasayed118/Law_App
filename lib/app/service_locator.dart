@@ -16,12 +16,22 @@ import '../data/auth/supabase_auth_api.dart';
 import '../data/auth/supabase_auth_api_impl.dart';
 import '../data/auth/supabase_auth_gateway.dart';
 import '../data/auth/supabase_env.dart';
+import '../data/billing/fake_payment_gateway.dart';
 import '../data/billing/supabase_billing_api.dart';
 import '../data/billing/supabase_billing_api_impl.dart';
 import '../data/billing/supabase_billing_gateway.dart';
+import '../data/billing/supabase_payment_api.dart';
+import '../data/billing/supabase_payment_api_impl.dart';
+import '../data/billing/supabase_payment_gateway.dart';
+import '../data/billing/url_launcher_checkout_launcher.dart';
+import '../data/booking/supabase_booking_api.dart';
+import '../data/booking/supabase_booking_api_impl.dart';
+import '../data/booking/supabase_booking_gateway.dart';
 import '../data/documents/supabase_document_api.dart';
 import '../data/documents/supabase_document_api_impl.dart';
 import '../data/documents/supabase_document_gateway.dart';
+import '../data/files/file_selector_file_picker.dart';
+import '../data/files/url_launcher_uri_opener.dart';
 import '../data/local/in_memory_locale_store.dart';
 import '../data/local/in_memory_org_selection_store.dart';
 import '../data/local/in_memory_theme_mode_store.dart';
@@ -68,6 +78,9 @@ import '../features/auth/domain/sign_up_gateway.dart';
 import '../features/auth/presentation/auth_cubit.dart';
 import '../features/billing/data/fake_billing_gateway.dart';
 import '../features/billing/domain/billing_gateway.dart';
+import '../features/billing/domain/checkout_launcher.dart';
+import '../features/billing/domain/payment_gateway.dart';
+import '../features/billing/domain/payment_mode.dart';
 import '../features/booking/data/fake_booking_gateway.dart';
 import '../features/booking/domain/booking_gateway.dart';
 import '../features/booking/domain/booking_prefill.dart';
@@ -91,7 +104,9 @@ import '../features/notifications/domain/notification_prefs_store.dart';
 import '../features/research/data/synthetic_ai_gateway.dart';
 import '../features/research/domain/ai_gateway.dart';
 import '../features/storage/data/fake_storage_gateway.dart';
+import '../features/storage/domain/file_picker.dart';
 import '../features/storage/domain/storage_gateway.dart';
+import '../features/storage/domain/uri_opener.dart';
 import '../features/tasks/data/fake_task_gateway.dart';
 import '../features/tasks/domain/task_gateway.dart';
 import '../features/video/data/fake_video_gateway.dart';
@@ -137,14 +152,18 @@ void configureDependencies({
   SupabaseMessageRealtimeApi Function()? supabaseMessageRealtimeApiFactory,
   SupabaseStorageApi Function()? supabaseStorageApiFactory,
   SupabaseBillingApi Function()? supabaseBillingApiFactory,
+  SupabasePaymentApi Function()? supabasePaymentApiFactory,
   SupabaseNotificationApi Function()? supabaseNotificationApiFactory,
   SupabaseTaskApi Function()? supabaseTaskApiFactory,
+  SupabaseBookingApi Function()? supabaseBookingApiFactory,
+  PaymentMode? paymentMode,
 }) {
   // Lazy singleton: stateless service, created on first resolution.
   // Per §4.5, stateless services/repositories register as lazy singletons.
   // App-scoped Cubits below are also lazy singletons because the router and
   // root MaterialApp must observe the same session and locale instances.
   final SupabaseEnv env = supabaseEnv ?? SupabaseEnv.fromEnvironment();
+  final PaymentMode paymentsMode = paymentMode ?? PaymentMode.fromEnvironment();
 
   _registerCoreServices(preferences: preferences);
   _registerAuthSeams(env, supabaseAuthApiFactory: supabaseAuthApiFactory);
@@ -153,7 +172,10 @@ void configureDependencies({
     supabaseOrgApiFactory: supabaseOrgApiFactory,
     supabasePlatformAdminApiFactory: supabasePlatformAdminApiFactory,
   );
-  _registerBookingSeams();
+  _registerBookingSeams(
+    env,
+    supabaseBookingApiFactory: supabaseBookingApiFactory,
+  );
   _registerMatterSeams(
     env,
     supabaseMatterApiFactory: supabaseMatterApiFactory,
@@ -168,6 +190,11 @@ void configureDependencies({
     supabaseBillingApiFactory: supabaseBillingApiFactory,
     supabaseNotificationApiFactory: supabaseNotificationApiFactory,
     supabaseTaskApiFactory: supabaseTaskApiFactory,
+  );
+  _registerPaymentSeams(
+    env,
+    mode: paymentsMode,
+    supabasePaymentApiFactory: supabasePaymentApiFactory,
   );
   _registerAppCubits();
   _registerDemoGateways();

@@ -94,6 +94,32 @@ void main() {
       // The local-only demo note resolves in every locale (D-B3/D-B6 copy).
       expect(tr.bookingLocalOnlyNote, isNot(en.bookingLocalOnlyNote));
       expect(ar.bookingLocalOnlyNote, isNot(en.bookingLocalOnlyNote));
+      // The real-backend path's no-payment note and the slot-conflict
+      // recovery copy resolve in every locale.
+      expect(en.bookingNoPaymentNote, 'No payment is taken at this step.');
+      expect(ar.bookingNoPaymentNote, 'لا يتم تحصيل أي دفعة في هذه الخطوة.');
+      expect(tr.bookingNoPaymentNote, 'Bu adımda herhangi bir ödeme alınmaz.');
+      expect(
+        en.bookingSlotUnavailable,
+        'That time is no longer available. Choose another time.',
+      );
+      expect(
+        ar.bookingSlotUnavailable,
+        'هذا الوقت لم يعد متاحًا. اختر وقتًا آخر.',
+      );
+      expect(
+        tr.bookingSlotUnavailable,
+        'Bu saat artık müsait değil. Başka bir saat seçin.',
+      );
+      expect(en.bookingChooseAnotherTime, 'Choose another time');
+      expect(ar.bookingChooseAnotherTime, 'اختر وقتًا آخر');
+      expect(tr.bookingChooseAnotherTime, 'Başka bir saat seç');
+      expect(tr.bookingNoPaymentNote, isNot(en.bookingNoPaymentNote));
+      expect(ar.bookingNoPaymentNote, isNot(en.bookingNoPaymentNote));
+      expect(tr.bookingSlotUnavailable, isNot(en.bookingSlotUnavailable));
+      expect(ar.bookingSlotUnavailable, isNot(en.bookingSlotUnavailable));
+      expect(tr.bookingChooseAnotherTime, isNot(en.bookingChooseAnotherTime));
+      expect(ar.bookingChooseAnotherTime, isNot(en.bookingChooseAnotherTime));
     });
 
     test('resolves the sign-up check-inbox keys in every locale (4.2 pin)', () {
@@ -785,6 +811,178 @@ void main() {
       },
     );
 
+    test(
+      'resolves the invoice-payment keys in every locale (2026-10-20 pin)',
+      () {
+        final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+        final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+        final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+        expect(en.invoicePayAction, 'Pay');
+        expect(ar.invoicePayAction, 'دفع');
+        expect(tr.invoicePayAction, 'Öde');
+
+        expect(en.paymentSheetTitle, 'Invoice payment');
+        expect(ar.paymentSheetTitle, 'دفع الفاتورة');
+        expect(tr.paymentSheetTitle, 'Fatura ödemesi');
+
+        expect(en.paymentPreparing, 'Preparing secure checkout…');
+        expect(ar.paymentPreparing, 'جارٍ تجهيز الدفع الآمن…');
+        expect(tr.paymentPreparing, 'Güvenli ödeme hazırlanıyor…');
+
+        expect(en.paymentWaiting, 'Waiting for payment confirmation…');
+        expect(ar.paymentWaiting, 'في انتظار تأكيد الدفع…');
+        expect(tr.paymentWaiting, 'Ödeme onayı bekleniyor…');
+
+        expect(en.paymentSuccessTitle, 'Payment successful');
+        expect(ar.paymentSuccessTitle, 'تم الدفع بنجاح');
+        expect(tr.paymentSuccessTitle, 'Ödeme başarılı');
+        expect(
+          en.paymentSuccessBody,
+          'Your payment was confirmed. The invoice will be marked as paid.',
+        );
+        expect(
+          ar.paymentSuccessBody,
+          'تم تأكيد دفعتك. ستُعلَّم الفاتورة كمدفوعة.',
+        );
+        expect(
+          tr.paymentSuccessBody,
+          'Ödemeniz onaylandı. Fatura ödendi olarak işaretlenecek.',
+        );
+
+        expect(en.paymentFailedTitle, 'Payment failed');
+        expect(ar.paymentFailedTitle, 'تعذّر الدفع');
+        expect(tr.paymentFailedTitle, 'Ödeme başarısız');
+        expect(
+          en.paymentFailedBody,
+          'The payment did not go through. You can try again.',
+        );
+        expect(
+          ar.paymentFailedBody,
+          'لم تكتمل عملية الدفع. يمكنك المحاولة مرة أخرى.',
+        );
+        expect(
+          tr.paymentFailedBody,
+          'Ödeme tamamlanamadı. Tekrar deneyebilirsiniz.',
+        );
+
+        expect(en.paymentCancelledTitle, 'Payment cancelled');
+        expect(ar.paymentCancelledTitle, 'تم إلغاء الدفع');
+        expect(tr.paymentCancelledTitle, 'Ödeme iptal edildi');
+        expect(
+          en.paymentCancelledBody,
+          'The payment was cancelled. You can try again.',
+        );
+        expect(
+          ar.paymentCancelledBody,
+          'تم إلغاء عملية الدفع. يمكنك المحاولة مرة أخرى.',
+        );
+        expect(
+          tr.paymentCancelledBody,
+          'Ödeme iptal edildi. Tekrar deneyebilirsiniz.',
+        );
+
+        expect(en.paymentExpiredTitle, 'Payment expired');
+        expect(ar.paymentExpiredTitle, 'انتهت صلاحية الدفع');
+        expect(tr.paymentExpiredTitle, 'Ödemenin süresi doldu');
+        expect(
+          en.paymentExpiredBody,
+          'The checkout session expired. You can start a new payment.',
+        );
+        expect(
+          ar.paymentExpiredBody,
+          'انتهت صلاحية جلسة الدفع. يمكنك بدء دفعة جديدة.',
+        );
+        expect(
+          tr.paymentExpiredBody,
+          'Ödeme oturumunun süresi doldu. Yeni bir ödeme başlatabilirsiniz.',
+        );
+
+        expect(en.paymentCheckStatus, 'Check status');
+        expect(ar.paymentCheckStatus, 'التحقق من الحالة');
+        expect(tr.paymentCheckStatus, 'Durumu kontrol et');
+
+        expect(en.paymentRetry, 'Try again');
+        expect(ar.paymentRetry, 'إعادة المحاولة');
+        expect(tr.paymentRetry, 'Tekrar dene');
+
+        expect(en.paymentClose, 'Close');
+        expect(ar.paymentClose, 'إغلاق');
+        expect(tr.paymentClose, 'Kapat');
+
+        expect(en.paymentOpenCheckout, 'Open checkout');
+        expect(ar.paymentOpenCheckout, 'فتح صفحة الدفع');
+        expect(tr.paymentOpenCheckout, 'Ödeme sayfasını aç');
+
+        expect(
+          en.paymentUnavailable,
+          'Payments are unavailable right now. Please try again.',
+        );
+        expect(
+          ar.paymentUnavailable,
+          'الدفع غير متاح حاليًا. يرجى المحاولة مرة أخرى.',
+        );
+        expect(
+          tr.paymentUnavailable,
+          'Ödemeler şu anda kullanılamıyor. Lütfen tekrar deneyin.',
+        );
+
+        expect(en.paymentDemoNote, 'Demo only — no real charge.');
+        expect(
+          ar.paymentDemoNote,
+          'وضع تجريبي فقط — لا يتم تحصيل أي مبلغ حقيقي.',
+        );
+        expect(tr.paymentDemoNote, 'Yalnızca demo — gerçek ücret alınmaz.');
+
+        expect(
+          en.paymentHostedCheckoutNote,
+          'Complete the payment in the secure hosted checkout, then come back '
+          'to this screen.',
+        );
+        expect(
+          ar.paymentHostedCheckoutNote,
+          'أكمل الدفع في صفحة الدفع الآمنة ثم عُد إلى هذه الشاشة.',
+        );
+        expect(
+          tr.paymentHostedCheckoutNote,
+          'Ödemeyi güvenli barındırılan ödeme sayfasında tamamlayın, ardından '
+          'bu ekrana dönün.',
+        );
+
+        expect(en.paymentDemoSuccess, 'Simulate success');
+        expect(ar.paymentDemoSuccess, 'محاكاة النجاح');
+        expect(tr.paymentDemoSuccess, 'Başarıyı simüle et');
+
+        expect(en.paymentDemoFailure, 'Simulate failure');
+        expect(ar.paymentDemoFailure, 'محاكاة الفشل');
+        expect(tr.paymentDemoFailure, 'Başarısızlığı simüle et');
+
+        expect(en.paymentDemoCancel, 'Simulate cancel');
+        expect(ar.paymentDemoCancel, 'محاكاة الإلغاء');
+        expect(tr.paymentDemoCancel, 'İptali simüle et');
+
+        // Real per-locale wording, not silent copies of EN.
+        expect(tr.invoicePayAction, isNot(en.invoicePayAction));
+        expect(ar.invoicePayAction, isNot(en.invoicePayAction));
+        expect(tr.paymentSheetTitle, isNot(en.paymentSheetTitle));
+        expect(ar.paymentSheetTitle, isNot(en.paymentSheetTitle));
+        expect(tr.paymentWaiting, isNot(en.paymentWaiting));
+        expect(ar.paymentWaiting, isNot(en.paymentWaiting));
+        expect(tr.paymentSuccessTitle, isNot(en.paymentSuccessTitle));
+        expect(ar.paymentSuccessTitle, isNot(en.paymentSuccessTitle));
+        expect(tr.paymentFailedTitle, isNot(en.paymentFailedTitle));
+        expect(ar.paymentFailedTitle, isNot(en.paymentFailedTitle));
+        expect(tr.paymentCancelledTitle, isNot(en.paymentCancelledTitle));
+        expect(ar.paymentCancelledTitle, isNot(en.paymentCancelledTitle));
+        expect(tr.paymentExpiredTitle, isNot(en.paymentExpiredTitle));
+        expect(ar.paymentExpiredTitle, isNot(en.paymentExpiredTitle));
+        expect(tr.paymentDemoNote, isNot(en.paymentDemoNote));
+        expect(ar.paymentDemoNote, isNot(en.paymentDemoNote));
+        expect(tr.paymentDemoSuccess, isNot(en.paymentDemoSuccess));
+        expect(ar.paymentDemoFailure, isNot(en.paymentDemoFailure));
+      },
+    );
+
     test('resolves the v1-queue keys in every locale (2026-08-09 pin)', () {
       final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
       final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
@@ -800,6 +998,18 @@ void main() {
       expect(en.tasksTitle, 'Task board');
       expect(ar.tasksTitle, 'لوحة المهام');
       expect(tr.tasksTitle, 'Görev panosu');
+
+      // Create/assign slice keys (2026-10-20): action labels and the
+      // localized task-failure copy resolve in every locale.
+      expect(en.taskCreateAction, 'New task');
+      expect(ar.taskCreateAction, 'مهمة جديدة');
+      expect(tr.taskCreateAction, 'Yeni görev');
+      expect(en.taskAssignUnassigned, 'Unassigned');
+      expect(ar.taskAssignUnassigned, 'غير مُسندة');
+      expect(tr.taskAssignUnassigned, 'Atanmamış');
+      expect(en.taskErrorDenied, 'You do not have permission to do that.');
+      expect(ar.taskErrorDenied, 'ليس لديك إذن للقيام بذلك.');
+      expect(tr.taskErrorDenied, 'Bunu yapma izniniz yok.');
 
       expect(en.approvalsTitle, 'Pending approvals');
       expect(ar.approvalsTitle, 'موافقات معلّقة');
@@ -822,6 +1032,12 @@ void main() {
       expect(ar.alertsTitle, isNot(en.alertsTitle));
       expect(tr.tasksTitle, isNot(en.tasksTitle));
       expect(ar.tasksTitle, isNot(en.tasksTitle));
+      expect(tr.taskCreateAction, isNot(en.taskCreateAction));
+      expect(ar.taskCreateAction, isNot(en.taskCreateAction));
+      expect(tr.taskAssignUnassigned, isNot(en.taskAssignUnassigned));
+      expect(ar.taskAssignUnassigned, isNot(en.taskAssignUnassigned));
+      expect(tr.taskErrorDenied, isNot(en.taskErrorDenied));
+      expect(ar.taskErrorDenied, isNot(en.taskErrorDenied));
       expect(tr.approvalsTitle, isNot(en.approvalsTitle));
       expect(ar.approvalsTitle, isNot(en.approvalsTitle));
       expect(tr.approvalsLocalOnlyNote, isNot(en.approvalsLocalOnlyNote));
@@ -990,6 +1206,40 @@ void main() {
         'مكالمة تجريبية مع Demo attorney',
       );
     });
+
+    test(
+      'resolves the file transfer keys in every locale (2026-10-20 pin)',
+      () {
+        final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+        final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+        final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+        expect(en.fileUploadAction, 'Upload file');
+        expect(ar.fileUploadAction, 'رفع ملف');
+        expect(tr.fileUploadAction, 'Dosya yükle');
+        expect(en.fileUploading('brief.pdf'), 'Uploading brief.pdf…');
+        expect(ar.fileUploading('brief.pdf'), 'جارٍ رفع brief.pdf…');
+        expect(tr.fileUploading('brief.pdf'), 'brief.pdf yükleniyor…');
+        expect(en.fileOpenAction, 'Open');
+        expect(ar.fileOpenAction, 'فتح');
+        expect(tr.fileOpenAction, 'Aç');
+        expect(en.fileUploadSuccess, 'File uploaded.');
+        expect(en.fileUploadTooLarge, contains('25 MB'));
+
+        // Real per-locale wording, not silent copies of EN.
+        expect(tr.fileUploadAction, isNot(en.fileUploadAction));
+        expect(ar.fileUploadAction, isNot(en.fileUploadAction));
+        expect(tr.fileUploading('x'), isNot(en.fileUploading('x')));
+        expect(ar.fileUploading('x'), isNot(en.fileUploading('x')));
+        expect(tr.fileUploadFailed, isNot(en.fileUploadFailed));
+        expect(ar.fileUploadDenied, isNot(en.fileUploadDenied));
+        expect(
+          tr.fileUploadUnsupportedType,
+          isNot(en.fileUploadUnsupportedType),
+        );
+        expect(ar.fileOpenFailed, isNot(en.fileOpenFailed));
+      },
+    );
   });
 
   group('AppLocalizations widget rendering', () {

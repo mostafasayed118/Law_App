@@ -850,6 +850,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Demo mode — no consultation is actually booked or sent.';
 
   @override
+  String get bookingNoPaymentNote => 'No payment is taken at this step.';
+
+  @override
   String get bookingCategoryStepTitle => 'Consultation type';
 
   @override
@@ -907,6 +910,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bookingConfirmFailed => 'Unable to confirm. Please try again.';
+
+  @override
+  String get bookingSlotUnavailable =>
+      'That time is no longer available. Choose another time.';
+
+  @override
+  String get bookingChooseAnotherTime => 'Choose another time';
 
   @override
   String get bookingSuccessTitle => 'Booking confirmed';
@@ -1211,6 +1221,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filesError => 'Unable to load files.';
 
   @override
+  String get fileUploadAction => 'Upload file';
+
+  @override
+  String fileUploading(String fileName) {
+    return 'Uploading $fileName…';
+  }
+
+  @override
+  String get fileUploadSuccess => 'File uploaded.';
+
+  @override
+  String get fileUploadFailed => 'Unable to upload the file. Please try again.';
+
+  @override
+  String get fileUploadTooLarge =>
+      'This file is too large. The maximum size is 25 MB.';
+
+  @override
+  String get fileUploadUnsupportedType => 'This file type is not supported.';
+
+  @override
+  String get fileUploadDenied =>
+      'You do not have permission to upload files to this matter.';
+
+  @override
+  String get fileOpenAction => 'Open';
+
+  @override
+  String get fileOpenFailed => 'Unable to open the file. Please try again.';
+
+  @override
   String get matterWorkspaceInvoicesTitle => 'Invoices';
 
   @override
@@ -1242,6 +1283,78 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invoiceStatusPaid => 'Paid';
+
+  @override
+  String get invoicePayAction => 'Pay';
+
+  @override
+  String get paymentSheetTitle => 'Invoice payment';
+
+  @override
+  String get paymentPreparing => 'Preparing secure checkout…';
+
+  @override
+  String get paymentWaiting => 'Waiting for payment confirmation…';
+
+  @override
+  String get paymentSuccessTitle => 'Payment successful';
+
+  @override
+  String get paymentSuccessBody =>
+      'Your payment was confirmed. The invoice will be marked as paid.';
+
+  @override
+  String get paymentFailedTitle => 'Payment failed';
+
+  @override
+  String get paymentFailedBody =>
+      'The payment did not go through. You can try again.';
+
+  @override
+  String get paymentCancelledTitle => 'Payment cancelled';
+
+  @override
+  String get paymentCancelledBody =>
+      'The payment was cancelled. You can try again.';
+
+  @override
+  String get paymentExpiredTitle => 'Payment expired';
+
+  @override
+  String get paymentExpiredBody =>
+      'The checkout session expired. You can start a new payment.';
+
+  @override
+  String get paymentCheckStatus => 'Check status';
+
+  @override
+  String get paymentRetry => 'Try again';
+
+  @override
+  String get paymentClose => 'Close';
+
+  @override
+  String get paymentOpenCheckout => 'Open checkout';
+
+  @override
+  String get paymentUnavailable =>
+      'Payments are unavailable right now. Please try again.';
+
+  @override
+  String get paymentDemoNote => 'Demo only — no real charge.';
+
+  @override
+  String get paymentHostedCheckoutNote =>
+      'Complete the payment in the secure hosted checkout, then come back to this screen.';
+
+  @override
+  String get paymentDemoSuccess => 'Simulate success';
+
+  @override
+  String get paymentDemoFailure => 'Simulate failure';
+
+  @override
+  String get paymentDemoCancel => 'Simulate cancel';
 
   @override
   String get orgAuditTitle => 'Audit trail';
@@ -1335,6 +1448,71 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get taskAcknowledged => 'Acknowledged';
+
+  @override
+  String get taskCreateAction => 'New task';
+
+  @override
+  String get taskCreateTitle => 'New task';
+
+  @override
+  String get taskCreateTitleLabel => 'Task title';
+
+  @override
+  String get taskCreateTitleHint => 'e.g. Draft response checklist';
+
+  @override
+  String get taskCreateMatterLabel => 'Matter';
+
+  @override
+  String get taskCreateMatterHint => 'Select a matter';
+
+  @override
+  String get taskCreateSubmit => 'Create task';
+
+  @override
+  String get taskCreateNoMatters =>
+      'No matters are available to create a task on.';
+
+  @override
+  String get taskCreateMattersError =>
+      'Unable to load matters. Please try again.';
+
+  @override
+  String get taskAssignAction => 'Assign';
+
+  @override
+  String get taskAssignTitle => 'Assign task';
+
+  @override
+  String get taskAssignMemberLabel => 'Assignee';
+
+  @override
+  String get taskAssignUnassigned => 'Unassigned';
+
+  @override
+  String get taskAssignSubmit => 'Save assignment';
+
+  @override
+  String get taskAssignMembersError =>
+      'Unable to load members. Please try again.';
+
+  @override
+  String get taskAssigneeUnavailable => 'Current assignee unavailable';
+
+  @override
+  String get taskErrorDenied => 'You do not have permission to do that.';
+
+  @override
+  String get taskErrorUnavailable =>
+      'This is temporarily unavailable. Please try again.';
+
+  @override
+  String get taskErrorInvalid =>
+      'That change is not valid. Check the details and try again.';
+
+  @override
+  String get taskErrorFailed => 'Something went wrong. Please try again.';
 
   @override
   String get approvalsTitle => 'Pending approvals';

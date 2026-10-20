@@ -59,6 +59,11 @@ class _StubOrganizationGateway implements OrganizationGateway {
   }
 
   @override
+  Future<OrgOutcome<List<AssignableMember>>> listAssignableMembers({
+    required String matterId,
+  }) => throw UnimplementedError();
+
+  @override
   Future<OrgOutcome<OrganizationSummary>> createOrganization({
     required String name,
   }) => throw UnimplementedError();
