@@ -79,4 +79,50 @@ void main() {
       expect(ascendingTables, isEmpty);
     });
   });
+
+  group('requireFilterableColumn — the audit A03 allowlist', () {
+    test('accepts the thread_id scoping on messages', () {
+      expect(
+        () => requireFilterableColumn('messages', 'thread_id'),
+        returnsNormally,
+      );
+    });
+
+    test('accepts the verified title columns for server-side search', () {
+      expect(
+        () => requireFilterableColumn('matters', 'title'),
+        returnsNormally,
+      );
+      expect(
+        () => requireFilterableColumn('documents', 'title'),
+        returnsNormally,
+      );
+      expect(
+        () => requireFilterableColumn('message_threads', 'title'),
+        returnsNormally,
+      );
+    });
+
+    test('rejects an unlisted column on a listed table', () {
+      expect(
+        () => requireFilterableColumn('messages', 'body'),
+        throwsArgumentError,
+      );
+      expect(
+        () => requireFilterableColumn('matters', 'organization_id;--'),
+        throwsArgumentError,
+      );
+    });
+
+    test('fails closed for tables with no allowlist entry', () {
+      expect(
+        () => requireFilterableColumn('notifications', 'id'),
+        throwsArgumentError,
+      );
+      expect(
+        () => requireFilterableColumn('table_that_does_not_exist', 'id'),
+        throwsArgumentError,
+      );
+    });
+  });
 }

@@ -10,7 +10,8 @@ import 'supabase_document_api.dart';
 /// holding the provider import: a table SELECT in, plain map rows out, and
 /// PostgrestExceptions mapped to [SupabaseDocumentException]s at the seam.
 class SupabaseDocumentApiImpl implements SupabaseDocumentApi {
-  SupabaseDocumentApiImpl(this._table);
+  SupabaseDocumentApiImpl(this._table, {DocumentSearchCaller? searchCaller})
+    : _searchCaller = searchCaller ?? _boundSearch;
 
   /// Binds to the app-level client after `Supabase.initialize`. Kept a
   /// factory so tests can construct the impl with any callable stub.
@@ -28,7 +29,25 @@ class SupabaseDocumentApiImpl implements SupabaseDocumentApi {
     return SupabaseSeam.boundTable(table, columns);
   }
 
+  /// Binds the search read to the app-level client via the shared bounded
+  /// table binding: the RLS-scoped page (cap 200), newest-first, with the
+  /// same `matters(title)` embed as the fetch read. The title-only SQL
+  /// prefilter was deliberately dropped — the client matcher also matches
+  /// document type and the embedded matter title, which the server cannot
+  /// express in a single column filter. The bounded page is the superset;
+  /// the caller refines it and takes the requested top-N.
+  static Future<List<Map<String, dynamic>>> _boundSearch(
+    String table,
+    String columns,
+    String ilikeColumn,
+    String needle,
+    int limit,
+  ) {
+    return SupabaseSeam.boundTable(table, columns);
+  }
+
   final DocumentTableCaller _table;
+  final DocumentSearchCaller _searchCaller;
 
   @override
   Future<List<Map<String, dynamic>>> fetchDocuments() async {
@@ -53,13 +72,43 @@ class SupabaseDocumentApiImpl implements SupabaseDocumentApi {
     }
   }
 
-  /// Maps a PostgrestException to the provider-neutral failure kind.
-  /// The stable RLS denial text is the only fragment matched; everything
-  /// else is [SupabaseDocumentFailureKind.unknown] with the message preserved.
+  /// Maps a PostgrestException to the provider-neutral failure kind via the
+  /// shared two-kind classifier ([postgrestKindFor] — audit 2026-09-27,
+  /// Q-Q1): this impl supplies only its enum values, the match-once logic
+  /// lives in `postgrest_failures.dart`.
   SupabaseDocumentFailureKind _kindFor(PostgrestException e) {
-    if (isPostgrestDenial(e)) {
-      return SupabaseDocumentFailureKind.denied;
+    return postgrestKindFor(
+      e,
+      denied: SupabaseDocumentFailureKind.denied,
+      unknown: SupabaseDocumentFailureKind.unknown,
+    );
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> searchDocuments(
+    String query, {
+    int limit = 30,
+  }) async {
+    try {
+      // Same RLS scope, columns, and matters(title) embed as fetchDocuments
+      // (D-DR1/D-DR2/D-DR4). The read is the bounded page (cap 200); the
+      // caller applies its full matching pass and takes the requested
+      // top-N (see _boundSearch for why the title-only SQL prefilter was
+      // dropped).
+      return await _searchCaller(
+        'documents',
+        'id, matter_id, title, document_type, created_at, matters(title)',
+        'title',
+        query,
+        limit,
+      );
+    } on PostgrestException catch (e) {
+      throw SupabaseDocumentException(kind: _kindFor(e), message: e.message);
+    } on Object {
+      throw const SupabaseDocumentException(
+        kind: SupabaseDocumentFailureKind.providerUnavailable,
+        message: 'Provider unavailable.',
+      );
     }
-    return SupabaseDocumentFailureKind.unknown;
   }
 }

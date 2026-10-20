@@ -196,4 +196,14 @@ class _StubDocumentGateway implements DocumentGateway {
     }
     return Future<Result<List<Document>>>.value(_queue.removeAt(0));
   }
+
+  @override
+  Future<Result<List<Document>>> searchDocuments(
+    String query, {
+    int limit = 30,
+  }) {
+    // Not exercised by the document cubit tests; delegates so the seam
+    // stays implementable.
+    return fetchDocuments();
+  }
 }

@@ -18,14 +18,14 @@ void _registerAppCubits() {
 void _registerDemoGateways() {
   // v1 queue (2026-08-09 scope drafts): read-only demo surfaces behind dev
   // fakes only — no server surface exists yet, so there is no env flip (the
-  // Phase 5–12 fake-domain pattern, "the fake is the product posture").
+  // Phase 5–12 fake-domain pattern, "the fake is the product posture"). The
+  // task board LEFT this group in the task-writes slice (Gate 3 spec
+  // 2026-09-27): TaskBoardGateway now flips in _registerContentSeams like
+  // the other applied-table seams.
   if (!serviceLocator.isRegistered<ComplianceAlertsGateway>()) {
     serviceLocator.registerLazySingleton<ComplianceAlertsGateway>(
       FakeComplianceGateway.new,
     );
-  }
-  if (!serviceLocator.isRegistered<TaskBoardGateway>()) {
-    serviceLocator.registerLazySingleton<TaskBoardGateway>(FakeTaskGateway.new);
   }
   if (!serviceLocator.isRegistered<ApprovalsGateway>()) {
     serviceLocator.registerLazySingleton<ApprovalsGateway>(

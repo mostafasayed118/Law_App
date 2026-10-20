@@ -26,9 +26,22 @@ class SupabaseDocumentGateway implements DocumentGateway {
   final SupabaseDocumentApi _api;
 
   @override
-  Future<Result<List<Document>>> fetchDocuments() async {
+  Future<Result<List<Document>>> fetchDocuments() => _run(_api.fetchDocuments);
+
+  @override
+  Future<Result<List<Document>>> searchDocuments(
+    String query, {
+    int limit = 30,
+  }) => _run(() => _api.searchDocuments(query, limit: limit));
+
+  /// Runs a row read (full fetch or title-prefiltered search) through the
+  /// identical mapping path. The search prefilter only shrinks the transfer
+  /// — mapping and failure semantics never diverge between the two reads.
+  Future<Result<List<Document>>> _run(
+    Future<List<Map<String, dynamic>>> Function() read,
+  ) async {
     try {
-      final List<Map<String, dynamic>> rows = await _api.fetchDocuments();
+      final List<Map<String, dynamic>> rows = await read();
       return Result<List<Document>>.success(
         List<Document>.unmodifiable(rows.map(_documentFromRow)),
       );

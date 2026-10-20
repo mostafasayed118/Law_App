@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/billing/domain/billing_gateway.dart';
 import 'package:legalhub/features/discovery/presentation/discovery_entry_card.dart';
+import 'package:legalhub/features/documents/domain/document_gateway.dart';
 import 'package:legalhub/features/matters/presentation/matter_documents_section.dart';
 import 'package:legalhub/features/matters/presentation/matter_entry_card.dart';
 import 'package:legalhub/features/matters/presentation/matter_messages_section.dart';
+import 'package:legalhub/features/matters/presentation/matter_workspace_cubit.dart';
+import 'package:legalhub/features/messaging/domain/message_gateway.dart';
 import 'package:legalhub/features/messaging/presentation/message_count_chip.dart';
 import 'package:legalhub/features/messaging/presentation/message_entry_card.dart';
 import 'package:legalhub/features/search/presentation/search_screen.dart';
+import 'package:legalhub/features/storage/domain/storage_gateway.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/view_state_view.dart';
 
@@ -1131,7 +1137,19 @@ void main() {
                 // An unmatched matterRef filters the synthetic list to the
                 // per-matter empty state (D-W2: every known matter owns at
                 // least one document, so only an unknown ref can empty it).
-                body: const MatterDocumentsSection(matterRef: 'no-such-matter'),
+                // The section reads the workspace composite (Phase 2), so a
+                // service-locator-backed cubit is provided above it.
+                body: BlocProvider<MatterWorkspaceCubit>(
+                  create: (_) => MatterWorkspaceCubit(
+                    serviceLocator<MessageGateway>(),
+                    serviceLocator<DocumentGateway>(),
+                    serviceLocator<BillingGateway>(),
+                    serviceLocator<StorageGateway>(),
+                  ),
+                  child: const MatterDocumentsSection(
+                    matterRef: 'no-such-matter',
+                  ),
+                ),
               ),
             ),
           );
@@ -1172,8 +1190,20 @@ void main() {
               supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
                 // An unmatched matterRef filters the synthetic list to the
-                // per-matter empty state.
-                body: const MatterMessagesSection(matterRef: 'no-such-matter'),
+                // per-matter empty state. The section reads the workspace
+                // composite (Phase 2), so a service-locator-backed cubit is
+                // provided above it.
+                body: BlocProvider<MatterWorkspaceCubit>(
+                  create: (_) => MatterWorkspaceCubit(
+                    serviceLocator<MessageGateway>(),
+                    serviceLocator<DocumentGateway>(),
+                    serviceLocator<BillingGateway>(),
+                    serviceLocator<StorageGateway>(),
+                  ),
+                  child: const MatterMessagesSection(
+                    matterRef: 'no-such-matter',
+                  ),
+                ),
               ),
             ),
           );

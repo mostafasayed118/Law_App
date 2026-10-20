@@ -17,4 +17,16 @@ abstract interface class MatterGateway {
   /// The synthetic matter list for the dashboard. Deterministic and
   /// read-first (owner decisions D-M1/D-M2/D-M4).
   Future<Result<List<Matter>>> fetchMatters();
+
+  /// Recall-oriented title candidate set for unified search (audit:
+  /// search fan-out — server-side prefilter + client-side refine).
+  ///
+  /// Returns up to [limit] rows whose title matches [query]
+  /// server-side (case-insensitive substring on the configured backend;
+  /// in-memory backends return their full list — no network cost to
+  /// save). Callers MUST still apply their full matching pass
+  /// (localized labels, status/practice-area names): this is a transfer
+  /// optimization, never the final arbiter. [limit] mirrors
+  /// `kSearchPageSize` without importing the data layer (layer rule).
+  Future<Result<List<Matter>>> searchMatters(String query, {int limit = 30});
 }

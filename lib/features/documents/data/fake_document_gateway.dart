@@ -60,4 +60,15 @@ class FakeDocumentGateway implements DocumentGateway {
     // this boundary but the D-V4 metadata surface.
     return Result<List<Document>>.success(syntheticDocuments);
   }
+
+  @override
+  Future<Result<List<Document>>> searchDocuments(
+    String query, {
+    int limit = 30,
+  }) async {
+    // In-memory backend: no transfer cost to save, so no prefilter — the
+    // caller's full matching pass is the arbiter and results stay identical
+    // to the fetchDocuments path.
+    return fetchDocuments();
+  }
 }

@@ -8,6 +8,10 @@ import '../../../l10n/app_localizations.dart';
 import '../../../shared/demo_labels.dart';
 import '../../../shared/formatting/date_formatting.dart';
 import '../../../shared/widgets/widgets.dart';
+import '../../billing/domain/billing_gateway.dart';
+import '../../documents/domain/document_gateway.dart';
+import '../../messaging/domain/message_gateway.dart';
+import '../../storage/domain/storage_gateway.dart';
 import '../domain/matter.dart';
 import '../domain/matter_gateway.dart';
 import 'matter_cubit.dart';
@@ -18,6 +22,7 @@ import 'matter_labels.dart';
 import 'matter_messages_section.dart';
 import 'matter_state.dart';
 import 'matter_status_chip.dart';
+import 'matter_workspace_cubit.dart';
 
 part 'matter_detail_row.dart';
 part 'matter_details_surface.dart';
@@ -54,7 +59,19 @@ class MatterDetailsScreen extends StatelessWidget {
     return BlocProvider<MatterCubit>(
       create: (BuildContext context) =>
           MatterCubit(serviceLocator<MatterGateway>()),
-      child: _DetailsSurface(matterId: matterId, capabilities: capabilities),
+      child: BlocProvider<MatterWorkspaceCubit>(
+        // Audit (matters god-feature): the workspace sections consume this
+        // matter-scoped composite — which orchestrates the four domain
+        // gateways directly — instead of four foreign presentation cubits.
+        // Gateways resolve here so the sections stay provider-free.
+        create: (BuildContext context) => MatterWorkspaceCubit(
+          serviceLocator<MessageGateway>(),
+          serviceLocator<DocumentGateway>(),
+          serviceLocator<BillingGateway>(),
+          serviceLocator<StorageGateway>(),
+        ),
+        child: _DetailsSurface(matterId: matterId, capabilities: capabilities),
+      ),
     );
   }
 }

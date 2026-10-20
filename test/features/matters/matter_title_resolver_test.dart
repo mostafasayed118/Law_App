@@ -36,6 +36,36 @@ void main() {
       expect(resolveMatterByTitle(duplicate, 'Demo acquisition review'), first);
     });
   });
+
+  group('buildMatterTitleIndex + resolveMatterByTitleIn (audit: per-row '
+      'O(1) resolution)', () {
+    test('the index resolves every row identically to the linear scan', () {
+      final Map<String, Matter> index = buildMatterTitleIndex(_matters);
+
+      // Same results as the single-shot scan for hits, misses, and the
+      // D-C2 unresolved case.
+      expect(
+        resolveMatterByTitleIn(index, 'Demo acquisition review')?.id,
+        'matter-1',
+      );
+      expect(
+        resolveMatterByTitleIn(index, 'Commercial lease consultation')?.id,
+        'matter-2',
+      );
+      expect(resolveMatterByTitleIn(index, 'No such synthetic matter'), isNull);
+      expect(resolveMatterByTitleIn(index, 'matter-1'), isNull);
+    });
+
+    test('first title wins on duplicates — same convention as the scan', () {
+      final Matter first = _matters[0];
+      final Map<String, Matter> index = buildMatterTitleIndex(<Matter>[
+        first,
+        _matters[1],
+      ]);
+
+      expect(resolveMatterByTitleIn(index, 'Demo acquisition review'), first);
+    });
+  });
 }
 
 /// The fixed synthetic matter list (mirrors FakeMatterGateway's titles).

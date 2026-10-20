@@ -36,10 +36,9 @@ class SupabaseSeam {
     String function,
     Map<String, dynamic> params,
   ) async {
-    final dynamic data = await Supabase.instance.client.rpc<dynamic>(
-      function,
-      params: params,
-    );
+    final dynamic data = await Supabase.instance.client
+        .rpc<dynamic>(function, params: params)
+        .timeout(const Duration(seconds: 15));
     return wrapRpcData(data);
   }
 
@@ -49,7 +48,9 @@ class SupabaseSeam {
     String function,
     Map<String, dynamic>? params,
   ) {
-    return Supabase.instance.client.rpc(function, params: params);
+    return Supabase.instance.client
+        .rpc<Object?>(function, params: params)
+        .timeout(const Duration(seconds: 15));
   }
 
   /// Shared table-SELECT binding: the bounded, deterministically ordered
@@ -74,6 +75,34 @@ class SupabaseSeam {
       columns,
       filterColumn: filterColumn,
       filterValue: filterValue,
+    );
+  }
+
+  /// Shared server-side search binding: first page of a case-insensitive
+  /// substring (`ilike`) match over [ilikeColumn], newest-first per the
+  /// table's deterministic ordering.
+  ///
+  /// Audit (search fan-out): the unified search fan-out fetched four full
+  /// capped lists (up to 800 rows) per query and filtered client-side. This
+  /// binding pushes a recall-oriented title prefilter to the server
+  /// (4 × [limit] rows) — callers MUST still apply their full matching
+  /// pass client-side (localized labels, enum names, and participant names
+  /// never cross the seam), so results keep their exact matching semantics
+  /// and only the transfer volume shrinks. The column passes through the
+  /// [requireFilterableColumn] allowlist inside [pagedTableSelect].
+  static Future<List<Map<String, dynamic>>> boundSearchTable(
+    String table,
+    String columns,
+    String ilikeColumn,
+    String needle, {
+    int limit = kSearchPageSize,
+  }) {
+    return pagedTableSelect(
+      table,
+      columns,
+      pageSize: limit,
+      ilikeColumn: ilikeColumn,
+      ilikeValue: needle,
     );
   }
 }

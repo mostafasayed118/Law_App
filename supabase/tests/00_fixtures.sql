@@ -303,7 +303,9 @@ values
 -- matter) + 70000000-0000-4000-8000-00000000fffe (its org-mismatched
 -- file) + 80000000-0000-4000-8000-00000000fffd (its org-mismatched
 -- object); 80000000-0000-4000-8000-00000000fffe (the guessed-path
--- object — matrix §6 row 1, unknown matter id, never a real matter); and
+-- object — matrix §6 row 1, unknown matter id, never a real matter);
+-- 80000000-0000-4000-8000-00000000fffb (the Batch B non-uuid-org-segment
+-- object — safe-cast deny pin, never a real path); and
 -- the guessed path's nonexistent matter id 99999999-9999-4999-8999-999999999999
 -- (deliberately NOT a fixture — the point is that no matter has it). Listed
 -- here so the harness's static fixture cross-ref resolves them.
@@ -491,5 +493,44 @@ begin
   select count(*) into v_cnt from public.notifications;
   if v_cnt <> 5 then
     raise exception 'FIXTURE ERROR: notifications must hold 5 rows, got %', v_cnt;
+  end if;
+end $$;
+
+-- ---- 15. Tasks (task-writes slice — the 17_task_rls.sql battery) ------
+-- Three rows exercising the assignment branches of tasks_select_assigned:
+-- two on matter 1 (assigned client-a + attorney partner-a — both see both)
+-- and one on matter 6 (assigned attorney suspended-a ONLY — nobody reads it
+-- under RLS: suspended memberships never authorize, and no other role is
+-- assigned on matter 6; the 17.06/17.16 denies pin exactly this). Titles are
+-- GENERIC non-PII demo copy — never real case content by convention.
+-- Battery 17's committed POS chain ADDS rows (create/advance/assign/ack);
+-- 17 runs last, so no other battery's counts are affected.
+insert into public.tasks
+  (id, organization_id, matter_id, title, status, assignee_id, created_at, updated_at)
+values
+  ('c0000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000001', 'Demo task 1-1: draft response checklist', 'todo',        '10000000-0000-4000-8000-000000000003', now(), now()),
+  ('c0000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000001', 'Demo task 1-2: gather documents',         'in_progress', '10000000-0000-4000-8000-000000000002', now(), now()),
+  ('c0000000-0000-4000-8000-000000000003', '20000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000006', 'Demo task 6-1: internal note',            'todo',        '10000000-0000-4000-8000-000000000005', now(), now());
+
+-- Reserved throwaway ids used by 17_task_rls.sql (deliberately NEVER
+-- seeded): c0000000-0000-4000-8000-00000000fff1 (the title CHECK-violation
+-- insert — fails before any row exists); the org-mismatch pair
+-- 40000000-0000-4000-8000-00000000fff9 (temp org-b matter) +
+-- c0000000-0000-4000-8000-00000000fff2 (its org-a task — the mismatch);
+-- c0000000-0000-4000-8000-00000000fff3 (the transition-probe task, rolled
+-- back); c0000000-0000-4000-8000-00000000ffff (the 17.14 guessed-id probe —
+-- a task id that exists NOWHERE, proving the deny is not an existence
+-- oracle; the battery never inserts it). Listed here so the harness's
+-- static fixture cross-ref resolves them.
+
+-- Sanity: exactly three tasks seeded (battery 17's committed POS rows land
+-- after every other battery has run and never reach this baseline).
+do $$
+declare
+  v_cnt bigint;
+begin
+  select count(*) into v_cnt from public.tasks;
+  if v_cnt <> 3 then
+    raise exception 'FIXTURE ERROR: tasks must hold 3 rows, got %', v_cnt;
   end if;
 end $$;

@@ -244,6 +244,12 @@ class _UnresolvedRefMessageGateway implements MessageGateway {
   }
 
   @override
+  Future<Result<List<MessageThread>>> searchThreads(
+    String query, {
+    int limit = 30,
+  }) => fetchThreads();
+
+  @override
   Future<Result<List<Message>>> fetchMessages(String threadId) async {
     return const Result<List<Message>>.success(<Message>[]);
   }
@@ -273,6 +279,12 @@ class _EmptyMessageGateway implements MessageGateway {
   Future<Result<List<MessageThread>>> fetchThreads() async {
     return Result<List<MessageThread>>.success(const <MessageThread>[]);
   }
+
+  @override
+  Future<Result<List<MessageThread>>> searchThreads(
+    String query, {
+    int limit = 30,
+  }) => fetchThreads();
 
   @override
   Future<Result<List<Message>>> fetchMessages(String threadId) async {

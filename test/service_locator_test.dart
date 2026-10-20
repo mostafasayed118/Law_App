@@ -225,6 +225,12 @@ class _FakeSupabaseMatterApi implements SupabaseMatterApi {
   @override
   Future<List<Map<String, dynamic>>> fetchMatters() async =>
       <Map<String, dynamic>>[];
+
+  @override
+  Future<List<Map<String, dynamic>>> searchMatters(
+    String query, {
+    int limit = 30,
+  }) async => <Map<String, dynamic>>[];
 }
 
 /// Hand-rolled fake of the [SupabaseMatterWriteApi] seam for the DI flip
@@ -246,6 +252,12 @@ class _FakeSupabaseDocumentApi implements SupabaseDocumentApi {
   @override
   Future<List<Map<String, dynamic>>> fetchDocuments() async =>
       <Map<String, dynamic>>[];
+
+  @override
+  Future<List<Map<String, dynamic>>> searchDocuments(
+    String query, {
+    int limit = 30,
+  }) async => <Map<String, dynamic>>[];
 }
 
 /// Hand-rolled fake of the [SupabaseMessageApi] seam for the DI flip test
@@ -256,11 +268,26 @@ class _FakeSupabaseMessageApi implements SupabaseMessageApi {
       <Map<String, dynamic>>[];
 
   @override
+  Future<List<Map<String, dynamic>>> searchMessageThreads(
+    String query, {
+    int limit = 30,
+  }) async => <Map<String, dynamic>>[];
+
+  @override
   Future<List<Map<String, dynamic>>> fetchMessages(String threadId) async =>
       <Map<String, dynamic>>[];
 
   @override
-  Future<String> sendMessage(String threadId, String body) async => 'msg-1';
+  Future<Map<String, dynamic>> sendMessage(
+    String threadId,
+    String body,
+  ) async => <String, dynamic>{
+    'id': 'msg-1',
+    'thread_id': threadId,
+    'author_display_name': 'Demo author',
+    'body': body,
+    'sent_at': '2026-08-08T12:00:00.000Z',
+  };
 }
 
 /// Hand-rolled fake of the [SupabaseMessageRealtimeApi] seam for the DI flip

@@ -25,3 +25,19 @@ bool isPostgrestDenial(PostgrestException e) {
   return message.contains('permission denied') ||
       message.contains('row-level security');
 }
+
+/// Maps a PostgREST failure to a two-kind seam enum (denied vs unknown).
+///
+/// The six read-seam `_kindFor` clones were byte-identical except for the
+/// enum type they returned (audit 2026-09-27, Q-Q1 — filed as five, six
+/// found): the denial RULE already lives in [isPostgrestDenial] (H-7), and
+/// this finishes the job — the match-once logic lives here, each impl
+/// supplies only its own enum values. The three extended classifiers named
+/// above keep their private `_kindFor` (behavior differs — see doc).
+T postgrestKindFor<T>(
+  PostgrestException e, {
+  required T denied,
+  required T unknown,
+}) {
+  return isPostgrestDenial(e) ? denied : unknown;
+}

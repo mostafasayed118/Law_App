@@ -205,4 +205,20 @@ void main() {
       },
     );
   });
+
+  group('FakeMessageGateway.searchThreads (audit: search fan-out)', () {
+    test('returns the full synthetic list — the cubit refiner is the '
+        'arbiter', () async {
+      final FakeMessageGateway gateway = FakeMessageGateway();
+
+      // In-memory backend: no transfer cost to save, so no prefilter — the
+      // search path serves the identical candidates as the fetch path.
+      final List<MessageThread>? searched = (await gateway.searchThreads(
+        'anything',
+      )).valueOrNull;
+
+      expect(searched, FakeMessageGateway.syntheticThreads);
+      expect(searched, hasLength(5));
+    });
+  });
 }

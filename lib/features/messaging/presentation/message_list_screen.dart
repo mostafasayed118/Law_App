@@ -53,7 +53,7 @@ class MessageListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: <BlocProvider<dynamic>>[
+      providers: [
         BlocProvider<MessageCubit>(
           create: (BuildContext context) =>
               MessageCubit(serviceLocator<MessageGateway>()),
@@ -149,6 +149,9 @@ class _ListSurfaceState extends State<_ListSurface> {
     ColorScheme scheme,
   ) {
     final MessageCubit cubit = context.read<MessageCubit>();
+    // Title index built ONCE per render (audit: per-row resolveMatterByTitle
+    // was O(rows × matters)); each tile resolves its reverse link in O(1).
+    final Map<String, Matter> matterIndex = buildMatterTitleIndex(matters);
     final Widget empty = Padding(
       padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
       child: Text(
@@ -172,7 +175,7 @@ class _ListSurfaceState extends State<_ListSurface> {
               AppRoutes.messageThreadDetailFor(thread.id),
               extra: thread.title,
             ),
-            onViewMatter: _matterTap(context, thread, matters),
+            onViewMatter: _matterTap(context, thread, matterIndex),
           ),
       empty: empty,
       errorCopy: l10n.messagesError,
@@ -187,12 +190,15 @@ class _ListSurfaceState extends State<_ListSurface> {
   VoidCallback? _matterTap(
     BuildContext context,
     MessageThread thread,
-    List<Matter> matters,
+    Map<String, Matter> matterIndex,
   ) {
     if (!widget.capabilities.canViewMatters) {
       return null;
     }
-    final Matter? matter = resolveMatterByTitle(matters, thread.matterRef);
+    final Matter? matter = resolveMatterByTitleIn(
+      matterIndex,
+      thread.matterRef,
+    );
     if (matter == null) {
       return null;
     }

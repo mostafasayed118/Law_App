@@ -19,6 +19,15 @@ class _StubSupabaseDocumentApi implements SupabaseDocumentApi {
     }
     return rows;
   }
+
+  @override
+  Future<List<Map<String, dynamic>>> searchDocuments(
+    String query, {
+    int limit = 30,
+  }) async {
+    // Same canned rows as the fetch path: identical mapping surface.
+    return fetchDocuments();
+  }
 }
 
 Map<String, dynamic> _row({
@@ -239,5 +248,41 @@ void main() {
       expect(error.code, 'document_read_unavailable');
       expect(error.technicalMessage, 'Provider unavailable.');
     });
+  });
+
+  group('searchDocuments runs the identical mapping path (audit: search '
+      'fan-out)', () {
+    test('maps title-prefiltered rows through the same VO path', () async {
+      api.rows = <Map<String, dynamic>>[_row()];
+
+      final Result<List<Document>> result = await gateway.searchDocuments(
+        'letter',
+      );
+
+      // The prefilter only shrinks the transfer: identical rows map to
+      // identical VOs, embed resolution included.
+      expect(result.isSuccess, isTrue);
+      final Document document = result.valueOrNull!.single;
+      expect(document.id, 'doc-1');
+      expect(document.title, 'Demo engagement letter');
+      expect(document.type, DocumentType.contract);
+      expect(document.matterRef, 'Demo acquisition review');
+    });
+
+    test(
+      'maps a seam denial to the same denied AppError as the fetch',
+      () async {
+        api.error = const SupabaseDocumentException(
+          kind: SupabaseDocumentFailureKind.denied,
+          message: 'permission denied',
+        );
+
+        final Result<List<Document>> result = await gateway.searchDocuments(
+          'letter',
+        );
+
+        expect(result.errorOrNull!.code, 'document_read_denied');
+      },
+    );
   });
 }

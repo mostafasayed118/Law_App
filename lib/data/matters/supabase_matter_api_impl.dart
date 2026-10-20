@@ -10,7 +10,8 @@ import 'supabase_matter_api.dart';
 /// holding the provider import: a table SELECT in, plain map rows out, and
 /// PostgrestExceptions mapped to [SupabaseMatterException]s at the seam.
 class SupabaseMatterApiImpl implements SupabaseMatterApi {
-  SupabaseMatterApiImpl(this._table);
+  SupabaseMatterApiImpl(this._table, {MatterSearchCaller? searchCaller})
+    : _searchCaller = searchCaller ?? _boundSearch;
 
   /// Binds to the app-level client after `Supabase.initialize`. Kept a
   /// factory so tests can construct the impl with any callable stub.
@@ -28,7 +29,25 @@ class SupabaseMatterApiImpl implements SupabaseMatterApi {
     return SupabaseSeam.boundTable(table, columns);
   }
 
+  /// Binds the search read to the app-level client via the shared bounded
+  /// table binding: the RLS-scoped page (cap 200), newest-first. The
+  /// title-only SQL prefilter was deliberately dropped — the client matcher
+  /// also matches status, practice area, and localized labels the server
+  /// cannot express, and a title prefilter silently discarded those hits.
+  /// The bounded page is the superset; the caller refines it and takes the
+  /// requested top-N.
+  static Future<List<Map<String, dynamic>>> _boundSearch(
+    String table,
+    String columns,
+    String ilikeColumn,
+    String needle,
+    int limit,
+  ) {
+    return SupabaseSeam.boundTable(table, columns);
+  }
+
   final MatterTableCaller _table;
+  final MatterSearchCaller _searchCaller;
 
   @override
   Future<List<Map<String, dynamic>>> fetchMatters() async {
@@ -54,13 +73,43 @@ class SupabaseMatterApiImpl implements SupabaseMatterApi {
     }
   }
 
-  /// Maps a PostgrestException to the provider-neutral failure kind.
-  /// The stable RLS denial text is the only fragment matched; everything
-  /// else is [SupabaseMatterFailureKind.unknown] with the message preserved.
+  /// Maps a PostgrestException to the provider-neutral failure kind via the
+  /// shared two-kind classifier ([postgrestKindFor] — audit 2026-09-27,
+  /// Q-Q1): this impl supplies only its enum values, the match-once logic
+  /// lives in `postgrest_failures.dart`.
   SupabaseMatterFailureKind _kindFor(PostgrestException e) {
-    if (isPostgrestDenial(e)) {
-      return SupabaseMatterFailureKind.denied;
+    return postgrestKindFor(
+      e,
+      denied: SupabaseMatterFailureKind.denied,
+      unknown: SupabaseMatterFailureKind.unknown,
+    );
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> searchMatters(
+    String query, {
+    int limit = 30,
+  }) async {
+    try {
+      // Same RLS scope and columns as fetchMatters (D-MR1/D-MR4). The read
+      // is the bounded page (cap 200); the caller applies its full matching
+      // pass and takes the requested top-N (see _boundSearch for why the
+      // title-only SQL prefilter was dropped).
+      return await _searchCaller(
+        'matters',
+        'id, organization_id, title, practice_area, status, '
+            'assigned_attorney_id, created_at',
+        'title',
+        query,
+        limit,
+      );
+    } on PostgrestException catch (e) {
+      throw SupabaseMatterException(kind: _kindFor(e), message: e.message);
+    } on Object {
+      throw const SupabaseMatterException(
+        kind: SupabaseMatterFailureKind.providerUnavailable,
+        message: 'Provider unavailable.',
+      );
     }
-    return SupabaseMatterFailureKind.unknown;
   }
 }

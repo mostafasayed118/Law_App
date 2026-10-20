@@ -278,6 +278,12 @@ class _EmptyDocumentGateway implements DocumentGateway {
   Future<Result<List<Document>>> fetchDocuments() async {
     return Result<List<Document>>.success(const <Document>[]);
   }
+
+  @override
+  Future<Result<List<Document>>> searchDocuments(
+    String query, {
+    int limit = 30,
+  }) => fetchDocuments();
 }
 
 /// Gateway stub that yields an empty thread list (workspace empty pin).
@@ -286,6 +292,12 @@ class _EmptyMessageGateway implements MessageGateway {
   Future<Result<List<MessageThread>>> fetchThreads() async {
     return Result<List<MessageThread>>.success(const <MessageThread>[]);
   }
+
+  @override
+  Future<Result<List<MessageThread>>> searchThreads(
+    String query, {
+    int limit = 30,
+  }) => fetchThreads();
 
   @override
   Future<Result<List<Message>>> fetchMessages(String threadId) async {
@@ -342,4 +354,8 @@ class _RetryMatterGateway implements MatterGateway {
     }
     return Result<List<Matter>>.success(FakeMatterGateway.syntheticMatters);
   }
+
+  @override
+  Future<Result<List<Matter>>> searchMatters(String query, {int limit = 30}) =>
+      fetchMatters();
 }

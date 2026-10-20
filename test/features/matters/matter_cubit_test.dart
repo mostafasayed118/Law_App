@@ -185,4 +185,11 @@ class _StubMatterGateway implements MatterGateway {
     }
     return Future<Result<List<Matter>>>.value(_queue.removeAt(0));
   }
+
+  @override
+  Future<Result<List<Matter>>> searchMatters(String query, {int limit = 30}) {
+    // Not exercised by the matter cubit tests; delegates so the seam stays
+    // implementable.
+    return fetchMatters();
+  }
 }

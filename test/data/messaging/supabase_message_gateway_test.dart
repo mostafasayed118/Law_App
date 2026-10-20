@@ -18,7 +18,7 @@ class _StubSupabaseMessageApi implements SupabaseMessageApi {
   List<Map<String, dynamic>> messageRows = <Map<String, dynamic>>[];
   SupabaseMessageException? error;
   final List<String> messageFetches = <String>[];
-  String? sentRowId;
+  Map<String, dynamic>? sentRow;
   SupabaseMessageException? sendError;
   String? sentThreadId;
   String? sentBody;
@@ -33,6 +33,15 @@ class _StubSupabaseMessageApi implements SupabaseMessageApi {
   }
 
   @override
+  Future<List<Map<String, dynamic>>> searchMessageThreads(
+    String query, {
+    int limit = 30,
+  }) async {
+    // Same canned rows as the fetch path: identical mapping surface.
+    return fetchMessageThreads();
+  }
+
+  @override
   Future<List<Map<String, dynamic>>> fetchMessages(String threadId) async {
     messageFetches.add(threadId);
     if (error != null) {
@@ -42,14 +51,16 @@ class _StubSupabaseMessageApi implements SupabaseMessageApi {
   }
 
   @override
-  Future<String> sendMessage(String threadId, String body) async {
+  Future<Map<String, dynamic>> sendMessage(String threadId, String body) async {
     sendCalls++;
     sentThreadId = threadId;
     sentBody = body;
     if (sendError != null) {
       throw sendError!;
     }
-    return sentRowId ?? 'msg-sent-1';
+    // The audited RPC returns the persisted row (audit follow-up
+    // 2026-09-27 — previously the id only, resolved via a re-read).
+    return sentRow ?? _messageRow(id: 'msg-sent-1', threadId: threadId);
   }
 }
 
@@ -495,65 +506,45 @@ void main() {
   });
 
   group('sendMessage mapping (D-SM2)', () {
-    test('maps the persisted row to the Message VO via the re-read', () async {
-      api.sentRowId = 'msg-sent-9';
-      api.messageRows = <Map<String, dynamic>>[
-        _messageRow(
+    test(
+      'maps the RPC-returned row to the Message VO with no re-read',
+      () async {
+        api.sentRow = _messageRow(
           id: 'msg-sent-9',
           threadId: 'thread-1',
           author: 'Demo Partner',
           body: 'A demo send body.',
           sentAt: '2026-08-08T12:00:00.000Z',
-        ),
-      ];
-
-      final Result<Message> result = await gateway.sendMessage(
-        'thread-1',
-        'A demo send body.',
-        authorDisplayName: 'Demo Client',
-      );
-
-      expect(result.isSuccess, isTrue);
-      expect(api.sendCalls, 1);
-      expect(api.sentThreadId, 'thread-1');
-      expect(api.sentBody, 'A demo send body.');
-      // The RPC returns the id; the VO maps from the re-read row (the
-      // server-derived stored author from profiles, D-RT4) — the client's
-      // authorDisplayName is unused on the real path.
-      expect(api.messageFetches, <String>['thread-1']);
-      final Message message = result.valueOrNull!;
-      expect(message.id, 'msg-sent-9');
-      expect(message.authorDisplayName, 'Demo Partner');
-      expect(message.body, 'A demo send body.');
-      expect(
-        message.sentAt,
-        DateTime.parse('2026-08-08T12:00:00.000Z').toLocal(),
-      );
-    });
-
-    test(
-      'fails the send loudly when the row is absent on the re-read',
-      () async {
-        api.sentRowId = 'msg-gone';
-        api.messageRows = <Map<String, dynamic>>[
-          _messageRow(id: 'msg-other', threadId: 'thread-1'),
-        ];
+        );
 
         final Result<Message> result = await gateway.sendMessage(
           'thread-1',
-          'Body',
+          'A demo send body.',
+          authorDisplayName: 'Demo Client',
         );
 
-        expect(result.isSuccess, isFalse);
-        expect(result.errorOrNull?.code, 'message_send_failed');
+        expect(result.isSuccess, isTrue);
+        expect(api.sendCalls, 1);
+        expect(api.sentThreadId, 'thread-1');
+        expect(api.sentBody, 'A demo send body.');
+        // The RPC returns the persisted row (audit follow-up 2026-09-27): the
+        // VO maps from the response directly — NO follow-up fetchMessages
+        // re-read. The stored author is the server-derived D-RT4 name; the
+        // client's authorDisplayName is unused on the real path.
+        expect(api.messageFetches, isEmpty);
+        final Message message = result.valueOrNull!;
+        expect(message.id, 'msg-sent-9');
+        expect(message.authorDisplayName, 'Demo Partner');
+        expect(message.body, 'A demo send body.');
+        expect(
+          message.sentAt,
+          DateTime.parse('2026-08-08T12:00:00.000Z').toLocal(),
+        );
       },
     );
 
-    test('a malformed re-read row fails the send loudly', () async {
-      api.sentRowId = 'msg-sent-1';
-      api.messageRows = <Map<String, dynamic>>[
-        <String, dynamic>{'id': 'msg-sent-1'},
-      ];
+    test('a malformed RPC row fails the send loudly', () async {
+      api.sentRow = <String, dynamic>{'id': 'msg-sent-1'};
 
       final Result<Message> result = await gateway.sendMessage(
         'thread-1',
@@ -727,5 +718,42 @@ void main() {
       expect(error.code, 'message_read_unavailable');
       expect(error.technicalMessage, 'Provider unavailable.');
     });
+  });
+
+  group('searchThreads runs the identical mapping path (audit: search '
+      'fan-out)', () {
+    test('maps title-prefiltered rows through the same VO path', () async {
+      api.rows = <Map<String, dynamic>>[_row()];
+
+      final Result<List<MessageThread>> result = await gateway.searchThreads(
+        'updates',
+      );
+
+      // The prefilter only shrinks the transfer: identical rows map to
+      // identical VOs, embed + participants resolution included.
+      expect(result.isSuccess, isTrue);
+      final MessageThread thread = result.valueOrNull!.single;
+      expect(thread.id, 'thread-1');
+      expect(thread.title, 'Demo matter updates');
+      expect(thread.matterRef, 'Demo acquisition review');
+      expect(thread.participants, <String>['Layla Mansour', 'Demo client']);
+      expect(thread.messageCount, 3);
+    });
+
+    test(
+      'maps a seam denial to the same denied AppError as the fetch',
+      () async {
+        api.error = const SupabaseMessageException(
+          kind: SupabaseMessageFailureKind.denied,
+          message: 'permission denied',
+        );
+
+        final Result<List<MessageThread>> result = await gateway.searchThreads(
+          'updates',
+        );
+
+        expect(result.errorOrNull!.code, 'message_read_denied');
+      },
+    );
   });
 }

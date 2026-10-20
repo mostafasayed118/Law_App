@@ -69,32 +69,13 @@ mixin _SupabaseMessageMethods on _SupabaseMessageBase {
   /// message is the provider's own (denial/availability text) — message
   /// content never crosses into errors.
   AppError _mapFailure(SupabaseMessageException e) {
-    final (
-      String code,
-      String userMessage,
-      AppErrorKind kind,
-    ) = switch (e.kind) {
-      SupabaseMessageFailureKind.denied => (
-        'message_read_denied',
-        'You do not have permission to view these threads.',
-        AppErrorKind.denied,
-      ),
-      SupabaseMessageFailureKind.providerUnavailable => (
-        'message_read_unavailable',
-        'Threads are temporarily unavailable. Please try again.',
-        AppErrorKind.unavailable,
-      ),
-      SupabaseMessageFailureKind.unknown => (
-        'message_read_failed',
-        'Unable to load threads. Please try again.',
-        AppErrorKind.unknown,
-      ),
-    };
-    return AppError(
-      code: code,
-      userMessage: userMessage,
-      kind: kind,
-      technicalMessage: e.message,
+    return _messageFailureFor(
+      e,
+      codePrefix: 'message_read',
+      deniedMessage: 'You do not have permission to view these threads.',
+      unavailableMessage:
+          'Threads are temporarily unavailable. Please try again.',
+      failedMessage: 'Unable to load threads. Please try again.',
     );
   }
 
@@ -104,32 +85,26 @@ mixin _SupabaseMessageMethods on _SupabaseMessageBase {
     String? authorDisplayName,
   }) async {
     try {
-      // D-SM2: the audited `send_message` RPC returns only the persisted
-      // message id; the full [Message] VO maps from the SHIPPED
-      // fetchMessages read so the row carries the server's own stored
-      // author (profiles, D-RT4) and sent_at — never a fabricated VO.
-      // `authorDisplayName` stays in the domain contract (the fake's seam)
-      // but is intentionally unused on the real path: the RPC derives the
-      // stored author in-function.
-      final String id = await _api.sendMessage(threadId, body);
-      final List<Map<String, dynamic>> rows = await _api.fetchMessages(
-        threadId,
-      );
-      final Map<String, dynamic>? row = _rowWithId(rows, id);
-      if (row == null) {
-        // The send succeeded but the row is absent on the re-read —
-        // provider drift; surface loudly, never a fabricated VO. The live
-        // channel (D-LV4) still delivers the row if it landed, so the
-        // consumer's dedupe-by-id recovers the visible append.
-        throw const FormatException(
-          'Sent message id was not found on the re-read',
-        );
-      }
+      // D-SM2: the audited `send_message` RPC returns the persisted row
+      // (audit follow-up 2026-09-27 — previously the id only, resolved
+      // through a follow-up fetchMessages re-read). The [Message] VO maps
+      // from the RPC response directly, so the row carries the server's own
+      // stored author (profiles, D-RT4) and sent_at with NO second
+      // round-trip — never a fabricated VO. `authorDisplayName` stays in
+      // the domain contract (the fake's seam) but is intentionally unused
+      // on the real path: the RPC derives the stored author in-function.
+      //
+      // A malformed RPC row surfaces loudly through the shared
+      // `_messageFromRow` guard (provider drift, never a silently wrong
+      // sent message). The live channel (D-LV4) still delivers the row if
+      // it landed, so the consumer's dedupe-by-id recovers the visible
+      // append.
+      final Map<String, dynamic> row = await _api.sendMessage(threadId, body);
       return Result<Message>.success(_messageFromRow(row));
     } on SupabaseMessageException catch (e) {
       return Result<Message>.failure(_mapSendFailure(e));
     } on FormatException catch (e) {
-      // Provider drift in the returned/re-read row surfaces loudly, never
+      // Provider drift in the returned row surfaces loudly, never
       // as a silently wrong sent message.
       return Result<Message>.failure(
         AppError(
@@ -139,16 +114,6 @@ mixin _SupabaseMessageMethods on _SupabaseMessageBase {
         ),
       );
     }
-  }
-
-  /// Returns the first row whose `id` equals [id], or null when absent.
-  Map<String, dynamic>? _rowWithId(List<Map<String, dynamic>> rows, String id) {
-    for (final Map<String, dynamic> row in rows) {
-      if (row['id'] == id) {
-        return row;
-      }
-    }
-    return null;
   }
 
   Stream<MessageRealtimeEvent> watchMessages(String threadId) {
@@ -185,32 +150,14 @@ mixin _SupabaseMessageMethods on _SupabaseMessageBase {
   /// failures separable from the reads' (D-LV1); the technical message is
   /// the provider's own — message content never crosses into errors.
   AppError _mapSendFailure(SupabaseMessageException e) {
-    final (
-      String code,
-      String userMessage,
-      AppErrorKind kind,
-    ) = switch (e.kind) {
-      SupabaseMessageFailureKind.denied => (
-        'message_send_denied',
-        'You do not have permission to send messages on this thread.',
-        AppErrorKind.denied,
-      ),
-      SupabaseMessageFailureKind.providerUnavailable => (
-        'message_send_unavailable',
-        'Sending is temporarily unavailable. Please try again.',
-        AppErrorKind.unavailable,
-      ),
-      SupabaseMessageFailureKind.unknown => (
-        'message_send_failed',
-        'Unable to send the message. Please try again.',
-        AppErrorKind.unknown,
-      ),
-    };
-    return AppError(
-      code: code,
-      userMessage: userMessage,
-      kind: kind,
-      technicalMessage: e.message,
+    return _messageFailureFor(
+      e,
+      codePrefix: 'message_send',
+      deniedMessage:
+          'You do not have permission to send messages on this thread.',
+      unavailableMessage:
+          'Sending is temporarily unavailable. Please try again.',
+      failedMessage: 'Unable to send the message. Please try again.',
     );
   }
 
@@ -220,32 +167,13 @@ mixin _SupabaseMessageMethods on _SupabaseMessageBase {
   /// technical message is the provider's own — message content never
   /// crosses into errors.
   AppError _mapMessageFailure(SupabaseMessageException e) {
-    final (
-      String code,
-      String userMessage,
-      AppErrorKind kind,
-    ) = switch (e.kind) {
-      SupabaseMessageFailureKind.denied => (
-        'message_body_read_denied',
-        'You do not have permission to view these messages.',
-        AppErrorKind.denied,
-      ),
-      SupabaseMessageFailureKind.providerUnavailable => (
-        'message_body_read_unavailable',
-        'Messages are temporarily unavailable. Please try again.',
-        AppErrorKind.unavailable,
-      ),
-      SupabaseMessageFailureKind.unknown => (
-        'message_body_read_failed',
-        'Unable to load messages. Please try again.',
-        AppErrorKind.unknown,
-      ),
-    };
-    return AppError(
-      code: code,
-      userMessage: userMessage,
-      kind: kind,
-      technicalMessage: e.message,
+    return _messageFailureFor(
+      e,
+      codePrefix: 'message_body_read',
+      deniedMessage: 'You do not have permission to view these messages.',
+      unavailableMessage:
+          'Messages are temporarily unavailable. Please try again.',
+      failedMessage: 'Unable to load messages. Please try again.',
     );
   }
 }

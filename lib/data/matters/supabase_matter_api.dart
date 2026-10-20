@@ -13,6 +13,21 @@ library;
 typedef MatterTableCaller =
     Future<List<Map<String, dynamic>>> Function(String table, String columns);
 
+/// A server-side title search: table + columns + ilike column + needle +
+/// page size → raw map rows.
+///
+/// Separate callable (rather than widening [MatterTableCaller]) so existing
+/// test injections of the two-arg fetch shape keep compiling; the search
+/// binding is the only file that touches the ilike path.
+typedef MatterSearchCaller =
+    Future<List<Map<String, dynamic>>> Function(
+      String table,
+      String columns,
+      String ilikeColumn,
+      String needle,
+      int limit,
+    );
+
 /// Typed reasons the matters read can fail, mapped from the PostgREST
 /// surface. The read path is a plain RLS-scoped SELECT — the RPC-specific
 /// kinds of the organization seam cannot occur here.
@@ -53,4 +68,12 @@ abstract interface class SupabaseMatterApi {
   /// `status`, `assigned_attorney_id`, `created_at` — the full read surface
   /// the [Matter] VO needs (names resolve via the roster, D-MR4).
   Future<List<Map<String, dynamic>>> fetchMatters();
+
+  /// First page of the caller's assignment-scoped `matters` rows whose
+  /// `title` matches [query] (case-insensitive substring, newest-first).
+  ///
+  /// Same columns and RLS scope as [fetchMatters]; the recall-oriented
+  /// prefilter for unified search (audit: search fan-out). The caller
+  /// still applies its full matching pass — a title prefilter only.
+  Future<List<Map<String, dynamic>>> searchMatters(String query, {int limit});
 }

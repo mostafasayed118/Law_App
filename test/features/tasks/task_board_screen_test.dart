@@ -90,6 +90,45 @@ void main() {
         findsOneWidget,
       );
     });
+
+    testWidgets('advance affordance moves a todo task one legal step', (
+      tester,
+    ) async {
+      await pumpTasks(tester);
+
+      expect(find.text('Demo acquisition review · To do'), findsOneWidget);
+      // The todo row's advance button carries the next-step tooltip.
+      await tester.tap(find.byTooltip('In progress').first);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Demo acquisition review · To do'), findsNothing);
+      expect(
+        find.text('Demo acquisition review · In progress'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('acknowledge affordance stamps the row acknowledged', (
+      tester,
+    ) async {
+      await pumpTasks(tester);
+
+      await tester.tap(find.text('Acknowledge').first);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Acknowledged'), findsOneWidget);
+    });
+
+    testWidgets('done and blocked rows offer no advance affordance', (
+      tester,
+    ) async {
+      await pumpTasks(tester);
+
+      // Five rows: todo(1) + in_progress(2) advance buttons only — the done
+      // row's tooltip and the blocked row never appear as advance targets.
+      expect(find.byTooltip('Done'), findsNWidgets(2));
+      expect(find.byTooltip('In progress'), findsOneWidget);
+    });
   });
 }
 
@@ -113,5 +152,29 @@ class _StubTaskGateway implements TaskBoardGateway {
   @override
   Future<Result<List<TaskItem>>> fetchTasks() async {
     return results.removeAt(0);
+  }
+
+  @override
+  Future<Result<TaskItem>> createTask({
+    required String matterId,
+    required String title,
+    String? assigneeId,
+  }) async {
+    throw UnimplementedError('createTask is not stubbed');
+  }
+
+  @override
+  Future<Result<TaskItem>> advanceTask(String taskId, TaskStatus to) async {
+    throw UnimplementedError('advanceTask is not stubbed');
+  }
+
+  @override
+  Future<Result<TaskItem>> assignTask(String taskId, String assigneeId) async {
+    throw UnimplementedError('assignTask is not stubbed');
+  }
+
+  @override
+  Future<Result<TaskItem>> acknowledgeTask(String taskId) async {
+    throw UnimplementedError('acknowledgeTask is not stubbed');
   }
 }

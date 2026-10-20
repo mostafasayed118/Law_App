@@ -65,4 +65,15 @@ class FakeMatterGateway implements MatterGateway {
       List<Matter>.unmodifiable(syntheticMatters),
     );
   }
+
+  @override
+  Future<Result<List<Matter>>> searchMatters(
+    String query, {
+    int limit = 30,
+  }) async {
+    // In-memory backend: no transfer cost to save, so no prefilter — the
+    // caller's full matching pass is the arbiter and results stay identical
+    // to the fetchMatters path.
+    return fetchMatters();
+  }
 }

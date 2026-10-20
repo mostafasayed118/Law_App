@@ -52,4 +52,20 @@ void main() {
       }
     });
   });
+
+  group('FakeMatterGateway.searchMatters (audit: search fan-out)', () {
+    test('returns the full synthetic list — the cubit refiner is the '
+        'arbiter', () async {
+      final FakeMatterGateway gateway = FakeMatterGateway();
+
+      // In-memory backend: no transfer cost to save, so no prefilter — the
+      // search path serves the identical candidates as the fetch path.
+      final List<Matter>? searched = (await gateway.searchMatters(
+        'anything',
+      )).valueOrNull;
+
+      expect(searched, FakeMatterGateway.syntheticMatters);
+      expect(searched, hasLength(5));
+    });
+  });
 }

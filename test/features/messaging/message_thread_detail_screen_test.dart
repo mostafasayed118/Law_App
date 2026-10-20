@@ -236,6 +236,12 @@ class _StubMessageGateway implements MessageGateway {
       const Result<List<MessageThread>>.success(<MessageThread>[]);
 
   @override
+  Future<Result<List<MessageThread>>> searchThreads(
+    String query, {
+    int limit = 30,
+  }) => fetchThreads();
+
+  @override
   Future<Result<List<Message>>> fetchMessages(String threadId) {
     fetchCalls.add(threadId);
     return Future<Result<List<Message>>>.value(_queue.removeAt(0));

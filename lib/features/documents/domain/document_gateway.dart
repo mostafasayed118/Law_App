@@ -18,4 +18,17 @@ abstract interface class DocumentGateway {
   /// read-first (owner decisions D-V1/D-V2/D-V4). **Metadata only — no
   /// document body ever crosses this boundary.**
   Future<Result<List<Document>>> fetchDocuments();
+
+  /// Recall-oriented title candidate set for unified search (audit:
+  /// search fan-out — server-side prefilter + client-side refine).
+  ///
+  /// Same contract as `MatterGateway.searchMatters`: up to [limit]
+  /// title-matching rows server-side; in-memory backends return their full
+  /// list. Callers MUST still apply their full matching pass (localized
+  /// labels, type names). [limit] mirrors `kSearchPageSize` without
+  /// importing the data layer (layer rule).
+  Future<Result<List<Document>>> searchDocuments(
+    String query, {
+    int limit = 30,
+  });
 }

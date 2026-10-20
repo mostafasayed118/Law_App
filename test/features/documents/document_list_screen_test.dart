@@ -200,6 +200,12 @@ class _EmptyDocumentGateway implements DocumentGateway {
   Future<Result<List<Document>>> fetchDocuments() async {
     return Result<List<Document>>.success(const <Document>[]);
   }
+
+  @override
+  Future<Result<List<Document>>> searchDocuments(
+    String query, {
+    int limit = 30,
+  }) => fetchDocuments();
 }
 
 /// Gateway stub whose single document carries an UNKNOWN matterRef — the
@@ -218,4 +224,10 @@ class _UnresolvedRefDocumentGateway implements DocumentGateway {
       ),
     ]);
   }
+
+  @override
+  Future<Result<List<Document>>> searchDocuments(
+    String query, {
+    int limit = 30,
+  }) => fetchDocuments();
 }

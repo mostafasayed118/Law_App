@@ -116,5 +116,64 @@ void main() {
         );
       },
     );
+
+    test(
+      'searchMatters prefilters the matters table on title with the limit',
+      () async {
+        // Same RLS scope and VO columns as the fetch (D-MR1/D-MR4); the only
+        // additions are the title ilike column + the page size — the
+        // server-side prefilter for unified search (audit: search fan-out).
+        final List<String> searchCalls = <String>[];
+        final SupabaseMatterApiImpl searchApi = SupabaseMatterApiImpl(
+          (String table, String columns) async =>
+              const <Map<String, dynamic>>[],
+          searchCaller:
+              (
+                String table,
+                String columns,
+                String ilikeColumn,
+                String needle,
+                int limit,
+              ) async {
+                searchCalls.add('$table|$columns|$ilikeColumn|$needle|$limit');
+                return const <Map<String, dynamic>>[];
+              },
+        );
+
+        await searchApi.searchMatters('acq', limit: 10);
+
+        expect(searchCalls, <String>[
+          'matters|id, organization_id, title, practice_area, status, '
+              'assigned_attorney_id, created_at|title|acq|10',
+        ]);
+      },
+    );
+
+    test('searchMatters maps a table denial to the denied kind', () async {
+      final SupabaseMatterApiImpl deniedApi = SupabaseMatterApiImpl(
+        (String table, String columns) async => const <Map<String, dynamic>>[],
+        searchCaller:
+            (
+              String table,
+              String columns,
+              String ilikeColumn,
+              String needle,
+              int limit,
+            ) async {
+              throw const PostgrestException(message: 'permission denied');
+            },
+      );
+
+      await expectLater(
+        deniedApi.searchMatters('acq'),
+        throwsA(
+          isA<SupabaseMatterException>().having(
+            (e) => e.kind,
+            'kind',
+            SupabaseMatterFailureKind.denied,
+          ),
+        ),
+      );
+    });
   });
 }

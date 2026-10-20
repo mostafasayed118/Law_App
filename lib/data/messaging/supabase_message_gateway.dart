@@ -34,9 +34,24 @@ class SupabaseMessageGateway extends _SupabaseMessageBase
   SupabaseMessageGateway(super._api, super._realtimeApi);
 
   @override
-  Future<Result<List<MessageThread>>> fetchThreads() async {
+  Future<Result<List<MessageThread>>> fetchThreads() =>
+      _runThreads(_api.fetchMessageThreads);
+
+  @override
+  Future<Result<List<MessageThread>>> searchThreads(
+    String query, {
+    int limit = 30,
+  }) => _runThreads(() => _api.searchMessageThreads(query, limit: limit));
+
+  /// Runs a thread read (full fetch or title-prefiltered search) through
+  /// the identical mapping path. The search prefilter only shrinks the
+  /// transfer — mapping and failure semantics never diverge between the
+  /// two reads.
+  Future<Result<List<MessageThread>>> _runThreads(
+    Future<List<Map<String, dynamic>>> Function() read,
+  ) async {
     try {
-      final List<Map<String, dynamic>> rows = await _api.fetchMessageThreads();
+      final List<Map<String, dynamic>> rows = await read();
       return Result<List<MessageThread>>.success(
         List<MessageThread>.unmodifiable(rows.map(_threadFromRow)),
       );

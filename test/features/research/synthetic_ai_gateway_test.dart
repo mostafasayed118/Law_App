@@ -18,6 +18,12 @@ class _FailingDocumentGateway implements DocumentGateway {
       const Result<List<Document>>.failure(
         AppError(code: 'doc-fail', userMessage: 'documents unavailable'),
       );
+
+  @override
+  Future<Result<List<Document>>> searchDocuments(
+    String query, {
+    int limit = 30,
+  }) => fetchDocuments();
 }
 
 /// A matter gateway that always fails — drives the typed-failure
@@ -28,6 +34,10 @@ class _FailingMatterGateway implements MatterGateway {
       const Result<List<Matter>>.failure(
         AppError(code: 'matter-fail', userMessage: 'matters unavailable'),
       );
+
+  @override
+  Future<Result<List<Matter>>> searchMatters(String query, {int limit = 30}) =>
+      fetchMatters();
 }
 
 void main() {

@@ -160,6 +160,16 @@ class _StubMessageGateway implements MessageGateway {
   }
 
   @override
+  Future<Result<List<MessageThread>>> searchThreads(
+    String query, {
+    int limit = 30,
+  }) {
+    // Not exercised by the thread-list cubit tests; delegates so the seam
+    // stays implementable.
+    return fetchThreads();
+  }
+
+  @override
   Future<Result<List<Message>>> fetchMessages(String threadId) async {
     // Not exercised by the thread-list cubit tests; an honest empty success
     // keeps the seam implementable for the detail cubit tests.

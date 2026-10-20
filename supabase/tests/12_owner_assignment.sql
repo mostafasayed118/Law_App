@@ -205,3 +205,24 @@ begin
     raise exception 'POLICY-BATTERY FAIL 12.10: platform owner id appears in % invoice row(s)', v_cnt;
   end if;
 end $$;
+
+-- CHECK 12.11 — tasks (uuid columns: id, organization_id, matter_id,
+-- assignee_id, acknowledged_by). The assignee position is the meaningful
+-- one: tasks carry their own assignment column (unlike the other content
+-- tables), so the owner-must-never-be-assigned invariant is pinned here
+-- directly — the RPCs refuse it (F2-D2), and this sweep proves no seed or
+-- drift created it off-RPC either.
+do $$
+declare
+  v_owner uuid;
+  v_cnt   bigint;
+begin
+  select owner_user_id into v_owner from public.platform_config limit 1;
+  select count(*) into v_cnt
+    from public.tasks
+   where id = v_owner or organization_id = v_owner or matter_id = v_owner
+       or assignee_id = v_owner or acknowledged_by = v_owner;
+  if v_cnt <> 0 then
+    raise exception 'POLICY-BATTERY FAIL 12.11: platform owner id appears in % task row(s)', v_cnt;
+  end if;
+end $$;

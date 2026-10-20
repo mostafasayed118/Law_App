@@ -41,6 +41,12 @@ class _StubDocumentGateway implements DocumentGateway {
   @override
   Future<Result<List<Document>>> fetchDocuments() async =>
       Result<List<Document>>.success(documents);
+
+  @override
+  Future<Result<List<Document>>> searchDocuments(
+    String query, {
+    int limit = 30,
+  }) => fetchDocuments();
 }
 
 class _StubMatterGateway implements MatterGateway {
@@ -50,18 +56,32 @@ class _StubMatterGateway implements MatterGateway {
   @override
   Future<Result<List<Matter>>> fetchMatters() async =>
       Result<List<Matter>>.success(matters);
+
+  @override
+  Future<Result<List<Matter>>> searchMatters(String query, {int limit = 30}) =>
+      fetchMatters();
 }
 
 class _FailingDocumentGateway implements DocumentGateway {
   @override
   Future<Result<List<Document>>> fetchDocuments() async =>
       Result<List<Document>>.failure(_loadFailure);
+
+  @override
+  Future<Result<List<Document>>> searchDocuments(
+    String query, {
+    int limit = 30,
+  }) => fetchDocuments();
 }
 
 class _FailingMatterGateway implements MatterGateway {
   @override
   Future<Result<List<Matter>>> fetchMatters() async =>
       Result<List<Matter>>.failure(_loadFailure);
+
+  @override
+  Future<Result<List<Matter>>> searchMatters(String query, {int limit = 30}) =>
+      fetchMatters();
 }
 
 void main() {

@@ -22,6 +22,16 @@ class _StubSupabaseMatterApi implements SupabaseMatterApi {
     }
     return rows;
   }
+
+  @override
+  Future<List<Map<String, dynamic>>> searchMatters(
+    String query, {
+    int limit = 30,
+  }) async {
+    // Same canned rows as the fetch path: the gateway's search mapping is
+    // the fetch mapping, so both read the identical canned surface.
+    return fetchMatters();
+  }
 }
 
 /// Hand-rolled fake of the [OrganizationGateway] roster seam for name
@@ -364,6 +374,42 @@ void main() {
         // technical message.
         expect(error.technicalMessage, 'provider hiccup');
         expect(error.context, isEmpty);
+      },
+    );
+  });
+
+  group('searchMatters runs the identical mapping path (audit: search '
+      'fan-out)', () {
+    test('maps title-prefiltered rows through the same VO path', () async {
+      api.rows = <Map<String, dynamic>>[_row()];
+      orgGateway.listMembersResult = OrgOutcome<List<OrgMember>>.success(
+        <OrgMember>[_member('attorney-1', 'Layla Mansour')],
+      );
+
+      final Result<List<Matter>> result = await gateway.searchMatters('acq');
+
+      // The prefilter only shrinks the transfer: identical rows map to
+      // identical VOs with identical roster resolution.
+      expect(result.isSuccess, isTrue);
+      final Matter matter = result.valueOrNull!.single;
+      expect(matter.id, 'm-1');
+      expect(matter.title, 'Demo acquisition review');
+      expect(matter.practiceArea, PracticeArea.corporate);
+      expect(matter.status, MatterStatus.active);
+      expect(matter.assignedAttorneyName, 'Layla Mansour');
+    });
+
+    test(
+      'maps a seam denial to the same denied AppError as the fetch',
+      () async {
+        api.error = const SupabaseMatterException(
+          kind: SupabaseMatterFailureKind.denied,
+          message: 'permission denied',
+        );
+
+        final Result<List<Matter>> result = await gateway.searchMatters('acq');
+
+        expect(result.errorOrNull!.code, 'matter_read_denied');
       },
     );
   });

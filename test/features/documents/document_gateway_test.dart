@@ -93,4 +93,20 @@ void main() {
       }
     });
   });
+
+  group('FakeDocumentGateway.searchDocuments (audit: search fan-out)', () {
+    test('returns the full synthetic list — the cubit refiner is the '
+        'arbiter', () async {
+      final FakeDocumentGateway gateway = FakeDocumentGateway();
+
+      // In-memory backend: no transfer cost to save, so no prefilter — the
+      // search path serves the identical candidates as the fetch path.
+      final List<Document>? searched = (await gateway.searchDocuments(
+        'anything',
+      )).valueOrNull;
+
+      expect(searched, FakeDocumentGateway.syntheticDocuments);
+      expect(searched, hasLength(5));
+    });
+  });
 }

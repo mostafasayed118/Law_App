@@ -127,5 +127,62 @@ void main() {
         );
       },
     );
+
+    test('searchDocuments prefilters the documents table on title with the '
+        'limit', () async {
+      // Same RLS scope, VO columns, and matters(title) embed as the fetch
+      // (D-DR1/D-DR2/D-DR4); the only additions are the title ilike column
+      // + the page size — the server-side prefilter for unified search
+      // (audit: search fan-out).
+      final List<String> searchCalls = <String>[];
+      final SupabaseDocumentApiImpl searchApi = SupabaseDocumentApiImpl(
+        (String table, String columns) async => const <Map<String, dynamic>>[],
+        searchCaller:
+            (
+              String table,
+              String columns,
+              String ilikeColumn,
+              String needle,
+              int limit,
+            ) async {
+              searchCalls.add('$table|$columns|$ilikeColumn|$needle|$limit');
+              return const <Map<String, dynamic>>[];
+            },
+      );
+
+      await searchApi.searchDocuments('letter', limit: 10);
+
+      expect(searchCalls, <String>[
+        'documents|id, matter_id, title, document_type, created_at, '
+            'matters(title)|title|letter|10',
+      ]);
+    });
+
+    test('searchDocuments maps a table denial to the denied kind', () async {
+      final SupabaseDocumentApiImpl deniedApi = SupabaseDocumentApiImpl(
+        (String table, String columns) async => const <Map<String, dynamic>>[],
+        searchCaller:
+            (
+              String table,
+              String columns,
+              String ilikeColumn,
+              String needle,
+              int limit,
+            ) async {
+              throw const PostgrestException(message: 'permission denied');
+            },
+      );
+
+      await expectLater(
+        deniedApi.searchDocuments('letter'),
+        throwsA(
+          isA<SupabaseDocumentException>().having(
+            (e) => e.kind,
+            'kind',
+            SupabaseDocumentFailureKind.denied,
+          ),
+        ),
+      );
+    });
   });
 }

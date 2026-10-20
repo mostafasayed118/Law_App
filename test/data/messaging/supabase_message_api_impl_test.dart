@@ -85,6 +85,68 @@ void main() {
       },
     );
 
+    test('searchMessageThreads prefilters the message_threads table on title '
+        'with the limit', () async {
+      // Same RLS scope, VO columns, and matters(title) embed as the
+      // threads read (D-MSR1/D-MSR2/D-MSR4); the only additions are the
+      // title ilike column + the page size — the server-side prefilter
+      // for unified search (audit: search fan-out).
+      final List<String> searchCalls = <String>[];
+      final SupabaseMessageApiImpl searchApi = SupabaseMessageApiImpl(
+        (String table, String columns, [String? threadId]) async =>
+            const <Map<String, dynamic>>[],
+        searchCaller:
+            (
+              String table,
+              String columns,
+              String ilikeColumn,
+              String needle,
+              int limit,
+            ) async {
+              searchCalls.add('$table|$columns|$ilikeColumn|$needle|$limit');
+              return const <Map<String, dynamic>>[];
+            },
+      );
+
+      await searchApi.searchMessageThreads('updates', limit: 10);
+
+      expect(searchCalls, <String>[
+        'message_threads|id, matter_id, title, participants, message_count, '
+            'last_activity_at, matters(title)|title|updates|10',
+      ]);
+    });
+
+    test(
+      'searchMessageThreads maps a table denial to the denied kind',
+      () async {
+        final SupabaseMessageApiImpl deniedApi = SupabaseMessageApiImpl(
+          (String table, String columns, [String? threadId]) async =>
+              const <Map<String, dynamic>>[],
+          searchCaller:
+              (
+                String table,
+                String columns,
+                String ilikeColumn,
+                String needle,
+                int limit,
+              ) async {
+                throw const PostgrestException(message: 'permission denied');
+              },
+        );
+
+        await expectLater(
+          deniedApi.searchMessageThreads('updates'),
+          throwsA(
+            isA<SupabaseMessageException>().having(
+              (e) => e.kind,
+              'kind',
+              SupabaseMessageFailureKind.denied,
+            ),
+          ),
+        );
+      },
+    );
+
     test(
       'fetchMessageThreads maps an RLS denial text to the denied kind',
       () async {
@@ -234,12 +296,25 @@ void main() {
     });
 
     test('sendMessage calls the audited send_message RPC with the thread + '
-        'body and returns the persisted id (D-SM2)', () async {
-      rpcData['send_message'] = 'msg-1';
+        'body and returns the persisted row (D-SM2)', () async {
+      rpcData['send_message'] = <String, dynamic>{
+        'id': 'msg-1',
+        'thread_id': 'thread-1',
+        'author_display_name': 'Demo Partner',
+        'body': 'A demo body',
+        'sent_at': '2026-08-08T12:00:00.000Z',
+      };
 
-      final String id = await api.sendMessage('thread-1', 'A demo body');
+      final Map<String, dynamic> row = await api.sendMessage(
+        'thread-1',
+        'A demo body',
+      );
 
-      expect(id, 'msg-1');
+      // The RPC returns the full persisted row (audit follow-up 2026-09-27
+      // — previously the id only, resolved via a re-read): the gateway
+      // maps the VO from this response with no second round-trip.
+      expect(row['id'], 'msg-1');
+      expect(row['author_display_name'], 'Demo Partner');
       // The only call is the RPC — no org pre-read (Q4: resolution moved
       // into the function) and no INSERT.
       expect(rpcCalls, <String>[
@@ -249,7 +324,13 @@ void main() {
 
     test('sendMessage sends no author — the RPC derives the stored author '
         'in-function (D-RT4)', () async {
-      rpcData['send_message'] = 'msg-2';
+      rpcData['send_message'] = <String, dynamic>{
+        'id': 'msg-2',
+        'thread_id': 'thread-1',
+        'author_display_name': 'Demo Partner',
+        'body': 'Body',
+        'sent_at': '2026-08-08T12:00:00.000Z',
+      };
 
       await api.sendMessage('thread-1', 'Body');
 
@@ -322,7 +403,7 @@ void main() {
       );
     });
 
-    test('sendMessage fails loudly when the RPC returns no id', () async {
+    test('sendMessage fails loudly when the RPC returns no row', () async {
       rpcData['send_message'] = null;
 
       await expectLater(
@@ -336,5 +417,26 @@ void main() {
         ),
       );
     });
+
+    test(
+      'sendMessage fails loudly when the RPC returns a non-row payload',
+      () async {
+        // A bare id string (the pre-follow-up shape) is no longer a valid
+        // response: the contract is the full row, so anything else is a loud
+        // unknown, never a silently mis-mapped VO.
+        rpcData['send_message'] = 'msg-1';
+
+        await expectLater(
+          api.sendMessage('thread-1', 'Body'),
+          throwsA(
+            isA<SupabaseMessageException>().having(
+              (e) => e.kind,
+              'kind',
+              SupabaseMessageFailureKind.unknown,
+            ),
+          ),
+        );
+      },
+    );
   });
 }

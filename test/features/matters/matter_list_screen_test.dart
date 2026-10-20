@@ -125,4 +125,8 @@ class _EmptyMatterGateway implements MatterGateway {
   Future<Result<List<Matter>>> fetchMatters() async {
     return Result<List<Matter>>.success(const <Matter>[]);
   }
+
+  @override
+  Future<Result<List<Matter>>> searchMatters(String query, {int limit = 30}) =>
+      fetchMatters();
 }

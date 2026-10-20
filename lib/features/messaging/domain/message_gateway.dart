@@ -34,6 +34,20 @@ abstract interface class MessageGateway {
   /// metadata only — no message body crosses this boundary here.**
   Future<Result<List<MessageThread>>> fetchThreads();
 
+  /// Recall-oriented title candidate set for unified search (audit:
+  /// search fan-out — server-side prefilter + client-side refine).
+  ///
+  /// Same contract as `MatterGateway.searchMatters`: up to [limit]
+  /// title-matching threads server-side; in-memory backends return their
+  /// full list. Callers MUST still apply their full matching pass
+  /// (localized labels, participant names). [limit] mirrors
+  /// `kSearchPageSize` without importing the data layer (layer rule).
+  /// **Thread metadata only — no message body crosses here.**
+  Future<Result<List<MessageThread>>> searchThreads(
+    String query, {
+    int limit = 30,
+  });
+
   /// The caller's assignment-scoped message rows for one thread (the
   /// `messages_select_assigned` RLS gate — the thread gate extended one
   /// hop, D-RT2). Deterministic and read-only. **This is the read-path

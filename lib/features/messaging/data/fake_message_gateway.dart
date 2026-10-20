@@ -101,6 +101,17 @@ class FakeMessageGateway implements MessageGateway {
     return Result<List<MessageThread>>.success(syntheticThreads);
   }
 
+  @override
+  Future<Result<List<MessageThread>>> searchThreads(
+    String query, {
+    int limit = 30,
+  }) async {
+    // In-memory backend: no transfer cost to save, so no prefilter — the
+    // caller's full matching pass is the arbiter and results stay identical
+    // to the fetchThreads path.
+    return fetchThreads();
+  }
+
   /// Instance-local messages sent through [sendMessage] in this fake's
   /// lifetime (keyed by thread). Kept OFF the static synthetic map so tests
   /// and dev runs never share sent state (the fake determinism pin).

@@ -170,9 +170,8 @@ class SupabaseTaskGateway implements TaskBoardGateway {
   /// Every cast below is guarded above (id/title/status), so a malformed
   /// row surfaces as a typed FormatException → AppError, never a raw
   /// TypeError across the boundary. The server status enum
-  /// (`todo`/`in_progress`/`done`) maps onto the VO's [TaskStatus]; any
-  /// other value is provider drift and fails loudly (the VO's `blocked`
-  /// exists only on synthetic dev rows and never arrives from the server).
+  /// (`todo`/`in_progress`/`blocked`/`done`) maps onto the VO's
+  /// [TaskStatus]; any other value is provider drift and fails loudly.
   /// `acknowledged` derives from `acknowledged_at` being set — the stamp
   /// itself never crosses (no timestamp PII in the VO).
   TaskItem _taskFromRow(Map<String, dynamic> row) {
@@ -188,6 +187,7 @@ class SupabaseTaskGateway implements TaskBoardGateway {
     final TaskStatus mapped = switch (status) {
       'todo' => TaskStatus.todo,
       'in_progress' => TaskStatus.inProgress,
+      'blocked' => TaskStatus.blocked,
       'done' => TaskStatus.done,
       _ => throw FormatException('Task row has unknown status: $status'),
     };
@@ -235,17 +235,17 @@ class SupabaseTaskGateway implements TaskBoardGateway {
     return DateTime.parse(createdAt).toLocal();
   }
 
-  /// Maps the VO's [TaskStatus] to the server enum value. `blocked` is
-  /// synthetic-only and can never be sent (the cubit never offers the
-  /// transition — this throw is defense-in-depth, never a user path).
+  /// Maps the VO's [TaskStatus] to the server enum value. The UI never
+  /// offers a `blocked` transition today (the tile's next-step ladder is
+  /// todo → in_progress → done), but the server domain accepts it and a
+  /// blocked row can arrive from the provider — mapping it here keeps the
+  /// read/write domain symmetric.
   String _serverStatusFor(TaskStatus status) {
     return switch (status) {
       TaskStatus.todo => 'todo',
       TaskStatus.inProgress => 'in_progress',
+      TaskStatus.blocked => 'blocked',
       TaskStatus.done => 'done',
-      TaskStatus.blocked => throw ArgumentError(
-        'TaskStatus.blocked has no server status',
-      ),
     };
   }
 

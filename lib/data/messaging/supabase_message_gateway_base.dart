@@ -9,3 +9,42 @@ class _SupabaseMessageBase {
   final SupabaseMessageApi _api;
   final SupabaseMessageRealtimeApi _realtimeApi;
 }
+
+/// Shared failure-mapper core for the three message-gateway mappers
+/// (`_mapFailure`, `_mapSendFailure`, `_mapMessageFailure` — audit
+/// 2026-09-27, Q-Q2): the switch shape and the kind mapping are identical,
+/// only the code prefix and the user-facing copy differ per scope, so each
+/// mapper supplies those and the match-once logic lives here. The technical
+/// message is the provider's own — message content never crosses into
+/// errors.
+AppError _messageFailureFor(
+  SupabaseMessageException e, {
+  required String codePrefix,
+  required String deniedMessage,
+  required String unavailableMessage,
+  required String failedMessage,
+}) {
+  final (String code, String userMessage, AppErrorKind kind) = switch (e.kind) {
+    SupabaseMessageFailureKind.denied => (
+      '${codePrefix}_denied',
+      deniedMessage,
+      AppErrorKind.denied,
+    ),
+    SupabaseMessageFailureKind.providerUnavailable => (
+      '${codePrefix}_unavailable',
+      unavailableMessage,
+      AppErrorKind.unavailable,
+    ),
+    SupabaseMessageFailureKind.unknown => (
+      '${codePrefix}_failed',
+      failedMessage,
+      AppErrorKind.unknown,
+    ),
+  };
+  return AppError(
+    code: code,
+    userMessage: userMessage,
+    kind: kind,
+    technicalMessage: e.message,
+  );
+}

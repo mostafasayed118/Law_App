@@ -13,6 +13,21 @@ library;
 typedef DocumentTableCaller =
     Future<List<Map<String, dynamic>>> Function(String table, String columns);
 
+/// A server-side title search: table + columns + ilike column + needle +
+/// page size → raw map rows.
+///
+/// Separate callable (rather than widening [DocumentTableCaller]) so existing
+/// test injections of the two-arg fetch shape keep compiling; the search
+/// binding is the only file that touches the ilike path.
+typedef DocumentSearchCaller =
+    Future<List<Map<String, dynamic>>> Function(
+      String table,
+      String columns,
+      String ilikeColumn,
+      String needle,
+      int limit,
+    );
+
 /// Typed reasons the documents read can fail, mapped from the PostgREST
 /// surface. The read path is a plain RLS-scoped SELECT — the RPC-specific
 /// kinds of the organization seam cannot occur here.
@@ -54,4 +69,13 @@ abstract interface class SupabaseDocumentApi {
   /// `created_at`, `matters(title)` — the metadata-only read surface the
   /// [Document] VO needs (D-V1: no body/content/size/url column exists).
   Future<List<Map<String, dynamic>>> fetchDocuments();
+
+  /// First page of the caller's assignment-scoped `documents` rows whose
+  /// `title` matches [query] (case-insensitive substring, newest-first).
+  ///
+  /// Same columns, embed, and RLS scope as [fetchDocuments]; the
+  /// recall-oriented prefilter for unified search (audit: search fan-out).
+  /// The caller still applies its full matching pass — a title prefilter
+  /// only.
+  Future<List<Map<String, dynamic>>> searchDocuments(String query, {int limit});
 }

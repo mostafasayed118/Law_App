@@ -54,6 +54,9 @@ import '../data/orgs/supabase_organization_gateway.dart';
 import '../data/storage/supabase_storage_api.dart';
 import '../data/storage/supabase_storage_api_impl.dart';
 import '../data/storage/supabase_storage_gateway.dart';
+import '../data/tasks/supabase_task_api.dart';
+import '../data/tasks/supabase_task_api_impl.dart';
+import '../data/tasks/supabase_task_gateway.dart';
 import '../features/approvals/data/fake_approvals_gateway.dart';
 import '../features/approvals/domain/approvals_gateway.dart';
 import '../features/auth/data/fake_password_recovery_gateway.dart';
@@ -135,6 +138,7 @@ void configureDependencies({
   SupabaseStorageApi Function()? supabaseStorageApiFactory,
   SupabaseBillingApi Function()? supabaseBillingApiFactory,
   SupabaseNotificationApi Function()? supabaseNotificationApiFactory,
+  SupabaseTaskApi Function()? supabaseTaskApiFactory,
 }) {
   // Lazy singleton: stateless service, created on first resolution.
   // Per §4.5, stateless services/repositories register as lazy singletons.
@@ -163,6 +167,7 @@ void configureDependencies({
     supabaseStorageApiFactory: supabaseStorageApiFactory,
     supabaseBillingApiFactory: supabaseBillingApiFactory,
     supabaseNotificationApiFactory: supabaseNotificationApiFactory,
+    supabaseTaskApiFactory: supabaseTaskApiFactory,
   );
   _registerAppCubits();
   _registerDemoGateways();

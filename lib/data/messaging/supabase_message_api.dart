@@ -20,6 +20,21 @@ typedef MessageTableCaller =
       String? threadId,
     ]);
 
+/// A server-side title search: table + columns + ilike column + needle +
+/// page size → raw map rows.
+///
+/// Separate callable (rather than widening [MessageTableCaller]) so existing
+/// test injections of the thread-messages shape keep compiling; the search
+/// binding is the only file that touches the ilike path.
+typedef MessageSearchCaller =
+    Future<List<Map<String, dynamic>>> Function(
+      String table,
+      String columns,
+      String ilikeColumn,
+      String needle,
+      int limit,
+    );
+
 /// Typed reasons the message-thread read can fail, mapped from the PostgREST
 /// surface. The read path is a plain RLS-scoped SELECT — the RPC-specific
 /// kinds of the organization seam cannot occur here.
@@ -71,6 +86,19 @@ abstract interface class SupabaseMessageApi {
   /// body/preview/attachment/sender column exists).
   Future<List<Map<String, dynamic>>> fetchMessageThreads();
 
+  /// First page of the caller's assignment-scoped `message_threads` rows
+  /// whose `title` matches [query] (case-insensitive substring,
+  /// newest-first).
+  ///
+  /// Same columns, embed, and RLS scope as [fetchMessageThreads]; the
+  /// recall-oriented prefilter for unified search (audit: search fan-out).
+  /// The caller still applies its full matching pass (participant names
+  /// never cross the seam) — a title prefilter only.
+  Future<List<Map<String, dynamic>>> searchMessageThreads(
+    String query, {
+    int limit,
+  });
+
   /// The caller's assignment-scoped `messages` rows for one thread.
   ///
   /// Columns requested: `id`, `thread_id`, `author_display_name`, `body`,
@@ -81,7 +109,7 @@ abstract interface class SupabaseMessageApi {
   Future<List<Map<String, dynamic>>> fetchMessages(String threadId);
 
   /// Sends one message on the thread through the audited `send_message`
-  /// RPC (D-SM2) and returns the persisted message id.
+  /// RPC (D-SM2) and returns the persisted row.
   ///
   /// The RPC is the ONLY message write path (D-SM3 — the direct-INSERT
   /// grant is revoked and `messages_insert_assigned` dropped), so the
@@ -90,7 +118,9 @@ abstract interface class SupabaseMessageApi {
   /// sends only the thread id + body — no org pre-read — and the author
   /// is derived in-function from profiles (the D-RT4 stored-name
   /// convention), so no author is sent either. The RPC returns the
-  /// persisted message id (uuid); the gateway resolves the full row
-  /// through the shipped fetch read.
-  Future<String> sendMessage(String threadId, String body);
+  /// persisted row as jsonb (`id`, `thread_id`, `author_display_name`,
+  /// `body`, `sent_at` — audit follow-up 2026-09-27), so the gateway maps
+  /// the VO from the response directly with NO follow-up fetchMessages
+  /// re-read; the row carries the server's own stored author and sent_at.
+  Future<Map<String, dynamic>> sendMessage(String threadId, String body);
 }

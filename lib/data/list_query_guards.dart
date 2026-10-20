@@ -44,6 +44,7 @@ const Map<String, (String, bool)> kSupabaseListOrderings =
       // detail screen's top-to-bottom render and the live-append path; the
       // `messages_thread_sent (thread_id, sent_at)` index serves both.
       'messages': ('sent_at', true),
+      'tasks': ('created_at', true),
     };
 
 /// The deterministic server-side ordering for `table`, or `null` when the
@@ -54,6 +55,40 @@ const Map<String, (String, bool)> kSupabaseListOrderings =
 /// Exposed as a pure function so the ordering decision is unit-testable
 /// without a Supabase instance (the binding itself needs the app client).
 (String, bool)? orderingFor(String table) => kSupabaseListOrderings[table];
+
+/// Per-table allowlist for caller-supplied filter column names (audit A03).
+///
+/// `.eq()`/`.ilike()` take a raw column name: PostgREST validates it against
+/// the schema (so no SQL injection), but without an allowlist a
+/// caller-controlled name could probe filters on columns that must never
+/// drive a query (e.g. RLS-bypass-adjacent or PII-heavy columns). Columns
+/// land here only when verified against the migration-set projections; a
+/// table with no entry (or a column missing from its set) fails closed with
+/// an [ArgumentError] — a programming error, never user input.
+const Map<String, Set<String>> kSupabaseFilterableColumns =
+    <String, Set<String>>{
+      'matters': <String>{
+        'id',
+        'organization_id',
+        'title',
+        'practice_area',
+        'status',
+        'assigned_attorney_id',
+      },
+      'documents': <String>{'id', 'matter_id', 'title', 'document_type'},
+      'messages': <String>{'id', 'thread_id'},
+      'message_threads': <String>{'id', 'matter_id', 'title'},
+    };
+
+/// Throws [ArgumentError] unless [column] is an allowed filter on [table].
+void requireFilterableColumn(String table, String column) {
+  final Set<String>? allowed = kSupabaseFilterableColumns[table];
+  if (allowed == null || !allowed.contains(column)) {
+    throw ArgumentError(
+      'Column "$column" is not an allowed filter on table "$table".',
+    );
+  }
+}
 
 /// The production table-SELECT binding shared by every Supabase api impl:
 /// a bounded, deterministically ordered table SELECT with an optional
@@ -93,9 +128,11 @@ Future<List<Map<String, dynamic>>> boundedTableSelect(
       .from(table)
       .select(columns);
   if (filterColumn != null && filterValue != null) {
+    requireFilterableColumn(table, filterColumn);
     filtered = filtered.eq(filterColumn, filterValue);
   }
   if (ilikeColumn != null && ilikeValue != null && ilikeValue.isNotEmpty) {
+    requireFilterableColumn(table, ilikeColumn);
     filtered = filtered.ilike(ilikeColumn, '%${_escapeIlike(ilikeValue)}%');
   }
   PostgrestTransformBuilder<List<Map<String, dynamic>>> query = filtered;

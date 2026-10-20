@@ -50,7 +50,7 @@ class DocumentListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: <BlocProvider<dynamic>>[
+      providers: [
         BlocProvider<DocumentCubit>(
           create: (BuildContext context) =>
               DocumentCubit(serviceLocator<DocumentGateway>()),
@@ -148,6 +148,9 @@ class _ListSurfaceState extends State<_ListSurface> {
     ColorScheme scheme,
   ) {
     final DocumentCubit cubit = context.read<DocumentCubit>();
+    // Title index built ONCE per render (audit: per-row resolveMatterByTitle
+    // was O(rows × matters)); each tile resolves its reverse link in O(1).
+    final Map<String, Matter> matterIndex = buildMatterTitleIndex(matters);
     final Widget empty = Padding(
       padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
       child: Text(
@@ -165,7 +168,7 @@ class _ListSurfaceState extends State<_ListSurface> {
       onRetry: cubit.load,
       tileBuilder: (BuildContext context, Document document) => _DocumentTile(
         document: document,
-        onViewMatter: _matterTap(context, document, matters),
+        onViewMatter: _matterTap(context, document, matterIndex),
       ),
       empty: empty,
       errorCopy: l10n.vaultError,
@@ -180,12 +183,15 @@ class _ListSurfaceState extends State<_ListSurface> {
   VoidCallback? _matterTap(
     BuildContext context,
     Document document,
-    List<Matter> matters,
+    Map<String, Matter> matterIndex,
   ) {
     if (!widget.capabilities.canViewMatters) {
       return null;
     }
-    final Matter? matter = resolveMatterByTitle(matters, document.matterRef);
+    final Matter? matter = resolveMatterByTitleIn(
+      matterIndex,
+      document.matterRef,
+    );
     if (matter == null) {
       return null;
     }
