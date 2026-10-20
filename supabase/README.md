@@ -210,6 +210,6 @@ gated on this rehearsal passing + the owner's dated apply-approval
   data, no service-role usage, no compliance claim.
 - The Flutter code (`lib/`) is untouched by this slice.
 
-### Paymob edge functions (code-complete, NOT deployed)
+### Paymob edge functions (deployed 2026-10-21; secrets pending)
 
-`supabase/functions/` carries `paymob-initiate` (verify_jwt = true), `paymob-webhook` and `paymob-reconcile` (verify_jwt = false), plus `_shared/paymob.ts`. Secret names (values never committed) are listed in `supabase/functions/.env.example`: `PAYMOB_API_KEY`, `PAYMOB_HMAC_SECRET`, `PAYMOB_INTEGRATION_ID`, `PAYMOB_IFRAME_ID`, `PAYMOB_BASE_URL`, `PAYMOB_RECONCILE_SECRET`. Deployment and `supabase secrets set` are owner-gated; this slice deploys nothing and live payment stays disabled by default (`PAYMENTS_MODE=disabled`).
+`supabase/functions/` carries `paymob-initiate` (verify_jwt = true), `paymob-webhook` and `paymob-reconcile` (verify_jwt = false), plus `_shared/paymob.ts`. All three were deployed on 2026-10-21 with `supabase functions deploy --use-api`. Secret names (values never committed) are listed in `supabase/functions/.env.example`: `PAYMOB_API_KEY`, `PAYMOB_HMAC_SECRET`, `PAYMOB_INTEGRATION_ID`, `PAYMOB_IFRAME_ID`, `PAYMOB_BASE_URL`, `PAYMOB_RECONCILE_SECRET`. **None of the `PAYMOB_*` secrets are set on the project yet**, so the functions return `server_misconfigured`; live payment stays disabled by default (`PAYMENTS_MODE=disabled`) until the secrets and the Paymob callback URL are configured. See `docs/live_apply_2026-10-21.md`.

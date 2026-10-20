@@ -24,6 +24,10 @@ screens behind an auth-aware GoRouter shell.
   as the credential-free fakes, and env-configured builds flip per seam.
 - **Localization** — full EN / AR / TR with RTL layouts and generated
   localizations.
+- **Live backend** — the task, booking, matter-file-write and payment schema
+  and RPCs are applied on the dev project; live payment collection stays
+  disabled until the Paymob secrets and a dated D-11 exception are in place
+  ([apply record](docs/live_apply_2026-10-21.md)).
 - **Quality gates** — 1736 tests, analyzer-clean, `dart format` pinned to the
   CI toolchain, a hash-pinned governance ledger (`scripts/verify_ledger.sh`)
   reconciling docs claims against the git object database, and
