@@ -101,7 +101,10 @@ must map to a named test; an AC without one is not met.
   phase adds no backend, no schema/RLS/policy, no matrix addendum (booking
   is not an org-surface).
 - No attorney-discovery integration (D-B7 decided 2026-08-03: standalone; additive `attorneyId` slice **deferred**, see decision record), no availability logic, no payment, no
-  video/phone/in-person consultation modes (D-B1).
+  video/phone/in-person consultation modes (deferred to the video track —
+  see `docs/video_scope_decision_2026-08-11.md` A-1; the earlier `(D-B1)`
+  citation here was a copy-paste slip, corrected 2026-09-27 — D-B1 covers
+  category options, not consultation modes).
 - The four checks were **NOT** run against the branch on this machine at
   drafting time (R1) — at landing (`05f13c8`/`0eb7ec9`/`3bd3d29`) the full
   gate stack was run on the merged tree: format CLEAN, analyze clean, 521

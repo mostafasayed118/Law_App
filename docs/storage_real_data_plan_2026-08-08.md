@@ -175,6 +175,13 @@ follow-up); realtime file events; audit surfacing for storage reads (stays
   CHECK rejects a negative value; matter-delete cascade removes its files
   rows; the storage.objects teardown deletes the temp objects (no matters
   FK — cleaned by the battery, pinned).
+  Harness cross-reference (D-BI6 style — added 2026-09-27): the battery
+  consumes the shared `supabase/tests/00_fixtures.sql` fixture matters
+  (the same six ids the invoice battery's D-BI6 references) and is wired
+  into `scripts/verify_policy_tests.sh` (`BATTERY_FILES` entry, run loop,
+  `--apply` order per `supabase/README.md`) — i.e. the same harness +
+  fixture contract as `11_invoice_rls.sql`, so a fixture-id change breaks
+  both batteries identically instead of silently.
 - **Dart unit:** `SupabaseStorageGateway` row→VO mapping (size_bytes/mime/
   storage_path guarded casts, matterRef embed + fallback, failure mapping
   incl. `providerUnavailable`, malformed-row guards — the documents T7

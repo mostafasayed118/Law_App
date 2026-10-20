@@ -1,10 +1,11 @@
-﻿# LegalHub Flutter bootstrap
+# LegalHub Flutter bootstrap
 
 LegalHub implements the approved **B1–B13 foundation scope** plus the
-auth/onboarding presentation scaffold and the first backend-free domain
-contract (`SignUpRequest`). It is not a production legal platform and does not
-connect to authentication, legal data, payments, AI, document storage, or
-messaging services.
+Supabase-backed auth, organization, matter, document, messaging, billing,
+notification, and task slices. It is not yet a production legal platform:
+booking, attorney discovery, approvals, compliance alerts, video consultation,
+and AI research remain demo/synthetic surfaces, and payments, document
+upload/download, and provider social sign-in are not implemented.
 
 ## At a glance
 
@@ -21,7 +22,7 @@ screens behind an auth-aware GoRouter shell.
   as the credential-free fakes, and env-configured builds flip per seam.
 - **Localization** — full EN / AR / TR with RTL layouts and generated
   localizations.
-- **Quality gates** — 1477 tests, analyzer-clean, `dart format` pinned to the
+- **Quality gates** — 1567 tests, analyzer-clean, `dart format` pinned to the
   CI toolchain, a hash-pinned governance ledger (`scripts/verify_ledger.sh`)
   reconciling docs claims against the git object database, and
   `docs/audit/LegalHub_AUDIT_2026-09-21.md` as the running build journal.
@@ -55,7 +56,8 @@ recorded prerequisites are approved — see
   `OrganizationGateway` (create org, member list, invite with one-time token,
   change role / suspend / reactivate / remove) with a PostgREST RPC adapter,
   a dev fake mirroring the server's last-active-partner and existing-member
-  guards, and typed failures — screens are a follow-up slice
+  guards, and typed failures — wired to the organization hub, roster, create
+  form, invitation acceptance, and partner audit screens
   ([spec](docs/p3_organization_membership_spec_2026-08-03.md)).
 - Redacted error-reporting boundary with no external observability SDK.
 - Auth and onboarding presentation: sign-in, sign-up, forgot-password
@@ -85,7 +87,7 @@ recorded prerequisites are approved — see
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (1565 total, full suite green 2026-09-28): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (1564 total) — full suite green 2026-10-20 (1567 at runtime): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), ThemeCubit (mode persistence + restart
   restore), Redactor (password/OTP/email/Bearer redaction with leak guards),
@@ -271,12 +273,13 @@ recorded prerequisites are approved — see
   the real router) and R-2 — a visible no-org state replaces the silent
   submit no-op; review `docs/matter_write_client_slice_review_2026-08-09.md`),
   building
-  on 1126 (2026-08-09, v1 queue demo surfaces — read-only
+  on 1126 (2026-08-09, v1 queue demo surfaces —
   `compliance_alerts` (`/alerts`), `collaboration task board` (`/tasks`),
   `pending_approvals` (`/approvals`): three fake-domain features with
   text/icon status lines, per-feature widget suites incl. empty/error/retry,
   three nav-hint capability flags granted to every role, home entries, and
-  EN/AR/TR l10n; scope drafts `docs/v1_compliance_alerts_scope_draft_2026-08-09.md`
+  EN/AR/TR l10n (the task board later gained the RPC-backed write slice
+  below); scope drafts `docs/v1_compliance_alerts_scope_draft_2026-08-09.md`
   etc.), building
   on 1109 (2026-08-09, partner org-audit slice — Task 4:
   the `OrgAuditCubit` + `/organizations/audit` surface: `OrgAuditScreen`
@@ -382,12 +385,12 @@ tokens never cross to presentation (contract §2.6).
   and privileged credentials belong only in controlled server/edge-function
   environments.
 - The only backend SDK imported anywhere in `lib/` is `supabase_flutter`, and
-  it is confined to two adapter files: `lib/data/auth/supabase_auth_api_impl.dart`
-  (the GoTrue-backed auth adapter) and `lib/data/orgs/supabase_org_api_impl.dart`
-  (the org RPC adapter). Every layer above consumes the provider-neutral
-  `SupabaseAuthApi`/`AuthGateway` + `SupabaseOrgApi`/`OrganizationGateway` seams —
-  DTOs and tokens are stripped at the adapter boundary. No `firebase`,
-  `paymob`, `http`, `dio`, `sqflite`, or `hive` appears in `lib/`.
+  every import sits in a `lib/data/**/supabase_*_impl.dart` adapter (auth, orgs,
+  matters, documents, messaging, billing, notifications, storage, tasks,
+  platform admin). Feature `domain/` and `presentation/` files never import it:
+  they consume provider-neutral seams, and DTOs/tokens are stripped at the
+  adapter boundary. No `firebase`, `paymob`, `http`, `dio`, `sqflite`, or
+  `hive` appears in `lib/`.
 
 ## Run and verify
 
@@ -437,8 +440,8 @@ HTTP layer and lock the exact postgrest await shape the app depends on —
 (2: `from().select()` plain + chained `.eq()` → raw row list). A future
 postgrest upgrade that changes the await contract fails loudly in CI, not on
 a device (the on-device create-org crash this class caused is recorded in
-`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **1551 tests**
-passing (1551 tracked declarations + loop-generated, 1559 at runtime,
+`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **1564 tests**
+passing (1564 tracked declarations + loop-generated, 1567 at runtime,
 ledger `verify_ledger.sh` PASS).
 
 ## Fonts and licenses

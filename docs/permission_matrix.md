@@ -701,6 +701,62 @@ there.
 > rehearsal + apply on the dev project recorded by the slice's apply
 > record. Per §7 this extends, not replaces, and widens no other row; the
 > write is the ONLY notifications mutation surface.
+>
+> **§4 addendum (2026-09-27, audit-remediation slice — client behavior only,
+> no grant changes):** three client-side changes land together; **no matrix
+> cell changes, no new policy, no new grant, §8 audit posture unchanged
+> throughout** —
+> - **Matter/document/thread search fan-out:** the "View a matter" /
+>   "Read a document/message body" rows gain a mechanism note, not a new
+>   grant. Search reads the bounded page under the *same* SELECT policies
+>   (`matters_select_assigned` / `documents_select_assigned` /
+>   `messages_select_assigned`, cap 200) and refines client-side over the
+>   full matcher (title, status, practice area, document type, matter
+>   reference, participants, localized labels); the env-less fakes return
+>   the full list and the cubits filter identically. A title-only SQL
+>   prefilter was removed because it silently dropped every non-title hit.
+>   A denied caller sees nothing new: the bounded read cannot widen a policy
+>   it runs inside of.
+> - **D-SM2 `send_message` full-row return:** the "Send a message (insert)"
+>   row's mechanism note extends — the RPC now returns the inserted row as
+>   `jsonb` (`supabase/rpc/send_message.sql`, `to_jsonb(messages.*)`) and the
+>   client maps it directly with no re-read. The row goes only to the
+>   authorized sender (the in-function D-SM1 gate already passed); §8 audit
+>   is untouched (still one redacted `message:create/allowed`, never the
+>   body; the §8 negative — a denied send writes no audit row — still
+>   pinned). Battery pins the shape (`10_send_message_rls.sql`
+>   10.01/10.02: row fields and author echo; 10.09 pins the empty-body
+>   CHECK).
+> - **D-N6/D-F6 optimistic mark-read:** the notification write cell is
+>   unchanged — the same `mark_notifications_read` RPC, same in-function
+>   `is_active_member` gate, same §8 audit (one redacted
+>   `notification:mark_read` per distinct org, server-side). The client now
+>   flips the row locally first and skips the reload; a failed RPC still
+>   surfaces and the next fetch re-syncs, so the optimistic bit can never
+>   mask the server state.
+> Per §7 this extends, not replaces, and widens no other row.
+>
+> **§4 addendum (2026-10-20, task-writes slice):** the collaboration task
+> board gains RPC-only writes; no cell above changes for any other feature.
+> - **Read:** `tasks_select_assigned` — an ACTIVE member of the task's org
+>   AND assigned (client or attorney) on the task's matter; the
+>   task/matter org equality is load-bearing. Cross-org, suspended,
+>   org-role-alone, and platform-owner callers read zero rows.
+> - **Writes:** `create_task`, `assign_task`, `advance_task_status`,
+>   `acknowledge_task` — the ONLY mutation path (no INSERT/UPDATE/DELETE
+>   grant or policy on `tasks`). Each resolves the matter through the same
+>   assignment gate; create/assign refuse the platform owner (F2-D2) and
+>   non-active assignees (F2-D4); acknowledge is first-person (assignee
+>   only); advance enforces `todo → in_progress → blocked|done` with `done`
+>   terminal and locks the row.
+> - **Response/audit:** every successful write returns the persisted row as
+>   `jsonb` (the D-SM2 convention) and writes one redacted
+>   `task:<action>/allowed` §8 audit row; denied writes write nothing.
+>   Reassignment clears the previous acknowledgement whenever the assignee
+>   changes (battery 17.21).
+> - **Battery:** `supabase/tests/17_task_rls.sql` (denials, validation,
+>   first-person ack, read policy, audit count, returned-row shape).
+> Per §7 this extends, not replaces, and widens no other row.
 
 ---
 

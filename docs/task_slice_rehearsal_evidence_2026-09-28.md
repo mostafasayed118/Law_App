@@ -1,5 +1,13 @@
 # Task-slice rehearsal evidence — 2026-09-28
 
+> **Status update (2026-10-20):** the rehearsal fixes were committed in
+> `d3baef5` (the "nothing committed" line below is stale). The four task
+> RPCs have since changed from `uuid`/`text`/`void` returns to the persisted
+> **`jsonb` row** (the D-SM2 contract the Dart seam always required), and
+> battery 17 now pins that shape plus reassignment-clears-acknowledgement.
+> This evidence predates those edits: re-run the battery live on the
+> ephemeral stack before applying migration 17 anywhere.
+
 Live rehearsal of the policy-test battery on an ephemeral local stack,
 covering the Gate 3 task-writes slice (battery 17) plus the previously
 never-run battery 16. Method: `supabase/README.md` "Running the battery".
@@ -48,5 +56,5 @@ never-run battery 16. Method: `supabase/README.md` "Running the battery".
 
 - `--check` cannot catch PL/pgSQL type errors (finding 1) or signature
   drift (finding 2) — consider a signature cross-check in `--check`.
-- Nothing committed by this rehearsal; the fixes above are working-tree
-  changes for owner review.
+- Nothing was committed by the rehearsal itself; the fixes above were later
+  committed in `d3baef5`.
