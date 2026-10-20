@@ -38,7 +38,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           # Full history (not shallow): both selftests create a scratch
           # worktree at HEAD and run the battery inside it, and the batteries
