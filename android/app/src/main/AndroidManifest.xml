@@ -43,14 +43,19 @@
                 <data android:scheme="${deepLinkScheme}"/>
             </intent-filter>
             <!-- Verified App Links (audit: custom-scheme hijack): the OS
-                 verifies `legalhub.app` against
-                 `https://legalhub.app/.well-known/assetlinks.json` before
-                 routing here, so a third-party app claiming the custom
-                 scheme cannot intercept invite/recovery links.
-                 `autoVerify` is what promotes this filter to verified;
-                 without it the link opens the disambiguation dialog.
-                 OWNER STEP: deploy `web/.well-known/assetlinks.json` with
-                 the real release signing-cert SHA-256 to legalhub.app. -->
+                  verifies `legalhub.app` against
+                  `https://legalhub.app/.well-known/assetlinks.json` before
+                  routing here, so a third-party app cannot intercept the
+                  https invite/recovery links. `autoVerify` is what promotes
+                  this filter to verified; without it the link opens the
+                  disambiguation dialog. NOTE: this protects ONLY the https
+                  filter below — the custom-scheme filter above stays
+                  hijackable by any app registering the same scheme until
+                  `assetlinks.json` is deployed AND the custom-scheme
+                  filter is removed.
+                  OWNER STEP: deploy `web/.well-known/assetlinks.json` with
+                  the real release signing-cert SHA-256 to legalhub.app,
+                  verify, then delete the custom-scheme intent-filter. -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>

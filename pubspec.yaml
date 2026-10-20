@@ -5,7 +5,7 @@ version: 1.0.0+1
 
 environment:
   # B1 target pins; confirm before subsequent backlog tickets.
-  sdk: '>=3.12.2 <3.13.0'
+  sdk: '>=3.12.2 <4.0.0'
   # Range, NOT an exact pin — and the exact pin is deliberate at the CI layer:
   # `.github/workflows/ci.yml` pins `flutter-version: '3.44.4'`, which is where
   # reproducibility is actually enforced. An exact pin HERE was tried and
@@ -28,7 +28,7 @@ dependencies:
   flutter_secure_storage: ^11.2.0
   get_it: ^9.2.1
   go_router: ^17.3.0
-  intl: 0.20.2
+  intl: ^0.20.3
   shared_preferences: ^2.5.5
   supabase_flutter: ^2.16.0
 

@@ -82,10 +82,12 @@ String demoThreadTitle(AppLocalizations l10n, String title) => switch (title) {
 
 /// Synthetic message body (`Demo message <n> — generic demo content…`).
 /// User-composed bodies never match the pattern and pass through.
+final RegExp _demoMessagePattern = RegExp(
+  r'^Demo message (\d+) — generic demo content',
+);
+
 String demoMessageBody(AppLocalizations l10n, String body) {
-  final RegExpMatch? match = RegExp(
-    r'^Demo message (\d+) — generic demo content',
-  ).firstMatch(body);
+  final RegExpMatch? match = _demoMessagePattern.firstMatch(body);
   if (match == null) {
     return body;
   }
