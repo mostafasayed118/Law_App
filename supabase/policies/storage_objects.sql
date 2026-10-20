@@ -26,8 +26,14 @@
 -- (review §5 pin). is_active_member is public-schema + EXECUTE-granted to
 -- authenticated (R-4); storage policy expressions may call public.*
 -- functions + auth.uid() — PROVEN live by the T3/T4 battery, not assumed.
--- No INSERT/UPDATE/DELETE policy: this slice is read-only (Q5); the bucket
--- is private (public = false) so anon has no public read path.
+-- Write half (matter-files write slice): files_storage_insert gates the
+-- bytes upload with the SAME predicate as the read gate (WITH CHECK), and
+-- files_storage_delete gates byte removal with the SAME predicate (USING).
+-- No UPDATE policy exists — objects are immutable in this slice; replacing a
+-- file is a delete + upload. The public.files metadata row is never written
+-- directly (no grant/policy); register_matter_file / delete_matter_file are
+-- the RPC-only metadata paths. The bucket stays private (public = false), so
+-- anon has no read or write path.
 
 create policy files_storage_select on storage.objects
   for select
@@ -36,6 +42,58 @@ create policy files_storage_select on storage.objects
     -- Batch B safe-cast: a non-uuid org segment used to raise 22P02 and
     -- abort the query; the CASE guard yields NULL instead so
     -- is_active_member(NULL) = false -> deny (matrix §6 row 1 holds).
+    and public.is_active_member(
+      case when (storage.foldername(name))[1] ~
+        '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+        then (storage.foldername(name))[1]::uuid
+        else null end
+    )
+    and exists (
+      select 1
+      from public.matters m
+      where m.id::text = (storage.foldername(name))[2]
+        and m.organization_id::text = (storage.foldername(name))[1]
+        and (
+          m.assigned_client_id = auth.uid()
+          or m.assigned_attorney_id = auth.uid()
+        )
+    )
+  );
+
+-- INSERT: the upload gate — the exact SELECT predicate re-used as WITH CHECK.
+-- A writer can only create an object under an org/matter path it can read:
+-- active membership in the path org, the path org equal to the matter's
+-- authoritative org, and an assignment on that matter. The safe-cast guard
+-- keeps a non-uuid org segment a deny (NULL -> false), never a 22P02 abort.
+create policy files_storage_insert on storage.objects
+  for insert
+  with check (
+    bucket_id = 'matter-files'
+    and public.is_active_member(
+      case when (storage.foldername(name))[1] ~
+        '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+        then (storage.foldername(name))[1]::uuid
+        else null end
+    )
+    and exists (
+      select 1
+      from public.matters m
+      where m.id::text = (storage.foldername(name))[2]
+        and m.organization_id::text = (storage.foldername(name))[1]
+        and (
+          m.assigned_client_id = auth.uid()
+          or m.assigned_attorney_id = auth.uid()
+        )
+    )
+  );
+
+-- DELETE: the cleanup gate — the exact SELECT predicate re-used as USING.
+-- The metadata row is removed by delete_matter_file first; the storage API
+-- then removes bytes through this policy. No UPDATE policy.
+create policy files_storage_delete on storage.objects
+  for delete
+  using (
+    bucket_id = 'matter-files'
     and public.is_active_member(
       case when (storage.foldername(name))[1] ~
         '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'

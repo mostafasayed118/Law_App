@@ -20,8 +20,9 @@
 --     write no audit row (17.01–17.03 commit exactly 4 audit rows; 17.15
 --     pins the count after all deny rows).
 --
--- Runs LAST in the run_battery loop (17.01–17.03 COMMIT their rows — no
--- other battery's counts are affected). Fixture anchors (00_fixtures.sql):
+-- Runs after the earlier batteries (18–21 follow; none of them writes a
+-- task:* audit row, so 17.15's committed-row count stays exact). Fixture
+-- anchors (00_fixtures.sql):
 -- owner 10000000-…-0001 · partner-a …-0002 (org-a partner, assigned on
 -- matters 1–3) · client-a …-0003 (assigned on matters 1, 2) · partner-b
 -- …-0004 (org-b ONLY, assigned attorney on org-a matter 5) · suspended-a

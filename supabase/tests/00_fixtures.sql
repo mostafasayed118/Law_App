@@ -42,6 +42,7 @@ delete from public.messages;
 delete from public.files;
 delete from public.message_threads;
 delete from public.documents;
+delete from public.payments;
 delete from public.billing_invoices;
 delete from public.notifications;
 delete from public.matters;
@@ -51,6 +52,8 @@ delete from public.organizations;
 delete from public.audit_events;
 delete from public.profiles;
 delete from public.platform_config;
+delete from public.consultations;
+delete from public.consultation_slots;
 delete from auth.users;
 
 -- ---- 1. Users (auth.users) -----------------------------------------------
@@ -532,5 +535,44 @@ begin
   select count(*) into v_cnt from public.tasks;
   if v_cnt <> 3 then
     raise exception 'FIXTURE ERROR: tasks must hold 3 rows, got %', v_cnt;
+  end if;
+end $$;
+
+-- ---- 16. Consultations (booking slice — the 18_booking_rls.sql battery) ----
+-- Four deterministic slots: two available (0001/0002), one already booked
+-- (0003) and one inactive (0004). Two consultations: client-a owns the
+-- booked slot's consultation; orphan owns a cancelled consultation on the
+-- inactive slot (exercises own-row scoping without an availability claim).
+-- Battery 18 is entirely transactional (BEGIN … ROLLBACK), so its booking
+-- never reaches this baseline; the slot/consultation counts stay exact.
+insert into public.consultation_slots
+  (id, starts_at, duration_minutes, is_active, booked_at, created_at)
+values
+  ('d0000000-0000-4000-8000-000000000001', now() + interval '1 day',  45, true,  null, now()),
+  ('d0000000-0000-4000-8000-000000000002', now() + interval '2 days', 30, true,  null, now()),
+  ('d0000000-0000-4000-8000-000000000003', now() + interval '3 days', 60, true,  now(), now()),
+  ('d0000000-0000-4000-8000-000000000004', now() + interval '4 days', 45, false, null, now());
+
+insert into public.consultations
+  (id, client_user_id, slot_id, category, topic, attorney_ref, status, reference_id, created_at, updated_at, cancelled_at)
+values
+  ('e0000000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000003', 'd0000000-0000-4000-8000-000000000003', 'general',   null, null, 'booked',    'LH-00000001', now(), now(), null),
+  ('e0000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000007', 'd0000000-0000-4000-8000-000000000004', 'follow_up', null, null, 'cancelled', 'LH-00000002', now(), now(), now());
+
+-- Sanity: exactly 4 slots (2 available), 2 consultations, and the booked
+-- slot carries its claim stamp (the 18 count expectations depend on these).
+do $$
+declare
+  v_slots bigint; v_avail bigint; v_cons bigint; v_booked bigint;
+begin
+  select count(*) into v_slots from public.consultation_slots;
+  select count(*) into v_avail from public.consultation_slots
+   where is_active and booked_at is null;
+  select count(*) into v_cons from public.consultations;
+  select count(*) into v_booked from public.consultation_slots
+   where id = 'd0000000-0000-4000-8000-000000000003' and booked_at is not null;
+  if v_slots <> 4 or v_avail <> 2 or v_cons <> 2 or v_booked <> 1 then
+    raise exception 'FIXTURE ERROR: consultations must hold 4 slots (2 available), 2 consultations, 1 booked slot — got %/%/%/%',
+      v_slots, v_avail, v_cons, v_booked;
   end if;
 end $$;

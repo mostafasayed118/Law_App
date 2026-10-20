@@ -757,6 +757,110 @@ there.
 > - **Battery:** `supabase/tests/17_task_rls.sql` (denials, validation,
 >   first-person ack, read policy, audit count, returned-row shape).
 > Per §7 this extends, not replaces, and widens no other row.
+>
+> **§4 addendum (2026-10-20, consultation-booking slice):** a **new "Book a
+> consultation" row is added** — any **authenticated** user may read the
+> available-slot catalogue and book one slot for themselves. **Read:**
+> `consultation_slots_select_available` exposes only `is_active` slots with
+> `booked_at is null`; `consultations_select_own` exposes only the caller's
+> own bookings (`client_user_id = auth.uid()`). **Write:** the audited
+> `book_consultation` RPC is the ONLY mutation path (security definer +
+> `set search_path = public`) — no INSERT/UPDATE/DELETE grant or policy on
+> either table. The RPC atomically claims the slot (`SELECT … FOR UPDATE` +
+> `booked_at` stamp), enforces the category allow-list
+> (`general`/`follow_up`/`urgent`), trims and caps `topic`/`attorney_ref`
+> (2000/100), and generates the server-side `LH-XXXXXXXX` reference.
+> **Allowed:** any authenticated caller for an available slot; the booking
+> is own-row readable afterwards. **Denied:** anon (no SELECT grant, no RPC
+> EXECUTE) · booked/inactive slots (invisible to the catalogue read) ·
+> another user's consultation (own-row policy) · direct
+> INSERT/UPDATE/DELETE on either table (privilege layer) · invalid category
+> or oversized topic (check_violation) · double-book (unique_violation).
+> **Audit:** every successful booking writes one
+> `consultation:book/allowed` §8 row with a **NULL organization_id** (the
+> slice is not org-scoped) and the fixed redacted summary
+> `consultation booked`; denied writes write nothing. The RPC response is a
+> non-PII projection only (`id`, `reference_id`, `slot_id`, `starts_at`,
+> `duration_minutes`, `category`, `status`, `attorney_ref`) — `topic` and
+> `client_user_id` are never returned. `attorney_ref` is a free-text label,
+> not an assignment or identity claim. **Battery:**
+> `supabase/tests/18_booking_rls.sql` (available-slot read, booking
+> positive, own-row scoping, anon/direct-write/validation/double-book
+> denies, audit positive + negative; the whole battery rolls back). Per §7
+> this extends, not replaces, and widens no other row.
+>
+> **§4 addendum (2026-10-20, matter-files write slice):** the existing
+> **"View a matter file (metadata)"** row gains its upload/cleanup half —
+> the download/read grant is unchanged. **Upload:** bytes are written to
+> the private `matter-files` bucket through the new
+> `files_storage_insert` policy on `storage.objects` (the exact SELECT gate
+> re-used as `WITH CHECK`: active membership in the path org, path-org =
+> matter's authoritative org, assigned client/attorney on the matter, same
+> safe-cast guard); the `public.files` metadata row is written ONLY by the
+> audited `register_matter_file` RPC, which re-asserts the matter gate,
+> validates name/mime/size, requires the `{org}/{matter}/` path prefix with
+> no `..`, and verifies the existing object's size/mimetype metadata.
+> **Delete:** `delete_matter_file` removes the metadata row through the same
+> matter gate and returns its `storage_path`; byte removal is gated by the
+> new `files_storage_delete` policy (same predicate, `USING`). **No UPDATE
+> policy** — replacing a file is delete + upload. **Allowed:** an active
+> member of the file's org who is the assigned client or attorney on the
+> file's matter. **Denied:** org-role-alone · cross-org · suspended
+> membership · `platform_owner_admin` (never assigned, no carve-out) · anon
+> (no RPC EXECUTE; storage remains private) · direct INSERT/UPDATE/DELETE on
+> `public.files` (no grants — RPC-only metadata) · path-prefix mismatch,
+> `..` traversal, missing object, or size/mimetype mismatch
+> (check_violation). The bucket envelope is pinned at **25 MiB** with a
+> seven-type allow-list (`pdf`, `doc`, `docx`, `txt`, `csv`, `png`, `jpg`).
+> **Audit:** `file:create/allowed` (`file uploaded`) and
+> `file:delete/allowed` (`file deleted`) redacted §8 rows with the org and
+> file id; denied writes write nothing. **Battery:**
+> `supabase/tests/19_file_write_rls.sql` (register positives against the
+> existing fixture objects, validation/path/object denies, assignment-gate
+> denies, no-direct-write pins, exactly 3 storage policies, bucket limits,
+> delete cleanup + audit, non-assigned delete deny, §8 negative; the whole
+> battery rolls back). Per §7 this extends, not replaces, and widens no
+> other row.
+>
+> **§4 addendum (2026-10-20, invoice-payment slice):** a new **"Pay an
+> invoice"** row is added, but **live collection stays disabled by default**
+> (`PAYMENTS_MODE=disabled`); the demo path uses a fake gateway and the live
+> path is owner-gated on merchant credentials + a dated D-11 exception.
+> **Initiate:** `initiate_invoice_payment` is the only client write —
+> authenticated, security definer, invoice must be `issued`, amount > 0,
+> currency EGP, caller an active member of the invoice org, matter-org
+> equality, and caller assigned client or attorney on the matter. It creates
+> or reuses ONE pending payment per invoice (partial unique index, row lock)
+> and writes `payment:initiate/allowed`. **Status:** the read-only
+> `get_invoice_payment_status` returns the caller's latest payment status
+> (no provider identifiers). **Apply:** `attach_paymob_order`,
+> `apply_paymob_transaction`, `record_payment_callback_rejected`, and
+> `list_stale_pending_payments` are **service-role only**; `succeeded` is
+> the only outcome that flips `billing_invoices` to `paid`, and terminal
+> states are immutable. **Storage:** `public.payments` has RLS enabled with
+> **no policy and no direct anon/authenticated grant** (RPC-only); no PAN,
+> CVV, payment token, checkout URL, billing address, or raw provider
+> payload is stored. **Audit:** one redacted `payment:<outcome>` §8 row per
+> terminal/initiation outcome; provider transaction ids and PII never enter
+> the summary. **Battery:** `supabase/tests/20_payment_rls.sql` (initiate
+> idempotency, status read, apply/duplicate/mismatch, auth denials,
+> service-role-only denies, direct-DML deny, cascade, audit redaction; the
+> whole battery rolls back). Per §7 this extends, not replaces, and widens
+> no other row.
+>
+> **§2 addendum (2026-10-20, task assignee picker):** the new read-only
+> `list_matter_assignable_members(p_matter_id)` RPC backs the task-assignment
+> picker. **Allowed:** the same callers as `create_task`/`assign_task` — an
+> active member of the matter's org who is the assigned client or attorney
+> on that matter. **Returned:** `user_id` + `display_name` only for ACTIVE
+> members of the matter's org; the platform owner is excluded; no email,
+> role, token, or invitation material. A failed gate returns **zero rows**
+> (no matter-existence oracle). **Denied:** org-role-alone, cross-org,
+> suspended, `platform_owner_admin`, and anon (no EXECUTE). Read-only: no
+> audit row. **Battery:** `supabase/tests/21_task_assignable_members_rls.sql`
+> (client/attorney positives, all denials, owner exclusion, exact output
+> contract; the battery rolls back). Per §7 this extends, not replaces, and
+> widens no other row.
 
 ---
 

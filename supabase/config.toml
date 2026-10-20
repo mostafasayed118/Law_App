@@ -1,0 +1,11 @@
+# Placeholder project ref: replace with the linked project id before any deploy.
+project_id = "law_app"
+
+[functions.paymob-initiate]
+verify_jwt = true
+
+[functions.paymob-webhook]
+verify_jwt = false
+
+[functions.paymob-reconcile]
+verify_jwt = false

@@ -171,20 +171,22 @@ scripts/verify_policy_tests.sh --check   # static validation, no database
 
 ### What it checks
 
-1. **Structural + grant pins** — the fourteen public tables exist with RLS
+1. **Structural + grant pins** — the seventeen public tables exist with RLS
    enabled; the narrow SELECT grants (audit_events/platform_config
    deliberately absent); the R-4 policy-helper EXECUTE grants present while
    `write_audit`, `is_platform_owner`, `active_membership`,
    `expire_stale_invitations`, `handle_new_user` stay denied; the full
-   audited RPC EXECUTE surface (24 files under `supabase/rpc/`, plus
+   audited RPC EXECUTE surface (34 files under `supabase/rpc/`, plus
    `mark_notifications_read` defined in migration 16); zero policies on
-   audit_events/platform_config (D-P0C4); and the §14 un-deferrals through
-   `tasks` (fourteen tables, thirteen policies).
+   audit_events/platform_config (D-P0C4); three storage policies; and the
+   §14 un-deferrals through `tasks`, booking, the matter-files write half and payments
+   (seventeen tables, fifteen public policies, three storage policies).
 2. **Behavior battery** — `00_fixtures.sql` then the per-matrix-block SQL
    files `01/02/03` (matrix §2/§3/§5, D-P0C1(a)/D-P0C3/D-P0C4) + the
-   un-deferral batteries `04`–`17` (matrix §4 rows, including the
-   notification producer/read-flag and task-writes slices), each check a DO
-   block that raises `POLICY-BATTERY FAIL <id>: <detail>` on violation.
+   un-deferral batteries `04`–`21` (matrix §4 rows, including the
+   notification producer/read-flag, task-writes, consultation-booking and
+   matter-files write, payment and assignable-members slices), each check a DO block that raises
+   `POLICY-BATTERY FAIL <id>: <detail>` on violation.
 
 ### Dev-project guard
 
@@ -204,7 +206,7 @@ read-only owner sweep.
 - Provider-level flows (sign-up/sign-in/reset, GoTrue email triggers) stay
   out of SQL battery scope (P2 r5 methodology); they have their own
   ephemeral harness (`scripts/verify_provider_loop.sh`). Storage/realtime
-  rows are covered by batteries 07/09 on the rehearsal host.
+  rows are covered by batteries 07/09/19 on the rehearsal host.
 
 ## CI wiring
 

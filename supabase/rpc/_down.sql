@@ -39,6 +39,16 @@ drop function if exists public.create_task(uuid, text, uuid);
 drop function if exists public.advance_task_status(uuid, text);
 drop function if exists public.assign_task(uuid, uuid);
 drop function if exists public.acknowledge_task(uuid);
+drop function if exists public.book_consultation(uuid, text, text, text);
+drop function if exists public.register_matter_file(uuid, text, text, bigint, text);
+drop function if exists public.delete_matter_file(uuid);
+drop function if exists public.initiate_invoice_payment(uuid);
+drop function if exists public.get_invoice_payment_status(uuid);
+drop function if exists public.attach_paymob_order(uuid, text);
+drop function if exists public.apply_paymob_transaction(text, text, text, bigint, text, text);
+drop function if exists public.record_payment_callback_rejected(text);
+drop function if exists public.list_stale_pending_payments(interval, integer);
+drop function if exists public.list_matter_assignable_members(uuid);
 
 -- The revokes above run first so the drops below are the final privilege
 -- reset: functions are gone and no execute grant survives in any role.

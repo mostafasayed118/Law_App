@@ -132,6 +132,10 @@ this battery hardens that pattern into a committed artifact.
 | `tests/15_notification_producer_rls.sql` | **Notification producer battery** (`docs/notification_feed_producer_gate_review_2026-08-11.md` Q1-Q6, D-P1..D-P6): the audit-mirror trigger — delta-based `matter:create`/`message:create` map positives (in-transaction, rolled back) with gate visibility through `notifications_select_org` + fixed-summary redaction pins (title/body never leak), the outcome / unmapped-action / NULL-org filters, the EXECUTE-deny (D-P4), and in-txn atomicity residue checks (D-P6) |
 | `tests/16_notification_read_flag.sql` | **Notification read-flag battery** (`docs/notification_read_flag_slice_plan_2026-09-02.md`, D-F1..D-F7): `mark_notifications_read` flips only the caller's own-org unread rows and returns the exact count, foreign-org ids are untouched, one redacted `notification:mark_read` audit row per distinct org (zero-flip writes none), idempotent re-mark returns 0, the mark-read action does not re-produce a feed row, and the RPC is the ONLY write path (no UPDATE grant; anon EXECUTE denied) |
 | `tests/17_task_rls.sql` | **Task-writes battery** (Gate 3 spec 2026-09-27): the `tasks_select_assigned` read policy (assigned member positives; org-role-alone / cross-org / suspended / owner / anon denials; org-mismatch invariant) + the four audited RPCs — assignment gate, F2-D2 owner refusal, F2-D4 active-assignee guard, title/status/transition validation, first-person acknowledge, `done` terminal, returned-row shape (`jsonb` + embedded matter title), reassignment clearing the receipt (17.21), and the §8 audit count (allowed writes audited, denied writes silent) |
+| `tests/18_booking_rls.sql` | **Consultation-booking battery** (booking slice): available-slot read; audited `book_consultation` positive (reference regex, `booked` status, atomic slot claim, non-PII projection with no topic/client id, NULL-org §8 audit); own-row scoping; anon SELECT/RPC, direct INSERT/UPDATE/DELETE, invalid category, oversized topic and double-book denies; the §8 negative. The whole battery is transactional and rolls back |
+| `tests/19_file_write_rls.sql` | **Matter-files write battery** (write slice): `register_matter_file` positives for the assigned client/attorney against the existing fixture objects with the `file:create` §8 audit rows; blank name/mime, negative size, path-prefix and missing-object denies; org-role-alone / cross-org / suspended / owner / anon denies; no direct `public.files` INSERT/UPDATE/DELETE grants; exactly 3 storage policies; the 25 MiB + seven-MIME bucket envelope; `delete_matter_file` cleanup with the `file:delete` audit row; a non-assigned delete deny; the §8 negative. The whole battery is transactional and rolls back |
+| `tests/20_payment_rls.sql` | **Invoice-payment battery** (payment slice): `initiate_invoice_payment` positive + duplicate idempotency + `payment:initiate` audit; `get_invoice_payment_status`; `apply_paymob_transaction` success settles the invoice + duplicate `already_processed` + failed leaves it issued; amount/currency/order mismatch rejection; assignment-gate/anon denials; service-role-only RPCs denied to authenticated; direct-DML deny; cascade; audit redaction. The whole battery rolls back. |
+| `tests/21_task_assignable_members_rls.sql` | **Task assignee-picker battery** (task slice): `list_matter_assignable_members` positives for the assigned client/attorney (active org members, display names), org-role-alone/cross-org/suspended/owner/anon denials, platform-owner exclusion, guessed-matter zero rows, exact `user_id`/`display_name` projection, no audit write. The whole battery rolls back. |
 
 ### Running the battery
 
@@ -157,7 +161,8 @@ scripts/verify_policy_tests.sh --check        # static validation, no database
   rehearsal host), `09_realtime_push.sql`, `10_billing_invoices.sql`,
   `11_matter_write.sql`, `14_notifications.sql`,
   `15_notification_producer.sql`, `16_notification_read_flag.sql`,
-  `17_tasks.sql`, then `policies/*.sql`, `rpc/*.sql` in the apply order above.
+  `17_tasks.sql`, `18_booking.sql`, `19_storage_write.sql`, `20_payments.sql`, then
+  `policies/*.sql`, `rpc/*.sql` in the apply order above.
   **`03_platform_config_seed.sql` is NOT applied**: its owner token is an
   apply-time substitution placeholder for the dev project; the battery seeds
   its own fixture owner row and proves the single-account bound (D-P0C3)
@@ -204,3 +209,7 @@ gated on this rehearsal passing + the owner's dated apply-approval
 - No matter/doc schema, no storage/realtime policy (Q4 deferral), no real
   data, no service-role usage, no compliance claim.
 - The Flutter code (`lib/`) is untouched by this slice.
+
+### Paymob edge functions (code-complete, NOT deployed)
+
+`supabase/functions/` carries `paymob-initiate` (verify_jwt = true), `paymob-webhook` and `paymob-reconcile` (verify_jwt = false), plus `_shared/paymob.ts`. Secret names (values never committed) are listed in `supabase/functions/.env.example`: `PAYMOB_API_KEY`, `PAYMOB_HMAC_SECRET`, `PAYMOB_INTEGRATION_ID`, `PAYMOB_IFRAME_ID`, `PAYMOB_BASE_URL`, `PAYMOB_RECONCILE_SECRET`. Deployment and `supabase secrets set` are owner-gated; this slice deploys nothing and live payment stays disabled by default (`PAYMENTS_MODE=disabled`).
