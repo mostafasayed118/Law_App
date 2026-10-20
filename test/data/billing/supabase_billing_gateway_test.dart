@@ -73,6 +73,25 @@ void main() {
       },
     );
 
+    test('maps PostgREST timestamptz strings to local DateTime', () async {
+      final Map<String, dynamic> row = _row();
+      row['issued_at'] = '2026-07-01T00:00:00+00:00';
+      row['due_at'] = '2026-07-31T00:00:00+00:00';
+      api.rows = <Map<String, dynamic>>[row];
+
+      final Invoice invoice =
+          (await gateway.fetchInvoices()).valueOrNull!.single;
+
+      expect(
+        invoice.issuedAt,
+        DateTime.parse('2026-07-01T00:00:00+00:00').toLocal(),
+      );
+      expect(
+        invoice.dueAt,
+        DateTime.parse('2026-07-31T00:00:00+00:00').toLocal(),
+      );
+    });
+
     test('maps a paid row to the paid status', () async {
       api.rows = <Map<String, dynamic>>[_row(status: 'paid')];
 

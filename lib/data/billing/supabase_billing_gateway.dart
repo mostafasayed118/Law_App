@@ -81,16 +81,11 @@ class SupabaseBillingGateway implements BillingGateway {
     if (status is! String || status.isEmpty) {
       throw FormatException('Invoice row has no status');
     }
-    // `issued_at`/`due_at` are timestamptz → PostgREST hands back a Dart
-    // DateTime; anything else is provider drift.
-    final Object? issuedAt = row['issued_at'];
-    if (issuedAt is! DateTime) {
-      throw FormatException('Invoice row has no issued_at');
-    }
-    final Object? dueAt = row['due_at'];
-    if (dueAt is! DateTime) {
-      throw FormatException('Invoice row has no due_at');
-    }
+    // `issued_at`/`due_at` are timestamptz. PostgREST hands timestamptz back
+    // as an ISO-8601 STRING (the live shape); the Dart-DateTime arm keeps the
+    // existing unit fixtures valid. Anything else is provider drift.
+    final DateTime issuedAt = _dateFromRow(row['issued_at'], 'issued_at');
+    final DateTime dueAt = _dateFromRow(row['due_at'], 'due_at');
     return Invoice(
       id: id,
       // D-BI5: the embedded matters(title) join resolves under the same RLS
@@ -105,6 +100,18 @@ class SupabaseBillingGateway implements BillingGateway {
       issuedAt: issuedAt,
       dueAt: dueAt,
     );
+  }
+
+  /// Parses one timestamptz value into a local [DateTime]. PostgREST returns
+  /// an ISO-8601 string; the DateTime arm is retained for unit fixtures.
+  DateTime _dateFromRow(Object? value, String field) {
+    if (value is DateTime) {
+      return value;
+    }
+    if (value is String && value.isNotEmpty) {
+      return DateTime.parse(value).toLocal();
+    }
+    throw FormatException('Invoice row has no $field');
   }
 
   /// Resolves the VO's title-keyed `matterRef` from the embedded
