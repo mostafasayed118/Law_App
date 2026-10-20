@@ -99,11 +99,14 @@ class NotificationCubit extends Cubit<NotificationState> {
     }
   }
 
-  /// Marks one notification read (D-N6 write slice, D-F6): calls the
-  /// gateway's mark and **reloads** the feed on success — the honest
-  /// refetch re-sorts newest-first and reflects the server's flip (the
-  /// count is informational, never surfaced). A failure renders the
-  /// ViewError arm (the load-failure posture); no optimistic local flip.
+  /// Marks one notification read (D-N6 write slice, D-F6): on success
+  /// applies an **optimistic local flip** — the row's `isRead` flips in
+  /// place and the unread affordance reflects it immediately, with NO full
+  /// feed reload (audit: the reload re-fetched the whole capped list for a
+  /// single-flag change). List order is untouched (the server flip carries
+  /// no reorder signal). A failure renders the ViewError arm (the
+  /// load-failure posture) and leaves the row as-is — no optimistic flip
+  /// on a failed write, no silent drop.
   Future<void> markRead(String id) async {
     if (isClosed || _loading || id.isEmpty) {
       return;
@@ -118,13 +121,46 @@ class NotificationCubit extends Cubit<NotificationState> {
     }
     switch (result) {
       case Success<int>():
-        await load();
+        _flipReadLocal(id);
       case Failure<int>(error: final AppError error):
         emit(
           state.copyWith(
             notifications: viewStateForFailure<List<Notification>>(error),
           ),
         );
+    }
+  }
+
+  /// Flips one row's `isRead` in place on the current success state. A
+  /// no-op when the feed is not in success (nothing to flip) or the id is
+  /// absent (the server flipped a row outside the visible page — the next
+  /// load picks it up).
+  void _flipReadLocal(String id) {
+    final ViewState<List<Notification>> current = state.notifications;
+    if (current is! ViewSuccess<List<Notification>>) {
+      return;
+    }
+    bool changed = false;
+    final List<Notification> flipped = current.data
+        .map((Notification notification) {
+          if (notification.id == id && !notification.isRead) {
+            changed = true;
+            return Notification(
+              id: notification.id,
+              category: notification.category,
+              type: notification.type,
+              summary: notification.summary,
+              serverTimestamp: notification.serverTimestamp,
+              isRead: true,
+            );
+          }
+          return notification;
+        })
+        .toList(growable: false);
+    if (changed) {
+      emit(
+        state.copyWith(notifications: ViewSuccess<List<Notification>>(flipped)),
+      );
     }
   }
 }

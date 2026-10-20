@@ -39,25 +39,32 @@
 -- ############################################################################
 
 -- CHECK 10.01 — POS: partner-a (org-a, partner/active, assigned attorney on
--- matter 1) sends on thread 1 (matter 1). The RPC returns the new message
--- id, the row persists, and the stored author is the D-RT4 name from
+-- matter 1) sends on thread 1 (matter 1). The RPC returns the persisted row
+-- as jsonb (audit follow-up 2026-09-27 — no client re-read), the row
+-- persists, and the stored author is the D-RT4 name from
 -- profiles ('Partner A' — never PII, the client-session source). The row is
 -- deliberately NOT rolled back: its audit row is asserted by 10.03/10.10.
 set role authenticated;
 do $$
 declare
-  v_id     uuid;
+  v_row    jsonb;
   v_author text;
 begin
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000002', false);
   perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002"}', false);
-  select public.send_message('60000000-0000-4000-8000-000000000001', 'Demo audited-send message (attorney)') into v_id;
-  if v_id is null then
-    raise exception 'POLICY-BATTERY FAIL 10.01: send_message returned no id';
+  select public.send_message('60000000-0000-4000-8000-000000000001', 'Demo audited-send message (attorney)') into v_row;
+  if v_row is null or v_row ->> 'id' is null then
+    raise exception 'POLICY-BATTERY FAIL 10.01: send_message returned no row';
+  end if;
+  if v_row ->> 'author_display_name' <> 'Partner A' then
+    raise exception 'POLICY-BATTERY FAIL 10.01: returned author is %, want Partner A (D-RT4 profiles source)', v_row ->> 'author_display_name';
+  end if;
+  if v_row ->> 'body' <> 'Demo audited-send message (attorney)' then
+    raise exception 'POLICY-BATTERY FAIL 10.01: returned body does not match the sent body';
   end if;
   select author_display_name into v_author
     from public.messages
-   where id = v_id;
+   where id = (v_row ->> 'id')::uuid;
   if v_author <> 'Partner A' then
     raise exception 'POLICY-BATTERY FAIL 10.01: stored author is %, want Partner A (D-RT4 profiles source)', v_author;
   end if;
@@ -69,18 +76,21 @@ reset role;
 set role authenticated;
 do $$
 declare
-  v_id     uuid;
+  v_row    jsonb;
   v_author text;
 begin
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000003', false);
   perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000003"}', false);
-  select public.send_message('60000000-0000-4000-8000-000000000001', 'Demo audited-send message (client)') into v_id;
-  if v_id is null then
-    raise exception 'POLICY-BATTERY FAIL 10.02: send_message returned no id';
+  select public.send_message('60000000-0000-4000-8000-000000000001', 'Demo audited-send message (client)') into v_row;
+  if v_row is null or v_row ->> 'id' is null then
+    raise exception 'POLICY-BATTERY FAIL 10.02: send_message returned no row';
+  end if;
+  if v_row ->> 'author_display_name' <> 'Client A' then
+    raise exception 'POLICY-BATTERY FAIL 10.02: returned author is %, want Client A (D-RT4 profiles source)', v_row ->> 'author_display_name';
   end if;
   select author_display_name into v_author
     from public.messages
-   where id = v_id;
+   where id = (v_row ->> 'id')::uuid;
   if v_author <> 'Client A' then
     raise exception 'POLICY-BATTERY FAIL 10.02: stored author is %, want Client A (D-RT4 profiles source)', v_author;
   end if;
@@ -219,12 +229,12 @@ set role authenticated;
 -- contract; the privileged twin is 09.10). Nothing is written.
 do $$
 declare
-  v_id uuid;
+  v_row jsonb;
 begin
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000002', false);
   perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002"}', false);
   begin
-    select public.send_message('60000000-0000-4000-8000-000000000001', '') into v_id;
+    select public.send_message('60000000-0000-4000-8000-000000000001', '') into v_row;
     raise exception 'POLICY-BATTERY FAIL 10.09: empty-body send succeeded';
   exception when check_violation then
     null; -- expected: messages_body_check
@@ -244,5 +254,58 @@ begin
    where action = 'message:create';
   if v_cnt <> 2 then
     raise exception 'POLICY-BATTERY FAIL 10.10: message:create audit rows = % after the deny rows, want exactly 2 (only successful sends are audited)', v_cnt;
+  end if;
+end $$;
+
+-- CHECK 10.11 — NEG (Batch B whitespace validation): a whitespace-only body
+-- passes the messages_body_check (body <> '') but is rejected by the RPC's
+-- trim gate with the same check_violation SQLSTATE. Nothing is written.
+set role authenticated;
+do $$
+declare
+  v_row jsonb;
+begin
+  perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000002', false);
+  perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002"}', false);
+  begin
+    select public.send_message('60000000-0000-4000-8000-000000000001', '   ') into v_row;
+    raise exception 'POLICY-BATTERY FAIL 10.11: whitespace-only send succeeded';
+  exception when check_violation then
+    null; -- expected: Batch B trim gate (check_violation SQLSTATE)
+  end;
+end $$;
+reset role;
+
+-- CHECK 10.12 — NEG (Batch B length validation): a 2001-char body has no
+-- schema CHECK to catch it, so the RPC's length gate rejects it with the
+-- check_violation SQLSTATE. Nothing is written.
+set role authenticated;
+do $$
+declare
+  v_row jsonb;
+begin
+  perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000002', false);
+  perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002"}', false);
+  begin
+    select public.send_message('60000000-0000-4000-8000-000000000001', repeat('x', 2001)) into v_row;
+    raise exception 'POLICY-BATTERY FAIL 10.12: oversized send succeeded';
+  exception when check_violation then
+    null; -- expected: Batch B length gate (check_violation SQLSTATE)
+  end;
+end $$;
+reset role;
+
+-- CHECK 10.13 — NEG (§8 negative, Batch B): after the 10.11/10.12 denies,
+-- still exactly two message:create audit rows — a validation-denied send
+-- writes NO audit row (the gate raises before the insert).
+do $$
+declare
+  v_cnt bigint;
+begin
+  select count(*) into v_cnt
+    from public.audit_events
+   where action = 'message:create';
+  if v_cnt <> 2 then
+    raise exception 'POLICY-BATTERY FAIL 10.13: message:create audit rows = % after the Batch B deny rows, want exactly 2 (only successful sends are audited)', v_cnt;
   end if;
 end $$;

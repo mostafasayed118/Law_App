@@ -22,16 +22,22 @@
 -- (the handle_new_user mirror of raw_user_meta_data ->> 'display_name' —
 -- the same source the client session's displayName comes from), with the
 -- generic fallback the client impl uses ('Demo client'); never PII.
+--
+-- Full-row return (audit follow-up 2026-09-27): the function returns the
+-- persisted row as jsonb (id, thread_id, author_display_name, body,
+-- sent_at) so the client maps the VO from the RPC response directly — the
+-- previous id-only return forced a follow-up fetchMessages re-read per
+-- send. The gate, the audit, and the grants are untouched.
 
 create or replace function public.send_message(
   p_thread_id uuid,
   p_body      text
-) returns uuid
+) returns jsonb
 language plpgsql security definer set search_path = public as $$
 declare
   v_org        uuid;
   v_author     text;
-  v_message_id uuid;
+  v_row        jsonb;
 begin
   -- D-SM1 gate: the exact messages_insert_assigned authorization, asserted
   -- inside the function. The thread must resolve through its matter with
@@ -49,6 +55,20 @@ begin
     raise exception 'permission denied';
   end if;
 
+  -- Batch B validation (mirror create_matter trim pattern): reject
+  -- whitespace-only and oversized bodies server-side. Raised with the
+  -- check_violation errcode so the SQLSTATE matches the messages_body_check
+  -- mapping contract — battery 10.09 (empty body -> check_violation) keeps
+  -- passing, and the new whitespace/oversize denies surface identically.
+  -- The composer trims client-side; this is the authoritative gate for any
+  -- other caller.
+  if p_body is null or trim(p_body) = '' then
+    raise exception 'message body is required' using errcode = 'check_violation';
+  end if;
+  if char_length(p_body) > 2000 then
+    raise exception 'message body too long' using errcode = 'check_violation';
+  end if;
+
   select display_name into v_author
     from public.profiles
    where user_id = auth.uid();
@@ -57,8 +77,8 @@ begin
   insert into public.messages
     (organization_id, thread_id, author_display_name, body)
   values
-    (v_org, p_thread_id, v_author, p_body)
-  returning id into v_message_id;
+    (v_org, p_thread_id, v_author, trim(p_body))
+  returning to_jsonb(messages.*) into v_row;
 
   -- Q3 — contract §8 audit: every successful send is audited. The summary
   -- is generic (redacted-only — never the body). Same implicit transaction
@@ -67,11 +87,11 @@ begin
     'message:create', 'allowed',
     p_organization_id  => v_org,
     p_resource_type    => 'message',
-    p_resource_id      => v_message_id,
+    p_resource_id      => (v_row ->> 'id')::uuid,
     p_redacted_summary => 'message sent'
   );
 
-  return v_message_id;
+  return v_row;
 end;
 $$;
 

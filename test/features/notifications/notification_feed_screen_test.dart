@@ -90,7 +90,8 @@ void main() {
     );
 
     testWidgets(
-      'tapping an unread row marks it read and reloads the feed (D-F6)',
+      'tapping an unread row marks it read and flips it locally with no '
+      'reload (D-F6)',
       (tester) async {
         final SemanticsHandle semantics = tester.ensureSemantics();
         await _registerMarkStub();
@@ -101,9 +102,10 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(_markStub!.markCallIds, <String>['notification-1']);
-        // The cubit reloads after the mark: two fetch rounds total.
-        expect(_markStub!.fetchCalls, 2);
-        // After the reload the row renders read: exactly the two remaining
+        // Optimistic local flip (audit): the mark flips the row in place —
+        // one fetch round total (the initial load), no post-mark reload.
+        expect(_markStub!.fetchCalls, 1);
+        // After the flip the row renders read: exactly the two remaining
         // unread rows carry the Semantics label (checked on the widget tree
         // shape/affordance, never color alone).
         final Finder unreadSemantics = find.byWidgetPredicate(

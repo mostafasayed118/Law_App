@@ -98,33 +98,29 @@ void main() {
     );
 
     blocTest<NotificationCubit, NotificationState>(
-      'markRead calls the gateway with the single id and reloads (D-F6/AC-3)',
-      setUp: () => gateway = _StubNotificationGateway(
-        results: <Result<List<Notification>>>[
-          Result<List<Notification>>.success(_notifications),
-          Result<List<Notification>>.success(_notifications),
-        ],
-      ),
+      'markRead calls the gateway with the single id and flips the row '
+      'locally with no reload (D-F6/AC-3)',
       build: () {
         gateway.markResult = const Result<int>.success(1);
         return NotificationCubit(gateway);
       },
-      act: (NotificationCubit cubit) => cubit.markRead('notification-1'),
-      // The cubit's initial state IS ViewLoading, so the post-mark load()
-      // skips the redundant loading frame (the load contract) and goes
-      // straight to the reloaded success.
+      act: (NotificationCubit cubit) async {
+        await cubit.load();
+        await cubit.markRead('n1');
+      },
+      // The load emits the full list; the successful mark flips n1 in place
+      // (audit: no full-list reload for a single-flag change).
       expect: () => <NotificationState>[
         NotificationState(
           notifications: ViewSuccess<List<Notification>>(_notifications),
         ),
+        NotificationState(
+          notifications: ViewSuccess<List<Notification>>(_n1Read),
+        ),
       ],
       verify: (_) {
-        expect(gateway.markCallIds, <String>['notification-1']);
-        expect(
-          gateway.fetchCalls,
-          1,
-          reason: 'the reload IS the post-mark fetch',
-        );
+        expect(gateway.markCallIds, <String>['n1']);
+        expect(gateway.fetchCalls, 1, reason: 'the load IS the only fetch');
       },
     );
 
@@ -141,7 +137,7 @@ void main() {
       },
       act: (NotificationCubit cubit) async {
         await cubit.load();
-        await cubit.markRead('notification-1');
+        await cubit.markRead('n1');
       },
       expect: () => <NotificationState>[
         NotificationState(
@@ -286,6 +282,27 @@ final List<Notification> _notifications = <Notification>[
     summary: 'Demo notification — invoice issued',
     serverTimestamp: DateTime.utc(2026, 7, 20, 9, 30),
     isRead: false,
+  ),
+  Notification(
+    id: 'n2',
+    category: NotificationCategory.activity,
+    type: 'matter_updated',
+    summary: 'Demo notification — matter status update',
+    serverTimestamp: DateTime.utc(2026, 7, 18, 14, 5),
+    isRead: false,
+  ),
+];
+
+/// The expected feed after an optimistic `markRead('n1')`: n1 flipped in
+/// place, order untouched.
+final List<Notification> _n1Read = <Notification>[
+  Notification(
+    id: 'n1',
+    category: NotificationCategory.system,
+    type: 'invoice_status',
+    summary: 'Demo notification — invoice issued',
+    serverTimestamp: DateTime.utc(2026, 7, 20, 9, 30),
+    isRead: true,
   ),
   Notification(
     id: 'n2',
