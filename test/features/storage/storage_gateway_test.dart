@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/storage/data/fake_storage_gateway.dart';
 import 'package:legalhub/features/storage/domain/file_metadata.dart';
 
@@ -96,6 +99,51 @@ void main() {
         expect(file.storagePath, isNot(startsWith('http')));
         expect(file.storagePath, isNot(contains('?')));
       }
+    });
+  });
+
+  group('FakeStorageGateway write/preview seams', () {
+    test('uploadFile adds a metadata row with the selected name', () async {
+      final FakeStorageGateway gateway = FakeStorageGateway();
+
+      final Result<FileMetadata> result = await gateway.uploadFile(
+        matterId: 'matter-1',
+        name: 'new note.txt',
+        mimeType: 'text/plain',
+        sizeBytes: 12,
+        bytes: Uint8List.fromList(<int>[1, 2, 3]),
+      );
+
+      expect(result.isSuccess, isTrue);
+      final FileMetadata uploaded = result.valueOrNull!;
+      expect(uploaded.name, 'new note.txt');
+      expect(uploaded.matterRef, 'Demo acquisition review');
+      expect(uploaded.mimeType, 'text/plain');
+      expect(uploaded.sizeBytes, 12);
+
+      final List<FileMetadata> files =
+          (await gateway.fetchFiles()).valueOrNull!;
+      expect(files, hasLength(6));
+      expect(files.last, uploaded);
+    });
+
+    test('createDownloadUrl returns a deterministic https URL', () async {
+      final FakeStorageGateway gateway = FakeStorageGateway();
+      const FileMetadata file = FileMetadata(
+        id: 'file-1',
+        name: 'Demo retainer scan',
+        matterRef: 'Demo acquisition review',
+        mimeType: 'application/pdf',
+        sizeBytes: 12,
+        storagePath: 'org-demo/matter-1/demo-retainer-scan.pdf',
+      );
+
+      final Result<Uri> first = await gateway.createDownloadUrl(file);
+      final Result<Uri> second = await gateway.createDownloadUrl(file);
+
+      expect(first.valueOrNull, second.valueOrNull);
+      expect(first.valueOrNull?.scheme, 'https');
+      expect(first.valueOrNull?.path, contains('file-1'));
     });
   });
 }

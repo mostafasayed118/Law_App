@@ -1,9 +1,11 @@
-/// Provider-neutral files-table seam.
+/// Provider-neutral files/bucket seam.
 ///
 /// The seam is the only surface the storage gateway talks to: plain map rows
 /// out, typed [SupabaseStorageException]s on failure. Provider types never
 /// cross this boundary (same discipline as [SupabaseDocumentApi]).
 library;
+
+import 'dart:typed_data';
 
 /// A PostgREST table SELECT: table name + columns → raw map rows.
 ///
@@ -13,18 +15,46 @@ library;
 typedef StorageTableCaller =
     Future<List<Map<String, dynamic>>> Function(String table, String columns);
 
-/// Typed reasons the files read can fail, mapped from the PostgREST surface.
-/// The read path is a plain RLS-scoped SELECT — the RPC-specific kinds of
-/// the organization seam cannot occur here.
+/// The RLS-scoped matter lookup for an upload (id, organization_id, title).
+typedef StorageMatterCaller =
+    Future<Map<String, dynamic>> Function(String matterId);
+
+/// Uploads bytes to the `matter-files` bucket at [path].
+typedef StorageObjectUploader =
+    Future<void> Function(String path, Uint8List bytes, String contentType);
+
+/// Creates a signed URL for [path] valid for [expiresInSeconds].
+typedef StorageSignedUrlCreator =
+    Future<String> Function(String path, int expiresInSeconds);
+
+/// Removes an object from the `matter-files` bucket.
+typedef StorageObjectRemover = Future<void> Function(String path);
+
+/// A raw RPC call: function name + named params → decoded payload.
+typedef StorageRpcCaller =
+    Future<Object?> Function(String function, Map<String, dynamic> params);
+
+/// Typed reasons the storage surface can fail, mapped from the provider.
 enum SupabaseStorageFailureKind {
-  /// The caller is not permitted to read the requested rows (RLS denied or
-  /// the caller has no session).
+  /// The caller is not permitted (RLS denied, 403, or no session).
   denied,
 
-  /// The provider is unavailable or rate-limited.
+  /// The object exceeds the bucket's size limit (413).
+  tooLarge,
+
+  /// The object's MIME type is not allowed (415).
+  unsupportedType,
+
+  /// The object or row does not exist (404).
+  notFound,
+
+  /// The object already exists / conflicts (409).
+  conflict,
+
+  /// The provider is unavailable or rate-limited (no status / transport).
   providerUnavailable,
 
-  /// An unspecified failure.
+  /// An unspecified failure, including an RPC that returned a non-map.
   unknown,
 }
 
@@ -39,16 +69,11 @@ class SupabaseStorageException implements Exception {
   String toString() => 'SupabaseStorageException(${kind.name}): $message';
 }
 
-/// Files-table surface backed by the Supabase PostgREST client.
+/// Files/bucket surface backed by Supabase PostgREST + Storage.
 ///
-/// The SELECT is RLS-scoped (plan D-STR1/D-STR2): the `files_select_assigned`
-/// policy returns only the rows whose matter the caller is assigned to
-/// (client or attorney) as an active member of the file's org. Rows carry ids
-/// + the embedded matter title — the gateway resolves the VO's title-keyed
-/// `matterRef` from the embed, falling back to the raw matter id (D-STR5).
-/// The byte-level read (`storage.from('matter-files').download(...)`) is a
-/// flagged follow-up slice (D-STR9); the storage.objects policy + battery
-/// prove the byte gate server-side.
+/// The SELECT is RLS-scoped (plan D-STR1/D-STR2); the write path is the
+/// two-step contract: upload the object under the matter prefix, then call
+/// `register_matter_file` to persist the metadata row.
 abstract interface class SupabaseStorageApi {
   /// The caller's assignment-scoped `files` rows.
   ///
@@ -57,4 +82,28 @@ abstract interface class SupabaseStorageApi {
   /// surface the [FileMetadata] VO needs (D-STR3: no content/body/url column
   /// exists).
   Future<List<Map<String, dynamic>>> fetchFiles();
+
+  /// Resolves the matter under the caller's RLS gate for an upload.
+  ///
+  /// Returns an empty map when no row is readable (the gateway maps that to
+  /// a denial).
+  Future<Map<String, dynamic>> fetchMatterForUpload(String matterId);
+
+  /// Uploads [bytes] to `matter-files` at [path].
+  Future<void> uploadObject(String path, Uint8List bytes, String contentType);
+
+  /// Creates a signed URL for [path].
+  Future<String> createSignedUrl(String path, int expiresInSeconds);
+
+  /// Best-effort object cleanup after a failed metadata registration.
+  Future<void> removeObject(String path);
+
+  /// Calls `register_matter_file` and returns `{file, matter_title}`.
+  Future<Map<String, dynamic>> registerMatterFile({
+    required String matterId,
+    required String name,
+    required String mimeType,
+    required int sizeBytes,
+    required String storagePath,
+  });
 }

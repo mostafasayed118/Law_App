@@ -4,11 +4,11 @@ import 'package:equatable/equatable.dart';
 ///
 /// Carries **non-PII metadata only**: a stable id, a generic demo name, a
 /// matter reference, a mime type, a byte size, and the storage path. **There
-/// is no content, no bytes, no download URL, and no signed-URL affordance
-/// anywhere on the type** (D-STR3/D-STR9) — the metadata-only line is
-/// enforced structurally, so the surface can never render file content. The
-/// byte-level read is the storage.objects policy + battery's server-side
-/// claim (D-STR2); this slice's client shows metadata only. Files come from
+/// is no content, no bytes, and no URL on the type** (D-STR3) — the
+/// metadata-only line is enforced structurally, so the surface can never
+/// render file content directly. The gateway mints a short-lived signed URL
+/// on demand for the open action; the storage.objects policy remains the
+/// server-side gate (D-STR2). Files come from
 /// the fake gateway's fixed synthetic list in env-less runs, and names are
 /// static demo copy (R1: fake-data honesty — nothing here may read as a real
 /// file).
@@ -40,8 +40,7 @@ class FileMetadata extends Equatable {
 
   /// The storage-path key (`{org_id}/{matter_id}/{filename}` per D-STR4) —
   /// the single source of truth linking the metadata row to its object.
-  /// Never rendered as a link: the download affordance is a flagged follow-up
-  /// (D-STR9).
+  /// Never rendered as a link; the gateway signs it on demand.
   final String storagePath;
 
   @override

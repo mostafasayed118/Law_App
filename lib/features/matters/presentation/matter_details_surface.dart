@@ -126,7 +126,9 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
           AppSectionHeader(
             title: l10n.matterWorkspaceFilesTitle,
             titleStyle: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-            children: <Widget>[MatterFilesSection(matterRef: matter.title)],
+            children: <Widget>[
+              MatterFilesSection(matterRef: matter.title, matterId: matter.id),
+            ],
           ),
           const SizedBox(height: LegalHubTheme.spaceXl),
         ],

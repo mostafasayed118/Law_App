@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
@@ -280,4 +282,19 @@ class _StubStorageGateway implements StorageGateway {
   @override
   Future<Result<List<FileMetadata>>> fetchFiles() async =>
       Result<List<FileMetadata>>.success(_files);
+
+  @override
+  Future<Result<FileMetadata>> uploadFile({
+    required String matterId,
+    required String name,
+    required String mimeType,
+    required int sizeBytes,
+    required Uint8List bytes,
+  }) async => Result<FileMetadata>.failure(_loadFailure);
+
+  @override
+  Future<Result<Uri>> createDownloadUrl(
+    FileMetadata file, {
+    Duration ttl = const Duration(seconds: 60),
+  }) async => Result<Uri>.failure(_loadFailure);
 }

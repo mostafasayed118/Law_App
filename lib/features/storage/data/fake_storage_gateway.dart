@@ -1,20 +1,17 @@
+import 'dart:typed_data';
+
 import '../../../core/errors/result.dart';
 import '../domain/file_metadata.dart';
 import '../domain/storage_gateway.dart';
 
 /// Development-only storage implementation: a fixed synthetic list of
-/// non-PII file **metadata**.
+/// non-PII file **metadata** plus deterministic in-memory uploads.
 ///
-/// No real backend, no storage bytes, no download affordance (D-STR7/
-/// D-STR9): [fetchFiles] returns the same deterministic list on every call.
-/// Files carry id / generic demo name / matter reference (one of the known
-/// synthetic matter titles, D-W2/D-STR5) / mime type / byte size / storage
-/// path only — **no content, no bytes, no download URL, no client or
-/// real-looking file references**, and names are static demo copy that must
-/// never read as a real file (R1). The storage path uses the D-STR4
-/// `{org}/{matter}/{filename}` encoding with clearly-demo segments. The list
-/// resolves immediately (no artificial delay) so cubit/widget tests stay
-/// timing-independent.
+/// [fetchFiles] returns the synthetic list followed by any uploads made in
+/// this instance — no real backend, no storage bytes, no PII. Uploads add a
+/// metadata row only (the bytes argument is ignored); [createDownloadUrl]
+/// returns a deterministic https URL. The list resolves immediately (no
+/// artificial delay) so cubit/widget tests stay timing-independent.
 class FakeStorageGateway implements StorageGateway {
   /// The fixed synthetic file-metadata list served by [fetchFiles].
   static final List<FileMetadata> syntheticFiles = <FileMetadata>[
@@ -60,10 +57,60 @@ class FakeStorageGateway implements StorageGateway {
     ),
   ];
 
+  /// Maps the synthetic matter ids used by tests to their demo titles.
+  static const Map<String, String> syntheticMatterTitles = <String, String>{
+    'matter-1': 'Demo acquisition review',
+    'matter-2': 'Commercial lease consultation',
+    'matter-3': 'Procedural review matter',
+    'matter-4': 'Family status consultation',
+    'matter-5': 'Startup formation advisory',
+  };
+
+  final List<FileMetadata> _uploaded = <FileMetadata>[];
+  int _sequence = 0;
+
   @override
   Future<Result<List<FileMetadata>>> fetchFiles() async {
-    // Metadata only — the synthetic list is returned as-is; nothing crosses
-    // this boundary but the D-STR3 metadata surface.
-    return Result<List<FileMetadata>>.success(syntheticFiles);
+    // Metadata only — the synthetic list plus this instance's uploads.
+    return Result<List<FileMetadata>>.success(
+      List<FileMetadata>.unmodifiable(<FileMetadata>[
+        ...syntheticFiles,
+        ..._uploaded,
+      ]),
+    );
+  }
+
+  @override
+  Future<Result<FileMetadata>> uploadFile({
+    required String matterId,
+    required String name,
+    required String mimeType,
+    required int sizeBytes,
+    required Uint8List bytes,
+  }) async {
+    _sequence += 1;
+    final FileMetadata file = FileMetadata(
+      id: 'upload-$_sequence',
+      name: name,
+      matterRef: syntheticMatterTitles[matterId] ?? matterId,
+      mimeType: mimeType,
+      sizeBytes: sizeBytes,
+      storagePath: 'org-demo/$matterId/upload-$_sequence-$name',
+    );
+    _uploaded.add(file);
+    return Result<FileMetadata>.success(file);
+  }
+
+  @override
+  Future<Result<Uri>> createDownloadUrl(
+    FileMetadata file, {
+    Duration ttl = const Duration(seconds: 60),
+  }) async {
+    return Result<Uri>.success(
+      Uri.parse(
+        'https://example.com/matter-files/${file.id}'
+        '?token=demo&ttl=${ttl.inSeconds}',
+      ),
+    );
   }
 }
