@@ -28,7 +28,23 @@
 | unpushed | 0 |
 | working tree | clean after the docs commit (this file + the evidence doc) |
 | CI | run `39569576730` on `c835ced` — success (quality + release AAB + debug APK) |
-| gates (local, verified this session) | `flutter analyze` clean · `flutter test` 1741/1741 · `scripts/verify_ledger.sh` PASS (115/0) · `scripts/verify_arb_parity.sh` PASS (510/510/510) |
+| gates (local, verified this session) | `flutter analyze` clean · `flutter test` 1745/1745 (after W1) · `scripts/verify_ledger.sh` PASS (115/0) · `scripts/verify_arb_parity.sh` PASS (510/510/510) |
+
+**Campaign state (updated by the PM after each wave):**
+
+| Wave | Status | Commit | Baseline for the next wave |
+|---|---|---|---|
+| W1 | **landed + PM-verified** | `8b5b08b` (root cause: candidate B — the seed guard in `active_org_store.dart` skipped a same-user re-auth; `OrganizationMembership` is an Equatable, so the membership-set comparison is by value) | `flutter test` = **1745** (1741 + 4 new), ledger 115/0, ARB parity 510/510/510 |
+| W2 | next | — | — |
+| W3 | queued | — | — |
+| W4 | queued (owner ruling D1) | — | — |
+| W5 | queued (owner ruling D2) | — | — |
+
+> **README note for the executors:** the repo's ledger gate compares the README's
+> test-count lines with the tracked declaration count. Whenever a wave adds tracked
+> test declarations, the README's two count lines **must** be bumped in the same
+> commit or `scripts/verify_ledger.sh` goes red. `README.md` (those two lines only)
+> is therefore in scope for any wave that adds tests.
 
 **Flutter startup lock:** only one Flutter gate process at a time — waves run
 **sequentially**, never in parallel.
@@ -102,10 +118,10 @@ builds a fresh store and seeds correctly.
 
 ```
 cd C:\flutter_projects\law_app
-git rev-parse HEAD                # c835ceddda58427adedc8377344b52bb819eeebb
+git rev-parse HEAD                # MUST be e92cccb (the docs commit: device evidence + wave plan)
 git status --porcelain=v1         # MUST be empty
-git rev-list --count origin/main..HEAD   # 0
-git ls-remote origin refs/heads/main     # c835ceddda58427adedc8377344b52bb819eeebb
+git rev-list --count origin/main..HEAD   # MUST be 1 (the docs commit is local — NEVER PUSH)
+git ls-remote origin refs/heads/main     # MUST be c835ceddda58427adedc8377344b52bb819eeebb
 flutter analyze --no-pub          # 0 issues
 flutter test                      # 1741 tests, all green — record the exact count
 ```
@@ -193,8 +209,9 @@ deep-link feature deliberately ignores anything that is not an accept-invite lin
 `NoAppLinkIntent`), so the raw URI arrives as an unmatched *platform initial route*
 and GoRouter throws.
 
-**STEP 0 — baseline.** Same commands as PROMPT 1 (record the exact `flutter test`
-count: 1741).
+**STEP 0 — baseline.** Same commands as PROMPT 1 (HEAD must be the W1 commit
+`8b5b08b` unless a later wave landed, porcelain empty, unpushed = 2, ls-remote
+`c835ced…`; record the exact `flutter test` count: **1745**).
 
 **STEP 1 — PROBE FIRST.** Reproduce the defect **without a device**: construct the
 router with an unmatched initial location and assert what the app renders. Confirm
