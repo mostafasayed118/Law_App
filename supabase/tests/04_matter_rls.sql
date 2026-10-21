@@ -11,6 +11,11 @@
 --   - suspended membership in the matter's org -> deny (stale access);
 --   - platform_owner_admin (never assigned)    -> deny, always (Q4 residual);
 --   - unauthenticated                          -> deny (no grant);
+--   - the CREATOR CARVE-OUT (owner ruling D1, 2026-10-21 — device finding
+--     F4): the creator of a matter reads their own UNASSIGNED matter back
+--     (04.11), while an active non-creator non-assignee (04.12), a
+--     suspended member (04.13) and a non-member (04.14) stay denied — the
+--     carve-out adds the creator and nobody else;
 --   - practice_area CHECK (mapping contract)   -> a write path cannot insert
 --     an unmapped value (privileged-path half; the client has no INSERT
 --     grant, so the CHECK is pinned at the postgres role);
@@ -205,3 +210,67 @@ begin
   end;
 end $$;
 set role authenticated;
+
+-- ############################################################################
+-- The D1 CREATOR CARVE-OUT (owner ruling, 2026-10-21 — device finding F4).
+--
+-- One partner-a create with NO assignee, then the same row read under four
+-- identities: the creator (POS — the carve-out) and three deny arms that
+-- prove the carve-out does NOT widen the gate for anyone else.
+-- ############################################################################
+
+begin;
+do $$
+declare
+  v_id  uuid;
+  v_cnt bigint;
+begin
+  -- partner-a (org-a, partner/active) creates an UNASSIGNED matter.
+  perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000002', false);
+  perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002"}', false);
+  select public.create_matter(
+    '20000000-0000-4000-8000-000000000001', '04.11 probe', 'corporate', null, null)
+    into v_id;
+  if v_id is null then
+    raise exception 'POLICY-BATTERY FAIL 04.11: create_matter returned a null id';
+  end if;
+
+  -- CHECK 04.11 — POS (the carve-out): the CREATOR reads their own
+  -- unassigned matter back. Before D1 this read was denied (device finding
+  -- F4 — the creator could never see the matter they had just created).
+  select count(*) into v_cnt from public.matters where id = v_id;
+  if v_cnt <> 1 then
+    raise exception 'POLICY-BATTERY FAIL 04.11: creator could NOT read their own unassigned matter (D1 carve-out — want 1, got %)', v_cnt;
+  end if;
+
+  -- CHECK 04.12 — NEG (the assignment gate still holds): orphan (org-a,
+  -- client/active) is an ACTIVE member of the matter's org but is neither an
+  -- assignee nor the creator — still denied.
+  perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000007', false);
+  perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000007"}', false);
+  select count(*) into v_cnt from public.matters where id = v_id;
+  if v_cnt <> 0 then
+    raise exception 'POLICY-BATTERY FAIL 04.12: an active non-creator non-assignee read the matter (want 0, got %)', v_cnt;
+  end if;
+
+  -- CHECK 04.13 — NEG (suspended creator): suspended-a holds a SUSPENDED
+  -- org-a membership — the membership conjunct of the policy still has to
+  -- hold, so a suspended member is denied even as a would-be creator.
+  perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000005', false);
+  perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000005"}', false);
+  select count(*) into v_cnt from public.matters where id = v_id;
+  if v_cnt <> 0 then
+    raise exception 'POLICY-BATTERY FAIL 04.13: a suspended member read the matter (want 0, got %)', v_cnt;
+  end if;
+
+  -- CHECK 04.14 — NEG (non-member): partner-b is an active member of org-b
+  -- ONLY — membership is tested against the matter's own org, so the carve-out
+  -- grants nothing.
+  perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000004', false);
+  perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000004"}', false);
+  select count(*) into v_cnt from public.matters where id = v_id;
+  if v_cnt <> 0 then
+    raise exception 'POLICY-BATTERY FAIL 04.14: a non-member read the matter (want 0, got %)', v_cnt;
+  end if;
+end $$;
+rollback;

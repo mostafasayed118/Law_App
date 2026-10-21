@@ -15,7 +15,9 @@
 --   - the UPDATE arm is pinned (13.14/13.15 — re-assignment to the owner is
 --     refused, non-owner re-assignment succeeds);
 --   - F2-D5: assignments nullable at creation — the orphan create succeeds
---     and is invisible to every role under RLS (13.16).
+--     and is readable by its CREATOR (13.16 — the owner ruling D1 of
+--     2026-10-21 flipped this pin from "invisible to every role" to
+--     "readable by its creator"; the deny arms live in 04_matter_rls.sql).
 --
 -- Run AFTER 00_fixtures.sql + 12_owner_assignment.sql by
 -- scripts/verify_policy_tests.sh (last in the run_battery loop).
@@ -416,11 +418,19 @@ end $$;
 rollback;
 
 -- ############################################################################
--- 13.16 — POS (F2-D5, review finding R-2): a partner may create a matter
--- with NO assignments (assignments nullable at creation — the orphan row;
--- invisible to every role, since the read gate is assignment-based, its
--- creator included, under RLS — the invoice-orphan 11 semantics). The RPC
--- returns the id. (Rolled back — the audit row rolls back with the create.)
+-- 13.16 — POS (F2-D5 + the owner ruling D1, 2026-10-21): a partner may
+-- create a matter with NO assignments (assignments nullable at creation —
+-- the orphan row — the invoice-orphan 11 semantics), the RPC returns the id,
+-- and the CREATOR CAN READ THE ROW BACK. Before D1 this pin asserted the
+-- opposite (the orphan row was invisible to every role, its creator
+-- included) — the exact device finding F4 (docs/device_e2e_2026-10-21_
+-- c835ced.md): a matter created without an assignee was a matter its own
+-- creator could never read. D1 (owner ruling, 2026-10-21) rules that the
+-- creator of a matter must always be able to read it, so the expectation
+-- flips 0 -> 1 here. The assignment gate itself is unchanged and is still
+-- pinned by the deny arms in 04_matter_rls.sql (04.12-04.14: an unassigned
+-- non-creator member, a suspended member and a non-member are all still
+-- denied). (Rolled back — the audit row rolls back with the create.)
 -- ############################################################################
 set role authenticated;
 begin;
@@ -438,8 +448,8 @@ begin
     raise exception 'POLICY-BATTERY FAIL 13.16: orphan create returned a null id';
   end if;
   select count(*) into v_cnt from public.matters where id = v_id;
-  if v_cnt <> 0 then
-    raise exception 'POLICY-BATTERY FAIL 13.16: orphan matter visible to its creator under RLS (want 0, got %)', v_cnt;
+  if v_cnt <> 1 then
+    raise exception 'POLICY-BATTERY FAIL 13.16: orphan matter NOT readable by its creator under RLS (D1 carve-out — want 1, got %)', v_cnt;
   end if;
 end $$;
 rollback;

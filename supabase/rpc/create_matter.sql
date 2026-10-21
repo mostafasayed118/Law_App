@@ -32,6 +32,16 @@
 -- §8 audit: every successful create writes a redacted summary ('matter
 -- created' — never the title), same implicit transaction as the insert (a
 -- write_audit failure rolls the create back).
+--
+-- CREATOR (owner ruling D1, 2026-10-21 — device finding F4): the insert also
+-- stamps created_by = auth.uid(), the creator of the matter. The read policy
+-- (supabase/policies/matters.sql) carries the matching creator carve-out, so
+-- a partner who creates a matter WITHOUT assigning anyone can still read it
+-- back (before D1 the row was invisible to its own creator). The stamp is
+-- additive: no gate above changes, and created_by is derived from the
+-- authenticated caller, never from an argument — a caller cannot create a
+-- matter on someone else's behalf. The column itself lands in
+-- migrations/21_matter_creator.sql.
 
 create or replace function public.create_matter(
   p_organization_id    uuid,
@@ -80,10 +90,10 @@ begin
 
   insert into public.matters
     (organization_id, title, practice_area, status,
-     assigned_client_id, assigned_attorney_id)
+     assigned_client_id, assigned_attorney_id, created_by)
   values
     (p_organization_id, trim(p_title), p_practice_area, 'open',
-     p_assigned_client_id, p_assigned_attorney_id)
+     p_assigned_client_id, p_assigned_attorney_id, auth.uid())
   returning id into v_matter;
 
   -- §8 audit (contract): redacted summary only — never the title.
