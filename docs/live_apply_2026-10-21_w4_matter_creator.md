@@ -8,8 +8,7 @@ Supabase MCP is bound to a different project, and the CLI reports
 available). `supabase db push` was **not** used (the project has no
 `supabase_migrations.schema_migrations` history).
 
-**Status: the schema apply is COMPLETE and verified. A PostgREST schema-cache
-incident is OPEN and blocks the app's RPC write paths (see §Incident).**
+**Status: the schema apply is COMPLETE and verified (it was rolled back once during the incident and re-applied). A PostgREST schema-cache incident is OPEN and blocks the app's RPC write paths (see §4). The carve-out is live in the database; the app's write path is not, for a platform-side reason.**
 
 ## 1. Owner ruling
 
@@ -111,18 +110,68 @@ path is down on the live project**: matter creation, task creation, booking,
 membership/org mutations and message sending — i.e. the app's write surfaces for
 every account, not only the QA one.
 
-**Remediation (needs the owner's GO — a live service window).**
+**Remediation attempts (all failed to restore the RPC surface).**
 
-1. **Restart the project** (dashboard: Project Settings → Restart project; the
-   platform's PostgREST then rebuilds the schema cache from scratch). The previous
-   session used the same lever on this project (`INACTIVE → ACTIVE_HEALTHY`).
-2. After the restart, re-verify: `POST /rest/v1/rpc/create_matter` (the app's exact
-   5-arg shape) → 200, plus one `send_message`-style call, and the carve-out
-   proof (create a matter with no assignee as the QA partner → read it back).
-3. If the restart restores the functions, the apply is complete and the wave
-   closes; if the function section is still empty after the restart, the carve-out
-   must be re-applied on a project whose PostgREST is healthy (and the wave's
-   local proof re-run, since the local stack's PostgREST is a different version).
+| Attempt | Result |
+|---|---|
+| `notify pgrst, 'reload schema'` (bare NOTIFY) | no change |
+| `select pg_notify('pgrst', 'reload schema')` | no change |
+| `select pg_notify('pgrst', 'reload config')` + `'reload schema'` | no change |
+| Full **rollback** of the apply (pre-21 policy + pre-21 function body + column/index dropped, from `git show 2bd5984^`) | schema restored to the 13:05 state, RPCs **still** 404 |
+| **Project restart** (dashboard → General → Restart project; the owner authorized it — the project went 502 for ~1 min, then reported "Healthy") | RPCs **still** 404 |
+| Re-created `create_matter` **without** its two `default null` args (PostgreSQL needs `drop function` first — 42P13 otherwise) | RPCs **still** 404 |
+| `grant execute on function public.create_organization(text) to public` (a reversible probe of the privilege-lookup theory) | RPCs **still** 404 ⇒ the privilege lookup is **not** the cause; the probe grant was **revoked** again in the re-apply script |
+
+**Diagnosis (evidence-based).**
+
+- The **service_role** key sees the functions (the log shows `400` + a Postgres
+  `P0001 permission denied` raised *inside* `list_organizations_metadata`'s body,
+  i.e. the function was found and executed). The **authenticated** role gets
+  `404 PGRST202` for every function, with every argument shape (0/3/4/5 args,
+  nulls and non-nulls) — including `create_organization`, which the app called
+  successfully at ~13:05 today.
+- The **schema** is not the cause: the rollback restored the exact pre-apply
+  catalog and the exposure stayed broken; the grants are intact
+  (`has_function_privilege('authenticated', …, 'execute')` = true for 33
+  functions, `anon` = false, `service_role` = true); there is exactly one
+  `create_matter` overload; **table** reads work throughout (200).
+- The project's service versions (dashboard → General → Service versions):
+  **PostgREST 14.15**, Auth 2.197.0, Postgres 17.6.1.155; the platform release
+  **17.11.0.003** is available ("Upgrade project").
+- ⇒ The fault is in the **PostgREST schema cache for the `authenticated` role**
+  on this project's API container: it is empty (or unbuilt), it does not answer
+  `reload schema` / `reload config`, it does not recover from DDL (the platform's
+  own reload trigger fired during the apply and during the rollback), and it did
+  not recover from a project restart. The `service_role` cache entry is intact,
+  which is why the same functions are reachable with that key.
+
+**Remaining levers (each needs the owner):**
+
+1. **Upgrade the platform release** (Settings → General → "Upgrade project" →
+   17.11.0.003). It replaces the API container, so the schema cache is rebuilt
+   from scratch. This is the same class of action as the restart the owner
+   already authorized, one step further.
+2. **Supabase support** with the evidence in this file (the project's API keys
+   are on the FREE plan, so support may be limited) — the ask is: "the
+   PostgREST schema cache for the `authenticated` role is empty on this project;
+   `service_role` sees the functions, `authenticated` gets PGRST202 for all of
+   them; `reload schema`, `reload config`, DDL and a project restart did not
+   rebuild it."
+3. **A Management API token for this project with project-write scope**
+   (`database_read` / `database_write` / project restart) so the PM can drive
+   the service restart and the SQL applies without the dashboard. The token in
+   the environment belongs to a different account and the Supabase MCP is bound
+   to another project.
+
+**Repo follow-up (independent of the incident).** Four RPC files carry
+`default null` arguments (`create_matter`, `create_task`, `book_consultation`,
+`apply_paymob_transaction`). PostgREST 14 does not expose default-argument
+functions the way the app calls them (the app always sends every argument), so
+those four signatures are a latent landmine even though the local battery (which
+calls them over psql, not over PostgREST) cannot see it. The follow-up is to
+drop the defaults from those four signatures (the app's call shape already sends
+every argument, so it stays compatible) — that belongs to the next wave, not to
+this one.
 
 **PM note.** The live apply itself is verified correct (§3) and the local proof is
 green (§2); the open item is a platform-side cache, not a schema defect. The PM
@@ -139,3 +188,23 @@ Gates at that commit: `flutter analyze` 0 · `flutter test` 1759/1759 ·
 `dart format --output=none --set-exit-if-changed .` 0 changed ·
 `scripts/verify_ledger.sh` 115/0 · `scripts/verify_arb_parity.sh` 520/520/520 ·
 local battery 126/0.
+
+## 6. Re-apply after the incident (2026-10-21, late)
+
+After the failed remediations above, the W4 apply was **re-applied** so the live
+project matches the repo and the owner's D1 ruling:
+
+- script sha256 5d0a3655dfc715043def9c062218d0c63afcd809411f35c72db13da3846a9049
+  (the same three repo files as §3, plus the reversal of the temporary
+  grant execute … to public probe);
+- editor result: **"Success. No rows returned"**;
+- post-apply read-back: public.matters.created_by exists again, the read policy
+  carries the creator arm, and the QA partner can read their matter
+  (GET /rest/v1/matters → 1 row, QA Device Matter 2);
+- the RPC surface is **still** PGRST202 for the uthenticated role (the
+  incident above is untouched by the re-apply — the same breakage survived a full
+  rollback to the 13:05 catalog).
+
+Existing matters keep created_by = NULL (no backfill): QA Device Matter 2 was
+created before the RPC could stamp a creator, so the carve-out does not apply to
+it; it is visible to the QA partner because that matter has the client assigned.
