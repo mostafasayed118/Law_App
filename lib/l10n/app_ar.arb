@@ -535,5 +535,6 @@
   "videoMicMuted": "الميكروفون مكتوم (تجريبي)",
   "videoCameraOn": "الكاميرا مفتوحة (تجريبي)",
   "videoCameraOff": "الكاميرا مغلقة (تجريبي)",
-  "videoLeave": "غادر المكالمة"
+  "videoLeave": "غادر المكالمة",
+  "unmatchedRouteTitle": "تعذّر فتح هذا الرابط."
 }

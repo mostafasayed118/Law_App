@@ -1659,4 +1659,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get videoLeave => 'غادر المكالمة';
+
+  @override
+  String get unmatchedRouteTitle => 'تعذّر فتح هذا الرابط.';
 }

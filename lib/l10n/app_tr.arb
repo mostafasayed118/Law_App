@@ -535,5 +535,6 @@
   "videoMicMuted": "Mikrofon kapalı (demo)",
   "videoCameraOn": "Kamera açık (demo)",
   "videoCameraOff": "Kamera kapalı (demo)",
-  "videoLeave": "Aramadan ayrıl"
+  "videoLeave": "Aramadan ayrıl",
+  "unmatchedRouteTitle": "Bu bağlantı açılamadı."
 }

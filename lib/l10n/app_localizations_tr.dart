@@ -1675,4 +1675,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get videoLeave => 'Aramadan ayrıl';
+
+  @override
+  String get unmatchedRouteTitle => 'Bu bağlantı açılamadı.';
 }

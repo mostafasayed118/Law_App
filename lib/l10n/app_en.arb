@@ -630,5 +630,6 @@
   "videoMicMuted": "Microphone muted (demo)",
   "videoCameraOn": "Camera on (demo)",
   "videoCameraOff": "Camera off (demo)",
-  "videoLeave": "Leave call"
+  "videoLeave": "Leave call",
+  "unmatchedRouteTitle": "This link could not be opened."
 }

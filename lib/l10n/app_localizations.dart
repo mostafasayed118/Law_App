@@ -3159,6 +3159,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Leave call'**
   String get videoLeave;
+
+  /// No description provided for @unmatchedRouteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This link could not be opened.'**
+  String get unmatchedRouteTitle;
 }
 
 class _AppLocalizationsDelegate

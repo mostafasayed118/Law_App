@@ -40,6 +40,8 @@ import '../features/tasks/presentation/task_board_screen.dart';
 import '../features/video/presentation/video_consultation_screen.dart';
 import '../l10n/app_localizations.dart';
 import '../shared/responsive/responsive.dart';
+import '../shared/widgets/app_centered_message.dart';
+import 'legalhub_theme.dart';
 part 'router_shell_routes.dart';
 part 'router_app_shell.dart';
 part 'router_refresh_stream.dart';
@@ -179,6 +181,11 @@ GoRouter createAppRouter(
       routes: _shellRoutes(authCubit, capabilitiesForRole),
     ),
   ],
+  errorBuilder: (BuildContext context, GoRouterState state) => Builder(
+    builder: (BuildContext innerContext) => _UnmatchedLocationSurface(
+      onOpenApp: () => GoRouter.of(innerContext).go(AppRoutes.home),
+    ),
+  ),
   redirect: (BuildContext context, GoRouterState state) {
     final bool authenticated = authCubit.state.isAuthenticated;
     final String path = state.uri.path;
@@ -210,3 +217,45 @@ GoRouter createAppRouter(
     return null;
   },
 );
+
+/// The calm surface the router shows for a location it does not own.
+///
+/// go_router's default error page prints the raw [GoException] — the
+/// "Page Not Found" + "no routes for location: …" screen a device showed for
+/// an unmatched deep link (F2, `docs/device_e2e_2026-10-21_c835ced.md` §2).
+/// The app owns exactly one deep link (the accept-invite share link); every
+/// other URI the platform hands the app is foreign, and a foreign URI must
+/// never put exception text on screen. This surface keeps the failure local:
+/// a calm, localized explanation and one way back into the app.
+class _UnmatchedLocationSurface extends StatelessWidget {
+  const _UnmatchedLocationSurface({required this.onOpenApp});
+
+  /// Routes back into the app (the shell's home; the signed-out redirect
+  /// carries a visitor to sign-in instead).
+  final VoidCallback onOpenApp;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final ColorScheme scheme = Theme.of(context).colorScheme;
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(Icons.link_off, size: 40, color: scheme.onSurfaceVariant),
+              const SizedBox(height: LegalHubTheme.spaceMd),
+              AppCenteredMessage(text: l10n.unmatchedRouteTitle),
+              const SizedBox(height: LegalHubTheme.spaceMd),
+              FilledButton(
+                onPressed: onOpenApp,
+                child: Text(l10n.homeNavigation),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

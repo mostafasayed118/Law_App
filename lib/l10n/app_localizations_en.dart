@@ -1676,4 +1676,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get videoLeave => 'Leave call';
+
+  @override
+  String get unmatchedRouteTitle => 'This link could not be opened.';
 }
