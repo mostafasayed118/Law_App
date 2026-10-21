@@ -18,6 +18,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get demoSessionNotice => 'جلسة تجريبية للتطوير فقط';
 
   @override
+  String get sessionNoticeConfigured => 'جلسة مباشرة — البيانات من الخادم.';
+
+  @override
   String get settingsTitle => 'الإعدادات';
 
   @override
@@ -85,6 +88,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get signOut => 'إنهاء الجلسة التجريبية';
+
+  @override
+  String get signOutConfigured => 'تسجيل الخروج';
 
   @override
   String get back => 'رجوع';
@@ -928,6 +934,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get bookingEntrySubtitle => 'جدولة استشارة — عرض تجريبي للتطوير.';
 
   @override
+  String get bookingEntrySubtitleConfigured => 'احجز استشارة مع محامٍ متاح.';
+
+  @override
   String get discoveryTitle => 'ابحث عن محامٍ';
 
   @override
@@ -1004,6 +1013,9 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get matterEntrySubtitle =>
       'تصفح ملفات القضايا التجريبية — عرض تجريبي للتطوير.';
+
+  @override
+  String get matterEntrySubtitleConfigured => 'تصفّح قضاياك وملفاتها.';
 
   @override
   String get matterDetailsTitle => 'تفاصيل القضية';
@@ -1113,6 +1125,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'تصفح البيانات الوصفية للمستندات التجريبية — عرض تجريبي للتطوير.';
 
   @override
+  String get vaultEntrySubtitleConfigured =>
+      'تصفّح المستندات المرفوعة في قضاياك.';
+
+  @override
   String get documentTypeContract => 'عقد';
 
   @override
@@ -1143,6 +1159,9 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get messagesEntrySubtitle =>
       'تصفح محادثات تجريبية — عرض تجريبي للتطوير.';
+
+  @override
+  String get messagesEntrySubtitleConfigured => 'تصفّح محادثاتك.';
 
   @override
   String messagesMessageCount(Object count) {
@@ -1263,6 +1282,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get invoicesEntrySubtitle => 'تصفّح الفواتير التجريبية — عرض تطويري.';
+
+  @override
+  String get invoicesEntrySubtitleConfigured =>
+      'تصفّح الفواتير وحالة الدفع فيها.';
 
   @override
   String get invoiceStatusIssued => 'صادرة';
@@ -1421,6 +1444,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tasksEntrySubtitle => 'استعرض المهام التجريبية — عرض تطويري.';
 
   @override
+  String get tasksEntrySubtitleConfigured => 'تصفّح المهام المسندة إليك.';
+
+  @override
   String get taskStatusTodo => 'للتنفيذ';
 
   @override
@@ -1550,6 +1576,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get notificationsFeedEntrySubtitle =>
       'عرض تنبيهات نشاط المؤسسة — خلاصة تجريبية للقراءة فقط.';
+
+  @override
+  String get notificationsFeedEntrySubtitleConfigured =>
+      'استعرض تنبيهات نشاط مؤسستك.';
 
   @override
   String get notificationCategoryAppointment => 'موعد';

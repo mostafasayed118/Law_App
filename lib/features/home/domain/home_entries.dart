@@ -31,6 +31,7 @@ class HomeEntry {
     required this.subtitle,
     required this.route,
     required this.isVisible,
+    this.configuredSubtitle,
   });
 
   /// Stable id for tests and analytics (e.g. `'matters'`).
@@ -43,6 +44,36 @@ class HomeEntry {
   /// Localized title/subtitle getters (mirror the wrapper's l10n keys).
   final String Function(AppLocalizations l10n) title;
   final String Function(AppLocalizations l10n) subtitle;
+
+  /// The subtitle to render in a configured (real-backend) build.
+  ///
+  /// `null` for the fake-only entries: their gateway has no Supabase
+  /// implementation, so their data is synthetic in EVERY build and the demo
+  /// wording of [subtitle] is truthful there — changing it would hide the
+  /// truth instead of stating it.
+  final String Function(AppLocalizations l10n)? configuredSubtitle;
+
+  /// Whether this entry's data comes from a real (server-backed) gateway in a
+  /// configured build — true exactly when [configuredSubtitle] is set.
+  ///
+  /// The flag is per entry, not a single global posture: the dashboard mixes
+  /// server-backed entries with fake-only ones, so only the former can drop
+  /// their demo wording in a configured build.
+  bool get isServerBacked => configuredSubtitle != null;
+
+  /// The subtitle to render for the given backend posture.
+  ///
+  /// [localOnly] is the app-wide posture seam (`backendIsLocalOnly`): true in
+  /// the demo-posture build, false in a configured (real-backend) build. A
+  /// server-backed entry reads as the real feature there; a fake-only entry
+  /// keeps its demo wording, which is the truthful one in every build.
+  String subtitleFor(AppLocalizations l10n, {required bool localOnly}) {
+    if (!localOnly && isServerBacked) {
+      // Provably non-null: [isServerBacked] is derived from it.
+      return configuredSubtitle!(l10n);
+    }
+    return subtitle(l10n);
+  }
 
   /// Forward-navigation route token (resolved to the `AppRoutes.*` string
   /// at the presentation boundary; the builder always `push`es — E2E BUG-1).
@@ -105,6 +136,7 @@ List<HomeEntry> homeEntriesFor(RoleCapability capabilities) {
       icon: HomeEntryIcon.booking,
       title: _bookingTitle,
       subtitle: _bookingSubtitle,
+      configuredSubtitle: _bookingConfiguredSubtitle,
       route: HomeEntryRoute.book,
       isVisible: _canBook,
     ),
@@ -129,6 +161,7 @@ List<HomeEntry> homeEntriesFor(RoleCapability capabilities) {
       icon: HomeEntryIcon.matters,
       title: _mattersTitle,
       subtitle: _mattersSubtitle,
+      configuredSubtitle: _mattersConfiguredSubtitle,
       route: HomeEntryRoute.matters,
       isVisible: _canViewMatters,
     ),
@@ -137,6 +170,7 @@ List<HomeEntry> homeEntriesFor(RoleCapability capabilities) {
       icon: HomeEntryIcon.documents,
       title: _vaultTitle,
       subtitle: _vaultSubtitle,
+      configuredSubtitle: _vaultConfiguredSubtitle,
       route: HomeEntryRoute.vault,
       isVisible: _canViewDocuments,
     ),
@@ -145,6 +179,7 @@ List<HomeEntry> homeEntriesFor(RoleCapability capabilities) {
       icon: HomeEntryIcon.messages,
       title: _messagesTitle,
       subtitle: _messagesSubtitle,
+      configuredSubtitle: _messagesConfiguredSubtitle,
       route: HomeEntryRoute.messages,
       isVisible: _canViewMessages,
     ),
@@ -153,6 +188,7 @@ List<HomeEntry> homeEntriesFor(RoleCapability capabilities) {
       icon: HomeEntryIcon.invoices,
       title: _invoicesTitle,
       subtitle: _invoicesSubtitle,
+      configuredSubtitle: _invoicesConfiguredSubtitle,
       route: HomeEntryRoute.invoices,
       isVisible: _canViewDocuments,
     ),
@@ -161,6 +197,7 @@ List<HomeEntry> homeEntriesFor(RoleCapability capabilities) {
       icon: HomeEntryIcon.notifications,
       title: _notificationsTitle,
       subtitle: _notificationsSubtitle,
+      configuredSubtitle: _notificationsConfiguredSubtitle,
       route: HomeEntryRoute.notificationsFeed,
       isVisible: _canViewNotifications,
     ),
@@ -177,6 +214,7 @@ List<HomeEntry> homeEntriesFor(RoleCapability capabilities) {
       icon: HomeEntryIcon.tasks,
       title: _tasksTitle,
       subtitle: _tasksSubtitle,
+      configuredSubtitle: _tasksConfiguredSubtitle,
       route: HomeEntryRoute.tasks,
       isVisible: _canViewTasks,
     ),
@@ -213,26 +251,40 @@ bool _canUseAiResearch(RoleCapability c) => c.canUseAiResearch;
 
 String _bookingTitle(AppLocalizations l10n) => l10n.bookingEntryTitle;
 String _bookingSubtitle(AppLocalizations l10n) => l10n.bookingEntrySubtitle;
+String _bookingConfiguredSubtitle(AppLocalizations l10n) =>
+    l10n.bookingEntrySubtitleConfigured;
 String _videoTitle(AppLocalizations l10n) => l10n.videoEntryTitle;
 String _videoSubtitle(AppLocalizations l10n) => l10n.videoEntrySubtitle;
 String _discoveryTitle(AppLocalizations l10n) => l10n.discoveryEntryTitle;
 String _discoverySubtitle(AppLocalizations l10n) => l10n.discoveryEntrySubtitle;
 String _mattersTitle(AppLocalizations l10n) => l10n.matterEntryTitle;
 String _mattersSubtitle(AppLocalizations l10n) => l10n.matterEntrySubtitle;
+String _mattersConfiguredSubtitle(AppLocalizations l10n) =>
+    l10n.matterEntrySubtitleConfigured;
 String _vaultTitle(AppLocalizations l10n) => l10n.vaultEntryTitle;
 String _vaultSubtitle(AppLocalizations l10n) => l10n.vaultEntrySubtitle;
+String _vaultConfiguredSubtitle(AppLocalizations l10n) =>
+    l10n.vaultEntrySubtitleConfigured;
 String _messagesTitle(AppLocalizations l10n) => l10n.messagesEntryTitle;
 String _messagesSubtitle(AppLocalizations l10n) => l10n.messagesEntrySubtitle;
+String _messagesConfiguredSubtitle(AppLocalizations l10n) =>
+    l10n.messagesEntrySubtitleConfigured;
 String _invoicesTitle(AppLocalizations l10n) => l10n.invoicesEntryTitle;
 String _invoicesSubtitle(AppLocalizations l10n) => l10n.invoicesEntrySubtitle;
+String _invoicesConfiguredSubtitle(AppLocalizations l10n) =>
+    l10n.invoicesEntrySubtitleConfigured;
 String _notificationsTitle(AppLocalizations l10n) =>
     l10n.notificationsFeedEntryTitle;
 String _notificationsSubtitle(AppLocalizations l10n) =>
     l10n.notificationsFeedEntrySubtitle;
+String _notificationsConfiguredSubtitle(AppLocalizations l10n) =>
+    l10n.notificationsFeedEntrySubtitleConfigured;
 String _alertsTitle(AppLocalizations l10n) => l10n.alertsEntryTitle;
 String _alertsSubtitle(AppLocalizations l10n) => l10n.alertsEntrySubtitle;
 String _tasksTitle(AppLocalizations l10n) => l10n.tasksEntryTitle;
 String _tasksSubtitle(AppLocalizations l10n) => l10n.tasksEntrySubtitle;
+String _tasksConfiguredSubtitle(AppLocalizations l10n) =>
+    l10n.tasksEntrySubtitleConfigured;
 String _approvalsTitle(AppLocalizations l10n) => l10n.approvalsEntryTitle;
 String _approvalsSubtitle(AppLocalizations l10n) => l10n.approvalsEntrySubtitle;
 String _researchTitle(AppLocalizations l10n) => l10n.aiResearchEntryTitle;

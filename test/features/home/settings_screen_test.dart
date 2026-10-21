@@ -7,6 +7,7 @@ import 'package:legalhub/app/router.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/app/theme/theme_cubit.dart';
 import 'package:legalhub/core/auth/auth_state.dart';
+import 'package:legalhub/core/backend_posture.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/local/in_memory_locale_store.dart';
@@ -373,4 +374,40 @@ void main() {
 
     expect(find.text('Light'), findsOneWidget);
   });
+
+  testWidgets(
+    'the configured posture shows the live-session notice and the sign-out '
+    'label instead of the demo wording',
+    (tester) async {
+      // The configured (real-backend) posture is the seam the app registers
+      // when the Supabase env is configured: a real account is not a demo
+      // session, so the role card and the sign-out button must say so.
+      await resetServiceLocator();
+      serviceLocator.registerSingleton<BackendPosture>(
+        const BackendPosture(isLocalOnly: false),
+      );
+      addTearDown(resetServiceLocator);
+
+      await tester.pumpWidget(pumpScreen());
+      await tester.pumpAndSettle();
+
+      await authCubit.startDemoSession();
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Live session — data comes from the server.'),
+        findsOneWidget,
+      );
+      expect(find.text('Development-only demo session'), findsNothing);
+
+      // Scroll the list — the sign-out button sits below the tiles.
+      await tester.scrollUntilVisible(
+        find.text('Sign out'),
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('Sign out'), findsOneWidget);
+      expect(find.text('End demo session'), findsNothing);
+    },
+  );
 }

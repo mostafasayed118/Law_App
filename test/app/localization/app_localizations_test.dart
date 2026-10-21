@@ -1252,6 +1252,184 @@ void main() {
         expect(ar.fileOpenFailed, isNot(en.fileOpenFailed));
       },
     );
+
+    test(
+      'resolves the configured-build (server-backed) home and settings copy in '
+      'every locale (2026-10-21 W3 pin)',
+      () {
+        final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+        final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+        final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+        // Server-backed home entries read as the real feature in a configured
+        // build; the demo wording stays for the demo posture (pinned above).
+        expect(
+          en.bookingEntrySubtitleConfigured,
+          'Schedule a consultation with an available attorney.',
+        );
+        expect(
+          ar.bookingEntrySubtitleConfigured,
+          'احجز استشارة مع محامٍ متاح.',
+        );
+        expect(
+          tr.bookingEntrySubtitleConfigured,
+          'Müsait bir avukatla danışma randevusu oluşturun.',
+        );
+        expect(
+          en.matterEntrySubtitleConfigured,
+          'Browse your matters and their case files.',
+        );
+        expect(ar.matterEntrySubtitleConfigured, 'تصفّح قضاياك وملفاتها.');
+        expect(
+          tr.matterEntrySubtitleConfigured,
+          'Kendi davalarınıza ve dosyalarına göz atın.',
+        );
+        expect(
+          en.vaultEntrySubtitleConfigured,
+          'Browse the documents filed in your matters.',
+        );
+        expect(
+          ar.vaultEntrySubtitleConfigured,
+          'تصفّح المستندات المرفوعة في قضاياك.',
+        );
+        expect(
+          tr.vaultEntrySubtitleConfigured,
+          'Dosyalarınıza eklenen belgeleri görüntüleyin.',
+        );
+        expect(
+          en.messagesEntrySubtitleConfigured,
+          'Browse your message threads.',
+        );
+        expect(ar.messagesEntrySubtitleConfigured, 'تصفّح محادثاتك.');
+        expect(
+          tr.messagesEntrySubtitleConfigured,
+          'Kendi mesaj dizilerinize göz atın.',
+        );
+        expect(
+          en.invoicesEntrySubtitleConfigured,
+          'Browse invoices and their payment status.',
+        );
+        expect(
+          ar.invoicesEntrySubtitleConfigured,
+          'تصفّح الفواتير وحالة الدفع فيها.',
+        );
+        expect(
+          tr.invoicesEntrySubtitleConfigured,
+          'Faturaları ve ödeme durumlarını görüntüleyin.',
+        );
+        expect(
+          en.notificationsFeedEntrySubtitleConfigured,
+          "View your organization's activity alerts.",
+        );
+        expect(
+          ar.notificationsFeedEntrySubtitleConfigured,
+          'استعرض تنبيهات نشاط مؤسستك.',
+        );
+        expect(
+          tr.notificationsFeedEntrySubtitleConfigured,
+          'Kuruluşunuzun etkinlik uyarılarını görüntüleyin.',
+        );
+        expect(
+          en.tasksEntrySubtitleConfigured,
+          'Browse the tasks assigned to you.',
+        );
+        expect(ar.tasksEntrySubtitleConfigured, 'تصفّح المهام المسندة إليك.');
+        expect(
+          tr.tasksEntrySubtitleConfigured,
+          'Size atanmış görevleri görüntüleyin.',
+        );
+
+        // The Settings role card and the sign-out label describe a real
+        // account in a configured build — never a "demo session".
+        expect(
+          en.sessionNoticeConfigured,
+          'Live session — data comes from the server.',
+        );
+        expect(ar.sessionNoticeConfigured, 'جلسة مباشرة — البيانات من الخادم.');
+        expect(
+          tr.sessionNoticeConfigured,
+          'Canlı oturum — veriler sunucudan gelir.',
+        );
+        expect(en.signOutConfigured, 'Sign out');
+        expect(ar.signOutConfigured, 'تسجيل الخروج');
+        expect(tr.signOutConfigured, 'Çıkış yap');
+
+        // Real per-locale wording, not silent copies of EN.
+        expect(
+          tr.bookingEntrySubtitleConfigured,
+          isNot(en.bookingEntrySubtitleConfigured),
+        );
+        expect(
+          ar.bookingEntrySubtitleConfigured,
+          isNot(en.bookingEntrySubtitleConfigured),
+        );
+        expect(
+          tr.matterEntrySubtitleConfigured,
+          isNot(en.matterEntrySubtitleConfigured),
+        );
+        expect(
+          ar.matterEntrySubtitleConfigured,
+          isNot(en.matterEntrySubtitleConfigured),
+        );
+        expect(
+          tr.vaultEntrySubtitleConfigured,
+          isNot(en.vaultEntrySubtitleConfigured),
+        );
+        expect(
+          ar.vaultEntrySubtitleConfigured,
+          isNot(en.vaultEntrySubtitleConfigured),
+        );
+        expect(
+          tr.messagesEntrySubtitleConfigured,
+          isNot(en.messagesEntrySubtitleConfigured),
+        );
+        expect(
+          ar.messagesEntrySubtitleConfigured,
+          isNot(en.messagesEntrySubtitleConfigured),
+        );
+        expect(
+          tr.invoicesEntrySubtitleConfigured,
+          isNot(en.invoicesEntrySubtitleConfigured),
+        );
+        expect(
+          ar.invoicesEntrySubtitleConfigured,
+          isNot(en.invoicesEntrySubtitleConfigured),
+        );
+        expect(
+          tr.notificationsFeedEntrySubtitleConfigured,
+          isNot(en.notificationsFeedEntrySubtitleConfigured),
+        );
+        expect(
+          ar.notificationsFeedEntrySubtitleConfigured,
+          isNot(en.notificationsFeedEntrySubtitleConfigured),
+        );
+        expect(
+          tr.tasksEntrySubtitleConfigured,
+          isNot(en.tasksEntrySubtitleConfigured),
+        );
+        expect(
+          ar.tasksEntrySubtitleConfigured,
+          isNot(en.tasksEntrySubtitleConfigured),
+        );
+        expect(tr.sessionNoticeConfigured, isNot(en.sessionNoticeConfigured));
+        expect(ar.sessionNoticeConfigured, isNot(en.sessionNoticeConfigured));
+
+        // The configured-build copy must never claim demo data, and the demo
+        // wording must never leak into it (the honesty rails of W3).
+        expect(en.bookingEntrySubtitleConfigured, isNot(contains('demo')));
+        expect(en.matterEntrySubtitleConfigured, isNot(contains('demo')));
+        expect(en.vaultEntrySubtitleConfigured, isNot(contains('demo')));
+        expect(en.messagesEntrySubtitleConfigured, isNot(contains('demo')));
+        expect(en.invoicesEntrySubtitleConfigured, isNot(contains('demo')));
+        expect(
+          en.notificationsFeedEntrySubtitleConfigured,
+          isNot(contains('demo')),
+        );
+        expect(en.tasksEntrySubtitleConfigured, isNot(contains('demo')));
+        expect(en.sessionNoticeConfigured, isNot(contains('demo')));
+        expect(en.signOutConfigured, isNot(contains('demo')));
+      },
+    );
   });
 
   group('AppLocalizations widget rendering', () {

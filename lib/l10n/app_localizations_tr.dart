@@ -18,6 +18,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get demoSessionNotice => 'Yalnızca geliştirme amaçlı demo oturumu';
 
   @override
+  String get sessionNoticeConfigured =>
+      'Canlı oturum — veriler sunucudan gelir.';
+
+  @override
   String get settingsTitle => 'Ayarlar';
 
   @override
@@ -85,6 +89,9 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get signOut => 'Demo oturumunu sonlandır';
+
+  @override
+  String get signOutConfigured => 'Çıkış yap';
 
   @override
   String get back => 'Geri';
@@ -935,6 +942,10 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bir danışma planlayın — geliştirme demosu.';
 
   @override
+  String get bookingEntrySubtitleConfigured =>
+      'Müsait bir avukatla danışma randevusu oluşturun.';
+
+  @override
   String get discoveryTitle => 'Avukat Bul';
 
   @override
@@ -1011,6 +1022,10 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get matterEntrySubtitle =>
       'Demo dava dosyalarına göz atın — geliştirme demosu.';
+
+  @override
+  String get matterEntrySubtitleConfigured =>
+      'Kendi davalarınıza ve dosyalarına göz atın.';
 
   @override
   String get matterDetailsTitle => 'Dava detayları';
@@ -1123,6 +1138,10 @@ class AppLocalizationsTr extends AppLocalizations {
       'Demo belge meta verilerine göz atın — geliştirme demosu.';
 
   @override
+  String get vaultEntrySubtitleConfigured =>
+      'Dosyalarınıza eklenen belgeleri görüntüleyin.';
+
+  @override
   String get documentTypeContract => 'Sözleşme';
 
   @override
@@ -1153,6 +1172,10 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get messagesEntrySubtitle =>
       'Demo mesaj dizilerine göz atın — geliştirme demosu.';
+
+  @override
+  String get messagesEntrySubtitleConfigured =>
+      'Kendi mesaj dizilerinize göz atın.';
 
   @override
   String messagesMessageCount(Object count) {
@@ -1275,6 +1298,10 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get invoicesEntrySubtitle =>
       'Sentetik fatura meta verilerine göz atın — geliştirme demosu.';
+
+  @override
+  String get invoicesEntrySubtitleConfigured =>
+      'Faturaları ve ödeme durumlarını görüntüleyin.';
 
   @override
   String get invoiceStatusIssued => 'Düzenlendi';
@@ -1436,6 +1463,10 @@ class AppLocalizationsTr extends AppLocalizations {
       'Sentetik görevlere göz atın — geliştirme demosu.';
 
   @override
+  String get tasksEntrySubtitleConfigured =>
+      'Size atanmış görevleri görüntüleyin.';
+
+  @override
   String get taskStatusTodo => 'Yapılacak';
 
   @override
@@ -1565,6 +1596,10 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get notificationsFeedEntrySubtitle =>
       'Kuruluş etkinlik uyarılarını görüntüleyin — salt okunur demo akışı.';
+
+  @override
+  String get notificationsFeedEntrySubtitleConfigured =>
+      'Kuruluşunuzun etkinlik uyarılarını görüntüleyin.';
 
   @override
   String get notificationCategoryAppointment => 'Randevu';

@@ -118,6 +118,12 @@ abstract class AppLocalizations {
   /// **'Development-only demo session'**
   String get demoSessionNotice;
 
+  /// No description provided for @sessionNoticeConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Live session — data comes from the server.'**
+  String get sessionNoticeConfigured;
+
   /// No description provided for @settingsTitle.
   ///
   /// In en, this message translates to:
@@ -255,6 +261,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'End demo session'**
   String get signOut;
+
+  /// No description provided for @signOutConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get signOutConfigured;
 
   /// No description provided for @back.
   ///
@@ -1816,6 +1828,12 @@ abstract class AppLocalizations {
   /// **'Schedule a consultation — development demo.'**
   String get bookingEntrySubtitle;
 
+  /// No description provided for @bookingEntrySubtitleConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule a consultation with an available attorney.'**
+  String get bookingEntrySubtitleConfigured;
+
   /// No description provided for @discoveryTitle.
   ///
   /// In en, this message translates to:
@@ -1959,6 +1977,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Browse demo matter files — development demo.'**
   String get matterEntrySubtitle;
+
+  /// No description provided for @matterEntrySubtitleConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse your matters and their case files.'**
+  String get matterEntrySubtitleConfigured;
 
   /// No description provided for @matterDetailsTitle.
   ///
@@ -2152,6 +2176,12 @@ abstract class AppLocalizations {
   /// **'Browse demo document metadata — development demo.'**
   String get vaultEntrySubtitle;
 
+  /// No description provided for @vaultEntrySubtitleConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse the documents filed in your matters.'**
+  String get vaultEntrySubtitleConfigured;
+
   /// No description provided for @documentTypeContract.
   ///
   /// In en, this message translates to:
@@ -2211,6 +2241,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Browse demo message threads — development demo.'**
   String get messagesEntrySubtitle;
+
+  /// No description provided for @messagesEntrySubtitleConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse your message threads.'**
+  String get messagesEntrySubtitleConfigured;
 
   /// No description provided for @messagesMessageCount.
   ///
@@ -2427,6 +2463,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Browse demo invoice metadata — development demo.'**
   String get invoicesEntrySubtitle;
+
+  /// No description provided for @invoicesEntrySubtitleConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse invoices and their payment status.'**
+  String get invoicesEntrySubtitleConfigured;
 
   /// No description provided for @invoiceStatusIssued.
   ///
@@ -2722,6 +2764,12 @@ abstract class AppLocalizations {
   /// **'Browse demo tasks — development demo.'**
   String get tasksEntrySubtitle;
 
+  /// No description provided for @tasksEntrySubtitleConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse the tasks assigned to you.'**
+  String get tasksEntrySubtitleConfigured;
+
   /// No description provided for @taskStatusTodo.
   ///
   /// In en, this message translates to:
@@ -2967,6 +3015,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View org activity alerts — read-only demo feed.'**
   String get notificationsFeedEntrySubtitle;
+
+  /// No description provided for @notificationsFeedEntrySubtitleConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'View your organization\'s activity alerts.'**
+  String get notificationsFeedEntrySubtitleConfigured;
 
   /// No description provided for @notificationCategoryAppointment.
   ///

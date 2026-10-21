@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../app/localization/locale_cubit.dart';
 import '../../../app/router.dart';
+import '../../../app/service_locator.dart';
 import '../../../app/theme/theme_cubit.dart';
 import '../../../core/auth/auth_state.dart';
 import '../../../l10n/app_localizations.dart';
@@ -36,6 +37,10 @@ class SettingsScreen extends StatelessWidget {
     );
     final AuthState authState = context.watch<AuthCubit>().state;
     final ThemeMode themeMode = context.watch<ThemeCubit>().state;
+    // The role card and the sign-out label describe the SESSION: a demo
+    // session is not a real account, so the copy follows the backend posture
+    // instead of calling a configured account a demo.
+    final bool localOnly = backendIsLocalOnly;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.settingsTitle)),
       body: ListView(
@@ -105,7 +110,9 @@ class SettingsScreen extends StatelessWidget {
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.person_outline),
             title: RoleLabel(role: authState.session?.primaryRole),
-            subtitle: Text(l10n.demoSessionNotice),
+            subtitle: Text(
+              localOnly ? l10n.demoSessionNotice : l10n.sessionNoticeConfigured,
+            ),
           ),
           const SizedBox(height: LegalHubTheme.spaceXl),
           ListTile(
@@ -149,7 +156,7 @@ class SettingsScreen extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: () => context.read<AuthCubit>().signOut(),
             icon: const Icon(Icons.logout),
-            label: Text(l10n.signOut),
+            label: Text(localOnly ? l10n.signOut : l10n.signOutConfigured),
           ),
         ],
       ),

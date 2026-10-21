@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/legalhub_theme.dart';
 import '../../../app/router.dart';
+import '../../../app/service_locator.dart';
 import '../../../core/auth/session.dart';
 import '../../../core/practice_area.dart';
 import '../../../core/roles/user_role.dart';

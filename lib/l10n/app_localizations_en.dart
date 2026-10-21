@@ -18,6 +18,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get demoSessionNotice => 'Development-only demo session';
 
   @override
+  String get sessionNoticeConfigured =>
+      'Live session — data comes from the server.';
+
+  @override
   String get settingsTitle => 'Settings';
 
   @override
@@ -85,6 +89,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get signOut => 'End demo session';
+
+  @override
+  String get signOutConfigured => 'Sign out';
 
   @override
   String get back => 'Back';
@@ -937,6 +944,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Schedule a consultation — development demo.';
 
   @override
+  String get bookingEntrySubtitleConfigured =>
+      'Schedule a consultation with an available attorney.';
+
+  @override
   String get discoveryTitle => 'Find an Attorney';
 
   @override
@@ -1013,6 +1024,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get matterEntrySubtitle =>
       'Browse demo matter files — development demo.';
+
+  @override
+  String get matterEntrySubtitleConfigured =>
+      'Browse your matters and their case files.';
 
   @override
   String get matterDetailsTitle => 'Matter details';
@@ -1124,6 +1139,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Browse demo document metadata — development demo.';
 
   @override
+  String get vaultEntrySubtitleConfigured =>
+      'Browse the documents filed in your matters.';
+
+  @override
   String get documentTypeContract => 'Contract';
 
   @override
@@ -1154,6 +1173,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get messagesEntrySubtitle =>
       'Browse demo message threads — development demo.';
+
+  @override
+  String get messagesEntrySubtitleConfigured => 'Browse your message threads.';
 
   @override
   String messagesMessageCount(Object count) {
@@ -1277,6 +1299,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get invoicesEntrySubtitle =>
       'Browse demo invoice metadata — development demo.';
+
+  @override
+  String get invoicesEntrySubtitleConfigured =>
+      'Browse invoices and their payment status.';
 
   @override
   String get invoiceStatusIssued => 'Issued';
@@ -1436,6 +1462,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tasksEntrySubtitle => 'Browse demo tasks — development demo.';
 
   @override
+  String get tasksEntrySubtitleConfigured =>
+      'Browse the tasks assigned to you.';
+
+  @override
   String get taskStatusTodo => 'To do';
 
   @override
@@ -1566,6 +1596,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notificationsFeedEntrySubtitle =>
       'View org activity alerts — read-only demo feed.';
+
+  @override
+  String get notificationsFeedEntrySubtitleConfigured =>
+      'View your organization\'s activity alerts.';
 
   @override
   String get notificationCategoryAppointment => 'Appointment';

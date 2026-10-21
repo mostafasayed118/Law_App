@@ -26,6 +26,7 @@ List<Widget> _homeEntryCards(
   RoleCapability capabilities,
 ) {
   final AppLocalizations l10n = AppLocalizations.of(context);
+  final bool localOnly = backendIsLocalOnly;
   final List<HomeEntry> entries = homeEntriesFor(capabilities);
   final List<Widget> cards = <Widget>[];
   for (int i = 0; i < entries.length; i++) {
@@ -37,7 +38,7 @@ List<Widget> _homeEntryCards(
       AppEntryCard(
         icon: _iconFor(entry.icon),
         title: entry.title(l10n),
-        subtitle: entry.subtitle(l10n),
+        subtitle: entry.subtitleFor(l10n, localOnly: localOnly),
         onTap: () => context.push(_routeFor(entry.route)),
       ),
     );
