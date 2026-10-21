@@ -1,9 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/active_org_store.dart';
-import 'package:legalhub/core/auth/session.dart';
+import 'package:legalhub/core/auth/auth_gateway.dart';
+import 'package:legalhub/core/observability/error_reporter.dart';
+import 'package:legalhub/core/organizations/membership_repository.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/local/in_memory_org_selection_store.dart';
 import 'package:legalhub/data/local/org_selection_store.dart';
+import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
+import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 
 /// OrgSelectionStore whose read/write can be forced to fail, proving the
 /// store degrades gracefully (persistence is best-effort UX context, D-08).
@@ -28,6 +34,90 @@ class _FlakyOrgSelectionStore implements OrgSelectionStore {
       throw StateError('write boom');
     }
     stored = organizationId;
+  }
+}
+
+/// A gateway mirroring the real provider seam ([SupabaseAuthGateway]):
+/// the sign-in snapshot carries **no memberships** (hydration is orchestrated
+/// above the seam) and every explicit operation is announced on
+/// [sessionChanges].
+class _ProviderSnapshotGateway implements AuthGateway {
+  final String userId = 'user-1';
+  Session? _session;
+  bool _recoveryPending = false;
+  final StreamController<Session?> _changes =
+      StreamController<Session?>.broadcast(sync: true);
+
+  @override
+  Session? get currentSession => _session;
+
+  @override
+  Stream<Session?> get sessionChanges => _changes.stream;
+
+  @override
+  bool get recoveryPending => _recoveryPending;
+
+  @override
+  bool get supportsDemoSession => false;
+
+  @override
+  Future<AuthOutcome<Session>> restore() async {
+    final Session? session = _session;
+    if (session == null) {
+      return const AuthOutcome<Session>.failure(
+        AuthFailure(kind: AuthFailureKind.signedOut),
+      );
+    }
+    return AuthOutcome<Session>.success(session);
+  }
+
+  @override
+  Future<AuthOutcome<Session>> signIn({
+    required String email,
+    required String password,
+  }) async {
+    final Session session = Session(
+      userId: userId,
+      displayName: 'qa-device-131043',
+      // The provider snapshot never carries memberships (P3.2 by design).
+      memberships: const <OrganizationMembership>[],
+      expiresAt: DateTime.now().add(const Duration(hours: 8)),
+    );
+    _session = session;
+    _changes.add(session);
+    return AuthOutcome<Session>.success(session);
+  }
+
+  @override
+  Future<AuthOutcome<Session>> startDemoSession() async {
+    return const AuthOutcome<Session>.failure(
+      AuthFailure(kind: AuthFailureKind.membershipDenied),
+    );
+  }
+
+  @override
+  Future<void> signOut() async {
+    _session = null;
+    _recoveryPending = false;
+    _changes.add(null);
+  }
+
+  Future<void> dispose() => _changes.close();
+}
+
+/// The membership read the live backend answers with: the caller's own
+/// `memberships` rows (RLS-scoped). The list is the server truth at that
+/// moment — empty before the organization is created, the created row after.
+class _LiveMembershipRepository implements MembershipRepository {
+  List<OrganizationMembership> memberships = const <OrganizationMembership>[];
+  int calls = 0;
+
+  @override
+  Future<MembershipHydrationResult> loadMemberships({
+    required String userId,
+  }) async {
+    calls += 1;
+    return HydrationSucceeded(memberships);
   }
 }
 
@@ -350,6 +440,145 @@ void main() {
       );
 
       expect(store.activeOrganizationId, 'org-a');
+    });
+  });
+
+  group('W1 F3 — the active organization survives a same-user re-auth', () {
+    /// Replays the device sequence
+    /// (docs/device_e2e_2026-10-21_c835ced.md, finding 3) at the seam level:
+    ///
+    /// 1. sign in → the user has no organization yet;
+    /// 2. create the organization → the membership row exists server-side and
+    ///    the hub refreshes the memberships in the background
+    ///    ([AuthCubit.hydrate]);
+    /// 3. sign out → the router redirects to sign-in and the hub leaves the
+    ///    screen, so the store is never told the session went away;
+    /// 4. sign in again as the **same** user.
+    ///
+    /// The hub seeds the store on every build
+    /// (organization_hub_screen.dart:79) — that is the call modelled here.
+    Future<void> replayDeviceSequence({
+      required AuthCubit cubit,
+      required ActiveOrgStore store,
+      required _LiveMembershipRepository memberships,
+    }) async {
+      await cubit.signIn(
+        email: 'qa-device-131043@legalhub.test',
+        password: 'QaDevice2026Tmp',
+      );
+      store.syncFromSession(cubit.state.session);
+      expect(store.activeOrganizationId, isNull);
+
+      // The organization is created: the row exists on the server now.
+      memberships.memberships = <OrganizationMembership>[
+        membership('org-a', name: 'QA Device Firm'),
+      ];
+      await cubit.hydrate();
+      store.syncFromSession(cubit.state.session);
+
+      await cubit.signOut();
+      expect(cubit.state.session, isNull);
+
+      await cubit.signIn(
+        email: 'qa-device-131043@legalhub.test',
+        password: 'QaDevice2026Tmp',
+      );
+      store.syncFromSession(cubit.state.session);
+    }
+
+    AuthCubit cubitWith(_LiveMembershipRepository memberships) => AuthCubit(
+      _ProviderSnapshotGateway(),
+      InMemoryErrorReporter(),
+      memberships,
+      FakeOrganizationGateway(),
+    );
+
+    test('probe: the same-user re-auth hydrates the membership (candidate A '
+        'refuted)', () async {
+      final _LiveMembershipRepository memberships = _LiveMembershipRepository();
+      final AuthCubit cubit = cubitWith(memberships);
+      addTearDown(cubit.close);
+      final ActiveOrgStore store = ActiveOrgStore(InMemoryOrgSelectionStore());
+
+      await replayDeviceSequence(
+        cubit: cubit,
+        store: store,
+        memberships: memberships,
+      );
+
+      // The membership read answers with the created row — the defect is
+      // not in the hydration read.
+      expect(cubit.state.session!.memberships, hasLength(1));
+      expect(cubit.state.session!.activeMembership!.organizationId, 'org-a');
+    });
+
+    test('the active organization survives the same-user re-auth', () async {
+      final _LiveMembershipRepository memberships = _LiveMembershipRepository();
+      final AuthCubit cubit = cubitWith(memberships);
+      addTearDown(cubit.close);
+      final ActiveOrgStore store = ActiveOrgStore(InMemoryOrgSelectionStore());
+      int notifications = 0;
+      store.addListener(() => notifications++);
+
+      await replayDeviceSequence(
+        cubit: cubit,
+        store: store,
+        memberships: memberships,
+      );
+
+      // The hub must not render the "Create Organization" form again.
+      expect(store.activeOrganizationId, 'org-a');
+      // Re-seeding is a silent context update (no notification).
+      expect(notifications, 0);
+    });
+
+    test(
+      'a fresh store seeds the same session (the device restart fixes it)',
+      () async {
+        final _LiveMembershipRepository memberships =
+            _LiveMembershipRepository();
+        final AuthCubit cubit = cubitWith(memberships);
+        addTearDown(cubit.close);
+        final ActiveOrgStore store = ActiveOrgStore(
+          InMemoryOrgSelectionStore(),
+        );
+
+        await replayDeviceSequence(
+          cubit: cubit,
+          store: store,
+          memberships: memberships,
+        );
+
+        // A cold start builds a fresh store — it seeds the very same session.
+        final ActiveOrgStore fresh = ActiveOrgStore(
+          InMemoryOrgSelectionStore(),
+        );
+        fresh.syncFromSession(cubit.state.session);
+        expect(fresh.activeOrganizationId, 'org-a');
+      },
+    );
+
+    test('an explicit selection survives a membership-set change', () {
+      final ActiveOrgStore store = ActiveOrgStore(InMemoryOrgSelectionStore());
+      store.syncFromSession(
+        sessionWith(<OrganizationMembership>[
+          membership('org-a'),
+          membership('org-b'),
+        ]),
+      );
+      store.select('org-b');
+
+      // The session gains a membership (a background refresh).
+      store.syncFromSession(
+        sessionWith(<OrganizationMembership>[
+          membership('org-a'),
+          membership('org-b'),
+          membership('org-c'),
+        ]),
+      );
+
+      // The user's own selection is never dropped by a re-seed.
+      expect(store.activeOrganizationId, 'org-b');
     });
   });
 }

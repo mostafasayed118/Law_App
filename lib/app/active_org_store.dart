@@ -36,10 +36,14 @@ import '../data/local/org_selection_store.dart';
 ///   current user.
 /// - **Persist:** `select` writes the id best-effort; a write failure logs
 ///   loudly and never breaks the in-memory selection.
-/// - **Seed guard unchanged:** [syncFromSession] keys on the session
-///   `userId`, so an active membership change *within* the same session does
-///   not re-seed — a deliberate choice (a user selection must survive);
-///   consumers that need the membership re-derived should watch the session
+/// - **Seed guard:** [syncFromSession] re-derives the context when the
+///   session identity changes (sign-out → null, or a different user) **or**
+///   when the session's membership set changes (a membership created,
+///   suspended or removed while the session is alive) — otherwise a created
+///   organization would only become usable after an app restart (device
+///   finding F3, 2026-10-21). A rebuild with an unchanged identity and
+///   membership set stays a no-op, so a user selection survives; consumers
+///   that need the membership re-derived should watch the session
 ///   themselves.
 /// - **Pre-seed selection (P3.4):** the accept flow can select before the
 ///   hub ever seeds this session; that explicit selection is kept by the
@@ -108,20 +112,29 @@ class ActiveOrgStore extends ChangeNotifier {
 
   /// Seeds [activeOrganizationId] from [Session.activeMembership].
   ///
-  /// Re-seeding happens only when the session identity changes (sign-out →
-  /// null, or a different user); a selection made in the current session is
-  /// preserved across rebuilds. When a persisted selection exists, it wins
-  /// over the session default — but only if the session still holds a
-  /// membership for it; otherwise the session-derived default applies. No
-  /// notification is emitted — callers invoke this from a build/dependency
-  /// pass that already triggers their rebuild.
+  /// Re-seeding happens when the session identity changes (sign-out → null,
+  /// or a different user) **or** when the session's membership set changes
+  /// (a membership created, suspended or removed while the session is
+  /// alive); a selection made in the current session is preserved across
+  /// rebuilds. When a persisted selection exists, it wins over the session
+  /// default — but only if the session still holds a membership for it;
+  /// otherwise the session-derived default applies. No notification is
+  /// emitted — callers invoke this from a build/dependency pass that already
+  /// triggers their rebuild.
   void syncFromSession(Session? session) {
     final String? userId = session?.userId;
-    if (userId == _seededUserId) {
+    final List<OrganizationMembership>? sessionMemberships =
+        session?.memberships;
+    final bool identityChanged = userId != _seededUserId;
+    final bool membershipSetChanged = !listEquals(
+      sessionMemberships,
+      _seededMemberships,
+    );
+    if (!identityChanged && !membershipSetChanged) {
       return;
     }
     _seededUserId = userId;
-    _seededMemberships = session?.memberships;
+    _seededMemberships = sessionMemberships;
     if (session == null) {
       // Sign-out: clear the context (and the this-session selection intent)
       // but never discard a cached, not-yet-applied restore — the next
@@ -135,15 +148,22 @@ class ActiveOrgStore extends ChangeNotifier {
     // P3.4 review fix: an explicit selection made this session (the accept
     // flow can select before the hub ever seeds) is the freshest intent —
     // keep it when the new session still holds that membership, using the
-    // same validated-application rule as the restore. It is consumed by this
-    // seed (flag reset): a selection from a previous session is never
-    // carried into a different identity.
-    final String? current = _selectionMadeThisSession
-        ? _activeOrganizationId
-        : null;
+    // same validated-application rule as the restore. It is consumed by an
+    // **identity** change (flag reset): a selection from a previous session
+    // is never carried into a different identity.
+    //
+    // A membership-set change inside the same session keeps the current
+    // in-memory value when the session still holds it — the user's context
+    // survives a background refresh (the created organization joining the
+    // session must not drop the selected organization).
+    final String? current = identityChanged
+        ? (_selectionMadeThisSession ? _activeOrganizationId : null)
+        : _activeOrganizationId;
     final String? restored = _restoredOrganizationId;
     _restoredOrganizationId = null;
-    _selectionMadeThisSession = false;
+    if (identityChanged) {
+      _selectionMadeThisSession = false;
+    }
     final bool currentIsValid =
         current != null &&
         memberships.any(
