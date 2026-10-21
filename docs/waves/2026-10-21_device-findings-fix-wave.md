@@ -36,9 +36,21 @@
 |---|---|---|---|
 | W1 | **landed + PM-verified** | `8b5b08b` (root cause: candidate B — the seed guard in `active_org_store.dart` skipped a same-user re-auth; `OrganizationMembership` is an Equatable, so the membership-set comparison is by value) | — |
 | W2 | **landed + PM-verified** | `094246e` (root cause: go_router prefers `platformDispatcher.defaultRouteName` over `initialLocation`, so the platform hands the foreign URI to the router as the initial location; `findMatch` throws and the app had no `errorBuilder` → go_router's raw error page. Fix: one `errorBuilder` + a calm localized surface; the accept-invite path is untouched and still green) | `flutter test` = **1750**, tracked declarations **1744**, ARB parity **511/511/511**, ledger 115/0, repo-wide `dart format` = 0 changed |
-| W3 | next | — | — |
-| W4 | queued (owner ruling D1) | — | — |
+| W3 | **landed + PM-verified** | `16af6e9` (per-entry truth: `HomeEntry.configuredSubtitle` (nullable) + derived `isServerBacked` + `subtitleFor(l10n, {required bool localOnly})`; the 7 server-backed entries got a configured-build subtitle, the 5 fake-only ones kept their truthful demo wording byte-identical; Settings role card + sign-out label now follow the posture. 9 new l10n keys × 3 locales, parity held) | `flutter test` = **1758**, tracked declarations **1752**, ARB parity **520/520/520**, ledger 115/0, repo-wide `dart format` = 0 changed |
+| W4 | next (owner ruling D1) | — | — |
 | W5 | queued (owner ruling D2) | — | — |
+
+> **PM self-error (2026-10-21) — recorded, not hidden:** the W3 brief carried a
+> self-contradictory STOP clause ("a new l10n **key** → report the proposed copy
+> instead of adding it") next to a STEP 2 that mandated adding copy to three ARB
+> files and regenerating. The executor resolved it toward STEP 2 (adding the keys)
+> and flagged the contradiction in its report. The brief, not the executor, was
+> wrong. W4's brief below is corrected accordingly: `lib/l10n/**` is **in scope**
+> for W4, with the three-locale parity gate mandatory.
+>
+> **PM lesson for the next brief:** one rule per scope item. A STOP clause that
+> contradicts a STEP is a coin flip for the executor; write one and cross-check it
+> against the STEP before dispatching.
 
 > **README note for the executors:** the repo's ledger gate compares the README's
 > test-count lines with the tracked declaration count. Whenever a wave adds tracked
@@ -386,12 +398,19 @@ l10n key, add it to all three ARB files, regenerate, and keep
 `scripts/verify_arb_parity.sh` at parity; otherwise reuse the existing keys and
 report the exact wording you used.
 
-**Owned paths (exclusive).** `supabase/migrations/<your new file>.sql`,
+**Owned paths (exclusive).** `supabase/migrations/21_matter_creator.sql` (your new
+numbered file — the next free number after `20_payments.sql`),
 `supabase/rpc/create_matter.sql`, `supabase/policies/matters.sql`,
-`lib/features/matters/**` (+ its tests). **FORBIDDEN.** `supabase/tests/**` (unless
-you extend a battery for the new behavior — if you do, say so), `lib/app/**`,
-`lib/l10n/**` (report proposed copy instead of adding keys), `docs/**` except the
-apply record the PM writes, and **the live project** (no live SQL, ever).
+`scripts/verify_policy_tests.sh` (**the `--apply` order only** — the new migration
+must be applied in the rehearsal project or the new column never exists there),
+`supabase/tests/04_matter_rls.sql` and/or `supabase/tests/13_matter_write_rls.sql`
+(a battery case for the carve-out — say so in the report),
+`lib/features/matters/**` (+ its tests), and `lib/l10n/**` **if** you change copy
+(three ARBs + regenerated files; the parity gate must stay at `en=ar=tr`).
+**FORBIDDEN.** `supabase/migrations/**` other than your one new file,
+`supabase/rpc/**` other than `create_matter.sql`, `supabase/policies/**` other than
+`matters.sql`, `lib/app/**`, `lib/features/**` outside `matters/`, `docs/**` (the
+PM writes the apply record), and **the live project** (no live SQL, ever).
 
 **Gates.** `flutter analyze --no-pub` · `flutter test` · `scripts/verify_ledger.sh` ·
 `scripts/verify_arb_parity.sh` · the local stack battery (`--apply` then the full
