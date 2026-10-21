@@ -39,6 +39,7 @@ class NotificationFeedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final bool localOnly = backendIsLocalOnly;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.notificationsFeedTitle)),
       // The shared cubit-scoped list shell (audit 2026-09-21, M-10). The
@@ -73,7 +74,7 @@ class NotificationFeedScreen extends StatelessWidget {
               ),
             ),
             errorCopy: l10n.notificationsFeedError,
-            localOnlyNote: l10n.notificationsFeedLocalOnlyNote,
+            localOnlyNote: localOnly ? l10n.notificationsFeedLocalOnlyNote : '',
           ),
     );
   }

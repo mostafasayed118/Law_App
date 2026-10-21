@@ -3,15 +3,26 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/legalhub_theme.dart';
 import '../../../app/router.dart';
+import '../../../app/service_locator.dart';
+import '../../../data/local/onboarding_store.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/widgets.dart';
 
 /// Onboarding success confirmation matching
 /// `stitch_legalhub_mobile_app/onboarding_success`.
 ///
-/// Routes to sign-in. Presentation only; no state is persisted.
+/// Marks onboarding completed, then routes to sign-in.
 class OnboardingSuccessScreen extends StatelessWidget {
   const OnboardingSuccessScreen({super.key});
+
+  Future<void> _complete(BuildContext context) async {
+    if (serviceLocator.isRegistered<OnboardingStore>()) {
+      await serviceLocator<OnboardingStore>().markCompleted();
+    }
+    if (context.mounted) {
+      context.go(AppRoutes.signIn);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +67,7 @@ class OnboardingSuccessScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: LegalHubTheme.spaceXl * 1.5),
                 ElevatedButton(
-                  onPressed: () => context.go(AppRoutes.signIn),
+                  onPressed: () => _complete(context),
                   child: Text(l10n.onboardingSuccessAction),
                 ),
               ],

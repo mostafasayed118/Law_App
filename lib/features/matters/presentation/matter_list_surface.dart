@@ -63,6 +63,7 @@ class _ListSurfaceState extends State<_ListSurface> {
     ColorScheme scheme,
   ) {
     final MatterCubit cubit = context.read<MatterCubit>();
+    final bool localOnly = backendIsLocalOnly;
     final Widget empty = Padding(
       padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
       child: Text(
@@ -102,7 +103,7 @@ class _ListSurfaceState extends State<_ListSurface> {
       ],
       empty: empty,
       errorCopy: l10n.matterError,
-      localOnlyNote: l10n.matterLocalOnlyNote,
+      localOnlyNote: localOnly ? l10n.matterLocalOnlyNote : '',
       listPadding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
     );
   }

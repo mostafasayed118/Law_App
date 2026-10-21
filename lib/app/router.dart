@@ -129,8 +129,9 @@ class AppRoutes {
 GoRouter createAppRouter(
   AuthCubit authCubit, {
   Map<UserRole, RoleCapability> capabilitiesForRole = roleCapabilities,
+  String initialLocation = AppRoutes.signIn,
 }) => GoRouter(
-  initialLocation: AppRoutes.signIn,
+  initialLocation: initialLocation,
   refreshListenable: GoRouterRefreshStream(authCubit.stream),
   routes: <RouteBase>[
     GoRoute(

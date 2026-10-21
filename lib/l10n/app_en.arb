@@ -443,6 +443,7 @@
   "paymentWaiting": "Waiting for payment confirmation…",
   "paymentSuccessTitle": "Payment successful",
   "paymentSuccessBody": "Your payment was confirmed. The invoice will be marked as paid.",
+  "paymentDemoSuccessBody": "Demo payment simulated — no charge was made and the invoice is unchanged.",
   "paymentFailedTitle": "Payment failed",
   "paymentFailedBody": "The payment did not go through. You can try again.",
   "paymentCancelledTitle": "Payment cancelled",

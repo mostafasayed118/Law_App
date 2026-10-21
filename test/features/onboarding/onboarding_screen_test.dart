@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:legalhub/app/router.dart';
+import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
+import 'package:legalhub/data/local/onboarding_store.dart';
 import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
@@ -28,6 +30,7 @@ void main() {
   tearDown(() async {
     await authCubit.close();
     await gateway.dispose();
+    await resetServiceLocator();
   });
 
   /// Sizes the test surface to a representative phone viewport.
@@ -108,7 +111,34 @@ void main() {
       expect(find.text('Get Started'), findsOneWidget);
     });
 
-    testWidgets('Skip routes to the sign-in screen', (tester) async {
+    testWidgets('initialLocation onboarding starts the carousel', (
+      tester,
+    ) async {
+      configureDependencies();
+      final GoRouter router = createAppRouter(
+        authCubit,
+        initialLocation: AppRoutes.onboarding,
+      );
+      addTearDown(router.dispose);
+      usePhoneViewport(tester);
+
+      await tester.pumpWidget(
+        MaterialApp.router(
+          routerConfig: router,
+          locale: const Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Expert Legal Advice'), findsOneWidget);
+    });
+
+    testWidgets('Skip routes to the sign-in screen and completes onboarding', (
+      tester,
+    ) async {
+      configureDependencies();
       final GoRouter router = createAppRouter(authCubit);
       addTearDown(router.dispose);
       usePhoneViewport(tester);
@@ -143,6 +173,7 @@ void main() {
 
       // Landed on /sign-in, whose welcome copy is the destination proof.
       expect(find.text('Welcome Back'), findsOneWidget);
+      expect(await serviceLocator<OnboardingStore>().hasCompleted(), isTrue);
     });
 
     testWidgets('Get Started routes to the onboarding-success screen', (

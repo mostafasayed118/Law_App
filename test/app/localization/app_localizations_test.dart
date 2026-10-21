@@ -849,6 +849,18 @@ void main() {
           tr.paymentSuccessBody,
           'Ödemeniz onaylandı. Fatura ödendi olarak işaretlenecek.',
         );
+        expect(
+          en.paymentDemoSuccessBody,
+          'Demo payment simulated — no charge was made and the invoice is unchanged.',
+        );
+        expect(
+          ar.paymentDemoSuccessBody,
+          'تمت محاكاة دفعة تجريبية — لم يتم تحصيل أي مبلغ والفاتورة لم تتغير.',
+        );
+        expect(
+          tr.paymentDemoSuccessBody,
+          'Demo ödeme simüle edildi — ücret alınmadı ve fatura değişmedi.',
+        );
 
         expect(en.paymentFailedTitle, 'Payment failed');
         expect(ar.paymentFailedTitle, 'تعذّر الدفع');

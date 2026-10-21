@@ -18,6 +18,7 @@ import 'app/service_locator.dart';
 import 'app/theme/theme_cubit.dart';
 import 'data/auth/supabase_auth_api_impl.dart';
 import 'data/auth/supabase_env.dart';
+import 'data/local/onboarding_store.dart';
 import 'features/auth/presentation/auth_cubit.dart';
 import 'l10n/app_localizations.dart';
 
@@ -70,7 +71,14 @@ Future<void> bootstrap(AppConfig config) async {
     themeCubit.load(),
     authCubit.restore(),
   ]);
-  final GoRouter router = createAppRouter(authCubit);
+  final bool onboardingCompleted = await serviceLocator<OnboardingStore>()
+      .hasCompleted();
+  final GoRouter router = createAppRouter(
+    authCubit,
+    initialLocation: onboardingCompleted
+        ? AppRoutes.signIn
+        : AppRoutes.onboarding,
+  );
   // Phase 4.1 completion (D-P34.2 hook): the app-level deep-link listener
   // bridges OS intents — an accept-invitation share link buffers its
   // one-time token (in-memory only) and opens the accept surface. Recovery

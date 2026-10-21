@@ -148,6 +148,7 @@ class _ListSurfaceState extends State<_ListSurface> {
     ColorScheme scheme,
   ) {
     final DocumentCubit cubit = context.read<DocumentCubit>();
+    final bool localOnly = backendIsLocalOnly;
     // Title index built ONCE per render (audit: per-row resolveMatterByTitle
     // was O(rows × matters)); each tile resolves its reverse link in O(1).
     final Map<String, Matter> matterIndex = buildMatterTitleIndex(matters);
@@ -172,7 +173,7 @@ class _ListSurfaceState extends State<_ListSurface> {
       ),
       empty: empty,
       errorCopy: l10n.vaultError,
-      localOnlyNote: l10n.vaultLocalOnlyNote,
+      localOnlyNote: localOnly ? l10n.vaultLocalOnlyNote : '',
       listPadding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
     );
   }

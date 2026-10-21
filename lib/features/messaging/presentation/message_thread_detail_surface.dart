@@ -33,6 +33,7 @@ class _DetailSurfaceState extends State<_DetailSurface> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final bool localOnly = backendIsLocalOnly;
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
     return Scaffold(
@@ -57,15 +58,18 @@ class _DetailSurfaceState extends State<_DetailSurface> {
                     MessageThreadDetailState
                   >(builder: _bodyFor),
             ),
-            Padding(
-              padding: const EdgeInsetsDirectional.only(
-                bottom: LegalHubTheme.spaceSm,
+            if (localOnly)
+              Padding(
+                padding: const EdgeInsetsDirectional.only(
+                  bottom: LegalHubTheme.spaceSm,
+                ),
+                child: Text(
+                  l10n.messagesLocalOnlyNote,
+                  style: text.bodySmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
               ),
-              child: Text(
-                l10n.messagesLocalOnlyNote,
-                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-              ),
-            ),
           ],
         ),
       ),

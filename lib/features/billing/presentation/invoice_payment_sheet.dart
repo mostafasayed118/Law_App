@@ -273,7 +273,12 @@ class _InvoicePaymentSheetState extends State<InvoicePaymentSheet>
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: LegalHubTheme.spaceXs),
-          Text(l10n.paymentSuccessBody, textAlign: TextAlign.center),
+          Text(
+            widget.gateway.isLive
+                ? l10n.paymentSuccessBody
+                : l10n.paymentDemoSuccessBody,
+            textAlign: TextAlign.center,
+          ),
           const SizedBox(height: LegalHubTheme.spaceMd),
           _closeButton(context, l10n),
         ];

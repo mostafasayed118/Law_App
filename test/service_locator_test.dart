@@ -35,6 +35,7 @@ import 'package:legalhub/data/files/file_selector_file_picker.dart';
 import 'package:legalhub/data/files/url_launcher_uri_opener.dart';
 import 'package:legalhub/data/local/in_memory_org_selection_store.dart';
 import 'package:legalhub/data/local/locale_store.dart';
+import 'package:legalhub/data/local/onboarding_store.dart';
 import 'package:legalhub/data/local/org_selection_store.dart';
 import 'package:legalhub/data/matters/supabase_matter_api.dart';
 import 'package:legalhub/data/matters/supabase_matter_gateway.dart';
@@ -454,6 +455,7 @@ void main() {
       expect(serviceLocator.isRegistered<AuthGateway>(), isTrue);
       expect(serviceLocator.isRegistered<ErrorReporter>(), isTrue);
       expect(serviceLocator.isRegistered<LocaleStore>(), isTrue);
+      expect(serviceLocator.isRegistered<OnboardingStore>(), isTrue);
       expect(serviceLocator.isRegistered<LocaleCubit>(), isTrue);
       expect(serviceLocator.isRegistered<PasswordRecoveryGateway>(), isTrue);
       expect(serviceLocator.isRegistered<SignUpGateway>(), isTrue);
@@ -478,6 +480,23 @@ void main() {
       expect(serviceLocator.isRegistered<UriOpener>(), isTrue);
       expect(serviceLocator.isRegistered<AiGateway>(), isTrue);
       expect(serviceLocator.isRegistered<AuthCubit>(), isTrue);
+    });
+
+    test('exposes the local-only posture in env-less runs', () {
+      configureDependencies();
+
+      expect(backendIsLocalOnly, isTrue);
+    });
+
+    test('a configured env flips the posture to server-backed', () {
+      configureDependencies(
+        supabaseEnv: SupabaseEnv(
+          url: 'https://example.supabase.co',
+          anonKey: _anonJwt(),
+        ),
+      );
+
+      expect(backendIsLocalOnly, isFalse);
     });
 
     test('resolves each dependency as a lazy singleton (stable instance)', () {

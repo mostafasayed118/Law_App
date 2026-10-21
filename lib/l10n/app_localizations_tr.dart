@@ -1302,6 +1302,10 @@ class AppLocalizationsTr extends AppLocalizations {
       'Ödemeniz onaylandı. Fatura ödendi olarak işaretlenecek.';
 
   @override
+  String get paymentDemoSuccessBody =>
+      'Demo ödeme simüle edildi — ücret alınmadı ve fatura değişmedi.';
+
+  @override
   String get paymentFailedTitle => 'Ödeme başarısız';
 
   @override

@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/legalhub_theme.dart';
 import '../../../app/router.dart';
+import '../../../app/service_locator.dart';
+import '../../../data/local/onboarding_store.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/widgets.dart';
 
@@ -11,9 +13,10 @@ part 'onboarding_page.dart';
 /// Three-step onboarding carousel matching
 /// `stitch_legalhub_mobile_app/onboarding`.
 ///
-/// On completion it routes to the onboarding-success screen. This is
-/// presentation only; no state is persisted. Images in the designs are
-/// remote placeholders, so a tonal surface is used instead.
+/// On completion it routes to the onboarding-success screen. Skip (and the
+/// success action) mark the first-run flag in [OnboardingStore] so the next
+/// launch starts at sign-in. Images in the designs are remote placeholders,
+/// so a tonal surface is used instead.
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -29,6 +32,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  Future<void> _complete(BuildContext context) async {
+    if (serviceLocator.isRegistered<OnboardingStore>()) {
+      await serviceLocator<OnboardingStore>().markCompleted();
+    }
+    if (context.mounted) {
+      context.go(AppRoutes.signIn);
+    }
   }
 
   static const int _pageCount = 3;
@@ -61,7 +73,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   LegalHubTheme.marginMobile,
                 ),
                 child: TextButton(
-                  onPressed: () => context.go(AppRoutes.signIn),
+                  onPressed: () => _complete(context),
                   child: Text(
                     l10n.skip,
                     style: text.labelLarge?.copyWith(

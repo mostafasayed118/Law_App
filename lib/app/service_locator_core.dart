@@ -19,6 +19,13 @@ void _registerCoreServices({SharedPreferences? preferences}) {
           : SharedPreferencesLocaleStore(preferences),
     );
   }
+  if (!serviceLocator.isRegistered<OnboardingStore>()) {
+    serviceLocator.registerLazySingleton<OnboardingStore>(
+      () => preferences == null
+          ? InMemoryOnboardingStore()
+          : SharedPreferencesOnboardingStore(preferences),
+    );
+  }
   if (!serviceLocator.isRegistered<NotificationPrefsStore>()) {
     serviceLocator.registerLazySingleton<NotificationPrefsStore>(
       () => preferences == null

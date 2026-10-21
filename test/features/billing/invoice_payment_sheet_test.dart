@@ -187,7 +187,7 @@ void main() {
       expect(find.text('Payment successful'), findsOneWidget);
       expect(
         find.text(
-          'Your payment was confirmed. The invoice will be marked as paid.',
+          'Demo payment simulated — no charge was made and the invoice is unchanged.',
         ),
         findsOneWidget,
       );

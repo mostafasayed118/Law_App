@@ -422,6 +422,7 @@
   "paymentWaiting": "في انتظار تأكيد الدفع…",
   "paymentSuccessTitle": "تم الدفع بنجاح",
   "paymentSuccessBody": "تم تأكيد دفعتك. ستُعلَّم الفاتورة كمدفوعة.",
+  "paymentDemoSuccessBody": "تمت محاكاة دفعة تجريبية — لم يتم تحصيل أي مبلغ والفاتورة لم تتغير.",
   "paymentFailedTitle": "تعذّر الدفع",
   "paymentFailedBody": "لم تكتمل عملية الدفع. يمكنك المحاولة مرة أخرى.",
   "paymentCancelledTitle": "تم إلغاء الدفع",

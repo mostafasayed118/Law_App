@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/admin/platform_admin_gateway.dart';
 import '../core/auth/auth_gateway.dart';
+import '../core/backend_posture.dart';
 import '../core/observability/error_reporter.dart';
 import '../core/organizations/membership_repository.dart';
 import '../core/organizations/organization_gateway.dart';
@@ -33,11 +34,14 @@ import '../data/documents/supabase_document_gateway.dart';
 import '../data/files/file_selector_file_picker.dart';
 import '../data/files/url_launcher_uri_opener.dart';
 import '../data/local/in_memory_locale_store.dart';
+import '../data/local/in_memory_onboarding_store.dart';
 import '../data/local/in_memory_org_selection_store.dart';
 import '../data/local/in_memory_theme_mode_store.dart';
 import '../data/local/locale_store.dart';
+import '../data/local/onboarding_store.dart';
 import '../data/local/org_selection_store.dart';
 import '../data/local/shared_preferences_locale_store.dart';
+import '../data/local/shared_preferences_onboarding_store.dart';
 import '../data/local/shared_preferences_org_selection_store.dart';
 import '../data/local/shared_preferences_theme_mode_store.dart';
 import '../data/local/theme_mode_store.dart';
@@ -165,6 +169,12 @@ void configureDependencies({
   final SupabaseEnv env = supabaseEnv ?? SupabaseEnv.fromEnvironment();
   final PaymentMode paymentsMode = paymentMode ?? PaymentMode.fromEnvironment();
 
+  if (!serviceLocator.isRegistered<BackendPosture>()) {
+    serviceLocator.registerSingleton<BackendPosture>(
+      BackendPosture(isLocalOnly: !env.isConfigured),
+    );
+  }
+
   _registerCoreServices(preferences: preferences);
   _registerAuthSeams(env, supabaseAuthApiFactory: supabaseAuthApiFactory);
   _registerOrgSeams(
@@ -204,3 +214,10 @@ void configureDependencies({
 Future<void> resetServiceLocator() async {
   await serviceLocator.reset();
 }
+
+/// Presentation-level posture: true when the app is on the credential-free
+/// fakes. A screen pumped without [configureDependencies] keeps the historical
+/// local-only copy rather than throwing on a missing registration.
+bool get backendIsLocalOnly => serviceLocator.isRegistered<BackendPosture>()
+    ? serviceLocator<BackendPosture>().isLocalOnly
+    : true;

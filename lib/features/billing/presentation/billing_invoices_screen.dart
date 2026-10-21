@@ -35,6 +35,7 @@ class BillingInvoicesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final bool localOnly = backendIsLocalOnly;
     final PaymentMode mode = serviceLocator<PaymentMode>();
     final PaymentGateway paymentGateway = serviceLocator<PaymentGateway>();
     final CheckoutLauncher launcher = serviceLocator<CheckoutLauncher>();
@@ -64,7 +65,7 @@ class BillingInvoicesScreen extends StatelessWidget {
           ),
         ),
         errorCopy: l10n.invoicesError,
-        localOnlyNote: l10n.invoicesLocalOnlyNote,
+        localOnlyNote: localOnly ? l10n.invoicesLocalOnlyNote : '',
       ),
     );
   }

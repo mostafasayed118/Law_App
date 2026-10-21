@@ -75,6 +75,7 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
     }
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
+    final bool localOnly = backendIsLocalOnly;
     return ListView(
       padding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
       children: <Widget>[
@@ -140,10 +141,11 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
           ),
           const SizedBox(height: LegalHubTheme.spaceXl),
         ],
-        Text(
-          l10n.matterLocalOnlyNote,
-          style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-        ),
+        if (localOnly)
+          Text(
+            l10n.matterLocalOnlyNote,
+            style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+          ),
       ],
     );
   }

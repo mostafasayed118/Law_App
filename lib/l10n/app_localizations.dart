@@ -2476,6 +2476,12 @@ abstract class AppLocalizations {
   /// **'Your payment was confirmed. The invoice will be marked as paid.'**
   String get paymentSuccessBody;
 
+  /// No description provided for @paymentDemoSuccessBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo payment simulated — no charge was made and the invoice is unchanged.'**
+  String get paymentDemoSuccessBody;
+
   /// No description provided for @paymentFailedTitle.
   ///
   /// In en, this message translates to:

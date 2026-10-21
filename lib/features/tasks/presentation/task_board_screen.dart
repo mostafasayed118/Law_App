@@ -32,6 +32,7 @@ class TaskBoardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final bool localOnly = backendIsLocalOnly;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.tasksTitle)),
       // The shared cubit-scoped list shell (audit 2026-09-21, M-10).
@@ -92,7 +93,7 @@ class TaskBoardScreen extends StatelessWidget {
           ),
         ),
         errorCopy: l10n.tasksError,
-        localOnlyNote: l10n.tasksLocalOnlyNote,
+        localOnlyNote: localOnly ? l10n.tasksLocalOnlyNote : '',
       ),
     );
   }

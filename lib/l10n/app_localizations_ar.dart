@@ -1289,6 +1289,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get paymentSuccessBody => 'تم تأكيد دفعتك. ستُعلَّم الفاتورة كمدفوعة.';
 
   @override
+  String get paymentDemoSuccessBody =>
+      'تمت محاكاة دفعة تجريبية — لم يتم تحصيل أي مبلغ والفاتورة لم تتغير.';
+
+  @override
   String get paymentFailedTitle => 'تعذّر الدفع';
 
   @override

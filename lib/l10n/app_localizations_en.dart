@@ -1304,6 +1304,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your payment was confirmed. The invoice will be marked as paid.';
 
   @override
+  String get paymentDemoSuccessBody =>
+      'Demo payment simulated — no charge was made and the invoice is unchanged.';
+
+  @override
   String get paymentFailedTitle => 'Payment failed';
 
   @override

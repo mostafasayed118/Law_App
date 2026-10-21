@@ -88,10 +88,14 @@ class ViewStateList<ItemT> extends StatelessWidget {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final Widget note = Text(
-      localOnlyNote,
-      style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-    );
+    // Configured builds pass an empty note: the surfaces are backed by real
+    // server data, so the historical "Demo mode" footer would be false.
+    final Widget note = localOnlyNote.isEmpty
+        ? const SizedBox.shrink()
+        : Text(
+            localOnlyNote,
+            style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+          );
     return switch (state) {
       ViewLoading<List<ItemT>>() => const Padding(
         padding: EdgeInsetsDirectional.all(LegalHubTheme.spaceXl),

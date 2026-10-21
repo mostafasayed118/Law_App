@@ -422,6 +422,7 @@
   "paymentWaiting": "Ödeme onayı bekleniyor…",
   "paymentSuccessTitle": "Ödeme başarılı",
   "paymentSuccessBody": "Ödemeniz onaylandı. Fatura ödendi olarak işaretlenecek.",
+  "paymentDemoSuccessBody": "Demo ödeme simüle edildi — ücret alınmadı ve fatura değişmedi.",
   "paymentFailedTitle": "Ödeme başarısız",
   "paymentFailedBody": "Ödeme tamamlanamadı. Tekrar deneyebilirsiniz.",
   "paymentCancelledTitle": "Ödeme iptal edildi",
