@@ -28,15 +28,15 @@
 | unpushed | 0 |
 | working tree | clean after the docs commit (this file + the evidence doc) |
 | CI | run `39569576730` on `c835ced` — success (quality + release AAB + debug APK) |
-| gates (local, verified this session) | `flutter analyze` clean · `flutter test` 1745/1745 (after W1) · `scripts/verify_ledger.sh` PASS (115/0) · `scripts/verify_arb_parity.sh` PASS (510/510/510) |
+| gates (local, verified this session) | `flutter analyze` clean · `flutter test` 1750/1750 (after W2) · `dart format --output=none --set-exit-if-changed .` 0 changed (the CI command) · `scripts/verify_ledger.sh` PASS (115/0) · `scripts/verify_arb_parity.sh` PASS (511/511/511 — W2 added one l10n key) |
 
 **Campaign state (updated by the PM after each wave):**
 
 | Wave | Status | Commit | Baseline for the next wave |
 |---|---|---|---|
-| W1 | **landed + PM-verified** | `8b5b08b` (root cause: candidate B — the seed guard in `active_org_store.dart` skipped a same-user re-auth; `OrganizationMembership` is an Equatable, so the membership-set comparison is by value) | `flutter test` = **1745** (1741 + 4 new), ledger 115/0, ARB parity 510/510/510 |
-| W2 | next | — | — |
-| W3 | queued | — | — |
+| W1 | **landed + PM-verified** | `8b5b08b` (root cause: candidate B — the seed guard in `active_org_store.dart` skipped a same-user re-auth; `OrganizationMembership` is an Equatable, so the membership-set comparison is by value) | — |
+| W2 | **landed + PM-verified** | `094246e` (root cause: go_router prefers `platformDispatcher.defaultRouteName` over `initialLocation`, so the platform hands the foreign URI to the router as the initial location; `findMatch` throws and the app had no `errorBuilder` → go_router's raw error page. Fix: one `errorBuilder` + a calm localized surface; the accept-invite path is untouched and still green) | `flutter test` = **1750**, tracked declarations **1744**, ARB parity **511/511/511**, ledger 115/0, repo-wide `dart format` = 0 changed |
+| W3 | next | — | — |
 | W4 | queued (owner ruling D1) | — | — |
 | W5 | queued (owner ruling D2) | — | — |
 
@@ -45,6 +45,11 @@
 > test declarations, the README's two count lines **must** be bumped in the same
 > commit or `scripts/verify_ledger.sh` goes red. `README.md` (those two lines only)
 > is therefore in scope for any wave that adds tests.
+>
+> **Known doc nit (campaign close-out, not a wave):** `README.md:31` still reads
+> "**Quality gates** — 1741 tests"; the ledger only checks the two count lines, so
+> that third reference drifts with every wave. Fix it once, at the end, against the
+> final count.
 
 **Flutter startup lock:** only one Flutter gate process at a time — waves run
 **sequentially**, never in parallel.
@@ -272,7 +277,7 @@ entries listed above, plus the Settings role card and the sign-out label, are
 dishonest in a configured build.
 
 **STEP 0 — baseline** (same commands; also record `bash scripts/verify_arb_parity.sh`
-= 510/510/510 before you touch any ARB file).
+= **511/511/511** before you touch any ARB file, and `flutter test` = **1750**).
 
 **STEP 1 — PROVE THE TRUTH PER ENTRY.** For each of the twelve home entries in
 `lib/features/home/domain/home_entries.dart`, determine from the DI registration
