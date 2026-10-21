@@ -90,11 +90,16 @@ actor reference is nulled by the existing `ON DELETE SET NULL` FK.
   exist on this project; the schema was applied directly. `supabase db push`
   would try to replay migrations `01…20` and is **not safe** here. Keep using
   the dated apply records.
-- **Policy batteries 18–21 were not run live.** They are designed for an
-  ephemeral rehearsal project and their fixtures delete `auth.users`/
-  `platform_config`; running them against the dev project would be
-  destructive. The static `--check` is green; a fresh-stack rehearsal is
-  still the right proof for the SQL itself.
+- **Policy batteries were rehearsed on a fresh ephemeral stack, not on the
+  dev project.** On 2026-10-21, a local `supabase start` stack (ports
+  54421–54424) passed `--apply` **69/69** and the full battery **126/126**
+  (batteries 01–21, including 18/19/20/21). The dev project was not used for
+  the battery because its fixtures delete `auth.users`/`platform_config`.
+  Three harness defects surfaced and were fixed: four service-role-only
+  payment RPCs were wrongly pinned as `authenticated`-executable; the 18.05
+  battery read before switching the JWT back to client-a; and the legacy
+  `list_organizations_metadata()` pin predated the `(integer, integer)`
+  signature.
 - **Live payments remain disabled.** `PAYMOB_API_KEY`, `PAYMOB_HMAC_SECRET`,
   `PAYMOB_INTEGRATION_ID`, `PAYMOB_IFRAME_ID`, `PAYMOB_BASE_URL`, and
   `PAYMOB_RECONCILE_SECRET` are not set on the project. The deployed

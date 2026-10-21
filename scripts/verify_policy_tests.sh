@@ -481,7 +481,7 @@ structural_pins() {
     "reactivate_membership(uuid, uuid)"
     "remove_membership(uuid, uuid)"
     "delete_my_account()"
-    "list_organizations_metadata()"
+    "list_organizations_metadata(integer, integer)"
     "list_members_metadata(integer, integer)"
     "suspend_membership_platform(uuid, uuid)"
     "reactivate_membership_platform(uuid, uuid)"
@@ -500,10 +500,6 @@ structural_pins() {
     "delete_matter_file(uuid)"
     "initiate_invoice_payment(uuid)"
     "get_invoice_payment_status(uuid)"
-    "attach_paymob_order(uuid, text)"
-    "apply_paymob_transaction(text, text, text, bigint, text, text)"
-    "record_payment_callback_rejected(text)"
-    "list_stale_pending_payments(interval, integer)"
     "list_matter_assignable_members(uuid)"
   )
   for sig in "${rpc_list[@]}"; do

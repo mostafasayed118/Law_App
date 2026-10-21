@@ -177,6 +177,11 @@ declare
   v_id uuid;
   v_orphan bigint; v_cross bigint;
 begin
+  -- Read as the owner first: the previous block (18.04) left the JWT as the
+  -- orphan, so selecting before resetting the claim would be an RLS denial,
+  -- not a missing row (the non-vacuity guard must see the real row).
+  perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000003', false);
+  perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000003"}', false);
   select id into v_id
     from public.consultations
    where slot_id = 'd0000000-0000-4000-8000-000000000001'

@@ -138,6 +138,7 @@ Dart seam/cubit/UI, battery 17) that this journal does not cover. The
   reconciled after the README count update.
 - **Live apply (2026-10-21):** migrations 17–20 plus their policies/RPCs and
   the task assignable-members RPC were applied to `law_project`; the three
-  Paymob Edge Functions were deployed. Batteries 18–21 remain unrehearsed
-  live (their fixtures are destructive). See
+  Paymob Edge Functions were deployed. Batteries 18–21 were rehearsed on a
+  fresh ephemeral stack — `--apply` 69/69 and full battery 126/126 (01–21);
+  the dev project was not used because the fixtures are destructive. See
   `docs/live_apply_2026-10-21.md`.

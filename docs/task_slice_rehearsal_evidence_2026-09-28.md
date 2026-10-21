@@ -8,8 +8,8 @@
 > This evidence predates those edits: re-run the battery live on the
 > ephemeral stack before applying migration 17 anywhere. **Update
 > 2026-10-21:** migration 17 + the task policies/RPCs were applied live (see
-> `docs/live_apply_2026-10-21.md`); the battery itself still needs an
-> ephemeral-stack run.
+> `docs/live_apply_2026-10-21.md`); the full battery was then rehearsed on a
+> fresh ephemeral stack: **126/126** (01–21), including battery 17.
 
 Live rehearsal of the policy-test battery on an ephemeral local stack,
 covering the Gate 3 task-writes slice (battery 17) plus the previously
