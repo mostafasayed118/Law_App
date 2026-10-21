@@ -25,6 +25,10 @@ part 'matter_list_surface.dart';
 /// search RPC exists. All copy is local-only — the synthetic list must never
 /// read as real cases (R1/D-M4). Tapping a row (slice 7.2) navigates to the
 /// read-only details surface (`/matters/:id`, AC-3).
+///
+/// The list RE-READS itself when the create screen closes (W4, 2026-10-21):
+/// the create screen runs its own cubit, so without that re-read a matter
+/// created from the FAB never appeared in the list.
 class MatterListScreen extends StatelessWidget {
   const MatterListScreen({super.key, this.canCreateMatter = false});
 

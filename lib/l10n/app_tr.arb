@@ -357,7 +357,7 @@
       "id": {"type": "String"}
     }
   },
-  "matterCreateSuccessNote": "Yalnızca erişiminiz okumaya izin verdiğinde dava listenizde görünür.",
+  "matterCreateSuccessNote": "Siz oluşturduğunuz için şimdi görüyorsunuz. Onlara atandığında diğerleri de görür.",
   "matterCreateDone": "Tamam",
   "matterCreateErrorDenied": "Bu kuruluşta dava oluşturma izniniz yok.",
   "matterCreateErrorOwnerForbidden": "Platform sahibi bir davaya atanamaz.",

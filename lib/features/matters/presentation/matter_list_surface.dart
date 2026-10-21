@@ -24,6 +24,22 @@ class _ListSurfaceState extends State<_ListSurface> {
     });
   }
 
+  /// Opens the create screen and RE-READS the list when it closes (W4,
+  /// 2026-10-21).
+  ///
+  /// The create screen runs its OWN cubit ([MatterCreateScreen] provides it),
+  /// so a created matter never reaches this list on its own — before this,
+  /// the list only picked it up when the screen was re-entered. Re-reading
+  /// on close is what makes the creator's own new matter appear in the list
+  /// (the read gate that lets them see it is the D1 creator carve-out).
+  Future<void> _openCreateScreen() async {
+    await context.push(AppRoutes.matterCreate);
+    if (!mounted) {
+      return;
+    }
+    await context.read<MatterCubit>().load();
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
@@ -36,7 +52,8 @@ class _ListSurfaceState extends State<_ListSurface> {
       floatingActionButton: widget.canCreateMatter
           ? FloatingActionButton.extended(
               // E2E BUG-1 fix: forward navigation to the create screen.
-              onPressed: () => context.push(AppRoutes.matterCreate),
+              // W4: the list re-reads itself when the create screen closes.
+              onPressed: _openCreateScreen,
               icon: const Icon(Icons.add),
               label: Text(l10n.matterCreateFab),
             )

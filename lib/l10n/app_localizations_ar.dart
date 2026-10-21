@@ -1074,7 +1074,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get matterCreateSuccessNote =>
-      'تظهر في قائمتك فقط عندما يسمح وصولك بقراءتها.';
+      'تراها الآن لأنك أنشأتها. ويراها الآخرون بمجرد إسنادها إليهم.';
 
   @override
   String get matterCreateDone => 'تم';

@@ -1086,7 +1086,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get matterCreateSuccessNote =>
-      'Yalnızca erişiminiz okumaya izin verdiğinde dava listenizde görünür.';
+      'Siz oluşturduğunuz için şimdi görüyorsunuz. Onlara atandığında diğerleri de görür.';
 
   @override
   String get matterCreateDone => 'Tamam';

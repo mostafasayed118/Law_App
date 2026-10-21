@@ -1087,7 +1087,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get matterCreateSuccessNote =>
-      'It appears on your matters list only when your access allows reading it.';
+      'You see it now because you created it. Others see it once it is assigned to them.';
 
   @override
   String get matterCreateDone => 'Done';

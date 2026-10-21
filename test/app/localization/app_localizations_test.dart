@@ -336,6 +336,32 @@ void main() {
       expect(ar.matterDetailsCreated, 'تاريخ الإنشاء');
       expect(tr.matterDetailsCreated, 'Oluşturulma');
 
+      // Create surface (F-01 step 2) — the visibility rule after the D1
+      // creator carve-out (owner ruling, 2026-10-21): the creator always sees
+      // the matter they just created; everybody else needs an assignment.
+      // The pre-ruling copy hedged ("only when your access allows reading
+      // it") and is no longer true, so it must not come back.
+      expect(
+        en.matterCreateSuccessNote,
+        'You see it now because you created it. Others see it once it is '
+        'assigned to them.',
+      );
+      expect(
+        ar.matterCreateSuccessNote,
+        'تراها الآن لأنك أنشأتها. ويراها الآخرون بمجرد إسنادها إليهم.',
+      );
+      expect(
+        tr.matterCreateSuccessNote,
+        'Siz oluşturduğunuz için şimdi görüyorsunuz. Onlara atandığında '
+        'diğerleri de görür.',
+      );
+      expect(
+        en.matterCreateSuccessNote,
+        isNot(contains('only when your access')),
+      );
+      expect(ar.matterCreateSuccessNote, isNot(en.matterCreateSuccessNote));
+      expect(tr.matterCreateSuccessNote, isNot(en.matterCreateSuccessNote));
+
       // Real per-locale wording, not silent copies of EN.
       expect(tr.matterTitle, isNot(en.matterTitle));
       expect(ar.matterEmpty, isNot(en.matterEmpty));

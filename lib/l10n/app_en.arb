@@ -371,7 +371,7 @@
       "id": {"type": "String"}
     }
   },
-  "matterCreateSuccessNote": "It appears on your matters list only when your access allows reading it.",
+  "matterCreateSuccessNote": "You see it now because you created it. Others see it once it is assigned to them.",
   "matterCreateDone": "Done",
   "matterCreateErrorDenied": "You do not have permission to create matters in this organization.",
   "matterCreateErrorOwnerForbidden": "The platform owner cannot be assigned to a matter.",

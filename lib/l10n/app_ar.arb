@@ -357,7 +357,7 @@
       "id": {"type": "String"}
     }
   },
-  "matterCreateSuccessNote": "تظهر في قائمتك فقط عندما يسمح وصولك بقراءتها.",
+  "matterCreateSuccessNote": "تراها الآن لأنك أنشأتها. ويراها الآخرون بمجرد إسنادها إليهم.",
   "matterCreateDone": "تم",
   "matterCreateErrorDenied": "ليست لديك صلاحية إنشاء قضايا في هذه المؤسسة.",
   "matterCreateErrorOwnerForbidden": "لا يمكن إسناد مالك المنصة إلى قضية.",

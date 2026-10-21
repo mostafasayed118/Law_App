@@ -2089,7 +2089,7 @@ abstract class AppLocalizations {
   /// No description provided for @matterCreateSuccessNote.
   ///
   /// In en, this message translates to:
-  /// **'It appears on your matters list only when your access allows reading it.'**
+  /// **'You see it now because you created it. Others see it once it is assigned to them.'**
   String get matterCreateSuccessNote;
 
   /// No description provided for @matterCreateDone.

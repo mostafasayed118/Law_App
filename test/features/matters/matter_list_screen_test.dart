@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:legalhub/app/active_org_store.dart';
+import 'package:legalhub/app/router.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/practice_area.dart';
 import 'package:legalhub/features/matters/data/fake_matter_gateway.dart';
+import 'package:legalhub/features/matters/data/fake_matter_write_gateway.dart';
 import 'package:legalhub/features/matters/domain/matter.dart';
 import 'package:legalhub/features/matters/domain/matter_gateway.dart';
+import 'package:legalhub/features/matters/presentation/matter_create_screen.dart';
 import 'package:legalhub/features/matters/presentation/matter_list_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
@@ -116,6 +122,78 @@ void main() {
       expect(find.byType(FloatingActionButton), findsOneWidget);
       expect(find.text('New matter'), findsOneWidget);
     });
+
+    testWidgets('re-reads the list when the create screen closes (W4)', (
+      tester,
+    ) async {
+      // A read gateway that grows a row on every fetch AFTER the first: the
+      // new row shows up in the list only if the list fetched AGAIN once the
+      // create screen closed (the create screen runs its OWN cubit, so it
+      // never touches this list on its own).
+      final _GrowingMatterGateway gateway = _GrowingMatterGateway();
+      await resetServiceLocator();
+      // Registered BEFORE configureDependencies so the fake registration is
+      // skipped (the empty-gateway stub above uses the same seam).
+      serviceLocator.registerLazySingleton<MatterGateway>(() => gateway);
+      configureDependencies();
+      // The create intent targets the ACTIVE org (the demo org of the fake
+      // roster seam), selected here the way a hub visit would.
+      serviceLocator<ActiveOrgStore>().select(
+        FakeMatterWriteGateway.demoOrganizationId,
+      );
+
+      tester.view.physicalSize = const Size(800, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final GoRouter router = GoRouter(
+        initialLocation: AppRoutes.matters,
+        routes: <RouteBase>[
+          GoRoute(
+            path: AppRoutes.matters,
+            builder: (BuildContext context, GoRouterState state) =>
+                const MatterListScreen(canCreateMatter: true),
+          ),
+          GoRoute(
+            path: AppRoutes.matterCreate,
+            builder: (BuildContext context, GoRouterState state) =>
+                const MatterCreateScreen(),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp.router(
+          routerConfig: router,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Demo acquisition review'), findsOneWidget);
+      expect(gateway.fetchCount, 1);
+
+      // Create a matter from the FAB (the partner-gated entry).
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Title'),
+        'Fresh matter',
+      );
+      await tester.tap(find.widgetWithText(FilledButton, 'Create matter'));
+      await tester.pumpAndSettle();
+      expect(find.text('Matter created'), findsOneWidget);
+
+      // Done pops back to the list — which must now carry the new row.
+      await tester.tap(find.widgetWithText(FilledButton, 'Done'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Fresh matter'), findsOneWidget);
+      expect(gateway.fetchCount, 2);
+    });
   });
 }
 
@@ -124,6 +202,44 @@ class _EmptyMatterGateway implements MatterGateway {
   @override
   Future<Result<List<Matter>>> fetchMatters() async {
     return Result<List<Matter>>.success(const <Matter>[]);
+  }
+
+  @override
+  Future<Result<List<Matter>>> searchMatters(String query, {int limit = 30}) =>
+      fetchMatters();
+}
+
+/// Gateway stub whose list grows on every fetch after the first (W4 refresh
+/// pin): the extra row stands for the matter created on the create screen.
+class _GrowingMatterGateway implements MatterGateway {
+  /// How many times the list has been read.
+  int fetchCount = 0;
+
+  static final Matter _first = Matter(
+    id: 'matter-1',
+    title: 'Demo acquisition review',
+    practiceArea: PracticeArea.corporate,
+    status: MatterStatus.active,
+    assignedAttorneyName: 'Layla Mansour',
+    createdAt: DateTime.utc(2026, 7, 12),
+  );
+
+  static final Matter _created = Matter(
+    id: 'created-1',
+    title: 'Fresh matter',
+    practiceArea: PracticeArea.corporate,
+    status: MatterStatus.open,
+    assignedAttorneyName: 'Layla Mansour',
+    createdAt: DateTime.utc(2026, 10, 21),
+  );
+
+  @override
+  Future<Result<List<Matter>>> fetchMatters() async {
+    fetchCount++;
+    return Result<List<Matter>>.success(<Matter>[
+      _first,
+      if (fetchCount > 1) _created,
+    ]);
   }
 
   @override
