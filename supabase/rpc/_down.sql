@@ -66,6 +66,11 @@ drop function if exists public.start_research_run(uuid, uuid, text);
 drop function if exists public.complete_research_run(uuid, text, text, text, jsonb);
 drop function if exists public.list_research_runs(uuid);
 drop function if exists public.list_research_findings(uuid);
+drop function if exists public.create_video_session(uuid, uuid, uuid, timestamptz);
+drop function if exists public.list_video_sessions(uuid);
+drop function if exists public.get_video_session(uuid);
+drop function if exists public.mark_video_session_live(uuid);
+drop function if exists public.end_video_session(uuid);
 
 -- The revokes above run first so the drops below are the final privilege
 -- reset: functions are gone and no execute grant survives in any role.

@@ -12,3 +12,6 @@ verify_jwt = false
 
 [functions.research-analyze]
 verify_jwt = true
+
+[functions.video-token]
+verify_jwt = true
