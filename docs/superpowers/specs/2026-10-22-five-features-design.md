@@ -152,3 +152,29 @@ separate owner GO.
 - Background or scheduled AI analysis.
 - Push-notification delivery.
 - Applying anything to the live project before `PGRST202` clears.
+
+## 9. Implementation status — 2026-10-22
+
+All five waves landed locally (no push): W-A Discovery (`c38f665`, `ddca47d`,
+`c672601`), W-B Approvals (`dbddf1d`, `695f752`, `d645ca4`), W-C Compliance
+(`1d87795`, `127fc1e`, `807133f`), W-D Research (`f6c84a6`, `4c5246d`,
+`a1c5451`), W-E Video (`cc6cc74`, `c7b00b7`, `958adc3`).
+
+Gates on the final tree: format 0 changed, `flutter analyze` clean,
+`flutter test` 1883/1883 (concurrency=1 under local memory pressure), ledger
+115/0 PASS, ARB 703/703/703 PASS, policy `--check` 120/0 PASS, `deno check`
+clean for both new functions, and a development debug APK builds with the
+native LiveKit client.
+
+Still required before any of this is live:
+
+1. Resolve the PostgREST `PGRST202` incident (migrations 22-26 cannot be
+   exercised through RPCs until then).
+2. Apply migrations 22-26 forward-only on `law_project` via the dashboard,
+   recording a dated `docs/live_apply_*.md`.
+3. Deploy `research-analyze` and `video-token` with `--use-api`.
+4. Set `RIVER_*` and `LIVEKIT_*` secrets on the project.
+5. Run the new batteries (22-26) on an ephemeral local stack.
+6. Device E2E for discovery, approvals, compliance, research, and video.
+7. A push window for the unpushed commits, on an explicit owner GO.
+
