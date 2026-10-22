@@ -49,6 +49,11 @@ drop function if exists public.apply_paymob_transaction(text, text, text, bigint
 drop function if exists public.record_payment_callback_rejected(text);
 drop function if exists public.list_stale_pending_payments(interval, integer);
 drop function if exists public.list_matter_assignable_members(uuid);
+drop function if exists public.list_attorney_profiles(text, boolean, integer);
+drop function if exists public.get_attorney_profile(uuid);
+drop function if exists public.create_attorney_profile(text, text, text, text[], text[], text, integer, text);
+drop function if exists public.update_attorney_profile(uuid, text, text, text, text[], text[], text, integer, text, text);
+drop function if exists public.deactivate_attorney_profile(uuid);
 
 -- The revokes above run first so the drops below are the final privilege
 -- reset: functions are gone and no execute grant survives in any role.
