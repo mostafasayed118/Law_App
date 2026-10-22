@@ -1674,6 +1674,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Browse demo approvals — development demo.';
 
   @override
+  String get approvalsEntrySubtitleConfigured =>
+      'Review organization approval requests.';
+
+  @override
   String get approvalStatusPending => 'Pending';
 
   @override
@@ -1681,6 +1685,148 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get approvalStatusDenied => 'Denied';
+
+  @override
+  String get approvalStatusCancelled => 'Cancelled';
+
+  @override
+  String get approvalsScreenTitle => 'Approvals';
+
+  @override
+  String get approvalsStoredNote =>
+      'Requests are stored for this organization.';
+
+  @override
+  String get approvalsEmptyFiltered => 'No approvals match this filter.';
+
+  @override
+  String get approvalsFilterAll => 'All';
+
+  @override
+  String get approvalsCreateFab => 'New request';
+
+  @override
+  String get approvalKindConflict => 'Conflict check';
+
+  @override
+  String get approvalKindWaiver => 'Waiver';
+
+  @override
+  String get approvalKindFiling => 'Filing';
+
+  @override
+  String get approvalKindExpense => 'Expense';
+
+  @override
+  String get approvalKindOther => 'Other';
+
+  @override
+  String get approvalCreateTitle => 'New approval request';
+
+  @override
+  String get approvalCreateTitleLabel => 'Title';
+
+  @override
+  String get approvalCreateTitleHint => 'e.g. Conflict waiver for a new matter';
+
+  @override
+  String get approvalCreateTitleTooShort =>
+      'Title must be at least 2 characters.';
+
+  @override
+  String get approvalCreateTitleTooLong =>
+      'Title must be 160 characters or fewer.';
+
+  @override
+  String get approvalCreateKindLabel => 'Kind';
+
+  @override
+  String get approvalCreateMatterLabel => 'Matter (optional)';
+
+  @override
+  String get approvalCreateMatterNone => 'No matter';
+
+  @override
+  String get approvalCreateMattersError =>
+      'Unable to load matters. You can still submit without a matter.';
+
+  @override
+  String get approvalCreateDescriptionLabel => 'Description (optional)';
+
+  @override
+  String get approvalCreateDescriptionTooLong =>
+      'Description must be 4000 characters or fewer.';
+
+  @override
+  String get approvalCreateSubmit => 'Submit request';
+
+  @override
+  String get approvalCreateSuccess => 'Request submitted.';
+
+  @override
+  String get approvalCreateNoOrg =>
+      'Select an organization before creating a request.';
+
+  @override
+  String get approvalDetailKind => 'Kind';
+
+  @override
+  String get approvalDetailCreated => 'Created';
+
+  @override
+  String get approvalDetailDescription => 'Description';
+
+  @override
+  String get approvalDetailDecided => 'Decided';
+
+  @override
+  String get approvalDetailDecisionNote => 'Decision note';
+
+  @override
+  String get approvalApprove => 'Approve';
+
+  @override
+  String get approvalReject => 'Reject';
+
+  @override
+  String get approvalDecideNoteLabel => 'Note (required to reject)';
+
+  @override
+  String get approvalRejectNoteRequired =>
+      'Add a note of at least 2 characters to reject.';
+
+  @override
+  String get approvalCancelAction => 'Cancel request';
+
+  @override
+  String get approvalCancelConfirmTitle => 'Cancel this request?';
+
+  @override
+  String get approvalCancelConfirmBody =>
+      'The request will be marked as cancelled. This cannot be undone.';
+
+  @override
+  String get approvalDecidedApproved => 'Request approved.';
+
+  @override
+  String get approvalDecidedRejected => 'Request rejected.';
+
+  @override
+  String get approvalCancelled => 'Request cancelled.';
+
+  @override
+  String get approvalErrorDenied => 'You do not have permission to do that.';
+
+  @override
+  String get approvalErrorUnavailable =>
+      'The service is temporarily unavailable. Please try again.';
+
+  @override
+  String get approvalErrorInvalid =>
+      'The request can no longer be updated. Refresh and try again.';
+
+  @override
+  String get approvalErrorFailed => 'Something went wrong. Please try again.';
 
   @override
   String get notificationsFeedTitle => 'Notification feed';

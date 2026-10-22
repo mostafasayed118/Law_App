@@ -137,6 +137,28 @@ void _registerDiscoverySeams(
   );
 }
 
+/// Registers the approvals slice seams.
+void _registerApprovalSeams(
+  SupabaseEnv env, {
+  SupabaseApprovalApi Function()? supabaseApprovalApiFactory,
+}) {
+  // Stateless service: lazy singleton. The approvals Cubit is feature-scoped
+  // and created per screen via BlocProvider. The flip swaps the in-memory demo
+  // for the Supabase-backed workflow when the build is configured (Batch 3.3
+  // env pattern); env-less runs and ALL tests keep the fake. The read needs
+  // the active organization, resolved lazily through the app-scoped
+  // [ActiveOrgStore] so the data layer never imports the app layer.
+  _registerSeam<ApprovalsGateway>(
+    env,
+    supabase: () => SupabaseApprovalGateway(
+      (supabaseApprovalApiFactory ?? SupabaseApprovalApiImpl.bind)(),
+      organizationId: () =>
+          serviceLocator<ActiveOrgStore>().activeOrganizationId,
+    ),
+    fake: FakeApprovalsGateway.new,
+  );
+}
+
 /// Registers the payments slice seams.
 void _registerPaymentSeams(
   SupabaseEnv env, {

@@ -3154,6 +3154,12 @@ abstract class AppLocalizations {
   /// **'Browse demo approvals — development demo.'**
   String get approvalsEntrySubtitle;
 
+  /// No description provided for @approvalsEntrySubtitleConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Review organization approval requests.'**
+  String get approvalsEntrySubtitleConfigured;
+
   /// No description provided for @approvalStatusPending.
   ///
   /// In en, this message translates to:
@@ -3171,6 +3177,270 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Denied'**
   String get approvalStatusDenied;
+
+  /// No description provided for @approvalStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get approvalStatusCancelled;
+
+  /// No description provided for @approvalsScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Approvals'**
+  String get approvalsScreenTitle;
+
+  /// No description provided for @approvalsStoredNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Requests are stored for this organization.'**
+  String get approvalsStoredNote;
+
+  /// No description provided for @approvalsEmptyFiltered.
+  ///
+  /// In en, this message translates to:
+  /// **'No approvals match this filter.'**
+  String get approvalsEmptyFiltered;
+
+  /// No description provided for @approvalsFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get approvalsFilterAll;
+
+  /// No description provided for @approvalsCreateFab.
+  ///
+  /// In en, this message translates to:
+  /// **'New request'**
+  String get approvalsCreateFab;
+
+  /// No description provided for @approvalKindConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'Conflict check'**
+  String get approvalKindConflict;
+
+  /// No description provided for @approvalKindWaiver.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiver'**
+  String get approvalKindWaiver;
+
+  /// No description provided for @approvalKindFiling.
+  ///
+  /// In en, this message translates to:
+  /// **'Filing'**
+  String get approvalKindFiling;
+
+  /// No description provided for @approvalKindExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense'**
+  String get approvalKindExpense;
+
+  /// No description provided for @approvalKindOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get approvalKindOther;
+
+  /// No description provided for @approvalCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New approval request'**
+  String get approvalCreateTitle;
+
+  /// No description provided for @approvalCreateTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get approvalCreateTitleLabel;
+
+  /// No description provided for @approvalCreateTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Conflict waiver for a new matter'**
+  String get approvalCreateTitleHint;
+
+  /// No description provided for @approvalCreateTitleTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Title must be at least 2 characters.'**
+  String get approvalCreateTitleTooShort;
+
+  /// No description provided for @approvalCreateTitleTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Title must be 160 characters or fewer.'**
+  String get approvalCreateTitleTooLong;
+
+  /// No description provided for @approvalCreateKindLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Kind'**
+  String get approvalCreateKindLabel;
+
+  /// No description provided for @approvalCreateMatterLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Matter (optional)'**
+  String get approvalCreateMatterLabel;
+
+  /// No description provided for @approvalCreateMatterNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No matter'**
+  String get approvalCreateMatterNone;
+
+  /// No description provided for @approvalCreateMattersError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load matters. You can still submit without a matter.'**
+  String get approvalCreateMattersError;
+
+  /// No description provided for @approvalCreateDescriptionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Description (optional)'**
+  String get approvalCreateDescriptionLabel;
+
+  /// No description provided for @approvalCreateDescriptionTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Description must be 4000 characters or fewer.'**
+  String get approvalCreateDescriptionTooLong;
+
+  /// No description provided for @approvalCreateSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit request'**
+  String get approvalCreateSubmit;
+
+  /// No description provided for @approvalCreateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Request submitted.'**
+  String get approvalCreateSuccess;
+
+  /// No description provided for @approvalCreateNoOrg.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an organization before creating a request.'**
+  String get approvalCreateNoOrg;
+
+  /// No description provided for @approvalDetailKind.
+  ///
+  /// In en, this message translates to:
+  /// **'Kind'**
+  String get approvalDetailKind;
+
+  /// No description provided for @approvalDetailCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get approvalDetailCreated;
+
+  /// No description provided for @approvalDetailDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get approvalDetailDescription;
+
+  /// No description provided for @approvalDetailDecided.
+  ///
+  /// In en, this message translates to:
+  /// **'Decided'**
+  String get approvalDetailDecided;
+
+  /// No description provided for @approvalDetailDecisionNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Decision note'**
+  String get approvalDetailDecisionNote;
+
+  /// No description provided for @approvalApprove.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get approvalApprove;
+
+  /// No description provided for @approvalReject.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get approvalReject;
+
+  /// No description provided for @approvalDecideNoteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (required to reject)'**
+  String get approvalDecideNoteLabel;
+
+  /// No description provided for @approvalRejectNoteRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a note of at least 2 characters to reject.'**
+  String get approvalRejectNoteRequired;
+
+  /// No description provided for @approvalCancelAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel request'**
+  String get approvalCancelAction;
+
+  /// No description provided for @approvalCancelConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel this request?'**
+  String get approvalCancelConfirmTitle;
+
+  /// No description provided for @approvalCancelConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The request will be marked as cancelled. This cannot be undone.'**
+  String get approvalCancelConfirmBody;
+
+  /// No description provided for @approvalDecidedApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Request approved.'**
+  String get approvalDecidedApproved;
+
+  /// No description provided for @approvalDecidedRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Request rejected.'**
+  String get approvalDecidedRejected;
+
+  /// No description provided for @approvalCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Request cancelled.'**
+  String get approvalCancelled;
+
+  /// No description provided for @approvalErrorDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to do that.'**
+  String get approvalErrorDenied;
+
+  /// No description provided for @approvalErrorUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The service is temporarily unavailable. Please try again.'**
+  String get approvalErrorUnavailable;
+
+  /// No description provided for @approvalErrorInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'The request can no longer be updated. Refresh and try again.'**
+  String get approvalErrorInvalid;
+
+  /// No description provided for @approvalErrorFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get approvalErrorFailed;
 
   /// No description provided for @notificationsFeedTitle.
   ///

@@ -12,6 +12,9 @@ import '../data/admin/fake_platform_admin_gateway.dart';
 import '../data/admin/supabase_platform_admin_api.dart';
 import '../data/admin/supabase_platform_admin_api_impl.dart';
 import '../data/admin/supabase_platform_admin_gateway.dart';
+import '../data/approvals/supabase_approval_api.dart';
+import '../data/approvals/supabase_approval_api_impl.dart';
+import '../data/approvals/supabase_approval_gateway.dart';
 import '../data/auth/fake_auth_gateway.dart';
 import '../data/auth/supabase_auth_api.dart';
 import '../data/auth/supabase_auth_api_impl.dart';
@@ -166,6 +169,7 @@ void configureDependencies({
   SupabaseTaskApi Function()? supabaseTaskApiFactory,
   SupabaseBookingApi Function()? supabaseBookingApiFactory,
   SupabaseAttorneyApi Function()? supabaseAttorneyApiFactory,
+  SupabaseApprovalApi Function()? supabaseApprovalApiFactory,
   PaymentMode? paymentMode,
 }) {
   // Lazy singleton: stateless service, created on first resolution.
@@ -195,6 +199,10 @@ void configureDependencies({
   _registerDiscoverySeams(
     env,
     supabaseAttorneyApiFactory: supabaseAttorneyApiFactory,
+  );
+  _registerApprovalSeams(
+    env,
+    supabaseApprovalApiFactory: supabaseApprovalApiFactory,
   );
   _registerMatterSeams(
     env,

@@ -149,8 +149,17 @@ List<RouteBase> _shellRoutes(
     ),
     GoRoute(
       path: AppRoutes.approvals,
-      builder: (BuildContext context, GoRouterState state) =>
-          const ApprovalsScreen(),
+      builder: (BuildContext context, GoRouterState state) {
+        // UX-only projections from the active membership: decision authority
+        // is the partner role, and cancel is offered to the requester. The
+        // decide/cancel RPCs re-assert both gates server-side.
+        final UserRole role =
+            authCubit.state.session?.primaryRole ?? UserRole.client;
+        return ApprovalsScreen(
+          canDecide: role == UserRole.partner,
+          currentUserId: authCubit.state.session?.userId,
+        );
+      },
     ),
     GoRoute(
       path: AppRoutes.research,

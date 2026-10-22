@@ -1676,6 +1676,10 @@ class AppLocalizationsTr extends AppLocalizations {
       'Sentetik onaylara göz atın — geliştirme demosu.';
 
   @override
+  String get approvalsEntrySubtitleConfigured =>
+      'Kuruluş onay taleplerini inceleyin.';
+
+  @override
   String get approvalStatusPending => 'Bekliyor';
 
   @override
@@ -1683,6 +1687,149 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get approvalStatusDenied => 'Reddedildi';
+
+  @override
+  String get approvalStatusCancelled => 'İptal edildi';
+
+  @override
+  String get approvalsScreenTitle => 'Onaylar';
+
+  @override
+  String get approvalsStoredNote => 'Talepler bu kuruluş için saklanır.';
+
+  @override
+  String get approvalsEmptyFiltered => 'Bu filtreyle eşleşen onay yok.';
+
+  @override
+  String get approvalsFilterAll => 'Tümü';
+
+  @override
+  String get approvalsCreateFab => 'Yeni talep';
+
+  @override
+  String get approvalKindConflict => 'Çıkar çatışması kontrolü';
+
+  @override
+  String get approvalKindWaiver => 'Feragat';
+
+  @override
+  String get approvalKindFiling => 'Mahkemeye sunum';
+
+  @override
+  String get approvalKindExpense => 'Masraf';
+
+  @override
+  String get approvalKindOther => 'Diğer';
+
+  @override
+  String get approvalCreateTitle => 'Yeni onay talebi';
+
+  @override
+  String get approvalCreateTitleLabel => 'Başlık';
+
+  @override
+  String get approvalCreateTitleHint =>
+      'Örn. yeni dosya için çıkar çatışması feragatı';
+
+  @override
+  String get approvalCreateTitleTooShort =>
+      'Başlık en az 2 karakter olmalıdır.';
+
+  @override
+  String get approvalCreateTitleTooLong =>
+      'Başlık en fazla 160 karakter olabilir.';
+
+  @override
+  String get approvalCreateKindLabel => 'Tür';
+
+  @override
+  String get approvalCreateMatterLabel => 'Dosya (isteğe bağlı)';
+
+  @override
+  String get approvalCreateMatterNone => 'Dosya yok';
+
+  @override
+  String get approvalCreateMattersError =>
+      'Dosyalar yüklenemedi. Dosya olmadan da gönderebilirsiniz.';
+
+  @override
+  String get approvalCreateDescriptionLabel => 'Açıklama (isteğe bağlı)';
+
+  @override
+  String get approvalCreateDescriptionTooLong =>
+      'Açıklama en fazla 4000 karakter olabilir.';
+
+  @override
+  String get approvalCreateSubmit => 'Talebi gönder';
+
+  @override
+  String get approvalCreateSuccess => 'Talep gönderildi.';
+
+  @override
+  String get approvalCreateNoOrg =>
+      'Talep oluşturmadan önce bir kuruluş seçin.';
+
+  @override
+  String get approvalDetailKind => 'Tür';
+
+  @override
+  String get approvalDetailCreated => 'Oluşturuldu';
+
+  @override
+  String get approvalDetailDescription => 'Açıklama';
+
+  @override
+  String get approvalDetailDecided => 'Karar verildi';
+
+  @override
+  String get approvalDetailDecisionNote => 'Karar notu';
+
+  @override
+  String get approvalApprove => 'Onayla';
+
+  @override
+  String get approvalReject => 'Reddet';
+
+  @override
+  String get approvalDecideNoteLabel => 'Not (reddetmek için gerekli)';
+
+  @override
+  String get approvalRejectNoteRequired =>
+      'Reddetmek için en az 2 karakterlik bir not ekleyin.';
+
+  @override
+  String get approvalCancelAction => 'Talebi iptal et';
+
+  @override
+  String get approvalCancelConfirmTitle => 'Bu talep iptal edilsin mi?';
+
+  @override
+  String get approvalCancelConfirmBody =>
+      'Talep iptal edildi olarak işaretlenecek. Bu işlem geri alınamaz.';
+
+  @override
+  String get approvalDecidedApproved => 'Talep onaylandı.';
+
+  @override
+  String get approvalDecidedRejected => 'Talep reddedildi.';
+
+  @override
+  String get approvalCancelled => 'Talep iptal edildi.';
+
+  @override
+  String get approvalErrorDenied => 'Bunu yapma izniniz yok.';
+
+  @override
+  String get approvalErrorUnavailable =>
+      'Hizmet geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get approvalErrorInvalid =>
+      'Talep artık güncellenemiyor. Yenileyip tekrar deneyin.';
+
+  @override
+  String get approvalErrorFailed =>
+      'Bir şeyler ters gitti. Lütfen tekrar deneyin.';
 
   @override
   String get notificationsFeedTitle => 'Bildirim akışı';

@@ -21,15 +21,11 @@ void _registerDemoGateways() {
   // Phase 5–12 fake-domain pattern, "the fake is the product posture"). The
   // task board LEFT this group in the task-writes slice (Gate 3 spec
   // 2026-09-27): TaskBoardGateway now flips in _registerContentSeams like
-  // the other applied-table seams.
+  // the other applied-table seams. The approvals queue LEFT it in the
+  // approvals slice (design §3) and flips in _registerApprovalSeams.
   if (!serviceLocator.isRegistered<ComplianceAlertsGateway>()) {
     serviceLocator.registerLazySingleton<ComplianceAlertsGateway>(
       FakeComplianceGateway.new,
-    );
-  }
-  if (!serviceLocator.isRegistered<ApprovalsGateway>()) {
-    serviceLocator.registerLazySingleton<ApprovalsGateway>(
-      FakeApprovalsGateway.new,
     );
   }
   // AI research slice (plan 2026-09-02): the synthetic engine composes the

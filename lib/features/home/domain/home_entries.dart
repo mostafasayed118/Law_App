@@ -223,6 +223,7 @@ List<HomeEntry> homeEntriesFor(RoleCapability capabilities) {
       icon: HomeEntryIcon.approvals,
       title: _approvalsTitle,
       subtitle: _approvalsSubtitle,
+      configuredSubtitle: _approvalsConfiguredSubtitle,
       route: HomeEntryRoute.approvals,
       isVisible: _canViewApprovals,
     ),
@@ -287,5 +288,7 @@ String _tasksConfiguredSubtitle(AppLocalizations l10n) =>
     l10n.tasksEntrySubtitleConfigured;
 String _approvalsTitle(AppLocalizations l10n) => l10n.approvalsEntryTitle;
 String _approvalsSubtitle(AppLocalizations l10n) => l10n.approvalsEntrySubtitle;
+String _approvalsConfiguredSubtitle(AppLocalizations l10n) =>
+    l10n.approvalsEntrySubtitleConfigured;
 String _researchTitle(AppLocalizations l10n) => l10n.aiResearchEntryTitle;
 String _researchSubtitle(AppLocalizations l10n) => l10n.aiResearchEntrySubtitle;

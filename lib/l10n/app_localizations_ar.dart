@@ -1652,6 +1652,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'استعرض الموافقات التجريبية — عرض تطويري.';
 
   @override
+  String get approvalsEntrySubtitleConfigured =>
+      'راجع طلبات الموافقة الخاصة بالمؤسسة.';
+
+  @override
   String get approvalStatusPending => 'معلّق';
 
   @override
@@ -1659,6 +1663,145 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get approvalStatusDenied => 'مرفوض';
+
+  @override
+  String get approvalStatusCancelled => 'ملغاة';
+
+  @override
+  String get approvalsScreenTitle => 'الموافقات';
+
+  @override
+  String get approvalsStoredNote => 'تُحفظ الطلبات لهذه المؤسسة.';
+
+  @override
+  String get approvalsEmptyFiltered => 'لا توجد موافقات مطابقة لهذا الفلتر.';
+
+  @override
+  String get approvalsFilterAll => 'الكل';
+
+  @override
+  String get approvalsCreateFab => 'طلب جديد';
+
+  @override
+  String get approvalKindConflict => 'فحص تعارض';
+
+  @override
+  String get approvalKindWaiver => 'تنازل';
+
+  @override
+  String get approvalKindFiling => 'تقديم للمحكمة';
+
+  @override
+  String get approvalKindExpense => 'مصروف';
+
+  @override
+  String get approvalKindOther => 'أخرى';
+
+  @override
+  String get approvalCreateTitle => 'طلب موافقة جديد';
+
+  @override
+  String get approvalCreateTitleLabel => 'العنوان';
+
+  @override
+  String get approvalCreateTitleHint => 'مثال: تنازل عن تعارض لملف جديد';
+
+  @override
+  String get approvalCreateTitleTooShort =>
+      'يجب أن يكون العنوان حرفين على الأقل.';
+
+  @override
+  String get approvalCreateTitleTooLong => 'يجب ألا يتجاوز العنوان 160 حرفًا.';
+
+  @override
+  String get approvalCreateKindLabel => 'النوع';
+
+  @override
+  String get approvalCreateMatterLabel => 'الملف (اختياري)';
+
+  @override
+  String get approvalCreateMatterNone => 'بدون ملف';
+
+  @override
+  String get approvalCreateMattersError =>
+      'تعذّر تحميل الملفات. يمكنك الإرسال بدون ملف.';
+
+  @override
+  String get approvalCreateDescriptionLabel => 'الوصف (اختياري)';
+
+  @override
+  String get approvalCreateDescriptionTooLong =>
+      'يجب ألا يتجاوز الوصف 4000 حرف.';
+
+  @override
+  String get approvalCreateSubmit => 'إرسال الطلب';
+
+  @override
+  String get approvalCreateSuccess => 'تم إرسال الطلب.';
+
+  @override
+  String get approvalCreateNoOrg => 'اختر مؤسسة قبل إنشاء طلب.';
+
+  @override
+  String get approvalDetailKind => 'النوع';
+
+  @override
+  String get approvalDetailCreated => 'أُنشئ';
+
+  @override
+  String get approvalDetailDescription => 'الوصف';
+
+  @override
+  String get approvalDetailDecided => 'تم البت';
+
+  @override
+  String get approvalDetailDecisionNote => 'ملاحظة القرار';
+
+  @override
+  String get approvalApprove => 'موافقة';
+
+  @override
+  String get approvalReject => 'رفض';
+
+  @override
+  String get approvalDecideNoteLabel => 'ملاحظة (مطلوبة للرفض)';
+
+  @override
+  String get approvalRejectNoteRequired =>
+      'أضف ملاحظة من حرفين على الأقل للرفض.';
+
+  @override
+  String get approvalCancelAction => 'إلغاء الطلب';
+
+  @override
+  String get approvalCancelConfirmTitle => 'إلغاء هذا الطلب؟';
+
+  @override
+  String get approvalCancelConfirmBody =>
+      'سيُعلَّم الطلب كملغى. لا يمكن التراجع عن ذلك.';
+
+  @override
+  String get approvalDecidedApproved => 'تمت الموافقة على الطلب.';
+
+  @override
+  String get approvalDecidedRejected => 'تم رفض الطلب.';
+
+  @override
+  String get approvalCancelled => 'تم إلغاء الطلب.';
+
+  @override
+  String get approvalErrorDenied => 'ليس لديك إذن للقيام بذلك.';
+
+  @override
+  String get approvalErrorUnavailable =>
+      'الخدمة غير متاحة مؤقتًا. حاول مرة أخرى.';
+
+  @override
+  String get approvalErrorInvalid =>
+      'لم يعد بالإمكان تحديث الطلب. حدّث القائمة وحاول مرة أخرى.';
+
+  @override
+  String get approvalErrorFailed => 'حدث خطأ. حاول مرة أخرى.';
 
   @override
   String get notificationsFeedTitle => 'خلاصة الإشعارات';
