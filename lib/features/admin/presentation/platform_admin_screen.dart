@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../app/legalhub_theme.dart';
+import '../../../app/router.dart';
 import '../../../app/service_locator.dart';
 import '../../../core/admin/platform_admin_gateway.dart';
 import '../../../l10n/app_localizations.dart';

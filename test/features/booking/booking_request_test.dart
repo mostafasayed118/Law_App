@@ -104,6 +104,20 @@ void main() {
     });
   });
 
+  group('normalizeAttorneyRef (design §2)', () {
+    test('a synthetic attorney id is not sent to the real booking RPC', () {
+      expect(normalizeAttorneyRef('atty-1'), isNull);
+      expect(normalizeAttorneyRef('  atty-1  '), isNull);
+      expect(normalizeAttorneyRef(null), isNull);
+    });
+
+    test('a real uuid attorney id is preserved', () {
+      const String id = '11111111-1111-4111-8111-111111111111';
+      expect(normalizeAttorneyRef(id), id);
+      expect(normalizeAttorneyRef('  $id  '), id);
+    });
+  });
+
   group('BookingRequest value semantics', () {
     test('equates on category, topic, and slot (Equatable props)', () {
       final DateTime startsAt = DateTime(2026, 8, 10, 10);

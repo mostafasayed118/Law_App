@@ -1918,6 +1918,198 @@ abstract class AppLocalizations {
   /// **'Book with this attorney'**
   String get discoveryProfileBook;
 
+  /// No description provided for @discoveryDirectoryNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Directory profiles are maintained by the platform administrator. No credential verification is performed.'**
+  String get discoveryDirectoryNote;
+
+  /// No description provided for @discoveryProfileSpecialties.
+  ///
+  /// In en, this message translates to:
+  /// **'Specialties'**
+  String get discoveryProfileSpecialties;
+
+  /// No description provided for @discoveryProfileLanguages.
+  ///
+  /// In en, this message translates to:
+  /// **'Languages'**
+  String get discoveryProfileLanguages;
+
+  /// No description provided for @discoveryProfileYears.
+  ///
+  /// In en, this message translates to:
+  /// **'{years} years of experience'**
+  String discoveryProfileYears(int years);
+
+  /// No description provided for @attorneyStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get attorneyStatusActive;
+
+  /// No description provided for @attorneyStatusInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get attorneyStatusInactive;
+
+  /// No description provided for @attorneyAdminTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Attorney directory'**
+  String get attorneyAdminTitle;
+
+  /// No description provided for @attorneyAdminEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Attorney directory'**
+  String get attorneyAdminEntryTitle;
+
+  /// No description provided for @attorneyAdminEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review and manage directory profiles.'**
+  String get attorneyAdminEntrySubtitle;
+
+  /// No description provided for @attorneyAdminCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Add attorney'**
+  String get attorneyAdminCreate;
+
+  /// No description provided for @attorneyAdminEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit attorney'**
+  String get attorneyAdminEditTitle;
+
+  /// No description provided for @attorneyAdminSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get attorneyAdminSave;
+
+  /// No description provided for @attorneyAdminDeactivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate'**
+  String get attorneyAdminDeactivate;
+
+  /// No description provided for @attorneyAdminDeactivateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate attorney?'**
+  String get attorneyAdminDeactivateTitle;
+
+  /// No description provided for @attorneyAdminDeactivateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate {name}? The profile stays in the admin list but leaves the public directory.'**
+  String attorneyAdminDeactivateBody(String name);
+
+  /// No description provided for @attorneyAdminDeactivateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to deactivate the profile. Please try again.'**
+  String get attorneyAdminDeactivateFailed;
+
+  /// No description provided for @attorneyAdminEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No attorney profiles yet.'**
+  String get attorneyAdminEmpty;
+
+  /// No description provided for @attorneyAdminError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load attorney profiles.'**
+  String get attorneyAdminError;
+
+  /// No description provided for @attorneyAdminNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Profiles are maintained by the platform administrator. No credential verification is performed.'**
+  String get attorneyAdminNote;
+
+  /// No description provided for @attorneyAdminNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name'**
+  String get attorneyAdminNameLabel;
+
+  /// No description provided for @attorneyAdminHeadlineLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Headline (optional)'**
+  String get attorneyAdminHeadlineLabel;
+
+  /// No description provided for @attorneyAdminBioLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Bio (optional)'**
+  String get attorneyAdminBioLabel;
+
+  /// No description provided for @attorneyAdminSpecialtiesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Specialties'**
+  String get attorneyAdminSpecialtiesLabel;
+
+  /// No description provided for @attorneyAdminLanguagesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Languages (optional)'**
+  String get attorneyAdminLanguagesLabel;
+
+  /// No description provided for @attorneyAdminLanguagesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Comma separated, e.g. EN, AR'**
+  String get attorneyAdminLanguagesHint;
+
+  /// No description provided for @attorneyAdminCityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'City (optional)'**
+  String get attorneyAdminCityLabel;
+
+  /// No description provided for @attorneyAdminYearsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Years of experience (optional)'**
+  String get attorneyAdminYearsLabel;
+
+  /// No description provided for @attorneyAdminNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a display name.'**
+  String get attorneyAdminNameRequired;
+
+  /// No description provided for @attorneyAdminNameTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter at least 2 characters.'**
+  String get attorneyAdminNameTooShort;
+
+  /// No description provided for @attorneyAdminYearsInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a whole number from 0 to 80.'**
+  String get attorneyAdminYearsInvalid;
+
+  /// No description provided for @attorneyAdminSpecialtyRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least one specialty.'**
+  String get attorneyAdminSpecialtyRequired;
+
+  /// No description provided for @attorneyAdminSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to save the profile. Please try again.'**
+  String get attorneyAdminSaveFailed;
+
   /// No description provided for @matterTitle.
   ///
   /// In en, this message translates to:

@@ -983,6 +983,109 @@ class AppLocalizationsAr extends AppLocalizations {
   String get discoveryProfileBook => 'احجز مع هذا المحامي';
 
   @override
+  String get discoveryDirectoryNote =>
+      'تُدار ملفات الدليل بواسطة مسؤول المنصة. لا يتم التحقق من أي بيانات اعتماد.';
+
+  @override
+  String get discoveryProfileSpecialties => 'التخصصات';
+
+  @override
+  String get discoveryProfileLanguages => 'اللغات';
+
+  @override
+  String discoveryProfileYears(int years) {
+    return '$years سنة من الخبرة';
+  }
+
+  @override
+  String get attorneyStatusActive => 'نشط';
+
+  @override
+  String get attorneyStatusInactive => 'غير نشط';
+
+  @override
+  String get attorneyAdminTitle => 'دليل المحامين';
+
+  @override
+  String get attorneyAdminEntryTitle => 'دليل المحامين';
+
+  @override
+  String get attorneyAdminEntrySubtitle => 'راجع ملفات الدليل وأدرها.';
+
+  @override
+  String get attorneyAdminCreate => 'إضافة محامٍ';
+
+  @override
+  String get attorneyAdminEditTitle => 'تعديل بيانات المحامي';
+
+  @override
+  String get attorneyAdminSave => 'حفظ';
+
+  @override
+  String get attorneyAdminDeactivate => 'إلغاء التفعيل';
+
+  @override
+  String get attorneyAdminDeactivateTitle => 'إلغاء تفعيل المحامي؟';
+
+  @override
+  String attorneyAdminDeactivateBody(String name) {
+    return 'هل تريد إلغاء تفعيل $name؟ سيبقى الملف في قائمة الإدارة لكنه يختفي من الدليل العام.';
+  }
+
+  @override
+  String get attorneyAdminDeactivateFailed =>
+      'تعذّر إلغاء تفعيل الملف. حاول مرة أخرى.';
+
+  @override
+  String get attorneyAdminEmpty => 'لا توجد ملفات محامين بعد.';
+
+  @override
+  String get attorneyAdminError => 'تعذّر تحميل ملفات المحامين.';
+
+  @override
+  String get attorneyAdminNote =>
+      'تُدار الملفات بواسطة مسؤول المنصة. لا يتم التحقق من أي بيانات اعتماد.';
+
+  @override
+  String get attorneyAdminNameLabel => 'الاسم المعروض';
+
+  @override
+  String get attorneyAdminHeadlineLabel => 'العنوان التعريفي (اختياري)';
+
+  @override
+  String get attorneyAdminBioLabel => 'نبذة (اختياري)';
+
+  @override
+  String get attorneyAdminSpecialtiesLabel => 'التخصصات';
+
+  @override
+  String get attorneyAdminLanguagesLabel => 'اللغات (اختياري)';
+
+  @override
+  String get attorneyAdminLanguagesHint => 'مفصولة بفواصل، مثل EN, AR';
+
+  @override
+  String get attorneyAdminCityLabel => 'المدينة (اختياري)';
+
+  @override
+  String get attorneyAdminYearsLabel => 'سنوات الخبرة (اختياري)';
+
+  @override
+  String get attorneyAdminNameRequired => 'أدخل الاسم المعروض.';
+
+  @override
+  String get attorneyAdminNameTooShort => 'أدخل حرفين على الأقل.';
+
+  @override
+  String get attorneyAdminYearsInvalid => 'أدخل عددًا صحيحًا من 0 إلى 80.';
+
+  @override
+  String get attorneyAdminSpecialtyRequired => 'اختر تخصصًا واحدًا على الأقل.';
+
+  @override
+  String get attorneyAdminSaveFailed => 'تعذّر حفظ الملف. حاول مرة أخرى.';
+
+  @override
   String get matterTitle => 'القضايا';
 
   @override

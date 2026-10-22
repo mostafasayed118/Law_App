@@ -994,6 +994,111 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discoveryProfileBook => 'Book with this attorney';
 
   @override
+  String get discoveryDirectoryNote =>
+      'Directory profiles are maintained by the platform administrator. No credential verification is performed.';
+
+  @override
+  String get discoveryProfileSpecialties => 'Specialties';
+
+  @override
+  String get discoveryProfileLanguages => 'Languages';
+
+  @override
+  String discoveryProfileYears(int years) {
+    return '$years years of experience';
+  }
+
+  @override
+  String get attorneyStatusActive => 'Active';
+
+  @override
+  String get attorneyStatusInactive => 'Inactive';
+
+  @override
+  String get attorneyAdminTitle => 'Attorney directory';
+
+  @override
+  String get attorneyAdminEntryTitle => 'Attorney directory';
+
+  @override
+  String get attorneyAdminEntrySubtitle =>
+      'Review and manage directory profiles.';
+
+  @override
+  String get attorneyAdminCreate => 'Add attorney';
+
+  @override
+  String get attorneyAdminEditTitle => 'Edit attorney';
+
+  @override
+  String get attorneyAdminSave => 'Save';
+
+  @override
+  String get attorneyAdminDeactivate => 'Deactivate';
+
+  @override
+  String get attorneyAdminDeactivateTitle => 'Deactivate attorney?';
+
+  @override
+  String attorneyAdminDeactivateBody(String name) {
+    return 'Deactivate $name? The profile stays in the admin list but leaves the public directory.';
+  }
+
+  @override
+  String get attorneyAdminDeactivateFailed =>
+      'Unable to deactivate the profile. Please try again.';
+
+  @override
+  String get attorneyAdminEmpty => 'No attorney profiles yet.';
+
+  @override
+  String get attorneyAdminError => 'Unable to load attorney profiles.';
+
+  @override
+  String get attorneyAdminNote =>
+      'Profiles are maintained by the platform administrator. No credential verification is performed.';
+
+  @override
+  String get attorneyAdminNameLabel => 'Display name';
+
+  @override
+  String get attorneyAdminHeadlineLabel => 'Headline (optional)';
+
+  @override
+  String get attorneyAdminBioLabel => 'Bio (optional)';
+
+  @override
+  String get attorneyAdminSpecialtiesLabel => 'Specialties';
+
+  @override
+  String get attorneyAdminLanguagesLabel => 'Languages (optional)';
+
+  @override
+  String get attorneyAdminLanguagesHint => 'Comma separated, e.g. EN, AR';
+
+  @override
+  String get attorneyAdminCityLabel => 'City (optional)';
+
+  @override
+  String get attorneyAdminYearsLabel => 'Years of experience (optional)';
+
+  @override
+  String get attorneyAdminNameRequired => 'Enter a display name.';
+
+  @override
+  String get attorneyAdminNameTooShort => 'Enter at least 2 characters.';
+
+  @override
+  String get attorneyAdminYearsInvalid => 'Enter a whole number from 0 to 80.';
+
+  @override
+  String get attorneyAdminSpecialtyRequired => 'Select at least one specialty.';
+
+  @override
+  String get attorneyAdminSaveFailed =>
+      'Unable to save the profile. Please try again.';
+
+  @override
   String get matterTitle => 'Matters';
 
   @override

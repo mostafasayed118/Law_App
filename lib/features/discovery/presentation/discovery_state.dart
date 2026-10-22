@@ -4,27 +4,28 @@ import '../../../core/practice_area.dart';
 import '../../../core/state/view_state.dart';
 import '../domain/attorney.dart';
 
-/// Immutable state of the attorney-discovery search surface (Phase 6, 6.1).
+/// Immutable state of the attorney-discovery surfaces (design §2).
 ///
-/// - [attorneys] — the profile-list load lifecycle, using the shared
-///   [ViewState] vocabulary (loading / success / empty / error+retry).
-/// - [query] — the free-text search filter (client-side, D-A5).
-/// - [practiceArea] — the active practice-area filter chip, or null for "All".
-/// - [visibleAttorneys] — the client-side filtered projection the screen
-///   renders: the loaded list narrowed by [practiceArea] and [query]
-///   (case-insensitive match on name or the practice-area **token**). The
-///   token-level match is a deliberate D-A5 choice: area narrowing happens via
-///   the chips (typed enum), so the free-text query matches the English enum
-///   name (e.g. "corporate"), not localized labels. Empty until the list is
-///   loaded.
+/// - [attorneys] — the list load lifecycle, using the shared [ViewState]
+///   vocabulary (loading / success / empty / error+retry).
+/// - [profile] — the detail load lifecycle for `/discovery/:id`.
+/// - [query] — the free-text search query; sent to the gateway debounced and
+///   also projected locally so typing stays instant.
+/// - [practiceArea] — the active practice-area chip, or null for "All".
+/// - [visibleAttorneys] — the loaded page narrowed locally by [practiceArea]
+///   and [query]. The server already applies [query]; the local pass keeps
+///   the practice-area chips exact and preserves the pre-server-pass
+///   behavior for the fake and for the current page.
 class DiscoveryState extends Equatable {
   const DiscoveryState({
     this.attorneys = const ViewLoading<List<Attorney>>(),
+    this.profile = const ViewLoading<Attorney>(),
     this.query = '',
     this.practiceArea,
   });
 
   final ViewState<List<Attorney>> attorneys;
+  final ViewState<Attorney> profile;
   final String query;
   final PracticeArea? practiceArea;
 
@@ -39,11 +40,7 @@ class DiscoveryState extends Equatable {
     ViewUnauthorized() => const <Attorney>[],
   };
 
-  /// [visibleAttorneys] as a [ViewState], for the lazy list surface: its
-  /// builder consumes the state's data, so the filtered rows have to travel as
-  /// one. A query that matches nothing becomes an empty [ViewSuccess], which
-  /// the surface renders as the empty arm (the same copy the eager
-  /// `visibleAttorneys.isEmpty ? empty : …` branch produced).
+  /// [visibleAttorneys] as a [ViewState], for the lazy list surface.
   ViewState<List<Attorney>> get visibleAttorneysState => switch (attorneys) {
     ViewSuccess<List<Attorney>>() => ViewSuccess<List<Attorney>>(
       visibleAttorneys,
@@ -62,7 +59,15 @@ class DiscoveryState extends Equatable {
             return true;
           }
           return attorney.name.toLowerCase().contains(needle) ||
-              attorney.practiceArea.name.contains(needle);
+              (attorney.practiceArea?.name.contains(needle) ?? false) ||
+              (attorney.headline?.toLowerCase().contains(needle) ?? false) ||
+              (attorney.city?.toLowerCase().contains(needle) ?? false) ||
+              attorney.specialties.any(
+                (String value) => value.toLowerCase().contains(needle),
+              ) ||
+              attorney.languages.any(
+                (String value) => value.toLowerCase().contains(needle),
+              );
         })
         .toList(growable: false);
   }
@@ -73,11 +78,13 @@ class DiscoveryState extends Equatable {
 
   DiscoveryState copyWith({
     ViewState<List<Attorney>>? attorneys,
+    ViewState<Attorney>? profile,
     String? query,
     Object? practiceArea = _unset,
   }) {
     return DiscoveryState(
       attorneys: attorneys ?? this.attorneys,
+      profile: profile ?? this.profile,
       query: query ?? this.query,
       practiceArea: identical(practiceArea, _unset)
           ? this.practiceArea
@@ -86,5 +93,5 @@ class DiscoveryState extends Equatable {
   }
 
   @override
-  List<Object?> get props => <Object?>[attorneys, query, practiceArea];
+  List<Object?> get props => <Object?>[attorneys, profile, query, practiceArea];
 }

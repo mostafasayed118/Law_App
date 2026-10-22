@@ -29,6 +29,8 @@ import 'package:legalhub/data/billing/supabase_payment_gateway.dart';
 import 'package:legalhub/data/billing/url_launcher_checkout_launcher.dart';
 import 'package:legalhub/data/booking/supabase_booking_api.dart';
 import 'package:legalhub/data/booking/supabase_booking_gateway.dart';
+import 'package:legalhub/data/discovery/supabase_attorney_api_impl.dart';
+import 'package:legalhub/data/discovery/supabase_attorney_gateway.dart';
 import 'package:legalhub/data/documents/supabase_document_api.dart';
 import 'package:legalhub/data/documents/supabase_document_gateway.dart';
 import 'package:legalhub/data/files/file_selector_file_picker.dart';
@@ -65,7 +67,9 @@ import 'package:legalhub/features/billing/domain/payment_mode.dart';
 import 'package:legalhub/features/booking/data/fake_booking_gateway.dart';
 import 'package:legalhub/features/booking/domain/booking_gateway.dart';
 import 'package:legalhub/features/booking/domain/booking_prefill.dart';
+import 'package:legalhub/features/discovery/data/fake_attorney_admin_gateway.dart';
 import 'package:legalhub/features/discovery/data/fake_attorney_gateway.dart';
+import 'package:legalhub/features/discovery/domain/attorney_admin_gateway.dart';
 import 'package:legalhub/features/discovery/domain/attorney_gateway.dart';
 import 'package:legalhub/features/documents/data/fake_document_gateway.dart';
 import 'package:legalhub/features/documents/domain/document_gateway.dart';
@@ -601,6 +605,29 @@ void main() {
       // the dev fake is the registered seam; a real attorney backend is a
       // later approved data-layer slice.
       expect(serviceLocator<AttorneyGateway>(), isA<FakeAttorneyGateway>());
+      expect(
+        serviceLocator<AttorneyAdminGateway>(),
+        isA<FakeAttorneyAdminGateway>(),
+      );
+    });
+
+    test('flips both attorney gateways when env carries an anon key', () {
+      configureDependencies(
+        supabaseEnv: SupabaseEnv(
+          url: 'https://example.supabase.co',
+          anonKey: _anonJwt(),
+        ),
+        // The real bind() needs a running Supabase.instance; tests inject
+        // the seam instead (the flip's test seam, not production code).
+        supabaseAttorneyApiFactory: SupabaseAttorneyApiImpl.new,
+      );
+
+      // Design §2: a configured build never serves the synthetic directory.
+      expect(serviceLocator<AttorneyGateway>(), isA<SupabaseAttorneyGateway>());
+      expect(
+        serviceLocator<AttorneyAdminGateway>(),
+        isA<SupabaseAttorneyGateway>(),
+      );
     });
 
     test('wires the matter gateway to the fake dev implementation', () {

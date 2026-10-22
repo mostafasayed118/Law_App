@@ -1,8 +1,25 @@
 import 'package:equatable/equatable.dart';
 
 import '../../../core/observability/error_reporter.dart';
+import '../../../core/validation/uuid.dart';
 import 'booking_category.dart';
 import 'booking_slot.dart';
+
+/// Normalizes an attorney reference before it can reach the real booking RPC.
+///
+/// Returns the trimmed reference only when it is a UUID; anything else —
+/// including the synthetic `atty-*` discovery ids — becomes null, so the
+/// booking proceeds without an attorney reference instead of sending a
+/// non-UUID to `book_consultation` (design §2, principle 2). Applied by both
+/// the cubit (when it builds the request) and the Supabase gateway (before
+/// the RPC) so neither path can leak a synthetic id.
+String? normalizeAttorneyRef(String? raw) {
+  if (raw == null) {
+    return null;
+  }
+  final String trimmed = raw.trim();
+  return isValidUuid(trimmed) ? trimmed : null;
+}
 
 /// Transient, backend-free consultation booking request value object.
 ///

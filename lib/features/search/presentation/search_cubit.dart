@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/errors/app_error.dart';
 import '../../../core/errors/result.dart';
+import '../../../core/practice_area.dart';
 import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/demo_labels.dart';
@@ -281,13 +282,14 @@ class SearchCubit extends Cubit<SearchState> {
     String needle,
     AppLocalizations? l10n,
   ) {
+    final PracticeArea? area = attorney.practiceArea;
     if (_contains(attorney.name, needle) ||
-        _contains(attorney.practiceArea.name, needle)) {
+        (area != null && _contains(area.name, needle))) {
       return true;
     }
-    if (l10n == null) {
+    if (l10n == null || area == null) {
       return false;
     }
-    return _contains(practiceAreaLabel(l10n, attorney.practiceArea), needle);
+    return _contains(practiceAreaLabel(l10n, area), needle);
   }
 }

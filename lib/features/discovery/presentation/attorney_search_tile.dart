@@ -13,6 +13,7 @@ class _AttorneyTile extends StatelessWidget {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
+    final List<String> details = _details(l10n);
     return Material(
       color: scheme.surfaceContainerLowest,
       shape: RoundedRectangleBorder(
@@ -48,21 +49,43 @@ class _AttorneyTile extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${practiceAreaLabel(l10n, attorney.practiceArea)} · ${attorney.locale}',
-                      style: text.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
+                    for (final String line in details) ...<Widget>[
+                      const SizedBox(height: 2),
+                      Text(
+                        line,
+                        style: text.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right, color: scheme.outline),
+              DirectionalIcon(
+                icon: Icons.chevron_right,
+                mirroredIcon: Icons.chevron_left,
+                color: scheme.outline,
+              ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  /// The metadata line under the name. Synthetic rows keep the exact
+  /// "area · locale" line; a real row with neither falls back to its headline
+  /// or city (one line, so the row height stays stable).
+  List<String> _details(AppLocalizations l10n) {
+    final List<String> summary = <String>[
+      if (attorney.practiceArea != null)
+        practiceAreaLabel(l10n, attorney.practiceArea!),
+      if (attorney.locale.isNotEmpty) attorney.locale,
+    ];
+    if (summary.isNotEmpty) {
+      return <String>[summary.join(' · ')];
+    }
+    final String fallback = attorney.headline ?? attorney.city ?? '';
+    return fallback.isEmpty ? const <String>[] : <String>[fallback];
   }
 }

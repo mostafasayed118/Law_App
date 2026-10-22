@@ -80,7 +80,9 @@ class _SearchSurfaceState extends State<_SearchSurface> {
       ],
       empty: empty,
       errorCopy: l10n.discoveryError,
-      localOnlyNote: l10n.discoveryLocalOnlyNote,
+      localOnlyNote: backendIsLocalOnly
+          ? l10n.discoveryLocalOnlyNote
+          : l10n.discoveryDirectoryNote,
       listPadding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
     );
   }

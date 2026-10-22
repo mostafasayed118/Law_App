@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../core/practice_area.dart';
 import '../core/roles/user_role.dart';
+import '../features/admin/presentation/attorney_admin_screen.dart';
 import '../features/admin/presentation/platform_admin_screen.dart';
 import '../features/approvals/presentation/approvals_screen.dart';
 import '../features/auth/presentation/auth_cubit.dart';
@@ -65,6 +66,7 @@ class AppRoutes {
   static const String notifications = '/notifications';
   static const String notificationsFeed = '/notifications/feed';
   static const String platformAdmin = '/platform-admin';
+  static const String attorneysAdmin = '/platform-admin/attorneys';
   static const String book = '/book';
   static const String discovery = '/discovery';
   static const String discoveryProfile = '/discovery/:attorneyId';

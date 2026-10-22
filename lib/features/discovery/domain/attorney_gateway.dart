@@ -1,18 +1,20 @@
 import '../../../core/errors/result.dart';
 import 'attorney.dart';
 
-/// Attorney-discovery integration boundary (Phase 6, slice 6.1).
+/// Attorney-discovery integration boundary (design §2).
 ///
-/// Mirrors the credential-free discipline of [SignUpGateway]/[BookingGateway]:
-/// this slice deliberately has no real backend. A fake/in-memory implementation
-/// is registered for dev so the search surface can exercise the discovery
-/// lifecycle; no real attorney data crosses this boundary yet, and the real
-/// data contract is deferred to P2/P3 (owner decision D-A2).
-///
-/// Return convention matches the project's [Result] boundary (§D.4) — failures
-/// arrive as [Failure] with [AppError], never raw exceptions.
+/// The configured build binds the Supabase-backed implementation (the
+/// member-scoped directory read through the audited RPCs); env-less builds
+/// and all tests keep the credential-free fake. Failures arrive as
+/// [Failure] with an `AppError`, never raw exceptions (§D.4).
 abstract interface class AttorneyGateway {
-  /// The synthetic attorney list for the search surface. Deterministic and
-  /// availability-free (owner decisions D-A2/D-A4).
-  Future<Result<List<Attorney>>> fetchAttorneys();
+  /// Active directory profiles whose name, headline, city, or specialties
+  /// match [query] (case-insensitive substring; empty means no server-side
+  /// narrowing). The client still applies its practice-area projection and
+  /// free-text pass so a page of results keeps the same matching semantics.
+  Future<Result<List<Attorney>>> fetchAttorneys({String query = ''});
+
+  /// One profile by id. A missing (or, for a non-owner, inactive) row is a
+  /// `attorney_not_found` failure rather than an empty success.
+  Future<Result<Attorney>> fetchAttorney(String id);
 }

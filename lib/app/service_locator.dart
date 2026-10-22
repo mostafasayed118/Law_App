@@ -28,6 +28,9 @@ import '../data/billing/url_launcher_checkout_launcher.dart';
 import '../data/booking/supabase_booking_api.dart';
 import '../data/booking/supabase_booking_api_impl.dart';
 import '../data/booking/supabase_booking_gateway.dart';
+import '../data/discovery/supabase_attorney_api.dart';
+import '../data/discovery/supabase_attorney_api_impl.dart';
+import '../data/discovery/supabase_attorney_gateway.dart';
 import '../data/documents/supabase_document_api.dart';
 import '../data/documents/supabase_document_api_impl.dart';
 import '../data/documents/supabase_document_gateway.dart';
@@ -90,7 +93,9 @@ import '../features/booking/domain/booking_gateway.dart';
 import '../features/booking/domain/booking_prefill.dart';
 import '../features/compliance/data/fake_compliance_gateway.dart';
 import '../features/compliance/domain/compliance_gateway.dart';
+import '../features/discovery/data/fake_attorney_admin_gateway.dart';
 import '../features/discovery/data/fake_attorney_gateway.dart';
+import '../features/discovery/domain/attorney_admin_gateway.dart';
 import '../features/discovery/domain/attorney_gateway.dart';
 import '../features/documents/data/fake_document_gateway.dart';
 import '../features/documents/domain/document_gateway.dart';
@@ -160,6 +165,7 @@ void configureDependencies({
   SupabaseNotificationApi Function()? supabaseNotificationApiFactory,
   SupabaseTaskApi Function()? supabaseTaskApiFactory,
   SupabaseBookingApi Function()? supabaseBookingApiFactory,
+  SupabaseAttorneyApi Function()? supabaseAttorneyApiFactory,
   PaymentMode? paymentMode,
 }) {
   // Lazy singleton: stateless service, created on first resolution.
@@ -185,6 +191,10 @@ void configureDependencies({
   _registerBookingSeams(
     env,
     supabaseBookingApiFactory: supabaseBookingApiFactory,
+  );
+  _registerDiscoverySeams(
+    env,
+    supabaseAttorneyApiFactory: supabaseAttorneyApiFactory,
   );
   _registerMatterSeams(
     env,

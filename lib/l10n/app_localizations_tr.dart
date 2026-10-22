@@ -992,6 +992,113 @@ class AppLocalizationsTr extends AppLocalizations {
   String get discoveryProfileBook => 'Bu avukatla rezervasyon yap';
 
   @override
+  String get discoveryDirectoryNote =>
+      'Dizin profilleri platform yöneticisi tarafından yönetilir. Kimlik bilgisi doğrulaması yapılmaz.';
+
+  @override
+  String get discoveryProfileSpecialties => 'Uzmanlık alanları';
+
+  @override
+  String get discoveryProfileLanguages => 'Diller';
+
+  @override
+  String discoveryProfileYears(int years) {
+    return '$years yıl deneyim';
+  }
+
+  @override
+  String get attorneyStatusActive => 'Etkin';
+
+  @override
+  String get attorneyStatusInactive => 'Etkin değil';
+
+  @override
+  String get attorneyAdminTitle => 'Avukat dizini';
+
+  @override
+  String get attorneyAdminEntryTitle => 'Avukat dizini';
+
+  @override
+  String get attorneyAdminEntrySubtitle =>
+      'Dizin profillerini inceleyin ve yönetin.';
+
+  @override
+  String get attorneyAdminCreate => 'Avukat ekle';
+
+  @override
+  String get attorneyAdminEditTitle => 'Avukatı düzenle';
+
+  @override
+  String get attorneyAdminSave => 'Kaydet';
+
+  @override
+  String get attorneyAdminDeactivate => 'Devre dışı bırak';
+
+  @override
+  String get attorneyAdminDeactivateTitle => 'Avukat devre dışı bırakılsın mı?';
+
+  @override
+  String attorneyAdminDeactivateBody(String name) {
+    return '$name devre dışı bırakılsın mı? Profil yönetici listesinde kalır ancak genel dizinden çıkar.';
+  }
+
+  @override
+  String get attorneyAdminDeactivateFailed =>
+      'Profil devre dışı bırakılamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get attorneyAdminEmpty => 'Henüz avukat profili yok.';
+
+  @override
+  String get attorneyAdminError => 'Avukat profilleri yüklenemedi.';
+
+  @override
+  String get attorneyAdminNote =>
+      'Profiller platform yöneticisi tarafından yönetilir. Kimlik bilgisi doğrulaması yapılmaz.';
+
+  @override
+  String get attorneyAdminNameLabel => 'Görünen ad';
+
+  @override
+  String get attorneyAdminHeadlineLabel => 'Başlık (isteğe bağlı)';
+
+  @override
+  String get attorneyAdminBioLabel => 'Biyografi (isteğe bağlı)';
+
+  @override
+  String get attorneyAdminSpecialtiesLabel => 'Uzmanlık alanları';
+
+  @override
+  String get attorneyAdminLanguagesLabel => 'Diller (isteğe bağlı)';
+
+  @override
+  String get attorneyAdminLanguagesHint => 'Virgülle ayırın, ör. EN, AR';
+
+  @override
+  String get attorneyAdminCityLabel => 'Şehir (isteğe bağlı)';
+
+  @override
+  String get attorneyAdminYearsLabel => 'Deneyim yılı (isteğe bağlı)';
+
+  @override
+  String get attorneyAdminNameRequired => 'Görünen adı girin.';
+
+  @override
+  String get attorneyAdminNameTooShort => 'En az 2 karakter girin.';
+
+  @override
+  String get attorneyAdminYearsInvalid =>
+      '0 ile 80 arasında bir tam sayı girin.';
+
+  @override
+  String get attorneyAdminSpecialtyRequired =>
+      'En az bir uzmanlık alanı seçin.';
+
+  @override
+  String get attorneyAdminSaveFailed =>
+      'Profil kaydedilemedi. Lütfen tekrar deneyin.';
+
+  @override
   String get matterTitle => 'Davalar';
 
   @override

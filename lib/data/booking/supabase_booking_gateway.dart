@@ -67,7 +67,10 @@ class SupabaseBookingGateway implements BookingGateway {
         slotId: slot.id,
         category: _serverCategoryFor(request.category),
         topic: _trimmedOrNull(request.topic),
-        attorneyRef: _trimmedOrNull(request.attorneyId),
+        // Defense in depth (design §2 principle 2): even if a caller builds
+        // the request directly, a non-UUID attorney reference never reaches
+        // the RPC.
+        attorneyRef: normalizeAttorneyRef(request.attorneyId),
       );
       return Result<BookingConfirmation>.success(_confirmationFromRow(row));
     } on SupabaseBookingException catch (e) {

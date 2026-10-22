@@ -1588,6 +1588,27 @@ void main() {
         1,
       );
     });
+
+    testWidgets('the attorney directory route renders under platform admin', (
+      tester,
+    ) async {
+      // The admin gateway resolves the env-less fake (synthetic rows), so the
+      // route proves the screen wiring without a provider.
+      await resetServiceLocator();
+      configureDependencies();
+      addTearDown(() => resetServiceLocator());
+
+      await authCubit.startDemoSession();
+      await tester.pumpWidget(harness(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      router.go(AppRoutes.attorneysAdmin);
+      await tester.pumpAndSettle();
+
+      expect(topUri(router).path, AppRoutes.attorneysAdmin);
+      expect(find.text('Attorney directory'), findsOneWidget);
+      expect(find.text('Layla Mansour'), findsOneWidget);
+    });
   });
 
   group('notification-feed route (notification-feed slice D-N1)', () {

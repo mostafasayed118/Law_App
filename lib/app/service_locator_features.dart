@@ -60,15 +60,6 @@ void _registerBookingSeams(
     // GoRouter extra (D-B4).
     serviceLocator.registerLazySingleton<BookingPrefill>(BookingPrefill.new);
   }
-  if (!serviceLocator.isRegistered<AttorneyGateway>()) {
-    // Stateless service: lazy singleton. The discovery Cubit is feature-scoped
-    // and created per screen via BlocProvider, so it is NOT registered here.
-    // Fake-domain (D-A2): a real attorney backend is a later approved
-    // data-layer slice.
-    serviceLocator.registerLazySingleton<AttorneyGateway>(
-      FakeAttorneyGateway.new,
-    );
-  }
   if (!serviceLocator.isRegistered<ActiveOrgStore>()) {
     // Client-side active-org context (Phase 7 D-M7/D-08; P3.2 D-P32.2):
     // app-scoped, persisted on-device only via OrgSelectionStore (prefs
@@ -118,13 +109,35 @@ void _registerMatterSeams(
   );
 }
 
+void _registerDiscoverySeams(
+  SupabaseEnv env, {
+  SupabaseAttorneyApi Function()? supabaseAttorneyApiFactory,
+}) {
+  // Stateless services: lazy singletons. The discovery Cubit is feature-scoped
+  // and created per screen via BlocProvider. The flip swaps the synthetic fake
+  // for the Supabase-backed directory when the build is configured (Batch 3.3
+  // env pattern); env-less runs and ALL tests keep the fake. A configured
+  // build never serves synthetic rows (design §2: no fake data in configured
+  // builds).
+  _registerSeam<AttorneyGateway>(
+    env,
+    supabase: () => SupabaseAttorneyGateway(
+      (supabaseAttorneyApiFactory ?? SupabaseAttorneyApiImpl.bind)(),
+    ),
+    fake: FakeAttorneyGateway.new,
+  );
+  // The admin write seam: the same Supabase gateway class, with the
+  // owner-only audited RPCs; the env-less fake keeps an in-memory list.
+  _registerSeam<AttorneyAdminGateway>(
+    env,
+    supabase: () => SupabaseAttorneyGateway(
+      (supabaseAttorneyApiFactory ?? SupabaseAttorneyApiImpl.bind)(),
+    ),
+    fake: FakeAttorneyAdminGateway.new,
+  );
+}
+
 /// Registers the payments slice seams.
-///
-/// The mode is a build-time value (default `disabled`). The gateway is the
-/// fake unless the build is in `live` mode AND the Supabase env is fully
-/// configured; a live build with no env keeps the fake (`isLive == false`) so
-/// the UI's demo wording stays honest. The checkout launcher is an OS seam and
-/// registers unconditionally (tests may pre-register their own).
 void _registerPaymentSeams(
   SupabaseEnv env, {
   required PaymentMode mode,

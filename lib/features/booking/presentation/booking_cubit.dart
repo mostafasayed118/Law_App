@@ -263,7 +263,9 @@ class BookingCubit extends Cubit<BookingState> {
         category: category,
         topic: draft.topic?.trim(),
         slot: slot,
-        attorneyId: draft.attorneyId,
+        // Synthetic `atty-*` prefills are dropped here, before the request
+        // reaches any gateway (design §2 principle 2); a real UUID survives.
+        attorneyId: normalizeAttorneyRef(draft.attorneyId),
       ),
     );
     if (isClosed) {

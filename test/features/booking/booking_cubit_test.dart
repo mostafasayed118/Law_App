@@ -869,6 +869,30 @@ void main() {
     test(
       'confirm carries the prefilled attorneyId into the request (AC-4)',
       () async {
+        const String attorneyId = '11111111-1111-4111-8111-111111111111';
+        final BookingCubit cubit = BookingCubit(
+          gateway,
+          attorneyId: attorneyId,
+          attorneyName: 'Layla Mansour',
+        );
+        addTearDown(cubit.close);
+
+        cubit.selectCategory(BookingCategory.general);
+        await cubit.continueFromCategory();
+        cubit.selectSlot(_slot);
+        cubit.continueFromDateTime();
+        await cubit.confirm();
+
+        expect(cubit.state.step, BookingStep.success);
+        expect(gateway.received?.attorneyId, attorneyId);
+        // The display name is presentation-only and never leaves the draft.
+        expect(gateway.received?.category, BookingCategory.general);
+      },
+    );
+
+    test(
+      'a synthetic atty-* id is dropped from the confirm request (design §2)',
+      () async {
         final BookingCubit cubit = BookingCubit(
           gateway,
           attorneyId: 'atty-1',
@@ -882,10 +906,9 @@ void main() {
         cubit.continueFromDateTime();
         await cubit.confirm();
 
+        // The booking still proceeds; only the non-UUID reference is dropped.
         expect(cubit.state.step, BookingStep.success);
-        expect(gateway.received?.attorneyId, 'atty-1');
-        // The display name is presentation-only and never leaves the draft.
-        expect(gateway.received?.category, BookingCategory.general);
+        expect(gateway.received?.attorneyId, isNull);
       },
     );
   });

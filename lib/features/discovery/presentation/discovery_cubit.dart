@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/errors/app_error.dart';
@@ -8,50 +10,56 @@ import '../domain/attorney.dart';
 import '../domain/attorney_gateway.dart';
 import 'discovery_state.dart';
 
-/// Owns the attorney-discovery search surface (Phase 6, slice 6.1).
+/// Owns the attorney-discovery search and profile surfaces (design §2).
 ///
-/// [load] fetches the synthetic list on screen open (the screen wires it after
-/// first frame, matching the roster pattern); [updateQuery] and
-/// [setPracticeArea] narrow the list client-side (owner decision D-A5) — the
-/// filtering is a pure state projection ([DiscoveryState.visibleAttorneys]), so
-/// no server search RPC exists. Widgets render [DiscoveryState] and dispatch
-/// intents; they never call the gateway directly.
+/// [load] reads the directory (server-side [query], debounced on typing);
+/// [updateQuery] and [setPracticeArea] narrow the current page locally; and
+/// [loadProfile] reads one profile by id. Widgets render [DiscoveryState] and
+/// dispatch intents; they never call the gateway directly.
 class DiscoveryCubit extends Cubit<DiscoveryState> {
-  /// [initialPracticeArea] seeds the practice-area filter chip for a deep
-  /// link from the home dashboard's practice-area cards (`/discovery?area=…`):
-  /// the tapped card's area is active before the first frame, so the list
-  /// opens pre-narrowed. Defaults to null ("All") for the plain `/discovery`
-  /// entries — the shell tile and the home entry card.
+  /// [initialPracticeArea] seeds the practice-area chip for a deep link from
+  /// the home dashboard's practice-area cards (`/discovery?area=…`).
   DiscoveryCubit(this._gateway, {PracticeArea? initialPracticeArea})
     : super(DiscoveryState(practiceArea: initialPracticeArea));
 
+  /// Typing pause before a server query runs. The local projection already
+  /// filters the current page, so the debounce only controls re-fetching.
+  static const Duration searchDebounce = Duration(milliseconds: 300);
+
   final AttorneyGateway _gateway;
 
-  /// In-flight guard. Unlike [OrgCubit.loadRoster]'s state-based guard, the
-  /// initial state here IS loading, so a naive `if (loading) return` would
-  /// abort the very first load — the flag distinguishes "loading in flight"
-  /// from "not loaded yet".
+  /// In-flight guards. The initial list state IS loading, so a naive
+  /// `if (loading) return` would abort the first load — these flags
+  /// distinguish "request in flight" from "not loaded yet".
   bool _loading = false;
+  bool _profileLoading = false;
 
-  /// Loads the synthetic attorney list. The initial state is already loading,
-  /// so the first open never re-emits a redundant loading frame; a retry after
-  /// an error re-enters loading. Duplicate calls while a load is in flight are
-  /// ignored (same discipline as [OrgCubit.loadRoster]/[BookingCubit.confirm]).
-  /// An empty list maps to [ViewEmpty]; a failure to [ViewError] with the
-  /// draft filters untouched.
+  /// The query the current list was fetched with; used to decide whether a
+  /// settled load needs a follow-up fetch for a newer query.
+  String _loadedQuery = '';
+
+  Timer? _debounce;
+
+  /// Loads the directory for the current query. A retry after an error
+  /// re-enters loading. Duplicate calls while in flight are ignored; if the
+  /// query moved on meanwhile, the follow-up fetch is scheduled.
   Future<void> load() async {
     if (isClosed || _loading) {
       return;
     }
     _loading = true;
+    final String query = state.query.trim();
     if (state.attorneys is! ViewLoading<List<Attorney>>) {
       emit(state.copyWith(attorneys: const ViewLoading<List<Attorney>>()));
     }
-    final Result<List<Attorney>> result = await _gateway.fetchAttorneys();
+    final Result<List<Attorney>> result = await _gateway.fetchAttorneys(
+      query: query,
+    );
     _loading = false;
     if (isClosed) {
       return;
     }
+    _loadedQuery = query;
     switch (result) {
       case Success<List<Attorney>>(value: final List<Attorney> attorneys):
         emit(
@@ -66,15 +74,49 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
           state.copyWith(attorneys: viewStateForFailure<List<Attorney>>(error)),
         );
     }
+    if (state.query.trim() != _loadedQuery) {
+      _scheduleSearch();
+    }
   }
 
-  /// Stores the free-text search query verbatim (no trim here — trimming
-  /// happens in the state's filter projection so typing is never fought).
-  void updateQuery(String query) {
+  /// Loads one profile by id for the detail surface. A `not_found` failure
+  /// maps to [ViewEmpty] (the localized not-found copy); denials/outages keep
+  /// their typed state.
+  Future<void> loadProfile(String id) async {
+    if (isClosed || _profileLoading) {
+      return;
+    }
+    _profileLoading = true;
+    if (state.profile is! ViewLoading<Attorney>) {
+      emit(state.copyWith(profile: const ViewLoading<Attorney>()));
+    }
+    final Result<Attorney> result = await _gateway.fetchAttorney(id);
+    _profileLoading = false;
     if (isClosed) {
       return;
     }
+    switch (result) {
+      case Success<Attorney>(value: final Attorney attorney):
+        emit(state.copyWith(profile: ViewSuccess<Attorney>(attorney)));
+      case Failure<Attorney>(error: final AppError error):
+        emit(
+          state.copyWith(
+            profile: error.code == 'attorney_not_found'
+                ? const ViewEmpty<Attorney>()
+                : viewStateForFailure<Attorney>(error),
+          ),
+        );
+    }
+  }
+
+  /// Stores the free-text search query verbatim (trimming happens at the
+  /// gateway boundary) and schedules the debounced server query.
+  void updateQuery(String query) {
+    if (isClosed || query == state.query) {
+      return;
+    }
     emit(state.copyWith(query: query));
+    _scheduleSearch();
   }
 
   /// Activates a practice-area filter chip, or null for "All".
@@ -83,5 +125,21 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       return;
     }
     emit(state.copyWith(practiceArea: area));
+  }
+
+  void _scheduleSearch() {
+    _debounce?.cancel();
+    _debounce = Timer(searchDebounce, () {
+      if (isClosed || state.query.trim() == _loadedQuery) {
+        return;
+      }
+      load();
+    });
+  }
+
+  @override
+  Future<void> close() {
+    _debounce?.cancel();
+    return super.close();
   }
 }

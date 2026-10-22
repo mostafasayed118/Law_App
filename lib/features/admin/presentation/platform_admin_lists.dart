@@ -37,10 +37,10 @@ class _AdminLists extends StatelessWidget {
     // One lazily-built list with a flat index space (the M-20 pattern): rows
     // are constructed on demand instead of mapping every org and member into
     // children up front, so row culling applies to the sections the admin RPCs
-    // feed.
+    // feed. The attorney-directory entry occupies the first two slots.
     final int orgSlots = organizations.isEmpty ? 1 : organizations.length;
     final int memberSlots = members.isEmpty ? 1 : members.length;
-    final int membersGap = 2 + orgSlots; // 0 orgs header, 1 gap
+    final int membersGap = 4 + orgSlots; // entry, gap, orgs header, gap
     final int membersHeader = membersGap + 1;
     final int memberFirst = membersHeader + 2; // gap, members header
     final int auditGap = memberFirst + memberSlots;
@@ -55,15 +55,32 @@ class _AdminLists extends StatelessWidget {
       itemCount: auditGap + 4, // gap, audit header, gap, audit section
       itemBuilder: (BuildContext context, int index) {
         if (index == 0) {
+          return ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.badge_outlined),
+            title: Text(l10n.attorneyAdminEntryTitle),
+            subtitle: Text(l10n.attorneyAdminEntrySubtitle),
+            trailing: DirectionalIcon(
+              icon: Icons.chevron_right,
+              mirroredIcon: Icons.chevron_left,
+              color: Theme.of(context).colorScheme.outline,
+            ),
+            onTap: () => context.push(AppRoutes.attorneysAdmin),
+          );
+        }
+        if (index == 1) {
+          return const SizedBox(height: LegalHubTheme.spaceLg);
+        }
+        if (index == 2) {
           return Text(
             l10n.platformAdminOrganizations,
             style: Theme.of(context).textTheme.headlineSmall,
           );
         }
-        if (index == 1) {
+        if (index == 3) {
           return const SizedBox(height: LegalHubTheme.spaceSm);
         }
-        final int orgIndex = index - 2;
+        final int orgIndex = index - 4;
         if (orgIndex < orgSlots) {
           return organizations.isEmpty
               ? Text(l10n.stateEmpty)

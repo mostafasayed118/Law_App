@@ -108,6 +108,21 @@ void main() {
       verify: (_) => expect(gateway.fetchCalls, 2),
     );
 
+    test(
+      'load forwards the current query to the gateway (design §2)',
+      () async {
+        final DiscoveryCubit cubit = DiscoveryCubit(gateway);
+        addTearDown(cubit.close);
+
+        cubit.updateQuery('  layla  ');
+        await cubit.load();
+
+        // The gateway receives the trimmed query; the debounce only controls
+        // when the fetch fires, never its payload.
+        expect(gateway.lastQuery, 'layla');
+      },
+    );
+
     test('updateQuery filters by name, case-insensitive (AC-2)', () async {
       final DiscoveryCubit cubit = DiscoveryCubit(gateway);
       addTearDown(cubit.close);
@@ -248,13 +263,24 @@ class _StubAttorneyGateway implements AttorneyGateway {
   final List<Result<List<Attorney>>> _queue;
   final Completer<Result<List<Attorney>>>? completer;
   int fetchCalls = 0;
+  String lastQuery = '';
 
   @override
-  Future<Result<List<Attorney>>> fetchAttorneys() {
+  Future<Result<List<Attorney>>> fetchAttorneys({String query = ''}) {
     fetchCalls += 1;
+    lastQuery = query;
     if (completer != null) {
       return completer!.future;
     }
     return Future<Result<List<Attorney>>>.value(_queue.removeAt(0));
+  }
+
+  @override
+  Future<Result<Attorney>> fetchAttorney(String id) {
+    return Future<Result<Attorney>>.value(
+      const Result<Attorney>.failure(
+        AppError(code: 'attorney_not_found', userMessage: 'Not found'),
+      ),
+    );
   }
 }

@@ -351,7 +351,12 @@ class _SearchSurfaceState extends State<_SearchSurface> {
       ),
       title: attorney.name,
       subtitles: <String>[
-        '${practiceAreaLabel(l10n, attorney.practiceArea)} · ${attorney.locale}',
+        if (attorney.practiceArea != null || attorney.locale.isNotEmpty)
+          <String>[
+            if (attorney.practiceArea != null)
+              practiceAreaLabel(l10n, attorney.practiceArea!),
+            if (attorney.locale.isNotEmpty) attorney.locale,
+          ].join(' · '),
       ],
       onTap: () => context.push(AppRoutes.attorneyProfile(attorney.id)),
     );

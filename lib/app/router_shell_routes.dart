@@ -224,5 +224,13 @@ List<RouteBase> _shellRoutes(
       builder: (BuildContext context, GoRouterState state) =>
           const PlatformAdminScreen(),
     ),
+    GoRoute(
+      // The directory admin rides the authenticated shell and the same
+      // platform-admin surface: the owner-only RPCs gate server-side, so a
+      // non-owner sees the typed unauthorized arm (never empty success).
+      path: AppRoutes.attorneysAdmin,
+      builder: (BuildContext context, GoRouterState state) =>
+          const AttorneyAdminScreen(),
+    ),
   ];
 }

@@ -619,8 +619,17 @@ class _StubAttorneyGateway implements AttorneyGateway {
   int calls = 0;
 
   @override
-  Future<Result<List<Attorney>>> fetchAttorneys() {
+  Future<Result<List<Attorney>>> fetchAttorneys({String query = ''}) {
     calls += 1;
     return Future<Result<List<Attorney>>>.value(results.removeAt(0));
+  }
+
+  @override
+  Future<Result<Attorney>> fetchAttorney(String id) {
+    return Future<Result<Attorney>>.value(
+      const Result<Attorney>.failure(
+        AppError(code: 'attorney_not_found', userMessage: 'Not found'),
+      ),
+    );
   }
 }

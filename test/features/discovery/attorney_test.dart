@@ -47,6 +47,17 @@ void main() {
       expect(other, isNot(first));
     });
 
+    test('hasRealId distinguishes a UUID from a synthetic atty-* id', () {
+      const Attorney synthetic = Attorney(id: 'atty-1', name: 'Demo');
+      const Attorney real = Attorney(
+        id: '11111111-1111-4111-8111-111111111111',
+        name: 'Real',
+      );
+
+      expect(synthetic.hasRealId, isFalse);
+      expect(real.hasRealId, isTrue);
+    });
+
     test('carries no contact or credential fields (D-A4 shape)', () {
       const Attorney attorney = Attorney(
         id: 'atty-1',

@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/practice_area.dart';
 import 'package:legalhub/features/discovery/data/fake_attorney_gateway.dart';
 import 'package:legalhub/features/discovery/domain/attorney.dart';
@@ -53,6 +54,62 @@ void main() {
           reason: 'no synthetic profile for $area',
         );
       }
+    });
+
+    test('synthetic ids are deliberately non-UUIDs (design §2)', () async {
+      final FakeAttorneyGateway gateway = FakeAttorneyGateway();
+
+      final List<Attorney> attorneys =
+          (await gateway.fetchAttorneys()).valueOrNull!;
+
+      for (final Attorney attorney in attorneys) {
+        expect(attorney.id, startsWith('atty-'));
+        expect(attorney.hasRealId, isFalse);
+      }
+    });
+  });
+
+  group('FakeAttorneyGateway query + detail', () {
+    test('fetchAttorneys narrows by name, city, and specialty', () async {
+      final FakeAttorneyGateway gateway = FakeAttorneyGateway();
+
+      expect(
+        (await gateway.fetchAttorneys(
+          query: 'layla',
+        )).valueOrNull!.map((Attorney a) => a.id),
+        <String>['atty-1'],
+      );
+      expect(
+        (await gateway.fetchAttorneys(
+          query: 'alexandria',
+        )).valueOrNull!.map((Attorney a) => a.id),
+        <String>['atty-2'],
+      );
+      expect(
+        (await gateway.fetchAttorneys(
+          query: 'family',
+        )).valueOrNull!.map((Attorney a) => a.id),
+        <String>['atty-4'],
+      );
+    });
+
+    test('fetchAttorney returns the matching row by id', () async {
+      final FakeAttorneyGateway gateway = FakeAttorneyGateway();
+
+      final Attorney attorney = (await gateway.fetchAttorney(
+        'atty-3',
+      )).valueOrNull!;
+
+      expect(attorney.name, 'Sara Khalil');
+    });
+
+    test('fetchAttorney maps an unknown id to attorney_not_found', () async {
+      final FakeAttorneyGateway gateway = FakeAttorneyGateway();
+
+      final Result<Attorney> result = await gateway.fetchAttorney('no-such');
+
+      expect(result.isSuccess, isFalse);
+      expect(result.errorOrNull?.code, 'attorney_not_found');
     });
   });
 }

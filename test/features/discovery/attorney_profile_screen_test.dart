@@ -50,6 +50,18 @@ void main() {
       },
     );
 
+    testWidgets('renders the directory fields (headline, city, years)', (
+      tester,
+    ) async {
+      await pumpProfile(tester, 'atty-1');
+
+      expect(find.text('Corporate and governance counsel'), findsOneWidget);
+      expect(find.text('Cairo'), findsOneWidget);
+      expect(find.text('12 years of experience'), findsOneWidget);
+      expect(find.text('Specialties'), findsOneWidget);
+      expect(find.text('Languages'), findsOneWidget);
+    });
+
     testWidgets('carries the local-only demo note (R1)', (tester) async {
       await pumpProfile(tester, 'atty-1');
 

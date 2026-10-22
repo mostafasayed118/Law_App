@@ -120,13 +120,14 @@ void main() {
       'confirm maps category, trims topic, and sends the attorney ref',
       () async {
         api.rowResult = <String, dynamic>{'reference_id': 'LH-ABCDEF12'};
+        const String attorneyId = '11111111-1111-4111-8111-111111111111';
 
         final Result<BookingConfirmation> result = await gateway.confirm(
           BookingRequest(
             category: BookingCategory.followUp,
             topic: '  merger question  ',
             slot: _slot,
-            attorneyId: '  atty-1  ',
+            attorneyId: '  $attorneyId  ',
           ),
         );
 
@@ -137,10 +138,25 @@ void main() {
           'slotId': 'slot-1',
           'category': 'follow_up',
           'topic': 'merger question',
-          'attorneyRef': 'atty-1',
+          'attorneyRef': attorneyId,
         });
       },
     );
+
+    test('confirm drops a synthetic attorney ref before the RPC', () async {
+      api.rowResult = <String, dynamic>{'reference_id': 'LH-ABCDEF12'};
+
+      final Result<BookingConfirmation> result = await gateway.confirm(
+        BookingRequest(
+          category: BookingCategory.general,
+          slot: _slot,
+          attorneyId: 'atty-1',
+        ),
+      );
+
+      expect(result.isSuccess, isTrue);
+      expect(api.bookCalls.single['attorneyRef'], isNull);
+    });
 
     test('confirm sends nulls for a blank topic and absent attorney', () async {
       api.rowResult = <String, dynamic>{'reference_id': 'LH-ABCDEF12'};
