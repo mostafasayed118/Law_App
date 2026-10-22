@@ -130,8 +130,18 @@ List<RouteBase> _shellRoutes(
     ),
     GoRoute(
       path: AppRoutes.alerts,
-      builder: (BuildContext context, GoRouterState state) =>
-          const ComplianceAlertsScreen(),
+      builder: (BuildContext context, GoRouterState state) {
+        // UX-only projection from the active membership: create/resolve
+        // authority is the partner or compliance-officer role;
+        // acknowledgement is offered to every member. The RPCs re-assert
+        // every gate server-side.
+        final UserRole role =
+            authCubit.state.session?.primaryRole ?? UserRole.client;
+        return ComplianceAlertsScreen(
+          canManage:
+              role == UserRole.partner || role == UserRole.complianceOfficer,
+        );
+      },
     ),
     GoRoute(
       path: AppRoutes.tasks,

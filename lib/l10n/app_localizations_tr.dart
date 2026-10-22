@@ -1541,13 +1541,146 @@ class AppLocalizationsTr extends AppLocalizations {
       'Sentetik uyarılara göz atın — geliştirme demosu.';
 
   @override
-  String get alertSeverityInfo => 'Bilgi';
+  String get alertsEntrySubtitleConfigured =>
+      'Kuruluş uyum uyarılarını inceleyin.';
 
   @override
-  String get alertSeverityAttention => 'Dikkat';
+  String get alertsStoredNote =>
+      'Uyarılar bu kuruluş için kaydedilir. Otomatik hukuki doğrulama yapılmaz.';
+
+  @override
+  String get alertsEmptyFiltered => 'Bu filtreyle eşleşen uyarı yok.';
+
+  @override
+  String get alertsFilterAll => 'Tümü';
+
+  @override
+  String get alertsCreateFab => 'Yeni uyarı';
+
+  @override
+  String get alertStatusOpen => 'Açık';
+
+  @override
+  String get alertStatusAcknowledged => 'Görüldü';
+
+  @override
+  String get alertStatusResolved => 'Çözüldü';
+
+  @override
+  String get alertKindDeadline => 'Son tarih';
+
+  @override
+  String get alertKindConflict => 'Çıkar çatışması kontrolü';
+
+  @override
+  String get alertKindRetention => 'Saklama süresi';
+
+  @override
+  String get alertKindFiling => 'Dosyalama';
+
+  @override
+  String get alertKindOther => 'Diğer';
+
+  @override
+  String get alertSeverityLow => 'Düşük';
+
+  @override
+  String get alertSeverityMedium => 'Orta';
+
+  @override
+  String get alertSeverityHigh => 'Yüksek';
 
   @override
   String get alertSeverityCritical => 'Kritik';
+
+  @override
+  String get alertCreateTitle => 'Yeni uyum uyarısı';
+
+  @override
+  String get alertCreateTitleLabel => 'Başlık';
+
+  @override
+  String get alertCreateTitleHint => 'örn. Dosyalama son tarihi incelemesi';
+
+  @override
+  String get alertCreateTitleTooShort => 'Başlık en az 2 karakter olmalıdır.';
+
+  @override
+  String get alertCreateTitleTooLong =>
+      'Başlık 160 karakter veya daha kısa olmalıdır.';
+
+  @override
+  String get alertCreateKindLabel => 'Tür';
+
+  @override
+  String get alertCreateSeverityLabel => 'Önem';
+
+  @override
+  String get alertCreateDescriptionLabel => 'Açıklama (isteğe bağlı)';
+
+  @override
+  String get alertCreateDescriptionTooLong =>
+      'Açıklama 4000 karakter veya daha kısa olmalıdır.';
+
+  @override
+  String get alertCreateSubmit => 'Uyarı oluştur';
+
+  @override
+  String get alertCreateSuccess => 'Uyarı oluşturuldu.';
+
+  @override
+  String get alertCreateNoOrg => 'Uyarı oluşturmadan önce bir kuruluş seçin.';
+
+  @override
+  String get alertDetailKind => 'Tür';
+
+  @override
+  String get alertDetailSeverity => 'Önem';
+
+  @override
+  String get alertDetailCreated => 'Oluşturuldu';
+
+  @override
+  String get alertDetailDue => 'Son tarih';
+
+  @override
+  String get alertDetailDescription => 'Açıklama';
+
+  @override
+  String get alertDetailAcknowledged => 'Görüldü';
+
+  @override
+  String get alertDetailResolved => 'Çözüldü';
+
+  @override
+  String get alertAcknowledgeAction => 'Uyarıyı görüldü olarak işaretle';
+
+  @override
+  String get alertResolveAction => 'Uyarıyı çöz';
+
+  @override
+  String get alertResolveNoteLabel => 'Not (isteğe bağlı)';
+
+  @override
+  String get alertAcknowledgedSuccess => 'Uyarı görüldü olarak işaretlendi.';
+
+  @override
+  String get alertResolvedSuccess => 'Uyarı çözüldü.';
+
+  @override
+  String get alertErrorDenied => 'Bunu yapma izniniz yok.';
+
+  @override
+  String get alertErrorUnavailable =>
+      'Hizmet geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get alertErrorInvalid =>
+      'Uyarı artık güncellenemiyor. Yenileyip tekrar deneyin.';
+
+  @override
+  String get alertErrorFailed =>
+      'Bir şeyler ters gitti. Lütfen tekrar deneyin.';
 
   @override
   String get tasksTitle => 'Görev panosu';

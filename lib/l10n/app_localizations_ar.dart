@@ -1519,13 +1519,142 @@ class AppLocalizationsAr extends AppLocalizations {
   String get alertsEntrySubtitle => 'استعرض التنبيهات التجريبية — عرض تطويري.';
 
   @override
-  String get alertSeverityInfo => 'معلومات';
+  String get alertsEntrySubtitleConfigured =>
+      'راجع تنبيهات الامتثال الخاصة بالمؤسسة.';
 
   @override
-  String get alertSeverityAttention => 'انتباه';
+  String get alertsStoredNote =>
+      'تُسجَّل التنبيهات لهذه المؤسسة. لا يتم إجراء أي تحقق قانوني آلي.';
+
+  @override
+  String get alertsEmptyFiltered => 'لا توجد تنبيهات مطابقة لهذا التصفية.';
+
+  @override
+  String get alertsFilterAll => 'الكل';
+
+  @override
+  String get alertsCreateFab => 'تنبيه جديد';
+
+  @override
+  String get alertStatusOpen => 'مفتوح';
+
+  @override
+  String get alertStatusAcknowledged => 'تم الاطلاع';
+
+  @override
+  String get alertStatusResolved => 'تم الحل';
+
+  @override
+  String get alertKindDeadline => 'موعد نهائي';
+
+  @override
+  String get alertKindConflict => 'فحص تعارض';
+
+  @override
+  String get alertKindRetention => 'مدة الاحتفاظ';
+
+  @override
+  String get alertKindFiling => 'إيداع';
+
+  @override
+  String get alertKindOther => 'أخرى';
+
+  @override
+  String get alertSeverityLow => 'منخفض';
+
+  @override
+  String get alertSeverityMedium => 'متوسط';
+
+  @override
+  String get alertSeverityHigh => 'مرتفع';
 
   @override
   String get alertSeverityCritical => 'حرِج';
+
+  @override
+  String get alertCreateTitle => 'تنبيه امتثال جديد';
+
+  @override
+  String get alertCreateTitleLabel => 'العنوان';
+
+  @override
+  String get alertCreateTitleHint => 'مثال: مراجعة موعد إيداع';
+
+  @override
+  String get alertCreateTitleTooShort => 'يجب أن يكون العنوان حرفين على الأقل.';
+
+  @override
+  String get alertCreateTitleTooLong => 'يجب ألا يتجاوز العنوان 160 حرفًا.';
+
+  @override
+  String get alertCreateKindLabel => 'النوع';
+
+  @override
+  String get alertCreateSeverityLabel => 'الخطورة';
+
+  @override
+  String get alertCreateDescriptionLabel => 'الوصف (اختياري)';
+
+  @override
+  String get alertCreateDescriptionTooLong => 'يجب ألا يتجاوز الوصف 4000 حرف.';
+
+  @override
+  String get alertCreateSubmit => 'إنشاء التنبيه';
+
+  @override
+  String get alertCreateSuccess => 'تم إنشاء التنبيه.';
+
+  @override
+  String get alertCreateNoOrg => 'اختر مؤسسة قبل إنشاء تنبيه.';
+
+  @override
+  String get alertDetailKind => 'النوع';
+
+  @override
+  String get alertDetailSeverity => 'الخطورة';
+
+  @override
+  String get alertDetailCreated => 'أُنشئ';
+
+  @override
+  String get alertDetailDue => 'الاستحقاق';
+
+  @override
+  String get alertDetailDescription => 'الوصف';
+
+  @override
+  String get alertDetailAcknowledged => 'تم الاطلاع';
+
+  @override
+  String get alertDetailResolved => 'تم الحل';
+
+  @override
+  String get alertAcknowledgeAction => 'الاطلاع على التنبيه';
+
+  @override
+  String get alertResolveAction => 'حل التنبيه';
+
+  @override
+  String get alertResolveNoteLabel => 'ملاحظة (اختياري)';
+
+  @override
+  String get alertAcknowledgedSuccess => 'تم الاطلاع على التنبيه.';
+
+  @override
+  String get alertResolvedSuccess => 'تم حل التنبيه.';
+
+  @override
+  String get alertErrorDenied => 'ليس لديك صلاحية للقيام بذلك.';
+
+  @override
+  String get alertErrorUnavailable => 'الخدمة غير متاحة مؤقتًا. حاول مرة أخرى.';
+
+  @override
+  String get alertErrorInvalid =>
+      'لم يعد من الممكن تحديث التنبيه. حدّث القائمة وحاول مرة أخرى.';
+
+  @override
+  String get alertErrorFailed => 'حدث خطأ ما. حاول مرة أخرى.';
 
   @override
   String get tasksTitle => 'لوحة المهام';

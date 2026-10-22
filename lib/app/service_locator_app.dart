@@ -22,12 +22,9 @@ void _registerDemoGateways() {
   // task board LEFT this group in the task-writes slice (Gate 3 spec
   // 2026-09-27): TaskBoardGateway now flips in _registerContentSeams like
   // the other applied-table seams. The approvals queue LEFT it in the
-  // approvals slice (design §3) and flips in _registerApprovalSeams.
-  if (!serviceLocator.isRegistered<ComplianceAlertsGateway>()) {
-    serviceLocator.registerLazySingleton<ComplianceAlertsGateway>(
-      FakeComplianceGateway.new,
-    );
-  }
+  // approvals slice (design §3) and flips in _registerApprovalSeams; the
+  // compliance alerts LEFT it in the compliance slice (design §4) and flips
+  // in _registerComplianceSeams.
   // AI research slice (plan 2026-09-02): the synthetic engine composes the
   // two SHIPPED read seams (ratified scope decision D-2 — shipped gateways
   // only, no AI-only corpus), so it automatically follows the env flip of

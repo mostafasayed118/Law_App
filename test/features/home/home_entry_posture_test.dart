@@ -15,9 +15,9 @@ import 'package:legalhub/l10n/app_localizations.dart';
 
 /// W3 / device finding F1: in a configured (real-backend) build the
 /// dashboard must not advertise the server-backed features as demo data.
-/// The fake-only entries (video, discovery, compliance alerts, AI research)
-/// keep their demo wording in EVERY build — their gateways have no Supabase
-/// implementation, so the demo wording is the truthful one.
+/// The fake-only entries (video, discovery, AI research) keep their demo
+/// wording in EVERY build — their gateways have no Supabase implementation,
+/// so the demo wording is the truthful one.
 void main() {
   late AuthCubit authCubit;
 
@@ -71,7 +71,7 @@ void main() {
         'messages': true,
         'invoices': true,
         'notifications': true,
-        'alerts': false,
+        'alerts': true,
         'tasks': true,
         'approvals': true,
         'research': false,

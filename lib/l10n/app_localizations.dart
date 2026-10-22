@@ -2902,23 +2902,275 @@ abstract class AppLocalizations {
   /// **'Browse demo alerts — development demo.'**
   String get alertsEntrySubtitle;
 
-  /// No description provided for @alertSeverityInfo.
+  /// No description provided for @alertsEntrySubtitleConfigured.
   ///
   /// In en, this message translates to:
-  /// **'Info'**
-  String get alertSeverityInfo;
+  /// **'Review organization compliance alerts.'**
+  String get alertsEntrySubtitleConfigured;
 
-  /// No description provided for @alertSeverityAttention.
+  /// No description provided for @alertsStoredNote.
   ///
   /// In en, this message translates to:
-  /// **'Attention'**
-  String get alertSeverityAttention;
+  /// **'Alerts are recorded for this organization. No automated legal verification is performed.'**
+  String get alertsStoredNote;
+
+  /// No description provided for @alertsEmptyFiltered.
+  ///
+  /// In en, this message translates to:
+  /// **'No alerts match this filter.'**
+  String get alertsEmptyFiltered;
+
+  /// No description provided for @alertsFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get alertsFilterAll;
+
+  /// No description provided for @alertsCreateFab.
+  ///
+  /// In en, this message translates to:
+  /// **'New alert'**
+  String get alertsCreateFab;
+
+  /// No description provided for @alertStatusOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get alertStatusOpen;
+
+  /// No description provided for @alertStatusAcknowledged.
+  ///
+  /// In en, this message translates to:
+  /// **'Acknowledged'**
+  String get alertStatusAcknowledged;
+
+  /// No description provided for @alertStatusResolved.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolved'**
+  String get alertStatusResolved;
+
+  /// No description provided for @alertKindDeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Deadline'**
+  String get alertKindDeadline;
+
+  /// No description provided for @alertKindConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'Conflict check'**
+  String get alertKindConflict;
+
+  /// No description provided for @alertKindRetention.
+  ///
+  /// In en, this message translates to:
+  /// **'Retention'**
+  String get alertKindRetention;
+
+  /// No description provided for @alertKindFiling.
+  ///
+  /// In en, this message translates to:
+  /// **'Filing'**
+  String get alertKindFiling;
+
+  /// No description provided for @alertKindOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get alertKindOther;
+
+  /// No description provided for @alertSeverityLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get alertSeverityLow;
+
+  /// No description provided for @alertSeverityMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get alertSeverityMedium;
+
+  /// No description provided for @alertSeverityHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get alertSeverityHigh;
 
   /// No description provided for @alertSeverityCritical.
   ///
   /// In en, this message translates to:
   /// **'Critical'**
   String get alertSeverityCritical;
+
+  /// No description provided for @alertCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New compliance alert'**
+  String get alertCreateTitle;
+
+  /// No description provided for @alertCreateTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get alertCreateTitleLabel;
+
+  /// No description provided for @alertCreateTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Filing deadline review'**
+  String get alertCreateTitleHint;
+
+  /// No description provided for @alertCreateTitleTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Title must be at least 2 characters.'**
+  String get alertCreateTitleTooShort;
+
+  /// No description provided for @alertCreateTitleTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Title must be 160 characters or fewer.'**
+  String get alertCreateTitleTooLong;
+
+  /// No description provided for @alertCreateKindLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Kind'**
+  String get alertCreateKindLabel;
+
+  /// No description provided for @alertCreateSeverityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Severity'**
+  String get alertCreateSeverityLabel;
+
+  /// No description provided for @alertCreateDescriptionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Description (optional)'**
+  String get alertCreateDescriptionLabel;
+
+  /// No description provided for @alertCreateDescriptionTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Description must be 4000 characters or fewer.'**
+  String get alertCreateDescriptionTooLong;
+
+  /// No description provided for @alertCreateSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Create alert'**
+  String get alertCreateSubmit;
+
+  /// No description provided for @alertCreateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert created.'**
+  String get alertCreateSuccess;
+
+  /// No description provided for @alertCreateNoOrg.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an organization before creating an alert.'**
+  String get alertCreateNoOrg;
+
+  /// No description provided for @alertDetailKind.
+  ///
+  /// In en, this message translates to:
+  /// **'Kind'**
+  String get alertDetailKind;
+
+  /// No description provided for @alertDetailSeverity.
+  ///
+  /// In en, this message translates to:
+  /// **'Severity'**
+  String get alertDetailSeverity;
+
+  /// No description provided for @alertDetailCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get alertDetailCreated;
+
+  /// No description provided for @alertDetailDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Due'**
+  String get alertDetailDue;
+
+  /// No description provided for @alertDetailDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get alertDetailDescription;
+
+  /// No description provided for @alertDetailAcknowledged.
+  ///
+  /// In en, this message translates to:
+  /// **'Acknowledged'**
+  String get alertDetailAcknowledged;
+
+  /// No description provided for @alertDetailResolved.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolved'**
+  String get alertDetailResolved;
+
+  /// No description provided for @alertAcknowledgeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Acknowledge alert'**
+  String get alertAcknowledgeAction;
+
+  /// No description provided for @alertResolveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolve alert'**
+  String get alertResolveAction;
+
+  /// No description provided for @alertResolveNoteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (optional)'**
+  String get alertResolveNoteLabel;
+
+  /// No description provided for @alertAcknowledgedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert acknowledged.'**
+  String get alertAcknowledgedSuccess;
+
+  /// No description provided for @alertResolvedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert resolved.'**
+  String get alertResolvedSuccess;
+
+  /// No description provided for @alertErrorDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to do that.'**
+  String get alertErrorDenied;
+
+  /// No description provided for @alertErrorUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The service is temporarily unavailable. Please try again.'**
+  String get alertErrorUnavailable;
+
+  /// No description provided for @alertErrorInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'The alert can no longer be updated. Refresh and try again.'**
+  String get alertErrorInvalid;
+
+  /// No description provided for @alertErrorFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get alertErrorFailed;
 
   /// No description provided for @tasksTitle.
   ///

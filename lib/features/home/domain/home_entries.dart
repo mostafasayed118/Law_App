@@ -206,6 +206,7 @@ List<HomeEntry> homeEntriesFor(RoleCapability capabilities) {
       icon: HomeEntryIcon.alerts,
       title: _alertsTitle,
       subtitle: _alertsSubtitle,
+      configuredSubtitle: _alertsConfiguredSubtitle,
       route: HomeEntryRoute.alerts,
       isVisible: _canViewAlerts,
     ),
@@ -282,6 +283,8 @@ String _notificationsConfiguredSubtitle(AppLocalizations l10n) =>
     l10n.notificationsFeedEntrySubtitleConfigured;
 String _alertsTitle(AppLocalizations l10n) => l10n.alertsEntryTitle;
 String _alertsSubtitle(AppLocalizations l10n) => l10n.alertsEntrySubtitle;
+String _alertsConfiguredSubtitle(AppLocalizations l10n) =>
+    l10n.alertsEntrySubtitleConfigured;
 String _tasksTitle(AppLocalizations l10n) => l10n.tasksEntryTitle;
 String _tasksSubtitle(AppLocalizations l10n) => l10n.tasksEntrySubtitle;
 String _tasksConfiguredSubtitle(AppLocalizations l10n) =>

@@ -1539,13 +1539,146 @@ class AppLocalizationsEn extends AppLocalizations {
   String get alertsEntrySubtitle => 'Browse demo alerts — development demo.';
 
   @override
-  String get alertSeverityInfo => 'Info';
+  String get alertsEntrySubtitleConfigured =>
+      'Review organization compliance alerts.';
 
   @override
-  String get alertSeverityAttention => 'Attention';
+  String get alertsStoredNote =>
+      'Alerts are recorded for this organization. No automated legal verification is performed.';
+
+  @override
+  String get alertsEmptyFiltered => 'No alerts match this filter.';
+
+  @override
+  String get alertsFilterAll => 'All';
+
+  @override
+  String get alertsCreateFab => 'New alert';
+
+  @override
+  String get alertStatusOpen => 'Open';
+
+  @override
+  String get alertStatusAcknowledged => 'Acknowledged';
+
+  @override
+  String get alertStatusResolved => 'Resolved';
+
+  @override
+  String get alertKindDeadline => 'Deadline';
+
+  @override
+  String get alertKindConflict => 'Conflict check';
+
+  @override
+  String get alertKindRetention => 'Retention';
+
+  @override
+  String get alertKindFiling => 'Filing';
+
+  @override
+  String get alertKindOther => 'Other';
+
+  @override
+  String get alertSeverityLow => 'Low';
+
+  @override
+  String get alertSeverityMedium => 'Medium';
+
+  @override
+  String get alertSeverityHigh => 'High';
 
   @override
   String get alertSeverityCritical => 'Critical';
+
+  @override
+  String get alertCreateTitle => 'New compliance alert';
+
+  @override
+  String get alertCreateTitleLabel => 'Title';
+
+  @override
+  String get alertCreateTitleHint => 'e.g. Filing deadline review';
+
+  @override
+  String get alertCreateTitleTooShort => 'Title must be at least 2 characters.';
+
+  @override
+  String get alertCreateTitleTooLong =>
+      'Title must be 160 characters or fewer.';
+
+  @override
+  String get alertCreateKindLabel => 'Kind';
+
+  @override
+  String get alertCreateSeverityLabel => 'Severity';
+
+  @override
+  String get alertCreateDescriptionLabel => 'Description (optional)';
+
+  @override
+  String get alertCreateDescriptionTooLong =>
+      'Description must be 4000 characters or fewer.';
+
+  @override
+  String get alertCreateSubmit => 'Create alert';
+
+  @override
+  String get alertCreateSuccess => 'Alert created.';
+
+  @override
+  String get alertCreateNoOrg =>
+      'Select an organization before creating an alert.';
+
+  @override
+  String get alertDetailKind => 'Kind';
+
+  @override
+  String get alertDetailSeverity => 'Severity';
+
+  @override
+  String get alertDetailCreated => 'Created';
+
+  @override
+  String get alertDetailDue => 'Due';
+
+  @override
+  String get alertDetailDescription => 'Description';
+
+  @override
+  String get alertDetailAcknowledged => 'Acknowledged';
+
+  @override
+  String get alertDetailResolved => 'Resolved';
+
+  @override
+  String get alertAcknowledgeAction => 'Acknowledge alert';
+
+  @override
+  String get alertResolveAction => 'Resolve alert';
+
+  @override
+  String get alertResolveNoteLabel => 'Note (optional)';
+
+  @override
+  String get alertAcknowledgedSuccess => 'Alert acknowledged.';
+
+  @override
+  String get alertResolvedSuccess => 'Alert resolved.';
+
+  @override
+  String get alertErrorDenied => 'You do not have permission to do that.';
+
+  @override
+  String get alertErrorUnavailable =>
+      'The service is temporarily unavailable. Please try again.';
+
+  @override
+  String get alertErrorInvalid =>
+      'The alert can no longer be updated. Refresh and try again.';
+
+  @override
+  String get alertErrorFailed => 'Something went wrong. Please try again.';
 
   @override
   String get tasksTitle => 'Task board';
