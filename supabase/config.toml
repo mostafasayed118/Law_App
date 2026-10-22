@@ -9,3 +9,6 @@ verify_jwt = false
 
 [functions.paymob-reconcile]
 verify_jwt = false
+
+[functions.research-analyze]
+verify_jwt = true

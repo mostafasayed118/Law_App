@@ -7,10 +7,10 @@
 # EPHEMERAL rehearsal project built from the committed supabase/ files:
 #
 #   1. STRUCTURAL + GRANT PINS — table existence, RLS enabled on all
-#      twenty-two, the narrow SELECT grants, the function EXECUTE surface
+#      twenty-four, the narrow SELECT grants, the function EXECUTE surface
 #      (the R-4 policy-helper grants present; the internal helpers +
 #      write_audit denied), zero policies on audit_events/platform_config
-#      (D-P0C4), the twenty-policy total (12 minus the D-SM3
+#      (D-P0C4), the twenty-two-policy total (12 minus the D-SM3
 #      messages_insert_assigned drop — the write path moved to the audited
 #      send_message RPC; plus the notifications_select_org + tasks_select_
 #      assigned + the two booking policies), the storage-surface pins
@@ -144,6 +144,12 @@
 #      acknowledge positive; resolved / double-acknowledge denies; client
 #      resolve deny; officer + partner resolve positives; direct-write and
 #      structural pins; the whole battery rolls back).
+#      25_research_rls.sql (the research runs + findings battery —
+#      research_runs + research_findings read policies + the four org-scoped
+#      RPCs: partner/attorney start positives with §8 audit rows; client /
+#      suspended / owner / anon / cross-org matter denies; list scoping;
+#      service-role-only completion with findings + honest failed states;
+#      direct-write and structural pins; the whole battery rolls back).
 #      Every matrix row has ≥1 positive + ≥1 negative check (contract §9).
 #
 # The harness NEVER runs against the live dev project — only against a
@@ -233,6 +239,7 @@ BATTERY_FILES=(
   "22_attorney_directory_rls.sql"
   "23_approval_rls.sql"
   "24_compliance_alert_rls.sql"
+  "25_research_rls.sql"
 )
 
 usage() {
@@ -291,7 +298,8 @@ static_check() {
       "$TESTS_DIR/15_notification_producer_rls.sql" "$TESTS_DIR/17_task_rls.sql" \
       "$TESTS_DIR/18_booking_rls.sql" "$TESTS_DIR/19_file_write_rls.sql" \
       "$TESTS_DIR/21_task_assignable_members_rls.sql" "$TESTS_DIR/22_attorney_directory_rls.sql" \
-      "$TESTS_DIR/23_approval_rls.sql" "$TESTS_DIR/24_compliance_alert_rls.sql" | sort -u)
+      "$TESTS_DIR/23_approval_rls.sql" "$TESTS_DIR/24_compliance_alert_rls.sql" \
+      "$TESTS_DIR/25_research_rls.sql" | sort -u)
   for ref in $uuids_from; do
     if grep -q "$ref" "$TESTS_DIR/00_fixtures.sql"; then
       ok "fixture UUID $ref resolves in 00_fixtures.sql"
@@ -302,7 +310,7 @@ static_check() {
 
   note "static check: every battery check block carries the FAIL marker"
   local file blocks
-  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql 11_invoice_rls.sql 12_owner_assignment.sql 13_matter_write_rls.sql 14_notification_rls.sql 15_notification_producer_rls.sql 16_notification_read_flag.sql 17_task_rls.sql 18_booking_rls.sql 19_file_write_rls.sql 20_payment_rls.sql 21_task_assignable_members_rls.sql 22_attorney_directory_rls.sql 23_approval_rls.sql 24_compliance_alert_rls.sql; do
+  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql 11_invoice_rls.sql 12_owner_assignment.sql 13_matter_write_rls.sql 14_notification_rls.sql 15_notification_producer_rls.sql 16_notification_read_flag.sql 17_task_rls.sql 18_booking_rls.sql 19_file_write_rls.sql 20_payment_rls.sql 21_task_assignable_members_rls.sql 22_attorney_directory_rls.sql 23_approval_rls.sql 24_compliance_alert_rls.sql 25_research_rls.sql; do
     blocks=$(grep -c 'POLICY-BATTERY FAIL' "$TESTS_DIR/$f")
     if [ "$blocks" -ge 10 ]; then
       ok "$f: $blocks named check blocks"
@@ -365,13 +373,14 @@ apply_slice() {
   psql_apply "$SUPABASE_DIR/migrations/22_attorney_directory.sql" "apply migrations/22_attorney_directory.sql"
   psql_apply "$SUPABASE_DIR/migrations/23_approvals.sql" "apply migrations/23_approvals.sql"
   psql_apply "$SUPABASE_DIR/migrations/24_compliance_alerts.sql" "apply migrations/24_compliance_alerts.sql"
+  psql_apply "$SUPABASE_DIR/migrations/25_research.sql" "apply migrations/25_research.sql"
   # 03_platform_config_seed.sql is deliberately NOT applied: its owner token
   # is an apply-time substitution placeholder for the dev project; the
   # battery's fixtures seed the rehearsal project's own owner row (D-P0C3
   # proves the bound; the seed itself is a trusted migration, not a client
   # reachable path).
   note "apply: 03_platform_config_seed.sql skipped by design (apply-time token; fixtures seed the rehearsal owner)"
-  # The structural pins (22 tables/RLS, 20 policies + the storage-surface
+  # The structural pins (24 tables/RLS, 22 policies + the storage-surface
   # pins + the publication pin) and 00_fixtures' matters + documents +
   # message_threads + files + storage.objects + messages +
   # billing_invoices + tasks + consultations resets require every applied
@@ -421,10 +430,10 @@ expect_tf() { # $1 label, $2 actual ('t'/'f')
 
 structural_pins() {
   note "--- 1a. Tables + RLS ---"
-  expect_eq "twenty-two public tables present" \
-    "$(run_sql "select count(*) from pg_tables where schemaname='public' and tablename in ('profiles','organizations','memberships','invitations','audit_events','platform_config','matters','documents','message_threads','files','messages','billing_invoices','notifications','tasks','consultation_slots','consultations','payments','attorney_profiles','approval_requests','approval_events','compliance_alerts','compliance_alert_events');")" "22"
-  expect_eq "RLS enabled on all twenty-two" \
-    "$(run_sql "select count(*) from pg_tables where schemaname='public' and tablename in ('profiles','organizations','memberships','invitations','audit_events','platform_config','matters','documents','message_threads','files','messages','billing_invoices','notifications','tasks','consultation_slots','consultations','payments','attorney_profiles','approval_requests','approval_events','compliance_alerts','compliance_alert_events') and rowsecurity;")" "22"
+  expect_eq "twenty-four public tables present" \
+    "$(run_sql "select count(*) from pg_tables where schemaname='public' and tablename in ('profiles','organizations','memberships','invitations','audit_events','platform_config','matters','documents','message_threads','files','messages','billing_invoices','notifications','tasks','consultation_slots','consultations','payments','attorney_profiles','approval_requests','approval_events','compliance_alerts','compliance_alert_events','research_runs','research_findings');")" "24"
+  expect_eq "RLS enabled on all twenty-four" \
+    "$(run_sql "select count(*) from pg_tables where schemaname='public' and tablename in ('profiles','organizations','memberships','invitations','audit_events','platform_config','matters','documents','message_threads','files','messages','billing_invoices','notifications','tasks','consultation_slots','consultations','payments','attorney_profiles','approval_requests','approval_events','compliance_alerts','compliance_alert_events','research_runs','research_findings') and rowsecurity;")" "24"
 
   note "--- 1b. Narrow SELECT grants (01_org_schema.sql) ---"
   expect_tf "authenticated SELECT on profiles" \
@@ -505,6 +514,14 @@ structural_pins() {
     "$(run_sql "select has_table_privilege('authenticated','public.compliance_alert_events','SELECT');")"
   expect_eq "anon SELECT on compliance_alert_events ABSENT (default-deny)" \
     "$(run_sql "select has_table_privilege('anon','public.compliance_alert_events','SELECT');")" "f"
+  expect_tf "authenticated SELECT on research_runs (25_research.sql)" \
+    "$(run_sql "select has_table_privilege('authenticated','public.research_runs','SELECT');")"
+  expect_eq "anon SELECT on research_runs ABSENT (default-deny)" \
+    "$(run_sql "select has_table_privilege('anon','public.research_runs','SELECT');")" "f"
+  expect_tf "authenticated SELECT on research_findings (25_research.sql)" \
+    "$(run_sql "select has_table_privilege('authenticated','public.research_findings','SELECT');")"
+  expect_eq "anon SELECT on research_findings ABSENT (default-deny)" \
+    "$(run_sql "select has_table_privilege('anon','public.research_findings','SELECT');")" "f"
 
   note "--- 1c. Function EXECUTE surface (02_rls_functions.sql R-3/R-4) ---"
   expect_tf "policy helper is_active_member granted (R-4)" \
@@ -571,6 +588,9 @@ structural_pins() {
     "acknowledge_compliance_alert(uuid)"
     "resolve_compliance_alert(uuid, text)"
     "list_compliance_alerts(uuid, text, text)"
+    "start_research_run(uuid, uuid, text)"
+    "list_research_runs(uuid)"
+    "list_research_findings(uuid)"
   )
   for sig in "${rpc_list[@]}"; do
     expect_tf "authenticated EXECUTE on public.$sig" \
@@ -604,6 +624,14 @@ structural_pins() {
     "$(run_sql "select has_function_privilege('authenticated','public.apply_paymob_transaction(text, text, text, bigint, text, text)','EXECUTE');")" "f"
   expect_eq "authenticated EXECUTE on record_payment_callback_rejected ABSENT (service role only)" \
     "$(run_sql "select has_function_privilege('authenticated','public.record_payment_callback_rejected(text)','EXECUTE');")" "f"
+  expect_eq "authenticated EXECUTE on complete_research_run ABSENT (service role only)" \
+    "$(run_sql "select has_function_privilege('authenticated','public.complete_research_run(uuid, text, text, text, jsonb)','EXECUTE');")" "f"
+  expect_eq "anon EXECUTE on start_research_run ABSENT (research writes grant authenticated only)" \
+    "$(run_sql "select has_function_privilege('anon','public.start_research_run(uuid, uuid, text)','EXECUTE');")" "f"
+  expect_eq "anon EXECUTE on complete_research_run ABSENT (service role only)" \
+    "$(run_sql "select has_function_privilege('anon','public.complete_research_run(uuid, text, text, text, jsonb)','EXECUTE');")" "f"
+  expect_tf "service_role EXECUTE on complete_research_run (machine completion path)" \
+    "$(run_sql "select has_function_privilege('service_role','public.complete_research_run(uuid, text, text, text, jsonb)','EXECUTE');")"
   expect_eq "authenticated EXECUTE on list_stale_pending_payments ABSENT (service role only)" \
     "$(run_sql "select has_function_privilege('authenticated','public.list_stale_pending_payments(interval, integer)','EXECUTE');")" "f"
 
@@ -612,8 +640,8 @@ structural_pins() {
     "$(run_sql "select count(*) from pg_policies where schemaname='public' and tablename='audit_events';")" "0"
   expect_eq "zero policies on platform_config" \
     "$(run_sql "select count(*) from pg_policies where schemaname='public' and tablename='platform_config';")" "0"
-  expect_eq "exactly twenty policies across the client tables (12 minus the D-SM3 messages_insert_assigned drop, plus notifications_select_org, tasks_select_assigned, consultation_slots_select_available, consultations_select_own, attorney_profiles_select_active, approval_requests_select_org, approval_events_select_org, compliance_alerts_select_org and compliance_alert_events_select_org)" \
-    "$(run_sql "select count(*) from pg_policies where schemaname='public';")" "20"
+  expect_eq "exactly twenty-two policies across the client tables (12 minus the D-SM3 messages_insert_assigned drop, plus notifications_select_org, tasks_select_assigned, consultation_slots_select_available, consultations_select_own, attorney_profiles_select_active, approval_requests_select_org, approval_events_select_org, compliance_alerts_select_org, compliance_alert_events_select_org, research_runs_select_org and research_findings_select_org)" \
+    "$(run_sql "select count(*) from pg_policies where schemaname='public';")" "22"
 
   note "--- 1f. Forward pin re-scoped (2026-08-08): matters, documents, message_threads, files + messages are the FIRST FIVE §14 un-deferrals ---"
   # D-P0C1(b) originally pinned 'no matter/document/message tables exist'. The
@@ -683,7 +711,10 @@ structural_pins() {
   # each) and re-scopes the pins to 20 tables/RLS and 18 policies. The
   # compliance slice (24_compliance_alerts.sql) adds the RPC-only
   # compliance_alerts + compliance_alert_events workflow (one read policy
-  # each) and re-scopes the pins to 22 tables/RLS and 20 policies.
+  # each) and re-scopes the pins to 22 tables/RLS and 20 policies. The
+  # research slice (25_research.sql) adds the RPC-only research_runs +
+  # research_findings workflow (one read policy each) and re-scopes the pins
+  # to 24 tables/RLS and 22 policies.
   expect_eq "notifications present (new-surface feed)" \
     "$(run_sql "select count(*) from information_schema.tables where table_schema='public' and table_name = 'notifications';")" "1"
   expect_eq "tasks present (task-writes slice: org+matter-scoped, RPC-only writes)" \
@@ -740,7 +771,7 @@ run_battery() {
   expect_eq "exactly one platform_config row after fixtures" \
     "$(run_sql "select count(*) from public.platform_config;")" "1"
 
-  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql 11_invoice_rls.sql 12_owner_assignment.sql 13_matter_write_rls.sql 14_notification_rls.sql 15_notification_producer_rls.sql 16_notification_read_flag.sql 17_task_rls.sql 18_booking_rls.sql 19_file_write_rls.sql 20_payment_rls.sql 21_task_assignable_members_rls.sql 22_attorney_directory_rls.sql 23_approval_rls.sql 24_compliance_alert_rls.sql; do
+  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql 11_invoice_rls.sql 12_owner_assignment.sql 13_matter_write_rls.sql 14_notification_rls.sql 15_notification_producer_rls.sql 16_notification_read_flag.sql 17_task_rls.sql 18_booking_rls.sql 19_file_write_rls.sql 20_payment_rls.sql 21_task_assignable_members_rls.sql 22_attorney_directory_rls.sql 23_approval_rls.sql 24_compliance_alert_rls.sql 25_research_rls.sql; do
     note "--- 2c. Battery file: $f ---"
     out=$(psql "$SUPABASE_TEST_DB_URL" -X -q -v ON_ERROR_STOP=1 -f "$TESTS_DIR/$f" 2>&1)
     rc=$?

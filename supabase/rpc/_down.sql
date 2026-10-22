@@ -62,6 +62,10 @@ drop function if exists public.create_compliance_alert(uuid, uuid, text, text, t
 drop function if exists public.acknowledge_compliance_alert(uuid);
 drop function if exists public.resolve_compliance_alert(uuid, text);
 drop function if exists public.list_compliance_alerts(uuid, text, text);
+drop function if exists public.start_research_run(uuid, uuid, text);
+drop function if exists public.complete_research_run(uuid, text, text, text, jsonb);
+drop function if exists public.list_research_runs(uuid);
+drop function if exists public.list_research_findings(uuid);
 
 -- The revokes above run first so the drops below are the final privilege
 -- reset: functions are gone and no execute grant survives in any role.
