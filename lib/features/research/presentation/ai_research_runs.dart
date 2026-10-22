@@ -56,9 +56,7 @@ class _RunsHistory extends StatelessWidget {
               when data.isEmpty =>
             Text(
               l10n.aiResearchRunsEmpty,
-              style: text.bodySmall?.copyWith(
-                color: scheme.onSurfaceVariant,
-              ),
+              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
             ),
           ViewSuccess<List<ResearchRun>>(data: final List<ResearchRun> data) =>
             Column(
@@ -125,10 +123,7 @@ class _ResearchRunRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: LegalHubTheme.spaceXs),
-            Text(
-              label,
-              style: text.labelSmall?.copyWith(color: color),
-            ),
+            Text(label, style: text.labelSmall?.copyWith(color: color)),
           ],
         ),
       ),

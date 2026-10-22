@@ -61,15 +61,13 @@ class SupabaseResearchApiImpl implements SupabaseResearchApi {
     required String question,
   }) async {
     try {
-      final Object? data = await _functionCaller(
-        'research-analyze',
-        <String, dynamic>{
-          'organization_id': organizationId,
-          'matter_id': matterId,
-          'document_ids': documentIds,
-          'question': question,
-        },
-      );
+      final Object? data =
+          await _functionCaller('research-analyze', <String, dynamic>{
+            'organization_id': organizationId,
+            'matter_id': matterId,
+            'document_ids': documentIds,
+            'question': question,
+          });
       if (data is! Map) {
         throw const SupabaseResearchException(
           kind: SupabaseResearchFailureKind.invalidResponse,

@@ -55,10 +55,5 @@ class AiResearchState extends Equatable {
   static const Object _unset = Object();
 
   @override
-  List<Object?> get props => <Object?>[
-    findings,
-    runs,
-    lastQuery,
-    lastError,
-  ];
+  List<Object?> get props => <Object?>[findings, runs, lastQuery, lastError];
 }

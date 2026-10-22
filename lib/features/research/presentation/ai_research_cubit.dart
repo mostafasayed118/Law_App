@@ -53,7 +53,9 @@ class AiResearchCubit extends Cubit<AiResearchState> {
           ),
         );
       case Failure<List<ResearchRun>>(error: final AppError error):
-        emit(state.copyWith(runs: viewStateForFailure<List<ResearchRun>>(error)));
+        emit(
+          state.copyWith(runs: viewStateForFailure<List<ResearchRun>>(error)),
+        );
     }
   }
 
@@ -94,9 +96,7 @@ class AiResearchCubit extends Cubit<AiResearchState> {
       return;
     }
     switch (result) {
-      case Success<ResearchOutcome>(
-        value: final ResearchOutcome outcome,
-      ):
+      case Success<ResearchOutcome>(value: final ResearchOutcome outcome):
         emit(
           state.copyWith(
             findings: outcome.findings.isEmpty

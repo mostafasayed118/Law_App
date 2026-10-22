@@ -108,9 +108,7 @@ class _FindingCard extends StatelessWidget {
               const SizedBox(height: LegalHubTheme.spaceSm),
               Text(
                 copy.excerpt,
-                style: text.bodySmall?.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
               ),
             ],
             const SizedBox(height: LegalHubTheme.spaceMd),
@@ -127,9 +125,7 @@ class _FindingCard extends StatelessWidget {
             if (finding.sources.isEmpty)
               Text(
                 l10n.aiResearchNoSourceCited,
-                style: text.bodySmall?.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
               )
             else
               for (final AiSource source in finding.sources)

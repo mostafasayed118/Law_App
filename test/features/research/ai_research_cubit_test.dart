@@ -316,9 +316,7 @@ void main() {
           ),
         );
         when(() => gateway.fetchRuns()).thenAnswer(
-          (_) async => const Result<List<ResearchRun>>.success(
-            <ResearchRun>[],
-          ),
+          (_) async => const Result<List<ResearchRun>>.success(<ResearchRun>[]),
         );
         return AiResearchCubit(gateway);
       },

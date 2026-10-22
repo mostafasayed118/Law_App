@@ -391,10 +391,7 @@ void main() {
         expect(find.text('Generate findings'), findsOneWidget);
         expect(find.text('Documents (optional)'), findsOneWidget);
         expect(find.byType(FilterChip), findsNWidgets(5));
-        expect(
-          find.byType(DropdownButtonFormField<String?>),
-          findsOneWidget,
-        );
+        expect(find.byType(DropdownButtonFormField<String?>), findsOneWidget);
         expect(
           find.text('Ask a question to search the demo research corpus.'),
           findsOneWidget,

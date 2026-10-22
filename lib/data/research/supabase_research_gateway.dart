@@ -32,10 +32,7 @@ class SupabaseResearchGateway implements AiGateway {
   @override
   Future<Result<List<AiFinding>>> research(String query) async {
     final Result<ResearchOutcome> result = await analyze(
-      ResearchRequest(
-        organizationId: organizationId() ?? '',
-        question: query,
-      ),
+      ResearchRequest(organizationId: organizationId() ?? '', question: query),
     );
     return switch (result) {
       Success<ResearchOutcome>(value: final ResearchOutcome outcome) =>
@@ -141,7 +138,9 @@ class SupabaseResearchGateway implements AiGateway {
     for (int index = 0; index < raw.length; index++) {
       final Object? row = raw[index];
       if (row is! Map) {
-        throw const FormatException('Research response has a malformed finding');
+        throw const FormatException(
+          'Research response has a malformed finding',
+        );
       }
       final Map<String, dynamic> findingRow;
       try {

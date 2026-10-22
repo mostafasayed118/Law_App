@@ -88,10 +88,7 @@ void main() {
       expect(outcome.status, ResearchRunStatus.completed);
       expect(outcome.model, 'deepseek-ai/DeepSeek-V4.1-Flash-1017');
       expect(outcome.findings, hasLength(2));
-      expect(
-        outcome.findings.first.sources.single.kind,
-        AiSourceKind.document,
-      );
+      expect(outcome.findings.first.sources.single.kind, AiSourceKind.document);
       expect(outcome.findings.first.sources.single.sourceId, 'doc-1');
       expect(outcome.findings.last.sources.single.kind, AiSourceKind.none);
       expect(outcome.findings.last.excerpt, isEmpty);
@@ -115,7 +112,12 @@ void main() {
             ('unauthorized', 401, 'unauthorized', AppErrorKind.denied),
             ('forbidden', 403, 'forbidden', AppErrorKind.denied),
             ('invalid_request', 400, 'invalid_request', AppErrorKind.unknown),
-            ('context_too_large', 422, 'context_too_large', AppErrorKind.unknown),
+            (
+              'context_too_large',
+              422,
+              'context_too_large',
+              AppErrorKind.unknown,
+            ),
             (
               'provider_not_configured',
               409,
@@ -130,17 +132,13 @@ void main() {
             ),
             ('invalid_response', 500, 'invalid_response', AppErrorKind.unknown),
           ];
-      for (final (
-            String wire,
-            int status,
-            String expected,
-            AppErrorKind kind,
-          )
+      for (final (String wire, int status, String expected, AppErrorKind kind)
           in cases) {
         when(() => functionCaller('research-analyze', any())).thenThrow(
-          FunctionException(status: status, details: <String, dynamic>{
-            'error': wire,
-          }),
+          FunctionException(
+            status: status,
+            details: <String, dynamic>{'error': wire},
+          ),
         );
         final Result<ResearchOutcome> result = await gateway.analyze(request());
         expect(result, isA<Failure<ResearchOutcome>>(), reason: wire);
@@ -149,16 +147,19 @@ void main() {
       }
     });
 
-    test('falls back to the HTTP status when the error body is stripped', () async {
-      when(
-        () => functionCaller('research-analyze', any()),
-      ).thenThrow(const FunctionException(status: 409));
+    test(
+      'falls back to the HTTP status when the error body is stripped',
+      () async {
+        when(
+          () => functionCaller('research-analyze', any()),
+        ).thenThrow(const FunctionException(status: 409));
 
-      final Result<ResearchOutcome> result = await gateway.analyze(request());
+        final Result<ResearchOutcome> result = await gateway.analyze(request());
 
-      expect(result.errorOrNull?.code, 'provider_not_configured');
-      expect(result.errorOrNull?.kind, AppErrorKind.unavailable);
-    });
+        expect(result.errorOrNull?.code, 'provider_not_configured');
+        expect(result.errorOrNull?.kind, AppErrorKind.unavailable);
+      },
+    );
 
     test('rejects malformed findings as invalid_response', () async {
       when(() => functionCaller('research-analyze', any())).thenAnswer(
@@ -222,10 +223,7 @@ void main() {
 
       expect(result.valueOrNull, hasLength(1));
       expect(result.valueOrNull!.single.id, 'run-2');
-      expect(
-        result.valueOrNull!.single.status,
-        ResearchRunStatus.completed,
-      );
+      expect(result.valueOrNull!.single.status, ResearchRunStatus.completed);
       verify(
         () => rpcCaller('list_research_runs', <String, dynamic>{
           'p_organization_id': 'org-1',
@@ -269,26 +267,27 @@ void main() {
       ).called(1);
     });
 
-    test('a missing organization is a typed failure with no network call', () async {
-      final SupabaseResearchGateway noOrg = SupabaseResearchGateway(
-        SupabaseResearchApiImpl(
-          functionCaller: functionCaller.call,
-          rpcCaller: rpcCaller.call,
-        ),
-        organizationId: () => null,
-      );
+    test(
+      'a missing organization is a typed failure with no network call',
+      () async {
+        final SupabaseResearchGateway noOrg = SupabaseResearchGateway(
+          SupabaseResearchApiImpl(
+            functionCaller: functionCaller.call,
+            rpcCaller: rpcCaller.call,
+          ),
+          organizationId: () => null,
+        );
 
-      final Result<List<ResearchRun>> runs = await noOrg.fetchRuns();
-      expect(runs.errorOrNull?.code, 'invalid_request');
+        final Result<List<ResearchRun>> runs = await noOrg.fetchRuns();
+        expect(runs.errorOrNull?.code, 'invalid_request');
 
-      verifyNever(() => rpcCaller(any(), any()));
-      verifyNever(() => functionCaller(any(), any()));
-    });
+        verifyNever(() => rpcCaller(any(), any()));
+        verifyNever(() => functionCaller(any(), any()));
+      },
+    );
 
     test('a PostgREST denial maps to a denied AppError', () async {
-      when(
-        () => rpcCaller('list_research_runs', any()),
-      ).thenThrow(
+      when(() => rpcCaller('list_research_runs', any())).thenThrow(
         PostgrestException(
           message: 'permission denied for function list_research_runs',
           code: '42501',

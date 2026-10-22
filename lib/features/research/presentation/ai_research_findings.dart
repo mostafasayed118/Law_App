@@ -22,11 +22,11 @@ class _FindingsSection extends StatelessWidget {
       ViewUnauthorized<List<AiFinding>>() => _TypedErrorState(
         message: _errorMessage(l10n, state.lastError),
       ),
-      ViewOffline<List<AiFinding>>() || ViewError<List<AiFinding>>() =>
-        _TypedErrorState(
-          message: _errorMessage(l10n, state.lastError),
-          onRetry: onRetry,
-        ),
+      ViewOffline<List<AiFinding>>() ||
+      ViewError<List<AiFinding>>() => _TypedErrorState(
+        message: _errorMessage(l10n, state.lastError),
+        onRetry: onRetry,
+      ),
       ViewEmpty<List<AiFinding>>() => _EmptyAnswer(state: state),
       ViewSuccess<List<AiFinding>>(data: final List<AiFinding> data)
           when data.isEmpty =>
@@ -73,16 +73,11 @@ class _TypedErrorState extends StatelessWidget {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
     return Padding(
-      padding: const EdgeInsetsDirectional.only(
-        top: LegalHubTheme.spaceSm,
-      ),
+      padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceSm),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            message,
-            style: text.bodyMedium?.copyWith(color: scheme.error),
-          ),
+          Text(message, style: text.bodyMedium?.copyWith(color: scheme.error)),
           if (onRetry != null)
             TextButton(onPressed: onRetry, child: Text(l10n.retry)),
         ],
@@ -113,9 +108,7 @@ class _ProviderNotConfigured extends StatelessWidget {
           Text(
             l10n.aiResearchProviderNotConfigured,
             textAlign: TextAlign.center,
-            style: text.bodyMedium?.copyWith(
-              color: scheme.onSurfaceVariant,
-            ),
+            style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
           ),
         ],
       ),

@@ -47,12 +47,10 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
       _matters = null;
       _documents = null;
     });
-    final Future<Result<List<Matter>>> mattersFuture = serviceLocator<
-      MatterGateway
-    >().fetchMatters();
-    final Future<Result<List<Document>>> documentsFuture = serviceLocator<
-      DocumentGateway
-    >().fetchDocuments();
+    final Future<Result<List<Matter>>> mattersFuture =
+        serviceLocator<MatterGateway>().fetchMatters();
+    final Future<Result<List<Document>>> documentsFuture =
+        serviceLocator<DocumentGateway>().fetchDocuments();
     final Result<List<Matter>> matters = await mattersFuture;
     final Result<List<Document>> documents = await documentsFuture;
     if (!mounted) {
@@ -62,8 +60,7 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
       _matters = matters;
       _documents = documents;
       _loadingLookups = false;
-      final List<Matter> matterRows =
-          matters.valueOrNull ?? const <Matter>[];
+      final List<Matter> matterRows = matters.valueOrNull ?? const <Matter>[];
       if (_selectedMatterId != null &&
           !matterRows.any((Matter m) => m.id == _selectedMatterId)) {
         _selectedMatterId = null;
@@ -73,9 +70,7 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
             in documents.valueOrNull ?? const <Document>[])
           document.id,
       };
-      _selectedDocumentIds.removeWhere(
-        (String id) => !available.contains(id),
-      );
+      _selectedDocumentIds.removeWhere((String id) => !available.contains(id));
     });
   }
 
@@ -113,13 +108,11 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final bool hasOrganization =
-        backendIsLocalOnly || _organizationId != null;
+    final bool hasOrganization = backendIsLocalOnly || _organizationId != null;
     return SafeArea(
       child: BlocBuilder<AiResearchCubit, AiResearchState>(
         builder: (BuildContext context, AiResearchState state) {
-          final bool loading =
-              state.findings is ViewLoading<List<AiFinding>>;
+          final bool loading = state.findings is ViewLoading<List<AiFinding>>;
           return Form(
             key: _formKey,
             child: ListView(
@@ -136,8 +129,7 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
                   prefixIcon: Icons.auto_awesome_outlined,
                   maxLength: ResearchRequest.maxQuestionLength,
                   textInputAction: TextInputAction.search,
-                  validator: (String? value) =>
-                      _validateQuestion(l10n, value),
+                  validator: (String? value) => _validateQuestion(l10n, value),
                   onSubmitted: (String _) {
                     if (!loading) {
                       _submit();
@@ -166,13 +158,9 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
                           children: <Widget>[
                             const SizedBox.square(
                               dimension: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                              ),
+                              child: CircularProgressIndicator(strokeWidth: 2),
                             ),
-                            const SizedBox(
-                              width: LegalHubTheme.spaceSm,
-                            ),
+                            const SizedBox(width: LegalHubTheme.spaceSm),
                             Text(l10n.stateLoading),
                           ],
                         )
@@ -181,11 +169,9 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
                 const SizedBox(height: LegalHubTheme.spaceLg),
                 _RunsHistory(
                   runs: state.runs,
-                  onOpen: (ResearchRun run) => context
-                      .read<AiResearchCubit>()
-                      .loadRunFindings(run.id),
-                  onRetry: () =>
-                      context.read<AiResearchCubit>().loadRuns(),
+                  onOpen: (ResearchRun run) =>
+                      context.read<AiResearchCubit>().loadRunFindings(run.id),
+                  onRetry: () => context.read<AiResearchCubit>().loadRuns(),
                 ),
                 const SizedBox(height: LegalHubTheme.spaceLg),
                 _FindingsSection(state: state, onRetry: _submit),
@@ -227,8 +213,7 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
         onReload: _loadLookups,
       );
     }
-    final List<Matter> matters =
-        _matters?.valueOrNull ?? const <Matter>[];
+    final List<Matter> matters = _matters?.valueOrNull ?? const <Matter>[];
     return DropdownButtonFormField<String?>(
       initialValue: _selectedMatterId,
       isExpanded: true,
