@@ -517,3 +517,22 @@ For each wave: the executor's verbatim report, the PM's independent re-verificat
 `git show --name-only`), the accepted deviations, the wave verdict, and the master
 state after each landing. Landed waves are pushed only on an explicit owner GO
 (proof: `git ls-remote origin refs/heads/main` == HEAD, never the tracking ref).
+
+### Push window — 2026-10-22 (owner GO)
+
+- **Landed:** 12 commits from `c835ced` to `d49b2a1` (W1-W3 fixes, the W4 creator
+  carve-out, and the two W4 incident records). The 12th commit redacts the QA
+  fixture password from `docs/device_e2e_2026-10-21_c835ced.md` after the
+  pre-push secret scan flagged it; the test replay now uses a non-credential
+  string.
+- **Pre-flight:** tree clean, `merge-base --is-ancestor origin/main HEAD` = 0,
+  unpushed = 12, no stray Dart files, `git diff --check` = 0.
+- **Gates on the pushed tree:** format 0 changed · analyze No issues ·
+  `flutter test` 1759/1759 · ledger 115/0 PASS · ARB 520/520/520 PASS · policy
+  static battery 108/0 PASS (run through an LF copy of the harness because the
+  Windows checkout materialised CRLF; the repo object stays LF).
+- **Proof:** `git ls-remote origin refs/heads/main` = `d49b2a1` = HEAD,
+  unpushed = 0. CI run `39762033856` — `format + analyze + test` success,
+  `release bundle + debug APK ABI` success.
+- **Still open (unchanged):** the live PostgREST `PGRST202` incident blocks every
+  RPC write path; W4 is not usable live until that clears. W5 remains queued.
