@@ -36,6 +36,7 @@
 | `migrations/23_approvals.sql` | Org-scoped approval requests + append-only decision events (RLS on, default-deny, narrow select grants; RPC-only writes) | `migrations/23_approvals.down.sql` |
 | `migrations/24_compliance_alerts.sql` | Org-scoped compliance alerts + append-only events (RLS on, default-deny, narrow select grants; RPC-only writes) | `migrations/24_compliance_alerts.down.sql` |
 | `migrations/25_research.sql` | Org-scoped research runs + findings (RLS on, default-deny, narrow select grants; completion is service-role only) | `migrations/25_research.down.sql` |
+| `migrations/26_video_sessions.sql` | Org-scoped LiveKit room records (RLS on, default-deny, narrow select grant; RPC-only writes) | `migrations/26_video_sessions.down.sql` |
 | `policies/*.sql` | Per-table RLS policies (versioned in git, never edited in dashboard) | `git revert` of the policy commit (design §7) |
 | `rpc/*.sql` | Narrow RPC surface (security definer, each audited) | `rpc/_down.sql` (drops the whole surface) |
 
@@ -144,6 +145,7 @@ this battery hardens that pattern into a committed artifact.
 | `tests/23_approval_rls.sql` | **Approval-workflow battery** (design 2026-10-22 §3): member-scoped create/list, partner-only decisions, requester self-decision refusal, rejection-note requirement, requester/partner cancel, pending-only transitions, cross-org/suspended/anon denials, append-only events, §8 audit rows, direct-DML denial, no parameter defaults. The whole battery rolls back. |
 | `tests/24_compliance_alert_rls.sql` | **Compliance-alert battery** (design 2026-10-22 §4): partner/compliance-officer create, client/cross-org/suspended/anon denials, validation bounds, member-scoped list with status/severity filters, member acknowledge, resolved/double-ack denials, partner/officer resolve, append-only events, §8 audit rows, direct-DML denial, no parameter defaults. The whole battery rolls back. |
 | `tests/25_research_rls.sql` | **Research battery** (design 2026-10-22 §5): attorney/partner start, client/suspended/anon denials, cross-org matter denial, org-scoped run/finding reads, authenticated completion denied, service-role completion inserts findings and closes the run, empty/malformed/oversized findings rejected, failed-run code required, terminal re-completion denied, direct-DML denial, no parameter defaults. The whole battery rolls back. |
+| `tests/26_video_session_rls.sql` | **Video-session battery** (design 2026-10-22 §6): partner/attorney create with matter/booking gates, client/cross-org/suspended/anon denials, org-scoped list/get, member mark-live, terminal transitions, creator/partner end, unrelated-client denial, room-name shape, direct-DML denial, no parameter defaults, audit census. The whole battery rolls back. |
 
 ### Running the battery
 
@@ -171,7 +173,7 @@ scripts/verify_policy_tests.sh --check        # static validation, no database
   `15_notification_producer.sql`, `16_notification_read_flag.sql`,
   `17_tasks.sql`, `18_booking.sql`, `19_storage_write.sql`, `20_payments.sql`,
   `21_matter_creator.sql`, `22_attorney_directory.sql`, `23_approvals.sql`,
-  `24_compliance_alerts.sql`, `25_research.sql`, then
+  `24_compliance_alerts.sql`, `25_research.sql`, `26_video_sessions.sql`, then
   `policies/*.sql`, `rpc/*.sql` in the apply order above.
   **`03_platform_config_seed.sql` is NOT applied**: its owner token is an
   apply-time substitution placeholder for the dev project; the battery seeds
@@ -227,4 +229,4 @@ gated on this rehearsal passing + the owner's dated apply-approval
 
 ### Paymob edge functions (deployed 2026-10-21; secrets pending)
 
-`supabase/functions/` carries `paymob-initiate` (verify_jwt = true), `paymob-webhook` and `paymob-reconcile` (verify_jwt = false), `research-analyze` (verify_jwt = true), plus `_shared/paymob.ts`. The three Paymob functions were deployed on 2026-10-21 with `supabase functions deploy --use-api`; `research-analyze` is **not deployed yet**. Secret names (values never committed) are listed in `supabase/functions/.env.example`: `PAYMOB_API_KEY`, `PAYMOB_HMAC_SECRET`, `PAYMOB_INTEGRATION_ID`, `PAYMOB_IFRAME_ID`, `PAYMOB_BASE_URL`, `PAYMOB_RECONCILE_SECRET`, `RIVER_API_KEY`, `RIVER_BASE_URL`, `RIVER_MODEL`. **None of the `PAYMOB_*` secrets are set on the project yet**, so the functions return `server_misconfigured`; live payment stays disabled by default (`PAYMENTS_MODE=disabled`) until the secrets and the Paymob callback URL are configured. `research-analyze` returns `provider_not_configured` until `RIVER_API_KEY` is set. See `docs/live_apply_2026-10-21.md`.
+`supabase/functions/` carries `paymob-initiate` (verify_jwt = true), `paymob-webhook` and `paymob-reconcile` (verify_jwt = false), `research-analyze` (verify_jwt = true), `video-token` (verify_jwt = true), plus `_shared/paymob.ts`. The three Paymob functions were deployed on 2026-10-21 with `supabase functions deploy --use-api`; `research-analyze` and `video-token` are **not deployed yet**. Secret names (values never committed) are listed in `supabase/functions/.env.example`: `PAYMOB_API_KEY`, `PAYMOB_HMAC_SECRET`, `PAYMOB_INTEGRATION_ID`, `PAYMOB_IFRAME_ID`, `PAYMOB_BASE_URL`, `PAYMOB_RECONCILE_SECRET`, `RIVER_API_KEY`, `RIVER_BASE_URL`, `RIVER_MODEL`, `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`. **None of the `PAYMOB_*` secrets are set on the project yet**, so the functions return `server_misconfigured`; live payment stays disabled by default (`PAYMENTS_MODE=disabled`) until the secrets and the Paymob callback URL are configured. `research-analyze` returns `provider_not_configured` until `RIVER_API_KEY` is set; `video-token` returns the same code until the three `LIVEKIT_*` secrets are set. See `docs/live_apply_2026-10-21.md`.

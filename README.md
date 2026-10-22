@@ -3,15 +3,16 @@
 LegalHub implements the approved **B1–B13 foundation scope** plus the
 Supabase-backed auth, organization, matter, document, messaging, billing,
 notification, task, booking, matter-file storage, payment, attorney
-directory, approval-workflow, compliance-alert, and AI-research slices. It is
-not yet a production legal platform: video consultation remains a
-demo/synthetic surface; live payment collection is owner-gated (demo mode
-ships, default disabled); provider social sign-in and push-notification
-delivery are not implemented. The attorney directory is a real
-platform-managed table, but it carries professional profile data only and no
-credential verification. Compliance alerts are recorded records, not an
-automated legal-verification engine. AI research is provider-gated (River);
-output is labelled AI-generated and is not legal advice.
+directory, approval-workflow, compliance-alert, AI-research, and
+video-consultation slices. It is not yet a production legal platform: live
+payment collection is owner-gated (demo mode ships, default disabled);
+provider social sign-in and push-notification delivery are not implemented.
+The attorney directory is a real platform-managed table, but it carries
+professional profile data only and no credential verification. Compliance
+alerts are recorded records, not an automated legal-verification engine. AI
+research (River) and video rooms (LiveKit) are provider-gated; AI output is
+labelled AI-generated and is not legal advice, and video has no recording or
+transcription in v1.
 
 ## At a glance
 
@@ -97,7 +98,7 @@ recorded prerequisites are approved — see
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (1835 total) — full suite green 2026-10-22 (1850 at runtime): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (1850 total) — full suite green 2026-10-22 (1883 at runtime): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), ThemeCubit (mode persistence + restart
   restore), Redactor (password/OTP/email/Bearer redaction with leak guards),
@@ -450,8 +451,8 @@ HTTP layer and lock the exact postgrest await shape the app depends on —
 (2: `from().select()` plain + chained `.eq()` → raw row list). A future
 postgrest upgrade that changes the await contract fails loudly in CI, not on
 a device (the on-device create-org crash this class caused is recorded in
-`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **1835 tests**
-passing (1835 tracked declarations + loop-generated, 1850 at runtime,
+`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **1850 tests**
+passing (1850 tracked declarations + loop-generated, 1883 at runtime,
 ledger `verify_ledger.sh` PASS).
 
 ## Fonts and licenses
