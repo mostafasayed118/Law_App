@@ -150,12 +150,19 @@ List<RouteBase> _shellRoutes(
     ),
     GoRoute(
       path: AppRoutes.video,
-      // Spec D-15 demo-posture (`docs/video_scope_decision_2026-08-11.md`):
-      // the surface is the synthetic VideoGateway seam — no real media, no
-      // writes. Rides the booking entry's visibility (A-2: "book" → "join
-      // call"); a navigation hint, never an authorization grant.
-      builder: (BuildContext context, GoRouterState state) =>
-          const VideoConsultationScreen(),
+      builder: (BuildContext context, GoRouterState state) {
+        // UX-only projections from the active membership: scheduling is
+        // offered to partners and attorneys, ending to the session's creator
+        // or a partner. The create/end RPCs re-assert every gate server-side,
+        // so these flags are navigation hints, never authorization grants.
+        final UserRole role =
+            authCubit.state.session?.primaryRole ?? UserRole.client;
+        return VideoConsultationScreen(
+          canCreate: role == UserRole.partner || role == UserRole.attorney,
+          canEndAny: role == UserRole.partner,
+          currentUserId: authCubit.state.session?.userId,
+        );
+      },
     ),
     GoRoute(
       path: AppRoutes.approvals,

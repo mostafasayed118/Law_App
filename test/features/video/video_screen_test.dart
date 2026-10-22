@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/app/service_locator.dart';
-import 'package:legalhub/features/video/data/fake_video_gateway.dart';
-import 'package:legalhub/features/video/domain/consultation_session.dart';
 import 'package:legalhub/features/video/presentation/video_consultation_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
 void main() {
   tearDown(resetServiceLocator);
 
-  Future<void> pumpVideo(WidgetTester tester) async {
+  Future<void> pumpVideo(
+    WidgetTester tester, {
+    bool canCreate = false,
+    bool canEndAny = false,
+    String? currentUserId,
+  }) async {
     configureDependencies();
-    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.physicalSize = const Size(1000, 1800);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -19,108 +23,96 @@ void main() {
       MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: const VideoConsultationScreen(),
+        home: VideoConsultationScreen(
+          canCreate: canCreate,
+          canEndAny: canEndAny,
+          currentUserId: currentUserId,
+        ),
       ),
     );
     await tester.pumpAndSettle();
   }
 
-  group('video consultation screen (spec D-15 demo-posture)', () {
-    testWidgets('lists the synthetic sessions from the fake gateway', (
+  group('video consultation screen (design §6)', () {
+    testWidgets('lists sessions with statuses and the permitted actions', (
       tester,
     ) async {
-      await pumpVideo(tester);
+      await pumpVideo(tester, canEndAny: true, currentUserId: 'demo-user');
 
-      expect(find.text('Video consultation'), findsOneWidget);
-      for (final ConsultationSession session
-          in FakeVideoGateway.syntheticSessions) {
-        expect(find.text(session.participantName), findsOneWidget);
-        expect(find.textContaining(session.topic), findsOneWidget);
-      }
-      expect(find.text('Join demo call'), findsNWidgets(4));
-      // The demo posture is stated on the list mode too.
+      expect(find.text('Video consultations'), findsOneWidget);
+      expect(find.text('Scheduled'), findsOneWidget);
+      expect(find.text('Live'), findsOneWidget);
+      expect(find.text('Ended'), findsOneWidget);
+      expect(find.text('Cancelled'), findsOneWidget);
+      // Scheduled + live rows are joinable; ended/cancelled rows are not.
+      expect(find.text('Join call'), findsNWidgets(2));
+      // Creator (scheduled) + partner (live) can end; the ended row cannot.
+      expect(find.text('End'), findsNWidgets(2));
       expect(
-        find.textContaining('Demo mode — synthetic sessions only'),
+        find.text(
+          'Demo mode — sample sessions only. Video calls require a configured deployment.',
+        ),
         findsOneWidget,
       );
     });
 
-    testWidgets('join opens the synthetic call surface for that session', (
-      tester,
-    ) async {
+    testWidgets('a client sees join but no end action', (tester) async {
+      await pumpVideo(tester, currentUserId: 'other-user');
+
+      expect(find.text('Join call'), findsNWidgets(2));
+      expect(find.text('End'), findsNothing);
+    });
+
+    testWidgets('joining without provider secrets shows the honest '
+        'unavailable state and opens no call', (tester) async {
       await pumpVideo(tester);
 
-      await tester.tap(find.text('Join demo call').first);
-      // Explicit pumps, not pumpAndSettle: the call surface's 1-second
-      // elapsed ticker schedules a frame every fake-second, so a settle
-      // would never return.
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
+      await tester.tap(find.text('Join call').first);
+      await tester.pumpAndSettle();
 
-      // The call surface names the joined participant and never the others.
+      expect(find.text('Call unavailable'), findsOneWidget);
       expect(
-        find.text('Demo call with Demo attorney — A. Hassan'),
+        find.text(
+          'Video calls are not configured for this deployment. No call was started.',
+        ),
         findsOneWidget,
       );
-      expect(find.text('Demo attorney — S. Ibrahim'), findsNothing);
-      // Live badge, participant tiles, and the posture note are present.
-      expect(find.text('Live demo'), findsOneWidget);
-      expect(find.text('You'), findsOneWidget);
-      expect(
-        find.text('No real audio or video. Nothing is recorded or sent.'),
-        findsOneWidget,
-      );
-      expect(find.byIcon(Icons.call_end), findsOneWidget);
+      expect(find.text('Leave call'), findsNothing);
     });
 
-    testWidgets('leave returns to the session list', (tester) async {
-      await pumpVideo(tester);
-
-      await tester.tap(find.text('Join demo call').first);
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
-      await tester.tap(find.text('Leave call'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
-
-      expect(find.text('Join demo call'), findsNWidgets(4));
-      expect(find.text('Live demo'), findsNothing);
-    });
-
-    testWidgets('mic/camera toggles flip local state without any permission '
-        'request (C-2)', (tester) async {
-      await pumpVideo(tester);
-
-      await tester.tap(find.text('Join demo call').first);
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
-
-      expect(find.byIcon(Icons.mic), findsOneWidget);
-      expect(find.byIcon(Icons.videocam), findsOneWidget);
-
-      await tester.tap(find.byIcon(Icons.mic));
-      await tester.pump();
-      expect(find.byIcon(Icons.mic_off), findsOneWidget);
-
-      await tester.tap(find.byIcon(Icons.videocam));
-      await tester.pump();
-      expect(find.byIcon(Icons.videocam_off), findsOneWidget);
-    });
-
-    testWidgets('the elapsed readout is present in the call surface', (
+    testWidgets('the create sheet refuses to submit without an organization', (
       tester,
     ) async {
-      await pumpVideo(tester);
+      await pumpVideo(tester, canCreate: true);
 
-      await tester.tap(find.text('Join demo call').first);
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
+      await tester.tap(find.text('Schedule'));
+      await tester.pumpAndSettle();
 
-      expect(find.textContaining('Elapsed'), findsOneWidget);
-      // Advancing fake time ticks the readout (the periodic timer is
-      // driven by the test's fake async zone).
-      await tester.pump(const Duration(seconds: 65));
-      expect(find.textContaining('Elapsed 01:'), findsOneWidget);
+      expect(find.text('Schedule a video consultation'), findsOneWidget);
+      expect(
+        find.text('Select an organization before scheduling a session.'),
+        findsOneWidget,
+      );
+      final FilledButton submit = tester.widget<FilledButton>(
+        find.widgetWithText(FilledButton, 'Schedule session'),
+      );
+      expect(submit.onPressed, isNull);
+    });
+
+    testWidgets('the create sheet requires a date and time', (tester) async {
+      await pumpVideo(tester, canCreate: true);
+      serviceLocator<ActiveOrgStore>().select('org-demo');
+
+      await tester.tap(find.text('Schedule'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Schedule session'));
+      await tester.tap(find.text('Schedule session'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Choose a date and time for the session.'),
+        findsOneWidget,
+      );
     });
   });
 }

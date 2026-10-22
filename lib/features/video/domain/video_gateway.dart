@@ -1,21 +1,37 @@
 import '../../../core/errors/result.dart';
-import 'consultation_session.dart';
+import 'video_session.dart';
+import 'video_token.dart';
 
-/// Video-consultation integration boundary (spec D-15, demo-posture).
+/// Video-consultation integration boundary (design §6).
 ///
-/// **Synthetic demo surface only**, per the ratified video scope decision
-/// (`docs/video_scope_decision_2026-08-11.md`):
+/// Reads and writes go through audited, RPC-only server paths; the media
+/// token comes from the `video-token` Edge Function under the caller's JWT.
+/// No provider secret crosses this boundary and no synthetic call is ever
+/// produced: a deployment without LiveKit secrets fails with the typed
+/// `provider_not_configured` error, which the UI renders as an honest
+/// unavailable state.
 ///
-/// - **C-1** — the seam is synthetic; the fake implementation IS the product
-///   posture for the demo, not a stopgap.
-/// - **C-2** — no real media anywhere downstream of this interface: no
-///   camera/mic permission requests, no media streams, no WebRTC.
-/// - **C-3** — zero writes: joining or leaving a demo call records nothing,
-///   writes no call row, and adds no audit entry (audit is for real server
-///   outcomes only).
-/// - **B-2** — a real product records a named provider at slice-planning
-///   time (the D-11 billing pattern) with hosted infrastructure; nothing
-///   here anticipates one.
+/// Return convention matches the project's [Result] boundary — failures
+/// arrive as [Failure] with [AppError], never raw exceptions.
 abstract interface class VideoGateway {
-  Future<Result<List<ConsultationSession>>> fetchSessions();
+  /// The active organization's sessions (newest first), scoped by RLS.
+  Future<Result<List<VideoSession>>> fetchSessions();
+
+  /// Creates a scheduled session. [matterId] and [bookingId] are optional
+  /// references; the create RPC re-asserts the partner/attorney gate, the
+  /// same-org matter rule, and the caller's read access to that matter.
+  Future<Result<String>> createSession({
+    String? matterId,
+    String? bookingId,
+    DateTime? scheduledAt,
+  });
+
+  /// Fetches the room URL + JWT for [sessionId] from `video-token`.
+  Future<Result<VideoToken>> fetchToken(String sessionId);
+
+  /// Marks a scheduled session live (idempotent server gate: scheduled only).
+  Future<Result<void>> markLive(String id);
+
+  /// Ends a session. Only its creator or a partner may end it.
+  Future<Result<void>> end(String id);
 }

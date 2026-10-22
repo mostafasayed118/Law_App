@@ -145,6 +145,7 @@ List<HomeEntry> homeEntriesFor(RoleCapability capabilities) {
       icon: HomeEntryIcon.video,
       title: _videoTitle,
       subtitle: _videoSubtitle,
+      configuredSubtitle: _videoConfiguredSubtitle,
       route: HomeEntryRoute.video,
       isVisible: _canBook,
     ),
@@ -257,6 +258,8 @@ String _bookingConfiguredSubtitle(AppLocalizations l10n) =>
     l10n.bookingEntrySubtitleConfigured;
 String _videoTitle(AppLocalizations l10n) => l10n.videoEntryTitle;
 String _videoSubtitle(AppLocalizations l10n) => l10n.videoEntrySubtitle;
+String _videoConfiguredSubtitle(AppLocalizations l10n) =>
+    l10n.videoEntrySubtitleConfigured;
 String _discoveryTitle(AppLocalizations l10n) => l10n.discoveryEntryTitle;
 String _discoverySubtitle(AppLocalizations l10n) => l10n.discoveryEntrySubtitle;
 String _mattersTitle(AppLocalizations l10n) => l10n.matterEntryTitle;

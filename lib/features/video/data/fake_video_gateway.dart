@@ -1,49 +1,161 @@
+import '../../../core/errors/app_error.dart';
 import '../../../core/errors/result.dart';
-import '../domain/consultation_session.dart';
 import '../domain/video_gateway.dart';
+import '../domain/video_session.dart';
+import '../domain/video_token.dart';
 
-/// Development-only video-consultation implementation: a fixed synthetic
-/// list of 4 deterministic, non-PII demo sessions (spec D-15, demo-posture;
-/// `docs/video_scope_decision_2026-08-11.md`).
+/// Development-only video gateway: a fixed synthetic schedule plus in-memory
+/// create/end transitions (design §1.3 — the fake is registered only in
+/// env-less builds and ALL tests).
 ///
-/// The fake IS the product posture for the demo (C-1): there is no
-/// provider, no media path, and no persistence anywhere downstream. Rows
-/// never read as a real calendar (the R1 fake-data honesty rule shared with
-/// the booking slots and the attorney profiles).
+/// The one path it deliberately does **not** fake is the call itself:
+/// [fetchToken] always fails with `provider_not_configured`, because a
+/// deployment without LiveKit secrets must render an honest unavailable state
+/// rather than a synthetic call. Ids are obviously non-UUID and never reach a
+/// real backend (design §1.2).
 class FakeVideoGateway implements VideoGateway {
-  /// The fixed synthetic session list served by [fetchSessions].
-  static final List<ConsultationSession> syntheticSessions =
-      <ConsultationSession>[
-        ConsultationSession(
-          id: 'video-1',
-          participantName: 'Demo attorney — A. Hassan',
-          topic: 'Contract review — kickoff',
-          scheduledAt: DateTime.utc(2026, 9, 24, 10, 0),
-        ),
-        ConsultationSession(
-          id: 'video-2',
-          participantName: 'Demo attorney — S. Ibrahim',
-          topic: 'Incorporation walkthrough',
-          scheduledAt: DateTime.utc(2026, 9, 25, 13, 30),
-        ),
-        ConsultationSession(
-          id: 'video-3',
-          participantName: 'Demo attorney — M. Farouk',
-          topic: 'Employment dispute — follow-up',
-          scheduledAt: DateTime.utc(2026, 9, 28, 9, 0),
-        ),
-        ConsultationSession(
-          id: 'video-4',
-          participantName: 'Demo attorney — L. Adel',
-          topic: 'Family law consultation',
-          scheduledAt: DateTime.utc(2026, 9, 29, 16, 0),
-        ),
-      ];
+  /// The fixed synthetic schedule served by [fetchSessions] on a fresh
+  /// instance. One row per lifecycle state so the screen's status handling is
+  /// exercised end-to-end.
+  static final List<VideoSession> syntheticSessions = <VideoSession>[
+    VideoSession(
+      id: 'video-1',
+      organizationId: 'org-demo',
+      matterId: 'matter-1',
+      roomName: 'room_demo000000000001',
+      status: VideoSessionStatus.scheduled,
+      scheduledAt: DateTime.utc(2026, 10, 25, 10, 0),
+      createdBy: 'demo-user',
+    ),
+    VideoSession(
+      id: 'video-2',
+      organizationId: 'org-demo',
+      roomName: 'room_demo000000000002',
+      status: VideoSessionStatus.live,
+      scheduledAt: DateTime.utc(2026, 10, 22, 9, 0),
+      startedAt: DateTime.utc(2026, 10, 22, 9, 5),
+      createdBy: 'demo-attorney',
+    ),
+    VideoSession(
+      id: 'video-3',
+      organizationId: 'org-demo',
+      roomName: 'room_demo000000000003',
+      status: VideoSessionStatus.ended,
+      scheduledAt: DateTime.utc(2026, 10, 20, 14, 0),
+      startedAt: DateTime.utc(2026, 10, 20, 14, 2),
+      endedAt: DateTime.utc(2026, 10, 20, 14, 40),
+      createdBy: 'demo-user',
+    ),
+    VideoSession(
+      id: 'video-4',
+      organizationId: 'org-demo',
+      roomName: 'room_demo000000000004',
+      status: VideoSessionStatus.cancelled,
+      scheduledAt: DateTime.utc(2026, 10, 21, 11, 0),
+      createdBy: 'demo-attorney',
+    ),
+  ];
+
+  final List<VideoSession> _sessions = List<VideoSession>.of(syntheticSessions);
+  int _nextId = 1;
 
   @override
-  Future<Result<List<ConsultationSession>>> fetchSessions() async {
-    return Result<List<ConsultationSession>>.success(
-      List<ConsultationSession>.unmodifiable(syntheticSessions),
+  Future<Result<List<VideoSession>>> fetchSessions() async {
+    return Result<List<VideoSession>>.success(
+      List<VideoSession>.unmodifiable(_sessions),
     );
+  }
+
+  @override
+  Future<Result<String>> createSession({
+    String? matterId,
+    String? bookingId,
+    DateTime? scheduledAt,
+  }) async {
+    final int number = _nextId++;
+    final String id = 'video-local-$number';
+    _sessions.add(
+      VideoSession(
+        id: id,
+        organizationId: 'org-demo',
+        matterId: matterId,
+        bookingId: bookingId,
+        roomName: 'room_demo${number.toString().padLeft(16, '0')}',
+        status: VideoSessionStatus.scheduled,
+        scheduledAt:
+            scheduledAt ?? DateTime.now().add(const Duration(hours: 1)),
+        createdBy: 'demo-user',
+      ),
+    );
+    return Result<String>.success(id);
+  }
+
+  /// No fake call surface: the demo deployment has no provider secrets.
+  @override
+  Future<Result<VideoToken>> fetchToken(String sessionId) async {
+    return Result<VideoToken>.failure(
+      const AppError(
+        code: 'provider_not_configured',
+        userMessage:
+            'Video calls are not configured for this deployment. No call was started.',
+        kind: AppErrorKind.unavailable,
+      ),
+    );
+  }
+
+  @override
+  Future<Result<void>> markLive(String id) async {
+    return _transition(
+      id,
+      from: const <VideoSessionStatus>{VideoSessionStatus.scheduled},
+      to: VideoSessionStatus.live,
+      errorCode: 'video_live_invalid',
+      errorMessage: 'This consultation can no longer be started.',
+    );
+  }
+
+  @override
+  Future<Result<void>> end(String id) async {
+    return _transition(
+      id,
+      from: const <VideoSessionStatus>{
+        VideoSessionStatus.scheduled,
+        VideoSessionStatus.live,
+      },
+      to: VideoSessionStatus.ended,
+      errorCode: 'video_session_ended',
+      errorMessage: 'This consultation can no longer be ended.',
+    );
+  }
+
+  Future<Result<void>> _transition(
+    String id, {
+    required Set<VideoSessionStatus> from,
+    required VideoSessionStatus to,
+    required String errorCode,
+    required String errorMessage,
+  }) async {
+    final int index = _sessions.indexWhere((VideoSession s) => s.id == id);
+    if (index < 0) {
+      return Result<void>.failure(
+        const AppError(
+          code: 'video_session_not_found',
+          userMessage: 'This video consultation was not found.',
+        ),
+      );
+    }
+    final VideoSession current = _sessions[index];
+    if (!from.contains(current.status)) {
+      return Result<void>.failure(
+        AppError(code: errorCode, userMessage: errorMessage),
+      );
+    }
+    final DateTime now = DateTime.now();
+    _sessions[index] = current.copyWith(
+      status: to,
+      startedAt: to == VideoSessionStatus.live ? now : null,
+      endedAt: to == VideoSessionStatus.ended ? now : null,
+    );
+    return const Result<void>.success(null);
   }
 }

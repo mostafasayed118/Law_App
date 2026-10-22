@@ -3829,25 +3829,25 @@ abstract class AppLocalizations {
   /// No description provided for @videoTitle.
   ///
   /// In en, this message translates to:
-  /// **'Video consultation'**
+  /// **'Video consultations'**
   String get videoTitle;
 
   /// No description provided for @videoEmpty.
   ///
   /// In en, this message translates to:
-  /// **'No consultations are scheduled.'**
+  /// **'No video consultations yet.'**
   String get videoEmpty;
 
   /// No description provided for @videoError.
   ///
   /// In en, this message translates to:
-  /// **'Unable to load consultations.'**
+  /// **'Unable to load video consultations.'**
   String get videoError;
 
   /// No description provided for @videoLocalOnlyNote.
   ///
   /// In en, this message translates to:
-  /// **'Demo mode — synthetic sessions only. No real call is placed and nothing is recorded.'**
+  /// **'Demo mode — sample sessions only. Video calls require a configured deployment.'**
   String get videoLocalOnlyNote;
 
   /// No description provided for @videoEntryTitle.
@@ -3859,19 +3859,25 @@ abstract class AppLocalizations {
   /// No description provided for @videoEntrySubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Preview the demo call experience — no real media.'**
+  /// **'Schedule or join a video consultation.'**
   String get videoEntrySubtitle;
+
+  /// No description provided for @videoEntrySubtitleConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule or join a video consultation with your legal team.'**
+  String get videoEntrySubtitleConfigured;
 
   /// No description provided for @videoJoin.
   ///
   /// In en, this message translates to:
-  /// **'Join demo call'**
+  /// **'Join call'**
   String get videoJoin;
 
   /// No description provided for @videoCallLiveBadge.
   ///
   /// In en, this message translates to:
-  /// **'Live demo'**
+  /// **'Live'**
   String get videoCallLiveBadge;
 
   /// No description provided for @videoCallElapsed.
@@ -3880,46 +3886,34 @@ abstract class AppLocalizations {
   /// **'Elapsed {duration}'**
   String videoCallElapsed(String duration);
 
-  /// No description provided for @videoCallWith.
-  ///
-  /// In en, this message translates to:
-  /// **'Demo call with {name}'**
-  String videoCallWith(String name);
-
   /// No description provided for @videoCallYou.
   ///
   /// In en, this message translates to:
   /// **'You'**
   String get videoCallYou;
 
-  /// No description provided for @videoCallNote.
-  ///
-  /// In en, this message translates to:
-  /// **'No real audio or video. Nothing is recorded or sent.'**
-  String get videoCallNote;
-
   /// No description provided for @videoMicOn.
   ///
   /// In en, this message translates to:
-  /// **'Microphone on (demo)'**
+  /// **'Mute microphone'**
   String get videoMicOn;
 
   /// No description provided for @videoMicMuted.
   ///
   /// In en, this message translates to:
-  /// **'Microphone muted (demo)'**
+  /// **'Unmute microphone'**
   String get videoMicMuted;
 
   /// No description provided for @videoCameraOn.
   ///
   /// In en, this message translates to:
-  /// **'Camera on (demo)'**
+  /// **'Turn camera off'**
   String get videoCameraOn;
 
   /// No description provided for @videoCameraOff.
   ///
   /// In en, this message translates to:
-  /// **'Camera off (demo)'**
+  /// **'Turn camera on'**
   String get videoCameraOff;
 
   /// No description provided for @videoLeave.
@@ -3927,6 +3921,210 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Leave call'**
   String get videoLeave;
+
+  /// No description provided for @videoStoredNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Video consultations are stored with your organization. Calls use LiveKit; nothing is recorded.'**
+  String get videoStoredNote;
+
+  /// No description provided for @videoCreateFab.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule'**
+  String get videoCreateFab;
+
+  /// No description provided for @videoCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule a video consultation'**
+  String get videoCreateTitle;
+
+  /// No description provided for @videoCreateMatterLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Matter (optional)'**
+  String get videoCreateMatterLabel;
+
+  /// No description provided for @videoCreateMatterNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No matter'**
+  String get videoCreateMatterNone;
+
+  /// No description provided for @videoCreateMattersError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load matters.'**
+  String get videoCreateMattersError;
+
+  /// No description provided for @videoCreateDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date and time'**
+  String get videoCreateDateLabel;
+
+  /// No description provided for @videoCreateDateRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a date and time for the session.'**
+  String get videoCreateDateRequired;
+
+  /// No description provided for @videoCreateNoOrg.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an organization before scheduling a session.'**
+  String get videoCreateNoOrg;
+
+  /// No description provided for @videoCreateSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule session'**
+  String get videoCreateSubmit;
+
+  /// No description provided for @videoCreateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Video consultation scheduled.'**
+  String get videoCreateSuccess;
+
+  /// No description provided for @videoEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'End'**
+  String get videoEnd;
+
+  /// No description provided for @videoEndConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'End this consultation?'**
+  String get videoEndConfirmTitle;
+
+  /// No description provided for @videoEndConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone will be disconnected and the session will be marked ended.'**
+  String get videoEndConfirmBody;
+
+  /// No description provided for @videoEndConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'End session'**
+  String get videoEndConfirm;
+
+  /// No description provided for @videoEndSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Video consultation ended.'**
+  String get videoEndSuccess;
+
+  /// No description provided for @videoStatusScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled'**
+  String get videoStatusScheduled;
+
+  /// No description provided for @videoStatusLive.
+  ///
+  /// In en, this message translates to:
+  /// **'Live'**
+  String get videoStatusLive;
+
+  /// No description provided for @videoStatusEnded.
+  ///
+  /// In en, this message translates to:
+  /// **'Ended'**
+  String get videoStatusEnded;
+
+  /// No description provided for @videoStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get videoStatusCancelled;
+
+  /// No description provided for @videoSessionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Video consultation'**
+  String get videoSessionTitle;
+
+  /// No description provided for @videoProviderNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Video calls are not configured for this deployment. No call was started.'**
+  String get videoProviderNotConfigured;
+
+  /// No description provided for @videoJoinUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Call unavailable'**
+  String get videoJoinUnavailableTitle;
+
+  /// No description provided for @videoErrorUnauthorized.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in again to use video consultations.'**
+  String get videoErrorUnauthorized;
+
+  /// No description provided for @videoErrorForbidden.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to do that.'**
+  String get videoErrorForbidden;
+
+  /// No description provided for @videoErrorNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This video consultation was not found.'**
+  String get videoErrorNotFound;
+
+  /// No description provided for @videoErrorEnded.
+  ///
+  /// In en, this message translates to:
+  /// **'This video consultation has already ended.'**
+  String get videoErrorEnded;
+
+  /// No description provided for @videoErrorInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the session details and try again.'**
+  String get videoErrorInvalid;
+
+  /// No description provided for @videoErrorUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Video calls are temporarily unavailable. Please try again.'**
+  String get videoErrorUnavailable;
+
+  /// No description provided for @videoErrorFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to complete that action. Please try again.'**
+  String get videoErrorFailed;
+
+  /// No description provided for @videoNoOrg.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an organization to view video consultations.'**
+  String get videoNoOrg;
+
+  /// No description provided for @videoCallConnecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting…'**
+  String get videoCallConnecting;
+
+  /// No description provided for @videoCallFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to connect to the call.'**
+  String get videoCallFailed;
+
+  /// No description provided for @videoCallMediaWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected, but the camera or microphone could not be enabled.'**
+  String get videoCallMediaWarning;
 
   /// No description provided for @unmatchedRouteTitle.
   ///

@@ -83,6 +83,9 @@ import '../data/storage/supabase_storage_gateway.dart';
 import '../data/tasks/supabase_task_api.dart';
 import '../data/tasks/supabase_task_api_impl.dart';
 import '../data/tasks/supabase_task_gateway.dart';
+import '../data/video/supabase_video_api.dart';
+import '../data/video/supabase_video_api_impl.dart';
+import '../data/video/supabase_video_gateway.dart';
 import '../features/approvals/data/fake_approvals_gateway.dart';
 import '../features/approvals/domain/approvals_gateway.dart';
 import '../features/auth/data/fake_password_recovery_gateway.dart';
@@ -178,6 +181,7 @@ void configureDependencies({
   SupabaseApprovalApi Function()? supabaseApprovalApiFactory,
   SupabaseComplianceApi Function()? supabaseComplianceApiFactory,
   SupabaseResearchApi Function()? supabaseResearchApiFactory,
+  SupabaseVideoApi Function()? supabaseVideoApiFactory,
   PaymentMode? paymentMode,
 }) {
   // Lazy singleton: stateless service, created on first resolution.
@@ -220,6 +224,7 @@ void configureDependencies({
     env,
     supabaseResearchApiFactory: supabaseResearchApiFactory,
   );
+  _registerVideoSeams(env, supabaseVideoApiFactory: supabaseVideoApiFactory);
   _registerMatterSeams(
     env,
     supabaseMatterApiFactory: supabaseMatterApiFactory,

@@ -2041,30 +2041,33 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bildirimler bildirim ayarlarınızdan sessize alındı.';
 
   @override
-  String get videoTitle => 'Görüntülü görüşme';
+  String get videoTitle => 'Görüntülü görüşmeler';
 
   @override
-  String get videoEmpty => 'Planlanmış görüşme yok.';
+  String get videoEmpty => 'Henüz görüntülü görüşme yok.';
 
   @override
-  String get videoError => 'Görüşmeler yüklenemedi.';
+  String get videoError => 'Görüntülü görüşmeler yüklenemedi.';
 
   @override
   String get videoLocalOnlyNote =>
-      'Demo modu — yalnızca örnek oturumlar. Gerçek çağrı yapılmaz ve hiçbir şey kaydedilmez.';
+      'Demo modu — yalnızca örnek oturumlar. Görüntülü aramalar yapılandırılmış bir dağıtım gerektirir.';
 
   @override
   String get videoEntryTitle => 'Görüntülü görüşme';
 
   @override
-  String get videoEntrySubtitle =>
-      'Demo arama deneyimini önizleyin — gerçek medya yok.';
+  String get videoEntrySubtitle => 'Görüntülü görüşme planlayın veya katılın.';
 
   @override
-  String get videoJoin => 'Demo aramaya katıl';
+  String get videoEntrySubtitleConfigured =>
+      'Hukuk ekibinizle görüntülü görüşme planlayın veya katılın.';
 
   @override
-  String get videoCallLiveBadge => 'Canlı demo';
+  String get videoJoin => 'Aramaya katıl';
+
+  @override
+  String get videoCallLiveBadge => 'Canlı';
 
   @override
   String videoCallElapsed(String duration) {
@@ -2072,31 +2075,133 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String videoCallWith(String name) {
-    return '$name ile demo arama';
-  }
-
-  @override
   String get videoCallYou => 'Siz';
 
   @override
-  String get videoCallNote =>
-      'Gerçek ses veya video yok. Hiçbir şey kaydedilmez veya gönderilmez.';
+  String get videoMicOn => 'Mikrofonu sessize al';
 
   @override
-  String get videoMicOn => 'Mikrofon açık (demo)';
+  String get videoMicMuted => 'Mikrofonun sesini aç';
 
   @override
-  String get videoMicMuted => 'Mikrofon kapalı (demo)';
+  String get videoCameraOn => 'Kamerayı kapat';
 
   @override
-  String get videoCameraOn => 'Kamera açık (demo)';
-
-  @override
-  String get videoCameraOff => 'Kamera kapalı (demo)';
+  String get videoCameraOff => 'Kamerayı aç';
 
   @override
   String get videoLeave => 'Aramadan ayrıl';
+
+  @override
+  String get videoStoredNote =>
+      'Görüntülü görüşmeler kuruluşunuzla birlikte saklanır. Aramalar LiveKit üzerinden yapılır; hiçbir şey kaydedilmez.';
+
+  @override
+  String get videoCreateFab => 'Planla';
+
+  @override
+  String get videoCreateTitle => 'Görüntülü görüşme planla';
+
+  @override
+  String get videoCreateMatterLabel => 'Dosya (isteğe bağlı)';
+
+  @override
+  String get videoCreateMatterNone => 'Dosya yok';
+
+  @override
+  String get videoCreateMattersError => 'Dosyalar yüklenemedi.';
+
+  @override
+  String get videoCreateDateLabel => 'Tarih ve saat';
+
+  @override
+  String get videoCreateDateRequired => 'Oturum için bir tarih ve saat seçin.';
+
+  @override
+  String get videoCreateNoOrg => 'Oturum planlamadan önce bir kuruluş seçin.';
+
+  @override
+  String get videoCreateSubmit => 'Oturumu planla';
+
+  @override
+  String get videoCreateSuccess => 'Görüntülü görüşme planlandı.';
+
+  @override
+  String get videoEnd => 'Bitir';
+
+  @override
+  String get videoEndConfirmTitle => 'Bu görüşme bitirilsin mi?';
+
+  @override
+  String get videoEndConfirmBody =>
+      'Herkesin bağlantısı kesilecek ve oturum bitmiş olarak işaretlenecek.';
+
+  @override
+  String get videoEndConfirm => 'Oturumu bitir';
+
+  @override
+  String get videoEndSuccess => 'Görüntülü görüşme bitirildi.';
+
+  @override
+  String get videoStatusScheduled => 'Planlandı';
+
+  @override
+  String get videoStatusLive => 'Canlı';
+
+  @override
+  String get videoStatusEnded => 'Bitti';
+
+  @override
+  String get videoStatusCancelled => 'İptal edildi';
+
+  @override
+  String get videoSessionTitle => 'Görüntülü görüşme';
+
+  @override
+  String get videoProviderNotConfigured =>
+      'Görüntülü aramalar bu dağıtım için yapılandırılmamış. Hiçbir arama başlatılmadı.';
+
+  @override
+  String get videoJoinUnavailableTitle => 'Arama kullanılamıyor';
+
+  @override
+  String get videoErrorUnauthorized =>
+      'Görüntülü görüşmeleri kullanmak için tekrar giriş yapın.';
+
+  @override
+  String get videoErrorForbidden => 'Bunu yapma izniniz yok.';
+
+  @override
+  String get videoErrorNotFound => 'Bu görüntülü görüşme bulunamadı.';
+
+  @override
+  String get videoErrorEnded => 'Bu görüntülü görüşme zaten bitti.';
+
+  @override
+  String get videoErrorInvalid =>
+      'Oturum ayrıntılarını kontrol edip tekrar deneyin.';
+
+  @override
+  String get videoErrorUnavailable =>
+      'Görüntülü aramalar geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get videoErrorFailed =>
+      'Bu işlem tamamlanamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get videoNoOrg =>
+      'Görüntülü görüşmeleri görmek için bir kuruluş seçin.';
+
+  @override
+  String get videoCallConnecting => 'Bağlanıyor…';
+
+  @override
+  String get videoCallFailed => 'Aramaya bağlanılamadı.';
+
+  @override
+  String get videoCallMediaWarning =>
+      'Bağlandı, ancak kamera veya mikrofon açılamadı.';
 
   @override
   String get unmatchedRouteTitle => 'Bu bağlantı açılamadı.';

@@ -2038,30 +2038,33 @@ class AppLocalizationsEn extends AppLocalizations {
       'Notifications are muted in your notification settings.';
 
   @override
-  String get videoTitle => 'Video consultation';
+  String get videoTitle => 'Video consultations';
 
   @override
-  String get videoEmpty => 'No consultations are scheduled.';
+  String get videoEmpty => 'No video consultations yet.';
 
   @override
-  String get videoError => 'Unable to load consultations.';
+  String get videoError => 'Unable to load video consultations.';
 
   @override
   String get videoLocalOnlyNote =>
-      'Demo mode — synthetic sessions only. No real call is placed and nothing is recorded.';
+      'Demo mode — sample sessions only. Video calls require a configured deployment.';
 
   @override
   String get videoEntryTitle => 'Video consultation';
 
   @override
-  String get videoEntrySubtitle =>
-      'Preview the demo call experience — no real media.';
+  String get videoEntrySubtitle => 'Schedule or join a video consultation.';
 
   @override
-  String get videoJoin => 'Join demo call';
+  String get videoEntrySubtitleConfigured =>
+      'Schedule or join a video consultation with your legal team.';
 
   @override
-  String get videoCallLiveBadge => 'Live demo';
+  String get videoJoin => 'Join call';
+
+  @override
+  String get videoCallLiveBadge => 'Live';
 
   @override
   String videoCallElapsed(String duration) {
@@ -2069,31 +2072,134 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String videoCallWith(String name) {
-    return 'Demo call with $name';
-  }
-
-  @override
   String get videoCallYou => 'You';
 
   @override
-  String get videoCallNote =>
-      'No real audio or video. Nothing is recorded or sent.';
+  String get videoMicOn => 'Mute microphone';
 
   @override
-  String get videoMicOn => 'Microphone on (demo)';
+  String get videoMicMuted => 'Unmute microphone';
 
   @override
-  String get videoMicMuted => 'Microphone muted (demo)';
+  String get videoCameraOn => 'Turn camera off';
 
   @override
-  String get videoCameraOn => 'Camera on (demo)';
-
-  @override
-  String get videoCameraOff => 'Camera off (demo)';
+  String get videoCameraOff => 'Turn camera on';
 
   @override
   String get videoLeave => 'Leave call';
+
+  @override
+  String get videoStoredNote =>
+      'Video consultations are stored with your organization. Calls use LiveKit; nothing is recorded.';
+
+  @override
+  String get videoCreateFab => 'Schedule';
+
+  @override
+  String get videoCreateTitle => 'Schedule a video consultation';
+
+  @override
+  String get videoCreateMatterLabel => 'Matter (optional)';
+
+  @override
+  String get videoCreateMatterNone => 'No matter';
+
+  @override
+  String get videoCreateMattersError => 'Unable to load matters.';
+
+  @override
+  String get videoCreateDateLabel => 'Date and time';
+
+  @override
+  String get videoCreateDateRequired =>
+      'Choose a date and time for the session.';
+
+  @override
+  String get videoCreateNoOrg =>
+      'Select an organization before scheduling a session.';
+
+  @override
+  String get videoCreateSubmit => 'Schedule session';
+
+  @override
+  String get videoCreateSuccess => 'Video consultation scheduled.';
+
+  @override
+  String get videoEnd => 'End';
+
+  @override
+  String get videoEndConfirmTitle => 'End this consultation?';
+
+  @override
+  String get videoEndConfirmBody =>
+      'Everyone will be disconnected and the session will be marked ended.';
+
+  @override
+  String get videoEndConfirm => 'End session';
+
+  @override
+  String get videoEndSuccess => 'Video consultation ended.';
+
+  @override
+  String get videoStatusScheduled => 'Scheduled';
+
+  @override
+  String get videoStatusLive => 'Live';
+
+  @override
+  String get videoStatusEnded => 'Ended';
+
+  @override
+  String get videoStatusCancelled => 'Cancelled';
+
+  @override
+  String get videoSessionTitle => 'Video consultation';
+
+  @override
+  String get videoProviderNotConfigured =>
+      'Video calls are not configured for this deployment. No call was started.';
+
+  @override
+  String get videoJoinUnavailableTitle => 'Call unavailable';
+
+  @override
+  String get videoErrorUnauthorized =>
+      'Sign in again to use video consultations.';
+
+  @override
+  String get videoErrorForbidden => 'You do not have permission to do that.';
+
+  @override
+  String get videoErrorNotFound => 'This video consultation was not found.';
+
+  @override
+  String get videoErrorEnded => 'This video consultation has already ended.';
+
+  @override
+  String get videoErrorInvalid => 'Check the session details and try again.';
+
+  @override
+  String get videoErrorUnavailable =>
+      'Video calls are temporarily unavailable. Please try again.';
+
+  @override
+  String get videoErrorFailed =>
+      'Unable to complete that action. Please try again.';
+
+  @override
+  String get videoNoOrg =>
+      'Select an organization to view video consultations.';
+
+  @override
+  String get videoCallConnecting => 'Connecting…';
+
+  @override
+  String get videoCallFailed => 'Unable to connect to the call.';
+
+  @override
+  String get videoCallMediaWarning =>
+      'Connected, but the camera or microphone could not be enabled.';
 
   @override
   String get unmatchedRouteTitle => 'This link could not be opened.';

@@ -112,16 +112,19 @@ void main() {
   });
 
   testWidgets('the video entry card sits beside the booking entry and opens '
-      'the demo surface (D-15 A-2)', (tester) async {
+      'the consultation list (A-2)', (tester) async {
     await pumpWiredHome(tester);
 
     expect(find.text('Video consultation'), findsOneWidget);
-    expect(find.textContaining('Preview the demo call'), findsOneWidget);
+    expect(
+      find.textContaining('Schedule or join a video consultation'),
+      findsOneWidget,
+    );
 
     await tester.tap(find.text('Video consultation'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Demo attorney — A. Hassan'), findsOneWidget);
-    expect(find.text('Join demo call'), findsWidgets);
+    expect(find.text('Scheduled'), findsOneWidget);
+    expect(find.text('Join call'), findsWidgets);
   });
 }

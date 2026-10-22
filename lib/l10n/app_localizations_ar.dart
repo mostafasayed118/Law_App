@@ -2008,30 +2008,33 @@ class AppLocalizationsAr extends AppLocalizations {
       'الإشعارات مكتومة من إعدادات الإشعارات لديك.';
 
   @override
-  String get videoTitle => 'مكالمة الفيديو';
+  String get videoTitle => 'استشارات الفيديو';
 
   @override
-  String get videoEmpty => 'لا توجد استشارات مجدولة.';
+  String get videoEmpty => 'لا توجد استشارات فيديو بعد.';
 
   @override
-  String get videoError => 'تعذر تحميل الاستشارات.';
+  String get videoError => 'تعذر تحميل استشارات الفيديو.';
 
   @override
   String get videoLocalOnlyNote =>
-      'وضع العرض التوضيحي — جلسات تجريبية فقط. لا تُجرى مكالمة حقيقية ولا يُسجل أي شيء.';
+      'وضع العرض التوضيحي — جلسات تجريبية فقط. مكالمات الفيديو تحتاج نشرًا مُعدًا.';
 
   @override
   String get videoEntryTitle => 'مكالمة الفيديو';
 
   @override
-  String get videoEntrySubtitle =>
-      'معاينة تجربة المكالمة التجريبية — دون وسائط حقيقية.';
+  String get videoEntrySubtitle => 'جدول مكالمة فيديو أو انضم إليها.';
 
   @override
-  String get videoJoin => 'انضم للمكالمة التجريبية';
+  String get videoEntrySubtitleConfigured =>
+      'جدول مكالمة فيديو مع فريقك القانوني أو انضم إليها.';
 
   @override
-  String get videoCallLiveBadge => 'عرض توضيحي مباشر';
+  String get videoJoin => 'انضم للمكالمة';
+
+  @override
+  String get videoCallLiveBadge => 'مباشر';
 
   @override
   String videoCallElapsed(String duration) {
@@ -2039,31 +2042,129 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String videoCallWith(String name) {
-    return 'مكالمة تجريبية مع $name';
-  }
-
-  @override
   String get videoCallYou => 'أنت';
 
   @override
-  String get videoCallNote =>
-      'لا يوجد صوت أو فيديو حقيقي. لا يُسجل ولا يُرسل أي شيء.';
+  String get videoMicOn => 'كتم الميكروفون';
 
   @override
-  String get videoMicOn => 'الميكروفون مفتوح (تجريبي)';
+  String get videoMicMuted => 'إلغاء كتم الميكروفون';
 
   @override
-  String get videoMicMuted => 'الميكروفون مكتوم (تجريبي)';
+  String get videoCameraOn => 'إيقاف الكاميرا';
 
   @override
-  String get videoCameraOn => 'الكاميرا مفتوحة (تجريبي)';
-
-  @override
-  String get videoCameraOff => 'الكاميرا مغلقة (تجريبي)';
+  String get videoCameraOff => 'تشغيل الكاميرا';
 
   @override
   String get videoLeave => 'غادر المكالمة';
+
+  @override
+  String get videoStoredNote =>
+      'تُحفظ استشارات الفيديو لدى مؤسستك. تُجرى المكالمات عبر LiveKit، ولا يُسجَّل أي شيء.';
+
+  @override
+  String get videoCreateFab => 'جدولة';
+
+  @override
+  String get videoCreateTitle => 'جدولة استشارة فيديو';
+
+  @override
+  String get videoCreateMatterLabel => 'الملف (اختياري)';
+
+  @override
+  String get videoCreateMatterNone => 'بدون ملف';
+
+  @override
+  String get videoCreateMattersError => 'تعذر تحميل الملفات.';
+
+  @override
+  String get videoCreateDateLabel => 'التاريخ والوقت';
+
+  @override
+  String get videoCreateDateRequired => 'اختر تاريخًا ووقتًا للجلسة.';
+
+  @override
+  String get videoCreateNoOrg => 'اختر مؤسسة قبل جدولة جلسة.';
+
+  @override
+  String get videoCreateSubmit => 'جدولة الجلسة';
+
+  @override
+  String get videoCreateSuccess => 'تمت جدولة استشارة الفيديو.';
+
+  @override
+  String get videoEnd => 'إنهاء';
+
+  @override
+  String get videoEndConfirmTitle => 'إنهاء هذه الاستشارة؟';
+
+  @override
+  String get videoEndConfirmBody => 'سيتم فصل الجميع وستُعلَّم الجلسة كمنتهية.';
+
+  @override
+  String get videoEndConfirm => 'إنهاء الجلسة';
+
+  @override
+  String get videoEndSuccess => 'تم إنهاء استشارة الفيديو.';
+
+  @override
+  String get videoStatusScheduled => 'مجدولة';
+
+  @override
+  String get videoStatusLive => 'مباشرة';
+
+  @override
+  String get videoStatusEnded => 'منتهية';
+
+  @override
+  String get videoStatusCancelled => 'ملغاة';
+
+  @override
+  String get videoSessionTitle => 'استشارة فيديو';
+
+  @override
+  String get videoProviderNotConfigured =>
+      'مكالمات الفيديو غير مُعدة لهذا النشر. لم تبدأ أي مكالمة.';
+
+  @override
+  String get videoJoinUnavailableTitle => 'المكالمة غير متاحة';
+
+  @override
+  String get videoErrorUnauthorized =>
+      'سجّل الدخول مجددًا لاستخدام استشارات الفيديو.';
+
+  @override
+  String get videoErrorForbidden => 'لا تملك صلاحية القيام بذلك.';
+
+  @override
+  String get videoErrorNotFound => 'لم يتم العثور على استشارة الفيديو هذه.';
+
+  @override
+  String get videoErrorEnded => 'انتهت استشارة الفيديو هذه بالفعل.';
+
+  @override
+  String get videoErrorInvalid => 'تحقق من تفاصيل الجلسة وحاول مجددًا.';
+
+  @override
+  String get videoErrorUnavailable =>
+      'مكالمات الفيديو غير متاحة مؤقتًا. حاول مجددًا.';
+
+  @override
+  String get videoErrorFailed => 'تعذر إتمام هذا الإجراء. حاول مجددًا.';
+
+  @override
+  String get videoNoOrg => 'اختر مؤسسة لعرض استشارات الفيديو.';
+
+  @override
+  String get videoCallConnecting => 'جارٍ الاتصال…';
+
+  @override
+  String get videoCallFailed => 'تعذر الاتصال بالمكالمة.';
+
+  @override
+  String get videoCallMediaWarning =>
+      'تم الاتصال، لكن تعذر تشغيل الكاميرا أو الميكروفون.';
 
   @override
   String get unmatchedRouteTitle => 'تعذّر فتح هذا الرابط.';

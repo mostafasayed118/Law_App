@@ -2,6 +2,13 @@
     <!-- Required for the Supabase auth/data provider in release builds;
          debug/profile manifests already carry it via the Flutter template. -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Video consultations (LiveKit): camera/microphone capture is requested
+         at the first call. Both hardware features are optional so the app
+         stays installable on devices without a camera or microphone. -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-feature android:name="android.hardware.camera" android:required="false"/>
+    <uses-feature android:name="android.hardware.microphone" android:required="false"/>
     <application
         android:label="@string/app_name"
         android:name="${applicationName}"

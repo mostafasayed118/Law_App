@@ -3,177 +3,273 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/state/view_state.dart';
-import 'package:legalhub/features/video/domain/consultation_session.dart';
+import 'package:legalhub/features/matters/domain/matter.dart';
+import 'package:legalhub/features/matters/domain/matter_gateway.dart';
 import 'package:legalhub/features/video/domain/video_gateway.dart';
+import 'package:legalhub/features/video/domain/video_session.dart';
+import 'package:legalhub/features/video/domain/video_token.dart';
 import 'package:legalhub/features/video/presentation/video_cubit.dart';
 import 'package:legalhub/features/video/presentation/video_state.dart';
 
-final List<ConsultationSession> _sessions = <ConsultationSession>[
-  ConsultationSession(
-    id: 'video-1',
-    participantName: 'Demo attorney — A',
-    topic: 'Topic one',
-    scheduledAt: DateTime.utc(2026, 9, 24, 10, 0),
-  ),
-  ConsultationSession(
-    id: 'video-2',
-    participantName: 'Demo attorney — B',
-    topic: 'Topic two',
-    scheduledAt: DateTime.utc(2026, 9, 25, 13, 30),
-  ),
-];
-
-final AppError _loadFailure = AppError(
-  code: 'video_failed',
-  userMessage: 'Could not load consultations',
-);
-
-/// Hand-rolled gateway stub serving one fixed result (the discovery-stub
-/// shape, without the queue — the video cubit loads once per surface).
 class _StubVideoGateway implements VideoGateway {
-  _StubVideoGateway({Result<List<ConsultationSession>>? result})
-    : _result = result ?? Result<List<ConsultationSession>>.success(_sessions);
+  List<VideoSession> sessions = <VideoSession>[];
+  AppError? loadError;
+  AppError? createError;
+  AppError? endError;
 
-  final Result<List<ConsultationSession>> _result;
+  int fetchCalls = 0;
+  int createCalls = 0;
+  int endCalls = 0;
+  int tokenCalls = 0;
+  String? lastMatterId;
+  DateTime? lastScheduledAt;
+
+  @override
+  Future<Result<List<VideoSession>>> fetchSessions() async {
+    fetchCalls += 1;
+    if (loadError != null) {
+      return Result<List<VideoSession>>.failure(loadError!);
+    }
+    return Result<List<VideoSession>>.success(sessions);
+  }
+
+  @override
+  Future<Result<String>> createSession({
+    String? matterId,
+    String? bookingId,
+    DateTime? scheduledAt,
+  }) async {
+    createCalls += 1;
+    lastMatterId = matterId;
+    lastScheduledAt = scheduledAt;
+    if (createError != null) {
+      return Result<String>.failure(createError!);
+    }
+    return const Result<String>.success('v-new');
+  }
+
+  @override
+  Future<Result<VideoToken>> fetchToken(String sessionId) async {
+    tokenCalls += 1;
+    return const Result<VideoToken>.success(
+      VideoToken(
+        url: 'wss://livekit.example',
+        token: 'jwt-token',
+        room: 'room_abcdef0123456789',
+      ),
+    );
+  }
+
+  @override
+  Future<Result<void>> markLive(String id) async {
+    return const Result<void>.success(null);
+  }
+
+  @override
+  Future<Result<void>> end(String id) async {
+    endCalls += 1;
+    if (endError != null) {
+      return Result<void>.failure(endError!);
+    }
+    return const Result<void>.success(null);
+  }
+}
+
+class _StubMatterGateway implements MatterGateway {
   int fetchCalls = 0;
 
   @override
-  Future<Result<List<ConsultationSession>>> fetchSessions() async {
+  Future<Result<List<Matter>>> fetchMatters() async {
     fetchCalls += 1;
-    return _result;
+    return const Result<List<Matter>>.success(<Matter>[]);
   }
+
+  @override
+  Future<Result<List<Matter>>> searchMatters(
+    String query, {
+    int limit = 30,
+  }) async {
+    return const Result<List<Matter>>.success(<Matter>[]);
+  }
+}
+
+VideoSession _session({
+  required String id,
+  required VideoSessionStatus status,
+  DateTime? scheduledAt,
+}) {
+  return VideoSession(
+    id: id,
+    organizationId: 'org-1',
+    roomName: 'room_abcdef0123456789',
+    status: status,
+    scheduledAt: scheduledAt ?? DateTime.utc(2026, 10, 25),
+  );
 }
 
 void main() {
   late _StubVideoGateway gateway;
+  late _StubMatterGateway matters;
 
   setUp(() {
     gateway = _StubVideoGateway();
+    matters = _StubMatterGateway();
   });
 
-  group('VideoCubit (spec D-15 demo-posture)', () {
-    test('starts loading and browsing (not in a call)', () {
-      final VideoCubit cubit = VideoCubit(gateway);
+  group('VideoCubit load (design §6)', () {
+    test('starts loading', () {
+      final VideoCubit cubit = VideoCubit(gateway, matters);
       addTearDown(cubit.close);
 
-      expect(
-        cubit.state.sessions,
-        const ViewLoading<List<ConsultationSession>>(),
-      );
-      expect(cubit.state.joinedSessionId, isNull);
-      expect(cubit.state.inCall, isFalse);
+      expect(cubit.state.sessions, const ViewLoading<List<VideoSession>>());
     });
 
     blocTest<VideoCubit, VideoState>(
-      'load resolves to the synthetic list',
-      build: () => VideoCubit(gateway),
-      act: (VideoCubit cubit) => cubit.load(),
-      expect: () => <VideoState>[
-        VideoState(sessions: ViewSuccess<List<ConsultationSession>>(_sessions)),
-      ],
-      verify: (_) => expect(gateway.fetchCalls, 1),
-    );
-
-    blocTest<VideoCubit, VideoState>(
-      'load maps an empty list to ViewEmpty',
-      setUp: () => gateway = _StubVideoGateway(
-        result: Result<List<ConsultationSession>>.success(
-          const <ConsultationSession>[],
-        ),
-      ),
-      build: () => VideoCubit(gateway),
-      act: (VideoCubit cubit) => cubit.load(),
-      expect: () => <VideoState>[
-        const VideoState(sessions: ViewEmpty<List<ConsultationSession>>()),
-      ],
-    );
-
-    blocTest<VideoCubit, VideoState>(
-      'load maps a failure to ViewError via the shared failure mapping',
-      setUp: () => gateway = _StubVideoGateway(
-        result: Result<List<ConsultationSession>>.failure(_loadFailure),
-      ),
-      build: () => VideoCubit(gateway),
-      act: (VideoCubit cubit) => cubit.load(),
-      expect: () => <VideoState>[
-        VideoState(
-          sessions: ViewError<List<ConsultationSession>>(_loadFailure),
-        ),
-      ],
-    );
-
-    blocTest<VideoCubit, VideoState>(
-      'join a known session enters the demo call — a pure state transition, '
-      'no gateway call (C-3 zero writes)',
-      build: () => VideoCubit(gateway),
-      act: (VideoCubit cubit) async {
-        await cubit.load();
-        cubit.join('video-1');
+      'orders live, then upcoming soonest first, then ended and cancelled',
+      setUp: () {
+        gateway.sessions = <VideoSession>[
+          _session(id: 'ended', status: VideoSessionStatus.ended),
+          _session(
+            id: 'later',
+            status: VideoSessionStatus.scheduled,
+            scheduledAt: DateTime.utc(2026, 10, 26),
+          ),
+          _session(id: 'live', status: VideoSessionStatus.live),
+          _session(
+            id: 'sooner',
+            status: VideoSessionStatus.scheduled,
+            scheduledAt: DateTime.utc(2026, 10, 24),
+          ),
+          _session(id: 'cancelled', status: VideoSessionStatus.cancelled),
+        ];
       },
-      expect: () => <VideoState>[
-        VideoState(sessions: ViewSuccess<List<ConsultationSession>>(_sessions)),
-        VideoState(
-          sessions: ViewSuccess<List<ConsultationSession>>(_sessions),
-          joinedSessionId: 'video-1',
-        ),
-      ],
+      build: () => VideoCubit(gateway, matters),
+      act: (VideoCubit cubit) => cubit.load(),
       verify: (VideoCubit cubit) {
-        expect(cubit.state.inCall, isTrue);
-        // Joining consumed no extra gateway call.
+        final List<VideoSession> ordered =
+            (cubit.state.sessions as ViewSuccess<List<VideoSession>>).data;
+        expect(
+          ordered.map((VideoSession s) => s.id).toList(growable: false),
+          <String>['live', 'sooner', 'later', 'ended', 'cancelled'],
+        );
+      },
+    );
+
+    blocTest<VideoCubit, VideoState>(
+      'an empty list maps to ViewEmpty',
+      build: () => VideoCubit(gateway, matters),
+      act: (VideoCubit cubit) => cubit.load(),
+      expect: () => <VideoState>[
+        const VideoState(sessions: ViewEmpty<List<VideoSession>>()),
+      ],
+    );
+
+    blocTest<VideoCubit, VideoState>(
+      'a denial maps to ViewUnauthorized, not a retryable error',
+      setUp: () => gateway.loadError = const AppError(
+        code: 'video_forbidden',
+        userMessage: 'Denied',
+        kind: AppErrorKind.denied,
+      ),
+      build: () => VideoCubit(gateway, matters),
+      act: (VideoCubit cubit) => cubit.load(),
+      expect: () => <VideoState>[
+        const VideoState(sessions: ViewUnauthorized<List<VideoSession>>()),
+      ],
+    );
+
+    blocTest<VideoCubit, VideoState>(
+      'a generic failure maps to ViewError',
+      setUp: () => gateway.loadError = const AppError(
+        code: 'video_read_failed',
+        userMessage: 'Failed',
+      ),
+      build: () => VideoCubit(gateway, matters),
+      act: (VideoCubit cubit) => cubit.load(),
+      expect: () => <VideoState>[
+        VideoState(sessions: ViewError<List<VideoSession>>(gateway.loadError!)),
+      ],
+    );
+  });
+
+  group('VideoCubit writes (design §6)', () {
+    blocTest<VideoCubit, VideoState>(
+      'create trims blanks, forwards the schedule, and reloads on success',
+      build: () => VideoCubit(gateway, matters),
+      act: (VideoCubit cubit) async {
+        final AppError? error = await cubit.create(
+          matterId: '  ',
+          scheduledAt: DateTime.utc(2026, 11, 1, 9),
+        );
+        expect(error, isNull);
+      },
+      verify: (_) {
+        expect(gateway.createCalls, 1);
+        expect(gateway.lastMatterId, isNull);
+        expect(gateway.lastScheduledAt, DateTime.utc(2026, 11, 1, 9));
         expect(gateway.fetchCalls, 1);
       },
     );
 
     blocTest<VideoCubit, VideoState>(
-      'join an unknown session is a no-op (never opens a fabricated call)',
-      build: () => VideoCubit(gateway),
+      'create returns the typed AppError and does not reload',
+      setUp: () => gateway.createError = const AppError(
+        code: 'video_forbidden',
+        userMessage: 'Denied',
+        kind: AppErrorKind.denied,
+      ),
+      build: () => VideoCubit(gateway, matters),
       act: (VideoCubit cubit) async {
-        await cubit.load();
-        cubit.join('does-not-exist');
+        final AppError? error = await cubit.create(matterId: 'matter-1');
+        expect(error!.code, 'video_forbidden');
       },
-      expect: () => <VideoState>[
-        VideoState(sessions: ViewSuccess<List<ConsultationSession>>(_sessions)),
-      ],
-      verify: (VideoCubit cubit) => expect(cubit.state.inCall, isFalse),
+      verify: (_) => expect(gateway.fetchCalls, 0),
     );
 
     blocTest<VideoCubit, VideoState>(
-      'join while already in a call is a no-op (one call at a time)',
-      build: () => VideoCubit(gateway),
+      'end returns null on success and reloads',
+      build: () => VideoCubit(gateway, matters),
       act: (VideoCubit cubit) async {
-        await cubit.load();
-        cubit.join('video-1');
-        cubit.join('video-2');
+        expect(await cubit.end('v1'), isNull);
       },
-      expect: () => <VideoState>[
-        VideoState(sessions: ViewSuccess<List<ConsultationSession>>(_sessions)),
-        VideoState(
-          sessions: ViewSuccess<List<ConsultationSession>>(_sessions),
-          joinedSessionId: 'video-1',
-        ),
-      ],
-      verify: (VideoCubit cubit) =>
-          expect(cubit.state.joinedSessionId, 'video-1'),
+      verify: (_) {
+        expect(gateway.endCalls, 1);
+        expect(gateway.fetchCalls, 1);
+      },
     );
 
     blocTest<VideoCubit, VideoState>(
-      'leave clears the joined marker and returns to the list (idempotent)',
-      build: () => VideoCubit(gateway),
+      'end returns the typed AppError on failure',
+      setUp: () => gateway.endError = const AppError(
+        code: 'video_end_invalid',
+        userMessage: 'Already ended',
+      ),
+      build: () => VideoCubit(gateway, matters),
       act: (VideoCubit cubit) async {
-        await cubit.load();
-        cubit.join('video-1');
-        cubit.leave();
-        cubit.leave();
+        final AppError? error = await cubit.end('v1');
+        expect(error!.code, 'video_end_invalid');
       },
-      expect: () => <VideoState>[
-        VideoState(sessions: ViewSuccess<List<ConsultationSession>>(_sessions)),
-        VideoState(
-          sessions: ViewSuccess<List<ConsultationSession>>(_sessions),
-          joinedSessionId: 'video-1',
-        ),
-        VideoState(sessions: ViewSuccess<List<ConsultationSession>>(_sessions)),
-      ],
-      verify: (VideoCubit cubit) => expect(cubit.state.inCall, isFalse),
+      verify: (_) => expect(gateway.fetchCalls, 0),
     );
+
+    test('fetchToken delegates the join authorisation step', () async {
+      final VideoCubit cubit = VideoCubit(gateway, matters);
+      addTearDown(cubit.close);
+
+      final Result<VideoToken> result = await cubit.fetchToken('v1');
+
+      expect(result.valueOrNull!.room, 'room_abcdef0123456789');
+      expect(gateway.tokenCalls, 1);
+    });
+
+    test('loadMatters delegates to the matter gateway', () async {
+      final VideoCubit cubit = VideoCubit(gateway, matters);
+      addTearDown(cubit.close);
+
+      final Result<List<Matter>> result = await cubit.loadMatters();
+
+      expect(result.isSuccess, isTrue);
+      expect(matters.fetchCalls, 1);
+    });
   });
 }

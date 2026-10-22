@@ -1216,34 +1216,40 @@ void main() {
       },
     );
 
-    test('resolves the video-consultation keys in every locale (D-15 pin)', () {
-      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
-      final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
-      final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+    test(
+      'resolves the video-consultation keys in every locale (design §6 pin)',
+      () {
+        final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+        final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+        final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
 
-      // The D-15 demo-posture surface: exact copy per locale for the
-      // screen title, the join affordance, and the posture note, plus the
-      // no-silent-EN-copy guards.
-      expect(en.videoTitle, 'Video consultation');
-      expect(ar.videoTitle, 'مكالمة الفيديو');
-      expect(tr.videoTitle, 'Görüntülü görüşme');
-      expect(en.videoJoin, 'Join demo call');
-      expect(ar.videoJoin, 'انضم للمكالمة التجريبية');
-      expect(tr.videoJoin, 'Demo aramaya katıl');
-      expect(
-        en.videoLocalOnlyNote,
-        contains('Demo mode — synthetic sessions only'),
-      );
-      expect(ar.videoLocalOnlyNote, isNot(en.videoLocalOnlyNote));
-      expect(tr.videoLocalOnlyNote, isNot(en.videoLocalOnlyNote));
-      // The parameterized call copy resolves per locale.
-      expect(en.videoCallWith('Demo attorney'), 'Demo call with Demo attorney');
-      expect(tr.videoCallWith('Demo attorney'), 'Demo attorney ile demo arama');
-      expect(
-        ar.videoCallWith('Demo attorney'),
-        'مكالمة تجريبية مع Demo attorney',
-      );
-    });
+        // The real LiveKit surface: exact copy per locale for the screen
+        // title, the join affordance, the lifecycle labels, and the provider
+        // unavailable state, plus the no-silent-EN-copy guards.
+        expect(en.videoTitle, 'Video consultations');
+        expect(ar.videoTitle, 'استشارات الفيديو');
+        expect(tr.videoTitle, 'Görüntülü görüşmeler');
+        expect(en.videoJoin, 'Join call');
+        expect(ar.videoJoin, 'انضم للمكالمة');
+        expect(tr.videoJoin, 'Aramaya katıl');
+        expect(en.videoStatusLive, 'Live');
+        expect(ar.videoStatusLive, 'مباشرة');
+        expect(tr.videoStatusLive, 'Canlı');
+        expect(en.videoProviderNotConfigured, contains('not configured'));
+        expect(
+          ar.videoProviderNotConfigured,
+          isNot(en.videoProviderNotConfigured),
+        );
+        expect(
+          tr.videoProviderNotConfigured,
+          isNot(en.videoProviderNotConfigured),
+        );
+        // The parameterized elapsed copy resolves per locale.
+        expect(en.videoCallElapsed('01:00'), 'Elapsed 01:00');
+        expect(ar.videoCallElapsed('01:00'), 'المدة 01:00');
+        expect(tr.videoCallElapsed('01:00'), 'Süre 01:00');
+      },
+    );
 
     test(
       'resolves the file transfer keys in every locale (2026-10-20 pin)',

@@ -1,0 +1,453 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:livekit_client/livekit_client.dart';
+
+import '../../../app/legalhub_theme.dart';
+import '../../../l10n/app_localizations.dart';
+import '../domain/video_gateway.dart';
+import '../domain/video_session.dart';
+import '../domain/video_token.dart';
+
+/// Connects to a LiveKit room. Injected by tests so the pre-connect UI can be
+/// exercised without native WebRTC.
+typedef VideoRoomConnector = Future<Room> Function(String url, String token);
+
+Future<Room> _connectRoom(String url, String token) async {
+  final Room room = Room();
+  await room.connect(url, token);
+  return room;
+}
+
+/// The real in-call surface (design §6; plan Task 7).
+///
+/// Connects with the server-minted room token, enables the camera and
+/// microphone after the connection (the OS permission prompt happens inside
+/// LiveKit's native capture), renders every participant's video track, and
+/// disconnects on leave. The creator or a partner also ends the persisted
+/// session when they leave. Nothing is recorded or transcribed.
+class VideoCallScreen extends StatefulWidget {
+  const VideoCallScreen({
+    required this.session,
+    required this.token,
+    required this.gateway,
+    this.canEnd = false,
+    this.connector,
+    super.key,
+  });
+
+  final VideoSession session;
+  final VideoToken token;
+  final VideoGateway gateway;
+  final bool canEnd;
+  final VideoRoomConnector? connector;
+
+  @override
+  State<VideoCallScreen> createState() => _VideoCallScreenState();
+}
+
+class _VideoCallScreenState extends State<VideoCallScreen> {
+  Room? _room;
+  bool _connecting = true;
+  bool _failed = false;
+  bool _leaving = false;
+  bool _mediaWarning = false;
+  bool _micOn = true;
+  bool _cameraOn = true;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_connect());
+  }
+
+  @override
+  void dispose() {
+    final Room? room = _room;
+    if (room != null) {
+      room.removeListener(_onRoomChanged);
+      if (!_leaving) {
+        unawaited(room.disconnect());
+      }
+    }
+    super.dispose();
+  }
+
+  Future<void> _connect() async {
+    if (_connecting && _room != null) {
+      return;
+    }
+    setState(() {
+      _connecting = true;
+      _failed = false;
+    });
+    try {
+      final Room room = await (widget.connector ?? _connectRoom)(
+        widget.token.url,
+        widget.token.token,
+      );
+      if (!mounted) {
+        await room.disconnect();
+        return;
+      }
+      room.addListener(_onRoomChanged);
+      setState(() {
+        _room = room;
+        _connecting = false;
+      });
+      await _enableMedia(room);
+      unawaited(_markLive());
+    } on Object {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _connecting = false;
+        _failed = true;
+      });
+    }
+  }
+
+  Future<void> _enableMedia(Room room) async {
+    final LocalParticipant? local = room.localParticipant;
+    if (local == null) {
+      return;
+    }
+    try {
+      await local.setCameraEnabled(true);
+      await local.setMicrophoneEnabled(true);
+    } on Object {
+      if (mounted) {
+        setState(() => _mediaWarning = true);
+      }
+    }
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _micOn = local.isMicrophoneEnabled();
+      _cameraOn = local.isCameraEnabled();
+    });
+  }
+
+  Future<void> _markLive() async {
+    if (widget.session.status != VideoSessionStatus.scheduled) {
+      return;
+    }
+    await widget.gateway.markLive(widget.session.id);
+  }
+
+  void _onRoomChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Future<void> _toggleMic() async {
+    final LocalParticipant? local = _room?.localParticipant;
+    if (local == null) {
+      return;
+    }
+    final bool next = !_micOn;
+    setState(() => _micOn = next);
+    try {
+      await local.setMicrophoneEnabled(next);
+    } on Object {
+      if (mounted) {
+        setState(() => _micOn = !next);
+      }
+    }
+  }
+
+  Future<void> _toggleCamera() async {
+    final LocalParticipant? local = _room?.localParticipant;
+    if (local == null) {
+      return;
+    }
+    final bool next = !_cameraOn;
+    setState(() => _cameraOn = next);
+    try {
+      await local.setCameraEnabled(next);
+    } on Object {
+      if (mounted) {
+        setState(() => _cameraOn = !next);
+      }
+    }
+  }
+
+  Future<void> _leave() async {
+    if (_leaving) {
+      return;
+    }
+    setState(() => _leaving = true);
+    final Room? room = _room;
+    if (room != null) {
+      try {
+        await room.disconnect();
+      } on Object {
+        // The local connection is already gone; leaving must still complete.
+      }
+      if (widget.canEnd) {
+        await widget.gateway.end(widget.session.id);
+      }
+    }
+    if (!mounted) {
+      return;
+    }
+    Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) {
+        if (!didPop) {
+          unawaited(_leave());
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Text(l10n.videoSessionTitle),
+        ),
+        body: _body(l10n),
+      ),
+    );
+  }
+
+  Widget _body(AppLocalizations l10n) {
+    if (_connecting) {
+      return _connectingBody(l10n);
+    }
+    if (_failed) {
+      return _failedBody(l10n);
+    }
+    final Room? room = _room;
+    if (room == null) {
+      return _failedBody(l10n);
+    }
+    return _connectedBody(l10n, room);
+  }
+
+  Widget _connectingBody(AppLocalizations l10n) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          const CircularProgressIndicator(),
+          const SizedBox(height: LegalHubTheme.spaceMd),
+          Text(l10n.videoCallConnecting),
+          const SizedBox(height: LegalHubTheme.spaceSm),
+          TextButton(
+            onPressed: _leaving ? null : _leave,
+            child: Text(l10n.videoLeave),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _failedBody(AppLocalizations l10n) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(l10n.videoCallFailed),
+          const SizedBox(height: LegalHubTheme.spaceMd),
+          FilledButton(onPressed: _connect, child: Text(l10n.retry)),
+          const SizedBox(height: LegalHubTheme.spaceSm),
+          TextButton(
+            onPressed: _leaving ? null : _leave,
+            child: Text(l10n.videoLeave),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _connectedBody(AppLocalizations l10n, Room room) {
+    final ColorScheme scheme = Theme.of(context).colorScheme;
+    return Column(
+      children: <Widget>[
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsetsDirectional.all(
+              LegalHubTheme.marginMobile,
+            ),
+            children: <Widget>[
+              if (_mediaWarning) ...<Widget>[
+                Text(
+                  l10n.videoCallMediaWarning,
+                  style: TextStyle(color: scheme.error),
+                ),
+                const SizedBox(height: LegalHubTheme.spaceMd),
+              ],
+              _participantsGrid(l10n, room),
+            ],
+          ),
+        ),
+        SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(
+              LegalHubTheme.marginMobile,
+              0,
+              LegalHubTheme.marginMobile,
+              LegalHubTheme.spaceMd,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                IconButton.filledTonal(
+                  tooltip: _micOn ? l10n.videoMicOn : l10n.videoMicMuted,
+                  onPressed: _toggleMic,
+                  icon: Icon(_micOn ? Icons.mic : Icons.mic_off),
+                ),
+                const SizedBox(width: LegalHubTheme.spaceLg),
+                IconButton.filledTonal(
+                  tooltip: _cameraOn ? l10n.videoCameraOn : l10n.videoCameraOff,
+                  onPressed: _toggleCamera,
+                  icon: Icon(_cameraOn ? Icons.videocam : Icons.videocam_off),
+                ),
+                const SizedBox(width: LegalHubTheme.spaceLg),
+                FilledButton.icon(
+                  onPressed: _leaving ? null : _leave,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: scheme.error,
+                    foregroundColor: scheme.onError,
+                  ),
+                  icon: const Icon(Icons.call_end),
+                  label: Text(l10n.videoLeave),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _participantsGrid(AppLocalizations l10n, Room room) {
+    final List<Widget> tiles = <Widget>[];
+    final LocalParticipant? local = room.localParticipant;
+    if (local != null) {
+      tiles.add(
+        _ParticipantTile(
+          label: l10n.videoCallYou,
+          track: _videoTrackOf(local),
+          mirror: true,
+        ),
+      );
+    }
+    for (final RemoteParticipant remote in room.remoteParticipants.values) {
+      tiles.add(
+        _ParticipantTile(
+          label: remote.name.isEmpty ? remote.identity : remote.name,
+          track: _videoTrackOf(remote),
+        ),
+      );
+    }
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: tiles.length > 1 ? 2 : 1,
+        childAspectRatio: 3 / 4,
+        mainAxisSpacing: LegalHubTheme.spaceSm,
+        crossAxisSpacing: LegalHubTheme.spaceSm,
+      ),
+      itemCount: tiles.length,
+      itemBuilder: (BuildContext context, int index) => tiles[index],
+    );
+  }
+
+  VideoTrack? _videoTrackOf<T extends TrackPublication<Track>>(
+    Participant<T> participant,
+  ) {
+    for (final TrackPublication<Track> publication
+        in participant.videoTrackPublications) {
+      final Track? track = publication.track;
+      if (track is VideoTrack && !publication.muted) {
+        return track;
+      }
+    }
+    return null;
+  }
+}
+
+/// One participant tile: the live video track when published, otherwise an
+/// initial avatar, with the display name pinned to the corner.
+class _ParticipantTile extends StatelessWidget {
+  const _ParticipantTile({
+    required this.label,
+    required this.track,
+    this.mirror = false,
+  });
+
+  final String label;
+  final VideoTrack? track;
+  final bool mirror;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme scheme = Theme.of(context).colorScheme;
+    final String initial = label.isEmpty ? '?' : label.substring(0, 1);
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: ColoredBox(
+        color: scheme.surfaceContainerHighest,
+        child: Stack(
+          fit: StackFit.expand,
+          children: <Widget>[
+            if (track != null)
+              VideoTrackRenderer(
+                track!,
+                fit: VideoViewFit.cover,
+                mirrorMode: mirror
+                    ? VideoViewMirrorMode.mirror
+                    : VideoViewMirrorMode.off,
+              )
+            else
+              Center(
+                child: CircleAvatar(
+                  radius: 32,
+                  backgroundColor: scheme.primaryContainer,
+                  child: Text(
+                    initial.toUpperCase(),
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: scheme.onPrimaryContainer,
+                    ),
+                  ),
+                ),
+              ),
+            PositionedDirectional(
+              start: LegalHubTheme.spaceSm,
+              bottom: LegalHubTheme.spaceSm,
+              end: LegalHubTheme.spaceSm,
+              child: Container(
+                padding: const EdgeInsetsDirectional.symmetric(
+                  horizontal: LegalHubTheme.spaceSm,
+                  vertical: LegalHubTheme.spaceXs,
+                ),
+                decoration: BoxDecoration(
+                  color: scheme.surface.withValues(alpha: 0.82),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelMedium?.copyWith(color: scheme.onSurface),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

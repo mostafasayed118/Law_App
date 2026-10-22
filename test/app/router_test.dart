@@ -401,8 +401,8 @@ void main() {
     });
   });
 
-  group('video consultation route (spec D-15 demo-posture)', () {
-    testWidgets('renders the demo surface for an authenticated session', (
+  group('video consultation route (design §6)', () {
+    testWidgets('renders the consultation list for an authenticated session', (
       tester,
     ) async {
       await resetServiceLocator();
@@ -414,9 +414,9 @@ void main() {
       await tester.pumpWidget(harness(child: const SizedBox.shrink()));
       await tester.pumpAndSettle();
 
-      expect(find.text('Video consultation'), findsOneWidget);
-      expect(find.text('Demo attorney — A. Hassan'), findsOneWidget);
-      expect(find.text('Join demo call'), findsWidgets);
+      expect(find.text('Video consultations'), findsOneWidget);
+      expect(find.text('Scheduled'), findsOneWidget);
+      expect(find.text('Join call'), findsWidgets);
     });
 
     testWidgets('blocks unauthenticated access to the video route', (
