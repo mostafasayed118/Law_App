@@ -464,7 +464,7 @@ void main() {
     }) async {
       await cubit.signIn(
         email: 'qa-device-131043@legalhub.test',
-        password: 'QaDevice2026Tmp',
+        password: 'test-only-password',
       );
       store.syncFromSession(cubit.state.session);
       expect(store.activeOrganizationId, isNull);
@@ -481,7 +481,7 @@ void main() {
 
       await cubit.signIn(
         email: 'qa-device-131043@legalhub.test',
-        password: 'QaDevice2026Tmp',
+        password: 'test-only-password',
       );
       store.syncFromSession(cubit.state.session);
     }
