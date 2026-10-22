@@ -54,6 +54,10 @@ drop function if exists public.get_attorney_profile(uuid);
 drop function if exists public.create_attorney_profile(text, text, text, text[], text[], text, integer, text);
 drop function if exists public.update_attorney_profile(uuid, text, text, text, text[], text[], text, integer, text, text);
 drop function if exists public.deactivate_attorney_profile(uuid);
+drop function if exists public.create_approval_request(uuid, uuid, text, text, text);
+drop function if exists public.decide_approval_request(uuid, text, text);
+drop function if exists public.cancel_approval_request(uuid);
+drop function if exists public.list_approval_requests(uuid, text);
 
 -- The revokes above run first so the drops below are the final privilege
 -- reset: functions are gone and no execute grant survives in any role.
