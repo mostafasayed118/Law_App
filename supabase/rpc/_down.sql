@@ -58,6 +58,10 @@ drop function if exists public.create_approval_request(uuid, uuid, text, text, t
 drop function if exists public.decide_approval_request(uuid, text, text);
 drop function if exists public.cancel_approval_request(uuid);
 drop function if exists public.list_approval_requests(uuid, text);
+drop function if exists public.create_compliance_alert(uuid, uuid, text, text, text, text, timestamptz);
+drop function if exists public.acknowledge_compliance_alert(uuid);
+drop function if exists public.resolve_compliance_alert(uuid, text);
+drop function if exists public.list_compliance_alerts(uuid, text, text);
 
 -- The revokes above run first so the drops below are the final privilege
 -- reset: functions are gone and no execute grant survives in any role.
