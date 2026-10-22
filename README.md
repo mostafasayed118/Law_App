@@ -3,13 +3,14 @@
 LegalHub implements the approved **B1–B13 foundation scope** plus the
 Supabase-backed auth, organization, matter, document, messaging, billing,
 notification, task, booking, matter-file storage, payment, attorney
-directory, and approval-workflow slices. It is not yet a production legal
-platform: compliance alerts, video consultation, and AI research remain
+directory, approval-workflow, and compliance-alert slices. It is not yet a
+production legal platform: video consultation and AI research remain
 demo/synthetic surfaces; live payment collection is owner-gated (demo mode
 ships, default disabled); provider social sign-in and push-notification
 delivery are not implemented. The attorney directory is a real
 platform-managed table, but it carries professional profile data only and no
-credential verification.
+credential verification. Compliance alerts are recorded records, not an
+automated legal-verification engine.
 
 ## At a glance
 
@@ -95,7 +96,7 @@ recorded prerequisites are approved — see
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (1793 total) — full suite green 2026-10-22 (1811 at runtime): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (1814 total) — full suite green 2026-10-22 (1832 at runtime): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), ThemeCubit (mode persistence + restart
   restore), Redactor (password/OTP/email/Bearer redaction with leak guards),
@@ -448,8 +449,8 @@ HTTP layer and lock the exact postgrest await shape the app depends on —
 (2: `from().select()` plain + chained `.eq()` → raw row list). A future
 postgrest upgrade that changes the await contract fails loudly in CI, not on
 a device (the on-device create-org crash this class caused is recorded in
-`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **1793 tests**
-passing (1793 tracked declarations + loop-generated, 1811 at runtime,
+`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **1814 tests**
+passing (1814 tracked declarations + loop-generated, 1832 at runtime,
 ledger `verify_ledger.sh` PASS).
 
 ## Fonts and licenses
