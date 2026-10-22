@@ -2067,4 +2067,107 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get unmatchedRouteTitle => 'تعذّر فتح هذا الرابط.';
+
+  @override
+  String get aiResearchQuestionLabel => 'سؤال البحث';
+
+  @override
+  String get aiResearchQuestionTooShort => 'أدخل حرفين على الأقل.';
+
+  @override
+  String get aiResearchQuestionTooLong => 'اجعل السؤال في حدود 500 حرف.';
+
+  @override
+  String get aiResearchMatterLabel => 'الملف (اختياري)';
+
+  @override
+  String get aiResearchMatterNone => 'بدون ملف';
+
+  @override
+  String get aiResearchMattersError => 'تعذّر تحميل الملفات.';
+
+  @override
+  String get aiResearchDocumentsLabel => 'المستندات (اختياري)';
+
+  @override
+  String get aiResearchDocumentsError => 'تعذّر تحميل المستندات.';
+
+  @override
+  String get aiResearchDocumentsNone => 'لا توجد مستندات متاحة.';
+
+  @override
+  String get aiResearchReload => 'إعادة التحميل';
+
+  @override
+  String get aiResearchGenerate => 'إنشاء النتائج';
+
+  @override
+  String get aiResearchRunsTitle => 'عمليات البحث الأخيرة';
+
+  @override
+  String get aiResearchRunsEmpty => 'لا توجد عمليات بحث بعد.';
+
+  @override
+  String get aiResearchRunsError => 'تعذّر تحميل سجل العمليات.';
+
+  @override
+  String get aiResearchRunStatusRunning => 'قيد التشغيل';
+
+  @override
+  String get aiResearchRunStatusCompleted => 'مكتمل';
+
+  @override
+  String get aiResearchRunStatusFailed => 'فشل';
+
+  @override
+  String get aiResearchProviderNotConfigured =>
+      'البحث بالذكاء الاصطناعي غير مُهيأ لهذا النشر. لم يتم تشغيل أي تحليل.';
+
+  @override
+  String get aiResearchGeneratedNotice =>
+      'مُنشأ بالذكاء الاصطناعي — راجعه قبل الاعتماد عليه. ليس مشورة قانونية.';
+
+  @override
+  String get aiResearchStoredNote =>
+      'تُحفظ النتائج المُنشأة بالذكاء الاصطناعي لدى مؤسستك.';
+
+  @override
+  String get aiResearchIdlePromptReal =>
+      'اطرح سؤالًا على الملف والمستندات المحددة.';
+
+  @override
+  String get aiResearchErrorUnauthorized =>
+      'سجّل الدخول مجددًا لاستخدام البحث بالذكاء الاصطناعي.';
+
+  @override
+  String get aiResearchErrorForbidden =>
+      'دورك لا يسمح بتشغيل البحث بالذكاء الاصطناعي.';
+
+  @override
+  String get aiResearchErrorInvalidRequest =>
+      'تحقق من السؤال والعناصر المحددة ثم حاول مجددًا.';
+
+  @override
+  String get aiResearchErrorContextTooLarge =>
+      'السياق المحدد كبير جدًا. أزل بعض المستندات وحاول مجددًا.';
+
+  @override
+  String get aiResearchErrorProviderUnavailable =>
+      'مزوّد الذكاء الاصطناعي غير متاح مؤقتًا. حاول مجددًا.';
+
+  @override
+  String get aiResearchErrorInvalidResponse =>
+      'أعاد مزوّد الذكاء الاصطناعي ردًا غير متوقع. حاول مجددًا.';
+
+  @override
+  String get aiResearchErrorNoOrg => 'اختر مؤسسة لتشغيل البحث.';
+
+  @override
+  String get aiResearchNoSourceCited => 'لم يُذكر مصدر.';
+
+  @override
+  String get aiResearchSourceDocument => 'مستند';
+
+  @override
+  String get aiResearchSourceMatter => 'ملف';
 }

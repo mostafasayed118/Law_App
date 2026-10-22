@@ -181,6 +181,33 @@ void _registerComplianceSeams(
   );
 }
 
+/// Registers the research slice seams (design §5).
+void _registerResearchSeams(
+  SupabaseEnv env, {
+  SupabaseResearchApi Function()? supabaseResearchApiFactory,
+}) {
+  // Stateless service: lazy singleton. The research Cubit is feature-scoped
+  // and created per screen via BlocProvider. The flip swaps the synthetic demo
+  // engine for the Supabase-backed River path when the build is configured
+  // (Batch 3.3 env pattern); env-less runs and ALL tests keep the demo engine,
+  // which the UI labels as demo mode. A configured build never serves
+  // synthetic findings. Reads need the active organization, resolved lazily
+  // through the app-scoped [ActiveOrgStore] so the data layer never imports
+  // the app layer; the server re-derives membership per request.
+  _registerSeam<AiGateway>(
+    env,
+    supabase: () => SupabaseResearchGateway(
+      (supabaseResearchApiFactory ?? SupabaseResearchApiImpl.bind)(),
+      organizationId: () =>
+          serviceLocator<ActiveOrgStore>().activeOrganizationId,
+    ),
+    fake: () => SyntheticAiGateway(
+      documentGateway: serviceLocator<DocumentGateway>(),
+      matterGateway: serviceLocator<MatterGateway>(),
+    ),
+  );
+}
+
 /// Registers the payments slice seams.
 void _registerPaymentSeams(
   SupabaseEnv env, {

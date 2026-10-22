@@ -1,36 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../app/active_org_store.dart';
 import '../../../app/legalhub_theme.dart';
 import '../../../app/service_locator.dart';
+import '../../../core/errors/app_error.dart';
+import '../../../core/errors/result.dart';
 import '../../../core/roles/user_role.dart';
+import '../../../core/state/view_state.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/demo_labels.dart';
 import '../../../shared/widgets/widgets.dart';
+import '../../documents/domain/document.dart';
+import '../../documents/domain/document_gateway.dart';
+import '../../matters/domain/matter.dart';
+import '../../matters/domain/matter_gateway.dart';
 import '../domain/ai_finding.dart';
 import '../domain/ai_gateway.dart';
+import '../domain/research_request.dart';
+import '../domain/research_run.dart';
 import 'ai_research_cubit.dart';
 import 'ai_research_state.dart';
 part 'ai_research_denied_state.dart';
 part 'ai_research_surface.dart';
 part 'ai_research_idle_or_no_match.dart';
+part 'ai_research_findings.dart';
+part 'ai_research_runs.dart';
 part 'ai_research_finding_card.dart';
 
-/// AI research-assistant surface (`/research`; AI research slice 1.1, plan
-/// 2026-09-02).
+/// Research surface (`/research`; AI research slice 1.1; design §5).
 ///
-/// Demo-posture synthetic research (ratified scope decisions A-1/D-1): a
-/// query field drives the `SyntheticAiGateway` engine and the findings of
-/// the **latest** query render below (D-R2 — last answer only; no
-/// transcript). Rails pinned structurally:
-/// - the **"AI-suggested, not legal advice" banner is persistent on every
-///   render state** — idle, loading, success, empty, error (C-3);
-/// - **every finding's citation row renders unconditionally** (C-2/B-3);
-/// - **no save/apply/export affordance exists anywhere** (C-4/D-3) —
-///   findings are advisory-only and nothing is persisted (C-1).
+/// Two postures share this screen:
+/// - an env-less build answers from the synthetic demo corpus and says so in
+///   the banner and footer;
+/// - a configured build runs `research-analyze` against the caller's selected
+///   matter/documents, lists persisted runs, and surfaces every failure
+///   honestly — a missing provider secret renders an explicit unavailable
+///   state, never a synthetic success.
 ///
-/// D-R1 gating: a role without [RoleCapability.canUseAiResearch] (client /
-/// complianceOfficer / admin reaching the route by deep link) gets the
+/// Rails pinned structurally: the "AI-suggested / AI-generated — not legal
+/// advice" banner persists in every render state, findings are advisory-only
+/// (no save/apply/export affordance), and every finding's citation row renders
+/// unconditionally.
+///
+/// D-R1 gating: a role without [RoleCapability.canUseAiResearch] gets the
 /// distinct denial arm — never the research surface and never an
 /// empty-success (the platform-admin AC-7 pattern).
 class AiResearchScreen extends StatelessWidget {

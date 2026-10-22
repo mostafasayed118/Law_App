@@ -1,3 +1,4 @@
+import '../../../core/errors/app_error.dart';
 import '../../../core/errors/result.dart';
 import '../../documents/domain/document.dart';
 import '../../documents/domain/document_gateway.dart';
@@ -5,6 +6,9 @@ import '../../matters/domain/matter.dart';
 import '../../matters/domain/matter_gateway.dart';
 import '../domain/ai_finding.dart';
 import '../domain/ai_gateway.dart';
+import '../domain/research_outcome.dart';
+import '../domain/research_request.dart';
+import '../domain/research_run.dart';
 
 /// Demo-posture synthetic research engine (AI research slice, plan 1.0).
 ///
@@ -79,6 +83,42 @@ class SyntheticAiGateway implements AiGateway {
     return Result<List<AiFinding>>.success(
       List<AiFinding>.unmodifiable(findings),
     );
+  }
+
+  /// Demo implementation of the real-provider seam (design §5).
+  ///
+  /// It answers from the synthetic corpus and reports a completed demo run
+  /// with **no persistence**: the organization, matter, and document ids are
+  /// deliberately ignored because there is no server behind this posture.
+  /// The UI labels this build as demo mode; a configured build never
+  /// registers this gateway.
+  @override
+  Future<Result<ResearchOutcome>> analyze(ResearchRequest request) async {
+    final Result<List<AiFinding>> result = await research(request.question);
+    return switch (result) {
+      Success<List<AiFinding>>(value: final List<AiFinding> findings) =>
+        Result<ResearchOutcome>.success(
+          ResearchOutcome(
+            runId: 'synthetic-demo',
+            status: ResearchRunStatus.completed,
+            findings: findings,
+          ),
+        ),
+      Failure<List<AiFinding>>(error: final AppError error) =>
+        Result<ResearchOutcome>.failure(error),
+    };
+  }
+
+  /// The demo posture persists nothing: no run history exists.
+  @override
+  Future<Result<List<ResearchRun>>> fetchRuns({int limit = 20}) async {
+    return const Result<List<ResearchRun>>.success(<ResearchRun>[]);
+  }
+
+  /// The demo posture persists nothing: a run id has no stored findings.
+  @override
+  Future<Result<List<AiFinding>>> fetchFindings(String runId) async {
+    return const Result<List<AiFinding>>.success(<AiFinding>[]);
   }
 
   static final RegExp _tokenSplitPattern = RegExp(r'[\s,.;:!?()\-_/]+');

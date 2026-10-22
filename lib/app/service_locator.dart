@@ -74,6 +74,9 @@ import '../data/orgs/supabase_membership_repository.dart';
 import '../data/orgs/supabase_org_api.dart';
 import '../data/orgs/supabase_org_api_impl.dart';
 import '../data/orgs/supabase_organization_gateway.dart';
+import '../data/research/supabase_research_api.dart';
+import '../data/research/supabase_research_api_impl.dart';
+import '../data/research/supabase_research_gateway.dart';
 import '../data/storage/supabase_storage_api.dart';
 import '../data/storage/supabase_storage_api_impl.dart';
 import '../data/storage/supabase_storage_gateway.dart';
@@ -174,6 +177,7 @@ void configureDependencies({
   SupabaseAttorneyApi Function()? supabaseAttorneyApiFactory,
   SupabaseApprovalApi Function()? supabaseApprovalApiFactory,
   SupabaseComplianceApi Function()? supabaseComplianceApiFactory,
+  SupabaseResearchApi Function()? supabaseResearchApiFactory,
   PaymentMode? paymentMode,
 }) {
   // Lazy singleton: stateless service, created on first resolution.
@@ -211,6 +215,10 @@ void configureDependencies({
   _registerComplianceSeams(
     env,
     supabaseComplianceApiFactory: supabaseComplianceApiFactory,
+  );
+  _registerResearchSeams(
+    env,
+    supabaseResearchApiFactory: supabaseResearchApiFactory,
   );
   _registerMatterSeams(
     env,

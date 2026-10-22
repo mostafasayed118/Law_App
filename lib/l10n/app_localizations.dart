@@ -3933,6 +3933,192 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This link could not be opened.'**
   String get unmatchedRouteTitle;
+
+  /// No description provided for @aiResearchQuestionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Research question'**
+  String get aiResearchQuestionLabel;
+
+  /// No description provided for @aiResearchQuestionTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter at least 2 characters.'**
+  String get aiResearchQuestionTooShort;
+
+  /// No description provided for @aiResearchQuestionTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep the question at 500 characters or fewer.'**
+  String get aiResearchQuestionTooLong;
+
+  /// No description provided for @aiResearchMatterLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Matter (optional)'**
+  String get aiResearchMatterLabel;
+
+  /// No description provided for @aiResearchMatterNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No matter'**
+  String get aiResearchMatterNone;
+
+  /// No description provided for @aiResearchMattersError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load matters.'**
+  String get aiResearchMattersError;
+
+  /// No description provided for @aiResearchDocumentsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents (optional)'**
+  String get aiResearchDocumentsLabel;
+
+  /// No description provided for @aiResearchDocumentsError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load documents.'**
+  String get aiResearchDocumentsError;
+
+  /// No description provided for @aiResearchDocumentsNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No documents available.'**
+  String get aiResearchDocumentsNone;
+
+  /// No description provided for @aiResearchReload.
+  ///
+  /// In en, this message translates to:
+  /// **'Reload'**
+  String get aiResearchReload;
+
+  /// No description provided for @aiResearchGenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate findings'**
+  String get aiResearchGenerate;
+
+  /// No description provided for @aiResearchRunsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent research runs'**
+  String get aiResearchRunsTitle;
+
+  /// No description provided for @aiResearchRunsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No research runs yet.'**
+  String get aiResearchRunsEmpty;
+
+  /// No description provided for @aiResearchRunsError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load run history.'**
+  String get aiResearchRunsError;
+
+  /// No description provided for @aiResearchRunStatusRunning.
+  ///
+  /// In en, this message translates to:
+  /// **'Running'**
+  String get aiResearchRunStatusRunning;
+
+  /// No description provided for @aiResearchRunStatusCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get aiResearchRunStatusCompleted;
+
+  /// No description provided for @aiResearchRunStatusFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get aiResearchRunStatusFailed;
+
+  /// No description provided for @aiResearchProviderNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'AI research is not configured for this deployment. No analysis was run.'**
+  String get aiResearchProviderNotConfigured;
+
+  /// No description provided for @aiResearchGeneratedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'AI-generated — review before relying on it. Not legal advice.'**
+  String get aiResearchGeneratedNotice;
+
+  /// No description provided for @aiResearchStoredNote.
+  ///
+  /// In en, this message translates to:
+  /// **'AI-generated findings are stored with your organization.'**
+  String get aiResearchStoredNote;
+
+  /// No description provided for @aiResearchIdlePromptReal.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask a question across the selected matter and documents.'**
+  String get aiResearchIdlePromptReal;
+
+  /// No description provided for @aiResearchErrorUnauthorized.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in again to use AI research.'**
+  String get aiResearchErrorUnauthorized;
+
+  /// No description provided for @aiResearchErrorForbidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Your role cannot run AI research.'**
+  String get aiResearchErrorForbidden;
+
+  /// No description provided for @aiResearchErrorInvalidRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the question and selected items, then try again.'**
+  String get aiResearchErrorInvalidRequest;
+
+  /// No description provided for @aiResearchErrorContextTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'The selected context is too large. Remove documents and try again.'**
+  String get aiResearchErrorContextTooLarge;
+
+  /// No description provided for @aiResearchErrorProviderUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI provider is temporarily unavailable. Please try again.'**
+  String get aiResearchErrorProviderUnavailable;
+
+  /// No description provided for @aiResearchErrorInvalidResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI provider returned an unexpected response. Please try again.'**
+  String get aiResearchErrorInvalidResponse;
+
+  /// No description provided for @aiResearchErrorNoOrg.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an organization to run research.'**
+  String get aiResearchErrorNoOrg;
+
+  /// No description provided for @aiResearchNoSourceCited.
+  ///
+  /// In en, this message translates to:
+  /// **'No source cited.'**
+  String get aiResearchNoSourceCited;
+
+  /// No description provided for @aiResearchSourceDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Document'**
+  String get aiResearchSourceDocument;
+
+  /// No description provided for @aiResearchSourceMatter.
+  ///
+  /// In en, this message translates to:
+  /// **'Matter'**
+  String get aiResearchSourceMatter;
 }
 
 class _AppLocalizationsDelegate

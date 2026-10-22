@@ -8,6 +8,9 @@ import 'package:legalhub/features/matters/data/fake_matter_gateway.dart';
 import 'package:legalhub/features/research/data/synthetic_ai_gateway.dart';
 import 'package:legalhub/features/research/domain/ai_finding.dart';
 import 'package:legalhub/features/research/domain/ai_gateway.dart';
+import 'package:legalhub/features/research/domain/research_outcome.dart';
+import 'package:legalhub/features/research/domain/research_request.dart';
+import 'package:legalhub/features/research/domain/research_run.dart';
 import 'package:legalhub/features/research/presentation/ai_research_cubit.dart';
 import 'package:legalhub/features/research/presentation/ai_research_state.dart';
 import 'package:mocktail/mocktail.dart';
@@ -19,6 +22,9 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(const Result<List<AiFinding>>.success(<AiFinding>[]));
+    registerFallbackValue(
+      ResearchRequest(organizationId: 'org-1', question: 'Question'),
+    );
   });
 
   setUp(() {
@@ -104,6 +110,10 @@ void main() {
             AppError(code: 'doc-fail', userMessage: 'documents unavailable'),
           ),
           lastQuery: 'anything',
+          lastError: AppError(
+            code: 'doc-fail',
+            userMessage: 'documents unavailable',
+          ),
         ),
       ],
     );
@@ -231,5 +241,113 @@ void main() {
         expect(result.valueOrNull, isNotEmpty);
       },
     );
+
+    const AiFinding finding = AiFinding(
+      id: 'finding-1',
+      headline: 'Server headline',
+      summary: 'Server summary.',
+      excerpt: 'Server excerpt.',
+      sources: <AiSource>[
+        AiSource(
+          kind: AiSourceKind.document,
+          title: '',
+          detail: '',
+          sourceId: 'doc-1',
+        ),
+      ],
+    );
+    final ResearchRun run = ResearchRun(
+      id: 'run-1',
+      organizationId: 'org-1',
+      status: ResearchRunStatus.completed,
+      promptSummary: 'What changed?',
+      createdAt: DateTime.utc(2026, 10, 22),
+    );
+
+    blocTest<AiResearchCubit, AiResearchState>(
+      'generate renders the outcome and refreshes the run history',
+      build: () {
+        when(() => gateway.analyze(any())).thenAnswer(
+          (_) async => Result<ResearchOutcome>.success(
+            ResearchOutcome(
+              runId: 'run-1',
+              status: ResearchRunStatus.completed,
+              findings: const <AiFinding>[finding],
+            ),
+          ),
+        );
+        when(() => gateway.fetchRuns()).thenAnswer(
+          (_) async => Result<List<ResearchRun>>.success(<ResearchRun>[run]),
+        );
+        return AiResearchCubit(gateway);
+      },
+      act: (AiResearchCubit cubit) => cubit.generate(
+        ResearchRequest(
+          organizationId: 'org-1',
+          documentIds: const <String>['doc-1'],
+          question: 'What changed?',
+        ),
+      ),
+      verify: (AiResearchCubit cubit) {
+        final AiResearchState last = cubit.state;
+        expect(last.findings, isA<ViewSuccess<List<AiFinding>>>());
+        expect(
+          (last.findings as ViewSuccess<List<AiFinding>>).data,
+          const <AiFinding>[finding],
+        );
+        expect(last.runs, isA<ViewSuccess<List<ResearchRun>>>());
+        expect(last.lastQuery, 'What changed?');
+        expect(last.lastError, isNull);
+        verify(() => gateway.analyze(any())).called(1);
+        verify(() => gateway.fetchRuns()).called(1);
+      },
+    );
+
+    blocTest<AiResearchCubit, AiResearchState>(
+      'provider_not_configured keeps the typed error and an empty arm',
+      build: () {
+        when(() => gateway.analyze(any())).thenAnswer(
+          (_) async => const Result<ResearchOutcome>.failure(
+            AppError(
+              code: 'provider_not_configured',
+              userMessage: 'not configured',
+              kind: AppErrorKind.unavailable,
+            ),
+          ),
+        );
+        when(() => gateway.fetchRuns()).thenAnswer(
+          (_) async => const Result<List<ResearchRun>>.success(
+            <ResearchRun>[],
+          ),
+        );
+        return AiResearchCubit(gateway);
+      },
+      act: (AiResearchCubit cubit) => cubit.generate(
+        ResearchRequest(organizationId: 'org-1', question: 'What changed?'),
+      ),
+      verify: (AiResearchCubit cubit) {
+        final AiResearchState last = cubit.state;
+        expect(last.findings, isA<ViewEmpty<List<AiFinding>>>());
+        expect(last.lastError?.code, 'provider_not_configured');
+      },
+    );
+
+    test('loadRunFindings labels the answer with the run prompt', () async {
+      when(() => gateway.fetchRuns()).thenAnswer(
+        (_) async => Result<List<ResearchRun>>.success(<ResearchRun>[run]),
+      );
+      when(() => gateway.fetchFindings('run-1')).thenAnswer(
+        (_) async =>
+            const Result<List<AiFinding>>.success(<AiFinding>[finding]),
+      );
+      final AiResearchCubit cubit = AiResearchCubit(gateway);
+      addTearDown(cubit.close);
+
+      await cubit.loadRuns();
+      await cubit.loadRunFindings('run-1');
+
+      expect(cubit.state.lastQuery, 'What changed?');
+      expect(cubit.state.findings, isA<ViewSuccess<List<AiFinding>>>());
+    });
   });
 }

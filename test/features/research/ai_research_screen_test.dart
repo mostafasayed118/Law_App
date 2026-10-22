@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/backend_posture.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/data/local/in_memory_org_selection_store.dart';
 import 'package:legalhub/features/documents/data/fake_document_gateway.dart';
 import 'package:legalhub/features/documents/domain/document.dart';
 import 'package:legalhub/features/documents/domain/document_gateway.dart';
 import 'package:legalhub/features/matters/data/fake_matter_gateway.dart';
 import 'package:legalhub/features/matters/domain/matter.dart';
 import 'package:legalhub/features/matters/domain/matter_gateway.dart';
+import 'package:legalhub/features/research/domain/ai_finding.dart';
+import 'package:legalhub/features/research/domain/ai_gateway.dart';
+import 'package:legalhub/features/research/domain/research_outcome.dart';
+import 'package:legalhub/features/research/domain/research_request.dart';
+import 'package:legalhub/features/research/domain/research_run.dart';
 import 'package:legalhub/features/research/presentation/ai_research_entry_card.dart';
 import 'package:legalhub/features/research/presentation/ai_research_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
@@ -84,6 +92,67 @@ class _FailingMatterGateway implements MatterGateway {
       fetchMatters();
 }
 
+/// A configurable real-seam stub: one outcome, one typed failure, a run
+/// history, and stored findings. Captures the request the screen generates.
+class _StubAiGateway implements AiGateway {
+  _StubAiGateway({
+    this.outcome,
+    this.analyzeError,
+    this.runs = const <ResearchRun>[],
+    this.findings = const <AiFinding>[],
+  });
+
+  final ResearchOutcome? outcome;
+  final AppError? analyzeError;
+  final List<ResearchRun> runs;
+  final List<AiFinding> findings;
+  ResearchRequest? lastRequest;
+
+  @override
+  Future<Result<ResearchOutcome>> analyze(ResearchRequest request) async {
+    lastRequest = request;
+    final AppError? error = analyzeError;
+    if (error != null) {
+      return Result<ResearchOutcome>.failure(error);
+    }
+    return Result<ResearchOutcome>.success(outcome!);
+  }
+
+  @override
+  Future<Result<List<AiFinding>>> fetchFindings(String runId) async =>
+      Result<List<AiFinding>>.success(findings);
+
+  @override
+  Future<Result<List<ResearchRun>>> fetchRuns({int limit = 20}) async =>
+      Result<List<ResearchRun>>.success(runs);
+
+  @override
+  Future<Result<List<AiFinding>>> research(String query) async =>
+      const Result<List<AiFinding>>.success(<AiFinding>[]);
+}
+
+ResearchOutcome _outcome(List<AiFinding> findings) => ResearchOutcome(
+  runId: 'run-1',
+  status: ResearchRunStatus.completed,
+  model: 'test-model',
+  findings: findings,
+);
+
+AiFinding _serverFinding({String headline = 'Server headline'}) => AiFinding(
+  id: 'finding-1',
+  headline: headline,
+  summary: 'Server summary.',
+  excerpt: 'Server excerpt.',
+  sources: const <AiSource>[
+    AiSource(
+      kind: AiSourceKind.document,
+      title: '',
+      detail: '',
+      sourceId: 'doc-5',
+    ),
+  ],
+);
+
 void main() {
   tearDown(resetServiceLocator);
 
@@ -105,7 +174,23 @@ void main() {
       canViewApprovals: true,
       canUseAiResearch: true,
     ),
+    AiGateway? aiGateway,
+    bool localOnly = true,
+    String? activeOrganizationId,
   }) async {
+    if (aiGateway != null) {
+      serviceLocator.registerLazySingleton<AiGateway>(() => aiGateway);
+    }
+    if (!localOnly) {
+      serviceLocator.registerLazySingleton<BackendPosture>(
+        () => const BackendPosture(isLocalOnly: false),
+      );
+    }
+    if (activeOrganizationId != null) {
+      final ActiveOrgStore store = ActiveOrgStore(InMemoryOrgSelectionStore());
+      store.select(activeOrganizationId);
+      serviceLocator.registerLazySingleton<ActiveOrgStore>(() => store);
+    }
     configureDependencies();
     tester.view.physicalSize = const Size(800, 1600);
     tester.view.devicePixelRatio = 1.0;
@@ -290,6 +375,208 @@ void main() {
         find.text('Ask the demo research assistant — advisory only.'),
         findsOneWidget,
       );
+    });
+
+    testWidgets(
+      'renders the question field, optional pickers, and generate action',
+      (tester) async {
+        await _registerStub(
+          documents: FakeDocumentGateway.syntheticDocuments,
+          matters: FakeMatterGateway.syntheticMatters,
+        );
+        await pumpResearch(tester);
+        await tester.pumpAndSettle();
+
+        expect(find.text('Research question'), findsOneWidget);
+        expect(find.text('Generate findings'), findsOneWidget);
+        expect(find.text('Documents (optional)'), findsOneWidget);
+        expect(find.byType(FilterChip), findsNWidgets(5));
+        expect(
+          find.byType(DropdownButtonFormField<String?>),
+          findsOneWidget,
+        );
+        expect(
+          find.text('Ask a question to search the demo research corpus.'),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'generate sends the selected context and renders a server finding',
+      (tester) async {
+        final _StubAiGateway stub = _StubAiGateway(
+          outcome: _outcome(<AiFinding>[_serverFinding()]),
+        );
+        await _registerStub(
+          documents: FakeDocumentGateway.syntheticDocuments,
+          matters: FakeMatterGateway.syntheticMatters,
+        );
+        await pumpResearch(tester, aiGateway: stub);
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Demo settlement draft'));
+        await tester.pump();
+        await tester.enterText(
+          find.byType(TextField),
+          'What changed in the draft?',
+        );
+        await tester.tap(find.text('Generate findings'));
+        await tester.pumpAndSettle();
+
+        expect(stub.lastRequest?.question, 'What changed in the draft?');
+        expect(stub.lastRequest?.documentIds, contains('doc-5'));
+        expect(stub.lastRequest?.organizationId, 'demo-organization');
+        expect(find.text('Server headline'), findsOneWidget);
+        expect(find.text('Server summary.'), findsOneWidget);
+        expect(find.text('Document — doc-5'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'provider_not_configured renders an explicit unavailable state',
+      (tester) async {
+        final _StubAiGateway stub = _StubAiGateway(
+          analyzeError: const AppError(
+            code: 'provider_not_configured',
+            userMessage: 'not configured',
+            kind: AppErrorKind.unavailable,
+          ),
+        );
+        await _registerStub(
+          documents: FakeDocumentGateway.syntheticDocuments,
+          matters: FakeMatterGateway.syntheticMatters,
+        );
+        await pumpResearch(
+          tester,
+          aiGateway: stub,
+          localOnly: false,
+          activeOrganizationId: 'org-1',
+        );
+        await tester.pumpAndSettle();
+
+        await tester.enterText(find.byType(TextField), 'A valid question');
+        await tester.tap(find.text('Generate findings'));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text(
+            'AI research is not configured for this deployment. '
+            'No analysis was run.',
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.text('Retry'),
+          findsNothing,
+          reason: 'a missing provider secret is not a retryable failure',
+        );
+      },
+    );
+
+    testWidgets('a typed failure renders its copy with a retry', (
+      tester,
+    ) async {
+      final _StubAiGateway stub = _StubAiGateway(
+        analyzeError: const AppError(
+          code: 'context_too_large',
+          userMessage: 'too large',
+        ),
+      );
+      await _registerStub(
+        documents: FakeDocumentGateway.syntheticDocuments,
+        matters: FakeMatterGateway.syntheticMatters,
+      );
+      await pumpResearch(
+        tester,
+        aiGateway: stub,
+        localOnly: false,
+        activeOrganizationId: 'org-1',
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), 'A valid question');
+      await tester.tap(find.text('Generate findings'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(
+          'The selected context is too large. '
+          'Remove documents and try again.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Retry'), findsOneWidget);
+    });
+
+    testWidgets('run history renders statuses and opens stored findings', (
+      tester,
+    ) async {
+      final _StubAiGateway stub = _StubAiGateway(
+        runs: <ResearchRun>[
+          ResearchRun(
+            id: 'run-1',
+            organizationId: 'org-1',
+            status: ResearchRunStatus.completed,
+            promptSummary: 'Prior question',
+            createdAt: DateTime.utc(2026, 10, 22),
+          ),
+          ResearchRun(
+            id: 'run-0',
+            organizationId: 'org-1',
+            status: ResearchRunStatus.failed,
+            promptSummary: 'Broken question',
+            errorCode: 'provider_unavailable',
+            createdAt: DateTime.utc(2026, 10, 21),
+          ),
+        ],
+        findings: <AiFinding>[_serverFinding(headline: 'Stored finding')],
+      );
+      await _registerStub(
+        documents: FakeDocumentGateway.syntheticDocuments,
+        matters: FakeMatterGateway.syntheticMatters,
+      );
+      await pumpResearch(tester, aiGateway: stub);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Recent research runs'), findsOneWidget);
+      expect(find.text('Prior question'), findsOneWidget);
+      expect(find.text('Completed'), findsOneWidget);
+      expect(find.text('Failed'), findsOneWidget);
+
+      await tester.tap(find.text('Prior question'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Stored finding'), findsOneWidget);
+    });
+
+    testWidgets('configured builds name the AI generation and storage', (
+      tester,
+    ) async {
+      final _StubAiGateway stub = _StubAiGateway(
+        outcome: _outcome(const <AiFinding>[]),
+      );
+      await _registerStub(
+        documents: FakeDocumentGateway.syntheticDocuments,
+        matters: FakeMatterGateway.syntheticMatters,
+      );
+      await pumpResearch(
+        tester,
+        aiGateway: stub,
+        localOnly: false,
+        activeOrganizationId: 'org-1',
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.textContaining('AI-generated — review before relying on it'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('AI-generated findings are stored with your organization.'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('Demo mode'), findsNothing);
     });
   });
 }

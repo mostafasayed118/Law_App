@@ -2100,4 +2100,109 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get unmatchedRouteTitle => 'Bu bağlantı açılamadı.';
+
+  @override
+  String get aiResearchQuestionLabel => 'Araştırma sorusu';
+
+  @override
+  String get aiResearchQuestionTooShort => 'En az 2 karakter girin.';
+
+  @override
+  String get aiResearchQuestionTooLong =>
+      'Soruyu en fazla 500 karakterde tutun.';
+
+  @override
+  String get aiResearchMatterLabel => 'Dosya (isteğe bağlı)';
+
+  @override
+  String get aiResearchMatterNone => 'Dosya yok';
+
+  @override
+  String get aiResearchMattersError => 'Dosyalar yüklenemedi.';
+
+  @override
+  String get aiResearchDocumentsLabel => 'Belgeler (isteğe bağlı)';
+
+  @override
+  String get aiResearchDocumentsError => 'Belgeler yüklenemedi.';
+
+  @override
+  String get aiResearchDocumentsNone => 'Kullanılabilir belge yok.';
+
+  @override
+  String get aiResearchReload => 'Yeniden yükle';
+
+  @override
+  String get aiResearchGenerate => 'Bulguları oluştur';
+
+  @override
+  String get aiResearchRunsTitle => 'Son araştırma çalışmaları';
+
+  @override
+  String get aiResearchRunsEmpty => 'Henüz araştırma çalışması yok.';
+
+  @override
+  String get aiResearchRunsError => 'Çalışma geçmişi yüklenemedi.';
+
+  @override
+  String get aiResearchRunStatusRunning => 'Çalışıyor';
+
+  @override
+  String get aiResearchRunStatusCompleted => 'Tamamlandı';
+
+  @override
+  String get aiResearchRunStatusFailed => 'Başarısız';
+
+  @override
+  String get aiResearchProviderNotConfigured =>
+      'Yapay zekâ araştırması bu dağıtım için yapılandırılmamış. Hiçbir analiz çalıştırılmadı.';
+
+  @override
+  String get aiResearchGeneratedNotice =>
+      'Yapay zekâ tarafından oluşturuldu — güvenmeden önce inceleyin. Hukuki tavsiye değildir.';
+
+  @override
+  String get aiResearchStoredNote =>
+      'Yapay zekâ bulguları kuruluşunuzla birlikte saklanır.';
+
+  @override
+  String get aiResearchIdlePromptReal =>
+      'Seçili dosya ve belgeler üzerinde bir soru sorun.';
+
+  @override
+  String get aiResearchErrorUnauthorized =>
+      'Yapay zekâ araştırmasını kullanmak için yeniden giriş yapın.';
+
+  @override
+  String get aiResearchErrorForbidden =>
+      'Rolünüz yapay zekâ araştırması çalıştıramaz.';
+
+  @override
+  String get aiResearchErrorInvalidRequest =>
+      'Soruyu ve seçilenleri kontrol edip yeniden deneyin.';
+
+  @override
+  String get aiResearchErrorContextTooLarge =>
+      'Seçilen bağlam çok büyük. Belgeleri azaltıp yeniden deneyin.';
+
+  @override
+  String get aiResearchErrorProviderUnavailable =>
+      'Yapay zekâ sağlayıcısı geçici olarak kullanılamıyor. Lütfen yeniden deneyin.';
+
+  @override
+  String get aiResearchErrorInvalidResponse =>
+      'Yapay zekâ sağlayıcısı beklenmeyen bir yanıt döndürdü. Lütfen yeniden deneyin.';
+
+  @override
+  String get aiResearchErrorNoOrg =>
+      'Araştırmayı çalıştırmak için bir kuruluş seçin.';
+
+  @override
+  String get aiResearchNoSourceCited => 'Kaynak belirtilmedi.';
+
+  @override
+  String get aiResearchSourceDocument => 'Belge';
+
+  @override
+  String get aiResearchSourceMatter => 'Dosya';
 }

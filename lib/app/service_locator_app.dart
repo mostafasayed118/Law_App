@@ -24,19 +24,7 @@ void _registerDemoGateways() {
   // the other applied-table seams. The approvals queue LEFT it in the
   // approvals slice (design §3) and flips in _registerApprovalSeams; the
   // compliance alerts LEFT it in the compliance slice (design §4) and flips
-  // in _registerComplianceSeams.
-  // AI research slice (plan 2026-09-02): the synthetic engine composes the
-  // two SHIPPED read seams (ratified scope decision D-2 — shipped gateways
-  // only, no AI-only corpus), so it automatically follows the env flip of
-  // DocumentGateway/MatterGateway. D-1: no model provider — the synthetic
-  // gateway IS the product posture; a real provider would arrive behind the
-  // same AiGateway seam. C-1: no persistence — no store class is registered.
-  if (!serviceLocator.isRegistered<AiGateway>()) {
-    serviceLocator.registerLazySingleton<AiGateway>(
-      () => SyntheticAiGateway(
-        documentGateway: serviceLocator<DocumentGateway>(),
-        matterGateway: serviceLocator<MatterGateway>(),
-      ),
-    );
-  }
+  // in _registerComplianceSeams. The AI research seam LEFT it in the research
+  // slice (design §5): SyntheticAiGateway is now the env-less arm of
+  // _registerResearchSeams, and configured builds use SupabaseResearchGateway.
 }

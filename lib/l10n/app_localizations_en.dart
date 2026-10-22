@@ -2097,4 +2097,106 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unmatchedRouteTitle => 'This link could not be opened.';
+
+  @override
+  String get aiResearchQuestionLabel => 'Research question';
+
+  @override
+  String get aiResearchQuestionTooShort => 'Enter at least 2 characters.';
+
+  @override
+  String get aiResearchQuestionTooLong =>
+      'Keep the question at 500 characters or fewer.';
+
+  @override
+  String get aiResearchMatterLabel => 'Matter (optional)';
+
+  @override
+  String get aiResearchMatterNone => 'No matter';
+
+  @override
+  String get aiResearchMattersError => 'Unable to load matters.';
+
+  @override
+  String get aiResearchDocumentsLabel => 'Documents (optional)';
+
+  @override
+  String get aiResearchDocumentsError => 'Unable to load documents.';
+
+  @override
+  String get aiResearchDocumentsNone => 'No documents available.';
+
+  @override
+  String get aiResearchReload => 'Reload';
+
+  @override
+  String get aiResearchGenerate => 'Generate findings';
+
+  @override
+  String get aiResearchRunsTitle => 'Recent research runs';
+
+  @override
+  String get aiResearchRunsEmpty => 'No research runs yet.';
+
+  @override
+  String get aiResearchRunsError => 'Unable to load run history.';
+
+  @override
+  String get aiResearchRunStatusRunning => 'Running';
+
+  @override
+  String get aiResearchRunStatusCompleted => 'Completed';
+
+  @override
+  String get aiResearchRunStatusFailed => 'Failed';
+
+  @override
+  String get aiResearchProviderNotConfigured =>
+      'AI research is not configured for this deployment. No analysis was run.';
+
+  @override
+  String get aiResearchGeneratedNotice =>
+      'AI-generated — review before relying on it. Not legal advice.';
+
+  @override
+  String get aiResearchStoredNote =>
+      'AI-generated findings are stored with your organization.';
+
+  @override
+  String get aiResearchIdlePromptReal =>
+      'Ask a question across the selected matter and documents.';
+
+  @override
+  String get aiResearchErrorUnauthorized => 'Sign in again to use AI research.';
+
+  @override
+  String get aiResearchErrorForbidden => 'Your role cannot run AI research.';
+
+  @override
+  String get aiResearchErrorInvalidRequest =>
+      'Check the question and selected items, then try again.';
+
+  @override
+  String get aiResearchErrorContextTooLarge =>
+      'The selected context is too large. Remove documents and try again.';
+
+  @override
+  String get aiResearchErrorProviderUnavailable =>
+      'The AI provider is temporarily unavailable. Please try again.';
+
+  @override
+  String get aiResearchErrorInvalidResponse =>
+      'The AI provider returned an unexpected response. Please try again.';
+
+  @override
+  String get aiResearchErrorNoOrg => 'Select an organization to run research.';
+
+  @override
+  String get aiResearchNoSourceCited => 'No source cited.';
+
+  @override
+  String get aiResearchSourceDocument => 'Document';
+
+  @override
+  String get aiResearchSourceMatter => 'Matter';
 }
