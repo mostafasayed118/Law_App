@@ -33,6 +33,7 @@
 | `migrations/02_rls_functions.sql` | Helper functions + signup trigger + expiry cleanup (security definer) | `migrations/02_rls_functions.down.sql` |
 | `migrations/03_platform_config_seed.sql` | Q1 owner-uid seed (substitution token, applied only with verified id) | `migrations/03_platform_config_seed.down.sql` |
 | `migrations/22_attorney_directory.sql` | Platform-level attorney directory (professional profiles only; RLS on, default-deny, narrow select grant) | `migrations/22_attorney_directory.down.sql` |
+| `migrations/23_approvals.sql` | Org-scoped approval requests + append-only decision events (RLS on, default-deny, narrow select grants; RPC-only writes) | `migrations/23_approvals.down.sql` |
 | `policies/*.sql` | Per-table RLS policies (versioned in git, never edited in dashboard) | `git revert` of the policy commit (design §7) |
 | `rpc/*.sql` | Narrow RPC surface (security definer, each audited) | `rpc/_down.sql` (drops the whole surface) |
 
@@ -138,6 +139,7 @@ this battery hardens that pattern into a committed artifact.
 | `tests/20_payment_rls.sql` | **Invoice-payment battery** (payment slice): `initiate_invoice_payment` positive + duplicate idempotency + `payment:initiate` audit; `get_invoice_payment_status`; `apply_paymob_transaction` success settles the invoice + duplicate `already_processed` + failed leaves it issued; amount/currency/order mismatch rejection; assignment-gate/anon denials; service-role-only RPCs denied to authenticated; direct-DML deny; cascade; audit redaction. The whole battery rolls back. |
 | `tests/21_task_assignable_members_rls.sql` | **Task assignee-picker battery** (task slice): `list_matter_assignable_members` positives for the assigned client/attorney (active org members, display names), org-role-alone/cross-org/suspended/owner/anon denials, platform-owner exclusion, guessed-matter zero rows, exact `user_id`/`display_name` projection, no audit write. The whole battery rolls back. |
 | `tests/22_attorney_directory_rls.sql` | **Attorney-directory battery** (design 2026-10-22 §2): owner-only create/update/deactivate with `attorney_profile:*` audit rows; non-owner/anon/suspended/no-membership denials; active-only direct select; owner-only inactive listing; search by name/city/specialty; inactive `get` → not found; cross-org read by design; no parameter defaults; privilege/definer posture. The whole battery rolls back. |
+| `tests/23_approval_rls.sql` | **Approval-workflow battery** (design 2026-10-22 §3): member-scoped create/list, partner-only decisions, requester self-decision refusal, rejection-note requirement, requester/partner cancel, pending-only transitions, cross-org/suspended/anon denials, append-only events, §8 audit rows, direct-DML denial, no parameter defaults. The whole battery rolls back. |
 
 ### Running the battery
 
@@ -164,7 +166,7 @@ scripts/verify_policy_tests.sh --check        # static validation, no database
   `11_matter_write.sql`, `14_notifications.sql`,
   `15_notification_producer.sql`, `16_notification_read_flag.sql`,
   `17_tasks.sql`, `18_booking.sql`, `19_storage_write.sql`, `20_payments.sql`,
-  `21_matter_creator.sql`, `22_attorney_directory.sql`, then
+  `21_matter_creator.sql`, `22_attorney_directory.sql`, `23_approvals.sql`, then
   `policies/*.sql`, `rpc/*.sql` in the apply order above.
   **`03_platform_config_seed.sql` is NOT applied**: its owner token is an
   apply-time substitution placeholder for the dev project; the battery seeds
