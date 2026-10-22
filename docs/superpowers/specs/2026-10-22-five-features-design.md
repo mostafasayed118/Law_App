@@ -155,10 +155,17 @@ separate owner GO.
 
 ## 9. Implementation status — 2026-10-22
 
-All five waves landed locally (no push): W-A Discovery (`c38f665`, `ddca47d`,
-`c672601`), W-B Approvals (`dbddf1d`, `695f752`, `d645ca4`), W-C Compliance
-(`1d87795`, `127fc1e`, `807133f`), W-D Research (`f6c84a6`, `4c5246d`,
-`a1c5451`), W-E Video (`cc6cc74`, `c7b00b7`, `958adc3`).
+All five waves landed and were pushed on 2026-10-22 under an explicit owner
+GO: W-A Discovery (`c38f665`, `ddca47d`, `c672601`), W-B Approvals
+(`dbddf1d`, `695f752`, `d645ca4`), W-C Compliance (`1d87795`, `127fc1e`,
+`807133f`), W-D Research (`f6c84a6`, `4c5246d`, `a1c5451`), W-E Video
+(`cc6cc74`, `c7b00b7`, `958adc3`). The pre-flight also landed a format-only
+fix (`ed336e6`) and the suite-count reconciliation (`d19c0f1`).
+
+**Push window:** `af1d2ea..d19c0f1` (23 commits) — `git ls-remote` = HEAD =
+`d19c0f1`, unpushed 0. CI run `39800051002` green on both jobs
+(`format + analyze + test`, `release bundle + debug APK ABI`), including the
+native LiveKit dependency.
 
 Gates on the final tree: format 0 changed, `flutter analyze` clean,
 `flutter test` 1883/1883 (concurrency=1 under local memory pressure), ledger
@@ -176,5 +183,6 @@ Still required before any of this is live:
 4. Set `RIVER_*` and `LIVEKIT_*` secrets on the project.
 5. Run the new batteries (22-26) on an ephemeral local stack.
 6. Device E2E for discovery, approvals, compliance, research, and video.
-7. A push window for the unpushed commits, on an explicit owner GO.
+7. ~~A push window for the unpushed commits, on an explicit owner GO.~~
+   Done 2026-10-22 (`d19c0f1`).
 
