@@ -32,6 +32,7 @@
 | `migrations/01_org_schema.sql` | Enums, 6 tables, RLS enable, default-deny revokes + narrow grants | `migrations/01_org_schema.down.sql` |
 | `migrations/02_rls_functions.sql` | Helper functions + signup trigger + expiry cleanup (security definer) | `migrations/02_rls_functions.down.sql` |
 | `migrations/03_platform_config_seed.sql` | Q1 owner-uid seed (substitution token, applied only with verified id) | `migrations/03_platform_config_seed.down.sql` |
+| `migrations/22_attorney_directory.sql` | Platform-level attorney directory (professional profiles only; RLS on, default-deny, narrow select grant) | `migrations/22_attorney_directory.down.sql` |
 | `policies/*.sql` | Per-table RLS policies (versioned in git, never edited in dashboard) | `git revert` of the policy commit (design §7) |
 | `rpc/*.sql` | Narrow RPC surface (security definer, each audited) | `rpc/_down.sql` (drops the whole surface) |
 
@@ -136,6 +137,7 @@ this battery hardens that pattern into a committed artifact.
 | `tests/19_file_write_rls.sql` | **Matter-files write battery** (write slice): `register_matter_file` positives for the assigned client/attorney against the existing fixture objects with the `file:create` §8 audit rows; blank name/mime, negative size, path-prefix and missing-object denies; org-role-alone / cross-org / suspended / owner / anon denies; no direct `public.files` INSERT/UPDATE/DELETE grants; exactly 3 storage policies; the 25 MiB + seven-MIME bucket envelope; `delete_matter_file` cleanup with the `file:delete` audit row; a non-assigned delete deny; the §8 negative. The whole battery is transactional and rolls back |
 | `tests/20_payment_rls.sql` | **Invoice-payment battery** (payment slice): `initiate_invoice_payment` positive + duplicate idempotency + `payment:initiate` audit; `get_invoice_payment_status`; `apply_paymob_transaction` success settles the invoice + duplicate `already_processed` + failed leaves it issued; amount/currency/order mismatch rejection; assignment-gate/anon denials; service-role-only RPCs denied to authenticated; direct-DML deny; cascade; audit redaction. The whole battery rolls back. |
 | `tests/21_task_assignable_members_rls.sql` | **Task assignee-picker battery** (task slice): `list_matter_assignable_members` positives for the assigned client/attorney (active org members, display names), org-role-alone/cross-org/suspended/owner/anon denials, platform-owner exclusion, guessed-matter zero rows, exact `user_id`/`display_name` projection, no audit write. The whole battery rolls back. |
+| `tests/22_attorney_directory_rls.sql` | **Attorney-directory battery** (design 2026-10-22 §2): owner-only create/update/deactivate with `attorney_profile:*` audit rows; non-owner/anon/suspended/no-membership denials; active-only direct select; owner-only inactive listing; search by name/city/specialty; inactive `get` → not found; cross-org read by design; no parameter defaults; privilege/definer posture. The whole battery rolls back. |
 
 ### Running the battery
 
@@ -161,7 +163,8 @@ scripts/verify_policy_tests.sh --check        # static validation, no database
   rehearsal host), `09_realtime_push.sql`, `10_billing_invoices.sql`,
   `11_matter_write.sql`, `14_notifications.sql`,
   `15_notification_producer.sql`, `16_notification_read_flag.sql`,
-  `17_tasks.sql`, `18_booking.sql`, `19_storage_write.sql`, `20_payments.sql`, then
+  `17_tasks.sql`, `18_booking.sql`, `19_storage_write.sql`, `20_payments.sql`,
+  `21_matter_creator.sql`, `22_attorney_directory.sql`, then
   `policies/*.sql`, `rpc/*.sql` in the apply order above.
   **`03_platform_config_seed.sql` is NOT applied**: its owner token is an
   apply-time substitution placeholder for the dev project; the battery seeds
@@ -203,12 +206,17 @@ gated on this rehearsal passing + the owner's dated apply-approval
 
 ## What this directory does NOT authorize
 
-- No Supabase change beyond the reviewed + applied slice (Up 1–5, executed
-  2026-08-01 on the dev project; P2 closed 2026-08-03, §4.5 provider loop
-  deferred — `docs/p2_close_decision_2026-08-03.md`).
-- No matter/doc schema, no storage/realtime policy (Q4 deferral), no real
-  data, no service-role usage, no compliance claim.
-- The Flutter code (`lib/`) is untouched by this slice.
+- No Supabase change beyond the reviewed slices recorded in dated
+  `docs/live_apply_*.md` / `docs/*_apply_execution_*.md` files. There is no
+  `schema_migrations` history on the dev project, so `supabase db push` is not
+  a permitted apply path.
+- No apply to any project other than `law_project` (`eutmvevpskerzpqmwplv`),
+  and no policy battery against the dev project (batteries 18–21 delete
+  `auth.users` / `platform_config`; they run on an ephemeral stack only).
+- No real client data, no service-role key in the app, and no compliance or
+  credential-verification claim. The attorney directory carries professional
+  profile data only.
+- The Flutter code (`lib/`) is untouched by SQL-only changes.
 
 ### Paymob edge functions (deployed 2026-10-21; secrets pending)
 
