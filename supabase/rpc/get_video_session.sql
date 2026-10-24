@@ -5,8 +5,9 @@
 --
 -- READ-ONLY. Gates:
 --   - the session must exist ('video session not found');
---   - the caller must be an ACTIVE MEMBER of the session's organization
---     ('permission denied').
+--   - public.can_access_video_session must pass ('permission denied'): the
+--     caller is an active member of the session's organization AND a partner,
+--     the creator, a linked-matter reader, or the linked booking's client.
 --
 -- Returns the full row. No audit row: read path. No parameter defaults.
 
@@ -24,7 +25,7 @@ begin
   if not found then
     raise exception 'video session not found';
   end if;
-  if not public.is_active_member(v_row.organization_id) then
+  if not public.can_access_video_session(p_id) then
     raise exception 'permission denied';
   end if;
 

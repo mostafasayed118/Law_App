@@ -8,7 +8,7 @@
 -- shape contract for every minted room.
 --
 -- Default-deny posture: RLS on, all privileges revoked from anon +
--- authenticated, exactly one narrow SELECT grant. The active-member read
+-- authenticated, exactly one narrow SELECT grant. The participant read
 -- policy lives in supabase/policies/video_sessions.sql; the five RPCs live
 -- in supabase/rpc/*video*.sql.
 --

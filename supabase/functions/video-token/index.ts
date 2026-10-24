@@ -120,8 +120,11 @@ Deno.serve(async (request: Request): Promise<Response> => {
   }
   const sessionId = rawSessionId.toLowerCase();
 
-  // RLS is the authorization boundary: an active member of the session's org
-  // sees the row; everyone else gets no row (and therefore a 404).
+  // RLS is the authorization boundary: video_sessions_select_org calls
+  // public.can_access_video_session(id), so only a partner, the creator, a
+  // linked-matter reader, or the linked booking's client sees the row;
+  // everyone else gets no row (and therefore a 404). A policy-evaluation
+  // error is surfaced as 403 below.
   const { data, error } = await userClient
     .from("video_sessions")
     .select("id,room_name,status")

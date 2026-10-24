@@ -9,8 +9,10 @@
 --     denied; invalid kind and title bounds raise check_violation; every
 --     successful create writes exactly one 'created' event and one redacted
 --     audit row (23.01-23.08);
---   - list: active-member scoping, newest-first ordering, the status filter,
---     and cross-org denial; both read policies are exercised directly
+--   - list: participant-scoped reads (partner sees the org queue, a requester
+--     and a matter assignee see their own/matter rows, an unrelated active
+--     member sees none), newest-first ordering, the status filter, and
+--     cross-org denial; both read policies are exercised directly
 --     (23.09-23.10);
 --   - decide: partner approve/reject positives with event + audit; the
 --     requester cannot self-decide, a client cannot decide, invalid
@@ -483,10 +485,11 @@ begin
 end $$;
 
 -- ############################################################################
--- 23.09 — POS (list scoping, ordering, filter): partner-a and client-a both
--- read the four org-a rows (two anchors + 23.01/23.02) newest first; the
--- pending/cancelled filters narrow correctly; partner-b reads zero org-b
--- rows and both read policies expose nothing cross-org.
+-- 23.09 — POS/NEG (participant-scoped list): partner-a reads the four org-a
+-- rows (two anchors + 23.01/23.02) newest first and both filters narrow
+-- correctly. client-a (requester + matter-1 assignee on 23.02) reads exactly
+-- that one row and its event. orphan (active org-a member, assigned only on
+-- matter 4) reads none. partner-b reads zero org-b rows.
 -- ############################################################################
 set role authenticated;
 do $$
@@ -498,6 +501,7 @@ declare
   v_third  uuid;
   v_fourth uuid;
   v_events bigint;
+  v_only   uuid;
 begin
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000002', false);
   perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002"}', false);
@@ -550,8 +554,26 @@ begin
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000003', false);
   perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000003"}', false);
   select count(*) into v_total from public.list_approval_requests('20000000-0000-4000-8000-000000000001', null);
-  if v_total <> 4 then
-    raise exception 'POLICY-BATTERY FAIL 23.09: client-a sees % org-a rows, want 4', v_total;
+  if v_total <> 1 then
+    raise exception 'POLICY-BATTERY FAIL 23.09: client-a sees % org-a rows, want 1', v_total;
+  end if;
+  select id into v_only from public.list_approval_requests('20000000-0000-4000-8000-000000000001', null);
+  if v_only is distinct from current_setting('battery23.b')::uuid then
+    raise exception 'POLICY-BATTERY FAIL 23.09: client-a sees % instead of its matter-linked request', v_only;
+  end if;
+  select count(*) into v_total from public.approval_requests;
+  select count(*) into v_events from public.approval_events;
+  if v_total <> 1 or v_events <> 1 then
+    raise exception 'POLICY-BATTERY FAIL 23.09: client-a direct select drift (requests %, events %)', v_total, v_events;
+  end if;
+
+  perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000007', false);
+  perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000007"}', false);
+  select count(*) into v_total from public.list_approval_requests('20000000-0000-4000-8000-000000000001', null);
+  select count(*) into v_pend from public.approval_requests;
+  select count(*) into v_events from public.approval_events;
+  if v_total <> 0 or v_pend <> 0 or v_events <> 0 then
+    raise exception 'POLICY-BATTERY FAIL 23.09: unrelated active member sees rows (rpc %, requests %, events %)', v_total, v_pend, v_events;
   end if;
 
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000004', false);

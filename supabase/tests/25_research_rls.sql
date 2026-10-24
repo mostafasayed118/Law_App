@@ -8,8 +8,9 @@
 --     audit rows and the trimmed prompt summary (25.01-25.02);
 --   - client / suspended / owner / anon start denials; cross-org matter
 --     denial; prompt-summary validation (25.03-25.08);
---   - list scoping and newest-first ordering for runs; active-member reads
---     for findings; cross-org list denials; direct-select scoping
+--   - list scoping and newest-first ordering for runs; participant-scoped
+--     findings reads (partner/requester/matter reader); unrelated active
+--     member and cross-org denials; direct-select scoping
 --     (25.09-25.11);
 --   - authenticated cannot execute the service-role completion RPC (25.12);
 --   - service-role completion inserts findings + updates the run + writes a
@@ -475,9 +476,11 @@ begin
 end $$;
 
 -- ############################################################################
--- 25.09 — POS (run listing + scoping + ordering): partner-a, client-a and the
--- attorney read the three org-a runs; partner-b reads only the org-b seed.
--- The newest-first tail is the 2001 seed.
+-- 25.09 — POS/NEG (participant-scoped run listing): partner-a reads the
+-- three org-a runs (partner), the generated attorney reads its own
+-- matter-linked run, client-a and orphan (active org-a members with no
+-- participation) read none, and partner-b reads only the org-b seed. The
+-- newest-first tail is the 2001 seed.
 -- ############################################################################
 set role authenticated;
 do $$
@@ -485,6 +488,8 @@ declare
   v_total bigint;
   v_first uuid;
   v_last  uuid;
+  v_only  uuid;
+  v_direct bigint;
 begin
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000002', false);
   perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002"}', false);
@@ -524,8 +529,12 @@ begin
   perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000003"}', false);
   select count(*) into v_total
     from public.list_research_runs('20000000-0000-4000-8000-000000000001');
-  if v_total <> 3 then
-    raise exception 'POLICY-BATTERY FAIL 25.09: client-a sees % org-a runs, want 3', v_total;
+  if v_total <> 0 then
+    raise exception 'POLICY-BATTERY FAIL 25.09: client-a sees % org-a runs, want 0', v_total;
+  end if;
+  select count(*) into v_total from public.research_runs;
+  if v_total <> 0 then
+    raise exception 'POLICY-BATTERY FAIL 25.09: client-a direct run select returned %, want 0', v_total;
   end if;
 
   perform set_config('request.jwt.claim.sub', current_setting('battery25.attorney'), false);
@@ -533,8 +542,26 @@ begin
     json_build_object('sub', current_setting('battery25.attorney'))::text, false);
   select count(*) into v_total
     from public.list_research_runs('20000000-0000-4000-8000-000000000001');
-  if v_total <> 3 then
-    raise exception 'POLICY-BATTERY FAIL 25.09: attorney sees % org-a runs, want 3', v_total;
+  if v_total <> 1 then
+    raise exception 'POLICY-BATTERY FAIL 25.09: attorney sees % org-a runs, want 1', v_total;
+  end if;
+  select id into v_only
+    from public.list_research_runs('20000000-0000-4000-8000-000000000001');
+  if v_only is distinct from current_setting('battery25.run_attorney')::uuid then
+    raise exception 'POLICY-BATTERY FAIL 25.09: attorney sees % instead of its own run', v_only;
+  end if;
+  select count(*) into v_total from public.research_runs;
+  if v_total <> 1 then
+    raise exception 'POLICY-BATTERY FAIL 25.09: attorney direct run select returned %, want 1', v_total;
+  end if;
+
+  perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000007', false);
+  perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000007"}', false);
+  select count(*) into v_total
+    from public.list_research_runs('20000000-0000-4000-8000-000000000001');
+  select count(*) into v_direct from public.research_runs;
+  if v_total <> 0 or v_direct <> 0 then
+    raise exception 'POLICY-BATTERY FAIL 25.09: unrelated active member sees runs (rpc %, direct %)', v_total, v_direct;
   end if;
 
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000004', false);
@@ -589,9 +616,11 @@ end $$;
 reset role;
 
 -- ############################################################################
--- 25.11 — POS/NEG (findings read scoping): org-a members read the seeded
--- findings in sort_order; partner-b is denied the org-a run and reads its
--- own org-b finding. A missing run raises the typed not-found.
+-- 25.11 — POS/NEG (participant-scoped findings read): partner-a reads the
+-- seeded findings in sort_order; client-a and orphan (active org-a members
+-- with no participation) are denied by the RPC and see zero rows directly;
+-- partner-b is denied the org-a run and reads its own org-b finding. A
+-- missing run raises the typed not-found.
 -- ############################################################################
 set role authenticated;
 do $$
@@ -632,10 +661,38 @@ begin
 
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000003', false);
   perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000003"}', false);
-  select count(*) into v_total
-    from public.list_research_findings(current_setting('battery25.seed_a')::uuid);
-  if v_total <> 2 then
-    raise exception 'POLICY-BATTERY FAIL 25.11: client-a seed-a findings = %, want 2', v_total;
+  begin
+    perform public.list_research_findings(current_setting('battery25.seed_a')::uuid);
+    raise exception 'POLICY-BATTERY FAIL 25.11: unrelated client-a read seed-a findings';
+  exception when raise_exception then
+    if sqlerrm like '%POLICY-BATTERY FAIL%' then
+      raise;
+    end if;
+    if sqlerrm <> 'permission denied' then
+      raise exception 'POLICY-BATTERY FAIL 25.11: client-a findings read raised "%"', sqlerrm;
+    end if;
+  end;
+  select count(*) into v_total from public.research_findings;
+  if v_total <> 0 then
+    raise exception 'POLICY-BATTERY FAIL 25.11: client-a direct finding select returned %, want 0', v_total;
+  end if;
+
+  perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000007', false);
+  perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000007"}', false);
+  begin
+    perform public.list_research_findings(current_setting('battery25.seed_a')::uuid);
+    raise exception 'POLICY-BATTERY FAIL 25.11: unrelated orphan read seed-a findings';
+  exception when raise_exception then
+    if sqlerrm like '%POLICY-BATTERY FAIL%' then
+      raise;
+    end if;
+    if sqlerrm <> 'permission denied' then
+      raise exception 'POLICY-BATTERY FAIL 25.11: orphan findings read raised "%"', sqlerrm;
+    end if;
+  end;
+  select count(*) into v_total from public.research_findings;
+  if v_total <> 0 then
+    raise exception 'POLICY-BATTERY FAIL 25.11: orphan direct finding select returned %, want 0', v_total;
   end if;
 
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000004', false);

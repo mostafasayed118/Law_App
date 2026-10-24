@@ -54,6 +54,8 @@ async function inquireOrder(
   authToken: string,
   providerOrderId: string,
 ): Promise<InquiryResult> {
+  // `?auth_token=` is Paymob's documented inquiry API contract; the token is
+  // never logged (the error type carries only stage + status).
   const url = `${config.baseUrl}/api/ecommerce/orders/${encodeURIComponent(providerOrderId)}` +
     `?auth_token=${encodeURIComponent(authToken)}`;
   const response = await fetch(url, { method: "GET" });
