@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_error.dart';
 
 /// The transfer surface's lifecycle.
 enum FileTransferPhase { idle, uploading, success, failure, opening }

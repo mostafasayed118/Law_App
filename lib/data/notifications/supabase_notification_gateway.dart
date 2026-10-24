@@ -1,7 +1,7 @@
-import '../../core/errors/app_error.dart';
-import '../../core/errors/result.dart';
-import '../../features/notifications/domain/notification.dart';
-import '../../features/notifications/domain/notification_gateway.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/notifications/domain/notification.dart';
+import 'package:legalhub/features/notifications/domain/notification_gateway.dart';
 import 'supabase_notification_api.dart';
 
 /// [NotificationGateway] backed by the Supabase provider via

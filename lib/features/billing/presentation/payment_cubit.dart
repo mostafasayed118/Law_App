@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../domain/payment_gateway.dart';
-import '../domain/payment_session.dart';
-import '../domain/payment_status.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/billing/domain/payment_gateway.dart';
+import 'package:legalhub/features/billing/domain/payment_session.dart';
+import 'package:legalhub/features/billing/domain/payment_status.dart';
 import 'payment_state.dart';
 
 /// Owns one invoice-payment attempt for the modal sheet.

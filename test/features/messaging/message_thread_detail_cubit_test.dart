@@ -445,7 +445,7 @@ class _StubMessageGateway implements MessageGateway {
   int subscriptionCancels = 0;
 
   @override
-  Future<Result<List<MessageThread>>> fetchThreads() async {
+  Future<Result<List<MessageThread>>> fetchThreads({String? matterId}) async {
     // Not exercised by the detail cubit tests.
     return const Result<List<MessageThread>>.success(<MessageThread>[]);
   }

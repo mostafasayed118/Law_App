@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../shared/widgets/label_chip.dart';
+import 'package:legalhub/shared/widgets/label_chip.dart';
 
 /// Small colored chip rendering a matter's lifecycle status.
 ///

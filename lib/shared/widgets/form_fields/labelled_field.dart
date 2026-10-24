@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../app/legalhub_theme.dart';
-import '../../formatting/display_case.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/shared/formatting/display_case.dart';
 
 /// A labelled form-field row used across the auth/onboarding flows.
 ///

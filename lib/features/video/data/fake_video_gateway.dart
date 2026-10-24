@@ -1,8 +1,8 @@
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../domain/video_gateway.dart';
-import '../domain/video_session.dart';
-import '../domain/video_token.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/video/domain/video_gateway.dart';
+import 'package:legalhub/features/video/domain/video_session.dart';
+import 'package:legalhub/features/video/domain/video_token.dart';
 
 /// Development-only video gateway: a fixed synthetic schedule plus in-memory
 /// create/end transitions (design §1.3 — the fake is registered only in

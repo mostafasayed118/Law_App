@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/state/view_state.dart';
-import '../domain/notification.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/notifications/domain/notification.dart';
 
 /// Immutable state of the notification-feed surface (notification-feed
 /// slice, D-N1).

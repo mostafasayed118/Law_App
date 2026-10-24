@@ -383,6 +383,7 @@ apply_slice() {
   psql_apply "$SUPABASE_DIR/migrations/24_compliance_alerts.sql" "apply migrations/24_compliance_alerts.sql"
   psql_apply "$SUPABASE_DIR/migrations/25_research.sql" "apply migrations/25_research.sql"
   psql_apply "$SUPABASE_DIR/migrations/26_video_sessions.sql" "apply migrations/26_video_sessions.sql"
+  psql_apply "$SUPABASE_DIR/migrations/27_audit_remediation.sql" "apply migrations/27_audit_remediation.sql"
   # 03_platform_config_seed.sql is deliberately NOT applied: its owner token
   # is an apply-time substitution placeholder for the dev project; the
   # battery's fixtures seed the rehearsal project's own owner row (D-P0C3

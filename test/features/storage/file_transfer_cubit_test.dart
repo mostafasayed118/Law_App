@@ -265,7 +265,7 @@ class _StubStorageGateway implements StorageGateway {
   int downloadCalls = 0;
 
   @override
-  Future<Result<List<FileMetadata>>> fetchFiles() async =>
+  Future<Result<List<FileMetadata>>> fetchFiles({String? matterId}) async =>
       Result<List<FileMetadata>>.success(<FileMetadata>[_file]);
 
   @override

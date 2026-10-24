@@ -13,7 +13,7 @@ class _StubSupabaseBillingApi implements SupabaseBillingApi {
   SupabaseBillingException? error;
 
   @override
-  Future<List<Map<String, dynamic>>> fetchInvoices() async {
+  Future<List<Map<String, dynamic>>> fetchInvoices({String? matterId}) async {
     if (error != null) {
       throw error!;
     }

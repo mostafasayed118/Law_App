@@ -1,13 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../../../core/state/view_state.dart';
-import '../domain/ai_finding.dart';
-import '../domain/ai_gateway.dart';
-import '../domain/research_outcome.dart';
-import '../domain/research_request.dart';
-import '../domain/research_run.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/research/domain/ai_finding.dart';
+import 'package:legalhub/features/research/domain/ai_gateway.dart';
+import 'package:legalhub/features/research/domain/research_outcome.dart';
+import 'package:legalhub/features/research/domain/research_request.dart';
+import 'package:legalhub/features/research/domain/research_run.dart';
 import 'ai_research_state.dart';
 
 /// Owns the research surface (AI research slice 1.1; design §5).

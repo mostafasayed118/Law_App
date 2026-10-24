@@ -1,10 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../../../core/state/view_state.dart';
-import '../domain/matter.dart';
-import '../domain/matter_gateway.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/matters/domain/matter.dart';
+import 'package:legalhub/features/matters/domain/matter_gateway.dart';
 import 'matter_state.dart';
 
 /// Owns the matter dashboard list surface (Phase 7, slice 7.1).

@@ -1,5 +1,5 @@
-import '../../../core/roles/user_role.dart';
-import '../../../l10n/app_localizations.dart';
+import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
 
 /// A data descriptor for one home-dashboard entry.
 ///

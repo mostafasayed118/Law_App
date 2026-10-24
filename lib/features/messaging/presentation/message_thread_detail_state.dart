@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/state/view_state.dart';
-import '../domain/message.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/messaging/domain/message.dart';
 
 /// Immutable state of the thread-detail surface (sixth §14 un-deferral,
 /// realtime slice D-RT5; write + live-delivery surface realtime push slice

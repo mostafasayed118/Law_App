@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/state/view_state.dart';
-import '../domain/message_thread.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/messaging/domain/message_thread.dart';
 
 /// Immutable state of the thread-list surface (Phase 9, slice 9.1).
 ///

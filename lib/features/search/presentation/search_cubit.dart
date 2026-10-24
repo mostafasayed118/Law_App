@@ -1,23 +1,24 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/practice_area.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/discovery/domain/attorney.dart';
+import 'package:legalhub/features/discovery/domain/attorney_gateway.dart';
+import 'package:legalhub/features/documents/domain/document.dart';
+import 'package:legalhub/features/documents/domain/document_gateway.dart';
+import 'package:legalhub/features/documents/presentation/document_labels.dart';
+import 'package:legalhub/features/matters/domain/matter.dart';
+import 'package:legalhub/features/matters/domain/matter_gateway.dart';
+import 'package:legalhub/features/matters/presentation/matter_labels.dart'
+    show matterStatusLabel;
+import 'package:legalhub/features/messaging/domain/message_gateway.dart';
+import 'package:legalhub/features/messaging/domain/message_thread.dart';
+import 'package:legalhub/features/search/domain/search_results.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/demo_labels.dart';
+import 'package:legalhub/shared/widgets/practice_area_label.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../../../core/practice_area.dart';
-import '../../../core/state/view_state.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/demo_labels.dart';
-import '../../../shared/widgets/practice_area_label.dart';
-import '../../discovery/domain/attorney.dart';
-import '../../discovery/domain/attorney_gateway.dart';
-import '../../documents/domain/document.dart';
-import '../../documents/domain/document_gateway.dart';
-import '../../documents/presentation/document_labels.dart';
-import '../../matters/domain/matter.dart';
-import '../../matters/domain/matter_gateway.dart';
-import '../../matters/presentation/matter_labels.dart' show matterStatusLabel;
-import '../../messaging/domain/message_gateway.dart';
-import '../../messaging/domain/message_thread.dart';
-import '../domain/search_results.dart';
 import 'search_state.dart';
 
 /// Owns the unified search surface (Phase 11, slice 11.0, owner decision D-S1).
@@ -59,8 +60,8 @@ class SearchCubit extends Cubit<SearchState> {
 
   /// Maximum rows kept per result group (bounds the eager tile build to
   /// 4 × 30 tiles AND the server-side prefilter page per gateway).
-  /// Mirrors `kSearchPageSize` without importing the data layer —
-  /// presentation must never depend on `lib/data/` (layer rule).
+  /// Mirrors the shared 30-row search page size without importing the data
+  /// layer — presentation must never depend on `lib/data/` (layer rule).
   static const int searchPageSize = 30;
 
   final MatterGateway _matterGateway;

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/features/storage/domain/file_metadata.dart';
+import 'package:legalhub/features/storage/domain/file_picker.dart';
+import 'package:legalhub/features/storage/domain/storage_gateway.dart';
+import 'package:legalhub/features/storage/domain/uri_opener.dart';
+import 'package:legalhub/features/storage/presentation/file_transfer_cubit.dart';
+import 'package:legalhub/features/storage/presentation/file_transfer_state.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/demo_labels.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
 
-import '../../../app/legalhub_theme.dart';
-import '../../../app/service_locator.dart';
-import '../../../core/errors/app_error.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/demo_labels.dart';
-import '../../../shared/widgets/widgets.dart';
-import '../../storage/domain/file_metadata.dart';
-import '../../storage/domain/file_picker.dart';
-import '../../storage/domain/storage_gateway.dart';
-import '../../storage/domain/uri_opener.dart';
-import '../../storage/presentation/file_transfer_cubit.dart';
-import '../../storage/presentation/file_transfer_state.dart';
 import 'matter_workspace_cubit.dart';
 import 'matter_workspace_state.dart';
 
@@ -20,23 +20,16 @@ import 'matter_workspace_state.dart';
 /// D-STR7; write/preview slice).
 ///
 /// Consumes the matter-scoped [MatterWorkspaceCubit] (provided by the
-/// details screen) and renders the subset of the file-metadata list whose
-/// [FileMetadata.matterRef] equals [matterRef]. The upload button and the
-/// per-row open action are owned by a section-scoped
-/// [FileTransferCubit]: the picker/opener/platform seams resolve from the
-/// service locator, uploads land in the private bucket through the gateway,
-/// and a successful upload reloads the workspace list. An empty per-matter
-/// subset renders the localized empty copy.
+/// details screen); the cubit scopes the gateway read to the open matter
+/// server-side, so the list here is already the matter's subset (no
+/// client-side title filtering). The upload button and the per-row open
+/// action are owned by a section-scoped [FileTransferCubit]: the
+/// picker/opener/platform seams resolve from the service locator, uploads
+/// land in the private bucket through the gateway, and a successful upload
+/// reloads the workspace list. An empty per-matter subset renders the
+/// localized empty copy.
 class MatterFilesSection extends StatefulWidget {
-  const MatterFilesSection({
-    required this.matterRef,
-    required this.matterId,
-    super.key,
-  });
-
-  /// The matter title to filter by (matches [FileMetadata.matterRef],
-  /// D-STR5/D-W2).
-  final String matterRef;
+  const MatterFilesSection({required this.matterId, super.key});
 
   /// The matter id used by the upload gateway (the title is display-only).
   final String matterId;
@@ -49,9 +42,8 @@ class _MatterFilesSectionState extends State<MatterFilesSection> {
   @override
   void initState() {
     super.initState();
-    // Load the list on open (same pattern as the standalone surfaces); the
-    // per-matter subset is filtered client-side below. Only this list
-    // loads — sibling sections trigger their own.
+    // Load the matter-scoped file list on open. Only this list loads —
+    // sibling sections trigger their own.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
         return;
@@ -132,8 +124,6 @@ class _MatterFilesSectionState extends State<MatterFilesSection> {
                         context.read<MatterWorkspaceCubit>().loadFiles(),
                     errorCopy: l10n.filesError,
                     emptyCopy: l10n.matterWorkspaceFilesEmpty,
-                    matterRef: widget.matterRef,
-                    matterRefOf: (FileMetadata file) => file.matterRef,
                     itemBuilder: (BuildContext context, FileMetadata file) =>
                         Tooltip(
                           message: l10n.fileOpenAction,

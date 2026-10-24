@@ -1,7 +1,7 @@
-import '../../core/errors/result.dart';
-import '../../features/billing/domain/payment_gateway.dart';
-import '../../features/billing/domain/payment_session.dart';
-import '../../features/billing/domain/payment_status.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/billing/domain/payment_gateway.dart';
+import 'package:legalhub/features/billing/domain/payment_session.dart';
+import 'package:legalhub/features/billing/domain/payment_status.dart';
 
 /// Deterministic demo payment gateway.
 ///

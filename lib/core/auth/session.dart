@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../roles/user_role.dart';
+import 'package:legalhub/core/roles/user_role.dart';
 
 /// Lifecycle of an organization membership (contract §3.3).
 enum MembershipStatus { invited, active, suspended, removed }

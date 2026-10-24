@@ -103,22 +103,6 @@ void main() {
         en.demoAlertTitle1,
       );
       expect(demoTaskTitle(en, 'Demo: gather documents'), en.demoTaskTitle2);
-      expect(
-        demoApprovalReference(en, 'Demo role change'),
-        en.demoApprovalRefRoleChange,
-      );
-      expect(
-        demoApprovalReference(en, 'Demo engagement letter'),
-        en.demoDocumentTitle1,
-      );
-      expect(
-        demoApprovalEntityType(en, 'invitation'),
-        en.demoApprovalEntityInvitation,
-      );
-      expect(
-        demoVideoTopic(en, 'Contract review — kickoff'),
-        en.demoVideoTopic1,
-      );
     });
   });
 

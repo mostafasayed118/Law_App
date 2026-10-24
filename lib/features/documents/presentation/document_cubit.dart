@@ -1,10 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../../../core/state/view_state.dart';
-import '../domain/document.dart';
-import '../domain/document_gateway.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/documents/domain/document.dart';
+import 'package:legalhub/features/documents/domain/document_gateway.dart';
 import 'document_state.dart';
 
 /// Owns the document-vault list surface (Phase 8, slice 8.1).

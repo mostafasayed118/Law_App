@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/state/view_state.dart';
-import '../domain/invoice.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/billing/domain/invoice.dart';
 
 /// Immutable state of the matter-invoices surface (billing slice, D-BI5).
 ///

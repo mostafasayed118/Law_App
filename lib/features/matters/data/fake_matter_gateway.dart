@@ -1,7 +1,7 @@
-import '../../../core/errors/result.dart';
-import '../../../core/practice_area.dart';
-import '../domain/matter.dart';
-import '../domain/matter_gateway.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/practice_area.dart';
+import 'package:legalhub/features/matters/domain/matter.dart';
+import 'package:legalhub/features/matters/domain/matter_gateway.dart';
 
 /// Development-only matter implementation: a fixed synthetic list of
 /// non-PII matter previews.

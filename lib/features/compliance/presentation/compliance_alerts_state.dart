@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/state/view_state.dart';
-import '../domain/compliance_alert.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/compliance/domain/compliance_alert.dart';
 
 /// Immutable state of the compliance-alerts surface (design §4).
 ///

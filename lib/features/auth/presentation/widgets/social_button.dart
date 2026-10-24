@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../app/legalhub_theme.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
 
 /// A bordered social-sign-in button with a leading brand icon.
 ///

@@ -230,7 +230,7 @@ void main() {
 /// must render no reverse cross-link chip).
 class _UnresolvedRefMessageGateway implements MessageGateway {
   @override
-  Future<Result<List<MessageThread>>> fetchThreads() async {
+  Future<Result<List<MessageThread>>> fetchThreads({String? matterId}) async {
     return Result<List<MessageThread>>.success(<MessageThread>[
       MessageThread(
         id: 'thread-x',
@@ -276,7 +276,7 @@ class _UnresolvedRefMessageGateway implements MessageGateway {
 /// Gateway stub that yields an empty thread list (empty-state widget pin).
 class _EmptyMessageGateway implements MessageGateway {
   @override
-  Future<Result<List<MessageThread>>> fetchThreads() async {
+  Future<Result<List<MessageThread>>> fetchThreads({String? matterId}) async {
     return Result<List<MessageThread>>.success(const <MessageThread>[]);
   }
 

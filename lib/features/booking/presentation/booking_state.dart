@@ -1,10 +1,10 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/state/view_state.dart';
-import '../domain/booking_category.dart';
-import '../domain/booking_confirmation.dart';
-import '../domain/booking_slot.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/booking/domain/booking_category.dart';
+import 'package:legalhub/features/booking/domain/booking_confirmation.dart';
+import 'package:legalhub/features/booking/domain/booking_slot.dart';
 
 /// The four steps of the consultation booking flow (approved SPEC/PLAN
 /// Mermaid diagram): category → dateTime → review → success.

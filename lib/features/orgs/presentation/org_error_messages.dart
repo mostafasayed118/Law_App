@@ -1,5 +1,5 @@
-import '../../../core/organizations/organization_gateway.dart';
-import '../../../l10n/app_localizations.dart';
+import 'package:legalhub/core/organizations/organization_gateway.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
 
 /// Localized, non-sensitive message for an [OrgFailureKind].
 ///

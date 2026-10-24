@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../app/legalhub_theme.dart';
-import '../../core/state/view_state.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/core/state/view_state.dart';
 import 'view_state_switch.dart';
 
 /// The state-shell of a matter-workspace section: the `ViewStateSwitch` arms
-/// plus the filtered-by-[matterRef] rows column and the inline empty hint.
+/// plus the rows column and the inline empty hint.
 ///
 /// E10 extraction: the four matter workspace sections (documents, files,
 /// invoices, messages) previously duplicated this shell — the switch arm
@@ -14,15 +14,14 @@ import 'view_state_switch.dart';
 /// and the `spaceXs`-top inline empty copy. This widget owns that shell;
 /// each section keeps its own `BlocProvider`/`BlocBuilder` wiring (which
 /// differs only in cubit/gateway types) and supplies the state, retry,
-/// copies, the [matterRef] key, and the per-item tile via [itemBuilder].
+/// copies, and the per-item tile via [itemBuilder]. The matter scoping is
+/// server-side now, so the widget renders exactly the rows it is given.
 class WorkspaceSection<T> extends StatelessWidget {
   const WorkspaceSection({
     required this.state,
     required this.onRetry,
     required this.errorCopy,
     required this.emptyCopy,
-    required this.matterRef,
-    required this.matterRefOf,
     required this.itemBuilder,
     super.key,
   });
@@ -37,15 +36,8 @@ class WorkspaceSection<T> extends StatelessWidget {
   final String errorCopy;
 
   /// The feature's per-matter empty copy (e.g. `l10n.matterWorkspaceXEmpty`),
-  /// rendered for the empty full list, an empty filtered subset, and the
-  /// offline/unauthorized variants.
+  /// rendered for the empty list and the offline/unauthorized variants.
   final String emptyCopy;
-
-  /// The matter title to filter by (matches the item's `matterRef`).
-  final String matterRef;
-
-  /// Extracts the item's `matterRef` field.
-  final String Function(T item) matterRefOf;
 
   /// Renders one row (typically an `AppTile`). The `spaceSm` inter-row gap
   /// is owned by this widget.
@@ -68,18 +60,10 @@ class WorkspaceSection<T> extends StatelessWidget {
   }
 
   Widget _rows(BuildContext context, List<T> items) {
-    final List<T> matched = items
-        .where((T item) => matterRefOf(item) == matterRef)
-        .toList();
-    if (matched.isEmpty) {
-      final ColorScheme scheme = Theme.of(context).colorScheme;
-      final TextTheme text = Theme.of(context).textTheme;
-      return _empty(text, scheme);
-    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        for (final T item in matched) ...<Widget>[
+        for (final T item in items) ...<Widget>[
           itemBuilder(context, item),
           const SizedBox(height: LegalHubTheme.spaceSm),
         ],

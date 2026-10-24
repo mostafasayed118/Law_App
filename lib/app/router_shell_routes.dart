@@ -218,11 +218,7 @@ List<RouteBase> _shellRoutes(
         // UX-only projection of the active membership's role (mirrors
         // the shell); the audit surface renders the server's typed
         // denial for non-partners — never empty success (AC-7).
-        final UserRole role =
-            authCubit.state.session?.primaryRole ?? UserRole.client;
-        return OrgAuditScreen(
-          capabilities: capabilityForRole(capabilitiesForRole, role),
-        );
+        return const OrgAuditScreen();
       },
     ),
     GoRoute(

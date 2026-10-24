@@ -1,7 +1,7 @@
-import '../organizations/organization_models.dart';
+import 'package:legalhub/core/organizations/organization_models.dart';
 import 'audit_entry.dart';
 
-export '../organizations/organization_models.dart';
+export 'package:legalhub/core/organizations/organization_models.dart';
 export 'audit_entry.dart';
 
 /// Platform-owner administration boundary (permission matrix §5).

@@ -1,9 +1,9 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/state/view_state.dart';
-import '../domain/ai_finding.dart';
-import '../domain/research_run.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/research/domain/ai_finding.dart';
+import 'package:legalhub/features/research/domain/research_run.dart';
 
 /// Immutable state of the research surface (AI research slice 1.1; design §5).
 ///

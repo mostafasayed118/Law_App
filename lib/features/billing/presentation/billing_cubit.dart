@@ -1,10 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../../../core/state/view_state.dart';
-import '../domain/billing_gateway.dart';
-import '../domain/invoice.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/billing/domain/billing_gateway.dart';
+import 'package:legalhub/features/billing/domain/invoice.dart';
 import 'billing_state.dart';
 
 /// Owns the matter-invoices list surface (billing slice, D-BI5).

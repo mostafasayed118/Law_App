@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import '../../../core/errors/result.dart';
+import 'package:legalhub/core/errors/result.dart';
 import 'message.dart';
 import 'message_realtime_event.dart';
 import 'message_thread.dart';
@@ -32,7 +32,11 @@ abstract interface class MessageGateway {
   /// `message_threads_select_assigned` RLS gate server-side). Deterministic
   /// and read-only (owner decisions D-MSG1/D-MSG2/D-MSG4). **Thread
   /// metadata only — no message body crosses this boundary here.**
-  Future<Result<List<MessageThread>>> fetchThreads();
+  ///
+  /// [matterId] scopes the read server-side (the workspace passes the open
+  /// matter's id); null keeps the caller's full list, so existing callers are
+  /// unchanged.
+  Future<Result<List<MessageThread>>> fetchThreads({String? matterId});
 
   /// Recall-oriented title candidate set for unified search (audit:
   /// search fan-out — server-side prefilter + client-side refine).
@@ -40,8 +44,8 @@ abstract interface class MessageGateway {
   /// Same contract as `MatterGateway.searchMatters`: up to [limit]
   /// title-matching threads server-side; in-memory backends return their
   /// full list. Callers MUST still apply their full matching pass
-  /// (localized labels, participant names). [limit] mirrors
-  /// `kSearchPageSize` without importing the data layer (layer rule).
+  /// (localized labels, participant names). [limit] mirrors the shared
+  /// 30-row search page size without importing the data layer (layer rule).
   /// **Thread metadata only — no message body crosses here.**
   Future<Result<List<MessageThread>>> searchThreads(
     String query, {

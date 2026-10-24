@@ -15,6 +15,18 @@ import 'dart:typed_data';
 typedef StorageTableCaller =
     Future<List<Map<String, dynamic>>> Function(String table, String columns);
 
+/// A server-side matter-scoped SELECT: table + columns + matter id → raw map
+/// rows.
+///
+/// Separate callable (rather than widening [StorageTableCaller]) so existing
+/// test injections of the two-arg fetch shape keep compiling.
+typedef StorageMatterTableCaller =
+    Future<List<Map<String, dynamic>>> Function(
+      String table,
+      String columns,
+      String matterId,
+    );
+
 /// The RLS-scoped matter lookup for an upload (id, organization_id, title).
 typedef StorageMatterCaller =
     Future<Map<String, dynamic>> Function(String matterId);
@@ -81,7 +93,10 @@ abstract interface class SupabaseStorageApi {
   /// `size_bytes`, `storage_path`, `matters(title)` — the metadata-only read
   /// surface the [FileMetadata] VO needs (D-STR3: no content/body/url column
   /// exists).
-  Future<List<Map<String, dynamic>>> fetchFiles();
+  ///
+  /// When [matterId] is present the SELECT is additionally filtered
+  /// `.eq('matter_id', matterId)` server-side.
+  Future<List<Map<String, dynamic>>> fetchFiles({String? matterId});
 
   /// Resolves the matter under the caller's RLS gate for an upload.
   ///

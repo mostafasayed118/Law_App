@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../app/legalhub_theme.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
 
 /// A practice-area card with an icon chip and a title, used in the home
 /// dashboard's horizontal scroll.

@@ -1,6 +1,5 @@
+import 'package:legalhub/features/billing/domain/checkout_launcher.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../../features/billing/domain/checkout_launcher.dart';
 
 /// [CheckoutLauncher] backed by `package:url_launcher`.
 ///

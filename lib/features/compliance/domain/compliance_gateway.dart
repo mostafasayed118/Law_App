@@ -1,4 +1,4 @@
-import '../../../core/errors/result.dart';
+import 'package:legalhub/core/errors/result.dart';
 import 'compliance_alert.dart';
 
 /// The create intent for one org-scoped compliance alert (design §4).

@@ -1,12 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../domain/file_metadata.dart';
-import '../domain/file_picker.dart';
-import '../domain/picked_file.dart';
-import '../domain/storage_gateway.dart';
-import '../domain/uri_opener.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/storage/domain/file_metadata.dart';
+import 'package:legalhub/features/storage/domain/file_picker.dart';
+import 'package:legalhub/features/storage/domain/picked_file.dart';
+import 'package:legalhub/features/storage/domain/storage_gateway.dart';
+import 'package:legalhub/features/storage/domain/uri_opener.dart';
 import 'file_transfer_state.dart';
 
 /// Owns the pick → upload and open-signed-URL flows for a matter's files.

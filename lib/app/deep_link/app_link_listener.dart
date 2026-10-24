@@ -10,9 +10,10 @@ import 'pending_accept_invite_store.dart';
 /// [AppLinkParser]; an accept-invitation share link's one-time token is
 /// buffered in the [PendingAcceptInviteStore] and the caller is nudged to
 /// open the accept surface. Recovery/auth-callback URIs are deliberately
-/// **untouched** — supabase_flutter's `detectSessionInUri` observer owns
-/// them (double-consuming the PKCE code would break recovery), so this
-/// listener only forwards `AcceptInviteIntent`s.
+/// **untouched** here — the explicit
+/// `AuthCallbackObserver` in `lib/data/auth/` owns them (registered callback
+/// location + query-only PKCE code), so this listener only forwards
+/// `AcceptInviteIntent`s.
 ///
 /// The one-time token is never written to the URL surface or any log: it
 /// travels from the OS intent straight into the in-memory store (contract
@@ -61,8 +62,8 @@ class AppLinkListener {
         _pendingStore.setPendingToken(token);
         _onAcceptInviteLink();
       case RecoveryIntent() || NoAppLinkIntent():
-        // Untouched: supabase_flutter owns the recovery callback; foreign
-        // URIs are not app links.
+        // Untouched: the data-layer auth-callback observer owns the recovery
+        // exchange; foreign URIs are not app links.
         break;
     }
   }

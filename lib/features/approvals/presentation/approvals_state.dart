@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/state/view_state.dart';
-import '../domain/pending_approval.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/approvals/domain/pending_approval.dart';
 
 /// Immutable state of the approvals surface (design §3).
 ///

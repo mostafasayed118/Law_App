@@ -19,7 +19,7 @@ library;
 ///   identities), firm names, file paths, and reference codes (`LH-DEMO-*`)
 ///   are identities, not copy — only the generic role labels
 ///   (`demoAuthorAttorney` / `demoAuthorClient`) are localized.
-import '../l10n/app_localizations.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
 
 /// Notification tile title for a demo `type` wire value.
 String demoNotificationType(AppLocalizations l10n, String type) =>
@@ -140,36 +140,6 @@ String demoTaskTitle(AppLocalizations l10n, String title) => switch (title) {
   'Demo: schedule follow-up' => l10n.demoTaskTitle4,
   'Demo: update matter timeline' => l10n.demoTaskTitle5,
   _ => title,
-};
-
-/// Approval reference line. The engagement-letter reference is shared with
-/// the documents corpus and maps through the same key.
-String demoApprovalReference(AppLocalizations l10n, String reference) =>
-    switch (reference) {
-      'Demo invite — review' => l10n.demoApprovalRefInviteReview,
-      'Demo role change' => l10n.demoApprovalRefRoleChange,
-      'Demo engagement letter' => l10n.demoDocumentTitle1,
-      'Sample invite — expired' => l10n.demoApprovalRefInviteExpired,
-      'Demo suspension review' => l10n.demoApprovalRefSuspension,
-      _ => reference,
-    };
-
-/// Approval entity-type wire value.
-String demoApprovalEntityType(AppLocalizations l10n, String entityType) =>
-    switch (entityType) {
-      'invitation' => l10n.demoApprovalEntityInvitation,
-      'membership' => l10n.demoApprovalEntityMembership,
-      'document' => l10n.demoApprovalEntityDocument,
-      _ => entityType,
-    };
-
-/// Video-consultation topic. Participant names are identities and stay raw.
-String demoVideoTopic(AppLocalizations l10n, String topic) => switch (topic) {
-  'Contract review — kickoff' => l10n.demoVideoTopic1,
-  'Incorporation walkthrough' => l10n.demoVideoTopic2,
-  'Employment dispute — follow-up' => l10n.demoVideoTopic3,
-  'Family law consultation' => l10n.demoVideoTopic4,
-  _ => topic,
 };
 
 /// Research citation title: tries the document, matter, and thread corpora

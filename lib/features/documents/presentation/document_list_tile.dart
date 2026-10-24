@@ -11,7 +11,7 @@ class _DocumentTile extends StatelessWidget {
   final Document document;
 
   /// The reverse cross-link tap, or null when the row renders no chip
-  /// (unresolved `matterRef` or the nav hint not granted, D-C2/D-C4).
+  /// (no embedded matter title or the nav hint not granted, D-C2/D-C4).
   ///
   /// Null-checked with a `case` pattern below: public final fields do not
   /// promote in Dart 3.2, so a plain `!= null` check would not narrow the

@@ -1,5 +1,5 @@
-import '../domain/notification_prefs.dart';
-import '../domain/notification_prefs_store.dart';
+import 'package:legalhub/features/notifications/domain/notification_prefs.dart';
+import 'package:legalhub/features/notifications/domain/notification_prefs_store.dart';
 
 /// Non-persistent fallback used by tests and environments without
 /// preferences. Mirrors `InMemoryLocaleStore`.

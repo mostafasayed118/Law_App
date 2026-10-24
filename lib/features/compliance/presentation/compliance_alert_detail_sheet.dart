@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/features/compliance/domain/compliance_alert.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/formatting/date_formatting.dart';
 
-import '../../../app/legalhub_theme.dart';
-import '../../../core/errors/app_error.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/formatting/date_formatting.dart';
-import '../domain/compliance_alert.dart';
 import 'compliance_alert_error_messages.dart';
 import 'compliance_alert_labels.dart';
 import 'compliance_alerts_cubit.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../app/legalhub_theme.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
 
 /// A horizontal divider with a centered label ("OR CONTINUE WITH").
 class EditorialDivider extends StatelessWidget {

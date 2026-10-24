@@ -1,12 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/approvals/domain/approvals_gateway.dart';
+import 'package:legalhub/features/approvals/domain/pending_approval.dart';
+import 'package:legalhub/features/matters/domain/matter.dart';
+import 'package:legalhub/features/matters/domain/matter_gateway.dart';
+import 'package:legalhub/shared/state/write_gate.dart';
+import 'package:legalhub/shared/text/trim.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../../../core/state/view_state.dart';
-import '../../matters/domain/matter.dart';
-import '../../matters/domain/matter_gateway.dart';
-import '../domain/approvals_gateway.dart';
-import '../domain/pending_approval.dart';
 import 'approvals_state.dart';
 
 /// Owns the org-scoped approvals list and its writes (design §3).
@@ -28,7 +30,7 @@ class ApprovalsCubit extends Cubit<ApprovalsState> {
   /// pattern).
   int _request = 0;
 
-  bool _acting = false;
+  final WriteGate _writeGate = WriteGate();
 
   /// The matter choices for the create sheet (the gateway's own failure is
   /// returned, never swallowed into an empty list).
@@ -77,72 +79,42 @@ class ApprovalsCubit extends Cubit<ApprovalsState> {
   }
 
   /// Creates a request. The title is trimmed here (the sheet validates its
-  /// length before submitting); an empty description becomes null.
-  Future<AppError?> create(ApprovalDraft draft) async {
-    if (isClosed || _acting) {
-      return null;
-    }
-    _acting = true;
-    final Result<String> result = await _gateway.create(
-      ApprovalDraft(
-        organizationId: draft.organizationId,
-        matterId: draft.matterId,
-        title: draft.title.trim(),
-        kind: draft.kind,
-        description: _trimOrNull(draft.description),
+  /// length before submitting); an empty description becomes null. A write
+  /// that loses the in-flight race returns [WriteGate.busyError], never null.
+  Future<AppError?> create(ApprovalDraft draft) {
+    return _writeGate.run<String>(
+      isClosed: () => isClosed,
+      write: () => _gateway.create(
+        ApprovalDraft(
+          organizationId: draft.organizationId,
+          matterId: draft.matterId,
+          title: draft.title.trim(),
+          kind: draft.kind,
+          description: trimOrNull(draft.description),
+        ),
       ),
+      onSuccess: load,
     );
-    _acting = false;
-    if (isClosed) {
-      return null;
-    }
-    switch (result) {
-      case Success<String>():
-        await load();
-        return null;
-      case Failure<String>(error: final AppError error):
-        return error;
-    }
   }
 
   /// Decides a pending request. Returns null on success, the failure's
   /// [AppError] otherwise; a success re-reads the filtered list.
   Future<AppError?> decide(String id, {required bool approve, String? note}) {
-    return _runWrite(
-      () => _gateway.decide(id, approve: approve, note: _trimOrNull(note)),
+    return _writeGate.run<void>(
+      isClosed: () => isClosed,
+      write: () =>
+          _gateway.decide(id, approve: approve, note: trimOrNull(note)),
+      onSuccess: load,
     );
   }
 
   /// Cancels a pending request. Returns null on success, the failure's
   /// [AppError] otherwise; a success re-reads the filtered list.
   Future<AppError?> cancel(String id) {
-    return _runWrite(() => _gateway.cancel(id));
-  }
-
-  Future<AppError?> _runWrite(Future<Result<void>> Function() write) async {
-    if (isClosed || _acting) {
-      return null;
-    }
-    _acting = true;
-    final Result<void> result = await write();
-    _acting = false;
-    if (isClosed) {
-      return null;
-    }
-    switch (result) {
-      case Success<void>():
-        await load();
-        return null;
-      case Failure<void>(error: final AppError error):
-        return error;
-    }
-  }
-
-  String? _trimOrNull(String? value) {
-    if (value == null) {
-      return null;
-    }
-    final String trimmed = value.trim();
-    return trimmed.isEmpty ? null : trimmed;
+    return _writeGate.run<void>(
+      isClosed: () => isClosed,
+      write: () => _gateway.cancel(id),
+      onSuccess: load,
+    );
   }
 }

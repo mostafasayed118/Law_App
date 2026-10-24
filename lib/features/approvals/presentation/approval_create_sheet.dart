@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:legalhub/app/active_org_store.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/approvals/domain/approvals_gateway.dart';
+import 'package:legalhub/features/approvals/domain/pending_approval.dart';
+import 'package:legalhub/features/matters/domain/matter.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/demo_labels.dart';
 
-import '../../../app/active_org_store.dart';
-import '../../../app/legalhub_theme.dart';
-import '../../../app/service_locator.dart';
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/demo_labels.dart';
-import '../../matters/domain/matter.dart';
-import '../domain/approvals_gateway.dart';
-import '../domain/pending_approval.dart';
 import 'approval_error_messages.dart';
 import 'approval_labels.dart';
 import 'approvals_cubit.dart';

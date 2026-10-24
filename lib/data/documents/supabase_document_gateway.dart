@@ -1,7 +1,7 @@
-import '../../core/errors/app_error.dart';
-import '../../core/errors/result.dart';
-import '../../features/documents/domain/document.dart';
-import '../../features/documents/domain/document_gateway.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/documents/domain/document.dart';
+import 'package:legalhub/features/documents/domain/document_gateway.dart';
 import 'supabase_document_api.dart';
 
 /// [DocumentGateway] backed by the Supabase provider via [SupabaseDocumentApi].
@@ -26,7 +26,8 @@ class SupabaseDocumentGateway implements DocumentGateway {
   final SupabaseDocumentApi _api;
 
   @override
-  Future<Result<List<Document>>> fetchDocuments() => _run(_api.fetchDocuments);
+  Future<Result<List<Document>>> fetchDocuments({String? matterId}) =>
+      _run(() => _api.fetchDocuments(matterId: matterId));
 
   @override
   Future<Result<List<Document>>> searchDocuments(
@@ -83,14 +84,17 @@ class SupabaseDocumentGateway implements DocumentGateway {
     if (createdAt is! String || createdAt.isEmpty) {
       throw FormatException('Document row has no created_at');
     }
+    // D-DR4: the embedded matters(title) join resolves under the same RLS
+    // gate (the policy guarantees the reader passes the matter check). Both
+    // fields stay null when the embed is absent — the list surface then
+    // renders no reverse link (the safe fallback, never a fabricated title).
+    final String? matterTitle = _matterTitleFromRow(row);
     return Document(
       id: id,
       title: title,
-      // D-DR4: the embedded matters(title) join resolves under the same RLS
-      // gate (the policy guarantees the reader passes the matter check); an
-      // absent embed falls back to the raw matter id, never a fabricated
-      // title (the listMyMemberships null-embed pattern).
-      matterRef: _matterRefFromRow(row, matterId),
+      matterRef: matterTitle ?? matterId,
+      matterId: matterId,
+      matterTitle: matterTitle,
       // Guarded, never a bare cast: a present-but-non-string value (beyond
       // schema drift) would otherwise surface as a raw TypeError instead of
       // the typed FormatException the fetch catches.
@@ -101,16 +105,16 @@ class SupabaseDocumentGateway implements DocumentGateway {
     );
   }
 
-  /// Resolves the VO's title-keyed `matterRef` from the embedded
-  /// `matters(title)` select, falling back to the raw matter id (D-DR4).
-  String _matterRefFromRow(Map<String, dynamic> row, String matterId) {
+  /// Resolves the embedded `matters(title)` value, or null when the embed is
+  /// absent/empty (D-DR4's fallback path).
+  String? _matterTitleFromRow(Map<String, dynamic> row) {
     final Object? matters = row['matters'];
     final Object? embeddedTitle = matters is Map<String, dynamic>
         ? matters['title']
         : null;
     return (embeddedTitle is String && embeddedTitle.isNotEmpty)
         ? embeddedTitle
-        : matterId;
+        : null;
   }
 
   /// Maps a server `document_type` name to the domain [DocumentType], or

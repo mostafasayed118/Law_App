@@ -1,9 +1,9 @@
 import 'dart:convert';
 
+import 'package:legalhub/data/postgrest_failures.dart';
+import 'package:legalhub/data/supabase_seam.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../postgrest_failures.dart';
-import '../supabase_seam.dart';
 import 'supabase_research_api.dart';
 
 /// A call to the `research-analyze` Edge Function: name + body → decoded data.

@@ -1,7 +1,7 @@
-import '../../core/errors/app_error.dart';
-import '../../core/errors/result.dart';
-import '../../features/compliance/domain/compliance_alert.dart';
-import '../../features/compliance/domain/compliance_gateway.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/compliance/domain/compliance_alert.dart';
+import 'package:legalhub/features/compliance/domain/compliance_gateway.dart';
 import 'supabase_compliance_api.dart';
 
 /// Compliance-alert gateway backed by the Supabase provider (design §4).

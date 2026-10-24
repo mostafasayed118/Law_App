@@ -1,8 +1,8 @@
-import '../admin/audit_entry.dart';
-import '../roles/user_role.dart';
+import 'package:legalhub/core/admin/audit_entry.dart';
+import 'package:legalhub/core/roles/user_role.dart';
 import 'organization_models.dart';
 
-export '../admin/audit_entry.dart';
+export 'package:legalhub/core/admin/audit_entry.dart';
 export 'organization_models.dart';
 
 /// Organization and membership integration boundary.
@@ -34,8 +34,9 @@ abstract interface class OrganizationGateway {
     required String matterId,
   });
 
-  /// Invites an email to an organization. Only [serverAssignableRoles] may be
-  /// requested; the one-time token is returned for out-of-band delivery.
+  /// Invites an email to an organization. Only server-assignable roles
+  /// (client, attorney, partner) may be requested; the one-time token is
+  /// returned for out-of-band delivery.
   Future<OrgOutcome<InviteResult>> inviteMember({
     required String organizationId,
     required String email,

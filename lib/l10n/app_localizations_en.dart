@@ -375,39 +375,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get demoTaskTitle5 => 'Demo: update matter timeline';
 
   @override
-  String get demoApprovalRefInviteReview => 'Demo invite — review';
-
-  @override
-  String get demoApprovalRefRoleChange => 'Demo role change';
-
-  @override
-  String get demoApprovalRefInviteExpired => 'Sample invite — expired';
-
-  @override
-  String get demoApprovalRefSuspension => 'Demo suspension review';
-
-  @override
-  String get demoApprovalEntityInvitation => 'Invitation';
-
-  @override
-  String get demoApprovalEntityMembership => 'Membership';
-
-  @override
-  String get demoApprovalEntityDocument => 'Document';
-
-  @override
-  String get demoVideoTopic1 => 'Contract review — kickoff';
-
-  @override
-  String get demoVideoTopic2 => 'Incorporation walkthrough';
-
-  @override
-  String get demoVideoTopic3 => 'Employment dispute — follow-up';
-
-  @override
-  String get demoVideoTopic4 => 'Family law consultation';
-
-  @override
   String researchHeadline(String title) {
     return 'Research note — $title';
   }
@@ -1523,9 +1490,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get alertsTitle => 'Compliance alerts';
 
   @override
-  String get alertsEmpty => 'No compliance alerts are available.';
-
-  @override
   String get alertsError => 'Unable to load compliance alerts.';
 
   @override
@@ -1788,9 +1752,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get approvalsTitle => 'Pending approvals';
-
-  @override
-  String get approvalsEmpty => 'No pending approvals are available.';
 
   @override
   String get approvalsError => 'Unable to load approvals.';
@@ -2062,9 +2023,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get videoJoin => 'Join call';
-
-  @override
-  String get videoCallLiveBadge => 'Live';
 
   @override
   String videoCallElapsed(String duration) {

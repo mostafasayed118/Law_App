@@ -1,9 +1,9 @@
-import '../../core/errors/app_error.dart';
-import '../../core/errors/result.dart';
-import '../../core/practice_area.dart';
-import '../../features/discovery/domain/attorney.dart';
-import '../../features/discovery/domain/attorney_admin_gateway.dart';
-import '../../features/discovery/domain/attorney_gateway.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/practice_area.dart';
+import 'package:legalhub/features/discovery/domain/attorney.dart';
+import 'package:legalhub/features/discovery/domain/attorney_admin_gateway.dart';
+import 'package:legalhub/features/discovery/domain/attorney_gateway.dart';
 import 'supabase_attorney_api.dart';
 
 /// Attorney directory backed by the Supabase provider (design §2).

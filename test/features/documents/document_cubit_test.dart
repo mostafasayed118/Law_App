@@ -189,7 +189,7 @@ class _StubDocumentGateway implements DocumentGateway {
   int fetchCalls = 0;
 
   @override
-  Future<Result<List<Document>>> fetchDocuments() {
+  Future<Result<List<Document>>> fetchDocuments({String? matterId}) {
     fetchCalls += 1;
     if (completer != null) {
       return completer!.future;

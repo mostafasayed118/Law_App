@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../errors/app_error.dart';
+import 'package:legalhub/core/errors/app_error.dart';
 import 'auth_gateway.dart';
 
 /// Session lifecycle status (contract §5 state diagram).
@@ -31,7 +31,6 @@ enum AuthStatus {
 class AuthState extends Equatable {
   const AuthState({required this.status, this.session, this.error});
 
-  const AuthState.initial() : this(status: AuthStatus.initial);
   const AuthState.unauthenticated() : this(status: AuthStatus.unauthenticated);
 
   final AuthStatus status;

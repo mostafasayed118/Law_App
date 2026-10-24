@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../app/active_org_store.dart';
-import '../../../app/legalhub_theme.dart';
-import '../../../app/service_locator.dart';
-import '../../../core/organizations/organization_gateway.dart';
-import '../../../core/roles/user_role.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/formatting/date_formatting.dart';
+import 'package:legalhub/app/active_org_store.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/organizations/organization_gateway.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/formatting/date_formatting.dart';
 import 'org_audit_cubit.dart';
 part 'org_audit_list.dart';
 part 'org_audit_row.dart';
@@ -25,19 +24,12 @@ part 'org_audit_centered_state.dart';
 /// out / memberships not hydrated) the screen shows the no-organization
 /// state instead of a blank surface.
 class OrgAuditScreen extends StatefulWidget {
-  const OrgAuditScreen({
-    super.key,
-    this.organizationId,
-    required this.capabilities,
-  });
+  const OrgAuditScreen({super.key, this.organizationId});
 
   /// Optional explicit org context (tests). When null, the screen resolves
   /// the active-org context from the [ActiveOrgStore] (D-08 — a local UI
   /// context; the server re-derives membership).
   final String? organizationId;
-
-  /// UX-only navigation hint, never an authorization grant.
-  final RoleCapability capabilities;
 
   @override
   State<OrgAuditScreen> createState() => _OrgAuditScreenState();

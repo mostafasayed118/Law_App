@@ -20,6 +20,18 @@ typedef MessageTableCaller =
       String? threadId,
     ]);
 
+/// A server-side matter-scoped thread SELECT: table + columns + matter id →
+/// raw map rows.
+///
+/// Separate callable (rather than widening [MessageTableCaller]) so existing
+/// test injections of the thread-messages shape keep compiling.
+typedef MessageMatterTableCaller =
+    Future<List<Map<String, dynamic>>> Function(
+      String table,
+      String columns,
+      String matterId,
+    );
+
 /// A server-side title search: table + columns + ilike column + needle +
 /// page size → raw map rows.
 ///
@@ -84,7 +96,10 @@ abstract interface class SupabaseMessageApi {
   /// `message_count`, `last_activity_at`, `matters(title)` — the
   /// metadata-only read surface the [MessageThread] VO needs (D-MSG1: no
   /// body/preview/attachment/sender column exists).
-  Future<List<Map<String, dynamic>>> fetchMessageThreads();
+  ///
+  /// When [matterId] is present the SELECT is additionally filtered
+  /// `.eq('matter_id', matterId)` server-side.
+  Future<List<Map<String, dynamic>>> fetchMessageThreads({String? matterId});
 
   /// First page of the caller's assignment-scoped `message_threads` rows
   /// whose `title` matches [query] (case-insensitive substring,

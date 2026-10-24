@@ -1,7 +1,7 @@
-﻿import '../../core/errors/app_error.dart';
-import '../../core/errors/result.dart';
-import '../../features/approvals/domain/approvals_gateway.dart';
-import '../../features/approvals/domain/pending_approval.dart';
+﻿import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/approvals/domain/approvals_gateway.dart';
+import 'package:legalhub/features/approvals/domain/pending_approval.dart';
 import 'supabase_approval_api.dart';
 
 /// Approval-request gateway backed by the Supabase provider (design §3).

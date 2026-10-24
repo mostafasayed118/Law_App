@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../data/local/theme_mode_store.dart';
+import 'package:legalhub/data/local/theme_mode_store.dart';
 
 /// App-scoped controller for the user-selected theme mode.
 ///

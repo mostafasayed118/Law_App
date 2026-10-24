@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:legalhub/app/active_org_store.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/organizations/organization_gateway.dart';
+import 'package:legalhub/core/practice_area.dart';
+import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
+import 'package:legalhub/features/matters/domain/matter_write_gateway.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/forms/validators.dart';
+import 'package:legalhub/shared/widgets/practice_area_label.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
 
-import '../../../app/active_org_store.dart';
-import '../../../app/legalhub_theme.dart';
-import '../../../app/service_locator.dart';
-import '../../../core/errors/app_error.dart';
-import '../../../core/organizations/organization_gateway.dart';
-import '../../../core/practice_area.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/forms/validators.dart';
-import '../../../shared/widgets/practice_area_label.dart';
-import '../../../shared/widgets/widgets.dart';
-import '../../auth/presentation/auth_cubit.dart';
-import '../domain/matter_write_gateway.dart';
 import 'matter_create_cubit.dart';
 import 'matter_create_state.dart';
-part 'matter_create_surface.dart';
-part 'matter_create_form_view.dart';
+
 part 'matter_create_assignee_dropdown.dart';
-part 'matter_create_success_view.dart';
 part 'matter_create_error_message.dart';
+part 'matter_create_form_view.dart';
+part 'matter_create_success_view.dart';
+part 'matter_create_surface.dart';
 
 /// Create-matter form flow (F-01 step 2 client swap, C-D6).
 ///

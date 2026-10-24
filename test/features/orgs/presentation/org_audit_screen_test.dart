@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
-import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/orgs/presentation/org_audit_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
@@ -33,32 +32,12 @@ void main() {
 
   tearDown(() => resetServiceLocator());
 
-  RoleCapability partnerCapabilities() => const RoleCapability(
-    canViewHome: true,
-    canViewSettings: true,
-    canBookConsultation: true,
-    canViewAttorneyDiscovery: true,
-    canViewMatters: true,
-    canViewDocuments: true,
-    canViewMessages: true,
-    canViewFiles: true,
-    canViewAudit: true,
-    canViewNotifications: true,
-    canViewAlerts: true,
-    canViewTasks: true,
-    canViewApprovals: true,
-    canUseAiResearch: false,
-  );
-
   Widget harness({String? organizationId, Locale locale = const Locale('en')}) {
     return MaterialApp(
       locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: OrgAuditScreen(
-        organizationId: organizationId,
-        capabilities: partnerCapabilities(),
-      ),
+      home: OrgAuditScreen(organizationId: organizationId),
     );
   }
 

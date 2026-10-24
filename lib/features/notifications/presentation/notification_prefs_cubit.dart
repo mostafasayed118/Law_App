@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../domain/notification_prefs.dart';
-import '../domain/notification_prefs_store.dart';
+import 'package:legalhub/features/notifications/domain/notification_prefs.dart';
+import 'package:legalhub/features/notifications/domain/notification_prefs_store.dart';
 
 class NotificationPrefsState extends Equatable {
   const NotificationPrefsState(this.prefs);

@@ -1,23 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../app/legalhub_theme.dart';
-import '../../../app/router.dart';
-import '../../../app/service_locator.dart';
-import '../../../core/roles/user_role.dart';
-import '../../../core/state/view_state.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/demo_labels.dart';
-import '../../../shared/formatting/date_formatting.dart';
-import '../../../shared/widgets/widgets.dart';
-import '../../matters/domain/matter.dart';
-import '../../matters/domain/matter_gateway.dart';
-import '../../matters/domain/matter_title_resolver.dart';
-import '../../matters/presentation/matter_cubit.dart';
-import '../../matters/presentation/matter_link_chip.dart';
-import '../../matters/presentation/matter_state.dart';
-import '../domain/message_gateway.dart';
-import '../domain/message_thread.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/router.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/features/matters/presentation/matter_link_chip.dart';
+import 'package:legalhub/features/messaging/domain/message_gateway.dart';
+import 'package:legalhub/features/messaging/domain/message_thread.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/demo_labels.dart';
+import 'package:legalhub/shared/formatting/date_formatting.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
+
 import 'message_count_chip.dart';
 import 'message_cubit.dart';
 import 'message_state.dart';
@@ -31,17 +26,17 @@ part 'message_thread_tile.dart';
 /// D-MSG2). Rows render the five D-MSG4 fields (title, matter reference,
 /// participants, last-activity date, message count) and nothing else — no
 /// message body, no preview, no send/reply (D-MSG1/D-MSG3). Phase 12 adds
-/// the **reverse cross-link** (D-C1): a row whose `matterRef` resolves to a
-/// known synthetic matter renders the compact "View matter" chip (D-C2),
-/// gated by the `canViewMatters` nav hint (D-C4). The realtime slice (D-RT5)
-/// adds the **thread-open affordance**: the whole row is tappable and opens
-/// the read-only thread-detail surface (the first place message bodies
-/// appear — the D-MSG1 consummation scoped to the real read path; no
-/// composer/send/reply). Resolution is title-keyed and client-side against
-/// the loaded synthetic matter list (D-C3, the D-M5 discipline in reverse);
-/// rows whose `matterRef` does not resolve stay metadata-only. All copy is
-/// local-only — the synthetic list must never read as real case
-/// communications (R1/D-MSG4).
+/// the **reverse cross-link** (D-C1): a row whose provider query embedded
+/// the matter title renders the compact "View matter" chip (D-C2), gated by
+/// the `canViewMatters` nav hint (D-C4). The realtime slice (D-RT5) adds the
+/// **thread-open affordance**: the whole row is tappable and opens the
+/// read-only thread-detail surface (the first place message bodies appear —
+/// the D-MSG1 consummation scoped to the real read path; no composer/send/
+/// reply). The link target is the row's own `matter_id` (the embed carries
+/// the title), so the screen no longer loads the full matter list just to
+/// resolve `matterRef`; a row without the embed stays metadata-only (the
+/// safe fallback). All copy is local-only — the synthetic list must never
+/// read as real case communications (R1/D-MSG4).
 class MessageListScreen extends StatelessWidget {
   const MessageListScreen({required this.capabilities, super.key});
 
@@ -52,19 +47,9 @@ class MessageListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<MessageCubit>(
-          create: (BuildContext context) =>
-              MessageCubit(serviceLocator<MessageGateway>()),
-        ),
-        // Loads the synthetic matter list alongside the threads so each
-        // row's matterRef can be resolved client-side (D-C3).
-        BlocProvider<MatterCubit>(
-          create: (BuildContext context) =>
-              MatterCubit(serviceLocator<MatterGateway>()),
-        ),
-      ],
+    return BlocProvider<MessageCubit>(
+      create: (BuildContext context) =>
+          MessageCubit(serviceLocator<MessageGateway>()),
       child: _ListSurface(capabilities: capabilities),
     );
   }
@@ -83,16 +68,13 @@ class _ListSurfaceState extends State<_ListSurface> {
   @override
   void initState() {
     super.initState();
-    // Load both synthetic lists on open (matches the discovery/matter
-    // pattern): the cubits' initial states are already loading, and the
-    // fakes resolve immediately, so the first frame settles straight into
-    // the list.
+    // The cubit's initial state is already loading and the fake resolves
+    // immediately, so the first frame settles straight into the list.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
         return;
       }
       context.read<MessageCubit>().load();
-      context.read<MatterCubit>().load();
     });
   }
 
@@ -106,34 +88,7 @@ class _ListSurfaceState extends State<_ListSurface> {
       body: SafeArea(
         child: BlocBuilder<MessageCubit, MessageState>(
           builder: (BuildContext context, MessageState state) {
-            return BlocBuilder<MatterCubit, MatterState>(
-              builder: (BuildContext context, MatterState matterState) {
-                // The loaded matter list feeds the title-keyed resolution
-                // (D-C3); empty until the matter list loads, so tiles render
-                // without a chip until then (the fakes resolve immediately).
-                // Deliberate degradation: if the matter load ever fails, the
-                // messages list still renders its threads and the reverse
-                // link simply disappears — a nav hint, not a second error
-                // state.
-                final List<Matter> matters = switch (matterState.matters) {
-                  ViewSuccess<List<Matter>>(data: final List<Matter> list) =>
-                    list,
-                  ViewLoading() ||
-                  ViewEmpty() ||
-                  ViewError() ||
-                  ViewOffline() ||
-                  ViewUnauthorized() => const <Matter>[],
-                };
-                return _resultsView(
-                  context,
-                  state,
-                  matters,
-                  l10n,
-                  text,
-                  scheme,
-                );
-              },
-            );
+            return _resultsView(context, state, l10n, text, scheme);
           },
         ),
       ),
@@ -143,16 +98,12 @@ class _ListSurfaceState extends State<_ListSurface> {
   Widget _resultsView(
     BuildContext context,
     MessageState state,
-    List<Matter> matters,
     AppLocalizations l10n,
     TextTheme text,
     ColorScheme scheme,
   ) {
     final MessageCubit cubit = context.read<MessageCubit>();
     final bool localOnly = backendIsLocalOnly;
-    // Title index built ONCE per render (audit: per-row resolveMatterByTitle
-    // was O(rows × matters)); each tile resolves its reverse link in O(1).
-    final Map<String, Matter> matterIndex = buildMatterTitleIndex(matters);
     final Widget empty = Padding(
       padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
       child: Text(
@@ -176,7 +127,7 @@ class _ListSurfaceState extends State<_ListSurface> {
               AppRoutes.messageThreadDetailFor(thread.id),
               extra: thread.title,
             ),
-            onViewMatter: _matterTap(context, thread, matterIndex),
+            onViewMatter: _matterTap(context, thread),
           ),
       empty: empty,
       errorCopy: l10n.messagesError,
@@ -186,24 +137,19 @@ class _ListSurfaceState extends State<_ListSurface> {
   }
 
   /// The reverse cross-link target for a row, or null when the row renders
-  /// no affordance: the `matterRef` must resolve to a known synthetic matter
-  /// (D-C3) AND the `canViewMatters` nav hint must be granted (D-C4).
-  VoidCallback? _matterTap(
-    BuildContext context,
-    MessageThread thread,
-    Map<String, Matter> matterIndex,
-  ) {
+  /// no affordance: the provider query must have returned both the matter id
+  /// and its embedded title (the safe fallback when the embed is absent),
+  /// AND the `canViewMatters` nav hint must be granted (D-C4).
+  VoidCallback? _matterTap(BuildContext context, MessageThread thread) {
     if (!widget.capabilities.canViewMatters) {
       return null;
     }
-    final Matter? matter = resolveMatterByTitleIn(
-      matterIndex,
-      thread.matterRef,
-    );
-    if (matter == null) {
+    final String? matterId = thread.matterId;
+    final String? matterTitle = thread.matterTitle;
+    if (matterId == null || matterTitle == null) {
       return null;
     }
     // E2E BUG-1 fix: reverse cross-link is a forward navigation.
-    return () => context.push(AppRoutes.matterDetail(matter.id));
+    return () => context.push(AppRoutes.matterDetail(matterId));
   }
 }

@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../errors/app_error.dart';
+import 'package:legalhub/core/errors/app_error.dart';
 
 /// Shared async state vocabulary for Cubits and placeholder screens.
 sealed class ViewState<T> extends Equatable {

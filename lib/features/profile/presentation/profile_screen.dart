@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../app/legalhub_theme.dart';
-import '../../../core/auth/auth_state.dart';
-import '../../../core/auth/session.dart';
-import '../../../core/errors/app_error.dart';
-import '../../../core/organizations/organization_gateway.dart';
-import '../../../core/state/view_state.dart';
-import '../../../features/auth/presentation/auth_cubit.dart';
-import '../../../features/orgs/presentation/org_error_messages.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/formatting/date_formatting.dart';
-import '../../../shared/widgets/widgets.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/core/auth/auth_state.dart';
+import 'package:legalhub/core/auth/session.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/organizations/organization_gateway.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
+import 'package:legalhub/features/orgs/presentation/org_error_messages.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/formatting/date_formatting.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
 
 part 'profile_body.dart';
 

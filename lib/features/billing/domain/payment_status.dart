@@ -12,12 +12,6 @@ enum PaymentStatus {
   expired,
   refunded;
 
-  /// True once the attempt can no longer change without a new initiation.
-  bool get isTerminal => switch (this) {
-    none || pending => false,
-    succeeded || failed || cancelled || expired || refunded => true,
-  };
-
   /// Parses the wire value returned by the payment RPC/edge function.
   static PaymentStatus fromWire(String value) => switch (value) {
     'pending' => pending,

@@ -1,18 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/matters/domain/matter_gateway.dart';
+import 'package:legalhub/features/video/domain/video_gateway.dart';
+import 'package:legalhub/features/video/domain/video_session.dart';
+import 'package:legalhub/features/video/domain/video_token.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/formatting/date_formatting.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
 
-import '../../../app/legalhub_theme.dart';
-import '../../../app/service_locator.dart';
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/formatting/date_formatting.dart';
-import '../../../shared/widgets/widgets.dart';
-import '../../matters/domain/matter_gateway.dart';
-import '../domain/video_gateway.dart';
-import '../domain/video_session.dart';
-import '../domain/video_token.dart';
 import 'video_call_screen.dart';
 import 'video_create_sheet.dart';
 import 'video_cubit.dart';

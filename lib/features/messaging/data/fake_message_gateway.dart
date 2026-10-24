@@ -1,8 +1,8 @@
-import '../../../core/errors/result.dart';
-import '../domain/message.dart';
-import '../domain/message_gateway.dart';
-import '../domain/message_realtime_event.dart';
-import '../domain/message_thread.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/messaging/domain/message.dart';
+import 'package:legalhub/features/messaging/domain/message_gateway.dart';
+import 'package:legalhub/features/messaging/domain/message_realtime_event.dart';
+import 'package:legalhub/features/messaging/domain/message_thread.dart';
 
 /// Development-only messaging implementation: a fixed synthetic list of
 /// non-PII message-thread **metadata** + deterministic per-thread message
@@ -26,6 +26,8 @@ class FakeMessageGateway implements MessageGateway {
   static final List<MessageThread> syntheticThreads = <MessageThread>[
     MessageThread(
       id: 'thread-1',
+      matterId: 'matter-1',
+      matterTitle: 'Demo acquisition review',
       title: 'Demo matter updates',
       matterRef: 'Demo acquisition review',
       participants: const <String>['Layla Mansour', 'Demo client'],
@@ -34,6 +36,8 @@ class FakeMessageGateway implements MessageGateway {
     ),
     MessageThread(
       id: 'thread-2',
+      matterId: 'matter-2',
+      matterTitle: 'Commercial lease consultation',
       title: 'Consultation follow-up — demo',
       matterRef: 'Commercial lease consultation',
       participants: const <String>['Omar Farouk', 'Demo client'],
@@ -42,6 +46,8 @@ class FakeMessageGateway implements MessageGateway {
     ),
     MessageThread(
       id: 'thread-3',
+      matterId: 'matter-3',
+      matterTitle: 'Procedural review matter',
       title: 'Demo procedural notes',
       matterRef: 'Procedural review matter',
       participants: const <String>['Layla Mansour'],
@@ -50,6 +56,8 @@ class FakeMessageGateway implements MessageGateway {
     ),
     MessageThread(
       id: 'thread-4',
+      matterId: 'matter-4',
+      matterTitle: 'Family status consultation',
       title: 'Family matter thread — demo',
       matterRef: 'Family status consultation',
       participants: const <String>['Omar Farouk', 'Demo client'],
@@ -58,6 +66,8 @@ class FakeMessageGateway implements MessageGateway {
     ),
     MessageThread(
       id: 'thread-5',
+      matterId: 'matter-5',
+      matterTitle: 'Startup formation advisory',
       title: 'Startup advisory — demo',
       matterRef: 'Startup formation advisory',
       participants: const <String>['Sara Khalil', 'Demo client'],
@@ -95,10 +105,18 @@ class FakeMessageGateway implements MessageGateway {
   }
 
   @override
-  Future<Result<List<MessageThread>>> fetchThreads() async {
-    // Thread metadata only — the synthetic list is returned as-is; nothing
-    // crosses this boundary but the D-MSG4 metadata surface.
-    return Result<List<MessageThread>>.success(syntheticThreads);
+  Future<Result<List<MessageThread>>> fetchThreads({String? matterId}) async {
+    // Thread metadata only — nothing crosses this boundary but the D-MSG4
+    // metadata surface. A matter id scopes the in-memory read the same way
+    // the server-side filter does.
+    if (matterId == null) {
+      return Result<List<MessageThread>>.success(syntheticThreads);
+    }
+    return Result<List<MessageThread>>.success(
+      syntheticThreads
+          .where((MessageThread thread) => thread.matterId == matterId)
+          .toList(growable: false),
+    );
   }
 
   @override

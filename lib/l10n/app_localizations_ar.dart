@@ -370,39 +370,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get demoTaskTitle5 => 'تجريبي: تحديث الجدول الزمني للقضية';
 
   @override
-  String get demoApprovalRefInviteReview => 'دعوة تجريبية — مراجعة';
-
-  @override
-  String get demoApprovalRefRoleChange => 'تغيير دور تجريبي';
-
-  @override
-  String get demoApprovalRefInviteExpired => 'دعوة نموذجية — منتهية الصلاحية';
-
-  @override
-  String get demoApprovalRefSuspension => 'مراجعة إيقاف تجريبية';
-
-  @override
-  String get demoApprovalEntityInvitation => 'دعوة';
-
-  @override
-  String get demoApprovalEntityMembership => 'عضوية';
-
-  @override
-  String get demoApprovalEntityDocument => 'مستند';
-
-  @override
-  String get demoVideoTopic1 => 'مراجعة عقد — اجتماع البدء';
-
-  @override
-  String get demoVideoTopic2 => 'جولة تأسيس الشركة';
-
-  @override
-  String get demoVideoTopic3 => 'نزاع عمالي — متابعة';
-
-  @override
-  String get demoVideoTopic4 => 'استشارة قانون الأسرة';
-
-  @override
   String researchHeadline(String title) {
     return 'ملاحظة بحثية — $title';
   }
@@ -1503,9 +1470,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get alertsTitle => 'تنبيهات الامتثال';
 
   @override
-  String get alertsEmpty => 'لا توجد تنبيهات امتثال متاحة.';
-
-  @override
   String get alertsError => 'تعذّر تحميل تنبيهات الامتثال.';
 
   @override
@@ -1762,9 +1726,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get approvalsTitle => 'موافقات معلّقة';
-
-  @override
-  String get approvalsEmpty => 'لا توجد موافقات معلّقة متاحة.';
 
   @override
   String get approvalsError => 'تعذّر تحميل الموافقات.';
@@ -2032,9 +1993,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get videoJoin => 'انضم للمكالمة';
-
-  @override
-  String get videoCallLiveBadge => 'مباشر';
 
   @override
   String videoCallElapsed(String duration) {

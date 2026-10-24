@@ -1,6 +1,6 @@
-import '../../../core/errors/result.dart';
-import '../domain/document.dart';
-import '../domain/document_gateway.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/documents/domain/document.dart';
+import 'package:legalhub/features/documents/domain/document_gateway.dart';
 
 /// Development-only document implementation: a fixed synthetic list of
 /// non-PII document **metadata**.
@@ -19,6 +19,8 @@ class FakeDocumentGateway implements DocumentGateway {
   static final List<Document> syntheticDocuments = <Document>[
     Document(
       id: 'doc-1',
+      matterId: 'matter-1',
+      matterTitle: 'Demo acquisition review',
       title: 'Demo engagement letter',
       matterRef: 'Demo acquisition review',
       type: DocumentType.contract,
@@ -26,6 +28,8 @@ class FakeDocumentGateway implements DocumentGateway {
     ),
     Document(
       id: 'doc-2',
+      matterId: 'matter-2',
+      matterTitle: 'Commercial lease consultation',
       title: 'Sample matter brief — demo',
       matterRef: 'Commercial lease consultation',
       type: DocumentType.brief,
@@ -33,6 +37,8 @@ class FakeDocumentGateway implements DocumentGateway {
     ),
     Document(
       id: 'doc-3',
+      matterId: 'matter-3',
+      matterTitle: 'Procedural review matter',
       title: 'Demo evidence index',
       matterRef: 'Procedural review matter',
       type: DocumentType.evidence,
@@ -40,6 +46,8 @@ class FakeDocumentGateway implements DocumentGateway {
     ),
     Document(
       id: 'doc-4',
+      matterId: 'matter-4',
+      matterTitle: 'Family status consultation',
       title: 'Correspondence log — demo',
       matterRef: 'Family status consultation',
       type: DocumentType.correspondence,
@@ -47,6 +55,8 @@ class FakeDocumentGateway implements DocumentGateway {
     ),
     Document(
       id: 'doc-5',
+      matterId: 'matter-5',
+      matterTitle: 'Startup formation advisory',
       title: 'Demo settlement draft',
       matterRef: 'Startup formation advisory',
       type: DocumentType.contract,
@@ -55,10 +65,18 @@ class FakeDocumentGateway implements DocumentGateway {
   ];
 
   @override
-  Future<Result<List<Document>>> fetchDocuments() async {
+  Future<Result<List<Document>>> fetchDocuments({String? matterId}) async {
     // Metadata only — the synthetic list is returned as-is; nothing crosses
-    // this boundary but the D-V4 metadata surface.
-    return Result<List<Document>>.success(syntheticDocuments);
+    // this boundary but the D-V4 metadata surface. A matter id scopes the
+    // in-memory read the same way the server-side filter does.
+    if (matterId == null) {
+      return Result<List<Document>>.success(syntheticDocuments);
+    }
+    return Result<List<Document>>.success(
+      syntheticDocuments
+          .where((Document document) => document.matterId == matterId)
+          .toList(growable: false),
+    );
   }
 
   @override

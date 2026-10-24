@@ -5,15 +5,12 @@ import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/features/billing/domain/billing_gateway.dart';
-import 'package:legalhub/features/discovery/presentation/discovery_entry_card.dart';
 import 'package:legalhub/features/documents/domain/document_gateway.dart';
 import 'package:legalhub/features/matters/presentation/matter_documents_section.dart';
-import 'package:legalhub/features/matters/presentation/matter_entry_card.dart';
 import 'package:legalhub/features/matters/presentation/matter_messages_section.dart';
 import 'package:legalhub/features/matters/presentation/matter_workspace_cubit.dart';
 import 'package:legalhub/features/messaging/domain/message_gateway.dart';
 import 'package:legalhub/features/messaging/presentation/message_count_chip.dart';
-import 'package:legalhub/features/messaging/presentation/message_entry_card.dart';
 import 'package:legalhub/features/search/presentation/search_screen.dart';
 import 'package:legalhub/features/storage/domain/storage_gateway.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
@@ -1484,81 +1481,6 @@ void main() {
       expect(find.text('Loading'), findsNothing);
     });
 
-    testWidgets('renders the discovery entry card in AR and TR, not the EN '
-        'fallback (6.3 pin)', (tester) async {
-      Future<void> pumpAt(Locale locale) async {
-        await tester.pumpWidget(
-          MaterialApp(
-            locale: locale,
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(body: DiscoveryEntryCard(onTap: null)),
-          ),
-        );
-        await tester.pumpAndSettle();
-      }
-
-      await pumpAt(const Locale('ar'));
-      expect(find.text('ابحث عن محامٍ'), findsOneWidget);
-      expect(find.text('Find an attorney'), findsNothing);
-
-      await pumpAt(const Locale('tr'));
-      expect(find.text('Bir avukat bul'), findsOneWidget);
-      expect(find.text('Find an attorney'), findsNothing);
-    });
-
-    testWidgets(
-      'renders the matter entry card in AR and TR, not the EN fallback '
-      '(7.3 pin)',
-      (tester) async {
-        Future<void> pumpAt(Locale locale) async {
-          await tester.pumpWidget(
-            MaterialApp(
-              locale: locale,
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
-              supportedLocales: AppLocalizations.supportedLocales,
-              home: Scaffold(body: MatterEntryCard(onTap: null)),
-            ),
-          );
-          await tester.pumpAndSettle();
-        }
-
-        await pumpAt(const Locale('ar'));
-        expect(find.text('قضاياي'), findsOneWidget);
-        expect(find.text('My matters'), findsNothing);
-
-        await pumpAt(const Locale('tr'));
-        expect(find.text('Davalarım'), findsOneWidget);
-        expect(find.text('My matters'), findsNothing);
-      },
-    );
-
-    testWidgets(
-      'renders the message entry card in AR and TR, not the EN fallback '
-      '(9.2 pin)',
-      (tester) async {
-        Future<void> pumpAt(Locale locale) async {
-          await tester.pumpWidget(
-            MaterialApp(
-              locale: locale,
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
-              supportedLocales: AppLocalizations.supportedLocales,
-              home: Scaffold(body: MessageEntryCard(onTap: null)),
-            ),
-          );
-          await tester.pumpAndSettle();
-        }
-
-        await pumpAt(const Locale('ar'));
-        expect(find.text('الرسائل'), findsOneWidget);
-        expect(find.text('Messages'), findsNothing);
-
-        await pumpAt(const Locale('tr'));
-        expect(find.text('Mesajlar'), findsOneWidget);
-        expect(find.text('Messages'), findsNothing);
-      },
-    );
-
     testWidgets(
       'renders the message count chip with the AR and TR label, not the EN '
       'fallback (9.2 pin)',
@@ -1606,9 +1528,9 @@ void main() {
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
-                // An unmatched matterRef filters the synthetic list to the
+                // An unmatched matter id scopes the synthetic read to the
                 // per-matter empty state (D-W2: every known matter owns at
-                // least one document, so only an unknown ref can empty it).
+                // least one document, so only an unknown id can empty it).
                 // The section reads the workspace composite (Phase 2), so a
                 // service-locator-backed cubit is provided above it.
                 body: BlocProvider<MatterWorkspaceCubit>(
@@ -1617,10 +1539,9 @@ void main() {
                     serviceLocator<DocumentGateway>(),
                     serviceLocator<BillingGateway>(),
                     serviceLocator<StorageGateway>(),
+                    matterId: 'no-such-matter',
                   ),
-                  child: const MatterDocumentsSection(
-                    matterRef: 'no-such-matter',
-                  ),
+                  child: const MatterDocumentsSection(),
                 ),
               ),
             ),
@@ -1661,7 +1582,7 @@ void main() {
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
-                // An unmatched matterRef filters the synthetic list to the
+                // An unmatched matter id scopes the synthetic read to the
                 // per-matter empty state. The section reads the workspace
                 // composite (Phase 2), so a service-locator-backed cubit is
                 // provided above it.
@@ -1671,10 +1592,9 @@ void main() {
                     serviceLocator<DocumentGateway>(),
                     serviceLocator<BillingGateway>(),
                     serviceLocator<StorageGateway>(),
+                    matterId: 'no-such-matter',
                   ),
-                  child: const MatterMessagesSection(
-                    matterRef: 'no-such-matter',
-                  ),
+                  child: const MatterMessagesSection(),
                 ),
               ),
             ),

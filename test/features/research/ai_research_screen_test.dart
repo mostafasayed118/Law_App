@@ -18,7 +18,6 @@ import 'package:legalhub/features/research/domain/ai_gateway.dart';
 import 'package:legalhub/features/research/domain/research_outcome.dart';
 import 'package:legalhub/features/research/domain/research_request.dart';
 import 'package:legalhub/features/research/domain/research_run.dart';
-import 'package:legalhub/features/research/presentation/ai_research_entry_card.dart';
 import 'package:legalhub/features/research/presentation/ai_research_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
@@ -47,7 +46,7 @@ class _StubDocumentGateway implements DocumentGateway {
   final List<Document> documents;
 
   @override
-  Future<Result<List<Document>>> fetchDocuments() async =>
+  Future<Result<List<Document>>> fetchDocuments({String? matterId}) async =>
       Result<List<Document>>.success(documents);
 
   @override
@@ -72,7 +71,7 @@ class _StubMatterGateway implements MatterGateway {
 
 class _FailingDocumentGateway implements DocumentGateway {
   @override
-  Future<Result<List<Document>>> fetchDocuments() async =>
+  Future<Result<List<Document>>> fetchDocuments({String? matterId}) async =>
       Result<List<Document>>.failure(_loadFailure);
 
   @override
@@ -357,25 +356,6 @@ void main() {
         );
       },
     );
-
-    testWidgets('entry card renders its localized copy (AC-6 wiring)', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: Scaffold(body: AiResearchEntryCard(onTap: null)),
-        ),
-      );
-      await tester.pump();
-
-      expect(find.text('AI research'), findsOneWidget);
-      expect(
-        find.text('Ask the demo research assistant — advisory only.'),
-        findsOneWidget,
-      );
-    });
 
     testWidgets(
       'renders the question field, optional pickers, and generate action',

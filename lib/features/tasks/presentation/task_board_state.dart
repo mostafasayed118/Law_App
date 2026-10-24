@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/state/view_state.dart';
-import '../domain/task_item.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/tasks/domain/task_item.dart';
 
 /// Immutable state of the task-board surface (v1 queue, 2026-08-09).
 ///

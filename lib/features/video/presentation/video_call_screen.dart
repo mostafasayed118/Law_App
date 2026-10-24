@@ -1,13 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/features/video/domain/video_gateway.dart';
+import 'package:legalhub/features/video/domain/video_session.dart';
+import 'package:legalhub/features/video/domain/video_token.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:livekit_client/livekit_client.dart';
-
-import '../../../app/legalhub_theme.dart';
-import '../../../l10n/app_localizations.dart';
-import '../domain/video_gateway.dart';
-import '../domain/video_session.dart';
-import '../domain/video_token.dart';
 
 /// Connects to a LiveKit room. Injected by tests so the pre-connect UI can be
 /// exercised without native WebRTC.
@@ -65,7 +64,6 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   void dispose() {
     final Room? room = _room;
     if (room != null) {
-      room.removeListener(_onRoomChanged);
       if (!_leaving) {
         unawaited(room.disconnect());
       }
@@ -90,7 +88,6 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         await room.disconnect();
         return;
       }
-      room.addListener(_onRoomChanged);
       setState(() {
         _room = room;
         _connecting = false;
@@ -135,12 +132,6 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       return;
     }
     await widget.gateway.markLive(widget.session.id);
-  }
-
-  void _onRoomChanged() {
-    if (mounted) {
-      setState(() {});
-    }
   }
 
   Future<void> _toggleMic() async {
@@ -272,19 +263,33 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     return Column(
       children: <Widget>[
         Expanded(
-          child: ListView(
-            padding: const EdgeInsetsDirectional.all(
-              LegalHubTheme.marginMobile,
-            ),
-            children: <Widget>[
-              if (_mediaWarning) ...<Widget>[
-                Text(
-                  l10n.videoCallMediaWarning,
-                  style: TextStyle(color: scheme.error),
+          child: CustomScrollView(
+            slivers: <Widget>[
+              if (_mediaWarning)
+                SliverPadding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                    LegalHubTheme.marginMobile,
+                    LegalHubTheme.marginMobile,
+                    LegalHubTheme.marginMobile,
+                    0,
+                  ),
+                  sliver: SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsetsDirectional.only(
+                        bottom: LegalHubTheme.spaceMd,
+                      ),
+                      child: Text(
+                        l10n.videoCallMediaWarning,
+                        style: TextStyle(color: scheme.error),
+                      ),
+                    ),
+                  ),
                 ),
-                const SizedBox(height: LegalHubTheme.spaceMd),
-              ],
-              _participantsGrid(l10n, room),
+              _ParticipantsGrid(
+                l10n: l10n,
+                room: room,
+                topPadding: _mediaWarning ? 0 : LegalHubTheme.marginMobile,
+              ),
             ],
           ),
         ),
@@ -328,38 +333,63 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       ],
     );
   }
+}
 
-  Widget _participantsGrid(AppLocalizations l10n, Room room) {
-    final List<Widget> tiles = <Widget>[];
-    final LocalParticipant? local = room.localParticipant;
-    if (local != null) {
-      tiles.add(
-        _ParticipantTile(
-          label: l10n.videoCallYou,
-          track: _videoTrackOf(local),
-          mirror: true,
-        ),
-      );
-    }
-    for (final RemoteParticipant remote in room.remoteParticipants.values) {
-      tiles.add(
-        _ParticipantTile(
-          label: remote.name.isEmpty ? remote.identity : remote.name,
-          track: _videoTrackOf(remote),
-        ),
-      );
-    }
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: tiles.length > 1 ? 2 : 1,
-        childAspectRatio: 3 / 4,
-        mainAxisSpacing: LegalHubTheme.spaceSm,
-        crossAxisSpacing: LegalHubTheme.spaceSm,
-      ),
-      itemCount: tiles.length,
-      itemBuilder: (BuildContext context, int index) => tiles[index],
+/// The room-driven participant grid. Only this sliver listens to the room, so
+/// a participant/track event rebuilds the tiles instead of the whole call
+/// screen (the controls and app bar stay untouched).
+class _ParticipantsGrid extends StatelessWidget {
+  const _ParticipantsGrid({
+    required this.l10n,
+    required this.room,
+    required this.topPadding,
+  });
+
+  final AppLocalizations l10n;
+  final Room room;
+
+  /// Zero when the media warning already supplies the gap above the grid.
+  final double topPadding;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: room,
+      builder: (BuildContext context, Widget? child) {
+        final LocalParticipant? local = room.localParticipant;
+        final List<Widget> tiles = <Widget>[
+          if (local != null)
+            _ParticipantTile(
+              label: l10n.videoCallYou,
+              track: _videoTrackOf(local),
+              mirror: true,
+            ),
+          for (final RemoteParticipant remote in room.remoteParticipants.values)
+            _ParticipantTile(
+              label: remote.name.isEmpty ? remote.identity : remote.name,
+              track: _videoTrackOf(remote),
+            ),
+        ];
+        return SliverPadding(
+          padding: EdgeInsetsDirectional.fromSTEB(
+            LegalHubTheme.marginMobile,
+            topPadding,
+            LegalHubTheme.marginMobile,
+            LegalHubTheme.marginMobile,
+          ),
+          sliver: SliverGrid.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: tiles.length > 1 ? 2 : 1,
+              childAspectRatio: 3 / 4,
+              mainAxisSpacing: LegalHubTheme.spaceSm,
+              crossAxisSpacing: LegalHubTheme.spaceSm,
+            ),
+            itemCount: tiles.length,
+            itemBuilder: (BuildContext context, int index) =>
+                RepaintBoundary(child: tiles[index]),
+          ),
+        );
+      },
     );
   }
 

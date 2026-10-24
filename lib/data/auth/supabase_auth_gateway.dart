@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import '../../core/auth/auth_gateway.dart';
+import 'package:legalhub/core/auth/auth_gateway.dart';
 import 'supabase_auth_api.dart';
 
 /// [AuthGateway] backed by the Supabase provider via [SupabaseAuthApi].

@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/errors/result.dart';
-import '../../../core/use_cases/use_case.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/use_cases/use_case.dart';
 import 'notification.dart';
 import 'notification_prefs.dart';
 import 'notification_prefs_store.dart';

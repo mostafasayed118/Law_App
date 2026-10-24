@@ -200,7 +200,7 @@ class _StubBillingGateway implements BillingGateway {
   final List<Result<List<Invoice>>> results;
 
   @override
-  Future<Result<List<Invoice>>> fetchInvoices() async {
+  Future<Result<List<Invoice>>> fetchInvoices({String? matterId}) async {
     return results.removeAt(0);
   }
 }
@@ -210,7 +210,7 @@ class _CountingBillingGateway implements BillingGateway {
   int fetchCalls = 0;
 
   @override
-  Future<Result<List<Invoice>>> fetchInvoices() async {
+  Future<Result<List<Invoice>>> fetchInvoices({String? matterId}) async {
     fetchCalls++;
     return Result<List<Invoice>>.success(FakeBillingGateway.syntheticInvoices);
   }

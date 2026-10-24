@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/observability/error_reporter.dart';
+import 'package:legalhub/core/observability/error_reporter.dart';
 
 /// Transient, backend-free sign-up request value object.
 ///

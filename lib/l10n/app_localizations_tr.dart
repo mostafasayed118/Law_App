@@ -374,39 +374,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get demoTaskTitle5 => 'Demo: dosya zaman çizelgesini güncelle';
 
   @override
-  String get demoApprovalRefInviteReview => 'Demo davet — inceleme';
-
-  @override
-  String get demoApprovalRefRoleChange => 'Demo rol değişikliği';
-
-  @override
-  String get demoApprovalRefInviteExpired => 'Örnek davet — süresi dolmuş';
-
-  @override
-  String get demoApprovalRefSuspension => 'Demo uzaklaştırma incelemesi';
-
-  @override
-  String get demoApprovalEntityInvitation => 'Davet';
-
-  @override
-  String get demoApprovalEntityMembership => 'Üyelik';
-
-  @override
-  String get demoApprovalEntityDocument => 'Belge';
-
-  @override
-  String get demoVideoTopic1 => 'Sözleşme incelemesi — başlangıç';
-
-  @override
-  String get demoVideoTopic2 => 'Şirket kuruluş turu';
-
-  @override
-  String get demoVideoTopic3 => 'İş uyuşmazlığı — takip';
-
-  @override
-  String get demoVideoTopic4 => 'Aile hukuku danışmanlığı';
-
-  @override
   String researchHeadline(String title) {
     return 'Araştırma notu — $title';
   }
@@ -1524,9 +1491,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get alertsTitle => 'Uyum uyarıları';
 
   @override
-  String get alertsEmpty => 'Kullanılabilir uyum uyarısı yok.';
-
-  @override
   String get alertsError => 'Uyum uyarıları yüklenemedi.';
 
   @override
@@ -1790,9 +1754,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get approvalsTitle => 'Bekleyen onaylar';
-
-  @override
-  String get approvalsEmpty => 'Kullanılabilir bekleyen onay yok.';
 
   @override
   String get approvalsError => 'Onaylar yüklenemedi.';
@@ -2065,9 +2026,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get videoJoin => 'Aramaya katıl';
-
-  @override
-  String get videoCallLiveBadge => 'Canlı';
 
   @override
   String videoCallElapsed(String duration) {

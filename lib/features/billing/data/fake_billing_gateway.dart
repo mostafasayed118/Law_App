@@ -1,6 +1,6 @@
-import '../../../core/errors/result.dart';
-import '../domain/billing_gateway.dart';
-import '../domain/invoice.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/billing/domain/billing_gateway.dart';
+import 'package:legalhub/features/billing/domain/invoice.dart';
 
 /// Development-only billing implementation: a fixed synthetic list of
 /// non-PII invoice **metadata**.
@@ -20,6 +20,7 @@ class FakeBillingGateway implements BillingGateway {
   static final List<Invoice> syntheticInvoices = <Invoice>[
     Invoice(
       id: 'invoice-1',
+      matterId: 'matter-1',
       matterRef: 'Demo acquisition review',
       invoiceNumber: 'INV-2026-0001',
       amountCents: 125000,
@@ -30,6 +31,7 @@ class FakeBillingGateway implements BillingGateway {
     ),
     Invoice(
       id: 'invoice-2',
+      matterId: 'matter-2',
       matterRef: 'Commercial lease consultation',
       invoiceNumber: 'INV-2026-0002',
       amountCents: 87500,
@@ -40,6 +42,7 @@ class FakeBillingGateway implements BillingGateway {
     ),
     Invoice(
       id: 'invoice-3',
+      matterId: 'matter-3',
       matterRef: 'Procedural review matter',
       invoiceNumber: 'INV-2026-0003',
       amountCents: 62000,
@@ -50,6 +53,7 @@ class FakeBillingGateway implements BillingGateway {
     ),
     Invoice(
       id: 'invoice-4',
+      matterId: 'matter-4',
       matterRef: 'Family status consultation',
       invoiceNumber: 'INV-2026-0004',
       amountCents: 45000,
@@ -60,6 +64,7 @@ class FakeBillingGateway implements BillingGateway {
     ),
     Invoice(
       id: 'invoice-5',
+      matterId: 'matter-5',
       matterRef: 'Startup formation advisory',
       invoiceNumber: 'INV-2026-0005',
       amountCents: 98000,
@@ -71,9 +76,17 @@ class FakeBillingGateway implements BillingGateway {
   ];
 
   @override
-  Future<Result<List<Invoice>>> fetchInvoices() async {
-    // Metadata only — the synthetic list is returned as-is; nothing crosses
-    // this boundary but the D-BI1 metadata surface (no payment capability).
-    return Result<List<Invoice>>.success(syntheticInvoices);
+  Future<Result<List<Invoice>>> fetchInvoices({String? matterId}) async {
+    // Metadata only — nothing crosses this boundary but the D-BI1 metadata
+    // surface (no payment capability). A matter id scopes the in-memory read
+    // the same way the server-side filter does.
+    if (matterId == null) {
+      return Result<List<Invoice>>.success(syntheticInvoices);
+    }
+    return Result<List<Invoice>>.success(
+      syntheticInvoices
+          .where((Invoice invoice) => invoice.matterId == matterId)
+          .toList(growable: false),
+    );
   }
 }

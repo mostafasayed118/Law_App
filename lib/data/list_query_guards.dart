@@ -9,16 +9,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 /// an entire RLS-visible table into memory.
 ///
 /// The cap is intentionally conservative — 200 rows covers any realistic
-/// matter/document/invoice/notification list — and is a cap, not a page:
-/// callers that render unbounded surfaces (search, feeds) page through
-/// [pagedTableSelect] with [.range] windows of [kSearchPageSize] rows.
+/// matter/document/invoice/notification list.
 const int kSupabaseListRowCap = 200;
-
-/// Default page size for paged reads (unified search fan-out, feeds).
-///
-/// Four parallel page reads of 30 rows bound a search to ~120 rows instead
-/// of 4 × 200, and bound the eager tile build on the results surface.
-const int kSearchPageSize = 30;
 
 /// Deterministic server-side ordering per table: `(column, descending)`.
 ///
@@ -81,6 +73,13 @@ const Map<String, Set<String>> kSupabaseFilterableColumns =
         'assigned_attorney_id',
       },
       'documents': <String>{'id', 'matter_id', 'title', 'document_type'},
+      'files': <String>{'id', 'matter_id', 'name'},
+      'billing_invoices': <String>{
+        'id',
+        'matter_id',
+        'invoice_number',
+        'status',
+      },
       'messages': <String>{'id', 'thread_id'},
       'message_threads': <String>{'id', 'matter_id', 'title'},
     };
@@ -150,34 +149,6 @@ Future<List<Map<String, dynamic>>> boundedTableSelect(
     return query.range(offset, offset + effectiveLimit - 1);
   }
   return query.limit(effectiveLimit);
-}
-
-/// Explicit pagination over [boundedTableSelect]: page [page] (0-based) of
-/// [pageSize] rows with the table's deterministic ordering.
-///
-/// A dedicated name (rather than bare `offset:`) so call sites read as
-/// paging and the range math (`from`/`to` inclusive on PostgREST) lives in
-/// exactly one place.
-Future<List<Map<String, dynamic>>> pagedTableSelect(
-  String table,
-  String columns, {
-  int page = 0,
-  int pageSize = kSearchPageSize,
-  String? filterColumn,
-  Object? filterValue,
-  String? ilikeColumn,
-  String? ilikeValue,
-}) {
-  return boundedTableSelect(
-    table,
-    columns,
-    filterColumn: filterColumn,
-    filterValue: filterValue,
-    limit: pageSize,
-    offset: page * pageSize,
-    ilikeColumn: ilikeColumn,
-    ilikeValue: ilikeValue,
-  );
 }
 
 /// Escapes PostgREST `like` wildcards (`%`, `_`, `\`) in user input so a

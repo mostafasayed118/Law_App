@@ -274,7 +274,7 @@ class _FakeSupabaseMatterWriteApi implements SupabaseMatterWriteApi {
 /// (same discipline as [_FakeSupabaseMatterApi]).
 class _FakeSupabaseDocumentApi implements SupabaseDocumentApi {
   @override
-  Future<List<Map<String, dynamic>>> fetchDocuments() async =>
+  Future<List<Map<String, dynamic>>> fetchDocuments({String? matterId}) async =>
       <Map<String, dynamic>>[];
 
   @override
@@ -288,8 +288,9 @@ class _FakeSupabaseDocumentApi implements SupabaseDocumentApi {
 /// (same discipline as [_FakeSupabaseDocumentApi]).
 class _FakeSupabaseMessageApi implements SupabaseMessageApi {
   @override
-  Future<List<Map<String, dynamic>>> fetchMessageThreads() async =>
-      <Map<String, dynamic>>[];
+  Future<List<Map<String, dynamic>>> fetchMessageThreads({
+    String? matterId,
+  }) async => <Map<String, dynamic>>[];
 
   @override
   Future<List<Map<String, dynamic>>> searchMessageThreads(
@@ -330,7 +331,7 @@ class _FakeSupabaseMessageRealtimeApi implements SupabaseMessageRealtimeApi {
 /// (same discipline as [_FakeSupabaseMessageApi]).
 class _FakeSupabaseStorageApi implements SupabaseStorageApi {
   @override
-  Future<List<Map<String, dynamic>>> fetchFiles() async =>
+  Future<List<Map<String, dynamic>>> fetchFiles({String? matterId}) async =>
       <Map<String, dynamic>>[];
 
   @override
@@ -365,7 +366,7 @@ class _FakeSupabaseStorageApi implements SupabaseStorageApi {
 /// (same discipline as [_FakeSupabaseStorageApi]).
 class _FakeSupabaseBillingApi implements SupabaseBillingApi {
   @override
-  Future<List<Map<String, dynamic>>> fetchInvoices() async =>
+  Future<List<Map<String, dynamic>>> fetchInvoices({String? matterId}) async =>
       <Map<String, dynamic>>[];
 }
 

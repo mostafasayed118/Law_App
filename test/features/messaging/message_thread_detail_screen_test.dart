@@ -232,7 +232,7 @@ class _StubMessageGateway implements MessageGateway {
   String? sentBody;
 
   @override
-  Future<Result<List<MessageThread>>> fetchThreads() async =>
+  Future<Result<List<MessageThread>>> fetchThreads({String? matterId}) async =>
       const Result<List<MessageThread>>.success(<MessageThread>[]);
 
   @override

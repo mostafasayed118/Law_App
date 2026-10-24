@@ -1,6 +1,6 @@
-import '../../../core/errors/result.dart';
-import '../domain/password_recovery_gateway.dart';
-import '../domain/password_recovery_request.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/auth/domain/password_recovery_gateway.dart';
+import 'package:legalhub/features/auth/domain/password_recovery_request.dart';
 
 /// Development-only password-recovery implementation.
 ///

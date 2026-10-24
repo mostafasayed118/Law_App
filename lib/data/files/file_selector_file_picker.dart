@@ -2,8 +2,8 @@ import 'dart:typed_data';
 
 import 'package:file_selector/file_selector.dart';
 
-import '../../features/storage/domain/file_picker.dart';
-import '../../features/storage/domain/picked_file.dart';
+import 'package:legalhub/features/storage/domain/file_picker.dart';
+import 'package:legalhub/features/storage/domain/picked_file.dart';
 
 /// [FilePicker] backed by `package:file_selector`.
 ///

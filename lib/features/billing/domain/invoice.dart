@@ -31,9 +31,15 @@ class Invoice extends Equatable {
     required this.status,
     required this.issuedAt,
     required this.dueAt,
+    this.matterId,
   });
 
   final String id;
+
+  /// The raw `matter_id` when the provider row carries one; the workspace's
+  /// server-side matter filter keys on it (the demo rows carry the synthetic
+  /// ids).
+  final String? matterId;
 
   /// The matter this invoice belongs to, rendered as one of the existing
   /// synthetic matter titles (the same shape `Document.matterRef` and
@@ -67,5 +73,6 @@ class Invoice extends Equatable {
     status,
     issuedAt,
     dueAt,
+    matterId,
   ];
 }

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/router.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/auth/domain/password_recovery_gateway.dart';
+import 'package:legalhub/features/auth/presentation/password_recovery_cubit.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/forms/validators.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
 
-import '../../../../app/legalhub_theme.dart';
-import '../../../../app/router.dart';
-import '../../../../app/service_locator.dart';
-import '../../../../core/state/view_state.dart';
-import '../../../../l10n/app_localizations.dart';
-import '../../../../shared/forms/validators.dart';
-import '../../../../shared/widgets/widgets.dart';
-import '../../domain/password_recovery_gateway.dart';
-import '../password_recovery_cubit.dart';
 import 'recovery_error_localizer.dart';
 import 'recovery_routing_context.dart';
 

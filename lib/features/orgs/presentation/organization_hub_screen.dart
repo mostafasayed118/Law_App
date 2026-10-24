@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:legalhub/app/active_org_store.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/router.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/auth/session.dart';
+import 'package:legalhub/core/organizations/organization_gateway.dart';
+import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
 
-import '../../../app/active_org_store.dart';
-import '../../../app/legalhub_theme.dart';
-import '../../../app/router.dart';
-import '../../../app/service_locator.dart';
-import '../../../core/auth/session.dart';
-import '../../../core/organizations/organization_gateway.dart';
-import '../../../core/roles/user_role.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../auth/presentation/auth_cubit.dart';
 import 'create_organization_screen.dart';
 import 'member_roster_screen.dart';
 import 'org_cubit.dart';

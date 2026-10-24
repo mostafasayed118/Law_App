@@ -1,10 +1,10 @@
-import '../../core/errors/app_error.dart';
-import '../../core/errors/result.dart';
-import '../../features/booking/domain/booking_category.dart';
-import '../../features/booking/domain/booking_confirmation.dart';
-import '../../features/booking/domain/booking_gateway.dart';
-import '../../features/booking/domain/booking_request.dart';
-import '../../features/booking/domain/booking_slot.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/booking/domain/booking_category.dart';
+import 'package:legalhub/features/booking/domain/booking_confirmation.dart';
+import 'package:legalhub/features/booking/domain/booking_gateway.dart';
+import 'package:legalhub/features/booking/domain/booking_request.dart';
+import 'package:legalhub/features/booking/domain/booking_slot.dart';
 import 'supabase_booking_api.dart';
 
 /// [BookingGateway] backed by the Supabase provider via [SupabaseBookingApi].

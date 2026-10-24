@@ -1,6 +1,6 @@
+import 'package:legalhub/data/supabase_seam.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../supabase_seam.dart';
 import 'supabase_matter_write_api.dart';
 
 /// A PostgREST RPC call: function name + named params → response.

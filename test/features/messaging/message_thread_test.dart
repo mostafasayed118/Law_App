@@ -25,10 +25,11 @@ void main() {
       final MessageThread thread = _thread(last: DateTime.utc(2026, 7, 28));
 
       // props enumerates the ENTIRE field surface: id / title / matterRef /
-      // participants / lastActivityAt / messageCount. The body-less line
-      // (D-MSG1) is enforced structurally — any future body, last-message
-      // text, or preview field must enter props or fail this pin, so the
-      // messaging surface can never render message content.
+      // participants / lastActivityAt / messageCount / matterId /
+      // matterTitle. The body-less line (D-MSG1) is enforced structurally —
+      // any future body, last-message text, or preview field must enter props
+      // or fail this pin, so the messaging surface can never render message
+      // content.
       expect(thread.props, <Object?>[
         'thread-1',
         'Demo matter updates',
@@ -36,6 +37,8 @@ void main() {
         const <String>['Layla Mansour', 'Demo client'],
         DateTime.utc(2026, 7, 28),
         12,
+        null,
+        null,
       ]);
     });
   });

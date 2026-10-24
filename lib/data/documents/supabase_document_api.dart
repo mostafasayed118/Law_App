@@ -13,6 +13,19 @@ library;
 typedef DocumentTableCaller =
     Future<List<Map<String, dynamic>>> Function(String table, String columns);
 
+/// A server-side matter-scoped SELECT: table + columns + matter id → raw map
+/// rows.
+///
+/// Separate callable (rather than widening [DocumentTableCaller]) so existing
+/// test injections of the two-arg fetch shape keep compiling; the binding is
+/// the only file that touches the `.eq('matter_id', …)` path.
+typedef DocumentMatterTableCaller =
+    Future<List<Map<String, dynamic>>> Function(
+      String table,
+      String columns,
+      String matterId,
+    );
+
 /// A server-side title search: table + columns + ilike column + needle +
 /// page size → raw map rows.
 ///
@@ -68,7 +81,10 @@ abstract interface class SupabaseDocumentApi {
   /// Columns requested: `id`, `matter_id`, `title`, `document_type`,
   /// `created_at`, `matters(title)` — the metadata-only read surface the
   /// [Document] VO needs (D-V1: no body/content/size/url column exists).
-  Future<List<Map<String, dynamic>>> fetchDocuments();
+  ///
+  /// When [matterId] is present the SELECT is additionally filtered
+  /// `.eq('matter_id', matterId)` server-side.
+  Future<List<Map<String, dynamic>>> fetchDocuments({String? matterId});
 
   /// First page of the caller's assignment-scoped `documents` rows whose
   /// `title` matches [query] (case-insensitive substring, newest-first).

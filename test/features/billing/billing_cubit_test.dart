@@ -149,7 +149,7 @@ class _StubBillingGateway implements BillingGateway {
   int fetchCalls = 0;
 
   @override
-  Future<Result<List<Invoice>>> fetchInvoices() {
+  Future<Result<List<Invoice>>> fetchInvoices({String? matterId}) {
     fetchCalls += 1;
     if (completer != null) {
       return completer!.future;

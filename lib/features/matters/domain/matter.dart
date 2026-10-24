@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/practice_area.dart';
+import 'package:legalhub/core/practice_area.dart';
 
 /// Lifecycle status of a synthetic matter (Phase 7, D-M1/D-M4).
 ///

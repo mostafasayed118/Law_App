@@ -161,6 +161,30 @@ void main() {
         ),
       ],
     );
+
+    blocTest<MatterWorkspaceCubit, MatterWorkspaceState>(
+      'scopes every list read to the constructor matter id',
+      build: () {
+        final _StubMessageGateway message = _StubMessageGateway();
+        final _StubDocumentGateway document = _StubDocumentGateway();
+        final _StubBillingGateway billing = _StubBillingGateway();
+        final _StubStorageGateway storage = _StubStorageGateway();
+        addTearDown(() {
+          expect(message.lastMatterId, 'matter-1');
+          expect(document.lastMatterId, 'matter-1');
+          expect(billing.lastMatterId, 'matter-1');
+          expect(storage.lastMatterId, 'matter-1');
+        });
+        return MatterWorkspaceCubit(
+          message,
+          document,
+          billing,
+          storage,
+          matterId: 'matter-1',
+        );
+      },
+      act: (MatterWorkspaceCubit cubit) => cubit.load(),
+    );
   });
 }
 
@@ -226,6 +250,7 @@ class _StubMessageGateway implements MessageGateway {
 
   final List<Result<List<MessageThread>>> _results;
   int _cursor = 0;
+  String? lastMatterId;
 
   Result<List<MessageThread>> get _next {
     final Result<List<MessageThread>> result = _results[_cursor];
@@ -236,7 +261,10 @@ class _StubMessageGateway implements MessageGateway {
   }
 
   @override
-  Future<Result<List<MessageThread>>> fetchThreads() async => _next;
+  Future<Result<List<MessageThread>>> fetchThreads({String? matterId}) async {
+    lastMatterId = matterId;
+    return _next;
+  }
 
   @override
   Future<Result<List<MessageThread>>> searchThreads(
@@ -261,9 +289,13 @@ class _StubMessageGateway implements MessageGateway {
 }
 
 class _StubDocumentGateway implements DocumentGateway {
+  String? lastMatterId;
+
   @override
-  Future<Result<List<Document>>> fetchDocuments() async =>
-      Result<List<Document>>.success(_documents);
+  Future<Result<List<Document>>> fetchDocuments({String? matterId}) async {
+    lastMatterId = matterId;
+    return Result<List<Document>>.success(_documents);
+  }
 
   @override
   Future<Result<List<Document>>> searchDocuments(
@@ -273,15 +305,23 @@ class _StubDocumentGateway implements DocumentGateway {
 }
 
 class _StubBillingGateway implements BillingGateway {
+  String? lastMatterId;
+
   @override
-  Future<Result<List<Invoice>>> fetchInvoices() async =>
-      Result<List<Invoice>>.success(_invoices);
+  Future<Result<List<Invoice>>> fetchInvoices({String? matterId}) async {
+    lastMatterId = matterId;
+    return Result<List<Invoice>>.success(_invoices);
+  }
 }
 
 class _StubStorageGateway implements StorageGateway {
+  String? lastMatterId;
+
   @override
-  Future<Result<List<FileMetadata>>> fetchFiles() async =>
-      Result<List<FileMetadata>>.success(_files);
+  Future<Result<List<FileMetadata>>> fetchFiles({String? matterId}) async {
+    lastMatterId = matterId;
+    return Result<List<FileMetadata>>.success(_files);
+  }
 
   @override
   Future<Result<FileMetadata>> uploadFile({

@@ -1,10 +1,10 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/state/view_state.dart';
-import '../../billing/domain/invoice.dart';
-import '../../documents/domain/document.dart';
-import '../../messaging/domain/message_thread.dart';
-import '../../storage/domain/file_metadata.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/billing/domain/invoice.dart';
+import 'package:legalhub/features/documents/domain/document.dart';
+import 'package:legalhub/features/messaging/domain/message_thread.dart';
+import 'package:legalhub/features/storage/domain/file_metadata.dart';
 
 /// Immutable state of the per-matter workspace (audit: matters god-feature).
 ///

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../l10n/app_localizations.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
 
 /// Prompts for confirmation before a destructive action and resolves to true
 /// only on explicit confirmation.

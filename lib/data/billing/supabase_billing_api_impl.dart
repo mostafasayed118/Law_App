@@ -1,7 +1,7 @@
+import 'package:legalhub/data/postgrest_failures.dart';
+import 'package:legalhub/data/supabase_seam.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../postgrest_failures.dart';
-import '../supabase_seam.dart';
 import 'supabase_billing_api.dart';
 
 /// [SupabaseBillingApi] backed by the PostgREST client.
@@ -11,7 +11,10 @@ import 'supabase_billing_api.dart';
 /// and PostgrestExceptions mapped to [SupabaseBillingException]s at the
 /// seam.
 class SupabaseBillingApiImpl implements SupabaseBillingApi {
-  SupabaseBillingApiImpl(this._table);
+  SupabaseBillingApiImpl(
+    this._table, {
+    BillingMatterTableCaller? matterTableCaller,
+  }) : _matterTable = matterTableCaller ?? _boundMatterTable;
 
   /// Binds to the app-level client after `Supabase.initialize`. Kept a
   /// factory so tests can construct the impl with any callable stub.
@@ -28,20 +31,39 @@ class SupabaseBillingApiImpl implements SupabaseBillingApi {
     return SupabaseSeam.boundTable(table, columns);
   }
 
+  /// Binds the matter-scoped read to the app-level client via the shared
+  /// filtered binding: the same cap + order as [boundTable], with
+  /// `.eq('matter_id', …)` applied server-side.
+  static Future<List<Map<String, dynamic>>> _boundMatterTable(
+    String table,
+    String columns,
+    String matterId,
+  ) {
+    return SupabaseSeam.boundFilteredTable(
+      table,
+      columns,
+      filterColumn: 'matter_id',
+      filterValue: matterId,
+    );
+  }
+
   final BillingTableCaller _table;
+  final BillingMatterTableCaller _matterTable;
 
   @override
-  Future<List<Map<String, dynamic>>> fetchInvoices() async {
+  Future<List<Map<String, dynamic>>> fetchInvoices({String? matterId}) async {
     try {
       // RLS-scoped (D-BI2): `invoices_select_assigned` returns only the
       // caller's rows; the matterRef title comes from the embedded
       // matters(title) select (D-BI5), never a blocked `profiles` join.
       // Metadata only — the D-BI1 column list carries no card/payment data.
-      return await _table(
-        'billing_invoices',
-        'id, matter_id, invoice_number, amount_cents, currency, status, '
-            'issued_at, due_at, matters(title)',
-      );
+      // A non-null [matterId] narrows the transfer to the open matter.
+      const String columns =
+          'id, matter_id, invoice_number, amount_cents, currency, status, '
+          'issued_at, due_at, matters(title)';
+      return matterId == null
+          ? await _table('billing_invoices', columns)
+          : await _matterTable('billing_invoices', columns, matterId);
     } on PostgrestException catch (e) {
       throw SupabaseBillingException(kind: _kindFor(e), message: e.message);
     } on Object {

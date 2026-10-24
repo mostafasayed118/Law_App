@@ -1,9 +1,9 @@
 import 'dart:convert';
 
+import 'package:legalhub/data/postgrest_failures.dart';
+import 'package:legalhub/data/supabase_seam.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../postgrest_failures.dart';
-import '../supabase_seam.dart';
 import 'supabase_video_api.dart';
 
 /// A call to the `video-token` Edge Function: name + body → decoded data.

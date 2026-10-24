@@ -63,6 +63,30 @@ void main() {
       expect((context['nested']! as Map<String, Object?>)['otp'], '[REDACTED]');
     });
 
+    test('redacts phone-shaped strings before storing', () async {
+      final InMemoryErrorReporter reporter = InMemoryErrorReporter();
+
+      await reporter.report(
+        const AppError(
+          code: 'x',
+          userMessage: 'm',
+          context: <String, Object?>{
+            'note':
+                'Call +20 100 123 4567 or 0100-123-4567; '
+                'email person@example.com; ticket 2026-10-24',
+          },
+        ),
+      );
+
+      final Map<String, Object?> context =
+          reporter.reports.single['context']! as Map<String, Object?>;
+      expect(
+        context['note'],
+        'Call [REDACTED_PHONE] or [REDACTED_PHONE]; '
+        'email [REDACTED_EMAIL]; ticket 2026-10-24',
+      );
+    });
+
     test(
       'redacts payment provider and card-shaped context before storing',
       () async {

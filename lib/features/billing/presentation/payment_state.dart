@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../domain/payment_session.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/features/billing/domain/payment_session.dart';
 
 /// The payment sheet's view phase (payments slice).
 enum PaymentPhase {

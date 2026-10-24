@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/features/approvals/domain/pending_approval.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/formatting/date_formatting.dart';
+import 'package:legalhub/shared/widgets/confirm_dialog.dart';
 
-import '../../../app/legalhub_theme.dart';
-import '../../../core/errors/app_error.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/formatting/date_formatting.dart';
-import '../../../shared/widgets/confirm_dialog.dart';
-import '../domain/pending_approval.dart';
 import 'approval_error_messages.dart';
 import 'approval_labels.dart';
 import 'approvals_cubit.dart';

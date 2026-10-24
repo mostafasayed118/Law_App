@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/admin/platform_admin_gateway.dart';
-import '../../../core/errors/app_error.dart';
+import 'package:legalhub/core/admin/platform_admin_gateway.dart';
+import 'package:legalhub/core/errors/app_error.dart';
 part 'platform_admin_state.dart';
 part 'platform_admin_cubit_base.dart';
 part 'platform_admin_cubit_audit.dart';

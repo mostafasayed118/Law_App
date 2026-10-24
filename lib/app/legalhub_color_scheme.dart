@@ -12,17 +12,9 @@ extension LegalHubColorScheme on ColorScheme {
       ? LegalHubTheme.darkSuccess
       : LegalHubTheme.success;
 
-  Color get onSuccess => brightness == Brightness.dark
-      ? LegalHubTheme.darkOnSuccess
-      : LegalHubTheme.onSuccess;
-
   Color get warning => brightness == Brightness.dark
       ? LegalHubTheme.darkWarning
       : LegalHubTheme.warning;
-
-  Color get onWarning => brightness == Brightness.dark
-      ? LegalHubTheme.darkOnWarning
-      : LegalHubTheme.onWarning;
 
   Color get info => brightness == Brightness.dark
       ? LegalHubTheme.darkInfo

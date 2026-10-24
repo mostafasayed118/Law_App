@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/state/view_state.dart';
-import '../domain/video_session.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/video/domain/video_session.dart';
 
 /// Immutable state of the video-consultation surface (design §6).
 class VideoState extends Equatable {

@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/state/view_state.dart';
-import '../domain/matter.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/matters/domain/matter.dart';
 
 /// Immutable state of the matter dashboard list surface (Phase 7, 7.1).
 ///

@@ -1,32 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:legalhub/app/active_org_store.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/documents/domain/document.dart';
+import 'package:legalhub/features/documents/domain/document_gateway.dart';
+import 'package:legalhub/features/matters/domain/matter.dart';
+import 'package:legalhub/features/matters/domain/matter_gateway.dart';
+import 'package:legalhub/features/research/domain/ai_finding.dart';
+import 'package:legalhub/features/research/domain/ai_gateway.dart';
+import 'package:legalhub/features/research/domain/research_request.dart';
+import 'package:legalhub/features/research/domain/research_run.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/demo_labels.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
 
-import '../../../app/active_org_store.dart';
-import '../../../app/legalhub_theme.dart';
-import '../../../app/service_locator.dart';
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../../../core/roles/user_role.dart';
-import '../../../core/state/view_state.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/demo_labels.dart';
-import '../../../shared/widgets/widgets.dart';
-import '../../documents/domain/document.dart';
-import '../../documents/domain/document_gateway.dart';
-import '../../matters/domain/matter.dart';
-import '../../matters/domain/matter_gateway.dart';
-import '../domain/ai_finding.dart';
-import '../domain/ai_gateway.dart';
-import '../domain/research_request.dart';
-import '../domain/research_run.dart';
 import 'ai_research_cubit.dart';
 import 'ai_research_state.dart';
+
 part 'ai_research_denied_state.dart';
-part 'ai_research_surface.dart';
-part 'ai_research_idle_or_no_match.dart';
-part 'ai_research_findings.dart';
-part 'ai_research_runs.dart';
 part 'ai_research_finding_card.dart';
+part 'ai_research_findings.dart';
+part 'ai_research_idle_or_no_match.dart';
+part 'ai_research_runs.dart';
+part 'ai_research_surface.dart';
 
 /// Research surface (`/research`; AI research slice 1.1; design §5).
 ///

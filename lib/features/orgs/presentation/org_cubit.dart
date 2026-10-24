@@ -1,9 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/organizations/organization_gateway.dart';
-import '../../../core/roles/user_role.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/organizations/organization_gateway.dart';
+import 'package:legalhub/core/roles/user_role.dart';
 
 part 'org_state.dart';
 

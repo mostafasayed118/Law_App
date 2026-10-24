@@ -197,7 +197,7 @@ void main() {
 /// Gateway stub that yields an empty document list (empty-state widget pin).
 class _EmptyDocumentGateway implements DocumentGateway {
   @override
-  Future<Result<List<Document>>> fetchDocuments() async {
+  Future<Result<List<Document>>> fetchDocuments({String? matterId}) async {
     return Result<List<Document>>.success(const <Document>[]);
   }
 
@@ -213,7 +213,7 @@ class _EmptyDocumentGateway implements DocumentGateway {
 /// must render no reverse cross-link chip).
 class _UnresolvedRefDocumentGateway implements DocumentGateway {
   @override
-  Future<Result<List<Document>>> fetchDocuments() async {
+  Future<Result<List<Document>>> fetchDocuments({String? matterId}) async {
     return Result<List<Document>>.success(<Document>[
       Document(
         id: 'doc-x',

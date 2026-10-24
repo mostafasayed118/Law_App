@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../app/legalhub_theme.dart';
-import '../../../../shared/formatting/display_case.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/shared/formatting/display_case.dart';
 
 /// Small all-caps status chip ("ACTIVE CASE", "ACTION REQUIRED", …).
 class StatusChip extends StatelessWidget {

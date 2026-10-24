@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/state/view_state.dart';
-import '../domain/document.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/documents/domain/document.dart';
 
 /// Immutable state of the document-vault list surface (Phase 8, slice 8.1).
 ///

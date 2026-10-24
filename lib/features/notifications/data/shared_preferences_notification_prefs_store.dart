@@ -1,9 +1,8 @@
 import 'dart:convert';
 
+import 'package:legalhub/features/notifications/domain/notification_prefs.dart';
+import 'package:legalhub/features/notifications/domain/notification_prefs_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../domain/notification_prefs.dart';
-import '../domain/notification_prefs_store.dart';
 
 /// SharedPreferences-backed implementation of [NotificationPrefsStore].
 ///

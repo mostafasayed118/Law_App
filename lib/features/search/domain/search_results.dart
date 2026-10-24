@@ -1,9 +1,9 @@
 import 'package:equatable/equatable.dart';
 
-import '../../discovery/domain/attorney.dart';
-import '../../documents/domain/document.dart';
-import '../../matters/domain/matter.dart';
-import '../../messaging/domain/message_thread.dart';
+import 'package:legalhub/features/discovery/domain/attorney.dart';
+import 'package:legalhub/features/documents/domain/document.dart';
+import 'package:legalhub/features/matters/domain/matter.dart';
+import 'package:legalhub/features/messaging/domain/message_thread.dart';
 
 /// One result group of the unified search — also the unit a partial
 /// failure is recorded against (audit: fail-fast search).

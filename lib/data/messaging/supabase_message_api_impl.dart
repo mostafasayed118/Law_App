@@ -1,7 +1,7 @@
+import 'package:legalhub/data/postgrest_failures.dart';
+import 'package:legalhub/data/supabase_seam.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../postgrest_failures.dart';
-import '../supabase_seam.dart';
 import 'supabase_message_api.dart';
 
 /// A PostgREST RPC call: function name + named params → response.
@@ -26,8 +26,10 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
     this._table, {
     MessageRpcCaller? rpcCaller,
     MessageSearchCaller? searchCaller,
+    MessageMatterTableCaller? matterTableCaller,
   }) : _rpcCaller = rpcCaller ?? _boundRpc,
-       _searchCaller = searchCaller ?? _boundSearch;
+       _searchCaller = searchCaller ?? _boundSearch,
+       _matterTable = matterTableCaller ?? _boundMatterThreads;
 
   /// Binds to the app-level client after `Supabase.initialize`. Kept a
   /// factory so tests can construct the impl with any callable stub.
@@ -53,6 +55,22 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
       columns,
       filterColumn: threadId == null ? null : 'thread_id',
       filterValue: threadId,
+    );
+  }
+
+  /// Binds the matter-scoped thread read to the app-level client via the
+  /// shared filtered binding: the same cap + order as [boundTable], with
+  /// `.eq('matter_id', …)` applied server-side.
+  static Future<List<Map<String, dynamic>>> _boundMatterThreads(
+    String table,
+    String columns,
+    String matterId,
+  ) {
+    return SupabaseSeam.boundFilteredTable(
+      table,
+      columns,
+      filterColumn: 'matter_id',
+      filterValue: matterId,
     );
   }
 
@@ -84,19 +102,23 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
   final MessageTableCaller _table;
   final MessageRpcCaller _rpcCaller;
   final MessageSearchCaller _searchCaller;
+  final MessageMatterTableCaller _matterTable;
 
   @override
-  Future<List<Map<String, dynamic>>> fetchMessageThreads() async {
+  Future<List<Map<String, dynamic>>> fetchMessageThreads({
+    String? matterId,
+  }) async {
     try {
       // RLS-scoped (D-MSR1/D-MSR2): `message_threads_select_assigned`
       // returns only the caller's rows; the matterRef title comes from the
       // embedded matters(title) select (D-MSR4), never a blocked `profiles`
-      // join.
-      return await _table(
-        'message_threads',
-        'id, matter_id, title, participants, message_count, '
-            'last_activity_at, matters(title)',
-      );
+      // join. A non-null [matterId] narrows the transfer to the open matter.
+      const String columns =
+          'id, matter_id, title, participants, message_count, '
+          'last_activity_at, matters(title)';
+      return matterId == null
+          ? await _table('message_threads', columns)
+          : await _matterTable('message_threads', columns, matterId);
     } on PostgrestException catch (e) {
       throw SupabaseMessageException(kind: _kindFor(e), message: e.message);
     } on Object {
