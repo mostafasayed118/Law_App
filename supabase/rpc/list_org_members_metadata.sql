@@ -12,7 +12,11 @@
 -- stays own-row-only. The read itself is audited; denials raise the generic
 -- 'permission denied' with no audit row (design §7).
 
-create or replace function public.list_org_members_metadata(p_organization_id uuid)
+create or replace function public.list_org_members_metadata(
+  p_organization_id uuid,
+  p_limit           int default 200,
+  p_offset          int default 0
+)
 returns table (
   organization_id uuid,             -- always p_organization_id
   user_id         uuid,             -- members only; NULL for invited rows
@@ -38,6 +42,11 @@ begin
     p_redacted_summary => 'member metadata listing for org'
   );
 
+  -- Bounded 2026-10-24 (D2): the page applies to the combined member +
+  -- invitation roster after its deterministic order.
+  p_limit  := least(greatest(coalesce(p_limit, 200), 1), 500);
+  p_offset := greatest(coalesce(p_offset, 0), 0);
+
   return query
     -- members: membership metadata joined with identity metadata (LEFT JOIN +
     -- COALESCE — defensive against orphan memberships: a membership whose
@@ -58,9 +67,12 @@ begin
       from public.invitations i
      where i.organization_id = p_organization_id
        and i.status = 'pending'
-   order by organization_id, status, display_name nulls last, email;
+   order by organization_id, status, display_name nulls last, email
+   limit p_limit offset p_offset;
 end;
 $$;
 
-revoke execute on function public.list_org_members_metadata(uuid) from public, anon;
-grant execute on function public.list_org_members_metadata(uuid) to authenticated;
+drop function if exists public.list_org_members_metadata(uuid);
+
+revoke execute on function public.list_org_members_metadata(uuid, int, int) from public, anon;
+grant execute on function public.list_org_members_metadata(uuid, int, int) to authenticated;

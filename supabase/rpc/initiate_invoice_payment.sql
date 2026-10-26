@@ -25,8 +25,11 @@
 -- nothing.
 --
 -- Response: payment_id, invoice_id, invoice_number, amount_cents, currency,
--- status — deliberately NO provider order/transaction identifiers (those are
--- provider-side internals; the client only needs the invoice/payment handle).
+-- status, provider_order_id. The provider order id is returned so
+-- paymob-initiate can reuse an already-attached Paymob order on retry and
+-- skip a second attach; the shipped client calls that edge function, not this
+-- RPC, and the RPC stays authenticated-only. The order id is an opaque
+-- provider handle with no transaction or card data.
 
 create or replace function public.initiate_invoice_payment(
   p_invoice_id uuid
@@ -72,7 +75,7 @@ begin
 
   -- Idempotent pending reuse: the invoice lock guarantees this read is the
   -- serialized truth. Same id, no new row, no new audit.
-  select p.id, p.status, p.amount_cents, p.currency
+  select p.id, p.status, p.amount_cents, p.currency, p.provider_order_id
     into v_pay
     from public.payments p
    where p.invoice_id = p_invoice_id
@@ -88,7 +91,8 @@ begin
       'invoice_number', v_inv.invoice_number,
       'amount_cents',   v_pay.amount_cents,
       'currency',       v_pay.currency,
-      'status',         v_pay.status
+      'status',         v_pay.status,
+      'provider_order_id', v_pay.provider_order_id
     );
   end if;
 
@@ -96,7 +100,7 @@ begin
     (invoice_id, initiated_by, amount_cents, currency, status, provider)
   values
     (p_invoice_id, v_uid, v_inv.amount_cents, v_inv.currency, 'pending', 'paymob')
-  returning id, status into v_pay;
+  returning id, status, provider_order_id into v_pay;
 
   perform public.write_audit(
     'payment:initiate', 'allowed',
@@ -112,7 +116,8 @@ begin
     'invoice_number', v_inv.invoice_number,
     'amount_cents',   v_inv.amount_cents,
     'currency',       v_inv.currency,
-    'status',         v_pay.status
+    'status',         v_pay.status,
+    'provider_order_id', v_pay.provider_order_id
   );
 end;
 $$;

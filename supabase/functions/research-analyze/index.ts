@@ -5,6 +5,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 const DEFAULT_MODEL = "deepseek-ai/DeepSeek-V4.1-Flash-1017";
 const DEFAULT_BASE_URL = "https://api.river.ai/v1";
 const MAX_CONTEXT_CHARS = 12_000;
+const MAX_DOCUMENTS = 50;
 const MAX_FINDINGS = 12;
 const PROVIDER_TIMEOUT_MS = 30_000;
 
@@ -13,6 +14,7 @@ type FailureCode =
   | "forbidden"
   | "invalid_request"
   | "context_too_large"
+  | "too_many_documents"
   | "rate_limited"
   | "provider_not_configured"
   | "provider_unavailable"
@@ -260,6 +262,11 @@ Deno.serve(async (request: Request): Promise<Response> => {
   const documentIds = [...new Set(rawDocumentIds.map((id) => (id as string).toLowerCase()))];
   const documentIdSet = new Set(documentIds);
 
+  // Same cap as the client, enforced before any run row or paid provider call.
+  if (documentIds.length > MAX_DOCUMENTS) {
+    return fail(422, "too_many_documents", cors);
+  }
+
   // Per-caller throttle before any run row or paid provider call: at most five
   // research runs in the trailing hour. The service-role read is intentional
   // (the caller may not have SELECT on other members' runs).
@@ -316,11 +323,18 @@ Deno.serve(async (request: Request): Promise<Response> => {
 
   let documents: DocumentRow[] = [];
   if (documentIds.length > 0) {
-    const { data, error } = await userClient
+    // A matter-scoped run may only cite that matter's documents; the org
+    // filter alone would let matter A cite matter B. Titles are still sent to
+    // the configured LLM provider (owner/DPA decision remains open); they are
+    // not silently redacted here.
+    let documentQuery = userClient
       .from("documents")
       .select("id,matter_id,title,document_type")
-      .eq("organization_id", organizationId)
-      .in("id", documentIds);
+      .eq("organization_id", organizationId);
+    if (matterId !== null) {
+      documentQuery = documentQuery.eq("matter_id", matterId);
+    }
+    const { data, error } = await documentQuery.in("id", documentIds);
     if (error) {
       console.error("research-analyze document read failed", error.code ?? "unknown");
       await recordFailure(runId, "invalid_response");

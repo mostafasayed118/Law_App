@@ -11,18 +11,26 @@
 -- (created_at desc); the composite index approval_requests_org_status serves
 -- the shape.
 --
--- No writes, no audit row: this is a read path. No parameter carries a
--- default (the open PostgREST incident).
+-- No writes, no audit row: this is a read path. Bounded 2026-10-24 (D2):
+-- p_limit/p_offset default to 200/0 and are clamped server-side to 1..500
+-- and >= 0. The original arguments keep their positions and the page
+-- parameters are additive, so the existing named-argument callers stay
+-- compatible.
 
 create or replace function public.list_approval_requests(
   p_organization_id uuid,
-  p_status          text
+  p_status          text,
+  p_limit           int default 200,
+  p_offset          int default 0
 ) returns setof public.approval_requests
 language plpgsql security definer set search_path = public as $$
 begin
   if not public.is_active_member(p_organization_id) then
     raise exception 'permission denied';
   end if;
+
+  p_limit  := least(greatest(coalesce(p_limit, 200), 1), 500);
+  p_offset := greatest(coalesce(p_offset, 0), 0);
 
   return query
     select r.*
@@ -35,9 +43,12 @@ begin
          or public.can_read_matter(r.matter_id, r.organization_id)
        )
        and (p_status is null or r.status = p_status)
-     order by r.created_at desc;
+     order by r.created_at desc
+     limit p_limit offset p_offset;
 end;
 $$;
 
-revoke execute on function public.list_approval_requests(uuid, text) from public, anon;
-grant execute on function public.list_approval_requests(uuid, text) to authenticated;
+drop function if exists public.list_approval_requests(uuid, text);
+
+revoke execute on function public.list_approval_requests(uuid, text, int, int) from public, anon;
+grant execute on function public.list_approval_requests(uuid, text, int, int) to authenticated;

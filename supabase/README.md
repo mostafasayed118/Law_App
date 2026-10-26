@@ -178,7 +178,9 @@ scripts/verify_policy_tests.sh --check        # static validation, no database
   `24_compliance_alerts.sql`, `25_research.sql`, `26_video_sessions.sql`,
   `27_audit_remediation.sql`, then `policies/*.sql`, `rpc/*.sql` in the apply
   order above. The harness `--apply` list includes migration 27 (see
-  `docs/live_apply_2026-10-24_audit_remediation.md`).
+  `docs/live_apply_2026-10-24_audit_remediation.md`); the list-bounds wave's
+  `28_audit_indexes_and_list_bounds.sql` is **not yet** in that list (follow-up),
+  see `docs/live_apply_2026-10-24_list_bounds.md`.
   **`03_platform_config_seed.sql` is NOT applied**: its owner token is an
   apply-time substitution placeholder for the dev project; the battery seeds
   its own fixture owner row and proves the single-account bound (D-P0C3)

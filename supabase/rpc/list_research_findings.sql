@@ -8,10 +8,13 @@
 -- participant rule as the run policy (requester, partner, or a reader of the
 -- run's matter). A cross-org or unrelated caller gets the typed
 -- 'permission denied'. Results are ordered by sort_order; id is the
--- deterministic tie-break. No parameter defaults.
+-- deterministic tie-break. Bounded 2026-10-24 (D2): p_limit/p_offset default
+-- to 200/0 and are clamped server-side to 1..500 and >= 0.
 
 create or replace function public.list_research_findings(
-  p_run_id uuid
+  p_run_id uuid,
+  p_limit  int default 200,
+  p_offset int default 0
 ) returns setof public.research_findings
 language plpgsql security definer set search_path = public as $$
 declare
@@ -37,14 +40,20 @@ begin
     raise exception 'permission denied';
   end if;
 
+  p_limit  := least(greatest(coalesce(p_limit, 200), 1), 500);
+  p_offset := greatest(coalesce(p_offset, 0), 0);
+
   return query
     select f.*
       from public.research_findings f
      where f.run_id = p_run_id
        and f.organization_id = v_run.organization_id
-     order by f.sort_order asc, f.id asc;
+     order by f.sort_order asc, f.id asc
+     limit p_limit offset p_offset;
 end;
 $$;
 
-revoke execute on function public.list_research_findings(uuid) from public, anon;
-grant execute on function public.list_research_findings(uuid) to authenticated;
+drop function if exists public.list_research_findings(uuid);
+
+revoke execute on function public.list_research_findings(uuid, int, int) from public, anon;
+grant execute on function public.list_research_findings(uuid, int, int) to authenticated;

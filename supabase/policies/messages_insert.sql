@@ -3,6 +3,12 @@
 --                + docs/realtime_push_gate_review_2026-08-08.md (§4 deny-rows).
 -- Backout: git revert of this policy commit (rollback_plan.md design §7).
 --
+-- SUPERSEDED (2026-10-24): this file is retained as history, not as a write
+-- path. Applying it standalone must not leave an unaudited INSERT surface:
+-- the footer drops the policy and revokes the INSERT grant. The ordered apply
+-- then runs rpc/send_message.sql, which owns the audited write path and
+-- repeats the same drop/revoke (idempotent).
+--
 -- INSERT: a message row may be inserted iff the writer is an ACTIVE MEMBER
 -- of the message's organization AND is assigned (client or attorney) on
 -- the message's THREAD's MATTER — the same gate shape as the read policy
@@ -56,3 +62,7 @@ create policy messages_insert_assigned on public.messages
         )
     )
   );
+
+-- SUPERSEDED: leave no direct INSERT path if this file is applied alone.
+drop policy if exists messages_insert_assigned on public.messages;
+revoke insert on public.messages from authenticated;
