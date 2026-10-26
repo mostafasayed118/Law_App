@@ -209,7 +209,7 @@ class SupabaseAttorneyApiImpl implements SupabaseAttorneyApi {
       rethrow;
     } on PostgrestException catch (e) {
       throw SupabaseAttorneyException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       throw const SupabaseAttorneyException(
         kind: SupabaseAttorneyFailureKind.providerUnavailable,
         message: 'Provider unavailable.',

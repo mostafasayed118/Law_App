@@ -66,7 +66,7 @@ class SupabaseBillingApiImpl implements SupabaseBillingApi {
           : await _matterTable('billing_invoices', columns, matterId);
     } on PostgrestException catch (e) {
       throw SupabaseBillingException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       // A non-Postgrest provider failure (network/transport) is a typed
       // unavailable, never a raw exception across the seam (the auth
       // impl's defensive-catch precedent).

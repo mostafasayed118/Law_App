@@ -132,7 +132,7 @@ class SupabaseComplianceApiImpl implements SupabaseComplianceApi {
       rethrow;
     } on PostgrestException catch (e) {
       throw SupabaseComplianceException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       throw const SupabaseComplianceException(
         kind: SupabaseComplianceFailureKind.providerUnavailable,
         message: 'Provider unavailable.',

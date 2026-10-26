@@ -63,7 +63,7 @@ class FileSelectorFilePicker implements FilePicker {
         sizeBytes: length,
         bytes: bytes,
       );
-    } on Object {
+    } on Exception {
       // Plugin/OS failures are typed here; the message stays generic so no
       // file name or content can leak through the seam.
       throw const FilePickException();

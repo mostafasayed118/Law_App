@@ -57,7 +57,7 @@ class SupabaseNotificationApiImpl implements SupabaseNotificationApi {
         kind: _kindFor(e),
         message: e.message,
       );
-    } on Object {
+    } on Exception {
       // A non-Postgrest provider failure (network/transport) is a typed
       // unavailable, never a raw exception across the seam (the auth
       // impl's defensive-catch precedent).
@@ -107,7 +107,7 @@ class SupabaseNotificationApiImpl implements SupabaseNotificationApi {
       );
     } on SupabaseNotificationException {
       rethrow;
-    } on Object {
+    } on Exception {
       // A non-Postgrest provider failure (network/transport) is a typed
       // unavailable, never a raw exception across the seam (the read-path
       // defensive-catch precedent).

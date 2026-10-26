@@ -16,7 +16,7 @@ class UrlLauncherUriOpener implements UriOpener {
     }
     try {
       return await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } on Object {
+    } on Exception {
       return false;
     }
   }

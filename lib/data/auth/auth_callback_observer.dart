@@ -60,7 +60,7 @@ abstract final class AuthCallbackObserver {
     } on AuthException {
       // Expired, replayed, or not paired with this device's verifier.
       return;
-    } on Object {
+    } on Exception {
       // A transport failure triggered by an OS intent must not crash the app.
       return;
     }

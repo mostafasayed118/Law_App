@@ -66,7 +66,7 @@ class SupabaseBookingApiImpl implements SupabaseBookingApi {
       return await _table('consultation_slots', _slotColumns);
     } on PostgrestException catch (e) {
       throw SupabaseBookingException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       // A non-Postgrest provider failure (network/transport) is a typed
       // unavailable, never a raw exception across the seam.
       throw const SupabaseBookingException(
@@ -107,7 +107,7 @@ class SupabaseBookingApiImpl implements SupabaseBookingApi {
       rethrow;
     } on PostgrestException catch (e) {
       throw SupabaseBookingException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       throw const SupabaseBookingException(
         kind: SupabaseBookingFailureKind.providerUnavailable,
         message: 'Provider unavailable.',

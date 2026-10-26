@@ -141,7 +141,7 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
           message: error.message,
         ),
       );
-    } on Object {
+    } on Exception {
       return const SupabaseAuthFailed(
         SupabaseAuthFailure(kind: SupabaseAuthFailureKind.providerUnavailable),
       );
@@ -184,7 +184,7 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
           message: error.message,
         ),
       );
-    } on Object {
+    } on Exception {
       return const SupabaseSignUpFailed(
         SupabaseAuthFailure(kind: SupabaseAuthFailureKind.providerUnavailable),
       );
@@ -216,7 +216,7 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
           message: error.message,
         ),
       );
-    } on Object {
+    } on Exception {
       return const SupabaseAuthFailed(
         SupabaseAuthFailure(kind: SupabaseAuthFailureKind.providerUnavailable),
       );
@@ -247,7 +247,7 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
           message: error.message,
         ),
       );
-    } on Object {
+    } on Exception {
       return const SupabaseAuthFailed(
         SupabaseAuthFailure(kind: SupabaseAuthFailureKind.providerUnavailable),
       );
@@ -269,7 +269,7 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
           message: error.message,
         ),
       );
-    } on Object {
+    } on Exception {
       return const SupabaseAuthFailed(
         SupabaseAuthFailure(kind: SupabaseAuthFailureKind.providerUnavailable),
       );

@@ -76,7 +76,8 @@ class SupabaseNotificationGateway implements NotificationGateway {
     }
     // `server_timestamp` is a timestamptz → PostgREST hands back a Dart
     // DateTime; anything else is provider drift (the invoices
-    // malformed-row guard baseline).
+    // malformed-row guard baseline). Converted to local time here, at the
+    // mapping boundary, because the tile formats the value directly.
     final Object? serverTimestamp = row['server_timestamp'];
     if (serverTimestamp is! DateTime) {
       throw FormatException('Notification row has no server_timestamp');
@@ -90,7 +91,7 @@ class SupabaseNotificationGateway implements NotificationGateway {
       category: _categoryFromString(category),
       type: type,
       summary: summary,
-      serverTimestamp: serverTimestamp,
+      serverTimestamp: serverTimestamp.toLocal(),
       isRead: isRead,
     );
   }
@@ -153,7 +154,7 @@ class SupabaseNotificationGateway implements NotificationGateway {
       return Result<int>.success(flipped);
     } on SupabaseNotificationException catch (e) {
       return Result<int>.failure(_mapFailure(e));
-    } on Object {
+    } on Exception {
       // A non-seam failure (transport/parse) is a typed unavailable, never
       // a raw exception across the boundary (the read-path precedent).
       return const Result<int>.failure(

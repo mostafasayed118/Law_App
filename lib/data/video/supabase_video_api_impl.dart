@@ -107,6 +107,9 @@ class SupabaseVideoApiImpl implements SupabaseVideoApi {
       try {
         return Map<String, dynamic>.from(data);
       } on Object {
+        // Deliberately `on Object`: Map.from raises TypeError (an Error) on
+        // a malformed key/value shape, and that payload drift must stay a
+        // typed malformed response.
         throw const SupabaseVideoException(
           kind: SupabaseVideoFailureKind.unknown,
           message: 'video-token returned a malformed payload.',
@@ -120,7 +123,7 @@ class SupabaseVideoApiImpl implements SupabaseVideoApi {
         message: e.reasonPhrase ?? 'Video provider failure.',
         code: _errorCode(e.details),
       );
-    } on Object {
+    } on Exception {
       throw const SupabaseVideoException(
         kind: SupabaseVideoFailureKind.unavailable,
         message: 'Video provider unavailable.',
@@ -165,6 +168,8 @@ class SupabaseVideoApiImpl implements SupabaseVideoApi {
       try {
         rows.add(Map<String, dynamic>.from(row));
       } on Object {
+        // Deliberately `on Object`: a bad key/value shape raises TypeError
+        // (an Error); that row-level drift must stay a typed malformed row.
         throw SupabaseVideoException(
           kind: SupabaseVideoFailureKind.unknown,
           message: '$function returned a malformed row.',
@@ -187,7 +192,7 @@ class SupabaseVideoApiImpl implements SupabaseVideoApi {
         kind: _kindForPostgrest(e),
         message: e.message,
       );
-    } on Object {
+    } on Exception {
       throw const SupabaseVideoException(
         kind: SupabaseVideoFailureKind.unavailable,
         message: 'Video provider unavailable.',

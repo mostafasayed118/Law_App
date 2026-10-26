@@ -131,7 +131,7 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
           : await _matterTable('files', columns, matterId);
     } on PostgrestException catch (e) {
       throw SupabaseStorageException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       // A non-Postgrest provider failure (network/transport) is a typed
       // unavailable, never a raw exception across the seam (the auth
       // impl's defensive-catch precedent).
@@ -151,7 +151,7 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
       rethrow;
     } on PostgrestException catch (e) {
       throw SupabaseStorageException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       throw const SupabaseStorageException(
         kind: SupabaseStorageFailureKind.providerUnavailable,
         message: 'Provider unavailable.',
@@ -176,7 +176,7 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
       );
     } on PostgrestException catch (e) {
       throw SupabaseStorageException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       throw const SupabaseStorageException(
         kind: SupabaseStorageFailureKind.providerUnavailable,
         message: 'Provider unavailable.',
@@ -195,7 +195,7 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
         kind: _kindForStorage(e),
         message: e.message,
       );
-    } on Object {
+    } on Exception {
       throw const SupabaseStorageException(
         kind: SupabaseStorageFailureKind.providerUnavailable,
         message: 'Provider unavailable.',
@@ -214,7 +214,7 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
         kind: _kindForStorage(e),
         message: e.message,
       );
-    } on Object {
+    } on Exception {
       throw const SupabaseStorageException(
         kind: SupabaseStorageFailureKind.providerUnavailable,
         message: 'Provider unavailable.',
@@ -250,7 +250,7 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
       rethrow;
     } on PostgrestException catch (e) {
       throw SupabaseStorageException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       throw const SupabaseStorageException(
         kind: SupabaseStorageFailureKind.providerUnavailable,
         message: 'Provider unavailable.',

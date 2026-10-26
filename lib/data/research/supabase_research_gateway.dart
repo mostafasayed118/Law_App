@@ -146,6 +146,9 @@ class SupabaseResearchGateway implements AiGateway {
       try {
         findingRow = Map<String, dynamic>.from(row);
       } on Object {
+        // Deliberately `on Object`: Map.from raises TypeError (an Error) on
+        // a malformed key/value shape, and that drift must stay the typed
+        // FormatException.
         throw const FormatException(
           'Research response has a malformed finding',
         );

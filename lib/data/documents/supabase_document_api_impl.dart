@@ -84,7 +84,7 @@ class SupabaseDocumentApiImpl implements SupabaseDocumentApi {
           : await _matterTable('documents', columns, matterId);
     } on PostgrestException catch (e) {
       throw SupabaseDocumentException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       // A non-Postgrest provider failure (network/transport) is a typed
       // unavailable, never a raw exception across the seam (the auth
       // impl's defensive-catch precedent).
@@ -127,7 +127,7 @@ class SupabaseDocumentApiImpl implements SupabaseDocumentApi {
       );
     } on PostgrestException catch (e) {
       throw SupabaseDocumentException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       throw const SupabaseDocumentException(
         kind: SupabaseDocumentFailureKind.providerUnavailable,
         message: 'Provider unavailable.',

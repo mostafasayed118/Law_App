@@ -49,7 +49,7 @@ class SupabasePaymentApiImpl implements SupabasePaymentApi {
         kind: _kindForFunction(e),
         message: e.reasonPhrase ?? 'Payment provider failure.',
       );
-    } on Object {
+    } on Exception {
       throw const SupabasePaymentException(
         kind: SupabasePaymentFailureKind.providerUnavailable,
         message: 'Payment provider unavailable.',
@@ -77,7 +77,7 @@ class SupabasePaymentApiImpl implements SupabasePaymentApi {
             : SupabasePaymentFailureKind.unknown,
         message: e.message,
       );
-    } on Object {
+    } on Exception {
       throw const SupabasePaymentException(
         kind: SupabasePaymentFailureKind.providerUnavailable,
         message: 'Payment provider unavailable.',
@@ -96,6 +96,9 @@ class SupabasePaymentApiImpl implements SupabasePaymentApi {
     try {
       return Map<String, dynamic>.from(data);
     } on Object {
+      // Deliberately `on Object`: Map.from raises TypeError (an Error) on a
+      // malformed key/value shape, and that provider drift must stay a typed
+      // malformed response rather than propagate as a contract crash.
       throw const SupabasePaymentException(
         kind: SupabasePaymentFailureKind.unknown,
         message: 'Malformed payment response.',

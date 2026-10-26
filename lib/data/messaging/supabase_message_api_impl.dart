@@ -121,7 +121,7 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
           : await _matterTable('message_threads', columns, matterId);
     } on PostgrestException catch (e) {
       throw SupabaseMessageException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       // A non-Postgrest provider failure (network/transport) is a typed
       // unavailable, never a raw exception across the seam (the auth
       // impl's defensive-catch precedent).
@@ -153,7 +153,7 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
       );
     } on PostgrestException catch (e) {
       throw SupabaseMessageException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       throw const SupabaseMessageException(
         kind: SupabaseMessageFailureKind.providerUnavailable,
         message: 'Provider unavailable.',
@@ -176,7 +176,7 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
       );
     } on PostgrestException catch (e) {
       throw SupabaseMessageException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       // Same defensive catch as fetchMessageThreads: a non-Postgrest
       // provider failure is a typed unavailable, never a raw exception
       // across the seam (the auth impl's defensive-catch precedent).
@@ -215,7 +215,7 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
       rethrow;
     } on PostgrestException catch (e) {
       throw SupabaseMessageException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       // Same defensive catch as the reads: a non-Postgrest provider failure
       // is a typed unavailable, never a raw exception across the seam.
       throw const SupabaseMessageException(

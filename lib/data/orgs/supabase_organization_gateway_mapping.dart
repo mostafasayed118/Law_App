@@ -1,22 +1,24 @@
 part of 'supabase_organization_gateway.dart';
 
 /// The guarded row/failure mapping helpers of
-/// [SupabaseOrganizationGateway], moved verbatim as library-private
-/// top-level functions (they read no instance state, so the class call
-/// sites — including the `rows.map(_memberFromRow)` tear-offs — resolve
-/// unchanged).
+/// [SupabaseOrganizationGateway], library-private top-level functions (they
+/// read no instance state, so the class call sites — including the
+/// `rows.map(_memberFromRow)` tear-offs — resolve directly).
 Future<OrgOutcome<void>> _runVoid(Future<void> Function() call) async {
   try {
     await call();
     return const OrgOutcome<void>.success(null);
   } on SupabaseOrgException catch (e) {
     return OrgOutcome<void>.failure(
-      OrgFailure(kind: _mapKind(e.kind), message: e.message),
+      OrgFailure(kind: _mapKind(e.kind), message: orgRequestFailedMessage),
     );
-  } on TypeError catch (e) {
+  } on TypeError {
     // Defense-in-depth: no raw TypeError ever crosses the boundary.
-    return OrgOutcome<void>.failure(
-      OrgFailure(kind: OrgFailureKind.unknown, message: e.toString()),
+    return const OrgOutcome<void>.failure(
+      OrgFailure(
+        kind: OrgFailureKind.unknown,
+        message: orgRequestFailedMessage,
+      ),
     );
   }
 }
@@ -45,10 +47,13 @@ AssignableMember _assignableMemberFromRow(Map<String, dynamic> row) {
   return AssignableMember(userId: userId, displayName: displayName);
 }
 
-OrgMember _memberFromRow(Map<String, dynamic> row) {
+/// Maps one roster row; an unknown role row is skipped (null) so one
+/// provider-drift role cannot fail the whole roster.
+OrgMember? _memberFromRow(Map<String, dynamic> row) {
   final UserRole? role = userRoleFromServerName(row['role'] as String?);
   if (role == null) {
-    throw FormatException('Unknown server role name: ${row['role']}');
+    // One unknown role must not fail the whole roster; the row is skipped.
+    return null;
   }
   final MembershipStatus? status = membershipStatusFromServerName(
     row['status'] as String?,

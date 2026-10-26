@@ -5,6 +5,12 @@
 /// failure. Provider exceptions never cross this boundary.
 library;
 
+/// Fixed user-facing failure text for the organization seam.
+///
+/// Raw PostgREST/provider messages never cross this boundary into UI state;
+/// the typed failure kind carries the actionable distinction.
+const String orgRequestFailedMessage = 'Organization request failed.';
+
 /// Typed reasons an RPC call can fail, mapped from the PostgREST surface.
 enum SupabaseOrgFailureKind {
   /// The caller is not permitted (permission denied / self-removal).
@@ -62,16 +68,20 @@ abstract interface class SupabaseOrgApi {
     required String matterId,
   });
 
-  /// RLS-scoped SELECT of the caller's own `memberships` rows, embedded with
-  /// the joined `organizations` name (P3.2 membership hydration).
+  /// RLS-scoped SELECT of `memberships` rows, embedded with the joined
+  /// `organizations` name (P3.2 membership hydration).
   ///
-  /// The memberships policy returns the caller's own rows (own-row OR
-  /// active-member); the `organizations` policy is active-member-only, so
+  /// The memberships policy also admits active co-members' rows, so [userId]
+  /// travels with the call and every row is projected to the caller's own
+  /// `user_id` before mapping — another member's role must never reach the
+  /// session. The `organizations` policy is active-member-only, so
   /// `organizationName` resolves for active memberships and is NULL for
   /// suspended/removed ones (their org row is not visible). Returns raw map
-  /// rows: `organization_id`, `role`, `status`, and a nested
+  /// rows: `organization_id`, `user_id`, `role`, `status`, and a nested
   /// `organizations: {'name': …}` map (or null).
-  Future<List<Map<String, dynamic>>> listMyMemberships();
+  Future<List<Map<String, dynamic>>> listMyMemberships({
+    required String userId,
+  });
 
   /// `invite_member(org, email, role)` — returns the one-time token.
   Future<String> inviteMember({

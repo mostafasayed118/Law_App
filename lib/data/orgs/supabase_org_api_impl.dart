@@ -76,7 +76,10 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
       }
       return id;
     } on PostgrestException catch (e) {
-      throw SupabaseOrgException(kind: _kindFor(e), message: e.message);
+      throw SupabaseOrgException(
+        kind: _kindFor(e),
+        message: orgRequestFailedMessage,
+      );
     }
   }
 
@@ -95,7 +98,10 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
       }
       return data.whereType<Map<String, dynamic>>().toList(growable: false);
     } on PostgrestException catch (e) {
-      throw SupabaseOrgException(kind: _kindFor(e), message: e.message);
+      throw SupabaseOrgException(
+        kind: _kindFor(e),
+        message: orgRequestFailedMessage,
+      );
     }
   }
 
@@ -114,23 +120,36 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
       }
       return data.whereType<Map<String, dynamic>>().toList(growable: false);
     } on PostgrestException catch (e) {
-      throw SupabaseOrgException(kind: _kindFor(e), message: e.message);
+      throw SupabaseOrgException(
+        kind: _kindFor(e),
+        message: orgRequestFailedMessage,
+      );
     }
   }
 
   @override
-  Future<List<Map<String, dynamic>>> listMyMemberships() async {
+  Future<List<Map<String, dynamic>>> listMyMemberships({
+    required String userId,
+  }) async {
     try {
-      // RLS-scoped: memberships policy = own-row OR active-member; the
-      // embedded organizations(name) join resolves for active memberships
-      // and is null for suspended/removed ones (org row not visible) — the
-      // repository mapper tolerates the null name (plan §6).
-      return await _table(
+      // RLS-scoped: the memberships policy = own-row OR active-member, so it
+      // can return co-members' rows. `user_id` is selected and projected here
+      // before the repository's own guard (defense in depth). The embedded
+      // organizations(name) join resolves for active memberships and is null
+      // for suspended/removed ones (org row not visible) — the repository
+      // mapper tolerates the null name (plan §6).
+      final List<Map<String, dynamic>> rows = await _table(
         'memberships',
-        'organization_id, role, status, organizations(name)',
+        'organization_id, user_id, role, status, organizations(name)',
       );
+      return rows
+          .where((Map<String, dynamic> row) => row['user_id'] == userId)
+          .toList(growable: false);
     } on PostgrestException catch (e) {
-      throw SupabaseOrgException(kind: _kindFor(e), message: e.message);
+      throw SupabaseOrgException(
+        kind: _kindFor(e),
+        message: orgRequestFailedMessage,
+      );
     }
   }
 
@@ -158,7 +177,10 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
       }
       return token;
     } on PostgrestException catch (e) {
-      throw SupabaseOrgException(kind: _kindFor(e), message: e.message);
+      throw SupabaseOrgException(
+        kind: _kindFor(e),
+        message: orgRequestFailedMessage,
+      );
     }
   }
 
@@ -224,7 +246,10 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
       }
       return token;
     } on PostgrestException catch (e) {
-      throw SupabaseOrgException(kind: _kindFor(e), message: e.message);
+      throw SupabaseOrgException(
+        kind: _kindFor(e),
+        message: orgRequestFailedMessage,
+      );
     }
   }
 
@@ -256,7 +281,10 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
       }
       return membershipId;
     } on PostgrestException catch (e) {
-      throw SupabaseOrgException(kind: _kindFor(e), message: e.message);
+      throw SupabaseOrgException(
+        kind: _kindFor(e),
+        message: orgRequestFailedMessage,
+      );
     }
   }
 
@@ -265,9 +293,8 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
     required String organizationId,
   }) async {
     try {
-      final PostgrestResponse<dynamic> response = await _rpc(
-        'read_org_audit',
-        <String, dynamic>{'p_organization_id': organizationId},
+      final PostgrestResponse<dynamic> response = await _readOrgAuditRpc(
+        organizationId,
       );
       final Object? data = response.data;
       if (data is! List<dynamic>) {
@@ -275,15 +302,51 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
       }
       return data.whereType<Map<String, dynamic>>().toList(growable: false);
     } on PostgrestException catch (e) {
-      throw SupabaseOrgException(kind: _kindFor(e), message: e.message);
+      throw SupabaseOrgException(
+        kind: _kindFor(e),
+        message: orgRequestFailedMessage,
+      );
     }
+  }
+
+  /// Calls the parameterized `read_org_audit` and falls back to the live
+  /// zero-argument signature when the former is not installed yet
+  /// (`PGRST202` / `42883` / an explicit function-or-signature-not-found
+  /// message). Any other failure propagates to the caller's typed mapping.
+  Future<PostgrestResponse<dynamic>> _readOrgAuditRpc(
+    String organizationId,
+  ) async {
+    try {
+      return await _rpc('read_org_audit', <String, dynamic>{
+        'p_organization_id': organizationId,
+      });
+    } on PostgrestException catch (e) {
+      if (!_isFunctionNotFound(e)) {
+        rethrow;
+      }
+      return _rpc('read_org_audit', const <String, dynamic>{});
+    }
+  }
+
+  /// True when PostgREST reports that the called function (or that exact
+  /// signature) is not installed — the live-DB compatibility fallback trigger.
+  bool _isFunctionNotFound(PostgrestException e) {
+    if (e.code == 'PGRST202' || e.code == '42883') {
+      return true;
+    }
+    final String message = e.message.toLowerCase();
+    return message.contains('could not find the function') ||
+        (message.contains('function') && message.contains('does not exist'));
   }
 
   Future<void> _runVoidRpc(String function, Map<String, dynamic> params) async {
     try {
       await _rpc(function, params);
     } on PostgrestException catch (e) {
-      throw SupabaseOrgException(kind: _kindFor(e), message: e.message);
+      throw SupabaseOrgException(
+        kind: _kindFor(e),
+        message: orgRequestFailedMessage,
+      );
     }
   }
 }

@@ -52,7 +52,7 @@ class SupabasePlatformAdminApiImpl implements SupabasePlatformAdminApi {
     } on PostgrestException catch (e) {
       throw SupabasePlatformAdminException(
         kind: _kindFor(e),
-        message: e.message,
+        message: platformAdminRequestFailedMessage,
       );
     }
   }
@@ -72,7 +72,7 @@ class SupabasePlatformAdminApiImpl implements SupabasePlatformAdminApi {
     } on PostgrestException catch (e) {
       throw SupabasePlatformAdminException(
         kind: _kindFor(e),
-        message: e.message,
+        message: platformAdminRequestFailedMessage,
       );
     }
   }
@@ -110,15 +110,15 @@ class SupabasePlatformAdminApiImpl implements SupabasePlatformAdminApi {
     } on PostgrestException catch (e) {
       throw SupabasePlatformAdminException(
         kind: _kindFor(e),
-        message: e.message,
+        message: platformAdminRequestFailedMessage,
       );
-    } on Object {
+    } on Exception {
       // A non-Postgrest provider failure (network/transport) is a typed
       // unavailable, never a raw exception across the seam (the auth/storage
       // impls' defensive-catch precedent).
       throw const SupabasePlatformAdminException(
         kind: SupabasePlatformAdminFailureKind.providerUnavailable,
-        message: 'Provider unavailable.',
+        message: platformAdminRequestFailedMessage,
       );
     }
   }
@@ -126,22 +126,48 @@ class SupabasePlatformAdminApiImpl implements SupabasePlatformAdminApi {
   @override
   Future<List<Map<String, dynamic>>> readOrgAudit(String organizationId) async {
     try {
-      return _rowsFrom(
-        await _rpc('read_org_audit', <String, dynamic>{
-          'p_organization_id': organizationId,
-        }),
-      );
+      return _rowsFrom(await _readOrgAuditRpc(organizationId));
     } on PostgrestException catch (e) {
       throw SupabasePlatformAdminException(
         kind: _kindFor(e),
-        message: e.message,
+        message: platformAdminRequestFailedMessage,
       );
-    } on Object {
+    } on Exception {
       throw const SupabasePlatformAdminException(
         kind: SupabasePlatformAdminFailureKind.providerUnavailable,
-        message: 'Provider unavailable.',
+        message: platformAdminRequestFailedMessage,
       );
     }
+  }
+
+  /// Calls the parameterized `read_org_audit` and falls back to the live
+  /// zero-argument signature when the former is not installed yet
+  /// (`PGRST202` / `42883` / an explicit function-or-signature-not-found
+  /// message). Any other failure propagates to the caller's typed mapping.
+  Future<PostgrestResponse<dynamic>> _readOrgAuditRpc(
+    String organizationId,
+  ) async {
+    try {
+      return await _rpc('read_org_audit', <String, dynamic>{
+        'p_organization_id': organizationId,
+      });
+    } on PostgrestException catch (e) {
+      if (!_isFunctionNotFound(e)) {
+        rethrow;
+      }
+      return _rpc('read_org_audit', const <String, dynamic>{});
+    }
+  }
+
+  /// True when PostgREST reports that the called function (or that exact
+  /// signature) is not installed — the live-DB compatibility fallback trigger.
+  bool _isFunctionNotFound(PostgrestException e) {
+    if (e.code == 'PGRST202' || e.code == '42883') {
+      return true;
+    }
+    final String message = e.message.toLowerCase();
+    return message.contains('could not find the function') ||
+        (message.contains('function') && message.contains('does not exist'));
   }
 
   /// Extracts the plain map rows from an RPC response, skipping any
@@ -160,7 +186,7 @@ class SupabasePlatformAdminApiImpl implements SupabasePlatformAdminApi {
     } on PostgrestException catch (e) {
       throw SupabasePlatformAdminException(
         kind: _kindFor(e),
-        message: e.message,
+        message: platformAdminRequestFailedMessage,
       );
     }
   }

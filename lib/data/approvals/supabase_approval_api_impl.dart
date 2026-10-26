@@ -133,7 +133,7 @@ class SupabaseApprovalApiImpl implements SupabaseApprovalApi {
       rethrow;
     } on PostgrestException catch (e) {
       throw SupabaseApprovalException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       throw const SupabaseApprovalException(
         kind: SupabaseApprovalFailureKind.providerUnavailable,
         message: 'Provider unavailable.',
