@@ -53,6 +53,7 @@ class _AuditSectionState extends State<_AuditSection> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final DemoLabels labels = DemoLabels(l10n, localOnly: backendIsLocalOnly);
     final List<AuditEntry> rows = widget.selectedAuditOrgId == null
         ? widget.platformAudit
         : widget.orgAudit;
@@ -107,6 +108,7 @@ class _AuditSectionState extends State<_AuditSection> {
           ...rows.map(
             (AuditEntry entry) => _AuditRow(
               entry: entry,
+              labels: labels,
               organizationName: orgNames[entry.organizationId],
             ),
           ),

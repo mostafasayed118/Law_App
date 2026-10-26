@@ -1,7 +1,9 @@
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/observability/app_log.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
+import 'package:legalhub/core/pagination.dart';
 import 'package:legalhub/core/practice_area.dart';
 import 'package:legalhub/features/matters/domain/matter.dart';
 import 'package:legalhub/features/matters/domain/matter_gateway.dart';
@@ -41,8 +43,10 @@ class SupabaseMatterGateway implements MatterGateway {
   Future<Result<List<Matter>>> fetchMatters() => _run(_api.fetchMatters);
 
   @override
-  Future<Result<List<Matter>>> searchMatters(String query, {int limit = 30}) =>
-      _run(() => _api.searchMatters(query, limit: limit));
+  Future<Result<List<Matter>>> searchMatters(
+    String query, {
+    int limit = kSearchPageSize,
+  }) => _run(() => _api.searchMatters(query, limit: limit));
 
   /// Runs a row read (full fetch or title-prefiltered search) through the
   /// identical mapping path: roster display names + VO construction. The
@@ -72,6 +76,7 @@ class SupabaseMatterGateway implements MatterGateway {
         AppError(
           code: 'matter_read_failed',
           userMessage: 'Unable to load matters. Please try again.',
+          messageKey: AppMessageKey.errUnableToLoadMattersPleaseTryAgain,
           technicalMessage: e.message,
         ),
       );
@@ -207,26 +212,31 @@ class SupabaseMatterGateway implements MatterGateway {
       String code,
       String userMessage,
       AppErrorKind kind,
+      AppMessageKey? messageKey,
     ) = switch (e.kind) {
       SupabaseMatterFailureKind.denied => (
         'matter_read_denied',
         'You do not have permission to view these matters.',
         AppErrorKind.denied,
+        null,
       ),
       SupabaseMatterFailureKind.providerUnavailable => (
         'matter_read_unavailable',
         'Matters are temporarily unavailable. Please try again.',
         AppErrorKind.unavailable,
+        null,
       ),
       SupabaseMatterFailureKind.unknown => (
         'matter_read_failed',
         'Unable to load matters. Please try again.',
         AppErrorKind.unknown,
+        AppMessageKey.errUnableToLoadMattersPleaseTryAgain,
       ),
     };
     return AppError(
       code: code,
       userMessage: userMessage,
+      messageKey: messageKey,
       kind: kind,
       technicalMessage: e.message,
     );

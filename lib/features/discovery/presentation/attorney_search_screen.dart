@@ -8,6 +8,7 @@ import 'package:legalhub/core/practice_area.dart';
 import 'package:legalhub/features/discovery/domain/attorney.dart';
 import 'package:legalhub/features/discovery/domain/attorney_gateway.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
 
 import 'discovery_cubit.dart';

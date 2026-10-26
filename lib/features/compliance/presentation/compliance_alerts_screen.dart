@@ -42,6 +42,7 @@ class _ComplianceAlertsScreenState extends State<ComplianceAlertsScreen> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final bool localOnly = backendIsLocalOnly;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.alertsTitle)),
       floatingActionButton: widget.canManage
@@ -61,7 +62,11 @@ class _ComplianceAlertsScreenState extends State<ComplianceAlertsScreen> {
             project: (ComplianceAlertsState state) => state.alerts,
             load: (ComplianceAlertsCubit cubit) => cubit.load(),
             tileBuilder: (BuildContext context, ComplianceAlert alert) =>
-                _AlertTile(alert: alert, onTap: () => _openDetail(alert)),
+                _AlertTile(
+                  alert: alert,
+                  localOnly: localOnly,
+                  onTap: () => _openDetail(alert),
+                ),
             header: <Widget>[
               BlocBuilder<ComplianceAlertsCubit, ComplianceAlertsState>(
                 buildWhen:
@@ -113,7 +118,7 @@ class _ComplianceAlertsScreenState extends State<ComplianceAlertsScreen> {
                   ),
                 ),
             errorCopy: l10n.alertsError,
-            localOnlyNote: backendIsLocalOnly
+            localOnlyNote: localOnly
                 ? l10n.alertsLocalOnlyNote
                 : l10n.alertsStoredNote,
           ),

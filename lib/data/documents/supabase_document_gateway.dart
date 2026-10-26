@@ -1,5 +1,7 @@
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/pagination.dart';
 import 'package:legalhub/features/documents/domain/document.dart';
 import 'package:legalhub/features/documents/domain/document_gateway.dart';
 import 'supabase_document_api.dart';
@@ -32,7 +34,7 @@ class SupabaseDocumentGateway implements DocumentGateway {
   @override
   Future<Result<List<Document>>> searchDocuments(
     String query, {
-    int limit = 30,
+    int limit = kSearchPageSize,
   }) => _run(() => _api.searchDocuments(query, limit: limit));
 
   /// Runs a row read (full fetch or title-prefiltered search) through the
@@ -55,6 +57,7 @@ class SupabaseDocumentGateway implements DocumentGateway {
         AppError(
           code: 'document_read_failed',
           userMessage: 'Unable to load documents. Please try again.',
+          messageKey: AppMessageKey.errUnableToLoadDocumentsPleaseTryAgain,
           technicalMessage: e.message,
         ),
       );
@@ -138,26 +141,31 @@ class SupabaseDocumentGateway implements DocumentGateway {
       String code,
       String userMessage,
       AppErrorKind kind,
+      AppMessageKey? messageKey,
     ) = switch (e.kind) {
       SupabaseDocumentFailureKind.denied => (
         'document_read_denied',
         'You do not have permission to view these documents.',
         AppErrorKind.denied,
+        null,
       ),
       SupabaseDocumentFailureKind.providerUnavailable => (
         'document_read_unavailable',
         'Documents are temporarily unavailable. Please try again.',
         AppErrorKind.unavailable,
+        null,
       ),
       SupabaseDocumentFailureKind.unknown => (
         'document_read_failed',
         'Unable to load documents. Please try again.',
         AppErrorKind.unknown,
+        AppMessageKey.errUnableToLoadDocumentsPleaseTryAgain,
       ),
     };
     return AppError(
       code: code,
       userMessage: userMessage,
+      messageKey: messageKey,
       kind: kind,
       technicalMessage: e.message,
     );

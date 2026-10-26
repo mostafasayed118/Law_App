@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/matters/domain/matter.dart';
@@ -153,6 +154,7 @@ class _TaskCreateSheetState extends State<TaskCreateSheet> {
   }
 
   List<Widget> _buildBody(BuildContext context, AppLocalizations l10n) {
+    final DemoLabels labels = DemoLabels(l10n, localOnly: backendIsLocalOnly);
     if (_loading) {
       return const <Widget>[LinearProgressIndicator()];
     }
@@ -205,7 +207,7 @@ class _TaskCreateSheetState extends State<TaskCreateSheet> {
                 for (final Matter matter in matters)
                   DropdownMenuItem<String>(
                     value: matter.id,
-                    child: Text(demoMatterTitle(l10n, matter.title)),
+                    child: Text(labels.matterTitle(matter.title)),
                   ),
               ],
               onChanged: (String? value) {

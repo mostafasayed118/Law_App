@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "ar",
   "appTitle": "LegalHub",
   "continueAsDemo": "المتابعة بجلسة تجريبية",
@@ -94,7 +94,13 @@
   "demoThreadTitle4": "محادثة قضية أسرية — تجريبي",
   "demoThreadTitle5": "استشارة شركة ناشئة — تجريبي",
   "demoMessageBody": "رسالة تجريبية {count} — محتوى تجريبي عام، لا توجد بيانات عميل أو قانونية حقيقية.",
-  "@demoMessageBody": {"placeholders": {"count": {"type": "int"}}},
+  "@demoMessageBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "demoAuthorAttorney": "محامٍ تجريبي",
   "demoAuthorClient": "عميل تجريبي",
   "demoDocumentTitle1": "خطاب تكليف تجريبي",
@@ -118,18 +124,57 @@
   "demoTaskTitle4": "تجريبي: جدولة متابعة",
   "demoTaskTitle5": "تجريبي: تحديث الجدول الزمني للقضية",
   "researchHeadline": "ملاحظة بحثية — {title}",
-  "@researchHeadline": {"placeholders": {"title": {"type": "String"}}},
+  "@researchHeadline": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "researchSummaryDoc": "ملاحظة بحثية تجريبية مُجمّعة من الصف التجريبي \"{title}\" ({ref}). هذه نسخة تجريبية ثابتة مُعدّة للمدونة التجريبية — ليست تحليلاً قانونياً.",
-  "@researchSummaryDoc": {"placeholders": {"title": {"type": "String"}, "ref": {"type": "String"}}},
+  "@researchSummaryDoc": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "ref": {
+        "type": "String"
+      }
+    }
+  },
   "researchSummaryMatter": "ملاحظة بحثية تجريبية مُجمّعة من الصف التجريبي \"{title}\" ({area}). هذه نسخة تجريبية ثابتة مُعدّة للمدونة التجريبية — ليست تحليلاً قانونياً.",
-  "@researchSummaryMatter": {"placeholders": {"title": {"type": "String"}, "area": {"type": "String"}}},
+  "@researchSummaryMatter": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
   "researchExcerptDoc": "مقتطف المدونة: صف بيانات وصفية {type}، مرجع القضية \"{ref}\".",
-  "@researchExcerptDoc": {"placeholders": {"type": {"type": "String"}, "ref": {"type": "String"}}},
+  "@researchExcerptDoc": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "ref": {
+        "type": "String"
+      }
+    }
+  },
   "researchExcerptMatter": "مقتطف المدونة: صف قضية، المجال \"{area}\".",
-  "@researchExcerptMatter": {"placeholders": {"area": {"type": "String"}}},
+  "@researchExcerptMatter": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      }
+    }
+  },
   "researchRelatedMatter": "قضية تجريبية مرتبطة",
-      "resendCode": "إعادة إرسال الرمز",
-      "resendHelp": "لم يصلك البريد؟ تحقق من مجلد الرسائل غير المرغوبة أو تواصل مع الدعم.",
+  "resendCode": "إعادة إرسال الرمز",
+  "resendHelp": "لم يصلك البريد؟ تحقق من مجلد الرسائل غير المرغوبة أو تواصل مع الدعم.",
   "resetPasswordTitle": "إعادة تعيين كلمة المرور",
   "newPasswordLabel": "كلمة المرور الجديدة",
   "confirmPasswordLabel": "تأكيد كلمة المرور",
@@ -148,7 +193,13 @@
   "onboardingSuccessBody": "محطة العمل القانونية الآمنة جاهزة. سجّل الدخول للبدء.",
   "onboardingSuccessAction": "المتابعة إلى تسجيل الدخول",
   "homeGreeting": "مرحبًا، {name}",
-  "@homeGreeting": {"placeholders": {"name": {"type": "String"}}},
+  "@homeGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "homeFallbackName": "ضيف",
   "homeSubtitle": "كيف يمكننا مساعدتك في احتياجاتك القانونية اليوم؟",
   "searchPlaceholder": "ابحث عن محامٍ أو موضوع قانوني...",
@@ -172,16 +223,28 @@
   "validatorRequired": "هذا الحقل مطلوب.",
   "validatorEmailInvalid": "أدخل عنوان بريد إلكتروني صالح.",
   "validatorMinLength": "{count, plural, zero{يجب أن يكون على الأقل 0 حرف.} one{يجب أن يكون على الأقل حرف واحد.} two{يجب أن يكون على الأقل حرفان.} few{يجب أن يكون على الأقل {count} أحرف.} many{يجب أن يكون على الأقل {count} حرفًا.} other{يجب أن يكون على الأقل {count} حرف.}}",
-  "@validatorMinLength": {"placeholders": {"count": {"type": "int"}}},
+  "@validatorMinLength": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "validatorMismatch": "كلمتا المرور غير متطابقتين.",
   "validatorPasswordLength": "{count, plural, zero{يجب أن يكون على الأقل 0 حرف.} one{يجب أن يكون على الأقل حرف واحد.} two{يجب أن يكون على الأقل حرفان.} few{يجب أن يكون على الأقل {count} أحرف.} many{يجب أن يكون على الأقل {count} حرفًا.} other{يجب أن يكون على الأقل {count} حرف.}}",
-  "@validatorPasswordLength": {"placeholders": {"count": {"type": "int"}}},
+  "@validatorPasswordLength": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "validatorPasswordClasses": "أدخل ٣ من ٤ على الأقل: أحرف كبيرة، صغيرة، أرقام، رموز.",
   "validatorPasswordEmail": "لا تُدرج عنوان بريدك الإلكتروني في كلمة المرور.",
   "passwordStrengthWeak": "ضعيفة",
   "passwordStrengthFair": "متوسطة",
-      "passwordStrengthStrong": "قوية",
-      "profileNavigation": "الملف",
+  "passwordStrengthStrong": "قوية",
+  "profileNavigation": "الملف",
   "profileNameLabel": "الاسم",
   "profileAccountIdLabel": "معرّف الحساب",
   "profileRoleLabel": "الدور",
@@ -219,7 +282,13 @@
   "inviteTokenLabel": "رمز لمرة واحدة",
   "inviteSendButton": "إرسال الدعوة",
   "inviteTokenBody": "شارك رمز الاستخدام لمرة واحدة هذا مع {email}. لا يمكن عرضه مرة أخرى.",
-  "@inviteTokenBody": {"placeholders": {"email": {"type": "String"}}},
+  "@inviteTokenBody": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
   "inviteTokenCopy": "نسخ الرمز",
   "inviteTokenCopied": "تم نسخ الرمز إلى الحافظة.",
   "inviteShareLink": "نسخ رابط الدعوة",
@@ -228,7 +297,13 @@
   "actionRevokeInvitation": "إلغاء الدعوة",
   "invitationRevoked": "تم إلغاء الدعوة.",
   "inviteTokenResentBody": "رمز جديد لمرة واحدة لـ {email}. لا يمكن عرضه مرة أخرى.",
-  "@inviteTokenResentBody": {"placeholders": {"email": {"type": "String"}}},
+  "@inviteTokenResentBody": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
   "memberStatusInvited": "مدعو",
   "memberStatusActive": "نشط",
   "memberStatusSuspended": "موقوف",
@@ -238,7 +313,13 @@
   "actionRemove": "إزالة",
   "removeMemberConfirmTitle": "إزالة العضو؟",
   "removeMemberConfirmBody": "إزالة {name} من هذه المؤسسة؟",
-  "@removeMemberConfirmBody": {"placeholders": {"name": {"type": "String"}}},
+  "@removeMemberConfirmBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "removeMemberConfirmAction": "إزالة",
   "platformAdminTitle": "إدارة المنصة",
   "platformAdminOrganizations": "المؤسسات",
@@ -246,7 +327,13 @@
   "platformAdminDeleteDemo": "حذف حساب تجريبي",
   "platformAdminDeleteConfirmTitle": "حذف الحساب التجريبي؟",
   "platformAdminDeleteConfirmBody": "حذف الحساب التجريبي لـ {name}؟ لا يمكن التراجع عن هذا.",
-  "@platformAdminDeleteConfirmBody": {"placeholders": {"name": {"type": "String"}}},
+  "@platformAdminDeleteConfirmBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "platformAdminDeleteConfirmAction": "حذف",
   "platformAdminAudit": "سجل التدقيق",
   "platformAdminAuditPlatform": "نشاط المنصة",
@@ -261,8 +348,7 @@
   "actionInProgress": "يوجد إجراء قيد التنفيذ بالفعل.",
   "signUpCheckInboxTitle": "تحقق من بريدك الوارد",
   "signUpCheckInboxBody": "أرسلنا رابط التحقق إلى بريدك الإلكتروني. افتحه لتفعيل حسابك، ثم سجّل الدخول.",
-  "signUpCheckInboxAction": "المتابعة إلى تسجيل الدخول"
-,
+  "signUpCheckInboxAction": "المتابعة إلى تسجيل الدخول",
   "bookingTitle": "احجز استشارة",
   "bookingLocalOnlyNote": "وضع تجريبي — لا يتم حجز أي استشارة أو إرسالها فعليًا.",
   "bookingNoPaymentNote": "لا يتم تحصيل أي دفعة في هذه الخطوة.",
@@ -318,7 +404,13 @@
   "discoveryProfileSpecialties": "التخصصات",
   "discoveryProfileLanguages": "اللغات",
   "discoveryProfileYears": "{years} سنة من الخبرة",
-  "@discoveryProfileYears": {"placeholders": {"years": {"type": "int"}}},
+  "@discoveryProfileYears": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
   "attorneyStatusActive": "نشط",
   "attorneyStatusInactive": "غير نشط",
   "attorneyAdminTitle": "دليل المحامين",
@@ -330,7 +422,13 @@
   "attorneyAdminDeactivate": "إلغاء التفعيل",
   "attorneyAdminDeactivateTitle": "إلغاء تفعيل المحامي؟",
   "attorneyAdminDeactivateBody": "هل تريد إلغاء تفعيل {name}؟ سيبقى الملف في قائمة الإدارة لكنه يختفي من الدليل العام.",
-  "@attorneyAdminDeactivateBody": {"placeholders": {"name": {"type": "String"}}},
+  "@attorneyAdminDeactivateBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "attorneyAdminDeactivateFailed": "تعذّر إلغاء تفعيل الملف. حاول مرة أخرى.",
   "attorneyAdminEmpty": "لا توجد ملفات محامين بعد.",
   "attorneyAdminError": "تعذّر تحميل ملفات المحامين.",
@@ -378,7 +476,9 @@
   "matterCreateSuccessBody": "تم إنشاء القضية {id}.",
   "@matterCreateSuccessBody": {
     "placeholders": {
-      "id": {"type": "String"}
+      "id": {
+        "type": "String"
+      }
     }
   },
   "matterCreateSuccessNote": "تراها الآن لأنك أنشأتها. ويراها الآخرون بمجرد إسنادها إليهم.",
@@ -724,5 +824,642 @@
   "aiResearchErrorNoOrg": "اختر مؤسسة لتشغيل البحث.",
   "aiResearchNoSourceCited": "لم يُذكر مصدر.",
   "aiResearchSourceDocument": "مستند",
-  "aiResearchSourceMatter": "ملف"
+  "aiResearchSourceMatter": "ملف",
+  "demoApprovalTitleConflictNew": "مراجعة تعارض تجريبية — طلب جديد",
+  "@demoApprovalTitleConflictNew": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoApprovalTitleEngagementWaiver": "تنازل تجريبي عن التكليف",
+  "@demoApprovalTitleEngagementWaiver": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoApprovalTitleCourtFiling": "موافقة تجريبية على إيداع المحكمة",
+  "@demoApprovalTitleCourtFiling": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoApprovalTitleExpense": "موافقة تجريبية على نفقة",
+  "@demoApprovalTitleExpense": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoApprovalTitleConflictOpposing": "مراجعة تعارض تجريبية — الخصم",
+  "@demoApprovalTitleConflictOpposing": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoApprovalDescriptionWaiver": "طلب تجريبي — لا توجد بيانات عميل أو قضية حقيقية.",
+  "@demoApprovalDescriptionWaiver": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoApprovalDecisionApproved": "قرار تجريبي — موافقة.",
+  "@demoApprovalDecisionApproved": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoApprovalDecisionRejected": "قرار تجريبي — رفض.",
+  "@demoApprovalDecisionRejected": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAlertDescriptionReview": "تنبيه تجريبي — لا يظهر أي حدث امتثال حقيقي.",
+  "@demoAlertDescriptionReview": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAttorneyHeadlineCorporate": "مستشار الشركات والحوكمة",
+  "@demoAttorneyHeadlineCorporate": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAttorneyHeadlineCivil": "التقاضي المدني والعقود",
+  "@demoAttorneyHeadlineCivil": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAttorneyHeadlineCriminal": "الدفاع الجنائي والإجراءات",
+  "@demoAttorneyHeadlineCriminal": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAttorneyHeadlineFamily": "قانون الأسرة والأحوال الشخصية",
+  "@demoAttorneyHeadlineFamily": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAttorneyHeadlineStartup": "تأسيس الشركات الناشئة والاستشارات",
+  "@demoAttorneyHeadlineStartup": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAuditOrganizationCreated": "تم إنشاء المؤسسة (بيانات وصفية فقط)",
+  "@demoAuditOrganizationCreated": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAuditMemberInvited": "تمت دعوة عضو (بيانات وصفية فقط)",
+  "@demoAuditMemberInvited": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAuditMemberRoleChanged": "تم تغيير دور عضو (بيانات وصفية فقط)",
+  "@demoAuditMemberRoleChanged": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAuditMembershipSuspended": "تم تعليق العضوية (بيانات وصفية فقط)",
+  "@demoAuditMembershipSuspended": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAuditDemoAccountDeleted": "تم حذف الحساب التجريبي (بيانات وصفية فقط)",
+  "@demoAuditDemoAccountDeleted": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAuditRoleChange": "تغيير الدور",
+  "@demoAuditRoleChange": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAuditInvitationSent": "أُرسلت الدعوة",
+  "@demoAuditInvitationSent": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAuditSuspensionDenied": "رُفض التعليق",
+  "@demoAuditSuspensionDenied": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "homeActivityEmpty": "لا يوجد نشاط حديث بعد.",
+  "@homeActivityEmpty": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "discoveryEntrySubtitleConfigured": "تصفّح ملفات المحامين ومجالات الممارسة.",
+  "@discoveryEntrySubtitleConfigured": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "searchNoQueryConfigured": "اكتب كلمة بحث للبحث في القضايا والمستندات والرسائل والمحامين.",
+  "@searchNoQueryConfigured": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "aiResearchNoMatchesConfigured": "لا توجد نتائج مطابقة. جرّب كلمات مختلفة.",
+  "@aiResearchNoMatchesConfigured": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "aiResearchEntrySubtitleConfigured": "اسأل مساعد البحث عبر قضاياك ومستنداتك — استشارة فقط.",
+  "@aiResearchEntrySubtitleConfigured": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToViewThese2": "ليس لديك إذن لعرض هذه المهام.",
+  "@errYouDoNotHavePermissionToViewThese2": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadTasksPleaseTryAgain": "تعذر تحميل المهام. يرجى المحاولة مرة أخرى.",
+  "@errUnableToLoadTasksPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errARejectionNoteIsRequired": "ملاحظة الرفض مطلوبة.",
+  "@errARejectionNoteIsRequired": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errAcknowledgingTheAlertIsTemporarilyUnavailablePleaseTry": "الاطلاع على التنبيه غير متاح مؤقتًا. حاول مرة أخرى.",
+  "@errAcknowledgingTheAlertIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errApprovalRequestNotFound": "لم يتم العثور على طلب الموافقة.",
+  "@errApprovalRequestNotFound": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errApprovalsAreTemporarilyUnavailablePleaseTryAgain": "الموافقات غير متاحة مؤقتًا. حاول مرة أخرى.",
+  "@errApprovalsAreTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errCancellingTheRequestIsTemporarilyUnavailablePleaseTry": "إلغاء الطلب غير متاح مؤقتًا. حاول مرة أخرى.",
+  "@errCancellingTheRequestIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errComplianceAlertNotFound": "لم يتم العثور على تنبيه الامتثال.",
+  "@errComplianceAlertNotFound": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errComplianceAlertsAreTemporarilyUnavailablePleaseTryAgain": "تنبيهات الامتثال غير متاحة مؤقتًا. حاول مرة أخرى.",
+  "@errComplianceAlertsAreTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errCreatingTheAlertIsTemporarilyUnavailablePleaseTry": "إنشاء التنبيه غير متاح مؤقتًا. حاول مرة أخرى.",
+  "@errCreatingTheAlertIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errCreatingTheRequestIsTemporarilyUnavailablePleaseTry": "إنشاء الطلب غير متاح مؤقتًا. حاول مرة أخرى.",
+  "@errCreatingTheRequestIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errDecidingTheRequestIsTemporarilyUnavailablePleaseTry": "البت في الطلب غير متاح مؤقتًا. حاول مرة أخرى.",
+  "@errDecidingTheRequestIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errOnlyAPartnerCanDecideThisRequest": "يمكن للشريك فقط البت في هذا الطلب.",
+  "@errOnlyAPartnerCanDecideThisRequest": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errOnlyAPartnerOrComplianceOfficerCanCreate": "يمكن للشريك أو مسؤول الامتثال فقط إنشاء التنبيهات.",
+  "@errOnlyAPartnerOrComplianceOfficerCanCreate": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errOnlyAPartnerOrComplianceOfficerCanResolve": "يمكن للشريك أو مسؤول الامتثال فقط حل التنبيهات.",
+  "@errOnlyAPartnerOrComplianceOfficerCanResolve": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errOnlyAnActiveOrganizationMemberCanAcknowledgeAlerts": "يمكن لعضو نشط في المؤسسة فقط الاطلاع على التنبيهات.",
+  "@errOnlyAnActiveOrganizationMemberCanAcknowledgeAlerts": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errOnlyTheRequesterOrAPartnerCanCancel": "يمكن لمقدّم الطلب أو الشريك فقط إلغاء هذا الطلب.",
+  "@errOnlyTheRequesterOrAPartnerCanCancel": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errResolvingTheAlertIsTemporarilyUnavailablePleaseTry": "حل التنبيه غير متاح مؤقتًا. حاول مرة أخرى.",
+  "@errResolvingTheAlertIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errSelectAnOrganizationToViewApprovals": "اختر مؤسسة لعرض الموافقات.",
+  "@errSelectAnOrganizationToViewApprovals": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errSelectAnOrganizationToViewComplianceAlerts": "اختر مؤسسة لعرض تنبيهات الامتثال.",
+  "@errSelectAnOrganizationToViewComplianceAlerts": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheAlertCanNoLongerBeAcknowledged": "لم يعد بالإمكان الاطلاع على التنبيه.",
+  "@errTheAlertCanNoLongerBeAcknowledged": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheAlertCanNoLongerBeResolved": "لم يعد بالإمكان حل التنبيه.",
+  "@errTheAlertCanNoLongerBeResolved": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheAlertCouldNotBeCreatedCheckThe": "تعذّر إنشاء التنبيه. تحقق من التفاصيل وحاول مرة أخرى.",
+  "@errTheAlertCouldNotBeCreatedCheckThe": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheRequestCanNoLongerBeCancelled": "لم يعد بالإمكان إلغاء الطلب.",
+  "@errTheRequestCanNoLongerBeCancelled": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheRequestCouldNotBeCreatedCheckThe": "تعذّر إنشاء الطلب. تحقق من التفاصيل وحاول مرة أخرى.",
+  "@errTheRequestCouldNotBeCreatedCheckThe": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheRequestCouldNotBeDecidedItMay": "تعذّر البت في الطلب. قد لا يكون معلّقًا بعد الآن، أو أن الملاحظة مفقودة.",
+  "@errTheRequestCouldNotBeDecidedItMay": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheRequestIsNoLongerPending": "الطلب لم يعد معلّقًا.",
+  "@errTheRequestIsNoLongerPending": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToAcknowledgeTheAlertPleaseTryAgain": "تعذّر الاطلاع على التنبيه. حاول مرة أخرى.",
+  "@errUnableToAcknowledgeTheAlertPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToCancelTheRequestPleaseTryAgain": "تعذّر إلغاء الطلب. حاول مرة أخرى.",
+  "@errUnableToCancelTheRequestPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToCreateTheAlertPleaseTryAgain": "تعذّر إنشاء التنبيه. حاول مرة أخرى.",
+  "@errUnableToCreateTheAlertPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToCreateTheRequestPleaseTryAgain": "تعذّر إنشاء الطلب. حاول مرة أخرى.",
+  "@errUnableToCreateTheRequestPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToDecideTheRequestPleaseTryAgain": "تعذّر البت في الطلب. حاول مرة أخرى.",
+  "@errUnableToDecideTheRequestPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadApprovalsPleaseTryAgain": "تعذّر تحميل الموافقات. حاول مرة أخرى.",
+  "@errUnableToLoadApprovalsPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadComplianceAlertsPleaseTryAgain": "تعذّر تحميل تنبيهات الامتثال. حاول مرة أخرى.",
+  "@errUnableToLoadComplianceAlertsPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToResolveTheAlertPleaseTryAgain": "تعذّر حل التنبيه. حاول مرة أخرى.",
+  "@errUnableToResolveTheAlertPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToCreateApproval": "ليس لديك إذن لإنشاء طلبات الموافقة.",
+  "@errYouDoNotHavePermissionToCreateApproval": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToViewApprovals": "ليس لديك إذن لعرض الموافقات.",
+  "@errYouDoNotHavePermissionToViewApprovals": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToViewCompliance": "ليس لديك إذن لعرض تنبيهات الامتثال.",
+  "@errYouDoNotHavePermissionToViewCompliance": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errAcknowledgingTheTaskIsTemporarilyUnavailablePleaseTry": "الإقرار بالمهمة غير متاح مؤقتًا. يرجى المحاولة مرة أخرى.",
+  "@errAcknowledgingTheTaskIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errAvailableTimesAreTemporarilyUnavailablePleaseTryAgain": "الأوقات المتاحة غير متوفرة مؤقتًا. يرجى المحاولة مرة أخرى.",
+  "@errAvailableTimesAreTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errBookingIsTemporarilyUnavailablePleaseTryAgain": "الحجز غير متاح مؤقتًا. يرجى المحاولة مرة أخرى.",
+  "@errBookingIsTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errCreatingTheTaskIsTemporarilyUnavailablePleaseTry": "إنشاء المهمة غير متاح مؤقتًا. يرجى المحاولة مرة أخرى.",
+  "@errCreatingTheTaskIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errMessageIsTooLongMaxMaxMessageLengthCharacters": "الرسالة طويلة جدًا (الحد الأقصى {maxMessageLength} حرفًا).",
+  "@errMessageIsTooLongMaxMaxMessageLengthCharacters": {
+    "description": "[REVIEW] machine-drafted; human review required before release",
+    "placeholders": {
+      "maxMessageLength": {
+        "type": "int"
+      }
+    }
+  },
+  "errMessagesAreTemporarilyUnavailablePleaseTryAgain": "الرسائل غير متاحة مؤقتًا. يرجى المحاولة مرة أخرى.",
+  "@errMessagesAreTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errOnlyTheAssignedPersonCanAcknowledgeThisTask": "لا يمكن إلا للشخص المكلَّف الإقرار بهذه المهمة.",
+  "@errOnlyTheAssignedPersonCanAcknowledgeThisTask": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errReAssigningTheTaskIsTemporarilyUnavailablePlease": "إعادة إسناد المهمة غير متاحة مؤقتًا. يرجى المحاولة مرة أخرى.",
+  "@errReAssigningTheTaskIsTemporarilyUnavailablePlease": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errSendingIsTemporarilyUnavailablePleaseTryAgain": "الإرسال غير متاح مؤقتًا. يرجى المحاولة مرة أخرى.",
+  "@errSendingIsTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTasksAreTemporarilyUnavailablePleaseTryAgain": "المهام غير متاحة مؤقتًا. يرجى المحاولة مرة أخرى.",
+  "@errTasksAreTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errThatPersonCannotBeAssignedThisTaskChoose": "لا يمكن إسناد هذه المهمة إلى هذا الشخص. اختر عضوًا نشطًا في المؤسسة.",
+  "@errThatPersonCannotBeAssignedThisTaskChoose": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errThatTimeIsNoLongerAvailableChooseAnother": "هذا الوقت لم يعد متاحًا. اختر وقتًا آخر.",
+  "@errThatTimeIsNoLongerAvailableChooseAnother": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheBookingDetailsAreInvalidCheckThemAnd": "تفاصيل الحجز غير صالحة. تحقق منها وحاول مرة أخرى.",
+  "@errTheBookingDetailsAreInvalidCheckThemAnd": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheTaskCannotMoveToThatStatusIt": "لا يمكن نقل المهمة إلى تلك الحالة. ربما اكتملت بالفعل.",
+  "@errTheTaskCannotMoveToThatStatusIt": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheTaskCouldNotBeCreatedCheckThe": "تعذّر إنشاء المهمة. تحقق من العنوان وحاول مرة أخرى.",
+  "@errTheTaskCouldNotBeCreatedCheckThe": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errThreadsAreTemporarilyUnavailablePleaseTryAgain": "المحادثات غير متاحة مؤقتًا. يرجى المحاولة مرة أخرى.",
+  "@errThreadsAreTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToAcknowledgeTheTaskPleaseTryAgain": "تعذّر الإقرار بالمهمة. يرجى المحاولة مرة أخرى.",
+  "@errUnableToAcknowledgeTheTaskPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToConfirmPleaseTryAgain": "تعذّر التأكيد. حاول مرة أخرى.",
+  "@errUnableToConfirmPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToCreateTheTaskPleaseTryAgain": "تعذّر إنشاء المهمة. يرجى المحاولة مرة أخرى.",
+  "@errUnableToCreateTheTaskPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadAvailableTimesPleaseTryAgain": "تعذّر تحميل الأوقات المتاحة. يرجى المحاولة مرة أخرى.",
+  "@errUnableToLoadAvailableTimesPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadMessagesPleaseTryAgain": "تعذّر تحميل الرسائل. يرجى المحاولة مرة أخرى.",
+  "@errUnableToLoadMessagesPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadThreadsPleaseTryAgain": "تعذّر تحميل المحادثات. يرجى المحاولة مرة أخرى.",
+  "@errUnableToLoadThreadsPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToReAssignTheTaskPleaseTry": "تعذّرت إعادة إسناد المهمة. يرجى المحاولة مرة أخرى.",
+  "@errUnableToReAssignTheTaskPleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToSendTheMessagePleaseTryAgain": "تعذّر إرسال الرسالة. يرجى المحاولة مرة أخرى.",
+  "@errUnableToSendTheMessagePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToUpdateTheTaskPleaseTryAgain": "تعذّر تحديث المهمة. يرجى المحاولة مرة أخرى.",
+  "@errUnableToUpdateTheTaskPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUpdatingTheTaskIsTemporarilyUnavailablePleaseTry": "تحديث المهمة غير متاح مؤقتًا. يرجى المحاولة مرة أخرى.",
+  "@errUpdatingTheTaskIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToAdvanceThis": "ليس لديك إذن بتقديم هذه المهمة.",
+  "@errYouDoNotHavePermissionToAdvanceThis": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToBookThis": "ليس لديك إذن بحجز هذه الاستشارة.",
+  "@errYouDoNotHavePermissionToBookThis": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToCreateTasks": "ليس لديك إذن بإنشاء مهام على هذا الملف.",
+  "@errYouDoNotHavePermissionToCreateTasks": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToReAssign": "ليس لديك إذن بإعادة إسناد هذه المهمة.",
+  "@errYouDoNotHavePermissionToReAssign": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToSendMessages": "ليس لديك إذن بإرسال رسائل في هذه المحادثة.",
+  "@errYouDoNotHavePermissionToSendMessages": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToViewAvailable": "ليس لديك إذن لعرض الأوقات المتاحة.",
+  "@errYouDoNotHavePermissionToViewAvailable": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToViewThese": "ليس لديك إذن لعرض هذه الرسائل.",
+  "@errYouDoNotHavePermissionToViewThese": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToViewThese3": "ليس لديك إذن لعرض هذه المحادثات.",
+  "@errYouDoNotHavePermissionToViewThese3": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errAttorneyNotFound": "المحامي غير موجود.",
+  "@errAttorneyNotFound": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheDirectoryIsTemporarilyUnavailableTryAgain": "الدليل غير متاح مؤقتًا. حاول مرة أخرى.",
+  "@errTheDirectoryIsTemporarilyUnavailableTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheProfileDetailsAreInvalidCheckThemAnd": "بيانات الملف الشخصي غير صالحة. تحقق منها وأعد المحاولة.",
+  "@errTheProfileDetailsAreInvalidCheckThemAnd": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadTheDirectoryPleaseTryAgain": "تعذّر تحميل الدليل. حاول مرة أخرى.",
+  "@errUnableToLoadTheDirectoryPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToManageThe": "ليس لديك إذن لإدارة الدليل.",
+  "@errYouDoNotHavePermissionToManageThe": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToViewThe": "ليس لديك إذن لعرض الدليل.",
+  "@errYouDoNotHavePermissionToViewThe": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errNotificationsAreTemporarilyUnavailablePleaseTryAgain": "الإشعارات غير متاحة مؤقتًا. يرجى المحاولة مرة أخرى.",
+  "@errNotificationsAreTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errThisFileIsTooLarge": "هذا الملف كبير جدًا.",
+  "@errThisFileIsTooLarge": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errThisFileTypeIsNotSupported": "نوع هذا الملف غير مدعوم.",
+  "@errThisFileTypeIsNotSupported": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToCheckThePaymentStatusPleaseTry": "تعذّر التحقق من حالة الدفع. يرجى المحاولة مرة أخرى.",
+  "@errUnableToCheckThePaymentStatusPleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadDocumentsPleaseTryAgain": "تعذّر تحميل المستندات. يرجى المحاولة مرة أخرى.",
+  "@errUnableToLoadDocumentsPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadFilesPleaseTryAgain": "تعذّر تحميل الملفات. يرجى المحاولة مرة أخرى.",
+  "@errUnableToLoadFilesPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadInvoicesPleaseTryAgain": "تعذّر تحميل الفواتير. يرجى المحاولة مرة أخرى.",
+  "@errUnableToLoadInvoicesPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadMattersPleaseTryAgain": "تعذّر تحميل القضايا. يرجى المحاولة مرة أخرى.",
+  "@errUnableToLoadMattersPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadNotificationsPleaseTryAgain": "تعذّر تحميل الإشعارات. يرجى المحاولة مرة أخرى.",
+  "@errUnableToLoadNotificationsPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToOpenTheFilePleaseTryAgain": "تعذّر فتح الملف. يرجى المحاولة مرة أخرى.",
+  "@errUnableToOpenTheFilePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToStartThePaymentPleaseTryAgain": "تعذّر بدء الدفع. يرجى المحاولة مرة أخرى.",
+  "@errUnableToStartThePaymentPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToUploadTheFilePleaseTryAgain": "تعذّر رفع الملف. يرجى المحاولة مرة أخرى.",
+  "@errUnableToUploadTheFilePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToUploadFiles": "ليس لديك إذن لرفع ملفات إلى هذه القضية.",
+  "@errYouDoNotHavePermissionToUploadFiles": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errAIResearchIsNotConfiguredForThisDeployment": "البحث بالذكاء الاصطناعي غير مُهيَّأ لهذا النشر. لم يتم تشغيل أي تحليل.",
+  "@errAIResearchIsNotConfiguredForThisDeployment": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errAnActionIsAlreadyInProgress": "هناك إجراء قيد التنفيذ بالفعل.",
+  "@errAnActionIsAlreadyInProgress": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errEndingTheConsultationIsTemporarilyUnavailablePleaseTry": "إنهاء الاستشارة غير متاح مؤقتًا. يرجى المحاولة مرة أخرى.",
+  "@errEndingTheConsultationIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errEnterAQuestionBetweenResearchRequestMinQuestionLengthAndResearchRequest": "أدخل سؤالاً يتراوح بين {minQuestionLength} و{maxQuestionLength} حرفًا واختر مؤسسة.",
+  "@errEnterAQuestionBetweenResearchRequestMinQuestionLengthAndResearchRequest": {
+    "description": "[REVIEW] machine-drafted; human review required before release",
+    "placeholders": {
+      "minQuestionLength": {
+        "type": "int"
+      },
+      "maxQuestionLength": {
+        "type": "int"
+      }
+    }
+  },
+  "errOnlyAPartnerOrAttorneyCanScheduleA": "يمكن لشريك أو محامٍ فقط جدولة استشارة بالفيديو.",
+  "@errOnlyAPartnerOrAttorneyCanScheduleA": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errOnlyTheCreatorOrAPartnerCanEnd": "يمكن للمُنشئ أو الشريك فقط إنهاء هذه الاستشارة.",
+  "@errOnlyTheCreatorOrAPartnerCanEnd": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errOrganizationMembershipsCouldNotBeLoaded": "تعذّر تحميل عضويات المؤسسة.",
+  "@errOrganizationMembershipsCouldNotBeLoaded": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errSchedulingAConsultationIsTemporarilyUnavailablePleaseTry": "جدولة الاستشارة غير متاحة مؤقتًا. يرجى المحاولة مرة أخرى.",
+  "@errSchedulingAConsultationIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errSelectAResearchRunToViewItsFindings": "اختر جولة بحث لعرض نتائجها.",
+  "@errSelectAResearchRunToViewItsFindings": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errSelectAVideoConsultationToJoin": "اختر استشارة فيديو للانضمام إليها.",
+  "@errSelectAVideoConsultationToJoin": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errSelectAnOrganizationToScheduleAConsultation": "اختر مؤسسة لجدولة استشارة.",
+  "@errSelectAnOrganizationToScheduleAConsultation": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errSelectAnOrganizationToViewResearchRuns": "اختر مؤسسة لعرض جولات البحث.",
+  "@errSelectAnOrganizationToViewResearchRuns": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errSelectAnOrganizationToViewVideoConsultations": "اختر مؤسسة لعرض استشارات الفيديو.",
+  "@errSelectAnOrganizationToViewVideoConsultations": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errSignInAgainToUseVideoConsultations": "سجّل الدخول مرة أخرى لاستخدام استشارات الفيديو.",
+  "@errSignInAgainToUseVideoConsultations": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errStartingTheConsultationIsTemporarilyUnavailablePleaseTry": "بدء الاستشارة غير متاح مؤقتًا. يرجى المحاولة مرة أخرى.",
+  "@errStartingTheConsultationIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheAIProviderReturnedAnUnexpectedResponsePlease": "أعاد مزوّد الذكاء الاصطناعي استجابة غير متوقعة. يرجى المحاولة مرة أخرى.",
+  "@errTheAIProviderReturnedAnUnexpectedResponsePlease": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheConsultationCouldNotBeScheduledCheckThe": "تعذّرت جدولة الاستشارة. تحقق من التفاصيل وحاول مرة أخرى.",
+  "@errTheConsultationCouldNotBeScheduledCheckThe": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheConsultationIsNotAvailableToJoinRight": "الاستشارة غير متاحة للانضمام إليها الآن.",
+  "@errTheConsultationIsNotAvailableToJoinRight": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheSelectedContextIsTooLargeRemoveDocuments": "السياق المحدد كبير جدًا. احذف بعض المستندات وحاول مرة أخرى.",
+  "@errTheSelectedContextIsTooLargeRemoveDocuments": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheSelectedResearchRunWasNotFound": "لم يتم العثور على جولة البحث المحددة.",
+  "@errTheSelectedResearchRunWasNotFound": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errThisConsultationCanNoLongerBeEnded": "لم يعد من الممكن إنهاء هذه الاستشارة.",
+  "@errThisConsultationCanNoLongerBeEnded": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errThisConsultationCanNoLongerBeStarted": "لم يعد من الممكن بدء هذه الاستشارة.",
+  "@errThisConsultationCanNoLongerBeStarted": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errThisVideoConsultationHasAlreadyEnded": "انتهت استشارة الفيديو هذه بالفعل.",
+  "@errThisVideoConsultationHasAlreadyEnded": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errThisVideoConsultationWasNotFound": "لم يتم العثور على استشارة الفيديو هذه.",
+  "@errThisVideoConsultationWasNotFound": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToEndTheConsultationPleaseTryAgain": "تعذّر إنهاء الاستشارة. يرجى المحاولة مرة أخرى.",
+  "@errUnableToEndTheConsultationPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToJoinTheConsultationPleaseTryAgain": "تعذّر الانضمام إلى الاستشارة. يرجى المحاولة مرة أخرى.",
+  "@errUnableToJoinTheConsultationPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadVideoConsultationsPleaseTryAgain": "تعذّر تحميل استشارات الفيديو. يرجى المحاولة مرة أخرى.",
+  "@errUnableToLoadVideoConsultationsPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToReadTheVideoConsultationPleaseTry": "تعذّرت قراءة استشارة الفيديو. يرجى المحاولة مرة أخرى.",
+  "@errUnableToReadTheVideoConsultationPleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToRunAIResearchPleaseTryAgain": "تعذّر تشغيل البحث بالذكاء الاصطناعي. يرجى المحاولة مرة أخرى.",
+  "@errUnableToRunAIResearchPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToScheduleTheConsultationPleaseTryAgain": "تعذّرت جدولة الاستشارة. يرجى المحاولة مرة أخرى.",
+  "@errUnableToScheduleTheConsultationPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToStartTheConsultationPleaseTryAgain": "تعذّر بدء الاستشارة. يرجى المحاولة مرة أخرى.",
+  "@errUnableToStartTheConsultationPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errVideoCallsAreNotConfiguredForThisDeployment": "مكالمات الفيديو غير مُهيَّأة لهذا النشر. لم يتم بدء أي مكالمة.",
+  "@errVideoCallsAreNotConfiguredForThisDeployment": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errVideoCallsAreTemporarilyUnavailablePleaseTryAgain": "مكالمات الفيديو غير متاحة مؤقتًا. يرجى المحاولة مرة أخرى.",
+  "@errVideoCallsAreTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errVideoConsultationsAreTemporarilyUnavailablePleaseTryAgain": "استشارات الفيديو غير متاحة مؤقتًا. يرجى المحاولة مرة أخرى.",
+  "@errVideoConsultationsAreTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errWeCouldnTCompleteThatRequestPleaseTry": "تعذّر إكمال هذا الطلب. يرجى المحاولة مرة أخرى.",
+  "@errWeCouldnTCompleteThatRequestPleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToJoinThis": "ليس لديك إذن للانضمام إلى هذه الاستشارة.",
+  "@errYouDoNotHavePermissionToJoinThis": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToStartThis": "ليس لديك إذن لبدء هذه الاستشارة.",
+  "@errYouDoNotHavePermissionToStartThis": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToViewVideo": "ليس لديك إذن لعرض استشارات الفيديو.",
+  "@errYouDoNotHavePermissionToViewVideo": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  }
 }

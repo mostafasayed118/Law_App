@@ -1,4 +1,5 @@
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/compliance/domain/compliance_alert.dart';
 import 'package:legalhub/features/compliance/domain/compliance_gateway.dart';
@@ -29,6 +30,8 @@ class SupabaseComplianceGateway implements ComplianceAlertsGateway {
         const AppError(
           code: 'compliance_read_no_org',
           userMessage: 'Select an organization to view compliance alerts.',
+          messageKey:
+              AppMessageKey.errSelectAnOrganizationToViewComplianceAlerts,
         ),
       );
     }
@@ -53,6 +56,13 @@ class SupabaseComplianceGateway implements ComplianceAlertsGateway {
           unavailableMessage:
               'Compliance alerts are temporarily unavailable. Please try again.',
           failedMessage: 'Unable to load compliance alerts. Please try again.',
+          deniedKey: AppMessageKey.errYouDoNotHavePermissionToViewCompliance,
+          validationKey:
+              AppMessageKey.errUnableToLoadComplianceAlertsPleaseTryAgain,
+          unavailableKey: AppMessageKey
+              .errComplianceAlertsAreTemporarilyUnavailablePleaseTryAgain,
+          failedKey:
+              AppMessageKey.errUnableToLoadComplianceAlertsPleaseTryAgain,
         ),
       );
     } on FormatException catch (e) {
@@ -85,6 +95,11 @@ class SupabaseComplianceGateway implements ComplianceAlertsGateway {
           unavailableMessage:
               'Creating the alert is temporarily unavailable. Please try again.',
           failedMessage: 'Unable to create the alert. Please try again.',
+          deniedKey: AppMessageKey.errOnlyAPartnerOrComplianceOfficerCanCreate,
+          validationKey: AppMessageKey.errTheAlertCouldNotBeCreatedCheckThe,
+          unavailableKey: AppMessageKey
+              .errCreatingTheAlertIsTemporarilyUnavailablePleaseTry,
+          failedKey: AppMessageKey.errUnableToCreateTheAlertPleaseTryAgain,
         ),
       );
     } on FormatException catch (e) {
@@ -103,6 +118,12 @@ class SupabaseComplianceGateway implements ComplianceAlertsGateway {
       unavailableMessage:
           'Acknowledging the alert is temporarily unavailable. Please try again.',
       failedMessage: 'Unable to acknowledge the alert. Please try again.',
+      deniedKey:
+          AppMessageKey.errOnlyAnActiveOrganizationMemberCanAcknowledgeAlerts,
+      validationKey: AppMessageKey.errTheAlertCanNoLongerBeAcknowledged,
+      unavailableKey: AppMessageKey
+          .errAcknowledgingTheAlertIsTemporarilyUnavailablePleaseTry,
+      failedKey: AppMessageKey.errUnableToAcknowledgeTheAlertPleaseTryAgain,
     );
   }
 
@@ -116,6 +137,11 @@ class SupabaseComplianceGateway implements ComplianceAlertsGateway {
       unavailableMessage:
           'Resolving the alert is temporarily unavailable. Please try again.',
       failedMessage: 'Unable to resolve the alert. Please try again.',
+      deniedKey: AppMessageKey.errOnlyAPartnerOrComplianceOfficerCanResolve,
+      validationKey: AppMessageKey.errTheAlertCanNoLongerBeResolved,
+      unavailableKey:
+          AppMessageKey.errResolvingTheAlertIsTemporarilyUnavailablePleaseTry,
+      failedKey: AppMessageKey.errUnableToResolveTheAlertPleaseTryAgain,
     );
   }
 
@@ -126,6 +152,10 @@ class SupabaseComplianceGateway implements ComplianceAlertsGateway {
     required String validationMessage,
     required String unavailableMessage,
     required String failedMessage,
+    required AppMessageKey deniedKey,
+    required AppMessageKey validationKey,
+    required AppMessageKey unavailableKey,
+    required AppMessageKey failedKey,
   }) async {
     try {
       await write();
@@ -139,6 +169,10 @@ class SupabaseComplianceGateway implements ComplianceAlertsGateway {
           validationMessage: validationMessage,
           unavailableMessage: unavailableMessage,
           failedMessage: failedMessage,
+          deniedKey: deniedKey,
+          validationKey: validationKey,
+          unavailableKey: unavailableKey,
+          failedKey: failedKey,
         ),
       );
     } on FormatException catch (e) {
@@ -256,33 +290,42 @@ class SupabaseComplianceGateway implements ComplianceAlertsGateway {
     required String validationMessage,
     required String unavailableMessage,
     required String failedMessage,
+    required AppMessageKey deniedKey,
+    required AppMessageKey validationKey,
+    required AppMessageKey unavailableKey,
+    required AppMessageKey failedKey,
   }) {
     return switch (e.kind) {
       SupabaseComplianceFailureKind.denied => AppError(
         code: '${prefix}_denied',
         userMessage: deniedMessage,
+        messageKey: deniedKey,
         kind: AppErrorKind.denied,
         technicalMessage: e.message,
       ),
       SupabaseComplianceFailureKind.notFound => AppError(
         code: 'compliance_not_found',
         userMessage: 'Compliance alert not found.',
+        messageKey: AppMessageKey.errComplianceAlertNotFound,
         technicalMessage: e.message,
       ),
       SupabaseComplianceFailureKind.validation => AppError(
         code: '${prefix}_invalid',
         userMessage: validationMessage,
+        messageKey: validationKey,
         technicalMessage: e.message,
       ),
       SupabaseComplianceFailureKind.providerUnavailable => AppError(
         code: '${prefix}_unavailable',
         userMessage: unavailableMessage,
+        messageKey: unavailableKey,
         kind: AppErrorKind.unavailable,
         technicalMessage: e.message,
       ),
       SupabaseComplianceFailureKind.unknown => AppError(
         code: '${prefix}_failed',
         userMessage: failedMessage,
+        messageKey: failedKey,
         technicalMessage: e.message,
       ),
     };
@@ -293,6 +336,7 @@ class SupabaseComplianceGateway implements ComplianceAlertsGateway {
   AppError _drift(FormatException e) => AppError(
     code: 'compliance_read_failed',
     userMessage: 'Unable to load compliance alerts. Please try again.',
+    messageKey: AppMessageKey.errUnableToLoadComplianceAlertsPleaseTryAgain,
     technicalMessage: e.message,
   );
 }

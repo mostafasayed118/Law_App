@@ -1,6 +1,8 @@
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/pagination.dart';
 import 'package:legalhub/features/documents/domain/document.dart';
 import 'package:legalhub/features/documents/domain/document_gateway.dart';
+import 'package:legalhub/shared/demo/demo_corpus.dart';
 
 /// Development-only document implementation: a fixed synthetic list of
 /// non-PII document **metadata**.
@@ -19,46 +21,46 @@ class FakeDocumentGateway implements DocumentGateway {
   static final List<Document> syntheticDocuments = <Document>[
     Document(
       id: 'doc-1',
-      matterId: 'matter-1',
-      matterTitle: 'Demo acquisition review',
+      matterId: DemoCorpus.matterIds[0],
+      matterTitle: DemoCorpus.matterTitleAcquisition,
       title: 'Demo engagement letter',
-      matterRef: 'Demo acquisition review',
+      matterRef: DemoCorpus.matterTitleAcquisition,
       type: DocumentType.contract,
       createdAt: DateTime.utc(2026, 7, 10),
     ),
     Document(
       id: 'doc-2',
-      matterId: 'matter-2',
-      matterTitle: 'Commercial lease consultation',
+      matterId: DemoCorpus.matterIds[1],
+      matterTitle: DemoCorpus.matterTitleLease,
       title: 'Sample matter brief — demo',
-      matterRef: 'Commercial lease consultation',
+      matterRef: DemoCorpus.matterTitleLease,
       type: DocumentType.brief,
       createdAt: DateTime.utc(2026, 7, 15),
     ),
     Document(
       id: 'doc-3',
-      matterId: 'matter-3',
-      matterTitle: 'Procedural review matter',
+      matterId: DemoCorpus.matterIds[2],
+      matterTitle: DemoCorpus.matterTitleProcedural,
       title: 'Demo evidence index',
-      matterRef: 'Procedural review matter',
+      matterRef: DemoCorpus.matterTitleProcedural,
       type: DocumentType.evidence,
       createdAt: DateTime.utc(2026, 7, 19),
     ),
     Document(
       id: 'doc-4',
-      matterId: 'matter-4',
-      matterTitle: 'Family status consultation',
+      matterId: DemoCorpus.matterIds[3],
+      matterTitle: DemoCorpus.matterTitleFamily,
       title: 'Correspondence log — demo',
-      matterRef: 'Family status consultation',
+      matterRef: DemoCorpus.matterTitleFamily,
       type: DocumentType.correspondence,
       createdAt: DateTime.utc(2026, 7, 22),
     ),
     Document(
       id: 'doc-5',
-      matterId: 'matter-5',
-      matterTitle: 'Startup formation advisory',
+      matterId: DemoCorpus.matterIds[4],
+      matterTitle: DemoCorpus.matterTitleStartup,
       title: 'Demo settlement draft',
-      matterRef: 'Startup formation advisory',
+      matterRef: DemoCorpus.matterTitleStartup,
       type: DocumentType.contract,
       createdAt: DateTime.utc(2026, 7, 26),
     ),
@@ -82,7 +84,7 @@ class FakeDocumentGateway implements DocumentGateway {
   @override
   Future<Result<List<Document>>> searchDocuments(
     String query, {
-    int limit = 30,
+    int limit = kSearchPageSize,
   }) async {
     // In-memory backend: no transfer cost to save, so no prefilter — the
     // caller's full matching pass is the arbiter and results stay identical

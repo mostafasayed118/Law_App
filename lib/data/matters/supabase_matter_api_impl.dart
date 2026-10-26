@@ -1,5 +1,7 @@
+import 'package:legalhub/core/pagination.dart';
 import 'package:legalhub/data/postgrest_failures.dart';
 import 'package:legalhub/data/supabase_seam.dart';
+import 'package:legalhub/data/supabase_wire.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_matter_api.dart';
@@ -56,9 +58,9 @@ class SupabaseMatterApiImpl implements SupabaseMatterApi {
       // caller's assigned rows; ids only, names resolve via the roster seam
       // (D-MR4). `assigned_attorney_id` may be null (no attorney assigned).
       return await _table(
-        'matters',
+        SupabaseTables.matters,
         'id, organization_id, title, practice_area, status, '
-            'assigned_attorney_id, created_at',
+        'assigned_attorney_id, created_at',
       );
     } on PostgrestException catch (e) {
       throw SupabaseMatterException(kind: _kindFor(e), message: e.message);
@@ -88,7 +90,7 @@ class SupabaseMatterApiImpl implements SupabaseMatterApi {
   @override
   Future<List<Map<String, dynamic>>> searchMatters(
     String query, {
-    int limit = 30,
+    int limit = kSearchPageSize,
   }) async {
     try {
       // Same RLS scope and columns as fetchMatters (D-MR1/D-MR4). The read
@@ -96,7 +98,7 @@ class SupabaseMatterApiImpl implements SupabaseMatterApi {
       // pass and takes the requested top-N (see _boundSearch for why the
       // title-only SQL prefilter was dropped).
       return await _searchCaller(
-        'matters',
+        SupabaseTables.matters,
         'id, organization_id, title, practice_area, status, '
             'assigned_attorney_id, created_at',
         'title',

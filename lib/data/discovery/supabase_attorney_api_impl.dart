@@ -1,5 +1,6 @@
 import 'package:legalhub/data/postgrest_failures.dart';
 import 'package:legalhub/data/supabase_seam.dart';
+import 'package:legalhub/data/supabase_wire.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_attorney_api.dart';
@@ -43,7 +44,7 @@ class SupabaseAttorneyApiImpl implements SupabaseAttorneyApi {
   }) {
     return _guard(() async {
       final PostgrestResponse<dynamic> response = await _rpcCaller(
-        'list_attorney_profiles',
+        SupabaseRpcs.listAttorneyProfiles,
         <String, dynamic>{
           'p_query': query,
           'p_include_inactive': includeInactive,
@@ -78,7 +79,7 @@ class SupabaseAttorneyApiImpl implements SupabaseAttorneyApi {
   Future<Map<String, dynamic>> getAttorney(String id) {
     return _guard(() async {
       final PostgrestResponse<dynamic> response = await _rpcCaller(
-        'get_attorney_profile',
+        SupabaseRpcs.getAttorneyProfile,
         <String, dynamic>{'p_id': id},
       );
       final Map<String, dynamic>? row = _singleRow(response.data);
@@ -105,7 +106,7 @@ class SupabaseAttorneyApiImpl implements SupabaseAttorneyApi {
   }) {
     return _guard(() async {
       final PostgrestResponse<dynamic> response = await _rpcCaller(
-        'create_attorney_profile',
+        SupabaseRpcs.createAttorneyProfile,
         _writeParams(
           displayName: displayName,
           specialties: specialties,
@@ -141,7 +142,7 @@ class SupabaseAttorneyApiImpl implements SupabaseAttorneyApi {
     String? avatarUrl,
   }) {
     return _guard(() async {
-      await _rpcCaller('update_attorney_profile', <String, dynamic>{
+      await _rpcCaller(SupabaseRpcs.updateAttorneyProfile, <String, dynamic>{
         'p_id': id,
         ..._writeParams(
           displayName: displayName,
@@ -160,9 +161,10 @@ class SupabaseAttorneyApiImpl implements SupabaseAttorneyApi {
   @override
   Future<void> deactivateAttorney(String id) {
     return _guard(() async {
-      await _rpcCaller('deactivate_attorney_profile', <String, dynamic>{
-        'p_id': id,
-      });
+      await _rpcCaller(
+        SupabaseRpcs.deactivateAttorneyProfile,
+        <String, dynamic>{'p_id': id},
+      );
     });
   }
 
@@ -222,7 +224,7 @@ class SupabaseAttorneyApiImpl implements SupabaseAttorneyApi {
   /// the RPC's explicit `raise exception 'attorney profile not found'` and
   /// `'display name is required'` carry their stable text.
   SupabaseAttorneyFailureKind _kindFor(PostgrestException e) {
-    if (e.code == '23514') {
+    if (e.code == PostgrestCodes.validation) {
       return SupabaseAttorneyFailureKind.validation;
     }
     final String message = e.message.toLowerCase();

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/billing/domain/billing_timing.dart';
 import 'package:legalhub/features/billing/domain/payment_gateway.dart';
 import 'package:legalhub/features/billing/domain/payment_session.dart';
 import 'package:legalhub/features/billing/domain/payment_status.dart';
@@ -20,8 +21,8 @@ import 'payment_state.dart';
 class PaymentCubit extends Cubit<PaymentState> {
   PaymentCubit(
     this._gateway, {
-    this.pollInterval = const Duration(seconds: 5),
-    this.pollTimeout = const Duration(minutes: 2),
+    this.pollInterval = kPaymentPollInterval,
+    this.pollTimeout = kPaymentPollTimeout,
   }) : super(const PaymentState());
 
   final PaymentGateway _gateway;

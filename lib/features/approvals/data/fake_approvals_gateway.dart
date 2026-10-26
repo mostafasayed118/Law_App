@@ -1,7 +1,9 @@
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/approvals/domain/approvals_gateway.dart';
 import 'package:legalhub/features/approvals/domain/pending_approval.dart';
+import 'package:legalhub/shared/demo/demo_corpus.dart';
 
 /// Development-only approvals implementation: an in-memory mutable list of
 /// five synthetic, fully-redacted demo rows.
@@ -16,30 +18,30 @@ class FakeApprovalsGateway implements ApprovalsGateway {
   static final List<PendingApproval> syntheticApprovals = <PendingApproval>[
     PendingApproval(
       id: 'approval-1',
-      organizationId: 'demo-org',
+      organizationId: DemoCorpus.organizationId,
       title: 'Demo conflict check — new intake',
       kind: ApprovalKind.conflict,
       status: ApprovalStatus.pending,
-      requestedBy: 'demo-user',
+      requestedBy: DemoCorpus.ownerId,
       createdAt: DateTime.utc(2026, 8, 2),
     ),
     PendingApproval(
       id: 'approval-2',
-      organizationId: 'demo-org',
+      organizationId: DemoCorpus.organizationId,
       title: 'Demo engagement waiver',
       kind: ApprovalKind.waiver,
       status: ApprovalStatus.pending,
       description: 'Synthetic demo request — no real client or case data.',
-      requestedBy: 'demo-user',
+      requestedBy: DemoCorpus.ownerId,
       createdAt: DateTime.utc(2026, 8, 3),
     ),
     PendingApproval(
       id: 'approval-3',
-      organizationId: 'demo-org',
+      organizationId: DemoCorpus.organizationId,
       title: 'Demo court filing approval',
       kind: ApprovalKind.filing,
       status: ApprovalStatus.approved,
-      requestedBy: 'demo-user',
+      requestedBy: DemoCorpus.ownerId,
       decidedBy: 'demo-partner',
       decidedAt: DateTime.utc(2026, 8, 4),
       decisionNote: 'Demo decision — approved.',
@@ -47,11 +49,11 @@ class FakeApprovalsGateway implements ApprovalsGateway {
     ),
     PendingApproval(
       id: 'approval-4',
-      organizationId: 'demo-org',
+      organizationId: DemoCorpus.organizationId,
       title: 'Demo expense approval',
       kind: ApprovalKind.expense,
       status: ApprovalStatus.denied,
-      requestedBy: 'demo-user',
+      requestedBy: DemoCorpus.ownerId,
       decidedBy: 'demo-partner',
       decidedAt: DateTime.utc(2026, 8, 5),
       decisionNote: 'Demo decision — rejected.',
@@ -59,11 +61,11 @@ class FakeApprovalsGateway implements ApprovalsGateway {
     ),
     PendingApproval(
       id: 'approval-5',
-      organizationId: 'demo-org',
+      organizationId: DemoCorpus.organizationId,
       title: 'Demo conflict check — opposing counsel',
       kind: ApprovalKind.conflict,
       status: ApprovalStatus.pending,
-      requestedBy: 'demo-user',
+      requestedBy: DemoCorpus.ownerId,
       createdAt: DateTime.utc(2026, 8, 6),
     ),
   ];
@@ -98,7 +100,7 @@ class FakeApprovalsGateway implements ApprovalsGateway {
         description: draft.description,
         kind: draft.kind,
         status: ApprovalStatus.pending,
-        requestedBy: 'demo-user',
+        requestedBy: DemoCorpus.ownerId,
         createdAt: DateTime.now().toUtc(),
       ),
     );
@@ -175,15 +177,18 @@ class FakeApprovalsGateway implements ApprovalsGateway {
   static const AppError _notFound = AppError(
     code: 'approval_not_found',
     userMessage: 'Approval request not found.',
+    messageKey: AppMessageKey.errApprovalRequestNotFound,
   );
 
   static const AppError _notPending = AppError(
     code: 'approval_decide_invalid',
     userMessage: 'The request is no longer pending.',
+    messageKey: AppMessageKey.errTheRequestIsNoLongerPending,
   );
 
   static const AppError _rejectionNoteRequired = AppError(
     code: 'approval_decide_invalid',
     userMessage: 'A rejection note is required.',
+    messageKey: AppMessageKey.errARejectionNoteIsRequired,
   );
 }

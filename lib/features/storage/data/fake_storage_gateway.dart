@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/storage/domain/file_metadata.dart';
 import 'package:legalhub/features/storage/domain/storage_gateway.dart';
+import 'package:legalhub/shared/demo/demo_corpus.dart';
 
 /// Development-only storage implementation: a fixed synthetic list of
 /// non-PII file **metadata** plus deterministic in-memory uploads.
@@ -17,59 +18,55 @@ class FakeStorageGateway implements StorageGateway {
   static final List<FileMetadata> syntheticFiles = <FileMetadata>[
     FileMetadata(
       id: 'file-1',
-      matterId: 'matter-1',
+      matterId: DemoCorpus.matterIds[0],
       name: 'Demo retainer scan',
-      matterRef: 'Demo acquisition review',
+      matterRef: DemoCorpus.matterTitleAcquisition,
       mimeType: 'application/pdf',
       sizeBytes: 245760,
-      storagePath: 'org-demo/matter-1/demo-retainer-scan.pdf',
+      storagePath:
+          '${DemoCorpus.organizationId}/${DemoCorpus.matterIds[0]}/demo-retainer-scan.pdf',
     ),
     FileMetadata(
       id: 'file-2',
-      matterId: 'matter-2',
+      matterId: DemoCorpus.matterIds[1],
       name: 'Demo lease annex',
-      matterRef: 'Commercial lease consultation',
+      matterRef: DemoCorpus.matterTitleLease,
       mimeType: 'application/pdf',
       sizeBytes: 184320,
-      storagePath: 'org-demo/matter-2/demo-lease-annex.pdf',
+      storagePath:
+          '${DemoCorpus.organizationId}/${DemoCorpus.matterIds[1]}/demo-lease-annex.pdf',
     ),
     FileMetadata(
       id: 'file-3',
-      matterId: 'matter-3',
+      matterId: DemoCorpus.matterIds[2],
       name: 'Demo evidence register',
-      matterRef: 'Procedural review matter',
+      matterRef: DemoCorpus.matterTitleProcedural,
       mimeType: 'text/csv',
       sizeBytes: 40960,
-      storagePath: 'org-demo/matter-3/demo-evidence-register.csv',
+      storagePath:
+          '${DemoCorpus.organizationId}/${DemoCorpus.matterIds[2]}/demo-evidence-register.csv',
     ),
     FileMetadata(
       id: 'file-4',
-      matterId: 'matter-4',
+      matterId: DemoCorpus.matterIds[3],
       name: 'Demo correspondence copy',
-      matterRef: 'Family status consultation',
+      matterRef: DemoCorpus.matterTitleFamily,
       mimeType: 'image/png',
       sizeBytes: 512000,
-      storagePath: 'org-demo/matter-4/demo-correspondence-copy.png',
+      storagePath:
+          '${DemoCorpus.organizationId}/${DemoCorpus.matterIds[3]}/demo-correspondence-copy.png',
     ),
     FileMetadata(
       id: 'file-5',
-      matterId: 'matter-5',
+      matterId: DemoCorpus.matterIds[4],
       name: 'Demo formation checklist',
-      matterRef: 'Startup formation advisory',
+      matterRef: DemoCorpus.matterTitleStartup,
       mimeType: 'application/msword',
       sizeBytes: 30720,
-      storagePath: 'org-demo/matter-5/demo-formation-checklist.doc',
+      storagePath:
+          '${DemoCorpus.organizationId}/${DemoCorpus.matterIds[4]}/demo-formation-checklist.doc',
     ),
   ];
-
-  /// Maps the synthetic matter ids used by tests to their demo titles.
-  static const Map<String, String> syntheticMatterTitles = <String, String>{
-    'matter-1': 'Demo acquisition review',
-    'matter-2': 'Commercial lease consultation',
-    'matter-3': 'Procedural review matter',
-    'matter-4': 'Family status consultation',
-    'matter-5': 'Startup formation advisory',
-  };
 
   final List<FileMetadata> _uploaded = <FileMetadata>[];
   int _sequence = 0;
@@ -107,10 +104,11 @@ class FakeStorageGateway implements StorageGateway {
       id: 'upload-$_sequence',
       matterId: matterId,
       name: name,
-      matterRef: syntheticMatterTitles[matterId] ?? matterId,
+      matterRef: DemoCorpus.matterTitlesById[matterId] ?? matterId,
       mimeType: mimeType,
       sizeBytes: sizeBytes,
-      storagePath: 'org-demo/$matterId/upload-$_sequence-$name',
+      storagePath:
+          '${DemoCorpus.organizationId}/$matterId/upload-$_sequence-$name',
     );
     _uploaded.add(file);
     return Result<FileMetadata>.success(file);
@@ -119,7 +117,7 @@ class FakeStorageGateway implements StorageGateway {
   @override
   Future<Result<Uri>> createDownloadUrl(
     FileMetadata file, {
-    Duration ttl = const Duration(seconds: 60),
+    Duration ttl = kSignedUrlTtl,
   }) async {
     return Result<Uri>.success(
       Uri.parse(

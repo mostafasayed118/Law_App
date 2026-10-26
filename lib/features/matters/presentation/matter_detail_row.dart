@@ -22,7 +22,7 @@ class _DetailRow extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: LegalHubTheme.space2xs),
         Text(value, style: text.bodyMedium),
       ],
     );

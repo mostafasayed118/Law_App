@@ -1,5 +1,6 @@
 import 'package:legalhub/data/postgrest_failures.dart';
 import 'package:legalhub/data/supabase_seam.dart';
+import 'package:legalhub/data/supabase_wire.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_approval_api.dart';
@@ -41,7 +42,7 @@ class SupabaseApprovalApiImpl implements SupabaseApprovalApi {
   }) {
     return _guard(() async {
       final PostgrestResponse<dynamic> response = await _rpcCaller(
-        'list_approval_requests',
+        SupabaseRpcs.listApprovalRequests,
         <String, dynamic>{
           'p_organization_id': organizationId,
           'p_status': status,
@@ -80,14 +81,16 @@ class SupabaseApprovalApiImpl implements SupabaseApprovalApi {
     String? description,
   }) {
     return _guard(() async {
-      final PostgrestResponse<dynamic> response =
-          await _rpcCaller('create_approval_request', <String, dynamic>{
-            'p_organization_id': organizationId,
-            'p_matter_id': matterId,
-            'p_title': title,
-            'p_kind': kind,
-            'p_description': description,
-          });
+      final PostgrestResponse<dynamic> response = await _rpcCaller(
+        SupabaseRpcs.createApprovalRequest,
+        <String, dynamic>{
+          'p_organization_id': organizationId,
+          'p_matter_id': matterId,
+          'p_title': title,
+          'p_kind': kind,
+          'p_description': description,
+        },
+      );
       final Object? data = response.data;
       if (data is String && data.isNotEmpty) {
         return data;
@@ -106,7 +109,7 @@ class SupabaseApprovalApiImpl implements SupabaseApprovalApi {
     String? note,
   }) {
     return _guard(() async {
-      await _rpcCaller('decide_approval_request', <String, dynamic>{
+      await _rpcCaller(SupabaseRpcs.decideApprovalRequest, <String, dynamic>{
         'p_id': id,
         'p_decision': decision,
         'p_note': note,
@@ -117,7 +120,7 @@ class SupabaseApprovalApiImpl implements SupabaseApprovalApi {
   @override
   Future<void> cancelApproval(String id) {
     return _guard(() async {
-      await _rpcCaller('cancel_approval_request', <String, dynamic>{
+      await _rpcCaller(SupabaseRpcs.cancelApprovalRequest, <String, dynamic>{
         'p_id': id,
       });
     });
@@ -146,7 +149,7 @@ class SupabaseApprovalApiImpl implements SupabaseApprovalApi {
   /// `raise exception` texts (`not found`, `is not pending`, `note is
   /// required`) carry their stable words.
   SupabaseApprovalFailureKind _kindFor(PostgrestException e) {
-    if (e.code == '23514') {
+    if (e.code == PostgrestCodes.validation) {
       return SupabaseApprovalFailureKind.validation;
     }
     final String message = e.message.toLowerCase();

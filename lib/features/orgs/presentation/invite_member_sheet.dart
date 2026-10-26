@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:legalhub/app/deep_link/app_link_parser.dart';
+import 'package:legalhub/app/deep_link/deep_link_config.dart';
+import 'package:legalhub/app/flavor.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
@@ -292,13 +293,14 @@ class _InviteMemberSheetState extends State<InviteMemberSheet> {
 
   /// Copies the full accept-deep-link URI for [token] to the clipboard
   /// (D-P34.2 produce side). The link is built on-demand via
-  /// [AppLinkParser.acceptInviteUri] from the same scheme/host constants the
-  /// consume side classifies with, so every produced link round-trips through
-  /// `parse` as an `AcceptInviteIntent` with the identical token. The token
-  /// itself is never stored or logged beyond the sheet's existing one-shot
-  /// `_invite` state.
+  /// [DeepLinkConfig.acceptInviteUri] from the build's own deep-link scheme,
+  /// so every produced link round-trips through the parser as an
+  /// `AcceptInviteIntent` with the identical token. The token itself is never
+  /// stored or logged beyond the sheet's existing one-shot `_invite` state.
   Future<void> _copyShareLink(String token) async {
-    final Uri link = AppLinkParser.acceptInviteUri(token);
+    final Uri link = DeepLinkConfig(
+      scheme: AppConfig.fromEnvironment().deepLinkScheme,
+    ).acceptInviteUri(token);
     final String linkText = link.toString();
     await Clipboard.setData(ClipboardData(text: linkText));
     _scheduleClipboardClear(linkText);

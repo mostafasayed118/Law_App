@@ -1,4 +1,5 @@
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/billing/domain/payment_gateway.dart';
 import 'package:legalhub/features/billing/domain/payment_session.dart';
@@ -35,6 +36,7 @@ class SupabasePaymentGateway extends PaymentGateway {
         AppError(
           code: 'payment_initiate_failed',
           userMessage: 'Unable to start the payment. Please try again.',
+          messageKey: AppMessageKey.errUnableToStartThePaymentPleaseTryAgain,
           technicalMessage: e.message,
         ),
       );
@@ -58,6 +60,7 @@ class SupabasePaymentGateway extends PaymentGateway {
         AppError(
           code: 'payment_status_failed',
           userMessage: 'Unable to check the payment status. Please try again.',
+          messageKey: AppMessageKey.errUnableToCheckThePaymentStatusPleaseTry,
           technicalMessage: e.message,
         ),
       );
@@ -152,6 +155,7 @@ class SupabasePaymentGateway extends PaymentGateway {
       String code,
       String userMessage,
       AppErrorKind kind,
+      AppMessageKey? messageKey,
     ) = switch (e.kind) {
       SupabasePaymentFailureKind.denied => (
         'payment_${operation}_denied',
@@ -159,6 +163,7 @@ class SupabasePaymentGateway extends PaymentGateway {
             ? 'You do not have permission to pay this invoice.'
             : 'You do not have permission to view this payment.',
         AppErrorKind.denied,
+        null,
       ),
       SupabasePaymentFailureKind.providerUnavailable => (
         'payment_${operation}_unavailable',
@@ -166,6 +171,7 @@ class SupabasePaymentGateway extends PaymentGateway {
             ? 'Payments are temporarily unavailable. Please try again.'
             : 'Payment status is temporarily unavailable. Please try again.',
         AppErrorKind.unavailable,
+        null,
       ),
       SupabasePaymentFailureKind.unknown => (
         'payment_${operation}_failed',
@@ -173,11 +179,15 @@ class SupabasePaymentGateway extends PaymentGateway {
             ? 'Unable to start the payment. Please try again.'
             : 'Unable to check the payment status. Please try again.',
         AppErrorKind.unknown,
+        initiate
+            ? AppMessageKey.errUnableToStartThePaymentPleaseTryAgain
+            : AppMessageKey.errUnableToCheckThePaymentStatusPleaseTry,
       ),
     };
     return AppError(
       code: code,
       userMessage: userMessage,
+      messageKey: messageKey,
       kind: kind,
       technicalMessage: e.message,
     );

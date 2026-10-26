@@ -1,4 +1,5 @@
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/practice_area.dart';
 import 'package:legalhub/features/discovery/domain/attorney.dart';
@@ -215,28 +216,36 @@ class SupabaseAttorneyGateway implements AttorneyGateway, AttorneyAdminGateway {
         userMessage: write
             ? 'You do not have permission to manage the directory.'
             : 'You do not have permission to view the directory.',
+        messageKey: write
+            ? AppMessageKey.errYouDoNotHavePermissionToManageThe
+            : AppMessageKey.errYouDoNotHavePermissionToViewThe,
         kind: AppErrorKind.denied,
         technicalMessage: e.message,
       ),
       SupabaseAttorneyFailureKind.notFound => AppError(
         code: 'attorney_not_found',
         userMessage: 'Attorney not found.',
+        messageKey: AppMessageKey.errAttorneyNotFound,
         technicalMessage: e.message,
       ),
       SupabaseAttorneyFailureKind.validation => AppError(
         code: 'attorney_write_invalid',
         userMessage: 'The profile details are invalid. Check them and retry.',
+        messageKey: AppMessageKey.errTheProfileDetailsAreInvalidCheckThemAnd,
         technicalMessage: e.message,
       ),
       SupabaseAttorneyFailureKind.providerUnavailable => AppError(
         code: '${prefix}_unavailable',
         userMessage: 'The directory is temporarily unavailable. Try again.',
+        messageKey:
+            AppMessageKey.errTheDirectoryIsTemporarilyUnavailableTryAgain,
         kind: AppErrorKind.unavailable,
         technicalMessage: e.message,
       ),
       SupabaseAttorneyFailureKind.unknown => AppError(
         code: '${prefix}_failed',
         userMessage: 'Unable to load the directory. Please try again.',
+        messageKey: AppMessageKey.errUnableToLoadTheDirectoryPleaseTryAgain,
         technicalMessage: e.message,
       ),
     };
@@ -247,6 +256,7 @@ class SupabaseAttorneyGateway implements AttorneyGateway, AttorneyAdminGateway {
   AppError _drift(FormatException e) => AppError(
     code: 'attorney_read_failed',
     userMessage: 'Unable to load the directory. Please try again.',
+    messageKey: AppMessageKey.errUnableToLoadTheDirectoryPleaseTryAgain,
     technicalMessage: e.message,
   );
 }

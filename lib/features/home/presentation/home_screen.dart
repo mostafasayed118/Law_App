@@ -48,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final bool localOnly = backendIsLocalOnly;
     // Island rebuild: only a session change rebuilds the home scroll view —
     // auth status/error transitions (restore failures, reauth prompts)
     // don't touch it.
@@ -91,9 +92,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 LegalHubTheme.marginMobile,
                 LegalHubTheme.spaceXl,
               ),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate(_homeActivityCards(context)),
-              ),
+              sliver: localOnly
+                  ? SliverList(
+                      delegate: SliverChildListDelegate(
+                        _homeActivityCards(context),
+                      ),
+                    )
+                  : const SliverToBoxAdapter(child: _HomeActivityEmpty()),
             ),
           ],
         ),

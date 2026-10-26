@@ -13,6 +13,9 @@ class _OnboardingPage extends StatelessWidget {
   final String title;
   final String description;
 
+  static const double _artHeight = 240;
+  static const double _maxDescriptionWidth = 320;
+
   @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
@@ -35,7 +38,7 @@ class _OnboardingPage extends StatelessWidget {
               children: <Widget>[
                 Container(
                   width: double.infinity,
-                  height: 240,
+                  height: _artHeight,
                   margin: const EdgeInsetsDirectional.only(
                     bottom: LegalHubTheme.spaceXl,
                   ),
@@ -59,7 +62,9 @@ class _OnboardingPage extends StatelessWidget {
                 ),
                 const SizedBox(height: LegalHubTheme.spaceSm),
                 ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 320),
+                  constraints: const BoxConstraints(
+                    maxWidth: _maxDescriptionWidth,
+                  ),
                   child: Text(
                     description,
                     textAlign: TextAlign.center,

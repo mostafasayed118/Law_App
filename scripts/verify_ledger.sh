@@ -292,8 +292,8 @@ EOF
       fail "rehearsal-plan evidence citation ($plan_cite) MISSING from working tree"
     fi
   done
-  head_plain=$(git grep -hE '(^|[^A-Za-z])(test|testWidgets|blocTest)\(' -- test/ 2>/dev/null | wc -l | tr -d ' ')
-  head_gen=$(git grep -hE 'blocTest<' -- test/ 2>/dev/null | wc -l | tr -d ' ')
+  head_plain=$(git grep --untracked -hE '(^|[^A-Za-z])(test|testWidgets|blocTest)\(' -- test/ 2>/dev/null | wc -l | tr -d ' ')
+  head_gen=$(git grep --untracked -hE 'blocTest<' -- test/ 2>/dev/null | wc -l | tr -d ' ')
   head_total=$((head_plain + head_gen))
   if [ -f README.md ] && grep -qE "Tests \($head_total total\)" README.md && grep -qE "\*\*$head_total tests\*\*" README.md; then
     ok "README test count ($head_total) matches suite in working tree"

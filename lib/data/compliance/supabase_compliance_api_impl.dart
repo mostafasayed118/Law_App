@@ -1,5 +1,6 @@
 import 'package:legalhub/data/postgrest_failures.dart';
 import 'package:legalhub/data/supabase_seam.dart';
+import 'package:legalhub/data/supabase_wire.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_compliance_api.dart';
@@ -42,7 +43,7 @@ class SupabaseComplianceApiImpl implements SupabaseComplianceApi {
   }) {
     return _guard(() async {
       final PostgrestResponse<dynamic> response =
-          await _rpcCaller('list_compliance_alerts', <String, dynamic>{
+          await _rpcCaller(SupabaseRpcs.listComplianceAlerts, <String, dynamic>{
             'p_organization_id': organizationId,
             'p_status': status,
             'p_severity': severity,
@@ -82,16 +83,18 @@ class SupabaseComplianceApiImpl implements SupabaseComplianceApi {
     DateTime? dueAt,
   }) {
     return _guard(() async {
-      final PostgrestResponse<dynamic> response =
-          await _rpcCaller('create_compliance_alert', <String, dynamic>{
-            'p_organization_id': organizationId,
-            'p_matter_id': matterId,
-            'p_kind': kind,
-            'p_severity': severity,
-            'p_title': title,
-            'p_description': description,
-            'p_due_at': dueAt?.toUtc().toIso8601String(),
-          });
+      final PostgrestResponse<dynamic> response = await _rpcCaller(
+        SupabaseRpcs.createComplianceAlert,
+        <String, dynamic>{
+          'p_organization_id': organizationId,
+          'p_matter_id': matterId,
+          'p_kind': kind,
+          'p_severity': severity,
+          'p_title': title,
+          'p_description': description,
+          'p_due_at': dueAt?.toUtc().toIso8601String(),
+        },
+      );
       final Object? data = response.data;
       if (data is String && data.isNotEmpty) {
         return data;
@@ -106,16 +109,17 @@ class SupabaseComplianceApiImpl implements SupabaseComplianceApi {
   @override
   Future<void> acknowledgeAlert(String id) {
     return _guard(() async {
-      await _rpcCaller('acknowledge_compliance_alert', <String, dynamic>{
-        'p_id': id,
-      });
+      await _rpcCaller(
+        SupabaseRpcs.acknowledgeComplianceAlert,
+        <String, dynamic>{'p_id': id},
+      );
     });
   }
 
   @override
   Future<void> resolveAlert(String id, {String? note}) {
     return _guard(() async {
-      await _rpcCaller('resolve_compliance_alert', <String, dynamic>{
+      await _rpcCaller(SupabaseRpcs.resolveComplianceAlert, <String, dynamic>{
         'p_id': id,
         'p_note': note,
       });
@@ -144,7 +148,7 @@ class SupabaseComplianceApiImpl implements SupabaseComplianceApi {
   /// denial rule is the shared [isPostgrestDenial]; the RPCs' explicit
   /// `raise exception` texts carry their stable words.
   SupabaseComplianceFailureKind _kindFor(PostgrestException e) {
-    if (e.code == '23514') {
+    if (e.code == PostgrestCodes.validation) {
       return SupabaseComplianceFailureKind.validation;
     }
     final String message = e.message.toLowerCase();

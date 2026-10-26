@@ -1,3 +1,6 @@
+import 'package:legalhub/core/contracts/network.dart';
+import 'package:legalhub/core/pagination.dart';
+import 'package:legalhub/data/supabase_wire.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Shared guard constants + the bounded SELECT binding for Supabase list
@@ -10,13 +13,13 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 ///
 /// The cap is intentionally conservative — 200 rows covers any realistic
 /// matter/document/invoice/notification list.
-const int kSupabaseListRowCap = 200;
+const int kSupabaseListRowCap = kListRowCap;
 
 /// The list-read deadline, matching the RPC/storage seam: a stalled
 /// PostgREST socket surfaces as a TimeoutException (a transport failure the
 /// data impls map to `providerUnavailable`) instead of leaving every list
 /// screen loading forever.
-const Duration kSupabaseListReadTimeout = Duration(seconds: 15);
+const Duration kSupabaseListReadTimeout = kSupabaseRequestTimeout;
 
 /// Deterministic server-side ordering per table: `(column, descending)`.
 ///
@@ -28,12 +31,12 @@ const Duration kSupabaseListReadTimeout = Duration(seconds: 15);
 /// whose row count is bounded by the user's own orgs) get the cap only.
 const Map<String, (String, bool)> kSupabaseListOrderings =
     <String, (String, bool)>{
-      'matters': ('created_at', true),
-      'documents': ('created_at', true),
-      'files': ('created_at', true),
-      'billing_invoices': ('issued_at', true),
-      'notifications': ('server_timestamp', true),
-      'message_threads': ('last_activity_at', true),
+      SupabaseTables.matters: ('created_at', true),
+      SupabaseTables.documents: ('created_at', true),
+      SupabaseTables.files: ('created_at', true),
+      SupabaseTables.billingInvoices: ('issued_at', true),
+      SupabaseTables.notifications: ('server_timestamp', true),
+      SupabaseTables.messageThreads: ('last_activity_at', true),
       // Chat is fetched NEWEST-first (sent_at DESC): a hard cap keeps the
       // FIRST rows of the ordering, so an ascending order here would keep
       // the 200 oldest and silently drop the newest — the worst direction
@@ -41,13 +44,13 @@ const Map<String, (String, bool)> kSupabaseListOrderings =
       // reverses the mapped list to chronological (oldest first) for the
       // detail screen's top-to-bottom render and the live-append path; the
       // `messages_thread_sent (thread_id, sent_at)` index serves both.
-      'messages': ('sent_at', true),
-      'tasks': ('created_at', true),
+      SupabaseTables.messages: ('sent_at', true),
+      SupabaseTables.tasks: ('created_at', true),
       // Availability catalogue: ascending is deliberate — the cap must keep
       // the SOONEST bookable slots, not the furthest-out ones. This is not a
       // content feed, so the newest-end invariant does not apply; the
       // ordering test carries an explicit ascending allowlist for this table.
-      'consultation_slots': ('starts_at', false),
+      SupabaseTables.consultationSlots: ('starts_at', false),
     };
 
 /// The deterministic server-side ordering for `table`, or `null` when the
@@ -70,7 +73,7 @@ const Map<String, (String, bool)> kSupabaseListOrderings =
 /// an [ArgumentError] — a programming error, never user input.
 const Map<String, Set<String>> kSupabaseFilterableColumns =
     <String, Set<String>>{
-      'matters': <String>{
+      SupabaseTables.matters: <String>{
         'id',
         'organization_id',
         'title',
@@ -78,16 +81,21 @@ const Map<String, Set<String>> kSupabaseFilterableColumns =
         'status',
         'assigned_attorney_id',
       },
-      'documents': <String>{'id', 'matter_id', 'title', 'document_type'},
-      'files': <String>{'id', 'matter_id', 'name'},
-      'billing_invoices': <String>{
+      SupabaseTables.documents: <String>{
+        'id',
+        'matter_id',
+        'title',
+        'document_type',
+      },
+      SupabaseTables.files: <String>{'id', 'matter_id', 'name'},
+      SupabaseTables.billingInvoices: <String>{
         'id',
         'matter_id',
         'invoice_number',
         'status',
       },
-      'messages': <String>{'id', 'thread_id'},
-      'message_threads': <String>{'id', 'matter_id', 'title'},
+      SupabaseTables.messages: <String>{'id', 'thread_id'},
+      SupabaseTables.messageThreads: <String>{'id', 'matter_id', 'title'},
     };
 
 /// Throws [ArgumentError] unless [column] is an allowed filter on [table].

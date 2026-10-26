@@ -4281,6 +4281,946 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Matter'**
   String get aiResearchSourceMatter;
+
+  /// No description provided for @demoApprovalTitleConflictNew.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo conflict check — new intake'**
+  String get demoApprovalTitleConflictNew;
+
+  /// No description provided for @demoApprovalTitleEngagementWaiver.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo engagement waiver'**
+  String get demoApprovalTitleEngagementWaiver;
+
+  /// No description provided for @demoApprovalTitleCourtFiling.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo court filing approval'**
+  String get demoApprovalTitleCourtFiling;
+
+  /// No description provided for @demoApprovalTitleExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo expense approval'**
+  String get demoApprovalTitleExpense;
+
+  /// No description provided for @demoApprovalTitleConflictOpposing.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo conflict check — opposing counsel'**
+  String get demoApprovalTitleConflictOpposing;
+
+  /// No description provided for @demoApprovalDescriptionWaiver.
+  ///
+  /// In en, this message translates to:
+  /// **'Synthetic demo request — no real client or case data.'**
+  String get demoApprovalDescriptionWaiver;
+
+  /// No description provided for @demoApprovalDecisionApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo decision — approved.'**
+  String get demoApprovalDecisionApproved;
+
+  /// No description provided for @demoApprovalDecisionRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo decision — rejected.'**
+  String get demoApprovalDecisionRejected;
+
+  /// No description provided for @demoAlertDescriptionReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Synthetic demo alert — no real compliance event is shown.'**
+  String get demoAlertDescriptionReview;
+
+  /// No description provided for @demoAttorneyHeadlineCorporate.
+  ///
+  /// In en, this message translates to:
+  /// **'Corporate and governance counsel'**
+  String get demoAttorneyHeadlineCorporate;
+
+  /// No description provided for @demoAttorneyHeadlineCivil.
+  ///
+  /// In en, this message translates to:
+  /// **'Civil litigation and contracts'**
+  String get demoAttorneyHeadlineCivil;
+
+  /// No description provided for @demoAttorneyHeadlineCriminal.
+  ///
+  /// In en, this message translates to:
+  /// **'Criminal defense and procedure'**
+  String get demoAttorneyHeadlineCriminal;
+
+  /// No description provided for @demoAttorneyHeadlineFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Family law and personal status'**
+  String get demoAttorneyHeadlineFamily;
+
+  /// No description provided for @demoAttorneyHeadlineStartup.
+  ///
+  /// In en, this message translates to:
+  /// **'Startup formation and advisory'**
+  String get demoAttorneyHeadlineStartup;
+
+  /// No description provided for @demoAuditOrganizationCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Organization created (metadata only)'**
+  String get demoAuditOrganizationCreated;
+
+  /// No description provided for @demoAuditMemberInvited.
+  ///
+  /// In en, this message translates to:
+  /// **'Member invited (metadata only)'**
+  String get demoAuditMemberInvited;
+
+  /// No description provided for @demoAuditMemberRoleChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Member role changed (metadata only)'**
+  String get demoAuditMemberRoleChanged;
+
+  /// No description provided for @demoAuditMembershipSuspended.
+  ///
+  /// In en, this message translates to:
+  /// **'Membership suspended (metadata only)'**
+  String get demoAuditMembershipSuspended;
+
+  /// No description provided for @demoAuditDemoAccountDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo account deleted (metadata only)'**
+  String get demoAuditDemoAccountDeleted;
+
+  /// No description provided for @demoAuditRoleChange.
+  ///
+  /// In en, this message translates to:
+  /// **'role change'**
+  String get demoAuditRoleChange;
+
+  /// No description provided for @demoAuditInvitationSent.
+  ///
+  /// In en, this message translates to:
+  /// **'invitation sent'**
+  String get demoAuditInvitationSent;
+
+  /// No description provided for @demoAuditSuspensionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'suspension denied'**
+  String get demoAuditSuspensionDenied;
+
+  /// No description provided for @homeActivityEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No recent activity yet.'**
+  String get homeActivityEmpty;
+
+  /// No description provided for @discoveryEntrySubtitleConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse attorney profiles and practice areas.'**
+  String get discoveryEntrySubtitleConfigured;
+
+  /// No description provided for @searchNoQueryConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a search term to search matters, documents, messages, and attorneys.'**
+  String get searchNoQueryConfigured;
+
+  /// No description provided for @aiResearchNoMatchesConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'No matches found. Try different words.'**
+  String get aiResearchNoMatchesConfigured;
+
+  /// No description provided for @aiResearchEntrySubtitleConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask the research assistant across your matters and documents — advisory only.'**
+  String get aiResearchEntrySubtitleConfigured;
+
+  /// No description provided for @errYouDoNotHavePermissionToViewThese2.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to view these tasks.'**
+  String get errYouDoNotHavePermissionToViewThese2;
+
+  /// No description provided for @errUnableToLoadTasksPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load tasks. Please try again.'**
+  String get errUnableToLoadTasksPleaseTryAgain;
+
+  /// No description provided for @errARejectionNoteIsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'A rejection note is required.'**
+  String get errARejectionNoteIsRequired;
+
+  /// No description provided for @errAcknowledgingTheAlertIsTemporarilyUnavailablePleaseTry.
+  ///
+  /// In en, this message translates to:
+  /// **'Acknowledging the alert is temporarily unavailable. Please try again.'**
+  String get errAcknowledgingTheAlertIsTemporarilyUnavailablePleaseTry;
+
+  /// No description provided for @errApprovalRequestNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Approval request not found.'**
+  String get errApprovalRequestNotFound;
+
+  /// No description provided for @errApprovalsAreTemporarilyUnavailablePleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Approvals are temporarily unavailable. Please try again.'**
+  String get errApprovalsAreTemporarilyUnavailablePleaseTryAgain;
+
+  /// No description provided for @errCancellingTheRequestIsTemporarilyUnavailablePleaseTry.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelling the request is temporarily unavailable. Please try again.'**
+  String get errCancellingTheRequestIsTemporarilyUnavailablePleaseTry;
+
+  /// No description provided for @errComplianceAlertNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Compliance alert not found.'**
+  String get errComplianceAlertNotFound;
+
+  /// No description provided for @errComplianceAlertsAreTemporarilyUnavailablePleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Compliance alerts are temporarily unavailable. Please try again.'**
+  String get errComplianceAlertsAreTemporarilyUnavailablePleaseTryAgain;
+
+  /// No description provided for @errCreatingTheAlertIsTemporarilyUnavailablePleaseTry.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating the alert is temporarily unavailable. Please try again.'**
+  String get errCreatingTheAlertIsTemporarilyUnavailablePleaseTry;
+
+  /// No description provided for @errCreatingTheRequestIsTemporarilyUnavailablePleaseTry.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating the request is temporarily unavailable. Please try again.'**
+  String get errCreatingTheRequestIsTemporarilyUnavailablePleaseTry;
+
+  /// No description provided for @errDecidingTheRequestIsTemporarilyUnavailablePleaseTry.
+  ///
+  /// In en, this message translates to:
+  /// **'Deciding the request is temporarily unavailable. Please try again.'**
+  String get errDecidingTheRequestIsTemporarilyUnavailablePleaseTry;
+
+  /// No description provided for @errOnlyAPartnerCanDecideThisRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Only a partner can decide this request.'**
+  String get errOnlyAPartnerCanDecideThisRequest;
+
+  /// No description provided for @errOnlyAPartnerOrComplianceOfficerCanCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Only a partner or compliance officer can create alerts.'**
+  String get errOnlyAPartnerOrComplianceOfficerCanCreate;
+
+  /// No description provided for @errOnlyAPartnerOrComplianceOfficerCanResolve.
+  ///
+  /// In en, this message translates to:
+  /// **'Only a partner or compliance officer can resolve alerts.'**
+  String get errOnlyAPartnerOrComplianceOfficerCanResolve;
+
+  /// No description provided for @errOnlyAnActiveOrganizationMemberCanAcknowledgeAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Only an active organization member can acknowledge alerts.'**
+  String get errOnlyAnActiveOrganizationMemberCanAcknowledgeAlerts;
+
+  /// No description provided for @errOnlyTheRequesterOrAPartnerCanCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the requester or a partner can cancel this request.'**
+  String get errOnlyTheRequesterOrAPartnerCanCancel;
+
+  /// No description provided for @errResolvingTheAlertIsTemporarilyUnavailablePleaseTry.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolving the alert is temporarily unavailable. Please try again.'**
+  String get errResolvingTheAlertIsTemporarilyUnavailablePleaseTry;
+
+  /// No description provided for @errSelectAnOrganizationToViewApprovals.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an organization to view approvals.'**
+  String get errSelectAnOrganizationToViewApprovals;
+
+  /// No description provided for @errSelectAnOrganizationToViewComplianceAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an organization to view compliance alerts.'**
+  String get errSelectAnOrganizationToViewComplianceAlerts;
+
+  /// No description provided for @errTheAlertCanNoLongerBeAcknowledged.
+  ///
+  /// In en, this message translates to:
+  /// **'The alert can no longer be acknowledged.'**
+  String get errTheAlertCanNoLongerBeAcknowledged;
+
+  /// No description provided for @errTheAlertCanNoLongerBeResolved.
+  ///
+  /// In en, this message translates to:
+  /// **'The alert can no longer be resolved.'**
+  String get errTheAlertCanNoLongerBeResolved;
+
+  /// No description provided for @errTheAlertCouldNotBeCreatedCheckThe.
+  ///
+  /// In en, this message translates to:
+  /// **'The alert could not be created. Check the details and try again.'**
+  String get errTheAlertCouldNotBeCreatedCheckThe;
+
+  /// No description provided for @errTheRequestCanNoLongerBeCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'The request can no longer be cancelled.'**
+  String get errTheRequestCanNoLongerBeCancelled;
+
+  /// No description provided for @errTheRequestCouldNotBeCreatedCheckThe.
+  ///
+  /// In en, this message translates to:
+  /// **'The request could not be created. Check the details and try again.'**
+  String get errTheRequestCouldNotBeCreatedCheckThe;
+
+  /// No description provided for @errTheRequestCouldNotBeDecidedItMay.
+  ///
+  /// In en, this message translates to:
+  /// **'The request could not be decided. It may no longer be pending, or the note is missing.'**
+  String get errTheRequestCouldNotBeDecidedItMay;
+
+  /// No description provided for @errTheRequestIsNoLongerPending.
+  ///
+  /// In en, this message translates to:
+  /// **'The request is no longer pending.'**
+  String get errTheRequestIsNoLongerPending;
+
+  /// No description provided for @errUnableToAcknowledgeTheAlertPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to acknowledge the alert. Please try again.'**
+  String get errUnableToAcknowledgeTheAlertPleaseTryAgain;
+
+  /// No description provided for @errUnableToCancelTheRequestPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to cancel the request. Please try again.'**
+  String get errUnableToCancelTheRequestPleaseTryAgain;
+
+  /// No description provided for @errUnableToCreateTheAlertPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to create the alert. Please try again.'**
+  String get errUnableToCreateTheAlertPleaseTryAgain;
+
+  /// No description provided for @errUnableToCreateTheRequestPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to create the request. Please try again.'**
+  String get errUnableToCreateTheRequestPleaseTryAgain;
+
+  /// No description provided for @errUnableToDecideTheRequestPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to decide the request. Please try again.'**
+  String get errUnableToDecideTheRequestPleaseTryAgain;
+
+  /// No description provided for @errUnableToLoadApprovalsPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load approvals. Please try again.'**
+  String get errUnableToLoadApprovalsPleaseTryAgain;
+
+  /// No description provided for @errUnableToLoadComplianceAlertsPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load compliance alerts. Please try again.'**
+  String get errUnableToLoadComplianceAlertsPleaseTryAgain;
+
+  /// No description provided for @errUnableToResolveTheAlertPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to resolve the alert. Please try again.'**
+  String get errUnableToResolveTheAlertPleaseTryAgain;
+
+  /// No description provided for @errYouDoNotHavePermissionToCreateApproval.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to create approval requests.'**
+  String get errYouDoNotHavePermissionToCreateApproval;
+
+  /// No description provided for @errYouDoNotHavePermissionToViewApprovals.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to view approvals.'**
+  String get errYouDoNotHavePermissionToViewApprovals;
+
+  /// No description provided for @errYouDoNotHavePermissionToViewCompliance.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to view compliance alerts.'**
+  String get errYouDoNotHavePermissionToViewCompliance;
+
+  /// No description provided for @errAcknowledgingTheTaskIsTemporarilyUnavailablePleaseTry.
+  ///
+  /// In en, this message translates to:
+  /// **'Acknowledging the task is temporarily unavailable. Please try again.'**
+  String get errAcknowledgingTheTaskIsTemporarilyUnavailablePleaseTry;
+
+  /// No description provided for @errAvailableTimesAreTemporarilyUnavailablePleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Available times are temporarily unavailable. Please try again.'**
+  String get errAvailableTimesAreTemporarilyUnavailablePleaseTryAgain;
+
+  /// No description provided for @errBookingIsTemporarilyUnavailablePleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking is temporarily unavailable. Please try again.'**
+  String get errBookingIsTemporarilyUnavailablePleaseTryAgain;
+
+  /// No description provided for @errCreatingTheTaskIsTemporarilyUnavailablePleaseTry.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating the task is temporarily unavailable. Please try again.'**
+  String get errCreatingTheTaskIsTemporarilyUnavailablePleaseTry;
+
+  /// No description provided for @errMessageIsTooLongMaxMaxMessageLengthCharacters.
+  ///
+  /// In en, this message translates to:
+  /// **'Message is too long (max {maxMessageLength} characters).'**
+  String errMessageIsTooLongMaxMaxMessageLengthCharacters(int maxMessageLength);
+
+  /// No description provided for @errMessagesAreTemporarilyUnavailablePleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages are temporarily unavailable. Please try again.'**
+  String get errMessagesAreTemporarilyUnavailablePleaseTryAgain;
+
+  /// No description provided for @errOnlyTheAssignedPersonCanAcknowledgeThisTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the assigned person can acknowledge this task.'**
+  String get errOnlyTheAssignedPersonCanAcknowledgeThisTask;
+
+  /// No description provided for @errReAssigningTheTaskIsTemporarilyUnavailablePlease.
+  ///
+  /// In en, this message translates to:
+  /// **'Re-assigning the task is temporarily unavailable. Please try again.'**
+  String get errReAssigningTheTaskIsTemporarilyUnavailablePlease;
+
+  /// No description provided for @errSendingIsTemporarilyUnavailablePleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending is temporarily unavailable. Please try again.'**
+  String get errSendingIsTemporarilyUnavailablePleaseTryAgain;
+
+  /// No description provided for @errTasksAreTemporarilyUnavailablePleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasks are temporarily unavailable. Please try again.'**
+  String get errTasksAreTemporarilyUnavailablePleaseTryAgain;
+
+  /// No description provided for @errThatPersonCannotBeAssignedThisTaskChoose.
+  ///
+  /// In en, this message translates to:
+  /// **'That person cannot be assigned this task. Choose an active member of the organization.'**
+  String get errThatPersonCannotBeAssignedThisTaskChoose;
+
+  /// No description provided for @errThatTimeIsNoLongerAvailableChooseAnother.
+  ///
+  /// In en, this message translates to:
+  /// **'That time is no longer available. Choose another time.'**
+  String get errThatTimeIsNoLongerAvailableChooseAnother;
+
+  /// No description provided for @errTheBookingDetailsAreInvalidCheckThemAnd.
+  ///
+  /// In en, this message translates to:
+  /// **'The booking details are invalid. Check them and try again.'**
+  String get errTheBookingDetailsAreInvalidCheckThemAnd;
+
+  /// No description provided for @errTheTaskCannotMoveToThatStatusIt.
+  ///
+  /// In en, this message translates to:
+  /// **'The task cannot move to that status. It may already be done.'**
+  String get errTheTaskCannotMoveToThatStatusIt;
+
+  /// No description provided for @errTheTaskCouldNotBeCreatedCheckThe.
+  ///
+  /// In en, this message translates to:
+  /// **'The task could not be created. Check the title and try again.'**
+  String get errTheTaskCouldNotBeCreatedCheckThe;
+
+  /// No description provided for @errThreadsAreTemporarilyUnavailablePleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Threads are temporarily unavailable. Please try again.'**
+  String get errThreadsAreTemporarilyUnavailablePleaseTryAgain;
+
+  /// No description provided for @errUnableToAcknowledgeTheTaskPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to acknowledge the task. Please try again.'**
+  String get errUnableToAcknowledgeTheTaskPleaseTryAgain;
+
+  /// No description provided for @errUnableToConfirmPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to confirm. Please try again.'**
+  String get errUnableToConfirmPleaseTryAgain;
+
+  /// No description provided for @errUnableToCreateTheTaskPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to create the task. Please try again.'**
+  String get errUnableToCreateTheTaskPleaseTryAgain;
+
+  /// No description provided for @errUnableToLoadAvailableTimesPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load available times. Please try again.'**
+  String get errUnableToLoadAvailableTimesPleaseTryAgain;
+
+  /// No description provided for @errUnableToLoadMessagesPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load messages. Please try again.'**
+  String get errUnableToLoadMessagesPleaseTryAgain;
+
+  /// No description provided for @errUnableToLoadThreadsPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load threads. Please try again.'**
+  String get errUnableToLoadThreadsPleaseTryAgain;
+
+  /// No description provided for @errUnableToReAssignTheTaskPleaseTry.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to re-assign the task. Please try again.'**
+  String get errUnableToReAssignTheTaskPleaseTry;
+
+  /// No description provided for @errUnableToSendTheMessagePleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to send the message. Please try again.'**
+  String get errUnableToSendTheMessagePleaseTryAgain;
+
+  /// No description provided for @errUnableToUpdateTheTaskPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to update the task. Please try again.'**
+  String get errUnableToUpdateTheTaskPleaseTryAgain;
+
+  /// No description provided for @errUpdatingTheTaskIsTemporarilyUnavailablePleaseTry.
+  ///
+  /// In en, this message translates to:
+  /// **'Updating the task is temporarily unavailable. Please try again.'**
+  String get errUpdatingTheTaskIsTemporarilyUnavailablePleaseTry;
+
+  /// No description provided for @errYouDoNotHavePermissionToAdvanceThis.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to advance this task.'**
+  String get errYouDoNotHavePermissionToAdvanceThis;
+
+  /// No description provided for @errYouDoNotHavePermissionToBookThis.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to book this consultation.'**
+  String get errYouDoNotHavePermissionToBookThis;
+
+  /// No description provided for @errYouDoNotHavePermissionToCreateTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to create tasks on this matter.'**
+  String get errYouDoNotHavePermissionToCreateTasks;
+
+  /// No description provided for @errYouDoNotHavePermissionToReAssign.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to re-assign this task.'**
+  String get errYouDoNotHavePermissionToReAssign;
+
+  /// No description provided for @errYouDoNotHavePermissionToSendMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to send messages on this thread.'**
+  String get errYouDoNotHavePermissionToSendMessages;
+
+  /// No description provided for @errYouDoNotHavePermissionToViewAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to view available times.'**
+  String get errYouDoNotHavePermissionToViewAvailable;
+
+  /// No description provided for @errYouDoNotHavePermissionToViewThese.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to view these messages.'**
+  String get errYouDoNotHavePermissionToViewThese;
+
+  /// No description provided for @errYouDoNotHavePermissionToViewThese3.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to view these threads.'**
+  String get errYouDoNotHavePermissionToViewThese3;
+
+  /// No description provided for @errAttorneyNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Attorney not found.'**
+  String get errAttorneyNotFound;
+
+  /// No description provided for @errTheDirectoryIsTemporarilyUnavailableTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'The directory is temporarily unavailable. Try again.'**
+  String get errTheDirectoryIsTemporarilyUnavailableTryAgain;
+
+  /// No description provided for @errTheProfileDetailsAreInvalidCheckThemAnd.
+  ///
+  /// In en, this message translates to:
+  /// **'The profile details are invalid. Check them and retry.'**
+  String get errTheProfileDetailsAreInvalidCheckThemAnd;
+
+  /// No description provided for @errUnableToLoadTheDirectoryPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load the directory. Please try again.'**
+  String get errUnableToLoadTheDirectoryPleaseTryAgain;
+
+  /// No description provided for @errYouDoNotHavePermissionToManageThe.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to manage the directory.'**
+  String get errYouDoNotHavePermissionToManageThe;
+
+  /// No description provided for @errYouDoNotHavePermissionToViewThe.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to view the directory.'**
+  String get errYouDoNotHavePermissionToViewThe;
+
+  /// No description provided for @errNotificationsAreTemporarilyUnavailablePleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are temporarily unavailable. Please try again.'**
+  String get errNotificationsAreTemporarilyUnavailablePleaseTryAgain;
+
+  /// No description provided for @errThisFileIsTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'This file is too large.'**
+  String get errThisFileIsTooLarge;
+
+  /// No description provided for @errThisFileTypeIsNotSupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This file type is not supported.'**
+  String get errThisFileTypeIsNotSupported;
+
+  /// No description provided for @errUnableToCheckThePaymentStatusPleaseTry.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to check the payment status. Please try again.'**
+  String get errUnableToCheckThePaymentStatusPleaseTry;
+
+  /// No description provided for @errUnableToLoadDocumentsPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load documents. Please try again.'**
+  String get errUnableToLoadDocumentsPleaseTryAgain;
+
+  /// No description provided for @errUnableToLoadFilesPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load files. Please try again.'**
+  String get errUnableToLoadFilesPleaseTryAgain;
+
+  /// No description provided for @errUnableToLoadInvoicesPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load invoices. Please try again.'**
+  String get errUnableToLoadInvoicesPleaseTryAgain;
+
+  /// No description provided for @errUnableToLoadMattersPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load matters. Please try again.'**
+  String get errUnableToLoadMattersPleaseTryAgain;
+
+  /// No description provided for @errUnableToLoadNotificationsPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load notifications. Please try again.'**
+  String get errUnableToLoadNotificationsPleaseTryAgain;
+
+  /// No description provided for @errUnableToOpenTheFilePleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open the file. Please try again.'**
+  String get errUnableToOpenTheFilePleaseTryAgain;
+
+  /// No description provided for @errUnableToStartThePaymentPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to start the payment. Please try again.'**
+  String get errUnableToStartThePaymentPleaseTryAgain;
+
+  /// No description provided for @errUnableToUploadTheFilePleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to upload the file. Please try again.'**
+  String get errUnableToUploadTheFilePleaseTryAgain;
+
+  /// No description provided for @errYouDoNotHavePermissionToUploadFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to upload files to this matter.'**
+  String get errYouDoNotHavePermissionToUploadFiles;
+
+  /// No description provided for @errAIResearchIsNotConfiguredForThisDeployment.
+  ///
+  /// In en, this message translates to:
+  /// **'AI research is not configured for this deployment. No analysis was run.'**
+  String get errAIResearchIsNotConfiguredForThisDeployment;
+
+  /// No description provided for @errAnActionIsAlreadyInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'An action is already in progress.'**
+  String get errAnActionIsAlreadyInProgress;
+
+  /// No description provided for @errEndingTheConsultationIsTemporarilyUnavailablePleaseTry.
+  ///
+  /// In en, this message translates to:
+  /// **'Ending the consultation is temporarily unavailable. Please try again.'**
+  String get errEndingTheConsultationIsTemporarilyUnavailablePleaseTry;
+
+  /// No description provided for @errEnterAQuestionBetweenResearchRequestMinQuestionLengthAndResearchRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a question between {minQuestionLength} and {maxQuestionLength} characters and select an organization.'**
+  String
+  errEnterAQuestionBetweenResearchRequestMinQuestionLengthAndResearchRequest(
+    int minQuestionLength,
+    int maxQuestionLength,
+  );
+
+  /// No description provided for @errOnlyAPartnerOrAttorneyCanScheduleA.
+  ///
+  /// In en, this message translates to:
+  /// **'Only a partner or attorney can schedule a video consultation.'**
+  String get errOnlyAPartnerOrAttorneyCanScheduleA;
+
+  /// No description provided for @errOnlyTheCreatorOrAPartnerCanEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the creator or a partner can end this consultation.'**
+  String get errOnlyTheCreatorOrAPartnerCanEnd;
+
+  /// No description provided for @errOrganizationMembershipsCouldNotBeLoaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Organization memberships could not be loaded.'**
+  String get errOrganizationMembershipsCouldNotBeLoaded;
+
+  /// No description provided for @errSchedulingAConsultationIsTemporarilyUnavailablePleaseTry.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduling a consultation is temporarily unavailable. Please try again.'**
+  String get errSchedulingAConsultationIsTemporarilyUnavailablePleaseTry;
+
+  /// No description provided for @errSelectAResearchRunToViewItsFindings.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a research run to view its findings.'**
+  String get errSelectAResearchRunToViewItsFindings;
+
+  /// No description provided for @errSelectAVideoConsultationToJoin.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a video consultation to join.'**
+  String get errSelectAVideoConsultationToJoin;
+
+  /// No description provided for @errSelectAnOrganizationToScheduleAConsultation.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an organization to schedule a consultation.'**
+  String get errSelectAnOrganizationToScheduleAConsultation;
+
+  /// No description provided for @errSelectAnOrganizationToViewResearchRuns.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an organization to view research runs.'**
+  String get errSelectAnOrganizationToViewResearchRuns;
+
+  /// No description provided for @errSelectAnOrganizationToViewVideoConsultations.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an organization to view video consultations.'**
+  String get errSelectAnOrganizationToViewVideoConsultations;
+
+  /// No description provided for @errSignInAgainToUseVideoConsultations.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in again to use video consultations.'**
+  String get errSignInAgainToUseVideoConsultations;
+
+  /// No description provided for @errStartingTheConsultationIsTemporarilyUnavailablePleaseTry.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting the consultation is temporarily unavailable. Please try again.'**
+  String get errStartingTheConsultationIsTemporarilyUnavailablePleaseTry;
+
+  /// No description provided for @errTheAIProviderReturnedAnUnexpectedResponsePlease.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI provider returned an unexpected response. Please try again.'**
+  String get errTheAIProviderReturnedAnUnexpectedResponsePlease;
+
+  /// No description provided for @errTheConsultationCouldNotBeScheduledCheckThe.
+  ///
+  /// In en, this message translates to:
+  /// **'The consultation could not be scheduled. Check the details and try again.'**
+  String get errTheConsultationCouldNotBeScheduledCheckThe;
+
+  /// No description provided for @errTheConsultationIsNotAvailableToJoinRight.
+  ///
+  /// In en, this message translates to:
+  /// **'The consultation is not available to join right now.'**
+  String get errTheConsultationIsNotAvailableToJoinRight;
+
+  /// No description provided for @errTheSelectedContextIsTooLargeRemoveDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'The selected context is too large. Remove documents and try again.'**
+  String get errTheSelectedContextIsTooLargeRemoveDocuments;
+
+  /// No description provided for @errTheSelectedResearchRunWasNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'The selected research run was not found.'**
+  String get errTheSelectedResearchRunWasNotFound;
+
+  /// No description provided for @errThisConsultationCanNoLongerBeEnded.
+  ///
+  /// In en, this message translates to:
+  /// **'This consultation can no longer be ended.'**
+  String get errThisConsultationCanNoLongerBeEnded;
+
+  /// No description provided for @errThisConsultationCanNoLongerBeStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'This consultation can no longer be started.'**
+  String get errThisConsultationCanNoLongerBeStarted;
+
+  /// No description provided for @errThisVideoConsultationHasAlreadyEnded.
+  ///
+  /// In en, this message translates to:
+  /// **'This video consultation has already ended.'**
+  String get errThisVideoConsultationHasAlreadyEnded;
+
+  /// No description provided for @errThisVideoConsultationWasNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This video consultation was not found.'**
+  String get errThisVideoConsultationWasNotFound;
+
+  /// No description provided for @errUnableToEndTheConsultationPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to end the consultation. Please try again.'**
+  String get errUnableToEndTheConsultationPleaseTryAgain;
+
+  /// No description provided for @errUnableToJoinTheConsultationPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to join the consultation. Please try again.'**
+  String get errUnableToJoinTheConsultationPleaseTryAgain;
+
+  /// No description provided for @errUnableToLoadVideoConsultationsPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load video consultations. Please try again.'**
+  String get errUnableToLoadVideoConsultationsPleaseTryAgain;
+
+  /// No description provided for @errUnableToReadTheVideoConsultationPleaseTry.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to read the video consultation. Please try again.'**
+  String get errUnableToReadTheVideoConsultationPleaseTry;
+
+  /// No description provided for @errUnableToRunAIResearchPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to run AI research. Please try again.'**
+  String get errUnableToRunAIResearchPleaseTryAgain;
+
+  /// No description provided for @errUnableToScheduleTheConsultationPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to schedule the consultation. Please try again.'**
+  String get errUnableToScheduleTheConsultationPleaseTryAgain;
+
+  /// No description provided for @errUnableToStartTheConsultationPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to start the consultation. Please try again.'**
+  String get errUnableToStartTheConsultationPleaseTryAgain;
+
+  /// No description provided for @errVideoCallsAreNotConfiguredForThisDeployment.
+  ///
+  /// In en, this message translates to:
+  /// **'Video calls are not configured for this deployment. No call was started.'**
+  String get errVideoCallsAreNotConfiguredForThisDeployment;
+
+  /// No description provided for @errVideoCallsAreTemporarilyUnavailablePleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Video calls are temporarily unavailable. Please try again.'**
+  String get errVideoCallsAreTemporarilyUnavailablePleaseTryAgain;
+
+  /// No description provided for @errVideoConsultationsAreTemporarilyUnavailablePleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Video consultations are temporarily unavailable. Please try again.'**
+  String get errVideoConsultationsAreTemporarilyUnavailablePleaseTryAgain;
+
+  /// No description provided for @errWeCouldnTCompleteThatRequestPleaseTry.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t complete that request. Please try again.'**
+  String get errWeCouldnTCompleteThatRequestPleaseTry;
+
+  /// No description provided for @errYouDoNotHavePermissionToJoinThis.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to join this consultation.'**
+  String get errYouDoNotHavePermissionToJoinThis;
+
+  /// No description provided for @errYouDoNotHavePermissionToStartThis.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to start this consultation.'**
+  String get errYouDoNotHavePermissionToStartThis;
+
+  /// No description provided for @errYouDoNotHavePermissionToViewVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to view video consultations.'**
+  String get errYouDoNotHavePermissionToViewVideo;
 }
 
 class _AppLocalizationsDelegate

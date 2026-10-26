@@ -13,6 +13,8 @@ class SocialButton extends StatelessWidget {
     super.key,
   });
 
+  static const double _gap = 12;
+
   final String label;
   final IconData icon;
   final VoidCallback? onTap;
@@ -25,7 +27,7 @@ class SocialButton extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsetsDirectional.symmetric(
           horizontal: LegalHubTheme.spaceSm,
-          vertical: 12,
+          vertical: _gap,
         ),
         side: BorderSide(color: scheme.outlineVariant),
         shape: RoundedRectangleBorder(

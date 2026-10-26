@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:legalhub/app/legalhub_motion.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/app/router.dart';
 import 'package:legalhub/app/service_locator.dart';
@@ -106,7 +107,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               decoration: BoxDecoration(
                 color: scheme.surface,
                 borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(LegalHubTheme.spaceLg),
+                  top: Radius.circular(LegalHubTheme.radius2xl),
                 ),
                 border: Border(top: BorderSide(color: scheme.outlineVariant)),
               ),
@@ -125,11 +126,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       return GestureDetector(
                         onTap: () => _pageController.animateToPage(
                           i,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeOut,
+                          duration: LegalHubMotion.durationBase,
+                          curve: LegalHubMotion.curveStandard,
                         ),
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
+                          duration: LegalHubMotion.durationFast,
                           margin: const EdgeInsetsDirectional.symmetric(
                             horizontal: LegalHubTheme.spaceXs,
                           ),
@@ -175,8 +176,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _next() {
     if (_current < _pageCount - 1) {
       _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
+        duration: LegalHubMotion.durationBase,
+        curve: LegalHubMotion.curveStandard,
       );
     } else {
       context.go(AppRoutes.onboardingSuccess);

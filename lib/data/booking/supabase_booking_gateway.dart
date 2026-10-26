@@ -1,4 +1,5 @@
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/booking/domain/booking_category.dart';
 import 'package:legalhub/features/booking/domain/booking_confirmation.dart';
@@ -43,6 +44,7 @@ class SupabaseBookingGateway implements BookingGateway {
         AppError(
           code: 'booking_slots_failed',
           userMessage: 'Unable to load available times. Please try again.',
+          messageKey: AppMessageKey.errUnableToLoadAvailableTimesPleaseTryAgain,
           technicalMessage: e.message,
         ),
       );
@@ -59,6 +61,7 @@ class SupabaseBookingGateway implements BookingGateway {
         const AppError(
           code: 'booking_confirm_failed',
           userMessage: 'Unable to confirm. Please try again.',
+          messageKey: AppMessageKey.errUnableToConfirmPleaseTryAgain,
         ),
       );
     }
@@ -80,6 +83,7 @@ class SupabaseBookingGateway implements BookingGateway {
         AppError(
           code: 'booking_confirm_failed',
           userMessage: 'Unable to confirm. Please try again.',
+          messageKey: AppMessageKey.errUnableToConfirmPleaseTryAgain,
           technicalMessage: e.message,
         ),
       );
@@ -156,6 +160,7 @@ class SupabaseBookingGateway implements BookingGateway {
       SupabaseBookingFailureKind.denied => AppError(
         code: 'booking_slots_denied',
         userMessage: 'You do not have permission to view available times.',
+        messageKey: AppMessageKey.errYouDoNotHavePermissionToViewAvailable,
         kind: AppErrorKind.denied,
         technicalMessage: e.message,
       ),
@@ -163,6 +168,8 @@ class SupabaseBookingGateway implements BookingGateway {
         code: 'booking_slots_unavailable',
         userMessage:
             'Available times are temporarily unavailable. Please try again.',
+        messageKey: AppMessageKey
+            .errAvailableTimesAreTemporarilyUnavailablePleaseTryAgain,
         kind: AppErrorKind.unavailable,
         technicalMessage: e.message,
       ),
@@ -173,6 +180,7 @@ class SupabaseBookingGateway implements BookingGateway {
       SupabaseBookingFailureKind.unknown => AppError(
         code: 'booking_slots_failed',
         userMessage: 'Unable to load available times. Please try again.',
+        messageKey: AppMessageKey.errUnableToLoadAvailableTimesPleaseTryAgain,
         technicalMessage: e.message,
       ),
     };
@@ -188,11 +196,13 @@ class SupabaseBookingGateway implements BookingGateway {
       SupabaseBookingFailureKind.slotUnavailable => AppError(
         code: 'booking_slot_unavailable',
         userMessage: 'That time is no longer available. Choose another time.',
+        messageKey: AppMessageKey.errThatTimeIsNoLongerAvailableChooseAnother,
         technicalMessage: e.message,
       ),
       SupabaseBookingFailureKind.denied => AppError(
         code: 'booking_confirm_failed',
         userMessage: 'You do not have permission to book this consultation.',
+        messageKey: AppMessageKey.errYouDoNotHavePermissionToBookThis,
         kind: AppErrorKind.denied,
         technicalMessage: e.message,
       ),
@@ -200,17 +210,21 @@ class SupabaseBookingGateway implements BookingGateway {
         code: 'booking_confirm_failed',
         userMessage:
             'The booking details are invalid. Check them and try again.',
+        messageKey: AppMessageKey.errTheBookingDetailsAreInvalidCheckThemAnd,
         technicalMessage: e.message,
       ),
       SupabaseBookingFailureKind.providerUnavailable => AppError(
         code: 'booking_confirm_failed',
         userMessage: 'Booking is temporarily unavailable. Please try again.',
+        messageKey:
+            AppMessageKey.errBookingIsTemporarilyUnavailablePleaseTryAgain,
         kind: AppErrorKind.unavailable,
         technicalMessage: e.message,
       ),
       SupabaseBookingFailureKind.unknown => AppError(
         code: 'booking_confirm_failed',
         userMessage: 'Unable to confirm. Please try again.',
+        messageKey: AppMessageKey.errUnableToConfirmPleaseTryAgain,
         technicalMessage: e.message,
       ),
     };

@@ -1,3 +1,5 @@
+import 'package:legalhub/app/deep_link/deep_link_config.dart';
+
 /// The app's only accepted auth-callback deep link (2026-10-24 hardening).
 ///
 /// The provider's own `detectSessionInUri` observer is disabled: gotrue's URL
@@ -7,8 +9,9 @@
 /// contract to:
 ///
 /// * the registered callback location only —
-///   `com.legalhub.app://auth/v1/callback` (the production flavor's custom
-///   scheme, which the emailed recovery link targets) or
+///   `<scheme>://auth/v1/callback` (a scheme in
+///   [DeepLinkConfig.acceptedSchemes], the flavor's custom scheme which the
+///   emailed recovery link targets) or
 ///   `https://legalhub.app/auth/v1/callback` (the OS-verified App Link /
 ///   Universal Link); and
 /// * a non-empty PKCE `code` in the query string, with no implicit-flow
@@ -18,21 +21,6 @@
 /// `test/data/auth/auth_callback_test.dart`.
 class AuthCallbackUri {
   const AuthCallbackUri._();
-
-  /// The custom scheme registered for the production build.
-  static const String appScheme = 'com.legalhub.app';
-
-  /// The development flavor's registered scheme. Recovery links built by a
-  /// development build target this scheme, so it must classify identically.
-  static const String developmentAppScheme = 'com.legalhub.app.dev';
-
-  /// The verified https host (`web/.well-known/assetlinks.json` /
-  /// `apple-app-site-association`).
-  static const String verifiedHost = 'legalhub.app';
-
-  static const String _authHost = 'auth';
-  static const String _appCallbackPath = '/v1/callback';
-  static const String _httpsCallbackPath = '/auth/v1/callback';
 
   /// Implicit-flow material the PKCE exchange must never receive.
   static const Set<String> _implicitSessionParameters = <String>{
@@ -44,14 +32,17 @@ class AuthCallbackUri {
 
   /// The one-time PKCE code carried by [uri], or null when [uri] is not the
   /// exact auth callback or carries implicit-flow session material.
-  static String? pkceCode(Uri uri) {
+  static String? pkceCode(
+    Uri uri, {
+    DeepLinkConfig config = const DeepLinkConfig.production(),
+  }) {
     final bool expectedLocation =
-        ((uri.scheme == appScheme || uri.scheme == developmentAppScheme) &&
-            uri.host == _authHost &&
-            _isCallbackPath(uri.path, _appCallbackPath)) ||
+        (config.acceptedSchemes.contains(uri.scheme) &&
+            uri.host == DeepLinkConfig.authHost &&
+            _isCallbackPath(uri.path, DeepLinkConfig.appCallbackPath)) ||
         (uri.scheme == 'https' &&
-            uri.host == verifiedHost &&
-            _isCallbackPath(uri.path, _httpsCallbackPath));
+            uri.host == config.verifiedHost &&
+            _isCallbackPath(uri.path, DeepLinkConfig.httpsCallbackPath));
     if (!expectedLocation) {
       return null;
     }

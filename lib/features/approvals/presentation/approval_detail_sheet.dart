@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/contracts/server_limits.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/features/approvals/domain/pending_approval.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
 import 'package:legalhub/shared/widgets/confirm_dialog.dart';
 
@@ -159,6 +162,7 @@ class _ApprovalDetailSheetState extends State<ApprovalDetailSheet> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final DemoLabels labels = DemoLabels(l10n, localOnly: backendIsLocalOnly);
     return SafeArea(
       child: Padding(
         padding: EdgeInsetsDirectional.only(
@@ -171,7 +175,7 @@ class _ApprovalDetailSheetState extends State<ApprovalDetailSheet> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Text(
-                widget.approval.title,
+                labels.approvalTitle(widget.approval.title),
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: LegalHubTheme.spaceSm),
@@ -195,7 +199,7 @@ class _ApprovalDetailSheetState extends State<ApprovalDetailSheet> {
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
                 const SizedBox(height: LegalHubTheme.spaceXs),
-                Text(widget.approval.description!),
+                Text(labels.approvalDescription(widget.approval.description!)),
               ],
               if (widget.approval.decidedAt != null ||
                   widget.approval.decisionNote != null) ...<Widget>[
@@ -208,7 +212,7 @@ class _ApprovalDetailSheetState extends State<ApprovalDetailSheet> {
                   controller: _note,
                   enabled: !_submitting,
                   maxLines: 3,
-                  maxLength: 2000,
+                  maxLength: kDecisionNoteMaxLength,
                   decoration: InputDecoration(
                     labelText: l10n.approvalDecideNoteLabel,
                     errorText: _noteError,
@@ -276,6 +280,7 @@ class _ApprovalDetailSheetState extends State<ApprovalDetailSheet> {
   }
 
   Widget _decisionSection(AppLocalizations l10n) {
+    final DemoLabels labels = DemoLabels(l10n, localOnly: backendIsLocalOnly);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -292,7 +297,7 @@ class _ApprovalDetailSheetState extends State<ApprovalDetailSheet> {
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: LegalHubTheme.spaceXs),
-          Text(widget.approval.decisionNote!),
+          Text(labels.approvalDecisionNote(widget.approval.decisionNote!)),
         ],
       ],
     );

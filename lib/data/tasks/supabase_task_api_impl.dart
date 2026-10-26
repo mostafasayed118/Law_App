@@ -1,5 +1,6 @@
 import 'package:legalhub/data/postgrest_failures.dart';
 import 'package:legalhub/data/supabase_seam.dart';
+import 'package:legalhub/data/supabase_wire.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_task_api.dart';
@@ -72,7 +73,7 @@ class SupabaseTaskApiImpl implements SupabaseTaskApi {
       // RLS-scoped: `tasks_select_assigned` returns only the rows whose
       // matter the caller is assigned to as an active member of the task's
       // org (the org-mismatch equality is load-bearing).
-      return await _table('tasks', _taskColumns);
+      return await _table(SupabaseTables.tasks, _taskColumns);
     } on PostgrestException catch (e) {
       throw SupabaseTaskException(kind: _kindFor(e), message: e.message);
     } on Exception {
@@ -96,7 +97,7 @@ class SupabaseTaskApiImpl implements SupabaseTaskApi {
     // on `tasks`). The matter's org resolution + the assignment gate run
     // in-function, so the client sends only the matter id + title (+ an
     // optional assignee id) — no org pre-read. Returns the persisted row.
-    return _callRpc('create_task', <String, dynamic>{
+    return _callRpc(SupabaseRpcs.createTask, <String, dynamic>{
       'p_matter_id': matterId,
       'p_assignee_id': assigneeId,
       'p_title': title,
@@ -108,7 +109,7 @@ class SupabaseTaskApiImpl implements SupabaseTaskApi {
     String taskId,
     String toStatus,
   ) {
-    return _callRpc('advance_task_status', <String, dynamic>{
+    return _callRpc(SupabaseRpcs.advanceTaskStatus, <String, dynamic>{
       'p_task_id': taskId,
       'p_to_status': toStatus,
     });
@@ -116,7 +117,7 @@ class SupabaseTaskApiImpl implements SupabaseTaskApi {
 
   @override
   Future<Map<String, dynamic>> assignTask(String taskId, String? assigneeId) {
-    return _callRpc('assign_task', <String, dynamic>{
+    return _callRpc(SupabaseRpcs.assignTask, <String, dynamic>{
       'p_task_id': taskId,
       'p_assignee_id': assigneeId,
     });
@@ -124,7 +125,9 @@ class SupabaseTaskApiImpl implements SupabaseTaskApi {
 
   @override
   Future<Map<String, dynamic>> acknowledgeTask(String taskId) {
-    return _callRpc('acknowledge_task', <String, dynamic>{'p_task_id': taskId});
+    return _callRpc(SupabaseRpcs.acknowledgeTask, <String, dynamic>{
+      'p_task_id': taskId,
+    });
   }
 
   /// Calls one audited task RPC and returns its persisted-row response.
@@ -169,7 +172,7 @@ class SupabaseTaskApiImpl implements SupabaseTaskApi {
   /// matches the digits, never the condition name. Everything else is
   /// unknown.
   SupabaseTaskFailureKind _kindFor(PostgrestException e) {
-    if (e.code == '23514') {
+    if (e.code == PostgrestCodes.validation) {
       return SupabaseTaskFailureKind.validation;
     }
     return postgrestKindFor(

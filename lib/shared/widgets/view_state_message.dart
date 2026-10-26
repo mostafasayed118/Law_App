@@ -8,6 +8,8 @@ class _StateMessage extends StatelessWidget {
     this.action,
   });
 
+  static const double _gap = 12;
+
   final IconData icon;
   final String label;
   final Widget? child;
@@ -22,11 +24,11 @@ class _StateMessage extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Icon(icon, size: 32),
-          const SizedBox(height: 8),
+          const SizedBox(height: LegalHubTheme.spaceSm),
           Text(label, textAlign: TextAlign.center),
-          if (child != null) ...<Widget>[const SizedBox(height: 12), child!],
+          if (child != null) ...<Widget>[const SizedBox(height: _gap), child!],
           if (action != null) ...<Widget>[
-            const SizedBox(height: 8),
+            const SizedBox(height: LegalHubTheme.spaceSm),
             TextButton(
               onPressed: action,
               child: Text(AppLocalizations.of(context).retry),

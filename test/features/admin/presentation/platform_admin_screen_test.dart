@@ -605,5 +605,38 @@ void main() {
       expect(find.text('Denetim günlüğü'), findsOneWidget);
       expect(find.text('Platform etkinliği'), findsOneWidget);
     });
+
+    testWidgets('maps the demo audit summary in local mode (Task 26)', (
+      tester,
+    ) async {
+      final AppLocalizations ar = await AppLocalizations.delegate.load(
+        const Locale('ar'),
+      );
+      final _MutablePlatformAdminGateway gateway =
+          _MutablePlatformAdminGateway()
+            ..organizations = <OrganizationSummary>[_org]
+            ..members = <OrgMember>[_demoMember]
+            ..auditEntries = <AuditEntry>[
+              AuditEntry(
+                id: 1,
+                action: 'organization_created',
+                outcome: 'succeeded',
+                resourceType: 'organization',
+                correlationId: 'audit-0001',
+                redactedSummary: 'Organization created (metadata only)',
+                serverTimestamp: DateTime.utc(2026, 7, 25, 10, 0),
+                actorUserId: 'u-1',
+                organizationId: 'org-1',
+              ),
+            ];
+
+      await tester.pumpWidget(harness(gateway, locale: const Locale('ar')));
+      await tester.pumpAndSettle();
+
+      expect(find.text(ar.demoAuditOrganizationCreated), findsOneWidget);
+      expect(find.text('Organization created (metadata only)'), findsNothing);
+      // The action stays server vocabulary, never translated.
+      expect(find.textContaining('organization_created'), findsOneWidget);
+    });
   });
 }

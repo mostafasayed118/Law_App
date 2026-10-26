@@ -16,6 +16,10 @@ class PracticeAreaCard extends StatelessWidget {
   final String label;
   final VoidCallback? onTap;
 
+  static const double _cardWidth = 160;
+  static const double _cardHeight = 192;
+  static const double _iconSize = 40;
+
   @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
@@ -31,8 +35,8 @@ class PracticeAreaCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: SizedBox(
-          width: 160,
-          height: 192,
+          width: _cardWidth,
+          height: _cardHeight,
           child: Padding(
             padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
             child: Column(
@@ -40,8 +44,8 @@ class PracticeAreaCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Container(
-                  width: 40,
-                  height: 40,
+                  width: _iconSize,
+                  height: _iconSize,
                   margin: const EdgeInsetsDirectional.only(
                     bottom: LegalHubTheme.spaceSm,
                   ),

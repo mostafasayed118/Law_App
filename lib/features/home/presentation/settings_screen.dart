@@ -7,6 +7,7 @@ import 'package:legalhub/app/router.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/app/theme/theme_cubit.dart';
 import 'package:legalhub/core/auth/auth_state.dart';
+import 'package:legalhub/data/local/locale_store.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
@@ -14,10 +15,8 @@ import 'package:legalhub/shared/widgets/widgets.dart';
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
-  static const List<Locale> _locales = <Locale>[
-    Locale('en'),
-    Locale('ar'),
-    Locale('tr'),
+  static final List<Locale> _locales = <Locale>[
+    for (final String code in supportedLocaleCodes) Locale(code),
   ];
 
   static const List<ThemeMode> _themeModes = <ThemeMode>[

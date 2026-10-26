@@ -4,9 +4,14 @@ part of 'platform_admin_screen.dart';
 /// Metadata-only (contract §8) — no credentials, no content, no PII field
 /// names; rows are read-only (no tap affordance).
 class _AuditRow extends StatelessWidget {
-  const _AuditRow({required this.entry, required this.organizationName});
+  const _AuditRow({
+    required this.entry,
+    required this.labels,
+    required this.organizationName,
+  });
 
   final AuditEntry entry;
+  final DemoLabels labels;
   final String? organizationName;
 
   @override
@@ -23,7 +28,7 @@ class _AuditRow extends StatelessWidget {
         foregroundColor: scheme.onSurfaceVariant,
         child: Text(entry.action.isEmpty ? '?' : entry.action[0].toUpperCase()),
       ),
-      title: Text(entry.redactedSummary),
+      title: Text(labels.auditSummary(entry.redactedSummary)),
       subtitle: Text(
         [?organizationName, entry.action, entry.outcome, date].join(' · '),
         maxLines: 2,

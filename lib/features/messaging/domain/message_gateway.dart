@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/pagination.dart';
 import 'message.dart';
 import 'message_realtime_event.dart';
 import 'message_thread.dart';
@@ -49,7 +50,7 @@ abstract interface class MessageGateway {
   /// **Thread metadata only — no message body crosses here.**
   Future<Result<List<MessageThread>>> searchThreads(
     String query, {
-    int limit = 30,
+    int limit = kSearchPageSize,
   });
 
   /// The caller's assignment-scoped message rows for one thread (the

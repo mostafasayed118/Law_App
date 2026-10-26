@@ -4,13 +4,15 @@ part of 'message_thread_detail_screen.dart';
 /// and no trailing action** — the surface is read-only (D-RT5: no reply, no
 /// forward, no delete in this slice).
 class _MessageTile extends StatelessWidget {
-  const _MessageTile({required this.message});
+  const _MessageTile({required this.message, required this.localOnly});
 
   final Message message;
+  final bool localOnly;
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final DemoLabels labels = DemoLabels(l10n, localOnly: localOnly);
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
     // Same localized date shape as the list/vault surfaces (yMMMd,
@@ -33,7 +35,7 @@ class _MessageTile extends StatelessWidget {
               children: <Widget>[
                 Expanded(
                   child: Text(
-                    demoAuthorName(l10n, message.authorDisplayName),
+                    labels.authorName(message.authorDisplayName),
                     style: text.bodySmall?.copyWith(
                       color: scheme.primary,
                       fontWeight: FontWeight.w600,
@@ -49,7 +51,7 @@ class _MessageTile extends StatelessWidget {
               ],
             ),
             const SizedBox(height: LegalHubTheme.spaceSm),
-            Text(demoMessageBody(l10n, message.body), style: text.bodyMedium),
+            Text(labels.messageBody(message.body), style: text.bodyMedium),
           ],
         ),
       ),

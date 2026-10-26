@@ -1,5 +1,7 @@
+import 'package:legalhub/core/pagination.dart';
 import 'package:legalhub/data/postgrest_failures.dart';
 import 'package:legalhub/data/supabase_seam.dart';
+import 'package:legalhub/data/supabase_wire.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_document_api.dart';
@@ -80,8 +82,8 @@ class SupabaseDocumentApiImpl implements SupabaseDocumentApi {
       const String columns =
           'id, matter_id, title, document_type, created_at, matters(title)';
       return matterId == null
-          ? await _table('documents', columns)
-          : await _matterTable('documents', columns, matterId);
+          ? await _table(SupabaseTables.documents, columns)
+          : await _matterTable(SupabaseTables.documents, columns, matterId);
     } on PostgrestException catch (e) {
       throw SupabaseDocumentException(kind: _kindFor(e), message: e.message);
     } on Exception {
@@ -110,7 +112,7 @@ class SupabaseDocumentApiImpl implements SupabaseDocumentApi {
   @override
   Future<List<Map<String, dynamic>>> searchDocuments(
     String query, {
-    int limit = 30,
+    int limit = kSearchPageSize,
   }) async {
     try {
       // Same RLS scope, columns, and matters(title) embed as fetchDocuments
@@ -119,7 +121,7 @@ class SupabaseDocumentApiImpl implements SupabaseDocumentApi {
       // top-N (see _boundSearch for why the title-only SQL prefilter was
       // dropped).
       return await _searchCaller(
-        'documents',
+        SupabaseTables.documents,
         'id, matter_id, title, document_type, created_at, matters(title)',
         'title',
         query,

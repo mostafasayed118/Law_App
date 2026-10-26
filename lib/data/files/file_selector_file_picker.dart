@@ -4,6 +4,7 @@ import 'package:file_selector/file_selector.dart';
 
 import 'package:legalhub/features/storage/domain/file_picker.dart';
 import 'package:legalhub/features/storage/domain/picked_file.dart';
+import 'package:legalhub/features/storage/domain/storage_gateway.dart';
 
 /// [FilePicker] backed by `package:file_selector`.
 ///
@@ -14,27 +15,10 @@ import 'package:legalhub/features/storage/domain/picked_file.dart';
 class FileSelectorFilePicker implements FilePicker {
   const FileSelectorFilePicker();
 
-  static const XTypeGroup _matterFiles = XTypeGroup(
+  static final XTypeGroup _matterFiles = XTypeGroup(
     label: 'Matter files',
-    extensions: <String>[
-      'pdf',
-      'doc',
-      'docx',
-      'txt',
-      'csv',
-      'png',
-      'jpg',
-      'jpeg',
-    ],
-    mimeTypes: <String>[
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'text/plain',
-      'text/csv',
-      'image/png',
-      'image/jpeg',
-    ],
+    extensions: matterFileAllowedExtensions.toList(growable: false),
+    mimeTypes: matterFileAllowedMimeTypes.toList(growable: false),
     uniformTypeIdentifiers: <String>[
       'com.adobe.pdf',
       'com.microsoft.word.doc',
@@ -50,7 +34,7 @@ class FileSelectorFilePicker implements FilePicker {
   Future<PickedFile?> pickFile() async {
     try {
       final XFile? file = await openFile(
-        acceptedTypeGroups: const <XTypeGroup>[_matterFiles],
+        acceptedTypeGroups: <XTypeGroup>[_matterFiles],
       );
       if (file == null) {
         return null;

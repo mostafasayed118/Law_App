@@ -1,5 +1,6 @@
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/l10n/app_message_l10n.dart';
 
 /// Localized copy for a task create/assign failure.
 ///
@@ -9,6 +10,9 @@ import 'package:legalhub/l10n/app_localizations.dart';
 /// marks a server validation refusal (the task gateway's validation arm maps
 /// to `unknown` kind, so the code is the only validation signal).
 String taskErrorMessage(AppLocalizations l10n, AppError error) {
+  if (error.messageKey != null) {
+    return appMessage(l10n, error.messageKey!, args: error.messageArgs);
+  }
   if (error.kind == AppErrorKind.denied) {
     return l10n.taskErrorDenied;
   }

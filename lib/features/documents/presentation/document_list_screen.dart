@@ -118,6 +118,7 @@ class _ListSurfaceState extends State<_ListSurface> {
       onRetry: cubit.load,
       tileBuilder: (BuildContext context, Document document) => _DocumentTile(
         document: document,
+        localOnly: localOnly,
         onViewMatter: _matterTap(context, document),
       ),
       empty: empty,

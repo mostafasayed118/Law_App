@@ -43,6 +43,9 @@ class ProfileScreen extends StatelessWidget {
           // expired session, so the expired branch offers no Retry loop.
           child: ViewStateView<Session>(
             state: viewState,
+            errorFallback: viewState is ViewError<Session>
+                ? viewState.error.userMessage
+                : null,
             onRetry:
                 viewState is ViewError<Session> &&
                     viewState.error.code != 'sessionExpired'

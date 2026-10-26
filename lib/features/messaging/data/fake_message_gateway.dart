@@ -1,8 +1,10 @@
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/pagination.dart';
 import 'package:legalhub/features/messaging/domain/message.dart';
 import 'package:legalhub/features/messaging/domain/message_gateway.dart';
 import 'package:legalhub/features/messaging/domain/message_realtime_event.dart';
 import 'package:legalhub/features/messaging/domain/message_thread.dart';
+import 'package:legalhub/shared/demo/demo_corpus.dart';
 
 /// Development-only messaging implementation: a fixed synthetic list of
 /// non-PII message-thread **metadata** + deterministic per-thread message
@@ -26,50 +28,50 @@ class FakeMessageGateway implements MessageGateway {
   static final List<MessageThread> syntheticThreads = <MessageThread>[
     MessageThread(
       id: 'thread-1',
-      matterId: 'matter-1',
-      matterTitle: 'Demo acquisition review',
+      matterId: DemoCorpus.matterIds[0],
+      matterTitle: DemoCorpus.matterTitleAcquisition,
       title: 'Demo matter updates',
-      matterRef: 'Demo acquisition review',
+      matterRef: DemoCorpus.matterTitleAcquisition,
       participants: const <String>['Layla Mansour', 'Demo client'],
       lastActivityAt: DateTime.utc(2026, 7, 28),
       messageCount: 12,
     ),
     MessageThread(
       id: 'thread-2',
-      matterId: 'matter-2',
-      matterTitle: 'Commercial lease consultation',
+      matterId: DemoCorpus.matterIds[1],
+      matterTitle: DemoCorpus.matterTitleLease,
       title: 'Consultation follow-up — demo',
-      matterRef: 'Commercial lease consultation',
+      matterRef: DemoCorpus.matterTitleLease,
       participants: const <String>['Omar Farouk', 'Demo client'],
       lastActivityAt: DateTime.utc(2026, 7, 25),
       messageCount: 8,
     ),
     MessageThread(
       id: 'thread-3',
-      matterId: 'matter-3',
-      matterTitle: 'Procedural review matter',
+      matterId: DemoCorpus.matterIds[2],
+      matterTitle: DemoCorpus.matterTitleProcedural,
       title: 'Demo procedural notes',
-      matterRef: 'Procedural review matter',
+      matterRef: DemoCorpus.matterTitleProcedural,
       participants: const <String>['Layla Mansour'],
       lastActivityAt: DateTime.utc(2026, 7, 22),
       messageCount: 5,
     ),
     MessageThread(
       id: 'thread-4',
-      matterId: 'matter-4',
-      matterTitle: 'Family status consultation',
+      matterId: DemoCorpus.matterIds[3],
+      matterTitle: DemoCorpus.matterTitleFamily,
       title: 'Family matter thread — demo',
-      matterRef: 'Family status consultation',
+      matterRef: DemoCorpus.matterTitleFamily,
       participants: const <String>['Omar Farouk', 'Demo client'],
       lastActivityAt: DateTime.utc(2026, 7, 19),
       messageCount: 15,
     ),
     MessageThread(
       id: 'thread-5',
-      matterId: 'matter-5',
-      matterTitle: 'Startup formation advisory',
+      matterId: DemoCorpus.matterIds[4],
+      matterTitle: DemoCorpus.matterTitleStartup,
       title: 'Startup advisory — demo',
-      matterRef: 'Startup formation advisory',
+      matterRef: DemoCorpus.matterTitleStartup,
       participants: const <String>['Sara Khalil', 'Demo client'],
       lastActivityAt: DateTime.utc(2026, 7, 15),
       messageCount: 9,
@@ -122,7 +124,7 @@ class FakeMessageGateway implements MessageGateway {
   @override
   Future<Result<List<MessageThread>>> searchThreads(
     String query, {
-    int limit = 30,
+    int limit = kSearchPageSize,
   }) async {
     // In-memory backend: no transfer cost to save, so no prefilter — the
     // caller's full matching pass is the arbiter and results stay identical

@@ -9,11 +9,13 @@ part of 'message_list_screen.dart';
 class _MessageThreadTile extends StatelessWidget {
   const _MessageThreadTile({
     required this.thread,
+    required this.localOnly,
     required this.onOpenThread,
     required this.onViewMatter,
   });
 
   final MessageThread thread;
+  final bool localOnly;
 
   /// The whole-row thread-open tap → the read-only thread-detail surface
   /// (D-RT5). Always non-null for a listed row.
@@ -30,12 +32,13 @@ class _MessageThreadTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final DemoLabels labels = DemoLabels(l10n, localOnly: localOnly);
     // Same localized date shape as the vault/details surfaces (yMMMd,
     // locale-aware via l10n.localeName).
     final String date = formatMediumDate(l10n, thread.lastActivityAt);
     return AppTile(
       icon: Icons.forum_outlined,
-      title: demoThreadTitle(l10n, thread.title),
+      title: labels.threadTitle(thread.title),
       subtitles: <String>['${thread.participants.join(', ')} · $date'],
       // The chips wrap beneath the metadata line (the roster pattern); the
       // link chip stays a secondary tap target in the row (D-C2). The row

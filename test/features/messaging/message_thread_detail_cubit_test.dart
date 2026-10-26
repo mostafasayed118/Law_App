@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/features/messaging/domain/message.dart';
@@ -377,6 +378,9 @@ void main() {
           sendError: const AppError(
             code: 'message_too_long',
             userMessage: 'Message is too long (max 2000 characters).',
+            messageKey:
+                AppMessageKey.errMessageIsTooLongMaxMaxMessageLengthCharacters,
+            messageArgs: <String, Object?>{'maxMessageLength': 2000},
           ),
         ),
       ],

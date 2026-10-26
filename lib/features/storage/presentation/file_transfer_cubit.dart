@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/storage/domain/file_metadata.dart';
 import 'package:legalhub/features/storage/domain/file_picker.dart';
@@ -45,6 +46,7 @@ class FileTransferCubit extends Cubit<FileTransferState> {
             const AppError(
               code: 'file_upload_unsupported_type',
               userMessage: 'This file type is not supported.',
+              messageKey: AppMessageKey.errThisFileTypeIsNotSupported,
             ),
             fileName: picked.name,
           ),
@@ -57,6 +59,7 @@ class FileTransferCubit extends Cubit<FileTransferState> {
             const AppError(
               code: 'file_upload_too_large',
               userMessage: 'This file is too large.',
+              messageKey: AppMessageKey.errThisFileIsTooLarge,
             ),
             fileName: picked.name,
           ),
@@ -132,9 +135,11 @@ class FileTransferCubit extends Cubit<FileTransferState> {
 const AppError _pickFailedError = AppError(
   code: 'file_upload_failed',
   userMessage: 'Unable to upload the file. Please try again.',
+  messageKey: AppMessageKey.errUnableToUploadTheFilePleaseTryAgain,
 );
 
 const AppError _openFailedError = AppError(
   code: 'file_open_failed',
   userMessage: 'Unable to open the file. Please try again.',
+  messageKey: AppMessageKey.errUnableToOpenTheFilePleaseTryAgain,
 );

@@ -9,6 +9,7 @@ import 'package:legalhub/features/research/domain/ai_gateway.dart';
 import 'package:legalhub/features/research/domain/research_outcome.dart';
 import 'package:legalhub/features/research/domain/research_request.dart';
 import 'package:legalhub/features/research/domain/research_run.dart';
+import 'package:legalhub/features/research/domain/research_wire_codes.dart';
 
 /// Demo-posture synthetic research engine (AI research slice, plan 1.0).
 ///
@@ -111,7 +112,9 @@ class SyntheticAiGateway implements AiGateway {
 
   /// The demo posture persists nothing: no run history exists.
   @override
-  Future<Result<List<ResearchRun>>> fetchRuns({int limit = 20}) async {
+  Future<Result<List<ResearchRun>>> fetchRuns({
+    int limit = kResearchRunPageSize,
+  }) async {
     return const Result<List<ResearchRun>>.success(<ResearchRun>[]);
   }
 

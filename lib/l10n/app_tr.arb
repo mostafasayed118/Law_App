@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "tr",
   "appTitle": "LegalHub",
   "continueAsDemo": "Demo oturumuyla devam et",
@@ -94,7 +94,13 @@
   "demoThreadTitle4": "Aile dosyası konuşması — demo",
   "demoThreadTitle5": "Girişim danışmanlığı — demo",
   "demoMessageBody": "Demo mesaj {count} — genel demo içeriği, gerçek müvekkil veya hukuk verisi yok.",
-  "@demoMessageBody": {"placeholders": {"count": {"type": "int"}}},
+  "@demoMessageBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "demoAuthorAttorney": "Demo avukat",
   "demoAuthorClient": "Demo müvekkil",
   "demoDocumentTitle1": "Demo iş kabul mektubu",
@@ -118,18 +124,57 @@
   "demoTaskTitle4": "Demo: takip planla",
   "demoTaskTitle5": "Demo: dosya zaman çizelgesini güncelle",
   "researchHeadline": "Araştırma notu — {title}",
-  "@researchHeadline": {"placeholders": {"title": {"type": "String"}}},
+  "@researchHeadline": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "researchSummaryDoc": "Sentetik derlem satırı \"{title}\" ({ref}) temel alınarak derlenen demo araştırma notu. Bu, demo derlemi için üretilmiş statik demo metindir — hukuki analiz değildir.",
-  "@researchSummaryDoc": {"placeholders": {"title": {"type": "String"}, "ref": {"type": "String"}}},
+  "@researchSummaryDoc": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "ref": {
+        "type": "String"
+      }
+    }
+  },
   "researchSummaryMatter": "Sentetik derlem satırı \"{title}\" ({area}) temel alınarak derlenen demo araştırma notu. Bu, demo derlemi için üretilmiş statik demo metindir — hukuki analiz değildir.",
-  "@researchSummaryMatter": {"placeholders": {"title": {"type": "String"}, "area": {"type": "String"}}},
+  "@researchSummaryMatter": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
   "researchExcerptDoc": "Derlem alıntısı: {type} meta veri satırı, dosya ref \"{ref}\".",
-  "@researchExcerptDoc": {"placeholders": {"type": {"type": "String"}, "ref": {"type": "String"}}},
+  "@researchExcerptDoc": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "ref": {
+        "type": "String"
+      }
+    }
+  },
   "researchExcerptMatter": "Derlem alıntısı: dosya satırı, alan \"{area}\".",
-  "@researchExcerptMatter": {"placeholders": {"area": {"type": "String"}}},
+  "@researchExcerptMatter": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      }
+    }
+  },
   "researchRelatedMatter": "ilgili demo dosya",
-      "resendCode": "Kodu Yeniden Gönder",
-      "resendHelp": "E-posta gelmedi mi? Spam klasörünüzü kontrol edin veya destekle iletişime geçin.",
+  "resendCode": "Kodu Yeniden Gönder",
+  "resendHelp": "E-posta gelmedi mi? Spam klasörünüzü kontrol edin veya destekle iletişime geçin.",
   "resetPasswordTitle": "Parolayı Sıfırla",
   "newPasswordLabel": "Yeni Parola",
   "confirmPasswordLabel": "Parolayı Onayla",
@@ -148,7 +193,13 @@
   "onboardingSuccessBody": "Güvenli hukuki çalışma istasyonunuz hazır. Başlamak için giriş yapın.",
   "onboardingSuccessAction": "Girişe Geç",
   "homeGreeting": "Merhaba, {name}",
-  "@homeGreeting": {"placeholders": {"name": {"type": "String"}}},
+  "@homeGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "homeFallbackName": "Misafir",
   "homeSubtitle": "Bugün hukuki ihtiyaçlarınızda size nasıl yardımcı olabiliriz?",
   "searchPlaceholder": "Avukat veya hukuki konu bulun...",
@@ -172,16 +223,28 @@
   "validatorRequired": "Bu alan zorunludur.",
   "validatorEmailInvalid": "Geçerli bir e-posta adresi girin.",
   "validatorMinLength": "{count, plural, =1{En az 1 karakter olmalıdır.} other{En az {count} karakter olmalıdır.}}",
-  "@validatorMinLength": {"placeholders": {"count": {"type": "int"}}},
+  "@validatorMinLength": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "validatorMismatch": "Şifreler eşleşmiyor.",
   "validatorPasswordLength": "{count, plural, =1{En az 1 karakter olmalıdır.} other{En az {count} karakter olmalıdır.}}",
-  "@validatorPasswordLength": {"placeholders": {"count": {"type": "int"}}},
+  "@validatorPasswordLength": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "validatorPasswordClasses": "4'ten en az 3'ünü içermelidir: büyük harf, küçük harf, rakam, sembol.",
   "validatorPasswordEmail": "Şifreniz e-posta adresinizi içermemelidir.",
   "passwordStrengthWeak": "Zayıf",
   "passwordStrengthFair": "Orta",
-      "passwordStrengthStrong": "Güçlü",
-      "profileNavigation": "Profil",
+  "passwordStrengthStrong": "Güçlü",
+  "profileNavigation": "Profil",
   "profileNameLabel": "Ad",
   "profileAccountIdLabel": "Hesap Kimliği",
   "profileRoleLabel": "Rol",
@@ -219,7 +282,13 @@
   "inviteTokenLabel": "Tek kullanımlık kod",
   "inviteSendButton": "Davetiye Gönder",
   "inviteTokenBody": "Bu tek kullanımlık kodu {email} ile paylaşın. Bir daha gösterilemez.",
-  "@inviteTokenBody": {"placeholders": {"email": {"type": "String"}}},
+  "@inviteTokenBody": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
   "inviteTokenCopy": "Kodu kopyala",
   "inviteTokenCopied": "Kod panoya kopyalandı.",
   "inviteShareLink": "Davet bağlantısını kopyala",
@@ -228,7 +297,13 @@
   "actionRevokeInvitation": "Daveti iptal et",
   "invitationRevoked": "Davet iptal edildi.",
   "inviteTokenResentBody": "{email} için yeni bir tek kullanımlık kod. Bir daha gösterilemez.",
-  "@inviteTokenResentBody": {"placeholders": {"email": {"type": "String"}}},
+  "@inviteTokenResentBody": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
   "memberStatusInvited": "DAVETLİ",
   "memberStatusActive": "AKTİF",
   "memberStatusSuspended": "ASKIDA",
@@ -238,7 +313,13 @@
   "actionRemove": "Kaldır",
   "removeMemberConfirmTitle": "Üye kaldırılsın mı?",
   "removeMemberConfirmBody": "{name} bu kuruluştan kaldırılsın mı?",
-  "@removeMemberConfirmBody": {"placeholders": {"name": {"type": "String"}}},
+  "@removeMemberConfirmBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "removeMemberConfirmAction": "Kaldır",
   "platformAdminTitle": "Platform yöneticisi",
   "platformAdminOrganizations": "Kuruluşlar",
@@ -246,7 +327,13 @@
   "platformAdminDeleteDemo": "Demo hesabını sil",
   "platformAdminDeleteConfirmTitle": "Demo hesabı silinsin mi?",
   "platformAdminDeleteConfirmBody": "{name} için demo hesabı silinsin mi? Bu geri alınamaz.",
-  "@platformAdminDeleteConfirmBody": {"placeholders": {"name": {"type": "String"}}},
+  "@platformAdminDeleteConfirmBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "platformAdminDeleteConfirmAction": "Sil",
   "platformAdminAudit": "Denetim günlüğü",
   "platformAdminAuditPlatform": "Platform etkinliği",
@@ -261,8 +348,7 @@
   "actionInProgress": "Zaten devam eden bir işlem var.",
   "signUpCheckInboxTitle": "Gelen Kutunuzu Kontrol Edin",
   "signUpCheckInboxBody": "E-posta adresinize bir doğrulama bağlantısı gönderdik. Hesabınızı etkinleştirmek için bağlantıyı açın, ardından giriş yapın.",
-  "signUpCheckInboxAction": "Girişe Geç"
-,
+  "signUpCheckInboxAction": "Girişe Geç",
   "bookingTitle": "Danışma Rezervasyonu",
   "bookingLocalOnlyNote": "Demo modu — hiçbir danışma fiilen rezerve edilmez veya gönderilmez.",
   "bookingNoPaymentNote": "Bu adımda herhangi bir ödeme alınmaz.",
@@ -318,7 +404,13 @@
   "discoveryProfileSpecialties": "Uzmanlık alanları",
   "discoveryProfileLanguages": "Diller",
   "discoveryProfileYears": "{years} yıl deneyim",
-  "@discoveryProfileYears": {"placeholders": {"years": {"type": "int"}}},
+  "@discoveryProfileYears": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
   "attorneyStatusActive": "Etkin",
   "attorneyStatusInactive": "Etkin değil",
   "attorneyAdminTitle": "Avukat dizini",
@@ -330,7 +422,13 @@
   "attorneyAdminDeactivate": "Devre dışı bırak",
   "attorneyAdminDeactivateTitle": "Avukat devre dışı bırakılsın mı?",
   "attorneyAdminDeactivateBody": "{name} devre dışı bırakılsın mı? Profil yönetici listesinde kalır ancak genel dizinden çıkar.",
-  "@attorneyAdminDeactivateBody": {"placeholders": {"name": {"type": "String"}}},
+  "@attorneyAdminDeactivateBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "attorneyAdminDeactivateFailed": "Profil devre dışı bırakılamadı. Lütfen tekrar deneyin.",
   "attorneyAdminEmpty": "Henüz avukat profili yok.",
   "attorneyAdminError": "Avukat profilleri yüklenemedi.",
@@ -378,7 +476,9 @@
   "matterCreateSuccessBody": "{id} numaralı dava oluşturuldu.",
   "@matterCreateSuccessBody": {
     "placeholders": {
-      "id": {"type": "String"}
+      "id": {
+        "type": "String"
+      }
     }
   },
   "matterCreateSuccessNote": "Siz oluşturduğunuz için şimdi görüyorsunuz. Onlara atandığında diğerleri de görür.",
@@ -724,5 +824,642 @@
   "aiResearchErrorNoOrg": "Araştırmayı çalıştırmak için bir kuruluş seçin.",
   "aiResearchNoSourceCited": "Kaynak belirtilmedi.",
   "aiResearchSourceDocument": "Belge",
-  "aiResearchSourceMatter": "Dosya"
+  "aiResearchSourceMatter": "Dosya",
+  "demoApprovalTitleConflictNew": "Demo çıkar çatışması kontrolü — yeni başvuru",
+  "@demoApprovalTitleConflictNew": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoApprovalTitleEngagementWaiver": "Demo görev feragatnamesi",
+  "@demoApprovalTitleEngagementWaiver": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoApprovalTitleCourtFiling": "Demo mahkeme başvurusu onayı",
+  "@demoApprovalTitleCourtFiling": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoApprovalTitleExpense": "Demo masraf onayı",
+  "@demoApprovalTitleExpense": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoApprovalTitleConflictOpposing": "Demo çıkar çatışması kontrolü — karşı taraf",
+  "@demoApprovalTitleConflictOpposing": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoApprovalDescriptionWaiver": "Sentetik demo talebi — gerçek müvekkil veya dava verisi yok.",
+  "@demoApprovalDescriptionWaiver": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoApprovalDecisionApproved": "Demo kararı — onaylandı.",
+  "@demoApprovalDecisionApproved": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoApprovalDecisionRejected": "Demo kararı — reddedildi.",
+  "@demoApprovalDecisionRejected": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAlertDescriptionReview": "Sentetik demo uyarısı — gerçek bir uyum olayı gösterilmez.",
+  "@demoAlertDescriptionReview": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAttorneyHeadlineCorporate": "Kurumsal ve yönetişim danışmanı",
+  "@demoAttorneyHeadlineCorporate": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAttorneyHeadlineCivil": "Medeni dava ve sözleşmeler",
+  "@demoAttorneyHeadlineCivil": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAttorneyHeadlineCriminal": "Ceza savunması ve usul",
+  "@demoAttorneyHeadlineCriminal": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAttorneyHeadlineFamily": "Aile hukuku ve kişisel statü",
+  "@demoAttorneyHeadlineFamily": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAttorneyHeadlineStartup": "Girişim kuruluşu ve danışmanlık",
+  "@demoAttorneyHeadlineStartup": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAuditOrganizationCreated": "Kuruluş oluşturuldu (yalnızca meta veri)",
+  "@demoAuditOrganizationCreated": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAuditMemberInvited": "Üye davet edildi (yalnızca meta veri)",
+  "@demoAuditMemberInvited": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAuditMemberRoleChanged": "Üye rolü değiştirildi (yalnızca meta veri)",
+  "@demoAuditMemberRoleChanged": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAuditMembershipSuspended": "Üyelik askıya alındı (yalnızca meta veri)",
+  "@demoAuditMembershipSuspended": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAuditDemoAccountDeleted": "Demo hesap silindi (yalnızca meta veri)",
+  "@demoAuditDemoAccountDeleted": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAuditRoleChange": "rol değişikliği",
+  "@demoAuditRoleChange": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAuditInvitationSent": "davet gönderildi",
+  "@demoAuditInvitationSent": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "demoAuditSuspensionDenied": "askıya alma reddedildi",
+  "@demoAuditSuspensionDenied": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "homeActivityEmpty": "Henüz yeni etkinlik yok.",
+  "@homeActivityEmpty": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "discoveryEntrySubtitleConfigured": "Avukat profillerine ve uygulama alanlarına göz atın.",
+  "@discoveryEntrySubtitleConfigured": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "searchNoQueryConfigured": "Davalar, belgeler, mesajlar veya avukatlar arasında arama yapmak için bir arama terimi yazın.",
+  "@searchNoQueryConfigured": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "aiResearchNoMatchesConfigured": "Eşleşme bulunamadı. Farklı kelimeler deneyin.",
+  "@aiResearchNoMatchesConfigured": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "aiResearchEntrySubtitleConfigured": "Araştırma asistanına davalarınız ve belgeleriniz üzerinden sorun — yalnızca tavsiye niteliğinde.",
+  "@aiResearchEntrySubtitleConfigured": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToViewThese2": "Bu görevleri görüntüleme izniniz yok.",
+  "@errYouDoNotHavePermissionToViewThese2": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadTasksPleaseTryAgain": "Görevler yüklenemedi. Lütfen tekrar deneyin.",
+  "@errUnableToLoadTasksPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errARejectionNoteIsRequired": "Ret notu gerekli.",
+  "@errARejectionNoteIsRequired": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errAcknowledgingTheAlertIsTemporarilyUnavailablePleaseTry": "Uyarıyı görüldü olarak işaretlemek geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errAcknowledgingTheAlertIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errApprovalRequestNotFound": "Onay talebi bulunamadı.",
+  "@errApprovalRequestNotFound": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errApprovalsAreTemporarilyUnavailablePleaseTryAgain": "Onaylar geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errApprovalsAreTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errCancellingTheRequestIsTemporarilyUnavailablePleaseTry": "Talebi iptal etmek geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errCancellingTheRequestIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errComplianceAlertNotFound": "Uyum uyarısı bulunamadı.",
+  "@errComplianceAlertNotFound": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errComplianceAlertsAreTemporarilyUnavailablePleaseTryAgain": "Uyum uyarıları geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errComplianceAlertsAreTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errCreatingTheAlertIsTemporarilyUnavailablePleaseTry": "Uyarı oluşturmak geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errCreatingTheAlertIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errCreatingTheRequestIsTemporarilyUnavailablePleaseTry": "Talep oluşturmak geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errCreatingTheRequestIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errDecidingTheRequestIsTemporarilyUnavailablePleaseTry": "Talebe karar vermek geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errDecidingTheRequestIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errOnlyAPartnerCanDecideThisRequest": "Bu talebe yalnızca bir ortak karar verebilir.",
+  "@errOnlyAPartnerCanDecideThisRequest": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errOnlyAPartnerOrComplianceOfficerCanCreate": "Uyarıları yalnızca bir ortak veya uyum görevlisi oluşturabilir.",
+  "@errOnlyAPartnerOrComplianceOfficerCanCreate": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errOnlyAPartnerOrComplianceOfficerCanResolve": "Uyarıları yalnızca bir ortak veya uyum görevlisi çözebilir.",
+  "@errOnlyAPartnerOrComplianceOfficerCanResolve": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errOnlyAnActiveOrganizationMemberCanAcknowledgeAlerts": "Uyarıları yalnızca etkin bir kuruluş üyesi görüldü olarak işaretleyebilir.",
+  "@errOnlyAnActiveOrganizationMemberCanAcknowledgeAlerts": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errOnlyTheRequesterOrAPartnerCanCancel": "Bu talebi yalnızca talebi oluşturan veya bir ortak iptal edebilir.",
+  "@errOnlyTheRequesterOrAPartnerCanCancel": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errResolvingTheAlertIsTemporarilyUnavailablePleaseTry": "Uyarıyı çözmek geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errResolvingTheAlertIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errSelectAnOrganizationToViewApprovals": "Onayları görmek için bir kuruluş seçin.",
+  "@errSelectAnOrganizationToViewApprovals": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errSelectAnOrganizationToViewComplianceAlerts": "Uyum uyarılarını görmek için bir kuruluş seçin.",
+  "@errSelectAnOrganizationToViewComplianceAlerts": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheAlertCanNoLongerBeAcknowledged": "Uyarı artık görüldü olarak işaretlenemiyor.",
+  "@errTheAlertCanNoLongerBeAcknowledged": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheAlertCanNoLongerBeResolved": "Uyarı artık çözülemiyor.",
+  "@errTheAlertCanNoLongerBeResolved": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheAlertCouldNotBeCreatedCheckThe": "Uyarı oluşturulamadı. Ayrıntıları kontrol edip tekrar deneyin.",
+  "@errTheAlertCouldNotBeCreatedCheckThe": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheRequestCanNoLongerBeCancelled": "Talep artık iptal edilemiyor.",
+  "@errTheRequestCanNoLongerBeCancelled": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheRequestCouldNotBeCreatedCheckThe": "Talep oluşturulamadı. Ayrıntıları kontrol edip tekrar deneyin.",
+  "@errTheRequestCouldNotBeCreatedCheckThe": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheRequestCouldNotBeDecidedItMay": "Talebe karar verilemedi. Talep artık beklemede olmayabilir veya not eksik olabilir.",
+  "@errTheRequestCouldNotBeDecidedItMay": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheRequestIsNoLongerPending": "Talep artık beklemede değil.",
+  "@errTheRequestIsNoLongerPending": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToAcknowledgeTheAlertPleaseTryAgain": "Uyarı görüldü olarak işaretlenemedi. Lütfen tekrar deneyin.",
+  "@errUnableToAcknowledgeTheAlertPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToCancelTheRequestPleaseTryAgain": "Talep iptal edilemedi. Lütfen tekrar deneyin.",
+  "@errUnableToCancelTheRequestPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToCreateTheAlertPleaseTryAgain": "Uyarı oluşturulamadı. Lütfen tekrar deneyin.",
+  "@errUnableToCreateTheAlertPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToCreateTheRequestPleaseTryAgain": "Talep oluşturulamadı. Lütfen tekrar deneyin.",
+  "@errUnableToCreateTheRequestPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToDecideTheRequestPleaseTryAgain": "Talebe karar verilemedi. Lütfen tekrar deneyin.",
+  "@errUnableToDecideTheRequestPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadApprovalsPleaseTryAgain": "Onaylar yüklenemedi. Lütfen tekrar deneyin.",
+  "@errUnableToLoadApprovalsPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadComplianceAlertsPleaseTryAgain": "Uyum uyarıları yüklenemedi. Lütfen tekrar deneyin.",
+  "@errUnableToLoadComplianceAlertsPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToResolveTheAlertPleaseTryAgain": "Uyarı çözülemedi. Lütfen tekrar deneyin.",
+  "@errUnableToResolveTheAlertPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToCreateApproval": "Onay talebi oluşturma izniniz yok.",
+  "@errYouDoNotHavePermissionToCreateApproval": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToViewApprovals": "Onayları görüntüleme izniniz yok.",
+  "@errYouDoNotHavePermissionToViewApprovals": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToViewCompliance": "Uyum uyarılarını görüntüleme izniniz yok.",
+  "@errYouDoNotHavePermissionToViewCompliance": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errAcknowledgingTheTaskIsTemporarilyUnavailablePleaseTry": "Görevi onaylama geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errAcknowledgingTheTaskIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errAvailableTimesAreTemporarilyUnavailablePleaseTryAgain": "Uygun zamanlar geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errAvailableTimesAreTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errBookingIsTemporarilyUnavailablePleaseTryAgain": "Rezervasyon geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errBookingIsTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errCreatingTheTaskIsTemporarilyUnavailablePleaseTry": "Görev oluşturma geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errCreatingTheTaskIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errMessageIsTooLongMaxMaxMessageLengthCharacters": "Mesaj çok uzun (en fazla {maxMessageLength} karakter).",
+  "@errMessageIsTooLongMaxMaxMessageLengthCharacters": {
+    "description": "[REVIEW] machine-drafted; human review required before release",
+    "placeholders": {
+      "maxMessageLength": {
+        "type": "int"
+      }
+    }
+  },
+  "errMessagesAreTemporarilyUnavailablePleaseTryAgain": "Mesajlar geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errMessagesAreTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errOnlyTheAssignedPersonCanAcknowledgeThisTask": "Bu görevi yalnızca atanan kişi onaylayabilir.",
+  "@errOnlyTheAssignedPersonCanAcknowledgeThisTask": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errReAssigningTheTaskIsTemporarilyUnavailablePlease": "Görevi yeniden atama geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errReAssigningTheTaskIsTemporarilyUnavailablePlease": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errSendingIsTemporarilyUnavailablePleaseTryAgain": "Gönderme geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errSendingIsTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTasksAreTemporarilyUnavailablePleaseTryAgain": "Görevler geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errTasksAreTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errThatPersonCannotBeAssignedThisTaskChoose": "Bu görev o kişiye atanamaz. Kuruluşun etkin bir üyesini seçin.",
+  "@errThatPersonCannotBeAssignedThisTaskChoose": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errThatTimeIsNoLongerAvailableChooseAnother": "Bu saat artık müsait değil. Başka bir saat seçin.",
+  "@errThatTimeIsNoLongerAvailableChooseAnother": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheBookingDetailsAreInvalidCheckThemAnd": "Rezervasyon ayrıntıları geçersiz. Kontrol edip tekrar deneyin.",
+  "@errTheBookingDetailsAreInvalidCheckThemAnd": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheTaskCannotMoveToThatStatusIt": "Görev bu duruma taşınamaz. Zaten tamamlanmış olabilir.",
+  "@errTheTaskCannotMoveToThatStatusIt": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheTaskCouldNotBeCreatedCheckThe": "Görev oluşturulamadı. Başlığı kontrol edip tekrar deneyin.",
+  "@errTheTaskCouldNotBeCreatedCheckThe": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errThreadsAreTemporarilyUnavailablePleaseTryAgain": "Mesaj dizileri geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errThreadsAreTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToAcknowledgeTheTaskPleaseTryAgain": "Görev onaylanamadı. Lütfen tekrar deneyin.",
+  "@errUnableToAcknowledgeTheTaskPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToConfirmPleaseTryAgain": "Onaylanamadı. Lütfen tekrar deneyin.",
+  "@errUnableToConfirmPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToCreateTheTaskPleaseTryAgain": "Görev oluşturulamadı. Lütfen tekrar deneyin.",
+  "@errUnableToCreateTheTaskPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadAvailableTimesPleaseTryAgain": "Uygun zamanlar yüklenemedi. Lütfen tekrar deneyin.",
+  "@errUnableToLoadAvailableTimesPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadMessagesPleaseTryAgain": "Mesajlar yüklenemedi. Lütfen tekrar deneyin.",
+  "@errUnableToLoadMessagesPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadThreadsPleaseTryAgain": "Mesaj dizileri yüklenemedi. Lütfen tekrar deneyin.",
+  "@errUnableToLoadThreadsPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToReAssignTheTaskPleaseTry": "Görev yeniden atanamadı. Lütfen tekrar deneyin.",
+  "@errUnableToReAssignTheTaskPleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToSendTheMessagePleaseTryAgain": "Mesaj gönderilemedi. Lütfen tekrar deneyin.",
+  "@errUnableToSendTheMessagePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToUpdateTheTaskPleaseTryAgain": "Görev güncellenemedi. Lütfen tekrar deneyin.",
+  "@errUnableToUpdateTheTaskPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUpdatingTheTaskIsTemporarilyUnavailablePleaseTry": "Görev güncelleme geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errUpdatingTheTaskIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToAdvanceThis": "Bu görevi ilerletme izniniz yok.",
+  "@errYouDoNotHavePermissionToAdvanceThis": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToBookThis": "Bu danışmayı rezerve etme izniniz yok.",
+  "@errYouDoNotHavePermissionToBookThis": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToCreateTasks": "Bu dosyada görev oluşturma izniniz yok.",
+  "@errYouDoNotHavePermissionToCreateTasks": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToReAssign": "Bu görevi yeniden atama izniniz yok.",
+  "@errYouDoNotHavePermissionToReAssign": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToSendMessages": "Bu mesaj dizisinde mesaj gönderme izniniz yok.",
+  "@errYouDoNotHavePermissionToSendMessages": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToViewAvailable": "Uygun zamanları görüntüleme izniniz yok.",
+  "@errYouDoNotHavePermissionToViewAvailable": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToViewThese": "Bu mesajları görüntüleme izniniz yok.",
+  "@errYouDoNotHavePermissionToViewThese": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToViewThese3": "Bu mesaj dizilerini görüntüleme izniniz yok.",
+  "@errYouDoNotHavePermissionToViewThese3": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errAttorneyNotFound": "Avukat bulunamadı.",
+  "@errAttorneyNotFound": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheDirectoryIsTemporarilyUnavailableTryAgain": "Dizin geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errTheDirectoryIsTemporarilyUnavailableTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheProfileDetailsAreInvalidCheckThemAnd": "Profil bilgileri geçersiz. Kontrol edip tekrar deneyin.",
+  "@errTheProfileDetailsAreInvalidCheckThemAnd": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadTheDirectoryPleaseTryAgain": "Dizin yüklenemedi. Lütfen tekrar deneyin.",
+  "@errUnableToLoadTheDirectoryPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToManageThe": "Dizini yönetme izniniz yok.",
+  "@errYouDoNotHavePermissionToManageThe": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToViewThe": "Dizini görüntüleme izniniz yok.",
+  "@errYouDoNotHavePermissionToViewThe": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errNotificationsAreTemporarilyUnavailablePleaseTryAgain": "Bildirimler geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errNotificationsAreTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errThisFileIsTooLarge": "Bu dosya çok büyük.",
+  "@errThisFileIsTooLarge": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errThisFileTypeIsNotSupported": "Bu dosya türü desteklenmiyor.",
+  "@errThisFileTypeIsNotSupported": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToCheckThePaymentStatusPleaseTry": "Ödeme durumu kontrol edilemedi. Lütfen tekrar deneyin.",
+  "@errUnableToCheckThePaymentStatusPleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadDocumentsPleaseTryAgain": "Belgeler yüklenemedi. Lütfen tekrar deneyin.",
+  "@errUnableToLoadDocumentsPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadFilesPleaseTryAgain": "Dosyalar yüklenemedi. Lütfen tekrar deneyin.",
+  "@errUnableToLoadFilesPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadInvoicesPleaseTryAgain": "Faturalar yüklenemedi. Lütfen tekrar deneyin.",
+  "@errUnableToLoadInvoicesPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadMattersPleaseTryAgain": "Davalar yüklenemedi. Lütfen tekrar deneyin.",
+  "@errUnableToLoadMattersPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadNotificationsPleaseTryAgain": "Bildirimler yüklenemedi. Lütfen tekrar deneyin.",
+  "@errUnableToLoadNotificationsPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToOpenTheFilePleaseTryAgain": "Dosya açılamadı. Lütfen tekrar deneyin.",
+  "@errUnableToOpenTheFilePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToStartThePaymentPleaseTryAgain": "Ödeme başlatılamadı. Lütfen tekrar deneyin.",
+  "@errUnableToStartThePaymentPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToUploadTheFilePleaseTryAgain": "Dosya yüklenemedi. Lütfen tekrar deneyin.",
+  "@errUnableToUploadTheFilePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToUploadFiles": "Bu davaya dosya yükleme izniniz yok.",
+  "@errYouDoNotHavePermissionToUploadFiles": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errAIResearchIsNotConfiguredForThisDeployment": "Yapay zekâ araştırması bu dağıtım için yapılandırılmamış. Hiçbir analiz çalıştırılmadı.",
+  "@errAIResearchIsNotConfiguredForThisDeployment": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errAnActionIsAlreadyInProgress": "Zaten devam eden bir işlem var.",
+  "@errAnActionIsAlreadyInProgress": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errEndingTheConsultationIsTemporarilyUnavailablePleaseTry": "Görüşmeyi sonlandırma geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errEndingTheConsultationIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errEnterAQuestionBetweenResearchRequestMinQuestionLengthAndResearchRequest": "{minQuestionLength} ile {maxQuestionLength} karakter arasında bir soru girin ve bir kuruluş seçin.",
+  "@errEnterAQuestionBetweenResearchRequestMinQuestionLengthAndResearchRequest": {
+    "description": "[REVIEW] machine-drafted; human review required before release",
+    "placeholders": {
+      "minQuestionLength": {
+        "type": "int"
+      },
+      "maxQuestionLength": {
+        "type": "int"
+      }
+    }
+  },
+  "errOnlyAPartnerOrAttorneyCanScheduleA": "Video görüşmesini yalnızca bir ortak veya avukat planlayabilir.",
+  "@errOnlyAPartnerOrAttorneyCanScheduleA": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errOnlyTheCreatorOrAPartnerCanEnd": "Bu görüşmeyi yalnızca oluşturan kişi veya bir ortak sonlandırabilir.",
+  "@errOnlyTheCreatorOrAPartnerCanEnd": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errOrganizationMembershipsCouldNotBeLoaded": "Kuruluş üyelikleri yüklenemedi.",
+  "@errOrganizationMembershipsCouldNotBeLoaded": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errSchedulingAConsultationIsTemporarilyUnavailablePleaseTry": "Görüşme planlama geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errSchedulingAConsultationIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errSelectAResearchRunToViewItsFindings": "Bulgularını görüntülemek için bir araştırma çalışması seçin.",
+  "@errSelectAResearchRunToViewItsFindings": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errSelectAVideoConsultationToJoin": "Katılmak için bir video görüşmesi seçin.",
+  "@errSelectAVideoConsultationToJoin": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errSelectAnOrganizationToScheduleAConsultation": "Görüşme planlamak için bir kuruluş seçin.",
+  "@errSelectAnOrganizationToScheduleAConsultation": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errSelectAnOrganizationToViewResearchRuns": "Araştırma çalışmalarını görüntülemek için bir kuruluş seçin.",
+  "@errSelectAnOrganizationToViewResearchRuns": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errSelectAnOrganizationToViewVideoConsultations": "Video görüşmelerini görüntülemek için bir kuruluş seçin.",
+  "@errSelectAnOrganizationToViewVideoConsultations": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errSignInAgainToUseVideoConsultations": "Video görüşmelerini kullanmak için tekrar oturum açın.",
+  "@errSignInAgainToUseVideoConsultations": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errStartingTheConsultationIsTemporarilyUnavailablePleaseTry": "Görüşmeyi başlatma geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errStartingTheConsultationIsTemporarilyUnavailablePleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheAIProviderReturnedAnUnexpectedResponsePlease": "Yapay zekâ sağlayıcısı beklenmeyen bir yanıt döndürdü. Lütfen tekrar deneyin.",
+  "@errTheAIProviderReturnedAnUnexpectedResponsePlease": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheConsultationCouldNotBeScheduledCheckThe": "Görüşme planlanamadı. Ayrıntıları kontrol edip tekrar deneyin.",
+  "@errTheConsultationCouldNotBeScheduledCheckThe": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheConsultationIsNotAvailableToJoinRight": "Görüşmeye şu anda katılmak mümkün değil.",
+  "@errTheConsultationIsNotAvailableToJoinRight": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheSelectedContextIsTooLargeRemoveDocuments": "Seçilen bağlam çok büyük. Bazı belgeleri kaldırıp tekrar deneyin.",
+  "@errTheSelectedContextIsTooLargeRemoveDocuments": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheSelectedResearchRunWasNotFound": "Seçilen araştırma çalışması bulunamadı.",
+  "@errTheSelectedResearchRunWasNotFound": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errThisConsultationCanNoLongerBeEnded": "Bu görüşme artık sonlandırılamaz.",
+  "@errThisConsultationCanNoLongerBeEnded": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errThisConsultationCanNoLongerBeStarted": "Bu görüşme artık başlatılamaz.",
+  "@errThisConsultationCanNoLongerBeStarted": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errThisVideoConsultationHasAlreadyEnded": "Bu video görüşmesi zaten sona erdi.",
+  "@errThisVideoConsultationHasAlreadyEnded": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errThisVideoConsultationWasNotFound": "Bu video görüşmesi bulunamadı.",
+  "@errThisVideoConsultationWasNotFound": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToEndTheConsultationPleaseTryAgain": "Görüşme sonlandırılamadı. Lütfen tekrar deneyin.",
+  "@errUnableToEndTheConsultationPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToJoinTheConsultationPleaseTryAgain": "Görüşmeye katılınamadı. Lütfen tekrar deneyin.",
+  "@errUnableToJoinTheConsultationPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadVideoConsultationsPleaseTryAgain": "Video görüşmeleri yüklenemedi. Lütfen tekrar deneyin.",
+  "@errUnableToLoadVideoConsultationsPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToReadTheVideoConsultationPleaseTry": "Video görüşmesi okunamadı. Lütfen tekrar deneyin.",
+  "@errUnableToReadTheVideoConsultationPleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToRunAIResearchPleaseTryAgain": "Yapay zekâ araştırması çalıştırılamadı. Lütfen tekrar deneyin.",
+  "@errUnableToRunAIResearchPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToScheduleTheConsultationPleaseTryAgain": "Görüşme planlanamadı. Lütfen tekrar deneyin.",
+  "@errUnableToScheduleTheConsultationPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToStartTheConsultationPleaseTryAgain": "Görüşme başlatılamadı. Lütfen tekrar deneyin.",
+  "@errUnableToStartTheConsultationPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errVideoCallsAreNotConfiguredForThisDeployment": "Video aramaları bu dağıtım için yapılandırılmamış. Hiçbir arama başlatılmadı.",
+  "@errVideoCallsAreNotConfiguredForThisDeployment": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errVideoCallsAreTemporarilyUnavailablePleaseTryAgain": "Video aramaları geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errVideoCallsAreTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errVideoConsultationsAreTemporarilyUnavailablePleaseTryAgain": "Video görüşmeleri geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+  "@errVideoConsultationsAreTemporarilyUnavailablePleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errWeCouldnTCompleteThatRequestPleaseTry": "Bu isteği tamamlayamadık. Lütfen tekrar deneyin.",
+  "@errWeCouldnTCompleteThatRequestPleaseTry": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToJoinThis": "Bu görüşmeye katılma izniniz yok.",
+  "@errYouDoNotHavePermissionToJoinThis": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToStartThis": "Bu görüşmeyi başlatma izniniz yok.",
+  "@errYouDoNotHavePermissionToStartThis": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouDoNotHavePermissionToViewVideo": "Video görüşmelerini görüntüleme izniniz yok.",
+  "@errYouDoNotHavePermissionToViewVideo": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  }
 }

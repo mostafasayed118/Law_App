@@ -1,5 +1,7 @@
+import 'package:legalhub/core/pagination.dart';
 import 'package:legalhub/data/postgrest_failures.dart';
 import 'package:legalhub/data/supabase_seam.dart';
+import 'package:legalhub/data/supabase_wire.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_message_api.dart';
@@ -117,8 +119,12 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
           'id, matter_id, title, participants, message_count, '
           'last_activity_at, matters(title)';
       return matterId == null
-          ? await _table('message_threads', columns)
-          : await _matterTable('message_threads', columns, matterId);
+          ? await _table(SupabaseTables.messageThreads, columns)
+          : await _matterTable(
+              SupabaseTables.messageThreads,
+              columns,
+              matterId,
+            );
     } on PostgrestException catch (e) {
       throw SupabaseMessageException(kind: _kindFor(e), message: e.message);
     } on Exception {
@@ -135,7 +141,7 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
   @override
   Future<List<Map<String, dynamic>>> searchMessageThreads(
     String query, {
-    int limit = 30,
+    int limit = kSearchPageSize,
   }) async {
     try {
       // Same RLS scope, columns, and matters(title) embed as
@@ -144,7 +150,7 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
       // (participants included) and takes the requested top-N (see
       // _boundSearch for why the title-only SQL prefilter was dropped).
       return await _searchCaller(
-        'message_threads',
+        SupabaseTables.messageThreads,
         'id, matter_id, title, participants, message_count, '
             'last_activity_at, matters(title)',
         'title',
@@ -170,7 +176,7 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
       // cross the seam. The body column is the D-MSG1 consummation — read
       // path only (D-RT5).
       return await _table(
-        'messages',
+        SupabaseTables.messages,
         'id, thread_id, author_display_name, body, sent_at',
         threadId,
       );
@@ -200,7 +206,7 @@ class SupabaseMessageApiImpl implements SupabaseMessageApi {
       // follow-up 2026-09-27): the gateway maps the VO from this response
       // directly — no follow-up fetchMessages re-read per send.
       final PostgrestResponse<dynamic> response = await _rpcCaller(
-        'send_message',
+        SupabaseRpcs.sendMessage,
         <String, dynamic>{'p_thread_id': threadId, 'p_body': body},
       );
       final Object? data = response.data;

@@ -1,5 +1,6 @@
 import 'package:legalhub/data/postgrest_failures.dart';
 import 'package:legalhub/data/supabase_seam.dart';
+import 'package:legalhub/data/supabase_wire.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_billing_api.dart';
@@ -62,8 +63,12 @@ class SupabaseBillingApiImpl implements SupabaseBillingApi {
           'id, matter_id, invoice_number, amount_cents, currency, status, '
           'issued_at, due_at, matters(title)';
       return matterId == null
-          ? await _table('billing_invoices', columns)
-          : await _matterTable('billing_invoices', columns, matterId);
+          ? await _table(SupabaseTables.billingInvoices, columns)
+          : await _matterTable(
+              SupabaseTables.billingInvoices,
+              columns,
+              matterId,
+            );
     } on PostgrestException catch (e) {
       throw SupabaseBillingException(kind: _kindFor(e), message: e.message);
     } on Exception {

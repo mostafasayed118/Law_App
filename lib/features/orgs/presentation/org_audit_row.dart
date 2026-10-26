@@ -10,6 +10,7 @@ class _AuditRow extends StatelessWidget {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final DemoLabels labels = DemoLabels(l10n, localOnly: backendIsLocalOnly);
     final String issued = formatMediumDate(
       l10n,
       entry.serverTimestamp.toLocal(),
@@ -41,7 +42,7 @@ class _AuditRow extends StatelessWidget {
             ),
             const SizedBox(height: LegalHubTheme.spaceXs),
             Text(
-              entry.redactedSummary,
+              labels.auditSummary(entry.redactedSummary),
               style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
             ),
             const SizedBox(height: LegalHubTheme.spaceXs),

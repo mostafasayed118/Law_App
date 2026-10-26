@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/storage/domain/file_metadata.dart';
 import 'package:legalhub/features/storage/domain/file_picker.dart';
@@ -58,6 +59,7 @@ void main() {
           AppError(
             code: 'file_upload_unsupported_type',
             userMessage: 'This file type is not supported.',
+            messageKey: AppMessageKey.errThisFileTypeIsNotSupported,
           ),
           fileName: 'archive.zip',
         ),
@@ -80,6 +82,7 @@ void main() {
           AppError(
             code: 'file_upload_too_large',
             userMessage: 'This file is too large.',
+            messageKey: AppMessageKey.errThisFileIsTooLarge,
           ),
           fileName: 'huge.pdf',
         ),
@@ -158,6 +161,7 @@ void main() {
           AppError(
             code: 'file_upload_failed',
             userMessage: 'Unable to upload the file. Please try again.',
+            messageKey: AppMessageKey.errUnableToUploadTheFilePleaseTryAgain,
           ),
         ),
       ],
@@ -206,6 +210,7 @@ void main() {
           AppError(
             code: 'file_open_failed',
             userMessage: 'Unable to open the file. Please try again.',
+            messageKey: AppMessageKey.errUnableToOpenTheFilePleaseTryAgain,
           ),
           fileName: 'Demo retainer scan',
         ),

@@ -1,5 +1,14 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+/// PostgREST/SQLSTATE codes shared by the data-seam classifiers.
+abstract final class PostgrestCodes {
+  static const String validation = '23514';
+  static const String uniqueViolation = '23505';
+  static const String undefinedFunction = '42883';
+  static const String schemaCacheMiss = 'PGRST202';
+  static const String invalidResponse = 'PGRST116';
+}
+
 /// Shared classification of a PostgREST failure at the data seam.
 ///
 /// The RLS-denial rule used to be copy-pasted into every api impl's `_kindFor`

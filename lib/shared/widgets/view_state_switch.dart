@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/l10n/app_error_label.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
 /// Renders the non-success arms of a `ViewState<T>` list switch and delegates
@@ -78,13 +79,13 @@ class ViewStateSwitch<T> extends StatelessWidget {
         child: const Center(child: CircularProgressIndicator()),
       ),
       ViewEmpty<T>() => empty,
-      ViewError<T>() => Padding(
+      ViewError<T>(error: final error) => Padding(
         padding: errorPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              errorCopy,
+              appErrorLabel(l10n, error, fallback: errorCopy),
               style:
                   errorTextStyle ??
                   text.bodyMedium?.copyWith(color: scheme.error),

@@ -263,6 +263,7 @@ class _VideoCreateSheetState extends State<VideoCreateSheet> {
   };
 
   Widget _matterDropdown(AppLocalizations l10n, List<Matter> matters) {
+    final DemoLabels labels = DemoLabels(l10n, localOnly: backendIsLocalOnly);
     return DropdownButtonFormField<String?>(
       initialValue: _selectedMatterId,
       decoration: InputDecoration(
@@ -274,7 +275,7 @@ class _VideoCreateSheetState extends State<VideoCreateSheet> {
         for (final Matter matter in matters)
           DropdownMenuItem<String?>(
             value: matter.id,
-            child: Text(demoMatterTitle(l10n, matter.title)),
+            child: Text(labels.matterTitle(matter.title)),
           ),
       ],
       onChanged: _submitting

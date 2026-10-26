@@ -47,16 +47,27 @@ class _FindingsSection extends StatelessWidget {
   }
 }
 
-/// Maps the preserved wire code to the typed, localized copy. Unknown codes
-/// fall back to the generic research error rather than leaking provider text.
+/// Resolves the gateway's [AppMessageKey] first — that key is preserved even
+/// when an unknown provider code is mapped to `research_failed` — then falls
+/// back to the wire-code switch for unkeyed errors. Unknown codes render the
+/// generic research copy rather than leaking provider text.
 String _errorMessage(AppLocalizations l10n, AppError? error) {
-  return switch (error?.code) {
-    'unauthorized' => l10n.aiResearchErrorUnauthorized,
-    'forbidden' => l10n.aiResearchErrorForbidden,
-    'invalid_request' => l10n.aiResearchErrorInvalidRequest,
-    'context_too_large' => l10n.aiResearchErrorContextTooLarge,
-    'provider_unavailable' => l10n.aiResearchErrorProviderUnavailable,
-    'invalid_response' => l10n.aiResearchErrorInvalidResponse,
+  final AppError? typedError = error;
+  if (typedError != null && typedError.messageKey != null) {
+    return appMessage(
+      l10n,
+      typedError.messageKey!,
+      args: typedError.messageArgs,
+    );
+  }
+  return switch (typedError?.code) {
+    ResearchWireCodes.unauthorized => l10n.aiResearchErrorUnauthorized,
+    ResearchWireCodes.forbidden => l10n.aiResearchErrorForbidden,
+    ResearchWireCodes.invalidRequest => l10n.aiResearchErrorInvalidRequest,
+    ResearchWireCodes.contextTooLarge => l10n.aiResearchErrorContextTooLarge,
+    ResearchWireCodes.providerUnavailable =>
+      l10n.aiResearchErrorProviderUnavailable,
+    ResearchWireCodes.invalidResponse => l10n.aiResearchErrorInvalidResponse,
     _ => l10n.aiResearchError,
   };
 }

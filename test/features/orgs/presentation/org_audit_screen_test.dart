@@ -62,6 +62,26 @@ void main() {
     expect(find.byIcon(Icons.upload_outlined), findsNothing);
   });
 
+  testWidgets('maps demo redacted summaries in local mode (Task 26)', (
+    WidgetTester tester,
+  ) async {
+    final AppLocalizations ar = await AppLocalizations.delegate.load(
+      const Locale('ar'),
+    );
+    await tester.pumpWidget(
+      harness(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+        locale: const Locale('ar'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text(ar.demoAuditRoleChange), findsOneWidget);
+    expect(find.text('role change'), findsNothing);
+    // The action wire vocabulary stays verbatim.
+    expect(find.text('member:role/change'), findsOneWidget);
+  });
+
   testWidgets('shows the honest empty state for a fresh org', (
     WidgetTester tester,
   ) async {

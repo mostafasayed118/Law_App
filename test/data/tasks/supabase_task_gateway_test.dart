@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/data/tasks/supabase_task_api.dart';
 import 'package:legalhub/data/tasks/supabase_task_gateway.dart';
@@ -73,9 +74,11 @@ void main() {
       final Result<List<TaskItem>> result = await gateway.fetchTasks();
 
       expect(result, isA<Failure<List<TaskItem>>>());
+      final AppError error = (result as Failure<List<TaskItem>>).error;
+      expect(error.code, 'task_read_failed');
       expect(
-        (result as Failure<List<TaskItem>>).error.code,
-        'task_read_failed',
+        error.messageKey,
+        AppMessageKey.errUnableToLoadTasksPleaseTryAgain,
       );
     });
 

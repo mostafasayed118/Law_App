@@ -139,6 +139,7 @@ mixin _AuthHydration on _AuthCubitBase {
         AppError(
           code: 'membershipHydrationFailed',
           userMessage: 'Organization memberships could not be loaded.',
+          messageKey: AppMessageKey.errOrganizationMembershipsCouldNotBeLoaded,
           context: <String, Object?>{'kind': kind.name},
         ),
       );

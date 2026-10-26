@@ -10,6 +10,7 @@ class _InvoiceTile extends StatelessWidget {
     required this.mode,
     required this.paymentGateway,
     required this.launcher,
+    required this.localOnly,
     required this.onSettled,
   });
 
@@ -17,11 +18,13 @@ class _InvoiceTile extends StatelessWidget {
   final PaymentMode mode;
   final PaymentGateway paymentGateway;
   final CheckoutLauncher launcher;
+  final bool localOnly;
   final Future<void> Function() onSettled;
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final DemoLabels labels = DemoLabels(l10n, localOnly: localOnly);
     final String amount = invoiceAmountLabel(invoice.amountCents);
     final String status = invoiceStatusLabel(l10n, invoice.status);
     final String issued = formatMediumDate(l10n, invoice.issuedAt);
@@ -33,7 +36,7 @@ class _InvoiceTile extends StatelessWidget {
       title: invoice.invoiceNumber,
       subtitles: <String>[
         '${invoice.currency} $amount · $status',
-        '${demoMatterTitle(l10n, invoice.matterRef)} · $issued',
+        '${labels.matterTitle(invoice.matterRef)} · $issued',
       ],
       trailing: Align(
         alignment: AlignmentDirectional.centerEnd,

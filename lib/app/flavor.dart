@@ -49,7 +49,6 @@ class AppConfig {
     required this.flavor,
     required this.appName,
     required this.applicationId,
-    required this.apiBaseUrl,
     required this.supabaseUrl,
     required this.supabaseAnonKey,
   });
@@ -59,25 +58,21 @@ class AppConfig {
   const AppConfig.development({
     this.supabaseUrl = '',
     this.supabaseAnonKey = '',
-    this.apiBaseUrl = '',
   }) : flavor = AppFlavor.development,
        appName = 'LegalHub Dev',
        applicationId = 'com.legalhub.app.dev';
 
   /// Production defaults: store display name + un-suffixed application ID.
-  const AppConfig.production({
-    this.supabaseUrl = '',
-    this.supabaseAnonKey = '',
-    this.apiBaseUrl = '',
-  }) : flavor = AppFlavor.production,
-       appName = 'LegalHub',
-       applicationId = 'com.legalhub.app';
+  const AppConfig.production({this.supabaseUrl = '', this.supabaseAnonKey = ''})
+    : flavor = AppFlavor.production,
+      appName = 'LegalHub',
+      applicationId = 'com.legalhub.app';
 
   /// Reads the configuration from build-time dart-defines.
   ///
   /// `APP_FLAVOR` picks the default set; `APP_NAME`, `APPLICATION_ID`,
-  /// `API_BASE_URL`, `SUPABASE_URL`, and `SUPABASE_ANON_KEY` each override
-  /// their default when non-empty. An empty Supabase pair means "not
+  /// `SUPABASE_URL`, and `SUPABASE_ANON_KEY` each override their default
+  /// when non-empty. An empty Supabase pair means "not
   /// configured": the DI flip stays on the credential-free fakes, so
   /// env-less runs and tests keep working.
   factory AppConfig.fromEnvironment() {
@@ -104,7 +99,6 @@ class AppConfig {
   static AppConfig _fromEnvironment(AppConfig defaults) {
     const String appName = String.fromEnvironment('APP_NAME');
     const String applicationId = String.fromEnvironment('APPLICATION_ID');
-    const String apiBaseUrl = String.fromEnvironment('API_BASE_URL');
     const String supabaseUrl = String.fromEnvironment('SUPABASE_URL');
     const String supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
     return AppConfig(
@@ -113,7 +107,6 @@ class AppConfig {
       applicationId: applicationId.isEmpty
           ? defaults.applicationId
           : applicationId,
-      apiBaseUrl: apiBaseUrl.isEmpty ? defaults.apiBaseUrl : apiBaseUrl,
       supabaseUrl: supabaseUrl,
       supabaseAnonKey: supabaseAnonKey,
     );
@@ -127,10 +120,6 @@ class AppConfig {
 
   /// Android `applicationId` / iOS bundle identifier.
   final String applicationId;
-
-  /// Base URL of the LegalHub REST backend, when one is configured.
-  /// Empty means "no separate backend": Supabase is the backend.
-  final String apiBaseUrl;
 
   /// Supabase project URL for this flavor.
   final String supabaseUrl;

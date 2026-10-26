@@ -1,5 +1,6 @@
 import 'package:legalhub/data/postgrest_failures.dart';
 import 'package:legalhub/data/supabase_seam.dart';
+import 'package:legalhub/data/supabase_wire.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_notification_api.dart';
@@ -49,7 +50,7 @@ class SupabaseNotificationApiImpl implements SupabaseNotificationApi {
       // caller's active-org rows. Metadata only — the D-N3 column list
       // carries no user-identity/content data (redaction structural, T1 Q1).
       return await _table(
-        'notifications',
+        SupabaseTables.notifications,
         'id, category, type, summary, server_timestamp, is_read',
       );
     } on PostgrestException catch (e) {
@@ -87,7 +88,7 @@ class SupabaseNotificationApiImpl implements SupabaseNotificationApi {
       // single uuid[] param. The in-function gate is the sole write
       // authorization; a Postgrest denial maps to the typed kind below.
       final Object? result = await _rpc(
-        'mark_notifications_read',
+        SupabaseRpcs.markNotificationsRead,
         <String, Object?>{'p_notification_ids': ids},
       );
       if (result is int) {

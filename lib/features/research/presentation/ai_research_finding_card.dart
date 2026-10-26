@@ -10,7 +10,7 @@ part of 'ai_research_screen.dart';
 /// the honest "no source cited" line instead of inventing a citation.
 typedef _LocalizedFinding = ({String headline, String summary, String excerpt});
 
-_LocalizedFinding _localizeFinding(AppLocalizations l10n, AiFinding finding) {
+_LocalizedFinding _localizeFinding(DemoLabels labels, AiFinding finding) {
   if (finding.sources.isEmpty) {
     return (
       headline: finding.headline,
@@ -26,21 +26,19 @@ _LocalizedFinding _localizeFinding(AppLocalizations l10n, AiFinding finding) {
       excerpt: finding.excerpt,
     );
   }
-  final String title = demoCorpusTitle(l10n, first.title);
+  final AppLocalizations l10n = labels.l10n;
+  final String title = labels.corpusTitle(first.title);
   if (first.kind == AiSourceKind.document) {
     final String ref = finding.sources.length > 1
-        ? demoCorpusTitle(l10n, finding.sources[1].title)
+        ? labels.corpusTitle(finding.sources[1].title)
         : '';
     return (
       headline: l10n.researchHeadline(title),
       summary: l10n.researchSummaryDoc(title, ref),
-      excerpt: l10n.researchExcerptDoc(
-        demoSourceDetail(l10n, first.detail),
-        ref,
-      ),
+      excerpt: l10n.researchExcerptDoc(labels.sourceDetail(first.detail), ref),
     );
   }
-  final String area = demoSourceDetail(l10n, first.detail);
+  final String area = labels.sourceDetail(first.detail);
   return (
     headline: l10n.researchHeadline(title),
     summary: l10n.researchSummaryMatter(title, area),
@@ -48,19 +46,19 @@ _LocalizedFinding _localizeFinding(AppLocalizations l10n, AiFinding finding) {
   );
 }
 
-String _sourceLabel(AppLocalizations l10n, AiSource source) {
+String _sourceLabel(DemoLabels labels, AiSource source) {
   switch (source.kind) {
     case AiSourceKind.none:
-      return l10n.aiResearchNoSourceCited;
+      return labels.l10n.aiResearchNoSourceCited;
     case AiSourceKind.document:
     case AiSourceKind.matter:
       if (source.title.isNotEmpty) {
-        return '${demoCorpusTitle(l10n, source.title)} — '
-            '${demoSourceDetail(l10n, source.detail)}';
+        return '${labels.corpusTitle(source.title)} — '
+            '${labels.sourceDetail(source.detail)}';
       }
       final String kindLabel = source.kind == AiSourceKind.document
-          ? l10n.aiResearchSourceDocument
-          : l10n.aiResearchSourceMatter;
+          ? labels.l10n.aiResearchSourceDocument
+          : labels.l10n.aiResearchSourceMatter;
       return source.sourceId == null
           ? kindLabel
           : '$kindLabel — ${source.sourceId}';
@@ -81,13 +79,14 @@ class _FindingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final DemoLabels labels = DemoLabels(l10n, localOnly: backendIsLocalOnly);
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
     // The gateway ships static EN copy for the demo, so the card recomposes
     // the prose from the structured citation sources through localized
     // templates. An unexpected shape falls back to the gateway strings
     // (never blank).
-    final _LocalizedFinding copy = _localizeFinding(l10n, finding);
+    final _LocalizedFinding copy = _localizeFinding(labels, finding);
     return Material(
       color: scheme.surfaceContainerLowest,
       shape: RoundedRectangleBorder(
@@ -144,7 +143,7 @@ class _FindingCard extends StatelessWidget {
                       const SizedBox(width: LegalHubTheme.spaceXs),
                       Expanded(
                         child: Text(
-                          _sourceLabel(l10n, source),
+                          _sourceLabel(labels, source),
                           style: text.bodySmall,
                         ),
                       ),

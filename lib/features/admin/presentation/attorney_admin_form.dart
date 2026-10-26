@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/core/contracts/server_limits.dart';
 import 'package:legalhub/core/practice_area.dart';
 import 'package:legalhub/features/discovery/domain/attorney.dart';
 import 'package:legalhub/features/discovery/domain/attorney_admin_gateway.dart';
@@ -93,6 +94,7 @@ class _AttorneyAdminFormState extends State<AttorneyAdminForm> {
                 label: l10n.attorneyAdminNameLabel,
                 hint: l10n.attorneyAdminNameLabel,
                 textInputAction: TextInputAction.next,
+                maxLength: kAttorneyNameMaxLength,
                 validator: (String? value) {
                   final String trimmed = value?.trim() ?? '';
                   if (trimmed.isEmpty) {
@@ -110,7 +112,7 @@ class _AttorneyAdminFormState extends State<AttorneyAdminForm> {
                 label: l10n.attorneyAdminHeadlineLabel,
                 hint: l10n.attorneyAdminHeadlineLabel,
                 textInputAction: TextInputAction.next,
-                maxLength: 160,
+                maxLength: kTitleMaxLength,
               ),
               const SizedBox(height: LegalHubTheme.spaceMd),
               LegalHubTextField(
@@ -118,7 +120,7 @@ class _AttorneyAdminFormState extends State<AttorneyAdminForm> {
                 label: l10n.attorneyAdminCityLabel,
                 hint: l10n.attorneyAdminCityLabel,
                 textInputAction: TextInputAction.next,
-                maxLength: 120,
+                maxLength: kAttorneyNameMaxLength,
               ),
               const SizedBox(height: LegalHubTheme.spaceMd),
               LegalHubTextField(
@@ -172,7 +174,7 @@ class _AttorneyAdminFormState extends State<AttorneyAdminForm> {
                 child: TextFormField(
                   controller: _bio,
                   maxLines: 4,
-                  maxLength: 2000,
+                  maxLength: kAttorneyBioMaxLength,
                   decoration: InputDecoration(
                     hintText: l10n.attorneyAdminBioLabel,
                   ),

@@ -40,6 +40,7 @@ class NotificationFeedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final bool localOnly = backendIsLocalOnly;
+    final DemoLabels labels = DemoLabels(l10n, localOnly: localOnly);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.notificationsFeedTitle)),
       // The shared cubit-scoped list shell (audit 2026-09-21, M-10). The
@@ -57,6 +58,7 @@ class NotificationFeedScreen extends StatelessWidget {
             tileBuilder: (BuildContext context, Notification notification) =>
                 _NotificationTile(
                   notification: notification,
+                  labels: labels,
                   onMarkRead: (String id) =>
                       context.read<NotificationCubit>().markRead(id),
                 ),
@@ -103,7 +105,7 @@ class _ActionErrorBanner extends StatelessWidget {
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: scheme.errorContainer,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(LegalHubTheme.radiusLg),
             ),
             child: Padding(
               padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceSm),

@@ -123,6 +123,10 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
                   builder: (BuildContext context, ViewState<void> state) {
                     final bool loading = state is ViewLoading<void>;
                     final bool error = state is ViewError<void>;
+                    final ViewState<void> localized = localizeRecoveryError(
+                      state,
+                      l10n,
+                    );
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
@@ -132,7 +136,10 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
                               bottom: LegalHubTheme.spaceMd,
                             ),
                             child: ViewStateView<void>(
-                              state: localizeRecoveryError(state, l10n),
+                              state: localized,
+                              errorFallback: localized is ViewError<void>
+                                  ? localized.error.userMessage
+                                  : null,
                               onRetry: () => context
                                   .read<PasswordRecoveryCubit>()
                                   .resetToEmpty(),

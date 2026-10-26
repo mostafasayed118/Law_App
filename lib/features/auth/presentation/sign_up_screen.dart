@@ -43,6 +43,8 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  static const double _maxContentWidth = 520;
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _fullName = TextEditingController();
   final TextEditingController _email = TextEditingController();
@@ -83,7 +85,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 }
               },
             ),
-            maxWidth: 520,
+            maxWidth: _maxContentWidth,
             scrollPadding: const EdgeInsetsDirectional.fromSTEB(
               LegalHubTheme.marginMobile,
               LegalHubTheme.spaceLg,
@@ -199,6 +201,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
             builder: (BuildContext context, ViewState<void> state) {
               final bool loading = state is ViewLoading<void>;
               final bool error = state is ViewError<void>;
+              final ViewState<void> localized = _localizeSignUpError(
+                state,
+                l10n,
+              );
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
@@ -208,7 +214,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         bottom: LegalHubTheme.spaceMd,
                       ),
                       child: ViewStateView<void>(
-                        state: _localizeSignUpError(state, l10n),
+                        state: localized,
+                        errorFallback: localized is ViewError<void>
+                            ? localized.error.userMessage
+                            : null,
                         onRetry: () =>
                             context.read<SignUpCubit>().resetToEmpty(),
                       ),
@@ -275,6 +284,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
         AppError(
           code: state.error.code,
           userMessage: message,
+          messageKey: state.error.messageKey,
+          messageArgs: state.error.messageArgs,
           // Preserve the redacted diagnostic context (ADR-0003) and any
           // technical message so diagnostics stay intact.
           technicalMessage: state.error.technicalMessage,

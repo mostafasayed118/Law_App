@@ -25,6 +25,8 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+  static const double _maxContentWidth = 520;
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
@@ -41,7 +43,7 @@ class _SignInScreenState extends State<SignInScreen> {
     final AppLocalizations l10n = AppLocalizations.of(context);
     return AuthScaffold(
       leading: const _SignInBackButton(),
-      maxWidth: 520,
+      maxWidth: _maxContentWidth,
       scrollPadding: const EdgeInsetsDirectional.fromSTEB(
         LegalHubTheme.marginMobile,
         LegalHubTheme.spaceLg,

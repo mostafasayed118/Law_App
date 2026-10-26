@@ -1,5 +1,23 @@
 part of 'home_screen.dart';
 
+/// Honest empty state for the recent-activity section in a configured
+/// (real-backend) build: the dashboard has no activity feed yet, so the
+/// deterministic demo fixture must not stand in for real data.
+class _HomeActivityEmpty extends StatelessWidget {
+  const _HomeActivityEmpty();
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    return Text(
+      l10n.homeActivityEmpty,
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
+    );
+  }
+}
+
 List<Widget> _homeActivityCards(BuildContext context) {
   final AppLocalizations l10n = AppLocalizations.of(context);
   final ColorScheme scheme = Theme.of(context).colorScheme;

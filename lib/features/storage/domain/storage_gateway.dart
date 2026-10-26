@@ -6,6 +6,9 @@ import 'file_metadata.dart';
 /// The server's `matter-files` bucket cap (25 MiB).
 const int matterFileMaxBytes = 25 * 1024 * 1024;
 
+/// Signed download URL lifetime.
+const Duration kSignedUrlTtl = Duration(seconds: 60);
+
 /// MIME types the server bucket accepts for matter files.
 const Set<String> matterFileAllowedMimeTypes = <String>{
   'application/pdf',
@@ -15,6 +18,18 @@ const Set<String> matterFileAllowedMimeTypes = <String>{
   'text/csv',
   'image/png',
   'image/jpeg',
+};
+
+/// File extensions the matter-file picker offers.
+const Set<String> matterFileAllowedExtensions = <String>{
+  'pdf',
+  'doc',
+  'docx',
+  'txt',
+  'csv',
+  'png',
+  'jpg',
+  'jpeg',
 };
 
 /// Matter-scoped storage integration boundary (fourth §14 un-deferral,
@@ -51,6 +66,6 @@ abstract interface class StorageGateway {
   /// Creates a short-lived signed URL for [file] (default 60 seconds).
   Future<Result<Uri>> createDownloadUrl(
     FileMetadata file, {
-    Duration ttl = const Duration(seconds: 60),
+    Duration ttl = kSignedUrlTtl,
   });
 }

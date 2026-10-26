@@ -1,4 +1,5 @@
-﻿import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/approvals/domain/approvals_gateway.dart';
 import 'package:legalhub/features/approvals/domain/pending_approval.dart';
@@ -27,13 +28,14 @@ class SupabaseApprovalGateway implements ApprovalsGateway {
         const AppError(
           code: 'approval_read_no_org',
           userMessage: 'Select an organization to view approvals.',
+          messageKey: AppMessageKey.errSelectAnOrganizationToViewApprovals,
         ),
       );
     }
     try {
       final List<Map<String, dynamic>> rows = await _api.listApprovals(
         organizationId: organizationId,
-        status: status == null ? null : _serverStatus(status),
+        status: status == null ? null : approvalStatusToWire(status),
       );
       return Result<List<PendingApproval>>.success(
         List<PendingApproval>.unmodifiable(rows.map(_fromRow)),
@@ -48,6 +50,11 @@ class SupabaseApprovalGateway implements ApprovalsGateway {
           unavailableMessage:
               'Approvals are temporarily unavailable. Please try again.',
           failedMessage: 'Unable to load approvals. Please try again.',
+          deniedKey: AppMessageKey.errYouDoNotHavePermissionToViewApprovals,
+          validationKey: AppMessageKey.errUnableToLoadApprovalsPleaseTryAgain,
+          unavailableKey:
+              AppMessageKey.errApprovalsAreTemporarilyUnavailablePleaseTryAgain,
+          failedKey: AppMessageKey.errUnableToLoadApprovalsPleaseTryAgain,
         ),
       );
     } on FormatException catch (e) {
@@ -78,6 +85,11 @@ class SupabaseApprovalGateway implements ApprovalsGateway {
           unavailableMessage:
               'Creating the request is temporarily unavailable. Please try again.',
           failedMessage: 'Unable to create the request. Please try again.',
+          deniedKey: AppMessageKey.errYouDoNotHavePermissionToCreateApproval,
+          validationKey: AppMessageKey.errTheRequestCouldNotBeCreatedCheckThe,
+          unavailableKey: AppMessageKey
+              .errCreatingTheRequestIsTemporarilyUnavailablePleaseTry,
+          failedKey: AppMessageKey.errUnableToCreateTheRequestPleaseTryAgain,
         ),
       );
     } on FormatException catch (e) {
@@ -94,7 +106,9 @@ class SupabaseApprovalGateway implements ApprovalsGateway {
     return _write(
       () => _api.decideApproval(
         id,
-        decision: approve ? 'approved' : 'rejected',
+        decision: approvalStatusToWire(
+          approve ? ApprovalStatus.approved : ApprovalStatus.denied,
+        ),
         note: note,
       ),
       prefix: 'approval_decide',
@@ -104,6 +118,11 @@ class SupabaseApprovalGateway implements ApprovalsGateway {
       unavailableMessage:
           'Deciding the request is temporarily unavailable. Please try again.',
       failedMessage: 'Unable to decide the request. Please try again.',
+      deniedKey: AppMessageKey.errOnlyAPartnerCanDecideThisRequest,
+      validationKey: AppMessageKey.errTheRequestCouldNotBeDecidedItMay,
+      unavailableKey:
+          AppMessageKey.errDecidingTheRequestIsTemporarilyUnavailablePleaseTry,
+      failedKey: AppMessageKey.errUnableToDecideTheRequestPleaseTryAgain,
     );
   }
 
@@ -117,6 +136,11 @@ class SupabaseApprovalGateway implements ApprovalsGateway {
       unavailableMessage:
           'Cancelling the request is temporarily unavailable. Please try again.',
       failedMessage: 'Unable to cancel the request. Please try again.',
+      deniedKey: AppMessageKey.errOnlyTheRequesterOrAPartnerCanCancel,
+      validationKey: AppMessageKey.errTheRequestCanNoLongerBeCancelled,
+      unavailableKey: AppMessageKey
+          .errCancellingTheRequestIsTemporarilyUnavailablePleaseTry,
+      failedKey: AppMessageKey.errUnableToCancelTheRequestPleaseTryAgain,
     );
   }
 
@@ -127,6 +151,10 @@ class SupabaseApprovalGateway implements ApprovalsGateway {
     required String validationMessage,
     required String unavailableMessage,
     required String failedMessage,
+    required AppMessageKey deniedKey,
+    required AppMessageKey validationKey,
+    required AppMessageKey unavailableKey,
+    required AppMessageKey failedKey,
   }) async {
     try {
       await write();
@@ -140,6 +168,10 @@ class SupabaseApprovalGateway implements ApprovalsGateway {
           validationMessage: validationMessage,
           unavailableMessage: unavailableMessage,
           failedMessage: failedMessage,
+          deniedKey: deniedKey,
+          validationKey: validationKey,
+          unavailableKey: unavailableKey,
+          failedKey: failedKey,
         ),
       );
     } on FormatException catch (e) {
@@ -163,7 +195,7 @@ class SupabaseApprovalGateway implements ApprovalsGateway {
       title: title,
       description: _optionalString(row['description']),
       kind: _kindOf(row['kind']),
-      status: _statusOf(row['status']),
+      status: approvalStatusFromWire(_requiredString(row, 'status')),
       requestedBy: _optionalString(row['requested_by']),
       decidedBy: _optionalString(row['decided_by']),
       decidedAt: _optionalDate(row['decided_at']),
@@ -172,14 +204,6 @@ class SupabaseApprovalGateway implements ApprovalsGateway {
     );
   }
 
-  ApprovalStatus _statusOf(Object? value) => switch (value) {
-    'pending' => ApprovalStatus.pending,
-    'approved' => ApprovalStatus.approved,
-    'rejected' => ApprovalStatus.denied,
-    'cancelled' => ApprovalStatus.cancelled,
-    _ => throw const FormatException('Approval row has an unknown status'),
-  };
-
   ApprovalKind _kindOf(Object? value) => switch (value) {
     'conflict' => ApprovalKind.conflict,
     'waiver' => ApprovalKind.waiver,
@@ -187,13 +211,6 @@ class SupabaseApprovalGateway implements ApprovalsGateway {
     'expense' => ApprovalKind.expense,
     'other' => ApprovalKind.other,
     _ => throw const FormatException('Approval row has an unknown kind'),
-  };
-
-  String _serverStatus(ApprovalStatus status) => switch (status) {
-    ApprovalStatus.pending => 'pending',
-    ApprovalStatus.approved => 'approved',
-    ApprovalStatus.denied => 'rejected',
-    ApprovalStatus.cancelled => 'cancelled',
   };
 
   String _requiredString(Map<String, dynamic> row, String field) {
@@ -245,33 +262,42 @@ class SupabaseApprovalGateway implements ApprovalsGateway {
     required String validationMessage,
     required String unavailableMessage,
     required String failedMessage,
+    required AppMessageKey deniedKey,
+    required AppMessageKey validationKey,
+    required AppMessageKey unavailableKey,
+    required AppMessageKey failedKey,
   }) {
     return switch (e.kind) {
       SupabaseApprovalFailureKind.denied => AppError(
         code: '${prefix}_denied',
         userMessage: deniedMessage,
+        messageKey: deniedKey,
         kind: AppErrorKind.denied,
         technicalMessage: e.message,
       ),
       SupabaseApprovalFailureKind.notFound => AppError(
         code: 'approval_not_found',
         userMessage: 'Approval request not found.',
+        messageKey: AppMessageKey.errApprovalRequestNotFound,
         technicalMessage: e.message,
       ),
       SupabaseApprovalFailureKind.validation => AppError(
         code: '${prefix}_invalid',
         userMessage: validationMessage,
+        messageKey: validationKey,
         technicalMessage: e.message,
       ),
       SupabaseApprovalFailureKind.providerUnavailable => AppError(
         code: '${prefix}_unavailable',
         userMessage: unavailableMessage,
+        messageKey: unavailableKey,
         kind: AppErrorKind.unavailable,
         technicalMessage: e.message,
       ),
       SupabaseApprovalFailureKind.unknown => AppError(
         code: '${prefix}_failed',
         userMessage: failedMessage,
+        messageKey: failedKey,
         technicalMessage: e.message,
       ),
     };
@@ -282,6 +308,7 @@ class SupabaseApprovalGateway implements ApprovalsGateway {
   AppError _drift(FormatException e) => AppError(
     code: 'approval_read_failed',
     userMessage: 'Unable to load approvals. Please try again.',
+    messageKey: AppMessageKey.errUnableToLoadApprovalsPleaseTryAgain,
     technicalMessage: e.message,
   );
 }

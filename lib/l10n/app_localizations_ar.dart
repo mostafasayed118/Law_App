@@ -2304,4 +2304,610 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get aiResearchSourceMatter => 'ملف';
+
+  @override
+  String get demoApprovalTitleConflictNew => 'مراجعة تعارض تجريبية — طلب جديد';
+
+  @override
+  String get demoApprovalTitleEngagementWaiver => 'تنازل تجريبي عن التكليف';
+
+  @override
+  String get demoApprovalTitleCourtFiling => 'موافقة تجريبية على إيداع المحكمة';
+
+  @override
+  String get demoApprovalTitleExpense => 'موافقة تجريبية على نفقة';
+
+  @override
+  String get demoApprovalTitleConflictOpposing =>
+      'مراجعة تعارض تجريبية — الخصم';
+
+  @override
+  String get demoApprovalDescriptionWaiver =>
+      'طلب تجريبي — لا توجد بيانات عميل أو قضية حقيقية.';
+
+  @override
+  String get demoApprovalDecisionApproved => 'قرار تجريبي — موافقة.';
+
+  @override
+  String get demoApprovalDecisionRejected => 'قرار تجريبي — رفض.';
+
+  @override
+  String get demoAlertDescriptionReview =>
+      'تنبيه تجريبي — لا يظهر أي حدث امتثال حقيقي.';
+
+  @override
+  String get demoAttorneyHeadlineCorporate => 'مستشار الشركات والحوكمة';
+
+  @override
+  String get demoAttorneyHeadlineCivil => 'التقاضي المدني والعقود';
+
+  @override
+  String get demoAttorneyHeadlineCriminal => 'الدفاع الجنائي والإجراءات';
+
+  @override
+  String get demoAttorneyHeadlineFamily => 'قانون الأسرة والأحوال الشخصية';
+
+  @override
+  String get demoAttorneyHeadlineStartup => 'تأسيس الشركات الناشئة والاستشارات';
+
+  @override
+  String get demoAuditOrganizationCreated =>
+      'تم إنشاء المؤسسة (بيانات وصفية فقط)';
+
+  @override
+  String get demoAuditMemberInvited => 'تمت دعوة عضو (بيانات وصفية فقط)';
+
+  @override
+  String get demoAuditMemberRoleChanged =>
+      'تم تغيير دور عضو (بيانات وصفية فقط)';
+
+  @override
+  String get demoAuditMembershipSuspended =>
+      'تم تعليق العضوية (بيانات وصفية فقط)';
+
+  @override
+  String get demoAuditDemoAccountDeleted =>
+      'تم حذف الحساب التجريبي (بيانات وصفية فقط)';
+
+  @override
+  String get demoAuditRoleChange => 'تغيير الدور';
+
+  @override
+  String get demoAuditInvitationSent => 'أُرسلت الدعوة';
+
+  @override
+  String get demoAuditSuspensionDenied => 'رُفض التعليق';
+
+  @override
+  String get homeActivityEmpty => 'لا يوجد نشاط حديث بعد.';
+
+  @override
+  String get discoveryEntrySubtitleConfigured =>
+      'تصفّح ملفات المحامين ومجالات الممارسة.';
+
+  @override
+  String get searchNoQueryConfigured =>
+      'اكتب كلمة بحث للبحث في القضايا والمستندات والرسائل والمحامين.';
+
+  @override
+  String get aiResearchNoMatchesConfigured =>
+      'لا توجد نتائج مطابقة. جرّب كلمات مختلفة.';
+
+  @override
+  String get aiResearchEntrySubtitleConfigured =>
+      'اسأل مساعد البحث عبر قضاياك ومستنداتك — استشارة فقط.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewThese2 =>
+      'ليس لديك إذن لعرض هذه المهام.';
+
+  @override
+  String get errUnableToLoadTasksPleaseTryAgain =>
+      'تعذر تحميل المهام. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errARejectionNoteIsRequired => 'ملاحظة الرفض مطلوبة.';
+
+  @override
+  String get errAcknowledgingTheAlertIsTemporarilyUnavailablePleaseTry =>
+      'الاطلاع على التنبيه غير متاح مؤقتًا. حاول مرة أخرى.';
+
+  @override
+  String get errApprovalRequestNotFound => 'لم يتم العثور على طلب الموافقة.';
+
+  @override
+  String get errApprovalsAreTemporarilyUnavailablePleaseTryAgain =>
+      'الموافقات غير متاحة مؤقتًا. حاول مرة أخرى.';
+
+  @override
+  String get errCancellingTheRequestIsTemporarilyUnavailablePleaseTry =>
+      'إلغاء الطلب غير متاح مؤقتًا. حاول مرة أخرى.';
+
+  @override
+  String get errComplianceAlertNotFound => 'لم يتم العثور على تنبيه الامتثال.';
+
+  @override
+  String get errComplianceAlertsAreTemporarilyUnavailablePleaseTryAgain =>
+      'تنبيهات الامتثال غير متاحة مؤقتًا. حاول مرة أخرى.';
+
+  @override
+  String get errCreatingTheAlertIsTemporarilyUnavailablePleaseTry =>
+      'إنشاء التنبيه غير متاح مؤقتًا. حاول مرة أخرى.';
+
+  @override
+  String get errCreatingTheRequestIsTemporarilyUnavailablePleaseTry =>
+      'إنشاء الطلب غير متاح مؤقتًا. حاول مرة أخرى.';
+
+  @override
+  String get errDecidingTheRequestIsTemporarilyUnavailablePleaseTry =>
+      'البت في الطلب غير متاح مؤقتًا. حاول مرة أخرى.';
+
+  @override
+  String get errOnlyAPartnerCanDecideThisRequest =>
+      'يمكن للشريك فقط البت في هذا الطلب.';
+
+  @override
+  String get errOnlyAPartnerOrComplianceOfficerCanCreate =>
+      'يمكن للشريك أو مسؤول الامتثال فقط إنشاء التنبيهات.';
+
+  @override
+  String get errOnlyAPartnerOrComplianceOfficerCanResolve =>
+      'يمكن للشريك أو مسؤول الامتثال فقط حل التنبيهات.';
+
+  @override
+  String get errOnlyAnActiveOrganizationMemberCanAcknowledgeAlerts =>
+      'يمكن لعضو نشط في المؤسسة فقط الاطلاع على التنبيهات.';
+
+  @override
+  String get errOnlyTheRequesterOrAPartnerCanCancel =>
+      'يمكن لمقدّم الطلب أو الشريك فقط إلغاء هذا الطلب.';
+
+  @override
+  String get errResolvingTheAlertIsTemporarilyUnavailablePleaseTry =>
+      'حل التنبيه غير متاح مؤقتًا. حاول مرة أخرى.';
+
+  @override
+  String get errSelectAnOrganizationToViewApprovals =>
+      'اختر مؤسسة لعرض الموافقات.';
+
+  @override
+  String get errSelectAnOrganizationToViewComplianceAlerts =>
+      'اختر مؤسسة لعرض تنبيهات الامتثال.';
+
+  @override
+  String get errTheAlertCanNoLongerBeAcknowledged =>
+      'لم يعد بالإمكان الاطلاع على التنبيه.';
+
+  @override
+  String get errTheAlertCanNoLongerBeResolved => 'لم يعد بالإمكان حل التنبيه.';
+
+  @override
+  String get errTheAlertCouldNotBeCreatedCheckThe =>
+      'تعذّر إنشاء التنبيه. تحقق من التفاصيل وحاول مرة أخرى.';
+
+  @override
+  String get errTheRequestCanNoLongerBeCancelled =>
+      'لم يعد بالإمكان إلغاء الطلب.';
+
+  @override
+  String get errTheRequestCouldNotBeCreatedCheckThe =>
+      'تعذّر إنشاء الطلب. تحقق من التفاصيل وحاول مرة أخرى.';
+
+  @override
+  String get errTheRequestCouldNotBeDecidedItMay =>
+      'تعذّر البت في الطلب. قد لا يكون معلّقًا بعد الآن، أو أن الملاحظة مفقودة.';
+
+  @override
+  String get errTheRequestIsNoLongerPending => 'الطلب لم يعد معلّقًا.';
+
+  @override
+  String get errUnableToAcknowledgeTheAlertPleaseTryAgain =>
+      'تعذّر الاطلاع على التنبيه. حاول مرة أخرى.';
+
+  @override
+  String get errUnableToCancelTheRequestPleaseTryAgain =>
+      'تعذّر إلغاء الطلب. حاول مرة أخرى.';
+
+  @override
+  String get errUnableToCreateTheAlertPleaseTryAgain =>
+      'تعذّر إنشاء التنبيه. حاول مرة أخرى.';
+
+  @override
+  String get errUnableToCreateTheRequestPleaseTryAgain =>
+      'تعذّر إنشاء الطلب. حاول مرة أخرى.';
+
+  @override
+  String get errUnableToDecideTheRequestPleaseTryAgain =>
+      'تعذّر البت في الطلب. حاول مرة أخرى.';
+
+  @override
+  String get errUnableToLoadApprovalsPleaseTryAgain =>
+      'تعذّر تحميل الموافقات. حاول مرة أخرى.';
+
+  @override
+  String get errUnableToLoadComplianceAlertsPleaseTryAgain =>
+      'تعذّر تحميل تنبيهات الامتثال. حاول مرة أخرى.';
+
+  @override
+  String get errUnableToResolveTheAlertPleaseTryAgain =>
+      'تعذّر حل التنبيه. حاول مرة أخرى.';
+
+  @override
+  String get errYouDoNotHavePermissionToCreateApproval =>
+      'ليس لديك إذن لإنشاء طلبات الموافقة.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewApprovals =>
+      'ليس لديك إذن لعرض الموافقات.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewCompliance =>
+      'ليس لديك إذن لعرض تنبيهات الامتثال.';
+
+  @override
+  String get errAcknowledgingTheTaskIsTemporarilyUnavailablePleaseTry =>
+      'الإقرار بالمهمة غير متاح مؤقتًا. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errAvailableTimesAreTemporarilyUnavailablePleaseTryAgain =>
+      'الأوقات المتاحة غير متوفرة مؤقتًا. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errBookingIsTemporarilyUnavailablePleaseTryAgain =>
+      'الحجز غير متاح مؤقتًا. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errCreatingTheTaskIsTemporarilyUnavailablePleaseTry =>
+      'إنشاء المهمة غير متاح مؤقتًا. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String errMessageIsTooLongMaxMaxMessageLengthCharacters(
+    int maxMessageLength,
+  ) {
+    return 'الرسالة طويلة جدًا (الحد الأقصى $maxMessageLength حرفًا).';
+  }
+
+  @override
+  String get errMessagesAreTemporarilyUnavailablePleaseTryAgain =>
+      'الرسائل غير متاحة مؤقتًا. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errOnlyTheAssignedPersonCanAcknowledgeThisTask =>
+      'لا يمكن إلا للشخص المكلَّف الإقرار بهذه المهمة.';
+
+  @override
+  String get errReAssigningTheTaskIsTemporarilyUnavailablePlease =>
+      'إعادة إسناد المهمة غير متاحة مؤقتًا. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errSendingIsTemporarilyUnavailablePleaseTryAgain =>
+      'الإرسال غير متاح مؤقتًا. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errTasksAreTemporarilyUnavailablePleaseTryAgain =>
+      'المهام غير متاحة مؤقتًا. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errThatPersonCannotBeAssignedThisTaskChoose =>
+      'لا يمكن إسناد هذه المهمة إلى هذا الشخص. اختر عضوًا نشطًا في المؤسسة.';
+
+  @override
+  String get errThatTimeIsNoLongerAvailableChooseAnother =>
+      'هذا الوقت لم يعد متاحًا. اختر وقتًا آخر.';
+
+  @override
+  String get errTheBookingDetailsAreInvalidCheckThemAnd =>
+      'تفاصيل الحجز غير صالحة. تحقق منها وحاول مرة أخرى.';
+
+  @override
+  String get errTheTaskCannotMoveToThatStatusIt =>
+      'لا يمكن نقل المهمة إلى تلك الحالة. ربما اكتملت بالفعل.';
+
+  @override
+  String get errTheTaskCouldNotBeCreatedCheckThe =>
+      'تعذّر إنشاء المهمة. تحقق من العنوان وحاول مرة أخرى.';
+
+  @override
+  String get errThreadsAreTemporarilyUnavailablePleaseTryAgain =>
+      'المحادثات غير متاحة مؤقتًا. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToAcknowledgeTheTaskPleaseTryAgain =>
+      'تعذّر الإقرار بالمهمة. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToConfirmPleaseTryAgain =>
+      'تعذّر التأكيد. حاول مرة أخرى.';
+
+  @override
+  String get errUnableToCreateTheTaskPleaseTryAgain =>
+      'تعذّر إنشاء المهمة. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToLoadAvailableTimesPleaseTryAgain =>
+      'تعذّر تحميل الأوقات المتاحة. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToLoadMessagesPleaseTryAgain =>
+      'تعذّر تحميل الرسائل. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToLoadThreadsPleaseTryAgain =>
+      'تعذّر تحميل المحادثات. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToReAssignTheTaskPleaseTry =>
+      'تعذّرت إعادة إسناد المهمة. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToSendTheMessagePleaseTryAgain =>
+      'تعذّر إرسال الرسالة. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToUpdateTheTaskPleaseTryAgain =>
+      'تعذّر تحديث المهمة. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUpdatingTheTaskIsTemporarilyUnavailablePleaseTry =>
+      'تحديث المهمة غير متاح مؤقتًا. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errYouDoNotHavePermissionToAdvanceThis =>
+      'ليس لديك إذن بتقديم هذه المهمة.';
+
+  @override
+  String get errYouDoNotHavePermissionToBookThis =>
+      'ليس لديك إذن بحجز هذه الاستشارة.';
+
+  @override
+  String get errYouDoNotHavePermissionToCreateTasks =>
+      'ليس لديك إذن بإنشاء مهام على هذا الملف.';
+
+  @override
+  String get errYouDoNotHavePermissionToReAssign =>
+      'ليس لديك إذن بإعادة إسناد هذه المهمة.';
+
+  @override
+  String get errYouDoNotHavePermissionToSendMessages =>
+      'ليس لديك إذن بإرسال رسائل في هذه المحادثة.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewAvailable =>
+      'ليس لديك إذن لعرض الأوقات المتاحة.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewThese =>
+      'ليس لديك إذن لعرض هذه الرسائل.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewThese3 =>
+      'ليس لديك إذن لعرض هذه المحادثات.';
+
+  @override
+  String get errAttorneyNotFound => 'المحامي غير موجود.';
+
+  @override
+  String get errTheDirectoryIsTemporarilyUnavailableTryAgain =>
+      'الدليل غير متاح مؤقتًا. حاول مرة أخرى.';
+
+  @override
+  String get errTheProfileDetailsAreInvalidCheckThemAnd =>
+      'بيانات الملف الشخصي غير صالحة. تحقق منها وأعد المحاولة.';
+
+  @override
+  String get errUnableToLoadTheDirectoryPleaseTryAgain =>
+      'تعذّر تحميل الدليل. حاول مرة أخرى.';
+
+  @override
+  String get errYouDoNotHavePermissionToManageThe =>
+      'ليس لديك إذن لإدارة الدليل.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewThe => 'ليس لديك إذن لعرض الدليل.';
+
+  @override
+  String get errNotificationsAreTemporarilyUnavailablePleaseTryAgain =>
+      'الإشعارات غير متاحة مؤقتًا. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errThisFileIsTooLarge => 'هذا الملف كبير جدًا.';
+
+  @override
+  String get errThisFileTypeIsNotSupported => 'نوع هذا الملف غير مدعوم.';
+
+  @override
+  String get errUnableToCheckThePaymentStatusPleaseTry =>
+      'تعذّر التحقق من حالة الدفع. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToLoadDocumentsPleaseTryAgain =>
+      'تعذّر تحميل المستندات. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToLoadFilesPleaseTryAgain =>
+      'تعذّر تحميل الملفات. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToLoadInvoicesPleaseTryAgain =>
+      'تعذّر تحميل الفواتير. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToLoadMattersPleaseTryAgain =>
+      'تعذّر تحميل القضايا. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToLoadNotificationsPleaseTryAgain =>
+      'تعذّر تحميل الإشعارات. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToOpenTheFilePleaseTryAgain =>
+      'تعذّر فتح الملف. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToStartThePaymentPleaseTryAgain =>
+      'تعذّر بدء الدفع. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToUploadTheFilePleaseTryAgain =>
+      'تعذّر رفع الملف. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errYouDoNotHavePermissionToUploadFiles =>
+      'ليس لديك إذن لرفع ملفات إلى هذه القضية.';
+
+  @override
+  String get errAIResearchIsNotConfiguredForThisDeployment =>
+      'البحث بالذكاء الاصطناعي غير مُهيَّأ لهذا النشر. لم يتم تشغيل أي تحليل.';
+
+  @override
+  String get errAnActionIsAlreadyInProgress => 'هناك إجراء قيد التنفيذ بالفعل.';
+
+  @override
+  String get errEndingTheConsultationIsTemporarilyUnavailablePleaseTry =>
+      'إنهاء الاستشارة غير متاح مؤقتًا. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String
+  errEnterAQuestionBetweenResearchRequestMinQuestionLengthAndResearchRequest(
+    int minQuestionLength,
+    int maxQuestionLength,
+  ) {
+    return 'أدخل سؤالاً يتراوح بين $minQuestionLength و$maxQuestionLength حرفًا واختر مؤسسة.';
+  }
+
+  @override
+  String get errOnlyAPartnerOrAttorneyCanScheduleA =>
+      'يمكن لشريك أو محامٍ فقط جدولة استشارة بالفيديو.';
+
+  @override
+  String get errOnlyTheCreatorOrAPartnerCanEnd =>
+      'يمكن للمُنشئ أو الشريك فقط إنهاء هذه الاستشارة.';
+
+  @override
+  String get errOrganizationMembershipsCouldNotBeLoaded =>
+      'تعذّر تحميل عضويات المؤسسة.';
+
+  @override
+  String get errSchedulingAConsultationIsTemporarilyUnavailablePleaseTry =>
+      'جدولة الاستشارة غير متاحة مؤقتًا. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errSelectAResearchRunToViewItsFindings =>
+      'اختر جولة بحث لعرض نتائجها.';
+
+  @override
+  String get errSelectAVideoConsultationToJoin =>
+      'اختر استشارة فيديو للانضمام إليها.';
+
+  @override
+  String get errSelectAnOrganizationToScheduleAConsultation =>
+      'اختر مؤسسة لجدولة استشارة.';
+
+  @override
+  String get errSelectAnOrganizationToViewResearchRuns =>
+      'اختر مؤسسة لعرض جولات البحث.';
+
+  @override
+  String get errSelectAnOrganizationToViewVideoConsultations =>
+      'اختر مؤسسة لعرض استشارات الفيديو.';
+
+  @override
+  String get errSignInAgainToUseVideoConsultations =>
+      'سجّل الدخول مرة أخرى لاستخدام استشارات الفيديو.';
+
+  @override
+  String get errStartingTheConsultationIsTemporarilyUnavailablePleaseTry =>
+      'بدء الاستشارة غير متاح مؤقتًا. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errTheAIProviderReturnedAnUnexpectedResponsePlease =>
+      'أعاد مزوّد الذكاء الاصطناعي استجابة غير متوقعة. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errTheConsultationCouldNotBeScheduledCheckThe =>
+      'تعذّرت جدولة الاستشارة. تحقق من التفاصيل وحاول مرة أخرى.';
+
+  @override
+  String get errTheConsultationIsNotAvailableToJoinRight =>
+      'الاستشارة غير متاحة للانضمام إليها الآن.';
+
+  @override
+  String get errTheSelectedContextIsTooLargeRemoveDocuments =>
+      'السياق المحدد كبير جدًا. احذف بعض المستندات وحاول مرة أخرى.';
+
+  @override
+  String get errTheSelectedResearchRunWasNotFound =>
+      'لم يتم العثور على جولة البحث المحددة.';
+
+  @override
+  String get errThisConsultationCanNoLongerBeEnded =>
+      'لم يعد من الممكن إنهاء هذه الاستشارة.';
+
+  @override
+  String get errThisConsultationCanNoLongerBeStarted =>
+      'لم يعد من الممكن بدء هذه الاستشارة.';
+
+  @override
+  String get errThisVideoConsultationHasAlreadyEnded =>
+      'انتهت استشارة الفيديو هذه بالفعل.';
+
+  @override
+  String get errThisVideoConsultationWasNotFound =>
+      'لم يتم العثور على استشارة الفيديو هذه.';
+
+  @override
+  String get errUnableToEndTheConsultationPleaseTryAgain =>
+      'تعذّر إنهاء الاستشارة. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToJoinTheConsultationPleaseTryAgain =>
+      'تعذّر الانضمام إلى الاستشارة. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToLoadVideoConsultationsPleaseTryAgain =>
+      'تعذّر تحميل استشارات الفيديو. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToReadTheVideoConsultationPleaseTry =>
+      'تعذّرت قراءة استشارة الفيديو. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToRunAIResearchPleaseTryAgain =>
+      'تعذّر تشغيل البحث بالذكاء الاصطناعي. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToScheduleTheConsultationPleaseTryAgain =>
+      'تعذّرت جدولة الاستشارة. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errUnableToStartTheConsultationPleaseTryAgain =>
+      'تعذّر بدء الاستشارة. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errVideoCallsAreNotConfiguredForThisDeployment =>
+      'مكالمات الفيديو غير مُهيَّأة لهذا النشر. لم يتم بدء أي مكالمة.';
+
+  @override
+  String get errVideoCallsAreTemporarilyUnavailablePleaseTryAgain =>
+      'مكالمات الفيديو غير متاحة مؤقتًا. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errVideoConsultationsAreTemporarilyUnavailablePleaseTryAgain =>
+      'استشارات الفيديو غير متاحة مؤقتًا. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errWeCouldnTCompleteThatRequestPleaseTry =>
+      'تعذّر إكمال هذا الطلب. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errYouDoNotHavePermissionToJoinThis =>
+      'ليس لديك إذن للانضمام إلى هذه الاستشارة.';
+
+  @override
+  String get errYouDoNotHavePermissionToStartThis =>
+      'ليس لديك إذن لبدء هذه الاستشارة.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewVideo =>
+      'ليس لديك إذن لعرض استشارات الفيديو.';
 }

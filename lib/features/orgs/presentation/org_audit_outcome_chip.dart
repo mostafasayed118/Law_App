@@ -13,11 +13,11 @@ class _OutcomeChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final String label = switch (outcome) {
-      'allowed' => l10n.orgAuditOutcomeAllowed,
-      'denied' => l10n.orgAuditOutcomeDenied,
+      AuditOutcomes.allowed => l10n.orgAuditOutcomeAllowed,
+      AuditOutcomes.denied => l10n.orgAuditOutcomeDenied,
       _ => outcome,
     };
-    final Color background = outcome == 'denied'
+    final Color background = outcome == AuditOutcomes.denied
         ? scheme.errorContainer
         : scheme.surfaceContainerHighest;
     return Container(

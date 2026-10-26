@@ -1,5 +1,7 @@
+import 'package:legalhub/core/contracts/http_status.dart';
 import 'package:legalhub/data/postgrest_failures.dart';
 import 'package:legalhub/data/supabase_seam.dart';
+import 'package:legalhub/data/supabase_wire.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_payment_api.dart';
@@ -20,8 +22,9 @@ class SupabasePaymentApiImpl implements SupabasePaymentApi {
     String function,
     Map<String, dynamic> body,
   ) async {
-    final FunctionResponse response = await Supabase.instance.client.functions
-        .invoke(function, body: body);
+    final FunctionResponse response = await SupabaseSeam.invokeWithTimeout(
+      () => Supabase.instance.client.functions.invoke(function, body: body),
+    );
     return response.data;
   }
 
@@ -38,9 +41,10 @@ class SupabasePaymentApiImpl implements SupabasePaymentApi {
   @override
   Future<Map<String, dynamic>> initiate(String invoiceId) async {
     try {
-      final Object? data = await _invoke('paymob-initiate', <String, dynamic>{
-        'invoice_id': invoiceId,
-      });
+      final Object? data = await _invoke(
+        SupabaseEdgeFunctions.paymobInitiate,
+        <String, dynamic>{'invoice_id': invoiceId},
+      );
       return _mapFrom(data);
     } on SupabasePaymentException {
       rethrow;
@@ -61,7 +65,7 @@ class SupabasePaymentApiImpl implements SupabasePaymentApi {
   Future<Map<String, dynamic>?> fetchStatus(String invoiceId) async {
     try {
       final Object? data = await _rpc(
-        'get_invoice_payment_status',
+        SupabaseRpcs.getInvoicePaymentStatus,
         <String, dynamic>{'p_invoice_id': invoiceId},
       );
       if (data == null) {
@@ -107,10 +111,11 @@ class SupabasePaymentApiImpl implements SupabasePaymentApi {
   }
 
   SupabasePaymentFailureKind _kindForFunction(FunctionException e) {
-    if (e.status == 401 || e.status == 403) {
+    if (e.status == HttpStatusCodes.unauthorized ||
+        e.status == HttpStatusCodes.forbidden) {
       return SupabasePaymentFailureKind.denied;
     }
-    if (e.status == 0 || e.status >= 500) {
+    if (e.status == 0 || e.status >= HttpStatusCodes.internalServerError) {
       return SupabasePaymentFailureKind.providerUnavailable;
     }
     return SupabasePaymentFailureKind.unknown;

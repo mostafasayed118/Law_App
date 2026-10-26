@@ -1,5 +1,6 @@
 import 'package:legalhub/data/postgrest_failures.dart';
 import 'package:legalhub/data/supabase_seam.dart';
+import 'package:legalhub/data/supabase_wire.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_booking_api.dart';
@@ -63,7 +64,7 @@ class SupabaseBookingApiImpl implements SupabaseBookingApi {
     try {
       // RLS-scoped: `consultation_slots_select_available` returns only
       // authenticated-visible, active, unclaimed rows.
-      return await _table('consultation_slots', _slotColumns);
+      return await _table(SupabaseTables.consultationSlots, _slotColumns);
     } on PostgrestException catch (e) {
       throw SupabaseBookingException(kind: _kindFor(e), message: e.message);
     } on Exception {
@@ -89,7 +90,7 @@ class SupabaseBookingApiImpl implements SupabaseBookingApi {
     // non-PII projection.
     try {
       final PostgrestResponse<dynamic> response =
-          await _rpcCaller('book_consultation', <String, dynamic>{
+          await _rpcCaller(SupabaseRpcs.bookConsultation, <String, dynamic>{
             'p_slot_id': slotId,
             'p_category': category,
             'p_topic': topic,
@@ -122,10 +123,10 @@ class SupabaseBookingApiImpl implements SupabaseBookingApi {
   /// the shared denial rule covers the in-function `permission denied` text
   /// and RLS denials. Everything else is unknown.
   SupabaseBookingFailureKind _kindFor(PostgrestException e) {
-    if (e.code == '23514') {
+    if (e.code == PostgrestCodes.validation) {
       return SupabaseBookingFailureKind.validation;
     }
-    if (e.code == '23505') {
+    if (e.code == PostgrestCodes.uniqueViolation) {
       return SupabaseBookingFailureKind.slotUnavailable;
     }
     return postgrestKindFor(

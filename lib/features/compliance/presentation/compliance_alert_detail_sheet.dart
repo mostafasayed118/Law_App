@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/contracts/server_limits.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/features/compliance/domain/compliance_alert.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
 
 import 'compliance_alert_error_messages.dart';
@@ -123,6 +126,7 @@ class _ComplianceAlertDetailSheetState
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final DemoLabels labels = DemoLabels(l10n, localOnly: backendIsLocalOnly);
     final ComplianceAlert alert = widget.alert;
     return SafeArea(
       child: Padding(
@@ -135,7 +139,10 @@ class _ComplianceAlertDetailSheetState
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Text(alert.title, style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                labels.alertTitle(alert.title),
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const SizedBox(height: LegalHubTheme.spaceSm),
               _stateLine(
                 icon: alertSeverityIcon(alert.severity),
@@ -173,7 +180,7 @@ class _ComplianceAlertDetailSheetState
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
                 const SizedBox(height: LegalHubTheme.spaceXs),
-                Text(alert.description!),
+                Text(labels.alertDescription(alert.description!)),
               ],
               if (alert.acknowledgedAt != null)
                 _timestampLine(
@@ -188,7 +195,7 @@ class _ComplianceAlertDetailSheetState
                   controller: _note,
                   enabled: !_submitting,
                   maxLines: 3,
-                  maxLength: 2000,
+                  maxLength: kDecisionNoteMaxLength,
                   decoration: InputDecoration(
                     labelText: l10n.alertResolveNoteLabel,
                     border: const OutlineInputBorder(),

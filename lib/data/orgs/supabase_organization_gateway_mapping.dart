@@ -27,12 +27,7 @@ Future<OrgOutcome<void>> _runVoid(Future<void> Function() call) async {
 /// else is rejected with [OrgFailureKind.invalidRole] (loud, never a
 /// silently wrong role on the server).
 String? _assignableRoleName(UserRole role) {
-  return switch (role) {
-    UserRole.client => 'client',
-    UserRole.attorney => 'attorney',
-    UserRole.partner => 'partner',
-    _ => null,
-  };
+  return userRoleToAssignableServerName(role);
 }
 
 AssignableMember _assignableMemberFromRow(Map<String, dynamic> row) {

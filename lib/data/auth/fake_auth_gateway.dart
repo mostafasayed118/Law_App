@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:legalhub/core/auth/auth_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/shared/demo/demo_corpus.dart';
 
 /// Development-only session implementation.
 ///
@@ -37,8 +38,8 @@ class FakeAuthGateway implements AuthGateway {
   /// org creator (initial partner), so the hub capability surface agrees
   /// with the session.
   static const OrganizationMembership demoMembership = OrganizationMembership(
-    organizationId: 'org-demo',
-    organizationName: 'Demo Firm',
+    organizationId: DemoCorpus.organizationId,
+    organizationName: DemoCorpus.organizationName,
     role: UserRole.partner,
     status: MembershipStatus.active,
   );
@@ -93,8 +94,8 @@ class FakeAuthGateway implements AuthGateway {
   @override
   Future<AuthOutcome<Session>> startDemoSession() async {
     final Session session = Session(
-      userId: 'demo-user',
-      displayName: 'Demo user',
+      userId: DemoCorpus.ownerId,
+      displayName: DemoCorpus.ownerName,
       memberships: const <OrganizationMembership>[demoMembership],
       expiresAt: DateTime.now().add(const Duration(hours: 8)),
     );

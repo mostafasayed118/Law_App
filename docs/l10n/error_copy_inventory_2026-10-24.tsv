@@ -1,0 +1,140 @@
+literal	key	count	files
+A rejection note is required.	errARejectionNoteIsRequired	1	lib/features/approvals/data/fake_approvals_gateway.dart:187
+AI research is not configured for this deployment. No analysis was run.	errAIResearchIsNotConfiguredForThisDeployment	1	lib/data/research/supabase_research_gateway.dart:323
+Acknowledging the alert is temporarily unavailable. Please try again.	errAcknowledgingTheAlertIsTemporarilyUnavailablePleaseTry	1	lib/data/compliance/supabase_compliance_gateway.dart:103
+Acknowledging the task is temporarily unavailable. Please try again.	errAcknowledgingTheTaskIsTemporarilyUnavailablePleaseTry	1	lib/data/tasks/supabase_task_gateway.dart:127
+An action is already in progress.	errAnActionIsAlreadyInProgress	1	lib/shared/state/write_gate.dart:18
+Approval request not found.	errApprovalRequestNotFound	2	lib/data/approvals/supabase_approval_gateway.dart:245,lib/features/approvals/data/fake_approvals_gateway.dart:177
+Approvals are temporarily unavailable. Please try again.	errApprovalsAreTemporarilyUnavailablePleaseTryAgain	1	lib/data/approvals/supabase_approval_gateway.dart:48
+Attorney not found.	errAttorneyNotFound	3	lib/data/discovery/supabase_attorney_gateway.dart:223,lib/features/discovery/data/fake_attorney_admin_gateway.dart:22,lib/features/discovery/data/fake_attorney_gateway.dart:85
+Available times are temporarily unavailable. Please try again.	errAvailableTimesAreTemporarilyUnavailablePleaseTryAgain	1	lib/data/booking/supabase_booking_gateway.dart:164
+Booking is temporarily unavailable. Please try again.	errBookingIsTemporarilyUnavailablePleaseTryAgain	1	lib/data/booking/supabase_booking_gateway.dart:207
+Cancelling the request is temporarily unavailable. Please try again.	errCancellingTheRequestIsTemporarilyUnavailablePleaseTry	1	lib/data/approvals/supabase_approval_gateway.dart:119
+Compliance alert not found.	errComplianceAlertNotFound	2	lib/data/compliance/supabase_compliance_gateway.dart:269,lib/features/compliance/data/fake_compliance_gateway.dart:172
+Compliance alerts are temporarily unavailable. Please try again.	errComplianceAlertsAreTemporarilyUnavailablePleaseTryAgain	1	lib/data/compliance/supabase_compliance_gateway.dart:53
+Creating the alert is temporarily unavailable. Please try again.	errCreatingTheAlertIsTemporarilyUnavailablePleaseTry	1	lib/data/compliance/supabase_compliance_gateway.dart:85
+Creating the request is temporarily unavailable. Please try again.	errCreatingTheRequestIsTemporarilyUnavailablePleaseTry	1	lib/data/approvals/supabase_approval_gateway.dart:78
+Creating the task is temporarily unavailable. Please try again.	errCreatingTheTaskIsTemporarilyUnavailablePleaseTry	1	lib/data/tasks/supabase_task_gateway.dart:76
+Deciding the request is temporarily unavailable. Please try again.	errDecidingTheRequestIsTemporarilyUnavailablePleaseTry	1	lib/data/approvals/supabase_approval_gateway.dart:106
+Ending the consultation is temporarily unavailable. Please try again.	errEndingTheConsultationIsTemporarilyUnavailablePleaseTry	1	lib/data/video/supabase_video_gateway.dart:159
+Enter a question between ${ResearchRequest.minQuestionLength} and ${ResearchRequest.maxQuestionLength} characters and select an organization.	errEnterAQuestionBetweenResearchRequestMinQuestionLengthAndResearchRequest	2	lib/data/research/supabase_research_gateway.dart:53,lib/features/research/presentation/ai_research_cubit.dart:74
+Message is too long (max $maxMessageLength characters).	errMessageIsTooLongMaxMaxMessageLengthCharacters	1	lib/features/messaging/presentation/message_thread_detail_cubit.dart:198
+Messages are temporarily unavailable. Please try again.	errMessagesAreTemporarilyUnavailablePleaseTryAgain	1	lib/data/messaging/supabase_message_gateway_messages.dart:174
+Notifications are temporarily unavailable. Please try again.	errNotificationsAreTemporarilyUnavailablePleaseTryAgain	1	lib/data/notifications/supabase_notification_gateway.dart:163
+Only a partner can decide this request.	errOnlyAPartnerCanDecideThisRequest	1	lib/data/approvals/supabase_approval_gateway.dart:103
+Only a partner or attorney can schedule a video consultation.	errOnlyAPartnerOrAttorneyCanScheduleA	1	lib/data/video/supabase_video_gateway.dart:91
+Only a partner or compliance officer can create alerts.	errOnlyAPartnerOrComplianceOfficerCanCreate	1	lib/data/compliance/supabase_compliance_gateway.dart:81
+Only a partner or compliance officer can resolve alerts.	errOnlyAPartnerOrComplianceOfficerCanResolve	1	lib/data/compliance/supabase_compliance_gateway.dart:114
+Only an active organization member can acknowledge alerts.	errOnlyAnActiveOrganizationMemberCanAcknowledgeAlerts	1	lib/data/compliance/supabase_compliance_gateway.dart:100
+Only the assigned person can acknowledge this task.	errOnlyTheAssignedPersonCanAcknowledgeThisTask	2	lib/data/tasks/supabase_task_gateway.dart:125,lib/features/tasks/data/fake_task_gateway.dart:211
+Only the creator or a partner can end this consultation.	errOnlyTheCreatorOrAPartnerCanEnd	1	lib/data/video/supabase_video_gateway.dart:157
+Only the requester or a partner can cancel this request.	errOnlyTheRequesterOrAPartnerCanCancel	1	lib/data/approvals/supabase_approval_gateway.dart:117
+Organization memberships could not be loaded.	errOrganizationMembershipsCouldNotBeLoaded	1	lib/features/auth/presentation/auth_cubit_hydration.dart:141
+Re-assigning the task is temporarily unavailable. Please try again.	errReAssigningTheTaskIsTemporarilyUnavailablePlease	1	lib/data/tasks/supabase_task_gateway.dart:114
+Resolving the alert is temporarily unavailable. Please try again.	errResolvingTheAlertIsTemporarilyUnavailablePleaseTry	1	lib/data/compliance/supabase_compliance_gateway.dart:116
+Scheduling a consultation is temporarily unavailable. Please try again.	errSchedulingAConsultationIsTemporarilyUnavailablePleaseTry	1	lib/data/video/supabase_video_gateway.dart:95
+Select a research run to view its findings.	errSelectAResearchRunToViewItsFindings	1	lib/data/research/supabase_research_gateway.dart:111
+Select a video consultation to join.	errSelectAVideoConsultationToJoin	1	lib/data/video/supabase_video_gateway.dart:113
+Select an organization to schedule a consultation.	errSelectAnOrganizationToScheduleAConsultation	1	lib/data/video/supabase_video_gateway.dart:74
+Select an organization to view approvals.	errSelectAnOrganizationToViewApprovals	1	lib/data/approvals/supabase_approval_gateway.dart:29
+Select an organization to view compliance alerts.	errSelectAnOrganizationToViewComplianceAlerts	1	lib/data/compliance/supabase_compliance_gateway.dart:31
+Select an organization to view research runs.	errSelectAnOrganizationToViewResearchRuns	1	lib/data/research/supabase_research_gateway.dart:85
+Select an organization to view video consultations.	errSelectAnOrganizationToViewVideoConsultations	1	lib/data/video/supabase_video_gateway.dart:32
+Sending is temporarily unavailable. Please try again.	errSendingIsTemporarilyUnavailablePleaseTryAgain	1	lib/data/messaging/supabase_message_gateway_messages.dart:158
+Sign in again to use video consultations.	errSignInAgainToUseVideoConsultations	1	lib/data/video/supabase_video_gateway.dart:279
+Starting the consultation is temporarily unavailable. Please try again.	errStartingTheConsultationIsTemporarilyUnavailablePleaseTry	1	lib/data/video/supabase_video_gateway.dart:146
+Tasks are temporarily unavailable. Please try again.	errTasksAreTemporarilyUnavailablePleaseTryAgain	1	lib/data/tasks/supabase_task_gateway.dart:36
+That person cannot be assigned this task. Choose an active member of the organization.	errThatPersonCannotBeAssignedThisTaskChoose	1	lib/data/tasks/supabase_task_gateway.dart:112
+That time is no longer available. Choose another time.	errThatTimeIsNoLongerAvailableChooseAnother	1	lib/data/booking/supabase_booking_gateway.dart:190
+The AI provider returned an unexpected response. Please try again.	errTheAIProviderReturnedAnUnexpectedResponsePlease	1	lib/data/research/supabase_research_gateway.dart:338
+The alert can no longer be acknowledged.	errTheAlertCanNoLongerBeAcknowledged	2	lib/data/compliance/supabase_compliance_gateway.dart:102,lib/features/compliance/data/fake_compliance_gateway.dart:177
+The alert can no longer be resolved.	errTheAlertCanNoLongerBeResolved	2	lib/data/compliance/supabase_compliance_gateway.dart:115,lib/features/compliance/data/fake_compliance_gateway.dart:182
+The alert could not be created. Check the details and try again.	errTheAlertCouldNotBeCreatedCheckThe	1	lib/data/compliance/supabase_compliance_gateway.dart:83
+The booking details are invalid. Check them and try again.	errTheBookingDetailsAreInvalidCheckThemAnd	1	lib/data/booking/supabase_booking_gateway.dart:201
+The consultation could not be scheduled. Check the details and try again.	errTheConsultationCouldNotBeScheduledCheckThe	1	lib/data/video/supabase_video_gateway.dart:93
+The consultation is not available to join right now.	errTheConsultationIsNotAvailableToJoinRight	1	lib/data/video/supabase_video_gateway.dart:127
+The directory is temporarily unavailable. Try again.	errTheDirectoryIsTemporarilyUnavailableTryAgain	1	lib/data/discovery/supabase_attorney_gateway.dart:233
+The profile details are invalid. Check them and retry.	errTheProfileDetailsAreInvalidCheckThemAnd	1	lib/data/discovery/supabase_attorney_gateway.dart:228
+The request can no longer be cancelled.	errTheRequestCanNoLongerBeCancelled	1	lib/data/approvals/supabase_approval_gateway.dart:118
+The request could not be created. Check the details and try again.	errTheRequestCouldNotBeCreatedCheckThe	1	lib/data/approvals/supabase_approval_gateway.dart:76
+The request could not be decided. It may no longer be pending, or the note is missing.	errTheRequestCouldNotBeDecidedItMay	1	lib/data/approvals/supabase_approval_gateway.dart:104
+The request is no longer pending.	errTheRequestIsNoLongerPending	1	lib/features/approvals/data/fake_approvals_gateway.dart:182
+The selected context is too large. Remove documents and try again.	errTheSelectedContextIsTooLargeRemoveDocuments	1	lib/data/research/supabase_research_gateway.dart:317
+The selected research run was not found.	errTheSelectedResearchRunWasNotFound	1	lib/data/research/supabase_research_gateway.dart:344
+The task cannot move to that status. It may already be done.	errTheTaskCannotMoveToThatStatusIt	2	lib/data/tasks/supabase_task_gateway.dart:98,lib/features/tasks/data/fake_task_gateway.dart:141
+The task could not be created. Check the title and try again.	errTheTaskCouldNotBeCreatedCheckThe	2	lib/data/tasks/supabase_task_gateway.dart:74,lib/features/tasks/data/fake_task_gateway.dart:103
+This consultation can no longer be ended.	errThisConsultationCanNoLongerBeEnded	1	lib/data/video/supabase_video_gateway.dart:158
+This consultation can no longer be started.	errThisConsultationCanNoLongerBeStarted	1	lib/data/video/supabase_video_gateway.dart:145
+This file is too large.	errThisFileIsTooLarge	2	lib/data/storage/supabase_storage_gateway.dart:74,lib/features/storage/presentation/file_transfer_cubit.dart:59
+This file type is not supported.	errThisFileTypeIsNotSupported	2	lib/data/storage/supabase_storage_gateway.dart:83,lib/features/storage/presentation/file_transfer_cubit.dart:47
+This video consultation has already ended.	errThisVideoConsultationHasAlreadyEnded	1	lib/data/video/supabase_video_gateway.dart:296
+This video consultation was not found.	errThisVideoConsultationWasNotFound	2	lib/data/video/supabase_video_gateway.dart:291,lib/features/video/data/fake_video_gateway.dart:143
+Threads are temporarily unavailable. Please try again.	errThreadsAreTemporarilyUnavailablePleaseTryAgain	1	lib/data/messaging/supabase_message_gateway_messages.dart:76
+Unable to acknowledge the alert. Please try again.	errUnableToAcknowledgeTheAlertPleaseTryAgain	1	lib/data/compliance/supabase_compliance_gateway.dart:105
+Unable to acknowledge the task. Please try again.	errUnableToAcknowledgeTheTaskPleaseTryAgain	2	lib/data/tasks/supabase_task_gateway.dart:126,lib/data/tasks/supabase_task_gateway.dart:129
+Unable to cancel the request. Please try again.	errUnableToCancelTheRequestPleaseTryAgain	1	lib/data/approvals/supabase_approval_gateway.dart:121
+Unable to check the payment status. Please try again.	errUnableToCheckThePaymentStatusPleaseTry	1	lib/data/billing/supabase_payment_gateway.dart:60
+Unable to confirm. Please try again.	errUnableToConfirmPleaseTryAgain	3	lib/data/booking/supabase_booking_gateway.dart:61,lib/data/booking/supabase_booking_gateway.dart:82,lib/data/booking/supabase_booking_gateway.dart:213
+Unable to create the alert. Please try again.	errUnableToCreateTheAlertPleaseTryAgain	1	lib/data/compliance/supabase_compliance_gateway.dart:87
+Unable to create the request. Please try again.	errUnableToCreateTheRequestPleaseTryAgain	1	lib/data/approvals/supabase_approval_gateway.dart:80
+Unable to create the task. Please try again.	errUnableToCreateTheTaskPleaseTryAgain	2	lib/data/tasks/supabase_task_gateway.dart:78,lib/data/tasks/supabase_task_gateway.dart:85
+Unable to decide the request. Please try again.	errUnableToDecideTheRequestPleaseTryAgain	1	lib/data/approvals/supabase_approval_gateway.dart:108
+Unable to end the consultation. Please try again.	errUnableToEndTheConsultationPleaseTryAgain	1	lib/data/video/supabase_video_gateway.dart:161
+Unable to join the consultation. Please try again.	errUnableToJoinTheConsultationPleaseTryAgain	1	lib/data/video/supabase_video_gateway.dart:131
+Unable to load approvals. Please try again.	errUnableToLoadApprovalsPleaseTryAgain	3	lib/data/approvals/supabase_approval_gateway.dart:47,lib/data/approvals/supabase_approval_gateway.dart:50,lib/data/approvals/supabase_approval_gateway.dart:271
+Unable to load available times. Please try again.	errUnableToLoadAvailableTimesPleaseTryAgain	2	lib/data/booking/supabase_booking_gateway.dart:45,lib/data/booking/supabase_booking_gateway.dart:175
+Unable to load compliance alerts. Please try again.	errUnableToLoadComplianceAlertsPleaseTryAgain	3	lib/data/compliance/supabase_compliance_gateway.dart:51,lib/data/compliance/supabase_compliance_gateway.dart:55,lib/data/compliance/supabase_compliance_gateway.dart:295
+Unable to load documents. Please try again.	errUnableToLoadDocumentsPleaseTryAgain	1	lib/data/documents/supabase_document_gateway.dart:58
+Unable to load files. Please try again.	errUnableToLoadFilesPleaseTryAgain	1	lib/data/storage/supabase_storage_gateway.dart:39
+Unable to load invoices. Please try again.	errUnableToLoadInvoicesPleaseTryAgain	1	lib/data/billing/supabase_billing_gateway.dart:45
+Unable to load matters. Please try again.	errUnableToLoadMattersPleaseTryAgain	1	lib/data/matters/supabase_matter_gateway.dart:77
+Unable to load messages. Please try again.	errUnableToLoadMessagesPleaseTryAgain	2	lib/data/messaging/supabase_message_gateway_messages.dart:31,lib/data/messaging/supabase_message_gateway_messages.dart:176
+Unable to load notifications. Please try again.	errUnableToLoadNotificationsPleaseTryAgain	1	lib/data/notifications/supabase_notification_gateway.dart:48
+Unable to load tasks. Please try again.	errUnableToLoadTasksPleaseTryAgain	3	lib/data/tasks/supabase_task_gateway.dart:35,lib/data/tasks/supabase_task_gateway.dart:38,lib/data/tasks/supabase_task_gateway.dart:47
+Unable to load the directory. Please try again.	errUnableToLoadTheDirectoryPleaseTryAgain	2	lib/data/discovery/supabase_attorney_gateway.dart:239,lib/data/discovery/supabase_attorney_gateway.dart:249
+Unable to load threads. Please try again.	errUnableToLoadThreadsPleaseTryAgain	2	lib/data/messaging/supabase_message_gateway.dart:67,lib/data/messaging/supabase_message_gateway_messages.dart:78
+Unable to load video consultations. Please try again.	errUnableToLoadVideoConsultationsPleaseTryAgain	2	lib/data/video/supabase_video_gateway.dart:50,lib/data/video/supabase_video_gateway.dart:54
+Unable to open the file. Please try again.	errUnableToOpenTheFilePleaseTryAgain	2	lib/data/storage/supabase_storage_gateway.dart:253,lib/features/storage/presentation/file_transfer_cubit.dart:139
+Unable to re-assign the task. Please try again.	errUnableToReAssignTheTaskPleaseTry	1	lib/data/tasks/supabase_task_gateway.dart:116
+Unable to read the video consultation. Please try again.	errUnableToReadTheVideoConsultationPleaseTry	1	lib/data/video/supabase_video_gateway.dart:329
+Unable to resolve the alert. Please try again.	errUnableToResolveTheAlertPleaseTryAgain	1	lib/data/compliance/supabase_compliance_gateway.dart:118
+Unable to run AI research. Please try again.	errUnableToRunAIResearchPleaseTryAgain	1	lib/data/research/supabase_research_gateway.dart:349
+Unable to schedule the consultation. Please try again.	errUnableToScheduleTheConsultationPleaseTryAgain	1	lib/data/video/supabase_video_gateway.dart:97
+Unable to send the message. Please try again.	errUnableToSendTheMessagePleaseTryAgain	2	lib/data/messaging/supabase_message_gateway_messages.dart:112,lib/data/messaging/supabase_message_gateway_messages.dart:160
+Unable to start the consultation. Please try again.	errUnableToStartTheConsultationPleaseTryAgain	1	lib/data/video/supabase_video_gateway.dart:148
+Unable to start the payment. Please try again.	errUnableToStartThePaymentPleaseTryAgain	1	lib/data/billing/supabase_payment_gateway.dart:37
+Unable to update the task. Please try again.	errUnableToUpdateTheTaskPleaseTryAgain	1	lib/data/tasks/supabase_task_gateway.dart:102
+Unable to upload the file. Please try again.	errUnableToUploadTheFilePleaseTryAgain	2	lib/data/storage/supabase_storage_gateway.dart:133,lib/features/storage/presentation/file_transfer_cubit.dart:134
+Updating the task is temporarily unavailable. Please try again.	errUpdatingTheTaskIsTemporarilyUnavailablePleaseTry	1	lib/data/tasks/supabase_task_gateway.dart:100
+Video calls are not configured for this deployment. No call was started.	errVideoCallsAreNotConfiguredForThisDeployment	2	lib/data/video/supabase_video_gateway.dart:301,lib/features/video/data/fake_video_gateway.dart:99
+Video calls are temporarily unavailable. Please try again.	errVideoCallsAreTemporarilyUnavailablePleaseTryAgain	1	lib/data/video/supabase_video_gateway.dart:129
+Video consultations are temporarily unavailable. Please try again.	errVideoConsultationsAreTemporarilyUnavailablePleaseTryAgain	1	lib/data/video/supabase_video_gateway.dart:52
+We couldn't complete that request. Please try again.	errWeCouldnTCompleteThatRequestPleaseTry	1	lib/features/auth/data/supabase_password_recovery_gateway.dart:57
+You do not have permission to advance this task.	errYouDoNotHavePermissionToAdvanceThis	2	lib/data/tasks/supabase_task_gateway.dart:97,lib/features/tasks/data/fake_task_gateway.dart:131
+You do not have permission to book this consultation.	errYouDoNotHavePermissionToBookThis	1	lib/data/booking/supabase_booking_gateway.dart:195
+You do not have permission to create approval requests.	errYouDoNotHavePermissionToCreateApproval	1	lib/data/approvals/supabase_approval_gateway.dart:74
+You do not have permission to create tasks on this matter.	errYouDoNotHavePermissionToCreateTasks	1	lib/data/tasks/supabase_task_gateway.dart:72
+You do not have permission to join this consultation.	errYouDoNotHavePermissionToJoinThis	1	lib/data/video/supabase_video_gateway.dart:125
+You do not have permission to manage the directory.	errYouDoNotHavePermissionToManageThe	1	lib/data/discovery/supabase_attorney_gateway.dart:215
+You do not have permission to re-assign this task.	errYouDoNotHavePermissionToReAssign	2	lib/data/tasks/supabase_task_gateway.dart:111,lib/features/tasks/data/fake_task_gateway.dart:181
+You do not have permission to send messages on this thread.	errYouDoNotHavePermissionToSendMessages	1	lib/data/messaging/supabase_message_gateway_messages.dart:156
+You do not have permission to start this consultation.	errYouDoNotHavePermissionToStartThis	1	lib/data/video/supabase_video_gateway.dart:144
+You do not have permission to upload files to this matter.	errYouDoNotHavePermissionToUploadFiles	1	lib/data/storage/supabase_storage_gateway.dart:244
+You do not have permission to view approvals.	errYouDoNotHavePermissionToViewApprovals	1	lib/data/approvals/supabase_approval_gateway.dart:46
+You do not have permission to view available times.	errYouDoNotHavePermissionToViewAvailable	1	lib/data/booking/supabase_booking_gateway.dart:158
+You do not have permission to view compliance alerts.	errYouDoNotHavePermissionToViewCompliance	1	lib/data/compliance/supabase_compliance_gateway.dart:49
+You do not have permission to view the directory.	errYouDoNotHavePermissionToViewThe	1	lib/data/discovery/supabase_attorney_gateway.dart:215
+You do not have permission to view these messages.	errYouDoNotHavePermissionToViewThese	1	lib/data/messaging/supabase_message_gateway_messages.dart:173
+You do not have permission to view these tasks.	errYouDoNotHavePermissionToViewThese2	1	lib/data/tasks/supabase_task_gateway.dart:34
+You do not have permission to view these threads.	errYouDoNotHavePermissionToViewThese3	1	lib/data/messaging/supabase_message_gateway_messages.dart:75
+You do not have permission to view video consultations.	errYouDoNotHavePermissionToViewVideo	1	lib/data/video/supabase_video_gateway.dart:48
+# EXTRA — leave (presentation-mapped)
+literal	key	count	files
+An account with this email already exists	-	1	lib/features/auth/data/supabase_sign_up_gateway.dart:65
+Please check your email	-	1	lib/features/auth/data/supabase_sign_up_gateway.dart:63
+Sign up failed	-	2	lib/features/auth/data/supabase_sign_up_gateway.dart:62,lib/features/auth/data/supabase_sign_up_gateway.dart:70
+Sign up is temporarily unavailable	-	1	lib/features/auth/data/supabase_sign_up_gateway.dart:69
+This account is disabled	-	1	lib/features/auth/data/supabase_sign_up_gateway.dart:66
+Too many attempts, try again later	-	1	lib/features/auth/data/supabase_sign_up_gateway.dart:67
+# UNPARSED
+# none

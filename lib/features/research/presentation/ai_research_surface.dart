@@ -88,7 +88,7 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
     if (active != null && active.isNotEmpty) {
       return active;
     }
-    return backendIsLocalOnly ? 'demo-organization' : null;
+    return backendIsLocalOnly ? DemoCorpus.organizationId : null;
   }
 
   void _submit() {
@@ -215,6 +215,7 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
   }
 
   Widget _matterPicker(AppLocalizations l10n, {required bool locked}) {
+    final DemoLabels labels = DemoLabels(l10n, localOnly: backendIsLocalOnly);
     if (_loadingLookups) {
       return const LinearProgressIndicator();
     }
@@ -237,7 +238,7 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
         for (final Matter matter in matters)
           DropdownMenuItem<String?>(
             value: matter.id,
-            child: Text(demoMatterTitle(l10n, matter.title)),
+            child: Text(labels.matterTitle(matter.title)),
           ),
       ],
       onChanged: locked
@@ -247,6 +248,7 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
   }
 
   Widget _documentsPicker(AppLocalizations l10n, {required bool locked}) {
+    final DemoLabels labels = DemoLabels(l10n, localOnly: backendIsLocalOnly);
     if (_loadingLookups) {
       return const LinearProgressIndicator();
     }
@@ -271,7 +273,7 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
           // chips; add paging if a matter's vault routinely exceeds that.
           for (final Document document in documents.take(_maxDocumentChips))
             FilterChip(
-              label: Text(demoDocumentTitle(l10n, document.title)),
+              label: Text(labels.documentTitle(document.title)),
               selected: _selectedDocumentIds.contains(document.id),
               onSelected: locked
                   ? null

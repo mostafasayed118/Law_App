@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:legalhub/app/deep_link/deep_link_config.dart';
 import 'package:legalhub/data/auth/auth_callback.dart';
 
 void main() {
@@ -16,6 +17,28 @@ void main() {
       expect(
         AuthCallbackUri.pkceCode(
           Uri.parse('com.legalhub.app.dev://auth/v1/callback?code=abc123'),
+        ),
+        'abc123',
+      );
+    });
+
+    test('honors a custom accepted-scheme set', () {
+      const DeepLinkConfig devOnly = DeepLinkConfig(
+        scheme: 'com.legalhub.app.dev',
+        acceptedSchemes: <String>{'com.legalhub.app.dev'},
+      );
+
+      expect(
+        AuthCallbackUri.pkceCode(
+          Uri.parse('com.legalhub.app://auth/v1/callback?code=abc123'),
+          config: devOnly,
+        ),
+        isNull,
+      );
+      expect(
+        AuthCallbackUri.pkceCode(
+          Uri.parse('com.legalhub.app.dev://auth/v1/callback?code=abc123'),
+          config: devOnly,
         ),
         'abc123',
       );

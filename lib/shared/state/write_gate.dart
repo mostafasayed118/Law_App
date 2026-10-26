@@ -1,4 +1,5 @@
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 
 /// Serializes a cubit's writes and maps the gateway result to presentation
@@ -16,6 +17,7 @@ class WriteGate {
   static const AppError busyError = AppError(
     code: 'busy',
     userMessage: 'An action is already in progress.',
+    messageKey: AppMessageKey.errAnActionIsAlreadyInProgress,
   );
 
   bool _inFlight = false;

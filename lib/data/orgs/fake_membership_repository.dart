@@ -1,6 +1,7 @@
 import 'package:legalhub/core/auth/session.dart';
 import 'package:legalhub/core/organizations/membership_repository.dart';
 import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/shared/demo/demo_corpus.dart';
 import 'fake_organization_gateway.dart';
 
 /// Development-only membership hydration implementation.
@@ -32,8 +33,8 @@ class FakeMembershipRepository implements MembershipRepository {
   /// org creator (initial partner), so the hub capability surface agrees
   /// with the session.
   static const OrganizationMembership demoMembership = OrganizationMembership(
-    organizationId: 'org-demo',
-    organizationName: 'Demo Firm',
+    organizationId: DemoCorpus.organizationId,
+    organizationName: DemoCorpus.organizationName,
     role: UserRole.partner,
     status: MembershipStatus.active,
   );

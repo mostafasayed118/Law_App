@@ -37,6 +37,7 @@ class _TopicFieldState extends State<_TopicField> {
       label: l10n.bookingTopicLabel,
       hint: l10n.bookingTopicPlaceholder,
       prefixIcon: Icons.subject_outlined,
+      maxLength: kBookingTopicMaxLength,
     );
   }
 }

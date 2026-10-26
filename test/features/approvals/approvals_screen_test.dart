@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/backend_posture.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/approvals/domain/approvals_gateway.dart';
@@ -37,6 +38,40 @@ void main() {
       expect(find.text('Court filing'), findsOneWidget);
       expect(find.text('Filing · Approved'), findsOneWidget);
     });
+
+    testWidgets(
+      'configured rows keep the server title; local rows map the demo title '
+      '(Task 26)',
+      (tester) async {
+        final AppLocalizations ar = await AppLocalizations.delegate.load(
+          const Locale('ar'),
+        );
+        await pumpApprovals(
+          tester,
+          configured: true,
+          locale: const Locale('ar'),
+          gateway: _StubApprovalsGateway(
+            rows: <PendingApproval>[
+              _row(id: 'a1', title: 'Demo engagement waiver'),
+            ],
+          ),
+        );
+        expect(find.text('Demo engagement waiver'), findsOneWidget);
+        expect(find.text(ar.demoApprovalTitleEngagementWaiver), findsNothing);
+
+        await resetServiceLocator();
+        await pumpApprovals(
+          tester,
+          locale: const Locale('ar'),
+          gateway: _StubApprovalsGateway(
+            rows: <PendingApproval>[
+              _row(id: 'a1', title: 'Demo engagement waiver'),
+            ],
+          ),
+        );
+        expect(find.text(ar.demoApprovalTitleEngagementWaiver), findsOneWidget);
+      },
+    );
 
     testWidgets('filter chips re-read with the selected status', (
       tester,
@@ -364,9 +399,16 @@ Future<void> pumpApprovals(
   WidgetTester tester, {
   required ApprovalsGateway gateway,
   bool canDecide = false,
+  bool configured = false,
+  Locale locale = const Locale('en'),
   String? currentUserId,
 }) async {
   serviceLocator.registerLazySingleton<ApprovalsGateway>(() => gateway);
+  if (configured) {
+    serviceLocator.registerSingleton<BackendPosture>(
+      const BackendPosture(isLocalOnly: false),
+    );
+  }
   configureDependencies();
   serviceLocator<ActiveOrgStore>().select('org-1');
   tester.view.physicalSize = const Size(800, 1600);
@@ -375,6 +417,7 @@ Future<void> pumpApprovals(
   addTearDown(tester.view.resetDevicePixelRatio);
   await tester.pumpWidget(
     MaterialApp(
+      locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: ApprovalsScreen(canDecide: canDecide, currentUserId: currentUserId),

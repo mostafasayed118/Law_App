@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:legalhub/app/deep_link/deep_link_config.dart';
+import 'package:legalhub/core/contracts/http_status.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'auth_callback_observer.dart';
@@ -101,12 +103,19 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
 
   final GoTrueClient _client;
 
+  /// The build's application ID, which is also its custom-scheme deep-link
+  /// host. Development builds inject `APPLICATION_ID=com.legalhub.app.dev`
+  /// via `--dart-define-from-file`; the store build keeps the default.
+  static const String _applicationId = String.fromEnvironment(
+    'APPLICATION_ID',
+    defaultValue: 'com.legalhub.app',
+  );
+
   /// The app's registered deep-link URI (Phase 4.1): the recovery email's
-  /// link target. Must match the Android/iOS intent filters
-  /// (`com.legalhub.app` scheme in the Android manifest and
-  /// iOS Info.plist).
-  static const String _recoveryDeepLinkUri =
-      'com.legalhub.app://auth/v1/callback';
+  /// link target. Must match the Android/iOS intent filters for the same
+  /// application ID.
+  String get _recoveryDeepLinkUri =>
+      DeepLinkConfig(scheme: _applicationId).authCallbackUri().toString();
 
   final StreamController<SupabaseAuthSnapshot?> _changes =
       StreamController<SupabaseAuthSnapshot?>.broadcast();

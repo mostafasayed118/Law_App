@@ -1,15 +1,27 @@
 import 'package:flutter/material.dart';
 
+import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/l10n/app_error_label.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
 part 'view_state_message.dart';
 
 class ViewStateView<T> extends StatelessWidget {
-  const ViewStateView({required this.state, this.onRetry, super.key});
+  const ViewStateView({
+    required this.state,
+    this.onRetry,
+    this.errorFallback,
+    super.key,
+  });
 
   final ViewState<T> state;
   final VoidCallback? onRetry;
+
+  /// Localized copy for an unkeyed [ViewError]. Callers that already localize
+  /// the error message pass it here; the default is the generic
+  /// [AppLocalizations.stateError], never the raw producer text.
+  final String? errorFallback;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +42,11 @@ class ViewStateView<T> extends StatelessWidget {
       ),
       ViewError<T>(error: final error) => _StateMessage(
         icon: Icons.error_outline,
-        label: error.userMessage,
+        label: appErrorLabel(
+          l10n,
+          error,
+          fallback: errorFallback ?? l10n.stateError,
+        ),
         action: onRetry,
       ),
       ViewOffline<T>() => _StateMessage(

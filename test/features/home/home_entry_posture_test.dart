@@ -14,10 +14,10 @@ import 'package:legalhub/features/home/presentation/home_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
 /// W3 / device finding F1: in a configured (real-backend) build the
-/// dashboard must not advertise the server-backed features as demo data.
-/// The fake-only entries (discovery, AI research) keep their demo wording in
-/// EVERY build — their gateways have no Supabase implementation, so the demo
-/// wording is the truthful one.
+/// dashboard must not advertise server-backed features as demo data. Every
+/// current entry — discovery and AI research included — has a Supabase
+/// gateway, so all twelve carry configured-build wording. A future fake-only
+/// entry would keep its demo wording in every build.
 void main() {
   late AuthCubit authCubit;
 
@@ -43,14 +43,17 @@ void main() {
     );
   }
 
-  Widget pumpHome(Locale locale) {
+  Widget pumpHome(
+    Locale locale, {
+    Map<UserRole, RoleCapability> capabilitiesForRole = roleCapabilities,
+  }) {
     return BlocProvider<AuthCubit>.value(
       value: authCubit,
       child: MaterialApp(
         locale: locale,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: const HomeScreen(),
+        home: HomeScreen(capabilitiesForRole: capabilitiesForRole),
       ),
     );
   }
@@ -65,7 +68,7 @@ void main() {
       final Map<String, bool> expected = <String, bool>{
         'booking': true,
         'video': true,
-        'discovery': false,
+        'discovery': true,
         'matters': true,
         'documents': true,
         'messages': true,
@@ -74,7 +77,7 @@ void main() {
         'alerts': true,
         'tasks': true,
         'approvals': true,
-        'research': false,
+        'research': true,
       };
       final List<HomeEntry> entries = allEntries();
 
@@ -105,8 +108,8 @@ void main() {
           // ... and it must differ from the demo wording it replaces.
           expect(configured, isNot(entry.subtitle(l10n)));
         } else {
-          // Fake-only entries have no configured-build wording at all: their
-          // demo wording is truthful in every build and stays.
+          // A (future) fake-only entry has no configured-build wording at
+          // all: its demo wording is truthful in every build and stays.
           expect(configured, isNull);
           expect(entry.subtitle(l10n), contains('demo'));
         }
@@ -158,15 +161,64 @@ void main() {
       );
     });
 
-    testWidgets('configured posture keeps the fake-only entries truthful', (
+    testWidgets(
+      'configured posture drops the demo wording on discovery and research',
+      (tester) async {
+        useConfiguredBackend();
+        await tester.pumpWidget(
+          pumpHome(
+            const Locale('en'),
+            capabilitiesForRole: <UserRole, RoleCapability>{
+              // No session is restored in this test: Home projects the client
+              // role, so the test override must key the client row.
+              UserRole.client: const RoleCapability(
+                canViewAttorneyDiscovery: true,
+                canUseAiResearch: true,
+              ),
+            },
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.scrollUntilVisible(
+          find.text('Find an attorney'),
+          200,
+          scrollable: find.byType(Scrollable).first,
+        );
+        expect(
+          find.text('Browse attorney profiles and practice areas.'),
+          findsOneWidget,
+        );
+        expect(
+          find.text('Browse demo attorney profiles — development demo.'),
+          findsNothing,
+        );
+
+        await tester.scrollUntilVisible(
+          find.text('AI research'),
+          200,
+          scrollable: find.byType(Scrollable).first,
+        );
+        expect(
+          find.text(
+            'Ask the research assistant across your matters and documents — '
+            'advisory only.',
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.text('Ask the demo research assistant — advisory only.'),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets('demo posture keeps the discovery demo wording', (
       tester,
     ) async {
-      useConfiguredBackend();
       await tester.pumpWidget(pumpHome(const Locale('en')));
       await tester.pumpAndSettle();
 
-      // The discovery gateway is fake-only: its data is synthetic in every
-      // build, so the demo wording stays — gating it would hide the truth.
       await tester.scrollUntilVisible(
         find.text('Find an attorney'),
         200,
@@ -175,6 +227,10 @@ void main() {
       expect(
         find.text('Browse demo attorney profiles — development demo.'),
         findsOneWidget,
+      );
+      expect(
+        find.text('Browse attorney profiles and practice areas.'),
+        findsNothing,
       );
     });
 
