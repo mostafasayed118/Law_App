@@ -8,14 +8,32 @@ import 'package:legalhub/features/video/domain/video_token.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:livekit_client/livekit_client.dart';
 
-/// Connects to a LiveKit room. Injected by tests so the pre-connect UI can be
-/// exercised without native WebRTC.
-typedef VideoRoomConnector = Future<Room> Function(String url, String token);
+/// Connects a room the screen created. Injected by tests so the pre-connect
+/// UI can be exercised without native WebRTC.
+typedef VideoRoomConnector =
+    Future<void> Function(Room room, String url, String token);
 
-Future<Room> _connectRoom(String url, String token) async {
-  final Room room = Room();
-  await room.connect(url, token);
-  return room;
+/// Tears a room down. Injected by tests in place of the real LiveKit calls.
+typedef VideoRoomTeardown = Future<void> Function(Room room);
+
+Room _createRoom() => Room();
+
+Future<void> _connectRoom(Room room, String url, String token) =>
+    room.connect(url, token);
+
+/// Disconnects then disposes [room]. Both steps are individually guarded:
+/// a connection that is already gone must not prevent the object release.
+Future<void> teardownVideoRoom(Room room) async {
+  try {
+    await room.disconnect();
+  } on Object {
+    // The local connection is already gone; disposal must still run.
+  }
+  try {
+    await room.dispose();
+  } on Object {
+    // A twice-disposed room is not a teardown failure.
+  }
 }
 
 /// The real in-call surface (design §6; plan Task 7).
@@ -32,6 +50,8 @@ class VideoCallScreen extends StatefulWidget {
     required this.gateway,
     this.canEnd = false,
     this.connector,
+    this.teardown,
+    this.roomFactory,
     super.key,
   });
 
@@ -40,6 +60,11 @@ class VideoCallScreen extends StatefulWidget {
   final VideoGateway gateway;
   final bool canEnd;
   final VideoRoomConnector? connector;
+  final VideoRoomTeardown? teardown;
+
+  /// Creates the room the screen owns. Injected by tests so no native
+  /// WebRTC engine is constructed.
+  final Room Function()? roomFactory;
 
   @override
   State<VideoCallScreen> createState() => _VideoCallScreenState();
@@ -63,12 +88,20 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   @override
   void dispose() {
     final Room? room = _room;
+    _room = null;
     if (room != null) {
-      if (!_leaving) {
-        unawaited(room.disconnect());
-      }
+      unawaited((widget.teardown ?? teardownVideoRoom)(room));
     }
     super.dispose();
+  }
+
+  VideoRoomTeardown get _teardownRoom => widget.teardown ?? teardownVideoRoom;
+
+  Future<void> _teardown(Room room) async {
+    if (identical(_room, room)) {
+      _room = null;
+    }
+    await _teardownRoom(room);
   }
 
   Future<void> _connect() async {
@@ -79,22 +112,25 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       _connecting = true;
       _failed = false;
     });
+    final Room room = _room ?? (widget.roomFactory ?? _createRoom)();
+    _room = room;
     try {
-      final Room room = await (widget.connector ?? _connectRoom)(
+      await (widget.connector ?? _connectRoom)(
+        room,
         widget.token.url,
         widget.token.token,
       );
       if (!mounted) {
-        await room.disconnect();
+        await _teardown(room);
         return;
       }
       setState(() {
-        _room = room;
         _connecting = false;
       });
       await _enableMedia(room);
       unawaited(_markLive());
     } on Object {
+      await _teardown(room);
       if (!mounted) {
         return;
       }
@@ -173,11 +209,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     setState(() => _leaving = true);
     final Room? room = _room;
     if (room != null) {
-      try {
-        await room.disconnect();
-      } on Object {
-        // The local connection is already gone; leaving must still complete.
-      }
+      _room = null;
+      await _teardownRoom(room);
       if (widget.canEnd) {
         await widget.gateway.end(widget.session.id);
       }

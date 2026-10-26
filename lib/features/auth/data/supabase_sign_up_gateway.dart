@@ -35,6 +35,12 @@ class SupabaseSignUpGateway implements SignUpGateway {
       case SupabaseSignUpAuthenticated():
         return const Result<void>.success(null);
       case SupabaseSignUpFailed(failure: final SupabaseAuthFailure failure):
+        if (failure.kind == SupabaseAuthFailureKind.emailInUse) {
+          // Anti-enumeration: an existing address gets the same pending
+          // "check your email" outcome as a new one. The typed failure is
+          // deliberately not surfaced to the caller.
+          return const Result<void>.success(null);
+        }
         return Result<void>.failure(_toAppError(request, failure));
     }
   }

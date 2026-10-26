@@ -2,8 +2,10 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/shared/state/write_gate.dart';
 
 part 'org_state.dart';
 
@@ -19,6 +21,8 @@ class OrgCubit extends Cubit<OrgState> {
   OrgCubit(this._gateway) : super(const OrgInitial());
 
   final OrganizationGateway _gateway;
+
+  final WriteGate _writeGate = WriteGate();
 
   /// Creates an organization. Emits [OrgCreateLoading] then
   /// [OrgCreateSuccess] or [OrgCreateFailed].
@@ -185,7 +189,9 @@ class OrgCubit extends Cubit<OrgState> {
   );
 
   /// Runs a member action: marks the row in-flight, calls the seam, refreshes
-  /// the roster on success, and restores the previous roster on failure.
+  /// the roster on success, and restores the previous roster on failure. A
+  /// duplicate action while one write is in flight returns
+  /// [OrgFailureKind.busy] and leaves the spinner untouched.
   Future<OrgFailureKind?> _runAction({
     required String organizationId,
     required String userId,
@@ -195,22 +201,38 @@ class OrgCubit extends Cubit<OrgState> {
     if (current is! OrgRosterLoaded) {
       return null;
     }
-    emit(current.copyWith(pendingUserId: userId));
-    final OrgOutcome<void> outcome = await call();
+    OrgFailureKind? failureKind;
+    bool started = false;
+    final AppError? error = await _writeGate.run<void>(
+      isClosed: () => isClosed,
+      write: () async {
+        started = true;
+        emit(current.copyWith(pendingUserId: userId));
+        final OrgOutcome<void> outcome = await call();
+        switch (outcome) {
+          case OrgSuccess<void>():
+            return const Success<void>(null);
+          case OrgFailed<void>(failure: final OrgFailure failure):
+            failureKind = failure.kind;
+            return Failure<void>(_appError(failure));
+        }
+      },
+      onSuccess: () => loadRoster(organizationId: organizationId),
+    );
     if (isClosed) {
       return null;
     }
-    switch (outcome) {
-      case OrgSuccess<void>():
-        await loadRoster(organizationId: organizationId);
-        return null;
-      case OrgFailed<void>(failure: final OrgFailure failure):
-        // pendingUserId deliberately cleared: the action finished
-        // (failed), so the row spinner goes. Explicit full construction —
-        // copyWith cannot clear it.
-        emit(OrgRosterLoaded(current.members));
-        return failure.kind;
+    if (!started) {
+      return OrgFailureKind.busy;
     }
+    if (error != null) {
+      // pendingUserId deliberately cleared: the action finished
+      // (failed), so the row spinner goes. Explicit full construction —
+      // copyWith cannot clear it.
+      emit(OrgRosterLoaded(current.members));
+      return failureKind ?? OrgFailureKind.unknown;
+    }
+    return null;
   }
 
   AppError _appError(OrgFailure failure) => AppError(

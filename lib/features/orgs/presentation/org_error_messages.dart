@@ -16,5 +16,6 @@ String orgErrorMessage(AppLocalizations l10n, OrgFailureKind kind) {
     OrgFailureKind.invalidInvitation => l10n.orgErrorInvalidInvitation,
     OrgFailureKind.providerUnavailable => l10n.orgErrorProviderUnavailable,
     OrgFailureKind.unknown => l10n.orgErrorUnknown,
+    OrgFailureKind.busy => l10n.actionInProgress,
   };
 }

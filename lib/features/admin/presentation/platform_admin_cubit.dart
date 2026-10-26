@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:legalhub/core/admin/platform_admin_gateway.dart';
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/shared/state/write_gate.dart';
 part 'platform_admin_state.dart';
 part 'platform_admin_cubit_base.dart';
 part 'platform_admin_cubit_audit.dart';
@@ -23,6 +25,8 @@ part 'platform_admin_cubit_audit.dart';
 class PlatformAdminCubit extends _PlatformAdminCubitBase
     with _PlatformAdminAudit {
   PlatformAdminCubit(super._gateway);
+
+  final WriteGate _writeGate = WriteGate();
 
   /// Loads both metadata lists in parallel. A `denied` response from either
   /// list becomes [PlatformAdminDenied] — never empty success (AC-7). The
@@ -139,6 +143,8 @@ class PlatformAdminCubit extends _PlatformAdminCubitBase
   /// Runs an action: marks the member row in-flight, calls the seam, reloads
   /// both lists on success, and restores the previous lists on failure. The
   /// audit trail is carried across both emissions (never wiped by an action).
+  /// A duplicate action while one write is in flight returns
+  /// [OrgFailureKind.busy] and leaves the spinner untouched.
   Future<OrgFailureKind?> _runAction({
     required String userId,
     required Future<OrgOutcome<void>> Function() call,
@@ -147,32 +153,48 @@ class PlatformAdminCubit extends _PlatformAdminCubitBase
     if (current is! PlatformAdminLoaded) {
       return null;
     }
-    emit(current.copyWith(pendingUserId: userId));
-    final OrgOutcome<void> outcome = await call();
+    OrgFailureKind? failureKind;
+    bool started = false;
+    final AppError? error = await _writeGate.run<void>(
+      isClosed: () => isClosed,
+      write: () async {
+        started = true;
+        emit(current.copyWith(pendingUserId: userId));
+        final OrgOutcome<void> outcome = await call();
+        switch (outcome) {
+          case OrgSuccess<void>():
+            return const Success<void>(null);
+          case OrgFailed<void>(failure: final OrgFailure failure):
+            failureKind = failure.kind;
+            return Failure<void>(_appError(failure));
+        }
+      },
+      onSuccess: load,
+    );
     if (isClosed) {
       return null;
     }
-    switch (outcome) {
-      case OrgSuccess<void>():
-        await load();
-        return null;
-      case OrgFailed<void>(failure: final OrgFailure failure):
-        emit(
-          // pendingUserId deliberately cleared: the action finished
-          // (failed), so the row spinner goes. Explicit full construction —
-          // copyWith cannot clear it.
-          PlatformAdminLoaded(
-            current.organizations,
-            current.members,
-            platformAudit: current.platformAudit,
-            orgAudit: current.orgAudit,
-            selectedAuditOrgId: current.selectedAuditOrgId,
-            auditLoading: current.auditLoading,
-            auditError: current.auditError,
-          ),
-        );
-        return failure.kind;
+    if (!started) {
+      return OrgFailureKind.busy;
     }
+    if (error != null) {
+      emit(
+        // pendingUserId deliberately cleared: the action finished
+        // (failed), so the row spinner goes. Explicit full construction —
+        // copyWith cannot clear it.
+        PlatformAdminLoaded(
+          current.organizations,
+          current.members,
+          platformAudit: current.platformAudit,
+          orgAudit: current.orgAudit,
+          selectedAuditOrgId: current.selectedAuditOrgId,
+          auditLoading: current.auditLoading,
+          auditError: current.auditError,
+        ),
+      );
+      return failureKind ?? OrgFailureKind.unknown;
+    }
+    return null;
   }
 
   AppError _appError(OrgFailure failure) => AppError(

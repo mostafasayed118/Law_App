@@ -129,7 +129,9 @@ class _MatterFilesSectionState extends State<MatterFilesSection> {
                           message: l10n.fileOpenAction,
                           child: AppTile(
                             title: demoFileName(l10n, file.name),
-                            subtitles: <String>[fileSizeLabel(file.sizeBytes)],
+                            subtitles: <String>[
+                              fileSizeLabel(l10n, file.sizeBytes),
+                            ],
                             icon: Icons.description_outlined,
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -179,18 +181,18 @@ String _transferErrorCopy(AppLocalizations l10n, AppError error) {
   };
 }
 
-/// Formats a byte count as a compact human label (240 KB / 1.5 MB / 512 B).
-/// Deterministic, locale-independent — the row's only secondary field. A
-/// whole value drops its trailing `.0` (240 KB, not 240.0 KB). Kept in the
-/// storage feature (domain formatting, not UI) after the E8 row extraction.
-String fileSizeLabel(int bytes) {
+/// Formats a byte count as a compact, localized human label (240 KB /
+/// 1.5 MB / 512 B). The row's only secondary field. A whole value drops its
+/// trailing `.0` (240 KB, not 240.0 KB). Kept in the storage feature (domain
+/// formatting, not UI) after the E8 row extraction.
+String fileSizeLabel(AppLocalizations l10n, int bytes) {
   if (bytes >= 1048576) {
-    return '${_trimOne(bytes / 1048576)} MB';
+    return l10n.fileSizeMb(_trimOne(bytes / 1048576));
   }
   if (bytes >= 1024) {
-    return '${_trimOne(bytes / 1024)} KB';
+    return l10n.fileSizeKb(_trimOne(bytes / 1024));
   }
-  return '$bytes B';
+  return l10n.fileSizeBytes('$bytes');
 }
 
 /// Renders [value] with one decimal, dropping a trailing `.0`.

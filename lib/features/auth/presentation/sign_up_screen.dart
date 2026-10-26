@@ -266,7 +266,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   ) {
     if (state is ViewError<void>) {
       final String message = switch (state.error.code) {
-        'emailInUse' => l10n.signUpErrorEmailInUse,
+        'emailInUse' => l10n.signUpErrorGeneric,
         'rateLimited' => l10n.signUpErrorRateLimited,
         'providerUnavailable' => l10n.signUpErrorServiceUnavailable,
         _ => l10n.signUpErrorGeneric,

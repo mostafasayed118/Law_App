@@ -75,7 +75,56 @@ class NotificationFeedScreen extends StatelessWidget {
             ),
             errorCopy: l10n.notificationsFeedError,
             localOnlyNote: localOnly ? l10n.notificationsFeedLocalOnlyNote : '',
+            header: const <Widget>[_ActionErrorBanner()],
           ),
+    );
+  }
+}
+
+/// Inline banner for a failed mark-read action. It subscribes to the cubit
+/// directly (the list shell's `buildWhen` only tracks the row projection, so
+/// an action error that leaves the list untouched would not rebuild it).
+class _ActionErrorBanner extends StatelessWidget {
+  const _ActionErrorBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<NotificationCubit, NotificationState, bool>(
+      selector: (NotificationState state) => state.actionError != null,
+      builder: (BuildContext context, bool hasError) {
+        if (!hasError) {
+          return const SizedBox.shrink();
+        }
+        final ColorScheme scheme = Theme.of(context).colorScheme;
+        return Padding(
+          padding: const EdgeInsetsDirectional.only(
+            bottom: LegalHubTheme.spaceMd,
+          ),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: scheme.errorContainer,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Padding(
+              padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceSm),
+              child: Row(
+                children: <Widget>[
+                  Icon(Icons.error_outline, color: scheme.onErrorContainer),
+                  const SizedBox(width: LegalHubTheme.spaceSm),
+                  Expanded(
+                    child: Text(
+                      AppLocalizations.of(context).stateError,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: scheme.onErrorContainer,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

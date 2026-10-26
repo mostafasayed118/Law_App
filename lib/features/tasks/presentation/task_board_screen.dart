@@ -14,6 +14,7 @@ import 'task_assign_sheet.dart';
 import 'task_board_cubit.dart';
 import 'task_board_state.dart';
 import 'task_create_sheet.dart';
+import 'task_error_messages.dart';
 
 part 'task_tile.dart';
 
@@ -72,7 +73,7 @@ class TaskBoardScreen extends StatelessWidget {
                   top: LegalHubTheme.spaceSm,
                 ),
                 child: Text(
-                  state.actionError!,
+                  taskErrorMessage(l10n, state.actionError!),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.error,
                   ),

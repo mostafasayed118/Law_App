@@ -12,6 +12,7 @@ import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
 
+import 'message_error_messages.dart';
 import 'message_thread_detail_cubit.dart';
 import 'message_thread_detail_state.dart';
 
