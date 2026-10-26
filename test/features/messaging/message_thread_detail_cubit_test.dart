@@ -341,7 +341,7 @@ void main() {
         ),
         MessageThreadDetailState(
           messages: ViewSuccess<List<Message>>(_messages),
-          sendError: 'Unable to send the message. Please try again.',
+          sendError: _sendFailure,
         ),
       ],
     );
@@ -374,7 +374,10 @@ void main() {
         ),
         MessageThreadDetailState(
           messages: ViewSuccess<List<Message>>(_messages),
-          sendError: 'Message is too long (max 2000 characters).',
+          sendError: const AppError(
+            code: 'message_too_long',
+            userMessage: 'Message is too long (max 2000 characters).',
+          ),
         ),
       ],
       verify: (_) => expect(gateway.sendCalls, 0),

@@ -193,6 +193,28 @@ void main() {
         findsOneWidget,
       );
     });
+
+    testWidgets('an oversized send surfaces the localized length error', (
+      tester,
+    ) async {
+      final _StubMessageGateway gateway = _StubMessageGateway(
+        results: <Result<List<Message>>>[
+          Result<List<Message>>.success(_singleMessage),
+        ],
+      );
+      await pumpDetail(tester, gatewayOverride: gateway);
+
+      await tester.enterText(find.byType(TextField), 'x' * 2001);
+      await tester.pump();
+      await tester.tap(find.byIcon(Icons.send));
+      await tester.pumpAndSettle();
+
+      expect(gateway.sendCalls, 0);
+      expect(
+        find.text('Message is too long. The maximum is 2000 characters.'),
+        findsOneWidget,
+      );
+    });
   });
 }
 

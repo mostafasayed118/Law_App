@@ -31,7 +31,9 @@ class _FailingOrgApi implements SupabaseOrgApi {
   final Object error;
 
   @override
-  Future<List<Map<String, dynamic>>> listMyMemberships() async => throw error;
+  Future<List<Map<String, dynamic>>> listMyMemberships({
+    required String userId,
+  }) async => throw error;
 
   @override
   Future<String> createOrganization({required String name}) async =>
@@ -278,7 +280,7 @@ void main() {
 
     test('documents: closed client → providerUnavailable', () async {
       final SupabaseDocumentApiImpl api = SupabaseDocumentApiImpl(
-        tableFor(StateError('client closed')),
+        tableFor(Exception('client closed')),
       );
       await expectLater(
         api.fetchDocuments(),

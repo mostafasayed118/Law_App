@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/admin/platform_admin_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
@@ -19,6 +21,8 @@ class _StubPlatformAdminGateway implements PlatformAdminGateway {
   OrgOutcome<List<AuditEntry>> orgAuditOutcome =
       const OrgOutcome<List<AuditEntry>>.success(<AuditEntry>[]);
   final List<String> calls = <String>[];
+  Completer<void>? suspendGate;
+  int suspendCalls = 0;
 
   @override
   Future<OrgOutcome<List<OrganizationSummary>>> listOrganizations() async {
@@ -37,7 +41,12 @@ class _StubPlatformAdminGateway implements PlatformAdminGateway {
     required String organizationId,
     required String userId,
   }) async {
+    suspendCalls++;
     calls.add('suspend:$organizationId:$userId');
+    final Completer<void>? gate = suspendGate;
+    if (gate != null) {
+      await gate.future;
+    }
     return voidOutcome;
   }
 
@@ -273,6 +282,33 @@ void main() {
       expect(kind, isNull);
       expect(cubit.state, const PlatformAdminInitial());
       expect(gateway.calls, isEmpty);
+    });
+
+    test('a second action returns busy while one write is in flight', () async {
+      final _StubPlatformAdminGateway gateway = _StubPlatformAdminGateway();
+      final PlatformAdminCubit cubit = await loadedCubit(gateway);
+      addTearDown(cubit.close);
+      final Completer<void> gate = Completer<void>();
+      gateway.suspendGate = gate;
+
+      final Future<OrgFailureKind?> first = cubit.suspendMembership(
+        organizationId: 'org-1',
+        userId: 'u-2',
+      );
+      await Future<void>.delayed(Duration.zero);
+      final OrgFailureKind? second = await cubit.suspendMembership(
+        organizationId: 'org-1',
+        userId: 'u-2',
+      );
+
+      expect(second, OrgFailureKind.busy);
+      expect(gateway.suspendCalls, 1);
+      // The first write's row spinner stays in place.
+      expect((cubit.state as PlatformAdminLoaded).pendingUserId, 'u-2');
+
+      gate.complete();
+      expect(await first, isNull);
+      expect((cubit.state as PlatformAdminLoaded).pendingUserId, isNull);
     });
 
     test('a second load is ignored while one is in flight', () async {

@@ -570,6 +570,69 @@ void main() {
       expect(find.text('Title'), findsOneWidget);
       expect(find.text('None'), findsNWidgets(2));
     });
+
+    testWidgets(
+      'matter create gate follows the selected organization role (A1)',
+      (tester) async {
+        await resetServiceLocator();
+        configureDependencies();
+        addTearDown(() => resetServiceLocator());
+
+        final AuthCubit multiCubit = AuthCubit(
+          RoleGateway(
+            Session(
+              userId: 'user-multi',
+              displayName: 'User multi',
+              memberships: const <OrganizationMembership>[
+                OrganizationMembership(
+                  organizationId: 'org-partner',
+                  organizationName: 'Partner Org',
+                  role: UserRole.partner,
+                  status: MembershipStatus.active,
+                ),
+                OrganizationMembership(
+                  organizationId: 'org-client',
+                  organizationName: 'Client Org',
+                  role: UserRole.client,
+                  status: MembershipStatus.active,
+                ),
+              ],
+              expiresAt: DateTime(2030, 1, 1),
+            ),
+          ),
+          InMemoryErrorReporter(),
+          FakeMembershipRepository(),
+          FakeOrganizationGateway(),
+        );
+        addTearDown(multiCubit.close);
+        final GoRouter multiRouter = createAppRouter(multiCubit);
+        addTearDown(multiRouter.dispose);
+
+        // primaryRole is the FIRST active membership (partner); selecting the
+        // client org must win over it for the partner-only create entry.
+        serviceLocator<ActiveOrgStore>().select('org-client');
+        multiRouter.go(AppRoutes.matters);
+        await tester.pumpWidget(
+          harness(
+            child: const SizedBox.shrink(),
+            cubitOverride: multiCubit,
+            routerOverride: multiRouter,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(FloatingActionButton), findsNothing);
+
+        // Switching to the partner org lifts the UX-only gate.
+        serviceLocator<ActiveOrgStore>().select('org-partner');
+        multiRouter.go(AppRoutes.home);
+        await tester.pumpAndSettle();
+        multiRouter.go(AppRoutes.matters);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(FloatingActionButton), findsOneWidget);
+      },
+    );
   });
 
   group('vault route (Phase 8 slice 8.1)', () {
@@ -1186,6 +1249,38 @@ void main() {
         );
       },
     );
+
+    testWidgets(
+      'resumes a pending accept token after sign-in without a manual go (A3)',
+      (tester) async {
+        // The accept screen consumes the locator's store, so the router must
+        // be wired to that same instance for the resume to be one-shot.
+        final PendingAcceptInviteStore invites =
+            serviceLocator<PendingAcceptInviteStore>();
+        final GoRouter inviteRouter = createAppRouter(
+          authCubit,
+          pendingAcceptInvites: invites,
+        );
+        addTearDown(inviteRouter.dispose);
+
+        await tester.pumpWidget(
+          harness(child: const SizedBox.shrink(), routerOverride: inviteRouter),
+        );
+        await tester.pumpAndSettle();
+        expect(topUri(inviteRouter).path, AppRoutes.signIn);
+
+        invites.setPendingToken('resumed-token');
+        await authCubit.startDemoSession();
+        await tester.pumpAndSettle();
+
+        expect(topUri(inviteRouter).path, AppRoutes.acceptInvitation);
+        final TextField field = tester.widget<TextField>(
+          find.byType(TextField),
+        );
+        expect(field.controller!.text, 'resumed-token');
+        expect(invites.hasPendingToken, isFalse);
+      },
+    );
   });
 
   group('shell NavigationBar selected index', () {
@@ -1608,6 +1703,9 @@ void main() {
       expect(topUri(router).path, AppRoutes.attorneysAdmin);
       expect(find.text('Attorney directory'), findsOneWidget);
       expect(find.text('Layla Mansour'), findsOneWidget);
+      // Nested platform-admin routes keep the settings destination selected;
+      // an exact match on /platform-admin would fall back to Home here.
+      expect(selectedIndex(tester), 1);
     });
   });
 

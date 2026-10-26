@@ -118,6 +118,41 @@ void main() {
       },
     );
 
+    testWidgets(
+      'a mark-read failure keeps the feed on screen and shows the inline '
+      'banner',
+      (tester) async {
+        await resetServiceLocator();
+        final _StubNotificationGateway stub =
+            _StubNotificationGateway(<Result<List<Notification>>>[
+              Result<List<Notification>>.success(
+                FakeNotificationGateway.syntheticNotifications,
+              ),
+            ])..markResult = Result<int>.failure(_markActionFailure);
+        serviceLocator.registerLazySingleton<NotificationGateway>(() => stub);
+
+        await pumpFeed(tester);
+        await tester.tap(find.text('Invoice issued').first);
+        await tester.pumpAndSettle();
+
+        final AppLocalizations en = await AppLocalizations.delegate.load(
+          const Locale('en'),
+        );
+        expect(stub.markCallIds, <String>['notification-1']);
+        expect(
+          find.text('Invoice issued'),
+          findsOneWidget,
+          reason: 'the loaded feed survives a failed mark-read',
+        );
+        expect(find.text(en.stateError), findsOneWidget);
+        expect(
+          find.text('Unable to load notifications.'),
+          findsNothing,
+          reason: 'the failure must not replace the list with the error arm',
+        );
+      },
+    );
+
     testWidgets('renders the local-only demo note (D-N7)', (tester) async {
       await pumpFeed(tester);
 
@@ -217,6 +252,11 @@ class _MutedPrefsStore implements NotificationPrefsStore {
 final AppError _loadFailure = AppError(
   code: 'notifications_failed',
   userMessage: 'Could not load notifications',
+);
+
+final AppError _markActionFailure = AppError(
+  code: 'notification_read_unavailable',
+  userMessage: 'Notifications are temporarily unavailable. Please try again.',
 );
 
 /// Registers a stub notification gateway in the locator so the screen

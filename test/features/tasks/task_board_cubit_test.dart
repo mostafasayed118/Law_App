@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
@@ -11,6 +13,7 @@ import 'package:legalhub/features/tasks/domain/task_gateway.dart';
 import 'package:legalhub/features/tasks/domain/task_item.dart';
 import 'package:legalhub/features/tasks/presentation/task_board_cubit.dart';
 import 'package:legalhub/features/tasks/presentation/task_board_state.dart';
+import 'package:legalhub/shared/state/write_gate.dart';
 
 void main() {
   late _StubTaskBoardGateway gateway;
@@ -103,7 +106,10 @@ void main() {
         ),
         TaskBoardState(
           tasks: ViewSuccess<List<TaskItem>>(<TaskItem>[task(id: 'task-1')]),
-          actionError: 'You do not have permission to advance this task.',
+          actionError: const AppError(
+            code: 'task_advance_denied',
+            userMessage: 'You do not have permission to advance this task.',
+          ),
         ),
       ],
     );
@@ -170,8 +176,12 @@ void main() {
       expect: () => <TaskBoardState>[
         TaskBoardState(
           tasks: ViewSuccess<List<TaskItem>>(<TaskItem>[task(id: 'task-1')]),
-          actionError:
-              'You do not have permission to create tasks on this matter.',
+          actionError: const AppError(
+            code: 'task_create_denied',
+            userMessage:
+                'You do not have permission to create tasks on this matter.',
+            kind: AppErrorKind.denied,
+          ),
         ),
       ],
       verify: (_) => expect(gateway.createTitles, <String>['Draft']),
@@ -274,6 +284,31 @@ void main() {
       ],
       verify: (_) => expect(gateway.assigneeCalls, <String?>[null]),
     );
+
+    test('a second assign returns busyError without a second write', () async {
+      gateway = _StubTaskBoardGateway(
+        assignResults: <Result<TaskItem>>[
+          Result<TaskItem>.success(task(id: 'task-1', assigneeId: 'user-2')),
+        ],
+      );
+      final Completer<void> gate = Completer<void>();
+      gateway.assignGate = gate;
+      final TaskBoardCubit cubit = buildCubit();
+      addTearDown(cubit.close);
+
+      final Future<AppError?> first = cubit.assignTask('task-1', 'user-2');
+      await Future<void>.delayed(Duration.zero);
+      final AppError? second = await cubit.assignTask('task-1', 'user-3');
+
+      expect(second, WriteGate.busyError);
+      expect(gateway.assigneeCalls, <String?>['user-2']);
+      // The first write's row spinner stays in place.
+      expect(cubit.state.actingTaskId, 'task-1');
+
+      gate.complete();
+      expect(await first, isNull);
+      expect(cubit.state.actingTaskId, isNull);
+    });
   });
 
   group('TaskBoardCubit picker reads', () {
@@ -327,6 +362,7 @@ class _StubTaskBoardGateway implements TaskBoardGateway {
   final List<String> createTitles = <String>[];
   final List<List<String>> advanceCalls = <List<String>>[];
   final List<String?> assigneeCalls = <String?>[];
+  Completer<void>? assignGate;
 
   @override
   Future<Result<List<TaskItem>>> fetchTasks() async {
@@ -352,6 +388,10 @@ class _StubTaskBoardGateway implements TaskBoardGateway {
   @override
   Future<Result<TaskItem>> assignTask(String taskId, String? assigneeId) async {
     assigneeCalls.add(assigneeId);
+    final Completer<void>? gate = assignGate;
+    if (gate != null) {
+      await gate.future;
+    }
     return _assignResults.removeAt(0);
   }
 

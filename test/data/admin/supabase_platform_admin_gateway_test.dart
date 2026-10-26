@@ -139,7 +139,7 @@ void main() {
         outcome.failureOrNull,
         const OrgFailure(
           kind: OrgFailureKind.denied,
-          message: 'permission denied',
+          message: platformAdminRequestFailedMessage,
         ),
       );
     });
@@ -193,13 +193,45 @@ void main() {
       expect(member.status, MembershipStatus.suspended);
     });
 
-    test('surfaces an unknown role name loudly', () async {
+    test(
+      'skips an unknown role row and keeps the mappable rows (A2)',
+      () async {
+        api.memberRows = <Map<String, dynamic>>[
+          <String, dynamic>{
+            'organization_id': 'org-1',
+            'user_id': 'u-unknown',
+            'display_name': 'X',
+            'role': 'admin',
+            'status': 'active',
+            'created_at': '2026-07-25T10:00:00.000Z',
+            'updated_at': '2026-07-25T10:00:00.000Z',
+          },
+          <String, dynamic>{
+            'organization_id': 'org-1',
+            'user_id': 'u-1',
+            'display_name': 'Amira',
+            'role': 'client',
+            'status': 'active',
+            'created_at': '2026-07-25T10:00:00.000Z',
+            'updated_at': '2026-07-25T10:00:00.000Z',
+          },
+        ];
+
+        final OrgOutcome<List<OrgMember>> outcome = await gateway.listMembers();
+
+        expect(outcome.isSuccess, isTrue);
+        expect(outcome.valueOrNull, hasLength(1));
+        expect(outcome.valueOrNull!.single.userId, 'u-1');
+      },
+    );
+
+    test('maps the compliance_officer server role (A2)', () async {
       api.memberRows = <Map<String, dynamic>>[
         <String, dynamic>{
           'organization_id': 'org-1',
           'user_id': 'u-1',
-          'display_name': 'X',
-          'role': 'admin',
+          'display_name': 'Amira',
+          'role': 'compliance_officer',
           'status': 'active',
           'created_at': '2026-07-25T10:00:00.000Z',
           'updated_at': '2026-07-25T10:00:00.000Z',
@@ -208,7 +240,7 @@ void main() {
 
       final OrgOutcome<List<OrgMember>> outcome = await gateway.listMembers();
 
-      expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
+      expect(outcome.valueOrNull!.single.role, UserRole.complianceOfficer);
     });
 
     test('surfaces a row missing user_id loudly', () async {

@@ -1,5 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:legalhub/data/list_query_guards.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Unit tests for the bounded-SELECT decision surface
 /// (`lib/data/list_query_guards.dart`).
@@ -17,6 +22,31 @@ import 'package:legalhub/data/list_query_guards.dart';
 /// newest end" group below fails the moment any table is flipped back to
 /// ascending.
 void main() {
+  group('boundedTableSelect — the list-read deadline (C1)', () {
+    test('defaults to the shared 15 s seam timeout', () {
+      expect(kSupabaseListReadTimeout, const Duration(seconds: 15));
+    });
+
+    test('a stalled table read times out instead of hanging forever', () async {
+      final Completer<http.Response> stalled = Completer<http.Response>();
+      final SupabaseClient client = SupabaseClient(
+        'https://example.supabase.co',
+        'anon-key',
+        httpClient: MockClient((http.Request request) => stalled.future),
+      );
+
+      await expectLater(
+        boundedTableSelect(
+          'notifications',
+          'id',
+          client: client,
+          timeout: const Duration(milliseconds: 20),
+        ),
+        throwsA(isA<TimeoutException>()),
+      );
+    });
+  });
+
   group('kSupabaseListRowCap', () {
     test('is the documented 200-row hard cap', () {
       expect(kSupabaseListRowCap, 200);

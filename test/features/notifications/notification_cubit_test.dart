@@ -125,7 +125,7 @@ void main() {
     );
 
     blocTest<NotificationCubit, NotificationState>(
-      'markRead failure renders the ViewError arm (no silent drop) (AC-3)',
+      'markRead failure keeps the loaded list and sets actionError (AC-3)',
       setUp: () => gateway = _StubNotificationGateway(
         results: <Result<List<Notification>>>[
           Result<List<Notification>>.success(_notifications),
@@ -144,11 +144,80 @@ void main() {
           notifications: ViewSuccess<List<Notification>>(_notifications),
         ),
         NotificationState(
-          notifications: ViewError<List<Notification>>(_markFailure),
+          notifications: ViewSuccess<List<Notification>>(_notifications),
+          actionError: _markFailure,
         ),
       ],
       verify: (_) =>
           expect(gateway.fetchCalls, 1, reason: 'no reload on failure'),
+    );
+
+    blocTest<NotificationCubit, NotificationState>(
+      'the next markRead clears the action error',
+      setUp: () => gateway = _StubNotificationGateway(
+        results: <Result<List<Notification>>>[
+          Result<List<Notification>>.success(_notifications),
+        ],
+      ),
+      build: () {
+        gateway.markResult = Result<int>.failure(_markFailure);
+        return NotificationCubit(gateway);
+      },
+      act: (NotificationCubit cubit) async {
+        await cubit.load();
+        await cubit.markRead('n1');
+        gateway.markResult = const Result<int>.success(1);
+        await cubit.markRead('n2');
+      },
+      expect: () => <NotificationState>[
+        NotificationState(
+          notifications: ViewSuccess<List<Notification>>(_notifications),
+        ),
+        NotificationState(
+          notifications: ViewSuccess<List<Notification>>(_notifications),
+          actionError: _markFailure,
+        ),
+        NotificationState(
+          notifications: ViewSuccess<List<Notification>>(_notifications),
+        ),
+        NotificationState(
+          notifications: ViewSuccess<List<Notification>>(_n2Read),
+        ),
+      ],
+    );
+
+    blocTest<NotificationCubit, NotificationState>(
+      'the next load clears the action error',
+      setUp: () => gateway = _StubNotificationGateway(
+        results: <Result<List<Notification>>>[
+          Result<List<Notification>>.success(_notifications),
+          Result<List<Notification>>.success(_notifications),
+        ],
+      ),
+      build: () {
+        gateway.markResult = Result<int>.failure(_markFailure);
+        return NotificationCubit(gateway);
+      },
+      act: (NotificationCubit cubit) async {
+        await cubit.load();
+        await cubit.markRead('n1');
+        await cubit.load();
+      },
+      expect: () => <NotificationState>[
+        NotificationState(
+          notifications: ViewSuccess<List<Notification>>(_notifications),
+        ),
+        NotificationState(
+          notifications: ViewSuccess<List<Notification>>(_notifications),
+          actionError: _markFailure,
+        ),
+        const NotificationState(
+          notifications: ViewLoading<List<Notification>>(),
+        ),
+        NotificationState(
+          notifications: ViewSuccess<List<Notification>>(_notifications),
+        ),
+      ],
     );
 
     test('markRead with an empty id is a no-op (no gateway call)', () async {
@@ -311,6 +380,27 @@ final List<Notification> _n1Read = <Notification>[
     summary: 'Demo notification — matter status update',
     serverTimestamp: DateTime.utc(2026, 7, 18, 14, 5),
     isRead: false,
+  ),
+];
+
+/// The expected feed after an optimistic `markRead('n2')`: n2 flipped in
+/// place, order untouched.
+final List<Notification> _n2Read = <Notification>[
+  Notification(
+    id: 'n1',
+    category: NotificationCategory.system,
+    type: 'invoice_status',
+    summary: 'Demo notification — invoice issued',
+    serverTimestamp: DateTime.utc(2026, 7, 20, 9, 30),
+    isRead: false,
+  ),
+  Notification(
+    id: 'n2',
+    category: NotificationCategory.activity,
+    type: 'matter_updated',
+    summary: 'Demo notification — matter status update',
+    serverTimestamp: DateTime.utc(2026, 7, 18, 14, 5),
+    isRead: true,
   ),
 ];
 

@@ -45,7 +45,9 @@ class _StubOrgApi implements SupabaseOrgApi {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> listMyMemberships() async {
+  Future<List<Map<String, dynamic>>> listMyMemberships({
+    required String userId,
+  }) async {
     if (error != null) {
       throw error!;
     }

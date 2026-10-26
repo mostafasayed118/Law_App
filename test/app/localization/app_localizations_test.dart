@@ -517,8 +517,19 @@ void main() {
 
       // Message-count chip label (slice 9.1) — a count, never content.
       expect(en.messagesMessageCount(12), '12 messages');
-      expect(ar.messagesMessageCount(12), '12 رسائل');
+      expect(ar.messagesMessageCount(12), '12 رسالة');
       expect(tr.messagesMessageCount(12), '12 mesaj');
+      // ICU plural branches resolve per locale (Arabic carries all six).
+      expect(en.messagesMessageCount(0), 'No messages');
+      expect(en.messagesMessageCount(1), '1 message');
+      expect(ar.messagesMessageCount(0), 'لا رسائل');
+      expect(ar.messagesMessageCount(1), 'رسالة واحدة');
+      expect(ar.messagesMessageCount(2), 'رسالتان');
+      expect(ar.messagesMessageCount(3), '3 رسائل');
+      expect(ar.messagesMessageCount(11), '11 رسالة');
+      expect(ar.messagesMessageCount(100), '100 رسالة');
+      expect(tr.messagesMessageCount(0), 'Mesaj yok');
+      expect(tr.messagesMessageCount(1), '1 mesaj');
 
       // Real per-locale wording, not silent copies of EN.
       expect(tr.messagesTitle, isNot(en.messagesTitle));
@@ -526,6 +537,27 @@ void main() {
       expect(tr.messagesEntryTitle, isNot(en.messagesEntryTitle));
       expect(ar.messagesLocalOnlyNote, isNot(en.messagesLocalOnlyNote));
       expect(ar.messagesMessageCount(12), isNot(en.messagesMessageCount(12)));
+    });
+
+    test('resolves the count plural forms in every locale (2026-10-24)', () {
+      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+      final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+      final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+      expect(en.bookingDurationMinutes(1), '1 min');
+      expect(en.bookingDurationMinutes(30), '30 min');
+      expect(ar.bookingDurationMinutes(1), 'دقيقة واحدة');
+      expect(ar.bookingDurationMinutes(2), 'دقيقتان');
+      expect(ar.bookingDurationMinutes(5), '5 دقائق');
+      expect(ar.bookingDurationMinutes(15), '15 دقيقة');
+      expect(tr.bookingDurationMinutes(1), '1 dk');
+      expect(en.validatorMinLength(1), 'Must be at least 1 character.');
+      expect(en.validatorMinLength(8), 'Must be at least 8 characters.');
+      expect(ar.validatorMinLength(1), 'يجب أن يكون على الأقل حرف واحد.');
+      expect(ar.validatorMinLength(2), 'يجب أن يكون على الأقل حرفان.');
+      expect(ar.validatorMinLength(8), 'يجب أن يكون على الأقل 8 أحرف.');
+      expect(ar.validatorPasswordLength(12), 'يجب أن يكون على الأقل 12 حرفًا.');
+      expect(tr.validatorPasswordLength(12), 'En az 12 karakter olmalıdır.');
     });
 
     test('messaging copy is local-only wording, no send/realtime/legal-advice '

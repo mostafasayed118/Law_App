@@ -381,13 +381,13 @@ void main() {
     test('sendMessage maps a non-Postgrest failure to '
         'providerUnavailable', () async {
       // A raw throw from the injected caller bypasses the Postgrest path;
-      // the impl's defensive `on Object` catch turns it into the typed
+      // the impl's defensive `on Exception` catch turns it into the typed
       // unavailable kind (the reads' precedent).
       final SupabaseMessageApiImpl throwing = SupabaseMessageApiImpl(
         (String table, String columns, [String? threadId]) async =>
             const <Map<String, dynamic>>[],
         rpcCaller: (String function, Map<String, dynamic> params) async {
-          throw StateError('network down');
+          throw Exception('network down');
         },
       );
 

@@ -651,6 +651,67 @@ void main() {
         startsWith('demo-invite-token-resend-'),
       );
     });
+
+    testWidgets('closing the resend dialog wipes the copied token', (
+      tester,
+    ) async {
+      String? clipboardText;
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (MethodCall call) async {
+          final Object? rawArgs = call.arguments;
+          final Map<Object?, Object?>? args = rawArgs is Map
+              ? rawArgs.cast<Object?, Object?>()
+              : null;
+          switch (call.method) {
+            case 'Clipboard.setData':
+              clipboardText = args?['text'] as String?;
+            case 'Clipboard.getData':
+              return <String, Object?>{'text': clipboardText};
+          }
+          return null;
+        },
+      );
+      addTearDown(() {
+        tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          SystemChannels.platform,
+          null,
+        );
+      });
+
+      await orgGateway.inviteMember(
+        organizationId: FakeOrganizationGateway.demoOrganizationId,
+        email: 'attorney@firm.com',
+        role: UserRole.attorney,
+      );
+      await tester.pumpWidget(harness(authCubit: await partnerAuth()));
+      await tester.pumpAndSettle();
+
+      final Finder attorneyRow = find.widgetWithText(
+        ListTile,
+        'attorney@firm.com',
+      );
+      await tester.tap(
+        find.descendant(
+          of: attorneyRow,
+          matching: find.byType(PopupMenuButton<OrgMemberAction>),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Resend invitation'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Copy token'));
+      await tester.pumpAndSettle();
+      expect(clipboardText, isNotNull);
+      expect(clipboardText, startsWith('demo-invite-token-resend-'));
+
+      // Dismissing before the 30s timer fires wipes the one-time token so it
+      // cannot outlive the dialog.
+      await tester.tap(find.text('Back').last);
+      await tester.pumpAndSettle();
+      expect(clipboardText, '');
+    });
   });
 
   group('MemberRosterScreen non-partner surface', () {

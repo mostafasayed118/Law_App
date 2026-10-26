@@ -88,6 +88,45 @@ void main() {
     });
 
     test(
+      'redacts identity and matter/document titles before storing',
+      () async {
+        final InMemoryErrorReporter reporter = InMemoryErrorReporter();
+        const Set<String> keys = <String>{
+          'name',
+          'display_name',
+          'title',
+          'matter_title',
+          'document_title',
+          'Name',
+          'Display_Name',
+          'Matter_Title',
+        };
+
+        await reporter.report(
+          AppError(
+            code: 'matter_open_failed',
+            userMessage: 'Could not open the matter',
+            context: <String, Object?>{
+              for (final String key in keys)
+                key: 'Nadia Hassan / Al-Rashid v. Fahmy',
+              'nested': <String, Object?>{'display_name': 'Nadia Hassan'},
+            },
+          ),
+        );
+
+        final Map<String, Object?> context =
+            reporter.reports.single['context']! as Map<String, Object?>;
+        for (final String key in keys) {
+          expect(context[key], '[REDACTED]', reason: key);
+        }
+        expect(
+          (context['nested']! as Map<String, Object?>)['display_name'],
+          '[REDACTED]',
+        );
+      },
+    );
+
+    test(
       'redacts payment provider and card-shaped context before storing',
       () async {
         final InMemoryErrorReporter reporter = InMemoryErrorReporter();
