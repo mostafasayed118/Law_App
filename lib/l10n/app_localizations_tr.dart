@@ -73,7 +73,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get stateEmpty => 'Gösterilecek bir şey yok';
 
   @override
-  String get stateError => 'Bu yer tutucu yüklenemedi';
+  String get stateError => 'Bir şeyler ters gitti. Lütfen tekrar deneyin.';
 
   @override
   String get stateOffline => 'Çevrimdışı';
@@ -540,7 +540,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String validatorMinLength(int count) {
-    return 'En az $count karakter olmalıdır.';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'En az $count karakter olmalıdır.',
+      one: 'En az 1 karakter olmalıdır.',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -548,7 +554,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String validatorPasswordLength(int count) {
-    return 'En az $count karakter olmalıdır.';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'En az $count karakter olmalıdır.',
+      one: 'En az 1 karakter olmalıdır.',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -805,6 +817,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get orgErrorUnknown => 'Bir şeyler ters gitti. Lütfen tekrar deneyin.';
 
   @override
+  String get actionInProgress => 'Zaten devam eden bir işlem var.';
+
+  @override
   String get signUpCheckInboxTitle => 'Gelen Kutunuzu Kontrol Edin';
 
   @override
@@ -856,7 +871,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String bookingDurationMinutes(int minutes) {
-    return '$minutes dk';
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes dk',
+      one: '1 dk',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -1252,8 +1273,15 @@ class AppLocalizationsTr extends AppLocalizations {
       'Kendi mesaj dizilerinize göz atın.';
 
   @override
-  String messagesMessageCount(Object count) {
-    return '$count mesaj';
+  String messagesMessageCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mesaj',
+      one: '1 mesaj',
+      zero: 'Mesaj yok',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -1270,6 +1298,22 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get messageSend => 'Gönder';
+
+  @override
+  String messageErrorTooLong(int max) {
+    return 'Mesaj çok uzun. En fazla $max karakter olabilir.';
+  }
+
+  @override
+  String get messageErrorDenied => 'Bu konuşmada mesaj gönderme izniniz yok.';
+
+  @override
+  String get messageErrorUnavailable =>
+      'Gönderme geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get messageErrorFailed =>
+      'Mesaj gönderilemedi. Lütfen tekrar deneyin.';
 
   @override
   String get searchTitle => 'Ara';
@@ -1345,6 +1389,21 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get fileOpenFailed => 'Dosya açılamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String fileSizeMb(String value) {
+    return '$value MB';
+  }
+
+  @override
+  String fileSizeKb(String value) {
+    return '$value KB';
+  }
+
+  @override
+  String fileSizeBytes(String value) {
+    return '$value B';
+  }
 
   @override
   String get matterWorkspaceInvoicesTitle => 'Faturalar';

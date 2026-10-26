@@ -73,7 +73,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stateEmpty => 'Nothing to show';
 
   @override
-  String get stateError => 'Unable to load this placeholder';
+  String get stateError => 'Something went wrong. Please try again.';
 
   @override
   String get stateOffline => 'Offline';
@@ -541,7 +541,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String validatorMinLength(int count) {
-    return 'Must be at least $count characters.';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Must be at least $count characters.',
+      one: 'Must be at least 1 character.',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -549,7 +555,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String validatorPasswordLength(int count) {
-    return 'Must be at least $count characters.';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Must be at least $count characters.',
+      one: 'Must be at least 1 character.',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -807,6 +819,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get orgErrorUnknown => 'Something went wrong. Please try again.';
 
   @override
+  String get actionInProgress => 'An action is already in progress.';
+
+  @override
   String get signUpCheckInboxTitle => 'Check Your Inbox';
 
   @override
@@ -858,7 +873,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String bookingDurationMinutes(int minutes) {
-    return '$minutes min';
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes min',
+      one: '1 min',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -1250,8 +1271,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get messagesEntrySubtitleConfigured => 'Browse your message threads.';
 
   @override
-  String messagesMessageCount(Object count) {
-    return '$count messages';
+  String messagesMessageCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count messages',
+      one: '1 message',
+      zero: 'No messages',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -1268,6 +1296,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get messageSend => 'Send';
+
+  @override
+  String messageErrorTooLong(int max) {
+    return 'Message is too long. The maximum is $max characters.';
+  }
+
+  @override
+  String get messageErrorDenied =>
+      'You do not have permission to send messages on this thread.';
+
+  @override
+  String get messageErrorUnavailable =>
+      'Sending is temporarily unavailable. Please try again.';
+
+  @override
+  String get messageErrorFailed =>
+      'Unable to send the message. Please try again.';
 
   @override
   String get searchTitle => 'Search';
@@ -1344,6 +1389,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fileOpenFailed => 'Unable to open the file. Please try again.';
+
+  @override
+  String fileSizeMb(String value) {
+    return '$value MB';
+  }
+
+  @override
+  String fileSizeKb(String value) {
+    return '$value KB';
+  }
+
+  @override
+  String fileSizeBytes(String value) {
+    return '$value B';
+  }
 
   @override
   String get matterWorkspaceInvoicesTitle => 'Invoices';

@@ -229,7 +229,7 @@ abstract class AppLocalizations {
   /// No description provided for @stateError.
   ///
   /// In en, this message translates to:
-  /// **'Unable to load this placeholder'**
+  /// **'Something went wrong. Please try again.'**
   String get stateError;
 
   /// No description provided for @stateOffline.
@@ -1087,7 +1087,7 @@ abstract class AppLocalizations {
   /// No description provided for @validatorMinLength.
   ///
   /// In en, this message translates to:
-  /// **'Must be at least {count} characters.'**
+  /// **'{count, plural, =1{Must be at least 1 character.} other{Must be at least {count} characters.}}'**
   String validatorMinLength(int count);
 
   /// No description provided for @validatorMismatch.
@@ -1099,7 +1099,7 @@ abstract class AppLocalizations {
   /// No description provided for @validatorPasswordLength.
   ///
   /// In en, this message translates to:
-  /// **'Must be at least {count} characters.'**
+  /// **'{count, plural, =1{Must be at least 1 character.} other{Must be at least {count} characters.}}'**
   String validatorPasswordLength(int count);
 
   /// No description provided for @validatorPasswordClasses.
@@ -1570,6 +1570,12 @@ abstract class AppLocalizations {
   /// **'Something went wrong. Please try again.'**
   String get orgErrorUnknown;
 
+  /// No description provided for @actionInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'An action is already in progress.'**
+  String get actionInProgress;
+
   /// No description provided for @signUpCheckInboxTitle.
   ///
   /// In en, this message translates to:
@@ -1669,7 +1675,7 @@ abstract class AppLocalizations {
   /// No description provided for @bookingDurationMinutes.
   ///
   /// In en, this message translates to:
-  /// **'{minutes} min'**
+  /// **'{minutes, plural, =1{1 min} other{{minutes} min}}'**
   String bookingDurationMinutes(int minutes);
 
   /// No description provided for @bookingReviewStep.
@@ -2377,8 +2383,8 @@ abstract class AppLocalizations {
   /// No description provided for @messagesMessageCount.
   ///
   /// In en, this message translates to:
-  /// **'{count} messages'**
-  String messagesMessageCount(Object count);
+  /// **'{count, plural, =0{No messages} =1{1 message} other{{count} messages}}'**
+  String messagesMessageCount(int count);
 
   /// No description provided for @messageThreadDetailTitle.
   ///
@@ -2409,6 +2415,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Send'**
   String get messageSend;
+
+  /// No description provided for @messageErrorTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Message is too long. The maximum is {max} characters.'**
+  String messageErrorTooLong(int max);
+
+  /// No description provided for @messageErrorDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to send messages on this thread.'**
+  String get messageErrorDenied;
+
+  /// No description provided for @messageErrorUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending is temporarily unavailable. Please try again.'**
+  String get messageErrorUnavailable;
+
+  /// No description provided for @messageErrorFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to send the message. Please try again.'**
+  String get messageErrorFailed;
 
   /// No description provided for @searchTitle.
   ///
@@ -2541,6 +2571,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unable to open the file. Please try again.'**
   String get fileOpenFailed;
+
+  /// No description provided for @fileSizeMb.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} MB'**
+  String fileSizeMb(String value);
+
+  /// No description provided for @fileSizeKb.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} KB'**
+  String fileSizeKb(String value);
+
+  /// No description provided for @fileSizeBytes.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} B'**
+  String fileSizeBytes(String value);
 
   /// No description provided for @matterWorkspaceInvoicesTitle.
   ///

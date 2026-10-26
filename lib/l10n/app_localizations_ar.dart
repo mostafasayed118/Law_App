@@ -72,7 +72,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get stateEmpty => 'لا يوجد ما يُعرض';
 
   @override
-  String get stateError => 'تعذر تحميل هذه الشاشة المؤقتة';
+  String get stateError => 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
 
   @override
   String get stateOffline => 'غير متصل';
@@ -535,7 +535,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String validatorMinLength(int count) {
-    return 'يجب أن يكون على الأقل $count أحرف.';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'يجب أن يكون على الأقل $count حرف.',
+      many: 'يجب أن يكون على الأقل $count حرفًا.',
+      few: 'يجب أن يكون على الأقل $count أحرف.',
+      two: 'يجب أن يكون على الأقل حرفان.',
+      one: 'يجب أن يكون على الأقل حرف واحد.',
+      zero: 'يجب أن يكون على الأقل 0 حرف.',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -543,7 +553,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String validatorPasswordLength(int count) {
-    return 'يجب أن يكون على الأقل $count أحرف.';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'يجب أن يكون على الأقل $count حرف.',
+      many: 'يجب أن يكون على الأقل $count حرفًا.',
+      few: 'يجب أن يكون على الأقل $count أحرف.',
+      two: 'يجب أن يكون على الأقل حرفان.',
+      one: 'يجب أن يكون على الأقل حرف واحد.',
+      zero: 'يجب أن يكون على الأقل 0 حرف.',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -798,6 +818,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get orgErrorUnknown => 'حدث خطأ ما. حاول مرة أخرى.';
 
   @override
+  String get actionInProgress => 'يوجد إجراء قيد التنفيذ بالفعل.';
+
+  @override
   String get signUpCheckInboxTitle => 'تحقق من بريدك الوارد';
 
   @override
@@ -849,7 +872,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String bookingDurationMinutes(int minutes) {
-    return '$minutes دقيقة';
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes دقيقة',
+      many: '$minutes دقيقة',
+      few: '$minutes دقائق',
+      two: 'دقيقتان',
+      one: 'دقيقة واحدة',
+      zero: '0 دقيقة',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -1234,8 +1267,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get messagesEntrySubtitleConfigured => 'تصفّح محادثاتك.';
 
   @override
-  String messagesMessageCount(Object count) {
-    return '$count رسائل';
+  String messagesMessageCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count رسالة',
+      many: '$count رسالة',
+      few: '$count رسائل',
+      two: 'رسالتان',
+      one: 'رسالة واحدة',
+      zero: 'لا رسائل',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -1252,6 +1295,23 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get messageSend => 'إرسال';
+
+  @override
+  String messageErrorTooLong(int max) {
+    return 'الرسالة طويلة جدًا. الحد الأقصى $max حرفًا.';
+  }
+
+  @override
+  String get messageErrorDenied =>
+      'ليس لديك صلاحية إرسال رسائل في هذه المحادثة.';
+
+  @override
+  String get messageErrorUnavailable =>
+      'الإرسال غير متاح مؤقتًا. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get messageErrorFailed =>
+      'تعذّر إرسال الرسالة. يرجى المحاولة مرة أخرى.';
 
   @override
   String get searchTitle => 'بحث';
@@ -1326,6 +1386,21 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get fileOpenFailed => 'تعذّر فتح الملف. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String fileSizeMb(String value) {
+    return '$value ميغابايت';
+  }
+
+  @override
+  String fileSizeKb(String value) {
+    return '$value كيلوبايت';
+  }
+
+  @override
+  String fileSizeBytes(String value) {
+    return '$value بايت';
+  }
 
   @override
   String get matterWorkspaceInvoicesTitle => 'الفواتير';
