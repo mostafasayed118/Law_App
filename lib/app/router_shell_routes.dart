@@ -1,5 +1,21 @@
 part of 'router.dart';
 
+/// UX-only role projection for the selected organization (the org switcher's
+/// client-side context), falling back to the session's first active
+/// membership for tests and pre-selection states, then to the least-privilege
+/// client role. Never an authorization grant — the server re-derives the
+/// role per request.
+UserRole _projectedRole(AuthCubit authCubit) {
+  final Session? session = authCubit.state.session;
+  return session
+          ?.membershipForOrganization(
+            serviceLocator<ActiveOrgStore>().activeOrganizationId,
+          )
+          ?.role ??
+      session?.primaryRole ??
+      UserRole.client;
+}
+
 /// The authenticated shell's nested routes. Split out of
 /// [createAppRouter] so the router file stays under the readability
 /// line; the closure inputs travel as explicit parameters — identical
@@ -45,8 +61,7 @@ List<RouteBase> _shellRoutes(
         // gate (the shell's capability pattern); the `create_matter` RPC
         // re-asserts F2-D1 server-side, so a non-partner caller reaching
         // the create screen gets the typed denial, never empty success.
-        final UserRole role =
-            authCubit.state.session?.primaryRole ?? UserRole.client;
+        final UserRole role = _projectedRole(authCubit);
         return MatterListScreen(canCreateMatter: role == UserRole.partner);
       },
     ),
@@ -58,11 +73,10 @@ List<RouteBase> _shellRoutes(
     GoRoute(
       path: AppRoutes.matterDetails,
       builder: (BuildContext context, GoRouterState state) {
-        // UX-only projection of the active membership's role (mirrors
-        // the shell); the workspace sections are navigation hints, never
-        // authorization grants (D-W5).
-        final UserRole role =
-            authCubit.state.session?.primaryRole ?? UserRole.client;
+        // UX-only projection of the selected organization's active
+        // membership role (mirrors the shell); the workspace sections are
+        // navigation hints, never authorization grants (D-W5).
+        final UserRole role = _projectedRole(authCubit);
         return MatterDetailsScreen(
           matterId: state.pathParameters['matterId'] ?? '',
           capabilities: capabilityForRole(capabilitiesForRole, role),

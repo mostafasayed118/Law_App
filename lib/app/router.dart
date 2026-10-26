@@ -3,6 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:legalhub/app/active_org_store.dart';
+import 'package:legalhub/app/deep_link/pending_accept_invite_store.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/auth/session.dart';
 import 'package:legalhub/core/practice_area.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/features/admin/presentation/attorney_admin_screen.dart';
@@ -133,6 +137,7 @@ class AppRoutes {
 GoRouter createAppRouter(
   AuthCubit authCubit, {
   Map<UserRole, RoleCapability> capabilitiesForRole = roleCapabilities,
+  PendingAcceptInviteStore? pendingAcceptInvites,
   String initialLocation = AppRoutes.signIn,
 }) => GoRouter(
   initialLocation: initialLocation,
@@ -212,6 +217,15 @@ GoRouter createAppRouter(
         return AppRoutes.forgotPasswordReset;
       }
       return null;
+    }
+    // A deep-linked accept-invite token that arrived while signed out is
+    // resumed as soon as a session exists: the accept screen consumes the
+    // pending token in initState, so the landing is one-shot.
+    if (authenticated &&
+        pendingAcceptInvites != null &&
+        pendingAcceptInvites.hasPendingToken &&
+        path != AppRoutes.acceptInvitation) {
+      return AppRoutes.acceptInvitation;
     }
     if (authenticated && onAuthRoute) {
       return AppRoutes.home;

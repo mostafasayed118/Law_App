@@ -75,6 +75,7 @@ Future<void> bootstrap(AppConfig config) async {
       .hasCompleted();
   final GoRouter router = createAppRouter(
     authCubit,
+    pendingAcceptInvites: serviceLocator<PendingAcceptInviteStore>(),
     initialLocation: onboardingCompleted
         ? AppRoutes.signIn
         : AppRoutes.onboarding,
@@ -82,9 +83,11 @@ Future<void> bootstrap(AppConfig config) async {
   // Phase 4.1 completion (D-P34.2 hook): the app-level deep-link listener
   // bridges OS intents — an accept-invitation share link buffers its
   // one-time token (in-memory only) and opens the accept surface. Recovery
-  // /auth-callback URIs are deliberately untouched: supabase_flutter's
-  // `detectSessionInUri` observer owns them (docs/p4_1_deeplink_recovery
-  // _plan_2026-08-07.md D-P41.2).
+  // /auth-callback URIs are deliberately untouched: `detectSessionInUri` is
+  // disabled in `initializeSupabase`, and the explicit `AuthCallbackObserver`
+  // (started by `SupabaseAuthApiImpl.bind`) owns them with the narrow
+  // query-only PKCE callback rule (docs/p4_1_deeplink_recovery_plan_2026-08-07
+  // .md D-P41.2).
   final AppLinkListener appLinkListener = AppLinkListener(
     AppLinksPluginSource(),
     const AppLinkParser(),

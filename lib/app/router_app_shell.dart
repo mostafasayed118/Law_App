@@ -52,10 +52,14 @@ class _AppShell extends StatelessWidget {
         ];
 
     // The settings destination stays highlighted on the settings surface and
-    // the screens reached from it (profile, notifications); every other
-    // shell route (home) is its own destination. The selected index is
-    // derived from the rendered destination list itself, so it survives
-    // future destination reordering or additions.
+    // the screens reached from it (profile, notifications, platform admin and
+    // its nested routes); every other shell route (home) is its own
+    // destination. The selected index is derived from the rendered
+    // destination list itself, so it survives future destination reordering
+    // or additions.
+    final bool onPlatformAdminSurface =
+        location == AppRoutes.platformAdmin ||
+        location.startsWith('${AppRoutes.platformAdmin}/');
     final bool onSettingsSurface =
         location == AppRoutes.settings ||
         location == AppRoutes.profile ||
@@ -63,7 +67,7 @@ class _AppShell extends StatelessWidget {
         location == AppRoutes.organizations ||
         location == AppRoutes.orgAudit ||
         location == AppRoutes.acceptInvitation ||
-        location == AppRoutes.platformAdmin;
+        onPlatformAdminSurface;
     final String targetRoute = onSettingsSurface
         ? AppRoutes.settings
         : AppRoutes.home;
