@@ -543,7 +543,7 @@ class _StubDocumentGateway implements DocumentGateway {
   int calls = 0;
 
   @override
-  Future<Result<List<Document>>> fetchDocuments() {
+  Future<Result<List<Document>>> fetchDocuments({String? matterId}) {
     calls += 1;
     return Future<Result<List<Document>>>.value(results.removeAt(0));
   }
@@ -570,7 +570,7 @@ class _StubMessageGateway implements MessageGateway {
   int calls = 0;
 
   @override
-  Future<Result<List<MessageThread>>> fetchThreads() {
+  Future<Result<List<MessageThread>>> fetchThreads({String? matterId}) {
     calls += 1;
     return Future<Result<List<MessageThread>>>.value(results.removeAt(0));
   }

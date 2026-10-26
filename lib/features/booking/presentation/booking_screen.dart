@@ -1,28 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/router.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/features/booking/domain/booking_category.dart';
+import 'package:legalhub/features/booking/domain/booking_gateway.dart';
+import 'package:legalhub/features/booking/domain/booking_prefill.dart';
+import 'package:legalhub/features/booking/domain/booking_slot.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
 
-import '../../../app/legalhub_theme.dart';
-import '../../../app/router.dart';
-import '../../../app/service_locator.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/widgets/widgets.dart';
-import '../domain/booking_category.dart';
-import '../domain/booking_gateway.dart';
-import '../domain/booking_prefill.dart';
-import '../domain/booking_slot.dart';
 import 'booking_cubit.dart';
 import 'booking_state.dart';
-part 'booking_wizard.dart';
-part 'booking_topic_field.dart';
-part 'booking_prefill_note.dart';
-part 'booking_summary_row.dart';
 
 part 'booking_category_step.dart';
 part 'booking_datetime_step.dart';
+part 'booking_prefill_note.dart';
 part 'booking_review_step.dart';
 part 'booking_selectable_tile.dart';
 part 'booking_success_step.dart';
+part 'booking_summary_row.dart';
+part 'booking_topic_field.dart';
+part 'booking_wizard.dart';
 
 /// Consultation-booking wizard (Phase 5 slice 5.1).
 ///

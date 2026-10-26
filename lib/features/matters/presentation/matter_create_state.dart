@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../domain/matter_write_gateway.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/features/matters/domain/matter_write_gateway.dart';
 
 /// Immutable state of the matter-creation flow (F-01 step 2 client swap,
 /// C-D6): the sealed `initial` / `submitting` / `success` / `failure`

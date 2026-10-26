@@ -1,6 +1,6 @@
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../domain/matter_write_gateway.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/matters/domain/matter_write_gateway.dart';
 
 /// Development-only matter-creation implementation (F-01 step 2 client swap,
 /// C-D3): a deterministic in-memory create path that mirrors the server

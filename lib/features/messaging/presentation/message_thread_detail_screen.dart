@@ -2,20 +2,23 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../app/legalhub_theme.dart';
-import '../../../app/service_locator.dart';
-import '../../../features/auth/presentation/auth_cubit.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/demo_labels.dart';
-import '../../../shared/formatting/date_formatting.dart';
-import '../../../shared/widgets/widgets.dart';
-import '../domain/message.dart';
-import '../domain/message_gateway.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
+import 'package:legalhub/features/messaging/domain/message.dart';
+import 'package:legalhub/features/messaging/domain/message_gateway.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/demo_labels.dart';
+import 'package:legalhub/shared/formatting/date_formatting.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
+
+import 'message_error_messages.dart';
 import 'message_thread_detail_cubit.dart';
 import 'message_thread_detail_state.dart';
+
+part 'message_thread_composer.dart';
 part 'message_thread_detail_surface.dart';
 part 'message_thread_detail_tile.dart';
-part 'message_thread_composer.dart';
 
 /// Thread-detail surface (sixth §14 un-deferral, realtime slice D-RT5;
 /// realtime push slice D-LV1/D-LV4).

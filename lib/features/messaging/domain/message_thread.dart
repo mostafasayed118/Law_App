@@ -22,6 +22,8 @@ class MessageThread extends Equatable {
     required this.participants,
     required this.lastActivityAt,
     required this.messageCount,
+    this.matterId,
+    this.matterTitle,
   });
 
   final String id;
@@ -33,6 +35,16 @@ class MessageThread extends Equatable {
   /// The matter this thread belongs to, rendered as one of the existing
   /// synthetic matter titles (D-MSG4 — no new identity surface).
   final String matterRef;
+
+  /// The raw `matter_id` when the provider row carries one (Supabase rows
+  /// always do; the in-memory demo rows carry the synthetic ids). Drives the
+  /// reverse cross-link without loading the full matter list.
+  final String? matterId;
+
+  /// The embedded `matters(title)` value, or null when the embed is absent
+  /// (the D-MSR4 fallback path). A null title means the row cannot render the
+  /// "View matter" link — the safe, non-fabricated fallback.
+  final String? matterTitle;
 
   /// Generic demo roster names only (Phase 6/7 synthetic names + the neutral
   /// "Demo client"); presentation-only, never an identity or availability
@@ -54,5 +66,7 @@ class MessageThread extends Equatable {
     participants,
     lastActivityAt,
     messageCount,
+    matterId,
+    matterTitle,
   ];
 }

@@ -1,4 +1,4 @@
-import '../../../core/errors/result.dart';
+import 'package:legalhub/core/errors/result.dart';
 import 'video_session.dart';
 import 'video_token.dart';
 

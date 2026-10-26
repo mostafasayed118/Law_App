@@ -1,5 +1,5 @@
-import '../../../core/errors/app_error.dart';
-import '../../../l10n/app_localizations.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
 
 /// Localized copy for a compliance-alert action failure.
 ///

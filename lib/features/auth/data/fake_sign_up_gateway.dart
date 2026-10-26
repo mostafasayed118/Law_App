@@ -1,6 +1,6 @@
-import '../../../core/errors/result.dart';
-import '../domain/sign_up_gateway.dart';
-import '../domain/sign_up_request.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/auth/domain/sign_up_gateway.dart';
+import 'package:legalhub/features/auth/domain/sign_up_request.dart';
 
 /// Dev-only sign-up seam; ignores the request and returns success.
 ///

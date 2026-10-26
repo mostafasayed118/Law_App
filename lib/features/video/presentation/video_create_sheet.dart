@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:legalhub/app/active_org_store.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/matters/domain/matter.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/demo_labels.dart';
+import 'package:legalhub/shared/formatting/date_formatting.dart';
 
-import '../../../app/active_org_store.dart';
-import '../../../app/legalhub_theme.dart';
-import '../../../app/service_locator.dart';
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/demo_labels.dart';
-import '../../../shared/formatting/date_formatting.dart';
-import '../../matters/domain/matter.dart';
 import 'video_cubit.dart';
 import 'video_error_messages.dart';
 

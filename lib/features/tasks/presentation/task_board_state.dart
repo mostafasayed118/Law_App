@@ -1,11 +1,12 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/state/view_state.dart';
-import '../domain/task_item.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/tasks/domain/task_item.dart';
 
 /// Immutable state of the task-board surface (v1 queue, 2026-08-09).
 ///
-/// [actionError] carries the latest write failure's user message (the
+/// [actionError] carries the latest write failure's typed error (the
 /// sendError precedent — inline, cleared on the next write attempt);
 /// [actingTaskId] marks the row with a write in flight so its affordances
 /// disable while the RPC runs.
@@ -17,7 +18,7 @@ class TaskBoardState extends Equatable {
   });
 
   final ViewState<List<TaskItem>> tasks;
-  final String? actionError;
+  final AppError? actionError;
   final String? actingTaskId;
 
   TaskBoardState copyWith({
@@ -29,7 +30,7 @@ class TaskBoardState extends Equatable {
       tasks: tasks ?? this.tasks,
       actionError: identical(actionError, _unset)
           ? this.actionError
-          : actionError as String?,
+          : actionError as AppError?,
       actingTaskId: identical(actingTaskId, _unset)
           ? this.actingTaskId
           : actingTaskId as String?,

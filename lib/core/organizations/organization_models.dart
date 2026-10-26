@@ -1,19 +1,9 @@
 import 'package:equatable/equatable.dart';
 
-import '../auth/session.dart';
-import '../roles/user_role.dart';
+import 'package:legalhub/core/auth/session.dart';
+import 'package:legalhub/core/roles/user_role.dart';
 
-export '../auth/session.dart' show MembershipStatus;
-
-/// Server-side `org_role` names that can be assigned via the organization
-/// RPC surface. The client `UserRole` enum is wider (compliance officer,
-/// research analyst, admin) — those are UX roles with no server counterpart
-/// and must never be sent to the boundary.
-const Set<String> serverAssignableRoles = <String>{
-  'client',
-  'attorney',
-  'partner',
-};
+export 'package:legalhub/core/auth/session.dart' show MembershipStatus;
 
 /// Maps a server `org_role` name to the domain [UserRole], or null when the
 /// name is not part of the assignable server surface.
@@ -22,20 +12,8 @@ UserRole? userRoleFromServerName(String? name) {
     'client' => UserRole.client,
     'attorney' => UserRole.attorney,
     'partner' => UserRole.partner,
+    'compliance_officer' => UserRole.complianceOfficer,
     _ => null,
-  };
-}
-
-/// Maps a domain [UserRole] to its server `org_role` name.
-///
-/// Only [serverAssignableRoles] may cross the boundary; any other role is a
-/// programmer error (the gateway validates before calling the seam).
-String userRoleToServerName(UserRole role) {
-  return switch (role) {
-    UserRole.client => 'client',
-    UserRole.attorney => 'attorney',
-    UserRole.partner => 'partner',
-    _ => throw ArgumentError.value(role, 'role', 'not assignable server-side'),
   };
 }
 
@@ -178,6 +156,9 @@ enum OrgFailureKind {
 
   /// An unspecified failure.
   unknown,
+
+  /// A write is already in flight; the duplicate action was refused.
+  busy,
 }
 
 /// A typed, safe organization failure crossing the domain boundary.

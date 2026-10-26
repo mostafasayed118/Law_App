@@ -73,7 +73,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stateEmpty => 'Nothing to show';
 
   @override
-  String get stateError => 'Unable to load this placeholder';
+  String get stateError => 'Something went wrong. Please try again.';
 
   @override
   String get stateOffline => 'Offline';
@@ -375,39 +375,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get demoTaskTitle5 => 'Demo: update matter timeline';
 
   @override
-  String get demoApprovalRefInviteReview => 'Demo invite — review';
-
-  @override
-  String get demoApprovalRefRoleChange => 'Demo role change';
-
-  @override
-  String get demoApprovalRefInviteExpired => 'Sample invite — expired';
-
-  @override
-  String get demoApprovalRefSuspension => 'Demo suspension review';
-
-  @override
-  String get demoApprovalEntityInvitation => 'Invitation';
-
-  @override
-  String get demoApprovalEntityMembership => 'Membership';
-
-  @override
-  String get demoApprovalEntityDocument => 'Document';
-
-  @override
-  String get demoVideoTopic1 => 'Contract review — kickoff';
-
-  @override
-  String get demoVideoTopic2 => 'Incorporation walkthrough';
-
-  @override
-  String get demoVideoTopic3 => 'Employment dispute — follow-up';
-
-  @override
-  String get demoVideoTopic4 => 'Family law consultation';
-
-  @override
   String researchHeadline(String title) {
     return 'Research note — $title';
   }
@@ -574,7 +541,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String validatorMinLength(int count) {
-    return 'Must be at least $count characters.';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Must be at least $count characters.',
+      one: 'Must be at least 1 character.',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -582,7 +555,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String validatorPasswordLength(int count) {
-    return 'Must be at least $count characters.';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Must be at least $count characters.',
+      one: 'Must be at least 1 character.',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -840,6 +819,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get orgErrorUnknown => 'Something went wrong. Please try again.';
 
   @override
+  String get actionInProgress => 'An action is already in progress.';
+
+  @override
   String get signUpCheckInboxTitle => 'Check Your Inbox';
 
   @override
@@ -891,7 +873,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String bookingDurationMinutes(int minutes) {
-    return '$minutes min';
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes min',
+      one: '1 min',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -1283,8 +1271,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get messagesEntrySubtitleConfigured => 'Browse your message threads.';
 
   @override
-  String messagesMessageCount(Object count) {
-    return '$count messages';
+  String messagesMessageCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count messages',
+      one: '1 message',
+      zero: 'No messages',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -1301,6 +1296,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get messageSend => 'Send';
+
+  @override
+  String messageErrorTooLong(int max) {
+    return 'Message is too long. The maximum is $max characters.';
+  }
+
+  @override
+  String get messageErrorDenied =>
+      'You do not have permission to send messages on this thread.';
+
+  @override
+  String get messageErrorUnavailable =>
+      'Sending is temporarily unavailable. Please try again.';
+
+  @override
+  String get messageErrorFailed =>
+      'Unable to send the message. Please try again.';
 
   @override
   String get searchTitle => 'Search';
@@ -1377,6 +1389,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fileOpenFailed => 'Unable to open the file. Please try again.';
+
+  @override
+  String fileSizeMb(String value) {
+    return '$value MB';
+  }
+
+  @override
+  String fileSizeKb(String value) {
+    return '$value KB';
+  }
+
+  @override
+  String fileSizeBytes(String value) {
+    return '$value B';
+  }
 
   @override
   String get matterWorkspaceInvoicesTitle => 'Invoices';
@@ -1521,9 +1548,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get alertsTitle => 'Compliance alerts';
-
-  @override
-  String get alertsEmpty => 'No compliance alerts are available.';
 
   @override
   String get alertsError => 'Unable to load compliance alerts.';
@@ -1788,9 +1812,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get approvalsTitle => 'Pending approvals';
-
-  @override
-  String get approvalsEmpty => 'No pending approvals are available.';
 
   @override
   String get approvalsError => 'Unable to load approvals.';
@@ -2062,9 +2083,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get videoJoin => 'Join call';
-
-  @override
-  String get videoCallLiveBadge => 'Live';
 
   @override
   String videoCallElapsed(String duration) {

@@ -1,6 +1,6 @@
-import '../../../../core/errors/app_error.dart';
-import '../../../../core/state/view_state.dart';
-import '../../../../l10n/app_localizations.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
 
 /// Re-wraps a recovery [ViewError] with the localized generic denial so the
 /// shared [ViewStateView] renders localized copy (plan §4 l10n: EN/AR/TR +

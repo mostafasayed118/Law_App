@@ -1,5 +1,9 @@
 part of 'ai_research_screen.dart';
 
+/// Upper bound on the eagerly built document-picker chips (the picker is
+/// optional context; a capped vault must not expand the whole form).
+const int _maxDocumentChips = 50;
+
 class _ResearchSurface extends StatefulWidget {
   const _ResearchSurface();
 
@@ -111,80 +115,87 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
     final bool hasOrganization = backendIsLocalOnly || _organizationId != null;
     return SafeArea(
       child: BlocBuilder<AiResearchCubit, AiResearchState>(
+        buildWhen: (AiResearchState previous, AiResearchState current) =>
+            previous.findings != current.findings ||
+            previous.runs != current.runs ||
+            previous.lastQuery != current.lastQuery ||
+            previous.lastError != current.lastError,
         builder: (BuildContext context, AiResearchState state) {
           final bool loading = state.findings is ViewLoading<List<AiFinding>>;
+          final List<Widget> sections = <Widget>[
+            _AdvisoryBanner(localOnly: backendIsLocalOnly),
+            const SizedBox(height: LegalHubTheme.spaceMd),
+            LegalHubTextField(
+              controller: _question,
+              label: l10n.aiResearchQuestionLabel,
+              hint: l10n.aiResearchFieldHint,
+              prefixIcon: Icons.auto_awesome_outlined,
+              maxLength: ResearchRequest.maxQuestionLength,
+              textInputAction: TextInputAction.search,
+              validator: (String? value) => _validateQuestion(l10n, value),
+              onSubmitted: (String _) {
+                if (!loading) {
+                  _submit();
+                }
+              },
+            ),
+            const SizedBox(height: LegalHubTheme.spaceSm),
+            _matterPicker(l10n, locked: loading),
+            const SizedBox(height: LegalHubTheme.spaceMd),
+            _documentsPicker(l10n, locked: loading),
+            const SizedBox(height: LegalHubTheme.spaceMd),
+            if (!hasOrganization) ...<Widget>[
+              Text(
+                l10n.aiResearchErrorNoOrg,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+              const SizedBox(height: LegalHubTheme.spaceSm),
+            ],
+            FilledButton(
+              onPressed: loading || !hasOrganization ? null : _submit,
+              child: loading
+                  ? Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        const SizedBox.square(
+                          dimension: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        const SizedBox(width: LegalHubTheme.spaceSm),
+                        Text(l10n.stateLoading),
+                      ],
+                    )
+                  : Text(l10n.aiResearchGenerate),
+            ),
+            const SizedBox(height: LegalHubTheme.spaceLg),
+            _RunsHistory(
+              runs: state.runs,
+              onOpen: (ResearchRun run) =>
+                  context.read<AiResearchCubit>().loadRunFindings(run.id),
+              onRetry: () => context.read<AiResearchCubit>().loadRuns(),
+            ),
+            const SizedBox(height: LegalHubTheme.spaceLg),
+            _FindingsSection(state: state, onRetry: _submit),
+            const SizedBox(height: LegalHubTheme.spaceLg),
+            Text(
+              backendIsLocalOnly
+                  ? l10n.aiResearchLocalOnlyNote
+                  : l10n.aiResearchStoredNote,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ];
           return Form(
             key: _formKey,
-            child: ListView(
+            // Lazy list: the sections inflate on demand instead of expanding
+            // the whole form tree on every state emission.
+            child: ListView.builder(
               padding: const EdgeInsetsDirectional.all(
                 LegalHubTheme.marginMobile,
               ),
-              children: <Widget>[
-                _AdvisoryBanner(localOnly: backendIsLocalOnly),
-                const SizedBox(height: LegalHubTheme.spaceMd),
-                LegalHubTextField(
-                  controller: _question,
-                  label: l10n.aiResearchQuestionLabel,
-                  hint: l10n.aiResearchFieldHint,
-                  prefixIcon: Icons.auto_awesome_outlined,
-                  maxLength: ResearchRequest.maxQuestionLength,
-                  textInputAction: TextInputAction.search,
-                  validator: (String? value) => _validateQuestion(l10n, value),
-                  onSubmitted: (String _) {
-                    if (!loading) {
-                      _submit();
-                    }
-                  },
-                ),
-                const SizedBox(height: LegalHubTheme.spaceSm),
-                _matterPicker(l10n, locked: loading),
-                const SizedBox(height: LegalHubTheme.spaceMd),
-                _documentsPicker(l10n, locked: loading),
-                const SizedBox(height: LegalHubTheme.spaceMd),
-                if (!hasOrganization) ...<Widget>[
-                  Text(
-                    l10n.aiResearchErrorNoOrg,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                  ),
-                  const SizedBox(height: LegalHubTheme.spaceSm),
-                ],
-                FilledButton(
-                  onPressed: loading || !hasOrganization ? null : _submit,
-                  child: loading
-                      ? Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            const SizedBox.square(
-                              dimension: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                            const SizedBox(width: LegalHubTheme.spaceSm),
-                            Text(l10n.stateLoading),
-                          ],
-                        )
-                      : Text(l10n.aiResearchGenerate),
-                ),
-                const SizedBox(height: LegalHubTheme.spaceLg),
-                _RunsHistory(
-                  runs: state.runs,
-                  onOpen: (ResearchRun run) =>
-                      context.read<AiResearchCubit>().loadRunFindings(run.id),
-                  onRetry: () => context.read<AiResearchCubit>().loadRuns(),
-                ),
-                const SizedBox(height: LegalHubTheme.spaceLg),
-                _FindingsSection(state: state, onRetry: _submit),
-                const SizedBox(height: LegalHubTheme.spaceLg),
-                Text(
-                  backendIsLocalOnly
-                      ? l10n.aiResearchLocalOnlyNote
-                      : l10n.aiResearchStoredNote,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
+              itemCount: sections.length,
+              itemBuilder: (BuildContext context, int index) => sections[index],
             ),
           );
         },
@@ -256,7 +267,9 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
         spacing: LegalHubTheme.spaceXs,
         runSpacing: LegalHubTheme.spaceXs,
         children: <Widget>[
-          for (final Document document in documents)
+          // shortcut: only the first _maxDocumentChips render as pickable
+          // chips; add paging if a matter's vault routinely exceeds that.
+          for (final Document document in documents.take(_maxDocumentChips))
             FilterChip(
               label: Text(demoDocumentTitle(l10n, document.title)),
               selected: _selectedDocumentIds.contains(document.id),

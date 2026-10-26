@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../app/legalhub_theme.dart';
-import '../legalhub_components.dart' show LegalHubAppBar;
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/shared/widgets/legalhub_components.dart'
+    show LegalHubAppBar;
 
 /// The shared scrollable, width-constrained body shell used by the auth and
 /// onboarding screens.

@@ -1,5 +1,5 @@
-import '../../core/practice_area.dart';
-import '../../l10n/app_localizations.dart';
+import 'package:legalhub/core/practice_area.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
 
 /// Localized label for a [PracticeArea], shared by the discovery and matter
 /// surfaces (Phase 6 slices 6.1/6.2, Phase 7 slice 7.1).

@@ -28,6 +28,16 @@ completion `2ff561a`). Verified file-by-file this session:
 | Reset-screen deep-link entry | ✅ `RecoveryRoutingContext.empty` null-extra fallback (reachable without OTP; the PKCE session authorizes the reset) |
 | Dependency | ✅ none added — gotrue's `passwordRecovery` auth event carries the intent (scope note §7) |
 
+> **2026-10-24 update — supersedes the "PKCE + URI detection" row above.**
+> The provider observer is now disabled (`detectSessionInUri: false`) because
+> gotrue accepts implicit-flow `access_token`/`refresh_token` material even on
+> a PKCE client. The replacement is `lib/data/auth/auth_callback.dart`
+> (registered callback location + query-only PKCE code; fragments and
+> implicit tokens rejected) driven by `auth_callback_observer.dart`. See
+> `docs/deep_link_release_checklist.md` for the remaining owner inputs
+> (assetlinks deployment, Apple Team ID, Supabase https redirect allowlist,
+> and the gated custom-scheme removal).
+
 Research (Supabase docs, 2026-08-07) confirms the shipped mechanics exactly:
 custom-scheme intent filters + `CFBundleURLTypes`; `detectSessionInUri`
 exchanges the PKCE code and fires `AuthChangeEvent.passwordRecovery` for

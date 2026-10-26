@@ -1,6 +1,5 @@
+import 'package:legalhub/features/storage/domain/uri_opener.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../../features/storage/domain/uri_opener.dart';
 
 /// [UriOpener] backed by `package:url_launcher`.
 ///
@@ -17,7 +16,7 @@ class UrlLauncherUriOpener implements UriOpener {
     }
     try {
       return await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } on Object {
+    } on Exception {
       return false;
     }
   }

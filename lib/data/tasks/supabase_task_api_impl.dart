@@ -1,7 +1,7 @@
+import 'package:legalhub/data/postgrest_failures.dart';
+import 'package:legalhub/data/supabase_seam.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../postgrest_failures.dart';
-import '../supabase_seam.dart';
 import 'supabase_task_api.dart';
 
 /// A PostgREST RPC call: function name + named params → response.
@@ -75,7 +75,7 @@ class SupabaseTaskApiImpl implements SupabaseTaskApi {
       return await _table('tasks', _taskColumns);
     } on PostgrestException catch (e) {
       throw SupabaseTaskException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       // A non-Postgrest provider failure (network/transport) is a typed
       // unavailable, never a raw exception across the seam (the auth
       // impl's defensive-catch precedent).
@@ -152,7 +152,7 @@ class SupabaseTaskApiImpl implements SupabaseTaskApi {
       rethrow;
     } on PostgrestException catch (e) {
       throw SupabaseTaskException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       throw const SupabaseTaskException(
         kind: SupabaseTaskFailureKind.providerUnavailable,
         message: 'Provider unavailable.',

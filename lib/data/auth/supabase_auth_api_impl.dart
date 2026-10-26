@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'auth_callback_observer.dart';
 import 'secure_session_storage.dart';
 import 'supabase_auth_api.dart';
 
@@ -21,11 +22,17 @@ Future<void> initializeSupabase({
   // supabase_flutter ^2.16 renamed the param to publishableKey (the anon
   // public key); the env var keeps the dashboard's "anon public" naming.
   //
-  // The auth options are stated explicitly (they are already the defaults)
-  // to pin the deep-link contract that Phase 4.1 depends on: PKCE flow +
-  // `detectSessionInUri: true` (the observer that turns an auth-callback
-  // URI into a session). `AuthFlowType.implicit` would be the legacy flow
-  // and must not be introduced here.
+  // The auth options are stated explicitly to pin the deep-link contract that
+  // Phase 4.1 depends on: PKCE flow + `detectSessionInUri: false`.
+  //
+  // The provider's URI observer is deliberately OFF (2026-10-24 hardening):
+  // gotrue's `getSessionFromUrl` accepts `access_token`/`refresh_token`
+  // pairs even on a PKCE client, so leaving detection on lets any URI the OS
+  // hands the app mint a session. The narrow replacement is
+  // [AuthCallbackObserver] (started by [SupabaseAuthApiImpl.bind]): it
+  // accepts only the registered callback location with a query-only PKCE
+  // `code` and rejects implicit-flow fragments. `AuthFlowType.implicit`
+  // would be the legacy flow and must not be introduced here.
   //
   // `secureLocalStorage` moves BOTH the persisted session (the refresh
   // token) and the PKCE code verifier out of SharedPreferences — plaintext
@@ -42,7 +49,7 @@ Future<void> initializeSupabase({
     publishableKey: anonKey,
     authOptions: FlutterAuthClientOptions(
       authFlowType: AuthFlowType.pkce,
-      detectSessionInUri: true,
+      detectSessionInUri: false,
       localStorage: secureLocalStorage,
       pkceAsyncStorage: secureLocalStorage,
     ),
@@ -51,11 +58,12 @@ Future<void> initializeSupabase({
 
 /// [SupabaseAuthApi] backed by the GoTrue auth client.
 ///
-/// This is the **only** file that imports provider types. It maps
-/// [Session] → [SupabaseAuthSnapshot], deliberately dropping access tokens,
-/// refresh tokens, and provider objects at the seam (contract §5, §2.6).
-/// Every provider call resolves to a typed [SupabaseAuthResult] /
-/// [SupabaseSignUpResult]; a GoTrue [AuthException] never crosses this seam.
+/// Together with the narrow [AuthCallbackObserver], this is the only place
+/// that imports provider types. It maps [Session] → [SupabaseAuthSnapshot],
+/// deliberately dropping access tokens, refresh tokens, and provider objects
+/// at the seam (contract §5, §2.6). Every provider call resolves to a typed
+/// [SupabaseAuthResult] / [SupabaseSignUpResult]; a GoTrue [AuthException]
+/// never crosses this seam.
 class SupabaseAuthApiImpl implements SupabaseAuthApi {
   SupabaseAuthApiImpl(this._client) {
     _subscription = _client.onAuthStateChange.listen((AuthState state) {
@@ -77,8 +85,19 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
 
   /// Binds to the app-level client after `Supabase.initialize`. Kept a
   /// factory so tests can construct the impl with any client-shaped stub.
-  factory SupabaseAuthApiImpl.bind() =>
-      SupabaseAuthApiImpl(Supabase.instance.client.auth);
+  ///
+  /// [AuthCallbackObserver.ensureStarted] is idempotent: the app-level client
+  /// is a singleton, and the gateway / recovery / sign-up APIs each call this
+  /// factory. Starting here (rather than in `initializeSupabase`) guarantees
+  /// the auth-state listener above is subscribed before a cold-start callback
+  /// can be exchanged.
+  factory SupabaseAuthApiImpl.bind() {
+    final SupabaseAuthApiImpl api = SupabaseAuthApiImpl(
+      Supabase.instance.client.auth,
+    );
+    AuthCallbackObserver.ensureStarted();
+    return api;
+  }
 
   final GoTrueClient _client;
 
@@ -122,7 +141,7 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
           message: error.message,
         ),
       );
-    } on Object {
+    } on Exception {
       return const SupabaseAuthFailed(
         SupabaseAuthFailure(kind: SupabaseAuthFailureKind.providerUnavailable),
       );
@@ -165,7 +184,7 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
           message: error.message,
         ),
       );
-    } on Object {
+    } on Exception {
       return const SupabaseSignUpFailed(
         SupabaseAuthFailure(kind: SupabaseAuthFailureKind.providerUnavailable),
       );
@@ -197,7 +216,7 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
           message: error.message,
         ),
       );
-    } on Object {
+    } on Exception {
       return const SupabaseAuthFailed(
         SupabaseAuthFailure(kind: SupabaseAuthFailureKind.providerUnavailable),
       );
@@ -228,7 +247,7 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
           message: error.message,
         ),
       );
-    } on Object {
+    } on Exception {
       return const SupabaseAuthFailed(
         SupabaseAuthFailure(kind: SupabaseAuthFailureKind.providerUnavailable),
       );
@@ -250,7 +269,7 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
           message: error.message,
         ),
       );
-    } on Object {
+    } on Exception {
       return const SupabaseAuthFailed(
         SupabaseAuthFailure(kind: SupabaseAuthFailureKind.providerUnavailable),
       );

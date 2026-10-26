@@ -25,6 +25,8 @@ class Document extends Equatable {
     required this.matterRef,
     required this.type,
     required this.createdAt,
+    this.matterId,
+    this.matterTitle,
   });
 
   final String id;
@@ -38,10 +40,28 @@ class Document extends Equatable {
   /// same shape `MessageThread.matterRef` uses, D-MSG4).
   final String matterRef;
 
+  /// The raw `matter_id` when the provider row carries one (Supabase rows
+  /// always do; the in-memory demo rows carry the synthetic ids). Drives the
+  /// reverse cross-link without loading the full matter list.
+  final String? matterId;
+
+  /// The embedded `matters(title)` value, or null when the embed is absent
+  /// (the D-DR4 fallback path). A null title means the row cannot render the
+  /// "View matter" link — the safe, non-fabricated fallback.
+  final String? matterTitle;
+
   final DocumentType type;
 
   final DateTime createdAt;
 
   @override
-  List<Object?> get props => <Object?>[id, title, matterRef, type, createdAt];
+  List<Object?> get props => <Object?>[
+    id,
+    title,
+    matterRef,
+    type,
+    createdAt,
+    matterId,
+    matterTitle,
+  ];
 }

@@ -202,6 +202,99 @@ void main() {
     expect(find.text('Invite link copied to clipboard.'), findsOneWidget);
   });
 
+  testWidgets('copy leaves the one-time token only for the auto-clear window', (
+    tester,
+  ) async {
+    String? clipboardText;
+    final List<MethodCall> platformCalls = <MethodCall>[];
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (MethodCall call) async {
+        platformCalls.add(call);
+        final Object? rawArgs = call.arguments;
+        final Map<Object?, Object?>? args = rawArgs is Map
+            ? rawArgs.cast<Object?, Object?>()
+            : null;
+        switch (call.method) {
+          case 'Clipboard.setData':
+            clipboardText = args?['text'] as String?;
+          case 'Clipboard.getData':
+            return <String, Object?>{'text': clipboardText};
+        }
+        return null;
+      },
+    );
+    addTearDown(() {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      );
+    });
+
+    await openSheet(tester);
+    await sendInvite(tester, email: 'new@firm.com');
+
+    await tester.tap(find.text('Copy token'));
+    await tester.pump();
+    expect(clipboardText, 'demo-invite-token-1');
+
+    // 30s window: still copyable, then wiped when the timer fires while the
+    // sheet is open.
+    await tester.pump(const Duration(seconds: 29));
+    expect(clipboardText, 'demo-invite-token-1');
+
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
+    expect(clipboardText, '');
+    expect(
+      platformCalls.where(
+        (MethodCall call) => call.method == 'Clipboard.setData',
+      ),
+      hasLength(2),
+    );
+  });
+
+  testWidgets('dismissing the sheet right after a copy wipes the token', (
+    tester,
+  ) async {
+    String? clipboardText;
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (MethodCall call) async {
+        final Object? rawArgs = call.arguments;
+        final Map<Object?, Object?>? args = rawArgs is Map
+            ? rawArgs.cast<Object?, Object?>()
+            : null;
+        switch (call.method) {
+          case 'Clipboard.setData':
+            clipboardText = args?['text'] as String?;
+          case 'Clipboard.getData':
+            return <String, Object?>{'text': clipboardText};
+        }
+        return null;
+      },
+    );
+    addTearDown(() {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      );
+    });
+
+    await openSheet(tester);
+    await sendInvite(tester, email: 'new@firm.com');
+
+    await tester.tap(find.text('Copy token'));
+    await tester.pump();
+    expect(clipboardText, 'demo-invite-token-1');
+
+    await tester.tap(find.text('Back'));
+    await tester.pumpAndSettle();
+
+    // Dispose fires before the 30s timer: the token never outlives the sheet.
+    expect(clipboardText, '');
+  });
+
   testWidgets(
     'link and token buttons copy distinct payloads with distinct snackbars',
     (tester) async {

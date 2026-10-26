@@ -1,6 +1,6 @@
-import '../../../core/errors/app_error.dart';
-import '../../../l10n/app_localizations.dart';
-import '../domain/video_session.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/features/video/domain/video_session.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
 
 /// Maps a gateway [AppError.code] to localized copy. The data layer keeps the
 /// wire code; presentation owns the user-facing sentence (the approvals

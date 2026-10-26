@@ -118,6 +118,17 @@ void main() {
         );
       },
     );
+
+    test(
+      'a contract Error from the seam propagates (not a fake outage)',
+      () async {
+        // C2: `on Exception` — a TypeError/StateError is a programming error
+        // and must not be swallowed as providerUnavailable.
+        objectErrors['notifications'] = StateError('client closed by a bug');
+
+        await expectLater(api.fetchNotifications(), throwsA(isA<StateError>()));
+      },
+    );
   });
 
   group('markNotificationsRead (D-N6 write slice, D-F5)', () {
@@ -193,8 +204,8 @@ void main() {
       rpcResult = null;
       rpcCalls.clear();
       // A throwing caller that is not a PostgrestException (the impl's
-      // Object branch rethrows the typed seam exception first — verify the
-      // transport branch via a separate throwing closure).
+      // defensive transport branch rethrows the typed seam exception first —
+      // verify the transport branch via a separate throwing closure).
       final SupabaseNotificationApiImpl throwingApi =
           SupabaseNotificationApiImpl(
             (String table, String columns) async =>

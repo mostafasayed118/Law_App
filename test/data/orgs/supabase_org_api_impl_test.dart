@@ -215,26 +215,36 @@ void main() {
       },
     );
 
-    test(
-      'listMyMemberships selects memberships with the org name embed',
-      () async {
-        tableData['memberships'] = <Map<String, dynamic>>[
-          <String, dynamic>{
-            'organization_id': 'org-1',
-            'role': 'partner',
-            'status': 'active',
-            'organizations': <String, dynamic>{'name': 'Demo Firm'},
-          },
-        ];
+    test('listMyMemberships selects user_id + the org embed and projects the '
+        'caller row only', () async {
+      tableData['memberships'] = <Map<String, dynamic>>[
+        <String, dynamic>{
+          'organization_id': 'org-1',
+          'user_id': 'u-1',
+          'role': 'partner',
+          'status': 'active',
+          'organizations': <String, dynamic>{'name': 'Demo Firm'},
+        },
+        <String, dynamic>{
+          'organization_id': 'org-2',
+          'user_id': 'u-2',
+          'role': 'partner',
+          'status': 'active',
+          'organizations': <String, dynamic>{'name': 'Co-member Firm'},
+        },
+      ];
 
-        final List<Map<String, dynamic>> rows = await api.listMyMemberships();
+      final List<Map<String, dynamic>> rows = await api.listMyMemberships(
+        userId: 'u-1',
+      );
 
-        expect(rows, hasLength(1));
-        expect(calls, <String>[
-          'memberships:organization_id, role, status, organizations(name)',
-        ]);
-      },
-    );
+      expect(rows, hasLength(1));
+      expect(rows.single['organization_id'], 'org-1');
+      expect(calls, <String>[
+        'memberships:organization_id, user_id, role, status, '
+            'organizations(name)',
+      ]);
+    });
 
     test('readOrgAudit sends the org id and returns only map rows', () async {
       data['read_org_audit'] = <dynamic>[
@@ -283,7 +293,7 @@ void main() {
       );
 
       await expectLater(
-        api.listMyMemberships(),
+        api.listMyMemberships(userId: 'u-1'),
         throwsA(
           isA<SupabaseOrgException>().having(
             (e) => e.kind,
@@ -293,6 +303,85 @@ void main() {
         ),
       );
     });
+
+    test(
+      'provider failures expose the fixed user-facing message (A5)',
+      () async {
+        errors['create_organization'] = const PostgrestException(
+          message: 'raw internal provider detail',
+        );
+
+        await expectLater(
+          api.createOrganization(name: 'New Firm'),
+          throwsA(
+            isA<SupabaseOrgException>()
+                .having((e) => e.kind, 'kind', SupabaseOrgFailureKind.unknown)
+                .having((e) => e.message, 'message', orgRequestFailedMessage),
+          ),
+        );
+      },
+    );
+
+    test('readOrgAudit falls back to the live zero-arg RPC when the '
+        'parameterized signature is missing (A4)', () async {
+      int attempts = 0;
+      final SupabaseOrgApiImpl fallbackApi = SupabaseOrgApiImpl((
+        String function,
+        Map<String, dynamic> params,
+      ) async {
+        attempts += 1;
+        if (attempts == 1) {
+          throw const PostgrestException(
+            message:
+                'Could not find the function public.read_org_audit'
+                '(p_organization_id) in the schema cache',
+            code: 'PGRST202',
+          );
+        }
+        expect(function, 'read_org_audit');
+        expect(params, isEmpty);
+        return PostgrestResponse<dynamic>(
+          data: <dynamic>[
+            <String, dynamic>{'id': 1, 'action': 'member_invited'},
+          ],
+          count: 0,
+        );
+      }, (String table, String columns) async => <Map<String, dynamic>>[]);
+
+      final List<Map<String, dynamic>> rows = await fallbackApi.readOrgAudit(
+        organizationId: 'org-1',
+      );
+
+      expect(rows, hasLength(1));
+      expect(rows.single['action'], 'member_invited');
+      expect(attempts, 2);
+    });
+
+    test(
+      'readOrgAudit does not retry a non-missing-function failure (A4)',
+      () async {
+        int attempts = 0;
+        final SupabaseOrgApiImpl deniedApi = SupabaseOrgApiImpl((
+          String function,
+          Map<String, dynamic> params,
+        ) async {
+          attempts += 1;
+          throw const PostgrestException(message: 'permission denied');
+        }, (String table, String columns) async => <Map<String, dynamic>>[]);
+
+        await expectLater(
+          deniedApi.readOrgAudit(organizationId: 'org-1'),
+          throwsA(
+            isA<SupabaseOrgException>().having(
+              (e) => e.kind,
+              'kind',
+              SupabaseOrgFailureKind.denied,
+            ),
+          ),
+        );
+        expect(attempts, 1);
+      },
+    );
 
     test('maps a roster denial to the denied kind', () async {
       errors['list_org_members_metadata'] = const PostgrestException(

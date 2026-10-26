@@ -107,7 +107,7 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
           AppSectionHeader(
             title: l10n.matterWorkspaceDocumentsTitle,
             titleStyle: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-            children: <Widget>[MatterDocumentsSection(matterRef: matter.title)],
+            children: <Widget>[const MatterDocumentsSection()],
           ),
           const SizedBox(height: LegalHubTheme.spaceXl),
         ],
@@ -119,7 +119,7 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
           AppSectionHeader(
             title: l10n.matterWorkspaceInvoicesTitle,
             titleStyle: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-            children: <Widget>[MatterInvoicesSection(matterRef: matter.title)],
+            children: <Widget>[const MatterInvoicesSection()],
           ),
           const SizedBox(height: LegalHubTheme.spaceXl),
         ],
@@ -127,9 +127,7 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
           AppSectionHeader(
             title: l10n.matterWorkspaceFilesTitle,
             titleStyle: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-            children: <Widget>[
-              MatterFilesSection(matterRef: matter.title, matterId: matter.id),
-            ],
+            children: <Widget>[MatterFilesSection(matterId: matter.id)],
           ),
           const SizedBox(height: LegalHubTheme.spaceXl),
         ],
@@ -137,7 +135,7 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
           AppSectionHeader(
             title: l10n.matterWorkspaceMessagesTitle,
             titleStyle: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-            children: <Widget>[MatterMessagesSection(matterRef: matter.title)],
+            children: <Widget>[const MatterMessagesSection()],
           ),
           const SizedBox(height: LegalHubTheme.spaceXl),
         ],

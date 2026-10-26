@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/errors/result.dart';
+import 'package:legalhub/core/errors/result.dart';
 import 'attorney.dart';
 
 /// The platform-admin write surface for the attorney directory (design §2).

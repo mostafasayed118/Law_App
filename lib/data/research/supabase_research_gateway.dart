@@ -1,10 +1,10 @@
-import '../../core/errors/app_error.dart';
-import '../../core/errors/result.dart';
-import '../../features/research/domain/ai_finding.dart';
-import '../../features/research/domain/ai_gateway.dart';
-import '../../features/research/domain/research_outcome.dart';
-import '../../features/research/domain/research_request.dart';
-import '../../features/research/domain/research_run.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/research/domain/ai_finding.dart';
+import 'package:legalhub/features/research/domain/ai_gateway.dart';
+import 'package:legalhub/features/research/domain/research_outcome.dart';
+import 'package:legalhub/features/research/domain/research_request.dart';
+import 'package:legalhub/features/research/domain/research_run.dart';
 import 'supabase_research_api.dart';
 
 /// Research gateway backed by the Supabase function + read RPCs (design §5).
@@ -146,6 +146,9 @@ class SupabaseResearchGateway implements AiGateway {
       try {
         findingRow = Map<String, dynamic>.from(row);
       } on Object {
+        // Deliberately `on Object`: Map.from raises TypeError (an Error) on
+        // a malformed key/value shape, and that drift must stay the typed
+        // FormatException.
         throw const FormatException(
           'Research response has a malformed finding',
         );

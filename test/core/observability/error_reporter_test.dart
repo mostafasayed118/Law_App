@@ -63,6 +63,69 @@ void main() {
       expect((context['nested']! as Map<String, Object?>)['otp'], '[REDACTED]');
     });
 
+    test('redacts phone-shaped strings before storing', () async {
+      final InMemoryErrorReporter reporter = InMemoryErrorReporter();
+
+      await reporter.report(
+        const AppError(
+          code: 'x',
+          userMessage: 'm',
+          context: <String, Object?>{
+            'note':
+                'Call +20 100 123 4567 or 0100-123-4567; '
+                'email person@example.com; ticket 2026-10-24',
+          },
+        ),
+      );
+
+      final Map<String, Object?> context =
+          reporter.reports.single['context']! as Map<String, Object?>;
+      expect(
+        context['note'],
+        'Call [REDACTED_PHONE] or [REDACTED_PHONE]; '
+        'email [REDACTED_EMAIL]; ticket 2026-10-24',
+      );
+    });
+
+    test(
+      'redacts identity and matter/document titles before storing',
+      () async {
+        final InMemoryErrorReporter reporter = InMemoryErrorReporter();
+        const Set<String> keys = <String>{
+          'name',
+          'display_name',
+          'title',
+          'matter_title',
+          'document_title',
+          'Name',
+          'Display_Name',
+          'Matter_Title',
+        };
+
+        await reporter.report(
+          AppError(
+            code: 'matter_open_failed',
+            userMessage: 'Could not open the matter',
+            context: <String, Object?>{
+              for (final String key in keys)
+                key: 'Nadia Hassan / Al-Rashid v. Fahmy',
+              'nested': <String, Object?>{'display_name': 'Nadia Hassan'},
+            },
+          ),
+        );
+
+        final Map<String, Object?> context =
+            reporter.reports.single['context']! as Map<String, Object?>;
+        for (final String key in keys) {
+          expect(context[key], '[REDACTED]', reason: key);
+        }
+        expect(
+          (context['nested']! as Map<String, Object?>)['display_name'],
+          '[REDACTED]',
+        );
+      },
+    );
+
     test(
       'redacts payment provider and card-shaped context before storing',
       () async {

@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../../../core/state/view_state.dart';
-import '../domain/message.dart';
-import '../domain/message_gateway.dart';
-import '../domain/message_realtime_event.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/messaging/domain/message.dart';
+import 'package:legalhub/features/messaging/domain/message_gateway.dart';
+import 'package:legalhub/features/messaging/domain/message_realtime_event.dart';
 import 'message_thread_detail_state.dart';
 
 /// Owns the thread-detail surface (sixth §14 un-deferral, realtime slice
@@ -28,6 +28,9 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
     : super(const MessageThreadDetailState());
 
   final MessageGateway _gateway;
+
+  /// The server-mirrored body cap (`send_message` validation).
+  static const int maxMessageLength = 2000;
 
   /// In-flight guard — the same contract as the thread-list cubit's `load`:
   /// the initial state IS loading, so the flag distinguishes "loading in
@@ -84,6 +87,9 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
   /// again for the same thread is a no-op; switching threads (or closing)
   /// cancels the previous subscription first.
   Future<void> subscribe(String threadId) async {
+    if (isClosed) {
+      return;
+    }
     if (_live != null && _threadId == threadId) {
       return;
     }
@@ -121,6 +127,9 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
   /// buffered (bounded, deduped) and merged into the next successful load
   /// instead of dropped until backfill.
   void _appendLive(Message message) {
+    if (isClosed) {
+      return;
+    }
     final ViewState<List<Message>> current = state.messages;
     if (current is! ViewSuccess<List<Message>>) {
       _bufferLive(message);
@@ -184,9 +193,15 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
     if (trimmed.isEmpty) {
       return;
     }
-    if (trimmed.length > 2000) {
+    if (trimmed.length > maxMessageLength) {
       emit(
-        state.copyWith(sendError: 'Message is too long (max 2000 characters).'),
+        state.copyWith(
+          sendError: const AppError(
+            code: 'message_too_long',
+            userMessage:
+                'Message is too long (max $maxMessageLength characters).',
+          ),
+        ),
       );
       return;
     }
@@ -207,7 +222,7 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
         // the composer visible there).
         emit(_appendedSendState(message));
       case Failure<Message>(error: final AppError error):
-        emit(state.copyWith(sending: false, sendError: error.userMessage));
+        emit(state.copyWith(sending: false, sendError: error));
     }
   }
 

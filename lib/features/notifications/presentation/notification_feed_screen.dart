@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart' hide Notification;
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/features/notifications/domain/notification.dart';
+import 'package:legalhub/features/notifications/domain/notification_gateway.dart';
+import 'package:legalhub/features/notifications/domain/notification_prefs_store.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/demo_labels.dart';
+import 'package:legalhub/shared/formatting/date_formatting.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
 
-import '../../../app/legalhub_theme.dart';
-import '../../../app/service_locator.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/demo_labels.dart';
-import '../../../shared/formatting/date_formatting.dart';
-import '../../../shared/widgets/widgets.dart';
-import '../domain/notification.dart';
-import '../domain/notification_gateway.dart';
-import '../domain/notification_prefs_store.dart';
 import 'notification_category_chip.dart';
 import 'notification_cubit.dart';
 import 'notification_state.dart';
@@ -75,7 +75,56 @@ class NotificationFeedScreen extends StatelessWidget {
             ),
             errorCopy: l10n.notificationsFeedError,
             localOnlyNote: localOnly ? l10n.notificationsFeedLocalOnlyNote : '',
+            header: const <Widget>[_ActionErrorBanner()],
           ),
+    );
+  }
+}
+
+/// Inline banner for a failed mark-read action. It subscribes to the cubit
+/// directly (the list shell's `buildWhen` only tracks the row projection, so
+/// an action error that leaves the list untouched would not rebuild it).
+class _ActionErrorBanner extends StatelessWidget {
+  const _ActionErrorBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<NotificationCubit, NotificationState, bool>(
+      selector: (NotificationState state) => state.actionError != null,
+      builder: (BuildContext context, bool hasError) {
+        if (!hasError) {
+          return const SizedBox.shrink();
+        }
+        final ColorScheme scheme = Theme.of(context).colorScheme;
+        return Padding(
+          padding: const EdgeInsetsDirectional.only(
+            bottom: LegalHubTheme.spaceMd,
+          ),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: scheme.errorContainer,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Padding(
+              padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceSm),
+              child: Row(
+                children: <Widget>[
+                  Icon(Icons.error_outline, color: scheme.onErrorContainer),
+                  const SizedBox(width: LegalHubTheme.spaceSm),
+                  Expanded(
+                    child: Text(
+                      AppLocalizations.of(context).stateError,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: scheme.onErrorContainer,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

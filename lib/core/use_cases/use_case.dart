@@ -1,4 +1,4 @@
-import '../errors/result.dart';
+import 'package:legalhub/core/errors/result.dart';
 
 /// Base contract for focused, asynchronous domain operations.
 abstract interface class UseCase<Output, Input> {

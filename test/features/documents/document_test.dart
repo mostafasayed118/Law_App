@@ -37,16 +37,18 @@ void main() {
         final Document document = _document(created: DateTime.utc(2026, 7, 10));
 
         // props enumerates the ENTIRE field surface: id / title / matterRef /
-        // type / createdAt. The metadata-only line (D-V1) is enforced
-        // structurally — any future body, content, size, or download-URL field
-        // must enter props or fail this pin, so the vault can never render
-        // document content.
+        // type / createdAt / matterId / matterTitle. The metadata-only line
+        // (D-V1) is enforced structurally — any future body, content, size, or
+        // download-URL field must enter props or fail this pin, so the vault
+        // can never render document content.
         expect(document.props, <Object?>[
           'doc-1',
           'Demo engagement letter',
           'Demo acquisition review',
           DocumentType.contract,
           DateTime.utc(2026, 7, 10),
+          null,
+          null,
         ]);
       },
     );

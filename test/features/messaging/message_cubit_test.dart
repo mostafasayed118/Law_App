@@ -151,7 +151,7 @@ class _StubMessageGateway implements MessageGateway {
   int fetchCalls = 0;
 
   @override
-  Future<Result<List<MessageThread>>> fetchThreads() {
+  Future<Result<List<MessageThread>>> fetchThreads({String? matterId}) {
     fetchCalls += 1;
     if (completer != null) {
       return completer!.future;

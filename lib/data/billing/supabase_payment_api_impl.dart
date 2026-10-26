@@ -1,7 +1,7 @@
+import 'package:legalhub/data/postgrest_failures.dart';
+import 'package:legalhub/data/supabase_seam.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../postgrest_failures.dart';
-import '../supabase_seam.dart';
 import 'supabase_payment_api.dart';
 
 /// [SupabasePaymentApi] backed by the Supabase client.
@@ -49,7 +49,7 @@ class SupabasePaymentApiImpl implements SupabasePaymentApi {
         kind: _kindForFunction(e),
         message: e.reasonPhrase ?? 'Payment provider failure.',
       );
-    } on Object {
+    } on Exception {
       throw const SupabasePaymentException(
         kind: SupabasePaymentFailureKind.providerUnavailable,
         message: 'Payment provider unavailable.',
@@ -77,7 +77,7 @@ class SupabasePaymentApiImpl implements SupabasePaymentApi {
             : SupabasePaymentFailureKind.unknown,
         message: e.message,
       );
-    } on Object {
+    } on Exception {
       throw const SupabasePaymentException(
         kind: SupabasePaymentFailureKind.providerUnavailable,
         message: 'Payment provider unavailable.',
@@ -96,6 +96,9 @@ class SupabasePaymentApiImpl implements SupabasePaymentApi {
     try {
       return Map<String, dynamic>.from(data);
     } on Object {
+      // Deliberately `on Object`: Map.from raises TypeError (an Error) on a
+      // malformed key/value shape, and that provider drift must stay a typed
+      // malformed response rather than propagate as a contract crash.
       throw const SupabasePaymentException(
         kind: SupabasePaymentFailureKind.unknown,
         message: 'Malformed payment response.',

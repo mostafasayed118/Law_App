@@ -14,7 +14,7 @@ import 'package:legalhub/features/research/domain/ai_finding.dart';
 /// passthrough pin (AC-3) without touching the real seams' success paths.
 class _FailingDocumentGateway implements DocumentGateway {
   @override
-  Future<Result<List<Document>>> fetchDocuments() async =>
+  Future<Result<List<Document>>> fetchDocuments({String? matterId}) async =>
       const Result<List<Document>>.failure(
         AppError(code: 'doc-fail', userMessage: 'documents unavailable'),
       );

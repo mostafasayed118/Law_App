@@ -1,4 +1,4 @@
-import '../../../core/errors/result.dart';
+import 'package:legalhub/core/errors/result.dart';
 import 'booking_confirmation.dart';
 import 'booking_request.dart';
 import 'booking_slot.dart';

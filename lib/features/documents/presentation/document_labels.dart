@@ -1,5 +1,5 @@
-import '../../../l10n/app_localizations.dart';
-import '../domain/document.dart';
+import 'package:legalhub/features/documents/domain/document.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
 
 /// Localized label for a [DocumentType], rendered as the vault tile's type
 /// chip and secondary-line type label (Phase 8, slice 8.1).

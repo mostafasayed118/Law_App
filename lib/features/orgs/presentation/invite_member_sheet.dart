@@ -4,15 +4,44 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../app/deep_link/app_link_parser.dart';
-import '../../../app/legalhub_theme.dart';
-import '../../../core/organizations/organization_gateway.dart';
-import '../../../core/roles/user_role.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/forms/validators.dart';
-import '../../../shared/widgets/widgets.dart';
+import 'package:legalhub/app/deep_link/app_link_parser.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/core/organizations/organization_gateway.dart';
+import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/forms/validators.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
 import 'org_cubit.dart';
 import 'org_error_messages.dart';
+
+/// Best-effort clipboard wipe for one-time invite payloads.
+///
+/// Every copy path calls [schedule] so the payload never outlives a 30-second
+/// window; the owning widget cancels the timer on dispose and calls
+/// [clearIfCurrent] immediately so a surface dismissed early cannot leave the
+/// token behind. The current-text check means a value the user copied
+/// elsewhere is never overwritten.
+class ClipboardAutoClear {
+  ClipboardAutoClear._();
+
+  static const Duration delay = Duration(seconds: 30);
+
+  static Timer schedule(String expected) =>
+      Timer(delay, () => unawaited(clearIfCurrent(expected)));
+
+  static Future<void> clearIfCurrent(String expected) async {
+    try {
+      final ClipboardData? current = await Clipboard.getData(
+        Clipboard.kTextPlain,
+      );
+      if (current?.text == expected) {
+        await Clipboard.setData(const ClipboardData(text: ''));
+      }
+    } catch (_) {
+      // Clipboard unavailable — nothing to clear.
+    }
+  }
+}
 
 /// Opens the invite-member bottom sheet for one organization.
 ///
@@ -62,37 +91,28 @@ class _InviteMemberSheetState extends State<InviteMemberSheet> {
   InviteResult? _invite;
   OrgFailureKind? _failure;
 
-  /// Lifecycle-bound clipboard auto-clear timer (OWASP A02). Stored (not
-  /// fire-and-forget) so `dispose` cancels it: a pending timer at widget
-  /// teardown fails the flutter_test invariant, and a clear firing after
-  /// the sheet is gone would erase a paste the user made elsewhere.
+  /// The payload scheduled for the 30s auto-clear, if any. Dispose cancels the
+  /// timer (flutter_test forbids leaking one past the tree) and wipes the
+  /// payload immediately when the user closes the sheet before it fires.
+  String? _clipboardPayload;
   Timer? _clipboardClearTimer;
 
   @override
   void dispose() {
     _clipboardClearTimer?.cancel();
     _clipboardClearTimer = null;
+    final String? payload = _clipboardPayload;
+    if (payload != null) {
+      unawaited(ClipboardAutoClear.clearIfCurrent(payload));
+    }
     _email.dispose();
     super.dispose();
   }
 
-  /// Schedules a best-effort clipboard clear of [expected] after 30s.
-  /// Only clears when the clipboard still holds our payload, and is
-  /// cancelled by [dispose] (see [_clipboardClearTimer]).
   void _scheduleClipboardClear(String expected) {
     _clipboardClearTimer?.cancel();
-    _clipboardClearTimer = Timer(const Duration(seconds: 30), () async {
-      try {
-        final ClipboardData? current = await Clipboard.getData(
-          Clipboard.kTextPlain,
-        );
-        if (current?.text == expected) {
-          await Clipboard.setData(const ClipboardData(text: ''));
-        }
-      } catch (_) {
-        // Clipboard unavailable — nothing to clear.
-      }
-    });
+    _clipboardPayload = expected;
+    _clipboardClearTimer = ClipboardAutoClear.schedule(expected);
   }
 
   @override

@@ -1,5 +1,5 @@
-import '../../../l10n/app_localizations.dart';
-import '../domain/invoice.dart';
+import 'package:legalhub/features/billing/domain/invoice.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
 
 /// Localized label for an [InvoiceStatus], rendered as the invoice row's
 /// secondary-line status label (billing slice, D-BI5 — the

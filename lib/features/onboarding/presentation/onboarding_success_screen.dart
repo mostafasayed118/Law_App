@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../app/legalhub_theme.dart';
-import '../../../app/router.dart';
-import '../../../app/service_locator.dart';
-import '../../../data/local/onboarding_store.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/widgets/widgets.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/router.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/data/local/onboarding_store.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
 
 /// Onboarding success confirmation matching
 /// `stitch_legalhub_mobile_app/onboarding_success`.

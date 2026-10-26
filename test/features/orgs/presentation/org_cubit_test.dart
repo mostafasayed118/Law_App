@@ -13,7 +13,9 @@ class _GatedOrgGateway implements OrganizationGateway {
 
   final OrganizationGateway _inner;
   Completer<void>? createGate;
+  Completer<void>? suspendGate;
   int createCalls = 0;
+  int suspendCalls = 0;
 
   @override
   Future<OrgOutcome<OrganizationSummary>> createOrganization({
@@ -62,7 +64,14 @@ class _GatedOrgGateway implements OrganizationGateway {
   Future<OrgOutcome<void>> suspendMember({
     required String organizationId,
     required String userId,
-  }) => _inner.suspendMember(organizationId: organizationId, userId: userId);
+  }) async {
+    suspendCalls++;
+    final Completer<void>? gate = suspendGate;
+    if (gate != null) {
+      await gate.future;
+    }
+    return _inner.suspendMember(organizationId: organizationId, userId: userId);
+  }
 
   @override
   Future<OrgOutcome<void>> reactivateMember({
@@ -188,7 +197,7 @@ void main() {
   });
 
   group('OrgCubit member actions', () {
-    Future<OrgCubit> loadedCubit(FakeOrganizationGateway gateway) async {
+    Future<OrgCubit> loadedCubit(OrganizationGateway gateway) async {
       final OrgCubit cubit = OrgCubit(gateway);
       await cubit.loadRoster(
         organizationId: FakeOrganizationGateway.demoOrganizationId,
@@ -240,6 +249,41 @@ void main() {
 
       expect(kind, OrgFailureKind.denied);
     });
+
+    test(
+      'a second member action returns busy while one write is in flight',
+      () async {
+        final _GatedOrgGateway gated = _GatedOrgGateway(
+          FakeOrganizationGateway(),
+        );
+        final OrgCubit cubit = await loadedCubit(gated);
+        addTearDown(cubit.close);
+        final Completer<void> gate = Completer<void>();
+        gated.suspendGate = gate;
+
+        final Future<OrgFailureKind?> first = cubit.suspendMember(
+          organizationId: FakeOrganizationGateway.demoOrganizationId,
+          userId: FakeOrganizationGateway.demoUserId,
+        );
+        await Future<void>.delayed(Duration.zero);
+        final OrgFailureKind? second = await cubit.suspendMember(
+          organizationId: FakeOrganizationGateway.demoOrganizationId,
+          userId: FakeOrganizationGateway.demoUserId,
+        );
+
+        expect(second, OrgFailureKind.busy);
+        expect(gated.suspendCalls, 1);
+        // The first write's row spinner stays in place.
+        expect(
+          (cubit.state as OrgRosterLoaded).pendingUserId,
+          FakeOrganizationGateway.demoUserId,
+        );
+
+        gate.complete();
+        expect(await first, OrgFailureKind.lastPartner);
+        expect((cubit.state as OrgRosterLoaded).pendingUserId, isNull);
+      },
+    );
 
     test(
       'a successful suspend reloads the roster with the new status',

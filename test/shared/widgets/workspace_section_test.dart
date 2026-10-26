@@ -10,16 +10,15 @@ import 'package:legalhub/shared/widgets/workspace_section.dart';
 // WorkspaceSection is the E10 extraction: the four matter workspace
 // sections (documents/files/invoices/messages) previously duplicated the
 // ViewStateSwitch arm config (spaceMd loading padding, zero error padding,
-// bodySmall error text), the filter-by-matterRef rows column, and the
-// inline empty copy. These tests pin the shared shell — the state arms, the
-// matterRef filter, the spaceSm row gaps, the inline empty hint, and RTL at
-// narrow width.
+// bodySmall error text) and the inline empty copy. These tests pin the
+// shared shell — the state arms, the spaceSm row gaps, the inline empty
+// hint, and RTL at narrow width. Matter scoping is server-side now, so the
+// shell renders exactly the rows it is given.
 void main() {
   const List<String> items = <String>['Alpha · m1', 'Beta · m1', 'Gamma · m2'];
 
   Widget pumpWorkspaceSection({
     ViewState<List<String>> state = const ViewSuccess<List<String>>(items),
-    String matterRef = 'm1',
     VoidCallback? onRetry,
   }) {
     return MaterialApp(
@@ -33,8 +32,6 @@ void main() {
           onRetry: onRetry ?? () {},
           errorCopy: 'Load error',
           emptyCopy: 'No rows for this matter',
-          matterRef: matterRef,
-          matterRefOf: (String item) => item.split(' · ')[1],
           itemBuilder: (BuildContext context, String item) =>
               AppTile(title: item, subtitles: const <String>['Row']),
         ),
@@ -42,24 +39,22 @@ void main() {
     );
   }
 
-  testWidgets('success renders only the rows matching the matterRef', (
-    tester,
-  ) async {
-    await tester.pumpWidget(pumpWorkspaceSection(matterRef: 'm1'));
+  testWidgets('success renders every row it is given', (tester) async {
+    await tester.pumpWidget(pumpWorkspaceSection());
 
     expect(find.text('Alpha · m1'), findsOneWidget);
     expect(find.text('Beta · m1'), findsOneWidget);
-    expect(find.text('Gamma · m2'), findsNothing);
+    expect(find.text('Gamma · m2'), findsOneWidget);
     expect(find.text('No rows for this matter'), findsNothing);
   });
 
-  testWidgets('success with no matching rows renders the inline empty copy', (
-    tester,
-  ) async {
-    await tester.pumpWidget(pumpWorkspaceSection(matterRef: 'missing'));
+  testWidgets('success with an empty list renders no rows', (tester) async {
+    await tester.pumpWidget(
+      pumpWorkspaceSection(state: const ViewSuccess<List<String>>(<String>[])),
+    );
 
-    expect(find.text('No rows for this matter'), findsOneWidget);
     expect(find.byType(AppTile), findsNothing);
+    expect(find.text('No rows for this matter'), findsNothing);
   });
 
   testWidgets('empty state renders the empty copy', (tester) async {
@@ -140,8 +135,6 @@ void main() {
                 onRetry: () {},
                 errorCopy: 'Load error',
                 emptyCopy: 'No rows for this matter',
-                matterRef: 'm1',
-                matterRefOf: (String item) => item.split(' · ')[1],
                 itemBuilder: (BuildContext context, String item) =>
                     AppTile(title: item),
               ),

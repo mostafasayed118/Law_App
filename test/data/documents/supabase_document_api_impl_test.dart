@@ -47,6 +47,26 @@ void main() {
       },
     );
 
+    test(
+      'fetchDocuments forwards a non-null matter id to the scoped read',
+      () async {
+        final List<String> scoped = <String>[];
+        final SupabaseDocumentApiImpl scopedApi = SupabaseDocumentApiImpl(
+          (String table, String columns) async =>
+              const <Map<String, dynamic>>[],
+          matterTableCaller:
+              (String table, String columns, String matterId) async {
+                scoped.add('$table|$matterId');
+                return const <Map<String, dynamic>>[];
+              },
+        );
+
+        await scopedApi.fetchDocuments(matterId: 'matter-1');
+
+        expect(scoped, <String>['documents|matter-1']);
+      },
+    );
+
     test('fetchDocuments maps a table denial to the denied kind', () async {
       tableErrors['documents'] = const PostgrestException(
         message: 'permission denied',

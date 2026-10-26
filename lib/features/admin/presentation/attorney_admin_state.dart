@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/state/view_state.dart';
-import '../../discovery/domain/attorney.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/discovery/domain/attorney.dart';
 
 /// State of the platform-admin attorney directory (design §2).
 ///

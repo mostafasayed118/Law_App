@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
-import '../../../core/errors/result.dart';
-import '../domain/file_metadata.dart';
-import '../domain/storage_gateway.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/storage/domain/file_metadata.dart';
+import 'package:legalhub/features/storage/domain/storage_gateway.dart';
 
 /// Development-only storage implementation: a fixed synthetic list of
 /// non-PII file **metadata** plus deterministic in-memory uploads.
@@ -17,6 +17,7 @@ class FakeStorageGateway implements StorageGateway {
   static final List<FileMetadata> syntheticFiles = <FileMetadata>[
     FileMetadata(
       id: 'file-1',
+      matterId: 'matter-1',
       name: 'Demo retainer scan',
       matterRef: 'Demo acquisition review',
       mimeType: 'application/pdf',
@@ -25,6 +26,7 @@ class FakeStorageGateway implements StorageGateway {
     ),
     FileMetadata(
       id: 'file-2',
+      matterId: 'matter-2',
       name: 'Demo lease annex',
       matterRef: 'Commercial lease consultation',
       mimeType: 'application/pdf',
@@ -33,6 +35,7 @@ class FakeStorageGateway implements StorageGateway {
     ),
     FileMetadata(
       id: 'file-3',
+      matterId: 'matter-3',
       name: 'Demo evidence register',
       matterRef: 'Procedural review matter',
       mimeType: 'text/csv',
@@ -41,6 +44,7 @@ class FakeStorageGateway implements StorageGateway {
     ),
     FileMetadata(
       id: 'file-4',
+      matterId: 'matter-4',
       name: 'Demo correspondence copy',
       matterRef: 'Family status consultation',
       mimeType: 'image/png',
@@ -49,6 +53,7 @@ class FakeStorageGateway implements StorageGateway {
     ),
     FileMetadata(
       id: 'file-5',
+      matterId: 'matter-5',
       name: 'Demo formation checklist',
       matterRef: 'Startup formation advisory',
       mimeType: 'application/msword',
@@ -70,13 +75,22 @@ class FakeStorageGateway implements StorageGateway {
   int _sequence = 0;
 
   @override
-  Future<Result<List<FileMetadata>>> fetchFiles() async {
-    // Metadata only — the synthetic list plus this instance's uploads.
+  Future<Result<List<FileMetadata>>> fetchFiles({String? matterId}) async {
+    // Metadata only — the synthetic list plus this instance's uploads. A
+    // matter id scopes the in-memory read the same way the server-side
+    // filter does.
+    final List<FileMetadata> rows = <FileMetadata>[
+      ...syntheticFiles,
+      ..._uploaded,
+    ];
     return Result<List<FileMetadata>>.success(
-      List<FileMetadata>.unmodifiable(<FileMetadata>[
-        ...syntheticFiles,
-        ..._uploaded,
-      ]),
+      List<FileMetadata>.unmodifiable(
+        matterId == null
+            ? rows
+            : rows
+                  .where((FileMetadata file) => file.matterId == matterId)
+                  .toList(growable: false),
+      ),
     );
   }
 
@@ -91,6 +105,7 @@ class FakeStorageGateway implements StorageGateway {
     _sequence += 1;
     final FileMetadata file = FileMetadata(
       id: 'upload-$_sequence',
+      matterId: matterId,
       name: name,
       matterRef: syntheticMatterTitles[matterId] ?? matterId,
       mimeType: mimeType,

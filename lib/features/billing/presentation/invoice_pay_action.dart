@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:legalhub/features/billing/domain/checkout_launcher.dart';
+import 'package:legalhub/features/billing/domain/invoice.dart';
+import 'package:legalhub/features/billing/domain/payment_gateway.dart';
+import 'package:legalhub/features/billing/domain/payment_mode.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
 
-import '../../../l10n/app_localizations.dart';
-import '../domain/checkout_launcher.dart';
-import '../domain/invoice.dart';
-import '../domain/payment_gateway.dart';
-import '../domain/payment_mode.dart';
 import 'invoice_payment_sheet.dart';
 
 /// The single pay affordance shared by the standalone invoice list and the

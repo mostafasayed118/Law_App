@@ -1,6 +1,6 @@
 import 'package:intl/intl.dart';
 
-import '../../l10n/app_localizations.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
 
 /// Locale-aware medium date (yMMMd — e.g. "Aug 10, 2026"), the exact shape
 /// the repo's list-row surfaces render (E6 extraction: the 12 inlined

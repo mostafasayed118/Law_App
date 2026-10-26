@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/features/billing/domain/checkout_launcher.dart';
+import 'package:legalhub/features/billing/domain/invoice.dart';
+import 'package:legalhub/features/billing/domain/payment_gateway.dart';
+import 'package:legalhub/features/billing/domain/payment_mode.dart';
+import 'package:legalhub/features/billing/presentation/invoice_labels.dart';
+import 'package:legalhub/features/billing/presentation/invoice_pay_action.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
 
-import '../../../app/service_locator.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/widgets/widgets.dart';
-import '../../billing/domain/checkout_launcher.dart';
-import '../../billing/domain/invoice.dart';
-import '../../billing/domain/payment_gateway.dart';
-import '../../billing/domain/payment_mode.dart';
-import '../../billing/presentation/invoice_labels.dart';
-import '../../billing/presentation/invoice_pay_action.dart';
 import 'matter_workspace_cubit.dart';
 import 'matter_workspace_state.dart';
 
@@ -18,19 +18,15 @@ import 'matter_workspace_state.dart';
 ///
 /// Consumes the matter-scoped [MatterWorkspaceCubit] (provided by the
 /// details screen) instead of a foreign feature's presentation cubit
-/// (audit: matters god-feature) and renders the subset of the
-/// invoice-metadata list whose [Invoice.matterRef] equals [matterRef] — a
-/// client-side view over the gateway list (the D-M5 pattern; there is no
-/// per-matter fetch). Each row renders the invoice number, the amount, and
-/// the status plus the shared pay action for `issued` invoices when
-/// `PAYMENTS_MODE` is enabled. No card/payer data and no row tap exist —
-/// the provider-hosted checkout owns the card surface. An empty per-matter
-/// subset renders the localized empty copy.
+/// (audit: matters god-feature). The cubit scopes the gateway read to the
+/// open matter server-side, so the list here is already the matter's subset;
+/// no client-side title filtering runs. Each row renders the invoice number,
+/// the amount, and the status plus the shared pay action for `issued`
+/// invoices when `PAYMENTS_MODE` is enabled. No card/payer data and no row
+/// tap exist — the provider-hosted checkout owns the card surface. An empty
+/// per-matter subset renders the localized empty copy.
 class MatterInvoicesSection extends StatefulWidget {
-  const MatterInvoicesSection({required this.matterRef, super.key});
-
-  /// The matter title to filter by (matches [Invoice.matterRef], D-BI5).
-  final String matterRef;
+  const MatterInvoicesSection({super.key});
 
   @override
   State<MatterInvoicesSection> createState() => _MatterInvoicesSectionState();
@@ -40,9 +36,8 @@ class _MatterInvoicesSectionState extends State<MatterInvoicesSection> {
   @override
   void initState() {
     super.initState();
-    // Load the list on open (same pattern as the standalone surfaces); the
-    // per-matter subset is filtered client-side below. Only this list
-    // loads — sibling sections trigger their own.
+    // Load the matter-scoped invoice list on open. Only this list loads —
+    // sibling sections trigger their own.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
         return;
@@ -67,8 +62,6 @@ class _MatterInvoicesSectionState extends State<MatterInvoicesSection> {
           onRetry: () => context.read<MatterWorkspaceCubit>().loadInvoices(),
           errorCopy: l10n.invoicesError,
           emptyCopy: l10n.matterWorkspaceInvoicesEmpty,
-          matterRef: widget.matterRef,
-          matterRefOf: (Invoice invoice) => invoice.matterRef,
           itemBuilder: (BuildContext context, Invoice invoice) => AppTile(
             title: invoice.invoiceNumber,
             subtitles: <String>[

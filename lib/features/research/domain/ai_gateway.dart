@@ -1,4 +1,4 @@
-import '../../../core/errors/result.dart';
+import 'package:legalhub/core/errors/result.dart';
 import 'ai_finding.dart';
 import 'research_outcome.dart';
 import 'research_request.dart';

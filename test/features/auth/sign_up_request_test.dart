@@ -88,7 +88,7 @@ void main() {
       expect(twice.values.join(), isNot(contains('amira@example.com')));
     });
 
-    test('name is retained for diagnostics (not classified as PII)', () {
+    test('name is redacted as PII', () {
       const SignUpRequest request = SignUpRequest(
         name: 'Amira Hassan',
         email: 'amira@example.com',
@@ -96,7 +96,9 @@ void main() {
         password: 'super-secret-123',
       );
 
-      expect(request.toRedactedMap()['name'], 'Amira Hassan');
+      final Map<String, Object?> redacted = request.toRedactedMap();
+      expect(redacted['name'], '[REDACTED]');
+      expect(redacted.values.join(), isNot(contains('Amira Hassan')));
     });
 
     test('produces a SignUpRequest from validated raw input', () {

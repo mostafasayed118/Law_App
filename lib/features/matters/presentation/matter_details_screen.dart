@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../app/legalhub_theme.dart';
-import '../../../app/service_locator.dart';
-import '../../../core/roles/user_role.dart';
-import '../../../core/state/view_state.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/demo_labels.dart';
-import '../../../shared/formatting/date_formatting.dart';
-import '../../../shared/widgets/widgets.dart';
-import '../../billing/domain/billing_gateway.dart';
-import '../../documents/domain/document_gateway.dart';
-import '../../messaging/domain/message_gateway.dart';
-import '../../storage/domain/storage_gateway.dart';
-import '../domain/matter.dart';
-import '../domain/matter_gateway.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/billing/domain/billing_gateway.dart';
+import 'package:legalhub/features/documents/domain/document_gateway.dart';
+import 'package:legalhub/features/matters/domain/matter.dart';
+import 'package:legalhub/features/matters/domain/matter_gateway.dart';
+import 'package:legalhub/features/messaging/domain/message_gateway.dart';
+import 'package:legalhub/features/storage/domain/storage_gateway.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/demo_labels.dart';
+import 'package:legalhub/shared/formatting/date_formatting.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
+
 import 'matter_cubit.dart';
 import 'matter_documents_section.dart';
 import 'matter_files_section.dart';
@@ -69,6 +70,7 @@ class MatterDetailsScreen extends StatelessWidget {
           serviceLocator<DocumentGateway>(),
           serviceLocator<BillingGateway>(),
           serviceLocator<StorageGateway>(),
+          matterId: matterId,
         ),
         child: _DetailsSurface(matterId: matterId, capabilities: capabilities),
       ),

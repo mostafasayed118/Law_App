@@ -6,6 +6,13 @@
 /// cross this boundary.
 library;
 
+/// Fixed user-facing failure text for the platform-admin seam.
+///
+/// Raw PostgREST/provider messages never cross this boundary into UI state;
+/// the typed failure kind carries the actionable distinction.
+const String platformAdminRequestFailedMessage =
+    'Platform administration request failed.';
+
 /// Typed reasons a platform-admin RPC call can fail, mapped from the
 /// PostgREST surface. The surface is deliberately narrow: the owner-only
 /// RPCs either succeed or deny.

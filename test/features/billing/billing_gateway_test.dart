@@ -16,6 +16,18 @@ void main() {
       expect(first, hasLength(5));
     });
 
+    test('scopes the list to one matter id', () async {
+      final FakeBillingGateway gateway = FakeBillingGateway();
+
+      final List<Invoice> invoices = (await gateway.fetchInvoices(
+        matterId: 'matter-1',
+      )).valueOrNull!;
+
+      expect(invoices, hasLength(1));
+      expect(invoices.single.id, 'invoice-1');
+      expect(invoices.single.matterId, 'matter-1');
+    });
+
     test('invoices carry only non-PII metadata fields (D-BI1 shape)', () async {
       final FakeBillingGateway gateway = FakeBillingGateway();
 

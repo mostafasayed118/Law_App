@@ -1,4 +1,4 @@
-import '../auth/session.dart';
+import 'package:legalhub/core/auth/session.dart';
 
 /// Membership hydration boundary (P3.2).
 ///

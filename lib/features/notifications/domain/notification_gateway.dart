@@ -1,4 +1,4 @@
-import '../../../core/errors/result.dart';
+import 'package:legalhub/core/errors/result.dart';
 import 'notification.dart';
 
 /// Notification-feed integration boundary (notification-feed slice, D-N1).

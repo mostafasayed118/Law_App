@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/router.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/auth/domain/sign_up_gateway.dart';
+import 'package:legalhub/features/auth/domain/sign_up_request.dart';
+import 'package:legalhub/features/auth/presentation/sign_up_cubit.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/forms/validators.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
 
-import '../../../app/legalhub_theme.dart';
-import '../../../app/router.dart';
-import '../../../app/service_locator.dart';
-import '../../../core/errors/app_error.dart';
-import '../../../core/state/view_state.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/forms/validators.dart';
-import '../../../shared/widgets/widgets.dart';
-import '../domain/sign_up_gateway.dart';
-import '../domain/sign_up_request.dart';
-import '../presentation/sign_up_cubit.dart';
 import 'widgets/auth_buttons.dart';
 
 part 'sign_up_check_inbox_success.dart';
@@ -266,7 +266,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   ) {
     if (state is ViewError<void>) {
       final String message = switch (state.error.code) {
-        'emailInUse' => l10n.signUpErrorEmailInUse,
+        'emailInUse' => l10n.signUpErrorGeneric,
         'rateLimited' => l10n.signUpErrorRateLimited,
         'providerUnavailable' => l10n.signUpErrorServiceUnavailable,
         _ => l10n.signUpErrorGeneric,

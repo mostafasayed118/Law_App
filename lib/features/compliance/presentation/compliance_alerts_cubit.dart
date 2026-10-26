@@ -1,10 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../../../core/state/view_state.dart';
-import '../domain/compliance_alert.dart';
-import '../domain/compliance_gateway.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/compliance/domain/compliance_alert.dart';
+import 'package:legalhub/features/compliance/domain/compliance_gateway.dart';
+import 'package:legalhub/shared/state/write_gate.dart';
+import 'package:legalhub/shared/text/trim.dart';
 import 'compliance_alerts_state.dart';
 
 /// Owns the org-scoped compliance-alert list and its writes (design §4).
@@ -25,7 +27,7 @@ class ComplianceAlertsCubit extends Cubit<ComplianceAlertsState> {
   /// pattern).
   int _request = 0;
 
-  bool _acting = false;
+  final WriteGate _writeGate = WriteGate();
 
   Future<void> load() async {
     final int request = ++_request;
@@ -80,72 +82,43 @@ class ComplianceAlertsCubit extends Cubit<ComplianceAlertsState> {
   }
 
   /// Creates an alert. The title is trimmed here (the sheet validates its
-  /// length before submitting); an empty description becomes null.
-  Future<AppError?> create(ComplianceAlertDraft draft) async {
-    if (isClosed || _acting) {
-      return null;
-    }
-    _acting = true;
-    final Result<String> result = await _gateway.create(
-      ComplianceAlertDraft(
-        organizationId: draft.organizationId,
-        matterId: draft.matterId,
-        title: draft.title.trim(),
-        kind: draft.kind,
-        severity: draft.severity,
-        description: _trimOrNull(draft.description),
-        dueAt: draft.dueAt,
+  /// length before submitting); an empty description becomes null. A write
+  /// that loses the in-flight race returns [WriteGate.busyError], never null.
+  Future<AppError?> create(ComplianceAlertDraft draft) {
+    return _writeGate.run<String>(
+      isClosed: () => isClosed,
+      write: () => _gateway.create(
+        ComplianceAlertDraft(
+          organizationId: draft.organizationId,
+          matterId: draft.matterId,
+          title: draft.title.trim(),
+          kind: draft.kind,
+          severity: draft.severity,
+          description: trimOrNull(draft.description),
+          dueAt: draft.dueAt,
+        ),
       ),
+      onSuccess: load,
     );
-    _acting = false;
-    if (isClosed) {
-      return null;
-    }
-    switch (result) {
-      case Success<String>():
-        await load();
-        return null;
-      case Failure<String>(error: final AppError error):
-        return error;
-    }
   }
 
   /// Acknowledges an open alert. Returns null on success, the failure's
   /// [AppError] otherwise; a success re-reads the filtered list.
   Future<AppError?> acknowledge(String id) {
-    return _runWrite(() => _gateway.acknowledge(id));
+    return _writeGate.run<void>(
+      isClosed: () => isClosed,
+      write: () => _gateway.acknowledge(id),
+      onSuccess: load,
+    );
   }
 
   /// Resolves an open/acknowledged alert. Returns null on success, the
   /// failure's [AppError] otherwise; a success re-reads the filtered list.
   Future<AppError?> resolve(String id, {String? note}) {
-    return _runWrite(() => _gateway.resolve(id, note: _trimOrNull(note)));
-  }
-
-  Future<AppError?> _runWrite(Future<Result<void>> Function() write) async {
-    if (isClosed || _acting) {
-      return null;
-    }
-    _acting = true;
-    final Result<void> result = await write();
-    _acting = false;
-    if (isClosed) {
-      return null;
-    }
-    switch (result) {
-      case Success<void>():
-        await load();
-        return null;
-      case Failure<void>(error: final AppError error):
-        return error;
-    }
-  }
-
-  String? _trimOrNull(String? value) {
-    if (value == null) {
-      return null;
-    }
-    final String trimmed = value.trim();
-    return trimmed.isEmpty ? null : trimmed;
+    return _writeGate.run<void>(
+      isClosed: () => isClosed,
+      write: () => _gateway.resolve(id, note: trimOrNull(note)),
+      onSuccess: load,
+    );
   }
 }

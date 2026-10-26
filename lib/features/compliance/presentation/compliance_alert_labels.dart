@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
-import '../../../l10n/app_localizations.dart';
-import '../domain/compliance_alert.dart';
+import 'package:legalhub/features/compliance/domain/compliance_alert.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
 
 /// Localized status label (design §4).
 String alertStatusLabel(AppLocalizations l10n, AlertStatus status) {

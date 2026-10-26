@@ -13,7 +13,9 @@ class _StubOrgApi implements SupabaseOrgApi {
   int calls = 0;
 
   @override
-  Future<List<Map<String, dynamic>>> listMyMemberships() async {
+  Future<List<Map<String, dynamic>>> listMyMemberships({
+    required String userId,
+  }) async {
     calls += 1;
     if (error != null) {
       throw error!;
@@ -98,12 +100,14 @@ void main() {
   });
 
   Map<String, dynamic> activeRow({
+    String userId = 'u-1',
     String organizationId = 'org-1',
     String? organizationName = 'Demo Firm',
     String role = 'partner',
     String status = 'active',
   }) => <String, dynamic>{
     'organization_id': organizationId,
+    'user_id': userId,
     'role': role,
     'status': status,
     if (organizationName != null)
@@ -157,6 +161,37 @@ void main() {
       expect(membership.isActive, isFalse);
     });
 
+    test(
+      "drops another member's row (own-membership projection, A1)",
+      () async {
+        // The memberships policy also exposes active co-members' rows; only
+        // the caller's own row may become a session membership.
+        api.rows = <Map<String, dynamic>>[
+          activeRow(
+            userId: 'u-2',
+            organizationId: 'org-foreign',
+            role: 'partner',
+          ),
+          activeRow(userId: 'u-1', organizationId: 'org-1', role: 'client'),
+        ];
+
+        final List<OrganizationMembership> memberships = await loadSucceeded();
+
+        expect(memberships, hasLength(1));
+        expect(memberships.single.organizationId, 'org-1');
+        // The co-member's partner role must not become the caller's role.
+        expect(memberships.single.role, UserRole.client);
+      },
+    );
+
+    test('maps the compliance_officer server role (A2)', () async {
+      api.rows = <Map<String, dynamic>>[activeRow(role: 'compliance_officer')];
+
+      final List<OrganizationMembership> memberships = await loadSucceeded();
+
+      expect(memberships.single.role, UserRole.complianceOfficer);
+    });
+
     test('drops an unknown schema role loudly (D-P32.1)', () async {
       api.rows = <Map<String, dynamic>>[
         activeRow(role: 'researchAnalyst'),
@@ -186,6 +221,7 @@ void main() {
     test('drops a row without an organization id', () async {
       api.rows = <Map<String, dynamic>>[
         <String, dynamic>{
+          'user_id': 'u-1',
           'role': 'partner',
           'status': 'active',
           'organizations': <String, dynamic>{'name': 'X'},

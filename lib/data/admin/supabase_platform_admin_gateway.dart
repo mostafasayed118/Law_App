@@ -1,5 +1,5 @@
-import '../../core/admin/platform_admin_gateway.dart';
-import '../../core/roles/user_role.dart';
+import 'package:legalhub/core/admin/platform_admin_gateway.dart';
+import 'package:legalhub/core/roles/user_role.dart';
 import 'supabase_platform_admin_api.dart';
 
 /// [PlatformAdminGateway] backed by the Supabase provider via
@@ -25,13 +25,19 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
       );
     } on SupabasePlatformAdminException catch (e) {
       return OrgOutcome<List<OrganizationSummary>>.failure(
-        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+        OrgFailure(
+          kind: _mapKind(e.kind),
+          message: platformAdminRequestFailedMessage,
+        ),
       );
-    } on FormatException catch (e) {
+    } on FormatException {
       // Provider drift (unexpected row shape) surfaces loudly, never as a
       // silently wrong organization.
       return OrgOutcome<List<OrganizationSummary>>.failure(
-        OrgFailure(kind: OrgFailureKind.unknown, message: e.message),
+        OrgFailure(
+          kind: OrgFailureKind.unknown,
+          message: platformAdminRequestFailedMessage,
+        ),
       );
     }
   }
@@ -41,15 +47,21 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
     try {
       final List<Map<String, dynamic>> rows = await _api.listMembers();
       return OrgOutcome<List<OrgMember>>.success(
-        rows.map(_memberFromRow).toList(growable: false),
+        rows.map(_memberFromRow).whereType<OrgMember>().toList(growable: false),
       );
     } on SupabasePlatformAdminException catch (e) {
       return OrgOutcome<List<OrgMember>>.failure(
-        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+        OrgFailure(
+          kind: _mapKind(e.kind),
+          message: platformAdminRequestFailedMessage,
+        ),
       );
-    } on FormatException catch (e) {
+    } on FormatException {
       return OrgOutcome<List<OrgMember>>.failure(
-        OrgFailure(kind: OrgFailureKind.unknown, message: e.message),
+        OrgFailure(
+          kind: OrgFailureKind.unknown,
+          message: platformAdminRequestFailedMessage,
+        ),
       );
     }
   }
@@ -98,13 +110,19 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
       );
     } on SupabasePlatformAdminException catch (e) {
       return OrgOutcome<List<AuditEntry>>.failure(
-        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+        OrgFailure(
+          kind: _mapKind(e.kind),
+          message: platformAdminRequestFailedMessage,
+        ),
       );
-    } on FormatException catch (e) {
+    } on FormatException {
       // Provider drift (unexpected row shape) surfaces loudly, never as a
       // silently wrong audit entry.
       return OrgOutcome<List<AuditEntry>>.failure(
-        OrgFailure(kind: OrgFailureKind.unknown, message: e.message),
+        OrgFailure(
+          kind: OrgFailureKind.unknown,
+          message: platformAdminRequestFailedMessage,
+        ),
       );
     }
   }
@@ -122,11 +140,17 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
       );
     } on SupabasePlatformAdminException catch (e) {
       return OrgOutcome<List<AuditEntry>>.failure(
-        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+        OrgFailure(
+          kind: _mapKind(e.kind),
+          message: platformAdminRequestFailedMessage,
+        ),
       );
-    } on FormatException catch (e) {
+    } on FormatException {
       return OrgOutcome<List<AuditEntry>>.failure(
-        OrgFailure(kind: OrgFailureKind.unknown, message: e.message),
+        OrgFailure(
+          kind: OrgFailureKind.unknown,
+          message: platformAdminRequestFailedMessage,
+        ),
       );
     }
   }
@@ -137,7 +161,10 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
       return const OrgOutcome<void>.success(null);
     } on SupabasePlatformAdminException catch (e) {
       return OrgOutcome<void>.failure(
-        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+        OrgFailure(
+          kind: _mapKind(e.kind),
+          message: platformAdminRequestFailedMessage,
+        ),
       );
     }
   }
@@ -156,7 +183,7 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
     );
   }
 
-  OrgMember _memberFromRow(Map<String, dynamic> row) {
+  OrgMember? _memberFromRow(Map<String, dynamic> row) {
     final String? userId = row['user_id'] as String?;
     if (userId == null) {
       // The platform RPC joins profiles — invited rows (no profile yet) do
@@ -165,7 +192,8 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
     }
     final UserRole? role = userRoleFromServerName(row['role'] as String?);
     if (role == null) {
-      throw FormatException('Unknown server role name: ${row['role']}');
+      // One unknown role must not fail the whole roster; the row is skipped.
+      return null;
     }
     final MembershipStatus? status = membershipStatusFromServerName(
       row['status'] as String?,

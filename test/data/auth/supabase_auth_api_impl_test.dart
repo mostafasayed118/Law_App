@@ -391,7 +391,7 @@ void main() {
             email: any(named: 'email'),
             password: any(named: 'password'),
           ),
-        ).thenThrow(StateError('network down'));
+        ).thenThrow(Exception('network down'));
 
         final SupabaseAuthResult result = await api.signInWithPassword(
           email: 'amira@example.com',

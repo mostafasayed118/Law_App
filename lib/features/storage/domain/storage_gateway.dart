@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import '../../../core/errors/result.dart';
+import 'package:legalhub/core/errors/result.dart';
 import 'file_metadata.dart';
 
 /// The server's `matter-files` bucket cap (25 MiB).
@@ -30,7 +30,11 @@ abstract interface class StorageGateway {
   /// file's org AND assigned on its matter, matrix §4 — the
   /// `files_select_assigned` RLS gate server-side). Deterministic and
   /// read-only.
-  Future<Result<List<FileMetadata>>> fetchFiles();
+  ///
+  /// [matterId] scopes the read server-side (the workspace passes the open
+  /// matter's id); null keeps the caller's full list, so existing callers are
+  /// unchanged.
+  Future<Result<List<FileMetadata>>> fetchFiles({String? matterId});
 
   /// Uploads [bytes] for [matterId] and registers the metadata row.
   ///

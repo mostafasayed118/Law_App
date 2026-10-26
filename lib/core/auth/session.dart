@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../roles/user_role.dart';
+import 'package:legalhub/core/roles/user_role.dart';
 
 /// Lifecycle of an organization membership (contract §3.3).
 enum MembershipStatus { invited, active, suspended, removed }
@@ -86,6 +86,21 @@ class Session extends Equatable {
   /// Navigation/capability hints read from here; it is never an
   /// authorization grant.
   UserRole? get primaryRole => activeMembership?.role;
+
+  /// The **active** membership for [organizationId], or null when the caller
+  /// has no active membership in that organization (or no selection is set).
+  /// A suspended/removed membership never projects a role.
+  OrganizationMembership? membershipForOrganization(String? organizationId) {
+    if (organizationId == null) {
+      return null;
+    }
+    for (final OrganizationMembership membership in memberships) {
+      if (membership.isActive && membership.organizationId == organizationId) {
+        return membership;
+      }
+    }
+    return null;
+  }
 
   @override
   List<Object?> get props => <Object?>[

@@ -1,8 +1,8 @@
-import '../../../core/errors/result.dart';
-import '../domain/booking_confirmation.dart';
-import '../domain/booking_gateway.dart';
-import '../domain/booking_request.dart';
-import '../domain/booking_slot.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/booking/domain/booking_confirmation.dart';
+import 'package:legalhub/features/booking/domain/booking_gateway.dart';
+import 'package:legalhub/features/booking/domain/booking_request.dart';
+import 'package:legalhub/features/booking/domain/booking_slot.dart';
 
 /// Development-only booking implementation: fixed synthetic slots and an
 /// in-memory confirmation list.

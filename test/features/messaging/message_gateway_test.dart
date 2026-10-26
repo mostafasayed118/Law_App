@@ -20,6 +20,18 @@ void main() {
       expect(first, hasLength(5));
     });
 
+    test('scopes the list to one matter id', () async {
+      final FakeMessageGateway gateway = FakeMessageGateway();
+
+      final List<MessageThread> threads = (await gateway.fetchThreads(
+        matterId: 'matter-1',
+      )).valueOrNull!;
+
+      expect(threads, hasLength(1));
+      expect(threads.single.id, 'thread-1');
+      expect(threads.single.matterId, 'matter-1');
+    });
+
     test('threads carry only non-PII metadata fields (D-MSG4 shape)', () async {
       final FakeMessageGateway gateway = FakeMessageGateway();
 

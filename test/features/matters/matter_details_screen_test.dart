@@ -424,7 +424,7 @@ void main() {
 /// Gateway stub that yields an empty document list (workspace empty pin).
 class _EmptyDocumentGateway implements DocumentGateway {
   @override
-  Future<Result<List<Document>>> fetchDocuments() async {
+  Future<Result<List<Document>>> fetchDocuments({String? matterId}) async {
     return Result<List<Document>>.success(const <Document>[]);
   }
 
@@ -438,7 +438,7 @@ class _EmptyDocumentGateway implements DocumentGateway {
 /// Gateway stub that yields an empty thread list (workspace empty pin).
 class _EmptyMessageGateway implements MessageGateway {
   @override
-  Future<Result<List<MessageThread>>> fetchThreads() async {
+  Future<Result<List<MessageThread>>> fetchThreads({String? matterId}) async {
     return Result<List<MessageThread>>.success(const <MessageThread>[]);
   }
 
@@ -475,7 +475,7 @@ class _EmptyMessageGateway implements MessageGateway {
 /// Gateway stub that yields an empty file list (workspace empty pin).
 class _EmptyStorageGateway implements StorageGateway {
   @override
-  Future<Result<List<FileMetadata>>> fetchFiles() async {
+  Future<Result<List<FileMetadata>>> fetchFiles({String? matterId}) async {
     return Result<List<FileMetadata>>.success(const <FileMetadata>[]);
   }
 
@@ -507,7 +507,7 @@ class _EmptyStorageGateway implements StorageGateway {
 /// billing D-BI5).
 class _EmptyBillingGateway implements BillingGateway {
   @override
-  Future<Result<List<Invoice>>> fetchInvoices() async {
+  Future<Result<List<Invoice>>> fetchInvoices({String? matterId}) async {
     return Result<List<Invoice>>.success(const <Invoice>[]);
   }
 }
@@ -517,9 +517,16 @@ class _CountingBillingGateway implements BillingGateway {
   int fetchCalls = 0;
 
   @override
-  Future<Result<List<Invoice>>> fetchInvoices() async {
+  Future<Result<List<Invoice>>> fetchInvoices({String? matterId}) async {
     fetchCalls++;
-    return Result<List<Invoice>>.success(FakeBillingGateway.syntheticInvoices);
+    final List<Invoice> rows = FakeBillingGateway.syntheticInvoices;
+    return Result<List<Invoice>>.success(
+      matterId == null
+          ? rows
+          : rows
+                .where((Invoice invoice) => invoice.matterId == matterId)
+                .toList(growable: false),
+    );
   }
 }
 
@@ -587,7 +594,8 @@ class _DelayedStorageGateway implements StorageGateway {
   void complete(Result<FileMetadata> result) => _completer.complete(result);
 
   @override
-  Future<Result<List<FileMetadata>>> fetchFiles() => _inner.fetchFiles();
+  Future<Result<List<FileMetadata>>> fetchFiles({String? matterId}) =>
+      _inner.fetchFiles(matterId: matterId);
 
   @override
   Future<Result<FileMetadata>> uploadFile({
@@ -616,7 +624,8 @@ class _ConfigurableStorageGateway implements StorageGateway {
   final FakeStorageGateway _inner = FakeStorageGateway();
 
   @override
-  Future<Result<List<FileMetadata>>> fetchFiles() => _inner.fetchFiles();
+  Future<Result<List<FileMetadata>>> fetchFiles({String? matterId}) =>
+      _inner.fetchFiles(matterId: matterId);
 
   @override
   Future<Result<FileMetadata>> uploadFile({

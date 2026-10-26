@@ -1,6 +1,6 @@
-import '../../core/auth/session.dart';
-import '../../core/organizations/organization_gateway.dart';
-import '../../core/roles/user_role.dart';
+import 'package:legalhub/core/auth/session.dart';
+import 'package:legalhub/core/organizations/organization_gateway.dart';
+import 'package:legalhub/core/roles/user_role.dart';
 part 'fake_organization_state.dart';
 part 'fake_organization_invitations.dart';
 part 'fake_organization_admin.dart';

@@ -37,6 +37,7 @@ class _StubPaymentGateway extends PaymentGateway {
   Result<PaymentSession>? initiateResult;
   Completer<Result<PaymentSession>>? initiateCompleter;
   Result<PaymentStatusSnapshot>? statusResult;
+  Completer<Result<PaymentStatusSnapshot>>? statusCompleter;
   Result<PaymentStatusSnapshot>? simulateResult;
 
   @override
@@ -58,10 +59,17 @@ class _StubPaymentGateway extends PaymentGateway {
   }
 
   @override
-  Future<Result<PaymentStatusSnapshot>> fetchStatus(String invoiceId) async {
+  Future<Result<PaymentStatusSnapshot>> fetchStatus(String invoiceId) {
     statusCalls.add(invoiceId);
-    return statusResult ??
-        Result<PaymentStatusSnapshot>.success(_snapshot(PaymentStatus.pending));
+    if (statusCompleter != null) {
+      return statusCompleter!.future;
+    }
+    return Future<Result<PaymentStatusSnapshot>>.value(
+      statusResult ??
+          Result<PaymentStatusSnapshot>.success(
+            _snapshot(PaymentStatus.pending),
+          ),
+    );
   }
 
   @override
@@ -265,6 +273,32 @@ void main() {
           error: _statusFailure,
         ),
       ],
+    );
+
+    blocTest<PaymentCubit, PaymentState>(
+      'simulate is ignored while a status check is in flight',
+      setUp: () =>
+          gateway.statusCompleter = Completer<Result<PaymentStatusSnapshot>>(),
+      build: () => PaymentCubit(gateway),
+      act: (PaymentCubit cubit) async {
+        await cubit.pay('invoice-1');
+        final Future<void> checking = cubit.checkStatus('invoice-1');
+        await cubit.simulate(PaymentStatus.succeeded);
+        gateway.statusCompleter!.complete(
+          Result<PaymentStatusSnapshot>.success(
+            _snapshot(PaymentStatus.pending),
+          ),
+        );
+        await checking;
+      },
+      expect: () => <PaymentState>[
+        const PaymentState(phase: PaymentPhase.initiating),
+        PaymentState(
+          phase: PaymentPhase.pending,
+          session: _session(PaymentStatus.pending),
+        ),
+      ],
+      verify: (_) => expect(gateway.simulateCalls, isEmpty),
     );
 
     blocTest<PaymentCubit, PaymentState>(

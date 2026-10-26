@@ -1,9 +1,9 @@
 import 'dart:convert';
 
+import 'package:legalhub/data/postgrest_failures.dart';
+import 'package:legalhub/data/supabase_seam.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../postgrest_failures.dart';
-import '../supabase_seam.dart';
 import 'supabase_research_api.dart';
 
 /// A call to the `research-analyze` Edge Function: name + body → decoded data.
@@ -77,6 +77,9 @@ class SupabaseResearchApiImpl implements SupabaseResearchApi {
       try {
         return Map<String, dynamic>.from(data);
       } on Object {
+        // Deliberately `on Object`: Map.from raises TypeError (an Error) on
+        // a malformed key/value shape, and that payload drift must stay a
+        // typed invalid response.
         throw const SupabaseResearchException(
           kind: SupabaseResearchFailureKind.invalidResponse,
           message: 'research-analyze returned a malformed payload.',
@@ -90,7 +93,7 @@ class SupabaseResearchApiImpl implements SupabaseResearchApi {
         message: e.reasonPhrase ?? 'Research provider failure.',
         code: _errorCode(e.details),
       );
-    } on Object {
+    } on Exception {
       throw const SupabaseResearchException(
         kind: SupabaseResearchFailureKind.providerUnavailable,
         message: 'Research provider unavailable.',
@@ -149,6 +152,8 @@ class SupabaseResearchApiImpl implements SupabaseResearchApi {
       try {
         rows.add(Map<String, dynamic>.from(row));
       } on Object {
+        // Deliberately `on Object`: a bad key/value shape raises TypeError
+        // (an Error); that row-level drift must stay a typed malformed row.
         throw SupabaseResearchException(
           kind: SupabaseResearchFailureKind.unknown,
           message: '$function returned a malformed row.',
@@ -171,7 +176,7 @@ class SupabaseResearchApiImpl implements SupabaseResearchApi {
         kind: _kindForPostgrest(e),
         message: e.message,
       );
-    } on Object {
+    } on Exception {
       throw const SupabaseResearchException(
         kind: SupabaseResearchFailureKind.providerUnavailable,
         message: 'Research provider unavailable.',

@@ -48,8 +48,8 @@ void main() {
         expect(context['password'], '[REDACTED]');
         expect(context['phone'], '[REDACTED]');
         expect(context['email'], '[REDACTED]');
-        // Name is not a sensitive key and is retained.
-        expect(context['name'], _request.name);
+        // The display name is PII and must not survive in diagnostics.
+        expect(context['name'], '[REDACTED]');
       },
     );
 

@@ -109,6 +109,53 @@ void main() {
       },
     );
 
+    test('membershipForOrganization returns the active membership for that '
+        'organization', () {
+      final Session session = _session(
+        memberships: const <OrganizationMembership>[
+          OrganizationMembership(
+            organizationId: 'org-a',
+            organizationName: 'Org A',
+            role: UserRole.attorney,
+            status: MembershipStatus.active,
+          ),
+          OrganizationMembership(
+            organizationId: 'org-b',
+            organizationName: 'Org B',
+            role: UserRole.partner,
+            status: MembershipStatus.active,
+          ),
+        ],
+      );
+
+      expect(
+        session.membershipForOrganization('org-b')?.role,
+        UserRole.partner,
+      );
+      expect(
+        session.membershipForOrganization('org-a')?.role,
+        UserRole.attorney,
+      );
+    });
+
+    test('membershipForOrganization is null for unknown, inactive, or no '
+        'selection', () {
+      final Session session = _session(
+        memberships: const <OrganizationMembership>[
+          OrganizationMembership(
+            organizationId: 'org-a',
+            organizationName: 'Org A',
+            role: UserRole.partner,
+            status: MembershipStatus.suspended,
+          ),
+        ],
+      );
+
+      expect(session.membershipForOrganization(null), isNull);
+      expect(session.membershipForOrganization('org-missing'), isNull);
+      expect(session.membershipForOrganization('org-a'), isNull);
+    });
+
     test('isExpired reflects the expiresAt boundary', () {
       expect(_session(expiresAt: DateTime(2020, 1, 1)).isExpired, isTrue);
       expect(_session(expiresAt: DateTime(2035, 1, 1)).isExpired, isFalse);

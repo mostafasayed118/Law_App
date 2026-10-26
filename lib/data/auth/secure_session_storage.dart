@@ -17,15 +17,17 @@ abstract interface class SecureSessionStore {
 /// Keystore-backed cipher (v11 default: AES-GCM data encryption with RSA-OAEP
 /// key wrapping, no biometric prompt) on Android.
 ///
-/// The iOS accessibility is [KeychainAccessibility.first_unlock]: the item is
-/// readable once the device has been unlocked after a restart, which is the
-/// standard choice for a refresh token — it keeps background token refreshes
-/// working across a reboot instead of failing until the user unlocks.
+/// The iOS accessibility is [KeychainAccessibility.first_unlock_this_device]:
+/// the item is readable once the device has been unlocked after a restart
+/// (keeping background token refreshes working across a reboot) but is
+/// never migrated to another device by an encrypted backup.
 class FlutterSecureSessionStore implements SecureSessionStore {
   const FlutterSecureSessionStore();
 
   static const FlutterSecureStorage _storage = FlutterSecureStorage(
-    iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
+    iOptions: IOSOptions(
+      accessibility: KeychainAccessibility.first_unlock_this_device,
+    ),
   );
 
   @override

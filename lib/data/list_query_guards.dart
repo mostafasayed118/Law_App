@@ -9,16 +9,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 /// an entire RLS-visible table into memory.
 ///
 /// The cap is intentionally conservative — 200 rows covers any realistic
-/// matter/document/invoice/notification list — and is a cap, not a page:
-/// callers that render unbounded surfaces (search, feeds) page through
-/// [pagedTableSelect] with [.range] windows of [kSearchPageSize] rows.
+/// matter/document/invoice/notification list.
 const int kSupabaseListRowCap = 200;
 
-/// Default page size for paged reads (unified search fan-out, feeds).
-///
-/// Four parallel page reads of 30 rows bound a search to ~120 rows instead
-/// of 4 × 200, and bound the eager tile build on the results surface.
-const int kSearchPageSize = 30;
+/// The list-read deadline, matching the RPC/storage seam: a stalled
+/// PostgREST socket surfaces as a TimeoutException (a transport failure the
+/// data impls map to `providerUnavailable`) instead of leaving every list
+/// screen loading forever.
+const Duration kSupabaseListReadTimeout = Duration(seconds: 15);
 
 /// Deterministic server-side ordering per table: `(column, descending)`.
 ///
@@ -81,6 +79,13 @@ const Map<String, Set<String>> kSupabaseFilterableColumns =
         'assigned_attorney_id',
       },
       'documents': <String>{'id', 'matter_id', 'title', 'document_type'},
+      'files': <String>{'id', 'matter_id', 'name'},
+      'billing_invoices': <String>{
+        'id',
+        'matter_id',
+        'invoice_number',
+        'status',
+      },
       'messages': <String>{'id', 'thread_id'},
       'message_threads': <String>{'id', 'matter_id', 'title'},
     };
@@ -110,7 +115,8 @@ void requireFilterableColumn(String table, String column) {
 ///
 /// Defaults preserve the pre-pagination contract exactly (cap 200, no
 /// offset, no ilike), so every existing caller keeps its behavior until it
-/// opts into paging.
+/// opts into paging. Every read carries the shared [kSupabaseListReadTimeout]
+/// deadline (overridable for tests via [timeout]).
 Future<List<Map<String, dynamic>>> boundedTableSelect(
   String table,
   String columns, {
@@ -120,6 +126,8 @@ Future<List<Map<String, dynamic>>> boundedTableSelect(
   int? offset,
   String? ilikeColumn,
   String? ilikeValue,
+  Duration timeout = kSupabaseListReadTimeout,
+  SupabaseClient? client,
 }) {
   // postgrest 2.8.0 type ladder: `.select()`/`.eq()`/`.ilike()` live on
   // `PostgrestFilterBuilder`, but `.order()`/`.limit()`/`.range()` are
@@ -127,11 +135,8 @@ Future<List<Map<String, dynamic>>> boundedTableSelect(
   // static type — so the filter chain is built first, then widened once
   // for order+limit/range. Declaring the variable as the filter builder
   // (the previous shape) made the ordered re-assignment a compile error.
-  PostgrestFilterBuilder<List<Map<String, dynamic>>> filtered = Supabase
-      .instance
-      .client
-      .from(table)
-      .select(columns);
+  PostgrestFilterBuilder<List<Map<String, dynamic>>> filtered =
+      (client ?? Supabase.instance.client).from(table).select(columns);
   if (filterColumn != null && filterValue != null) {
     requireFilterableColumn(table, filterColumn);
     filtered = filtered.eq(filterColumn, filterValue);
@@ -146,38 +151,10 @@ Future<List<Map<String, dynamic>>> boundedTableSelect(
     query = query.order(ordering.$1, ascending: !ordering.$2);
   }
   final int effectiveLimit = limit ?? kSupabaseListRowCap;
-  if (offset != null) {
-    return query.range(offset, offset + effectiveLimit - 1);
-  }
-  return query.limit(effectiveLimit);
-}
-
-/// Explicit pagination over [boundedTableSelect]: page [page] (0-based) of
-/// [pageSize] rows with the table's deterministic ordering.
-///
-/// A dedicated name (rather than bare `offset:`) so call sites read as
-/// paging and the range math (`from`/`to` inclusive on PostgREST) lives in
-/// exactly one place.
-Future<List<Map<String, dynamic>>> pagedTableSelect(
-  String table,
-  String columns, {
-  int page = 0,
-  int pageSize = kSearchPageSize,
-  String? filterColumn,
-  Object? filterValue,
-  String? ilikeColumn,
-  String? ilikeValue,
-}) {
-  return boundedTableSelect(
-    table,
-    columns,
-    filterColumn: filterColumn,
-    filterValue: filterValue,
-    limit: pageSize,
-    offset: page * pageSize,
-    ilikeColumn: ilikeColumn,
-    ilikeValue: ilikeValue,
-  );
+  final Future<List<Map<String, dynamic>>> read = offset != null
+      ? query.range(offset, offset + effectiveLimit - 1)
+      : query.limit(effectiveLimit);
+  return read.timeout(timeout);
 }
 
 /// Escapes PostgREST `like` wildcards (`%`, `_`, `\`) in user input so a

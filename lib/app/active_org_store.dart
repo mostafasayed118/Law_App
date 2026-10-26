@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import '../core/auth/session.dart';
-import '../core/observability/app_log.dart';
-import '../data/local/org_selection_store.dart';
+import 'package:legalhub/core/auth/session.dart';
+import 'package:legalhub/core/observability/app_log.dart';
+import 'package:legalhub/data/local/org_selection_store.dart';
 
 /// Client-side active-organization context (Phase 7 slice 7.0, D-M7/D-08;
 /// persistence added in P3.2, D-P32.2).

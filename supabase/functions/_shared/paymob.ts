@@ -98,11 +98,11 @@ export async function hmacSha512Hex(message: string, secret: string): Promise<st
   return toHex(new Uint8Array(signature));
 }
 
-/** Length-independent comparison: both inputs are hashed before the XOR loop. */
+/** Length-independent, case-sensitive comparison: both inputs are hashed before the XOR loop. */
 export async function constantTimeEqual(left: string, right: string): Promise<boolean> {
   const encoder = new TextEncoder();
-  const leftBytes = encoder.encode(left.toLowerCase());
-  const rightBytes = encoder.encode(right.toLowerCase());
+  const leftBytes = encoder.encode(left);
+  const rightBytes = encoder.encode(right);
   const [leftHash, rightHash] = await Promise.all([
     crypto.subtle.digest("SHA-256", leftBytes),
     crypto.subtle.digest("SHA-256", rightBytes),

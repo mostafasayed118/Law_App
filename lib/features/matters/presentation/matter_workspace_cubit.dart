@@ -1,23 +1,23 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../../../core/state/view_state.dart';
-import '../../billing/domain/billing_gateway.dart';
-import '../../billing/domain/invoice.dart';
-import '../../documents/domain/document.dart';
-import '../../documents/domain/document_gateway.dart';
-import '../../messaging/domain/message_gateway.dart';
-import '../../messaging/domain/message_thread.dart';
-import '../../storage/domain/file_metadata.dart';
-import '../../storage/domain/storage_gateway.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/billing/domain/billing_gateway.dart';
+import 'package:legalhub/features/billing/domain/invoice.dart';
+import 'package:legalhub/features/documents/domain/document.dart';
+import 'package:legalhub/features/documents/domain/document_gateway.dart';
+import 'package:legalhub/features/messaging/domain/message_gateway.dart';
+import 'package:legalhub/features/messaging/domain/message_thread.dart';
+import 'package:legalhub/features/storage/domain/file_metadata.dart';
+import 'package:legalhub/features/storage/domain/storage_gateway.dart';
 import 'matter_workspace_state.dart';
 
 /// Owns the per-matter workspace lists (audit: matters god-feature).
 ///
 /// The four workspace sections (messages, documents, invoices, files) used
 /// to each provide a *foreign feature's* presentation cubit
-/// (`MessageCubit`, `DocumentCubit`, `BillingCubit`, `StorageCubit`), which
+/// (`MessageCubit`, `DocumentCubit`, `BillingCubit`, and a storage cubit), which
 /// coupled matters' presentation to four sibling presentations and made
 /// matters untestable in isolation. This composite cubit orchestrates the
 /// four **domain** gateways directly — domain-to-domain composition, which
@@ -35,13 +35,18 @@ class MatterWorkspaceCubit extends Cubit<MatterWorkspaceState> {
     this._messageGateway,
     this._documentGateway,
     this._billingGateway,
-    this._storageGateway,
-  ) : super(const MatterWorkspaceState());
+    this._storageGateway, {
+    this.matterId,
+  }) : super(const MatterWorkspaceState());
 
   final MessageGateway _messageGateway;
   final DocumentGateway _documentGateway;
   final BillingGateway _billingGateway;
   final StorageGateway _storageGateway;
+
+  /// The open matter's id: every list read is scoped to it server-side
+  /// (null keeps the unscoped read for callers that need the full list).
+  final String? matterId;
 
   bool _loadingThreads = false;
   bool _loadingDocuments = false;
@@ -64,7 +69,7 @@ class MatterWorkspaceCubit extends Cubit<MatterWorkspaceState> {
     }
     try {
       final Result<List<MessageThread>> result = await _messageGateway
-          .fetchThreads();
+          .fetchThreads(matterId: matterId);
       if (isClosed) {
         return;
       }
@@ -85,7 +90,7 @@ class MatterWorkspaceCubit extends Cubit<MatterWorkspaceState> {
     }
     try {
       final Result<List<Document>> result = await _documentGateway
-          .fetchDocuments();
+          .fetchDocuments(matterId: matterId);
       if (isClosed) {
         return;
       }
@@ -105,8 +110,9 @@ class MatterWorkspaceCubit extends Cubit<MatterWorkspaceState> {
       emit(state.copyWith(invoices: const ViewLoading<List<Invoice>>()));
     }
     try {
-      final Result<List<Invoice>> result = await _billingGateway
-          .fetchInvoices();
+      final Result<List<Invoice>> result = await _billingGateway.fetchInvoices(
+        matterId: matterId,
+      );
       if (isClosed) {
         return;
       }
@@ -127,7 +133,7 @@ class MatterWorkspaceCubit extends Cubit<MatterWorkspaceState> {
     }
     try {
       final Result<List<FileMetadata>> result = await _storageGateway
-          .fetchFiles();
+          .fetchFiles(matterId: matterId);
       if (isClosed) {
         return;
       }

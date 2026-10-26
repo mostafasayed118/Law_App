@@ -25,7 +25,9 @@ class _StubSupabaseMessageApi implements SupabaseMessageApi {
   int sendCalls = 0;
 
   @override
-  Future<List<Map<String, dynamic>>> fetchMessageThreads() async {
+  Future<List<Map<String, dynamic>>> fetchMessageThreads({
+    String? matterId,
+  }) async {
     if (error != null) {
       throw error!;
     }

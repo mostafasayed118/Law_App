@@ -81,7 +81,7 @@ void main() {
     test(
       'fetchSlots maps a non-Postgrest failure to providerUnavailable',
       () async {
-        tableObjectError = StateError('transport down');
+        tableObjectError = Exception('transport down');
 
         await expectLater(
           api.fetchSlots(),
@@ -217,7 +217,7 @@ void main() {
       api = SupabaseBookingApiImpl(
         (String table, String columns) async => tableRows,
         rpcCaller: (String function, Map<String, dynamic> params) async {
-          throw StateError('transport down');
+          throw Exception('transport down');
         },
       );
 

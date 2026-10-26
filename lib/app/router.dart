@@ -3,45 +3,49 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../core/practice_area.dart';
-import '../core/roles/user_role.dart';
-import '../features/admin/presentation/attorney_admin_screen.dart';
-import '../features/admin/presentation/platform_admin_screen.dart';
-import '../features/approvals/presentation/approvals_screen.dart';
-import '../features/auth/presentation/auth_cubit.dart';
-import '../features/auth/presentation/forgot_password/forgot_password_email_screen.dart';
-import '../features/auth/presentation/forgot_password/forgot_password_otp_screen.dart';
-import '../features/auth/presentation/forgot_password/forgot_password_reset_screen.dart';
-import '../features/auth/presentation/sign_in_screen.dart';
-import '../features/auth/presentation/sign_up_screen.dart';
-import '../features/billing/presentation/billing_invoices_screen.dart';
-import '../features/booking/presentation/booking_screen.dart';
-import '../features/compliance/presentation/compliance_alerts_screen.dart';
-import '../features/discovery/presentation/attorney_profile_screen.dart';
-import '../features/discovery/presentation/attorney_search_screen.dart';
-import '../features/documents/presentation/document_list_screen.dart';
-import '../features/home/presentation/home_screen.dart';
-import '../features/home/presentation/settings_screen.dart';
-import '../features/matters/presentation/matter_create_screen.dart';
-import '../features/matters/presentation/matter_details_screen.dart';
-import '../features/matters/presentation/matter_list_screen.dart';
-import '../features/messaging/presentation/message_list_screen.dart';
-import '../features/messaging/presentation/message_thread_detail_screen.dart';
-import '../features/notifications/presentation/notification_feed_screen.dart';
-import '../features/notifications/presentation/notification_settings_screen.dart';
-import '../features/onboarding/presentation/onboarding_screen.dart';
-import '../features/onboarding/presentation/onboarding_success_screen.dart';
-import '../features/orgs/presentation/accept_invitation_screen.dart';
-import '../features/orgs/presentation/org_audit_screen.dart';
-import '../features/orgs/presentation/organization_hub_screen.dart';
-import '../features/profile/presentation/profile_screen.dart';
-import '../features/research/presentation/ai_research_screen.dart';
-import '../features/search/presentation/search_screen.dart';
-import '../features/tasks/presentation/task_board_screen.dart';
-import '../features/video/presentation/video_consultation_screen.dart';
-import '../l10n/app_localizations.dart';
-import '../shared/responsive/responsive.dart';
-import '../shared/widgets/app_centered_message.dart';
+import 'package:legalhub/app/active_org_store.dart';
+import 'package:legalhub/app/deep_link/pending_accept_invite_store.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/auth/session.dart';
+import 'package:legalhub/core/practice_area.dart';
+import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/features/admin/presentation/attorney_admin_screen.dart';
+import 'package:legalhub/features/admin/presentation/platform_admin_screen.dart';
+import 'package:legalhub/features/approvals/presentation/approvals_screen.dart';
+import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
+import 'package:legalhub/features/auth/presentation/forgot_password/forgot_password_email_screen.dart';
+import 'package:legalhub/features/auth/presentation/forgot_password/forgot_password_otp_screen.dart';
+import 'package:legalhub/features/auth/presentation/forgot_password/forgot_password_reset_screen.dart';
+import 'package:legalhub/features/auth/presentation/sign_in_screen.dart';
+import 'package:legalhub/features/auth/presentation/sign_up_screen.dart';
+import 'package:legalhub/features/billing/presentation/billing_invoices_screen.dart';
+import 'package:legalhub/features/booking/presentation/booking_screen.dart';
+import 'package:legalhub/features/compliance/presentation/compliance_alerts_screen.dart';
+import 'package:legalhub/features/discovery/presentation/attorney_profile_screen.dart';
+import 'package:legalhub/features/discovery/presentation/attorney_search_screen.dart';
+import 'package:legalhub/features/documents/presentation/document_list_screen.dart';
+import 'package:legalhub/features/home/presentation/home_screen.dart';
+import 'package:legalhub/features/home/presentation/settings_screen.dart';
+import 'package:legalhub/features/matters/presentation/matter_create_screen.dart';
+import 'package:legalhub/features/matters/presentation/matter_details_screen.dart';
+import 'package:legalhub/features/matters/presentation/matter_list_screen.dart';
+import 'package:legalhub/features/messaging/presentation/message_list_screen.dart';
+import 'package:legalhub/features/messaging/presentation/message_thread_detail_screen.dart';
+import 'package:legalhub/features/notifications/presentation/notification_feed_screen.dart';
+import 'package:legalhub/features/notifications/presentation/notification_settings_screen.dart';
+import 'package:legalhub/features/onboarding/presentation/onboarding_screen.dart';
+import 'package:legalhub/features/onboarding/presentation/onboarding_success_screen.dart';
+import 'package:legalhub/features/orgs/presentation/accept_invitation_screen.dart';
+import 'package:legalhub/features/orgs/presentation/org_audit_screen.dart';
+import 'package:legalhub/features/orgs/presentation/organization_hub_screen.dart';
+import 'package:legalhub/features/profile/presentation/profile_screen.dart';
+import 'package:legalhub/features/research/presentation/ai_research_screen.dart';
+import 'package:legalhub/features/search/presentation/search_screen.dart';
+import 'package:legalhub/features/tasks/presentation/task_board_screen.dart';
+import 'package:legalhub/features/video/presentation/video_consultation_screen.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/responsive/responsive.dart';
+import 'package:legalhub/shared/widgets/app_centered_message.dart';
 import 'legalhub_theme.dart';
 part 'router_shell_routes.dart';
 part 'router_app_shell.dart';
@@ -133,6 +137,7 @@ class AppRoutes {
 GoRouter createAppRouter(
   AuthCubit authCubit, {
   Map<UserRole, RoleCapability> capabilitiesForRole = roleCapabilities,
+  PendingAcceptInviteStore? pendingAcceptInvites,
   String initialLocation = AppRoutes.signIn,
 }) => GoRouter(
   initialLocation: initialLocation,
@@ -212,6 +217,15 @@ GoRouter createAppRouter(
         return AppRoutes.forgotPasswordReset;
       }
       return null;
+    }
+    // A deep-linked accept-invite token that arrived while signed out is
+    // resumed as soon as a session exists: the accept screen consumes the
+    // pending token in initState, so the landing is one-shot.
+    if (authenticated &&
+        pendingAcceptInvites != null &&
+        pendingAcceptInvites.hasPendingToken &&
+        path != AppRoutes.acceptInvitation) {
+      return AppRoutes.acceptInvitation;
     }
     if (authenticated && onAuthRoute) {
       return AppRoutes.home;

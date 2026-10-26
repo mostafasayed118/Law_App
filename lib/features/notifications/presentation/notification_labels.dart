@@ -1,5 +1,5 @@
-import '../../../l10n/app_localizations.dart';
-import '../domain/notification.dart';
+import 'package:legalhub/features/notifications/domain/notification.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
 
 /// Localized label for a [NotificationCategory], rendered as the feed row's
 /// status chip (notification-feed slice, D-N4 — the three generic

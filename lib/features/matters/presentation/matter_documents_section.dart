@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:legalhub/features/documents/domain/document.dart';
+import 'package:legalhub/features/documents/presentation/document_labels.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/demo_labels.dart';
+import 'package:legalhub/shared/formatting/date_formatting.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
 
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/demo_labels.dart';
-import '../../../shared/formatting/date_formatting.dart';
-import '../../../shared/widgets/widgets.dart';
-import '../../documents/domain/document.dart';
-import '../../documents/presentation/document_labels.dart';
 import 'matter_workspace_cubit.dart';
 import 'matter_workspace_state.dart';
 
@@ -15,18 +15,15 @@ import 'matter_workspace_state.dart';
 ///
 /// Consumes the matter-scoped [MatterWorkspaceCubit] (provided by the
 /// details screen) instead of a foreign feature's presentation cubit
-/// (audit: matters god-feature) and renders the subset of the document list
-/// whose [Document.matterRef] equals [matterRef] — a client-side view over
-/// the gateway list (the D-M5 pattern; there is no per-matter fetch).
+/// (audit: matters god-feature). The cubit scopes the gateway read to the
+/// open matter server-side, so the list here is already the matter's subset;
+/// no client-side title filtering runs.
 /// **Metadata only**: each row renders the D-V4 title/type/date fields and
 /// nothing else — no preview, no download, no open action, no tap
 /// affordance (D-W4). An empty per-matter subset renders the localized
 /// empty copy (AC-3).
 class MatterDocumentsSection extends StatefulWidget {
-  const MatterDocumentsSection({required this.matterRef, super.key});
-
-  /// The matter title to filter by (matches [Document.matterRef], D-W2).
-  final String matterRef;
+  const MatterDocumentsSection({super.key});
 
   @override
   State<MatterDocumentsSection> createState() => _MatterDocumentsSectionState();
@@ -36,9 +33,8 @@ class _MatterDocumentsSectionState extends State<MatterDocumentsSection> {
   @override
   void initState() {
     super.initState();
-    // Load the document list on open (same pattern as the standalone vault
-    // surface); the per-matter subset is filtered client-side below. Only
-    // this list loads — sibling sections trigger their own.
+    // Load the matter-scoped document list on open. Only this list loads —
+    // sibling sections trigger their own.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
         return;
@@ -60,8 +56,6 @@ class _MatterDocumentsSectionState extends State<MatterDocumentsSection> {
           onRetry: () => context.read<MatterWorkspaceCubit>().loadDocuments(),
           errorCopy: l10n.vaultError,
           emptyCopy: l10n.matterWorkspaceDocumentsEmpty,
-          matterRef: widget.matterRef,
-          matterRefOf: (Document document) => document.matterRef,
           itemBuilder: (BuildContext context, Document document) => AppTile(
             title: demoDocumentTitle(l10n, document.title),
             subtitles: <String>[

@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import '../errors/app_error.dart';
+import 'package:legalhub/core/errors/app_error.dart';
 
 abstract interface class ErrorReporter {
   Future<void> report(AppError error);
@@ -29,6 +29,13 @@ class Redactor {
     'pwd',
     'email',
     'phone',
+    // Identity and matter/document metadata: a remote sink must never retain
+    // a person's name or a privileged title verbatim.
+    'name',
+    'display_name',
+    'title',
+    'matter_title',
+    'document_title',
     // Payments: provider handles/tokens and card data must never be retained
     // in diagnostics (PCI surface stays structural).
     'payment_token',
@@ -46,6 +53,18 @@ class Redactor {
     r'Bearer\s+\S+',
     caseSensitive: false,
   );
+  // E.164-ish (`+20 100 123 4567`, `+1-555-123-4567`) and local numbers with
+  // separators (`0100 123 4567`, `(555) 123-4567`). Requiring either a `+`
+  // country prefix or separators keeps bare ids/dates from being swallowed.
+  static final RegExp _phonePattern = RegExp(
+    r'(?<![\w.])'
+    r'(?:'
+    r'\+\d{1,3}[\s.-]?\(?\d{1,4}\)?(?:[\s.-]?\d){5,12}'
+    r'|'
+    r'\(?\d{2,4}\)?[\s.-]\d{2,4}[\s.-]\d{3,4}'
+    r')'
+    r'(?![\w.])',
+  );
 
   static Map<String, Object?> map(Map<String, Object?> input) =>
       <String, Object?>{
@@ -60,7 +79,8 @@ class Redactor {
     if (value is String) {
       return value
           .replaceAll(_emailPattern, '[REDACTED_EMAIL]')
-          .replaceAll(_bearerPattern, 'Bearer [REDACTED]');
+          .replaceAll(_bearerPattern, 'Bearer [REDACTED]')
+          .replaceAll(_phonePattern, '[REDACTED_PHONE]');
     }
     if (value is Map) {
       return <String, Object?>{
@@ -105,9 +125,6 @@ class CompositeErrorReporter implements ErrorReporter {
 
   final List<ErrorReporter> _delegates;
 
-  /// Sinks that threw during fan-out. Best-effort must stay observable.
-  int droppedReports = 0;
-
   @override
   Future<void> report(AppError error) async {
     for (final ErrorReporter delegate in _delegates) {
@@ -115,7 +132,6 @@ class CompositeErrorReporter implements ErrorReporter {
         await delegate.report(error);
       } on Object {
         // Best-effort: a failing sink must not break error reporting.
-        droppedReports++;
       }
     }
   }

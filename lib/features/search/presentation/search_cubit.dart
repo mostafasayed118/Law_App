@@ -1,23 +1,24 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/practice_area.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/discovery/domain/attorney.dart';
+import 'package:legalhub/features/discovery/domain/attorney_gateway.dart';
+import 'package:legalhub/features/documents/domain/document.dart';
+import 'package:legalhub/features/documents/domain/document_gateway.dart';
+import 'package:legalhub/features/documents/presentation/document_labels.dart';
+import 'package:legalhub/features/matters/domain/matter.dart';
+import 'package:legalhub/features/matters/domain/matter_gateway.dart';
+import 'package:legalhub/features/matters/presentation/matter_labels.dart'
+    show matterStatusLabel;
+import 'package:legalhub/features/messaging/domain/message_gateway.dart';
+import 'package:legalhub/features/messaging/domain/message_thread.dart';
+import 'package:legalhub/features/search/domain/search_results.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/demo_labels.dart';
+import 'package:legalhub/shared/widgets/practice_area_label.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../../../core/practice_area.dart';
-import '../../../core/state/view_state.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/demo_labels.dart';
-import '../../../shared/widgets/practice_area_label.dart';
-import '../../discovery/domain/attorney.dart';
-import '../../discovery/domain/attorney_gateway.dart';
-import '../../documents/domain/document.dart';
-import '../../documents/domain/document_gateway.dart';
-import '../../documents/presentation/document_labels.dart';
-import '../../matters/domain/matter.dart';
-import '../../matters/domain/matter_gateway.dart';
-import '../../matters/presentation/matter_labels.dart' show matterStatusLabel;
-import '../../messaging/domain/message_gateway.dart';
-import '../../messaging/domain/message_thread.dart';
-import '../domain/search_results.dart';
 import 'search_state.dart';
 
 /// Owns the unified search surface (Phase 11, slice 11.0, owner decision D-S1).
@@ -32,18 +33,15 @@ import 'search_state.dart';
 /// they never call the gateways directly.
 ///
 /// Each group is truncated to [searchPageSize] rows so the results surface
-/// (an eager tile build) never renders more than 4 pages of tiles — and the
-/// same bound caps the transfer: the three Supabase-backed gateways receive
-/// it as their server-side title-prefilter page size, so a query moves at
-/// most 4 pages of candidate rows, not four capped full lists (audit:
-/// search fan-out). The exact full-matching pass below stays the arbiter
-/// client-side, so the "top-N per group" contract is preserved.
+/// (an eager tile build) never renders more than 4 pages of tiles. The
+/// Supabase-backed gateways fetch their bounded newest-first page (the
+/// shared 200-row cap) and the exact full-matching pass below refines it
+/// client-side — the title-only SQL prefilter was deliberately dropped
+/// because it discarded status/practice-area/localized-label matches.
 ///
-/// Recall caveat callers must know: on a real backend the prefilter is
-/// title-only, so a label-only match (e.g. a matter whose title does NOT
-/// contain the query but whose localized status does) reaches the refiner
-/// only when its title also matched the prefilter. Fakes (dev/tests) show
-/// the ideal — full-list candidates, exact results.
+/// Recall caveat callers must know: on a real backend a match outside the
+/// bounded page is not seen (the page, not the query, is the recall bound).
+/// Fakes (dev/tests) show the ideal — full-list candidates, exact results.
 ///
 /// Metadata only: matching fields are matter title/status/practice-area,
 /// document title/type/`matterRef`, thread title/participants/`matterRef`,
@@ -58,9 +56,9 @@ class SearchCubit extends Cubit<SearchState> {
   ) : super(const SearchState());
 
   /// Maximum rows kept per result group (bounds the eager tile build to
-  /// 4 × 30 tiles AND the server-side prefilter page per gateway).
-  /// Mirrors `kSearchPageSize` without importing the data layer —
-  /// presentation must never depend on `lib/data/` (layer rule).
+  /// 4 × 30 tiles). Mirrors the shared 30-row search page size without
+  /// importing the data layer — presentation must never depend on
+  /// `lib/data/` (layer rule). The server reads the shared 200-row page.
   static const int searchPageSize = 30;
 
   final MatterGateway _matterGateway;
@@ -119,14 +117,12 @@ class SearchCubit extends Cubit<SearchState> {
     if (state.results is! ViewLoading<SearchResults>) {
       emit(state.copyWith(results: const ViewLoading<SearchResults>()));
     }
-    // Server-side prefilter + client-side refine (audit: search fan-out):
-    // the three Supabase-backed gateways push a recall-oriented title
-    // prefilter to the server (first page of ilike matches, newest-first)
-    // bounded by the same effective limit that bounds the rendered groups;
-    // in-memory backends return their full list at no transfer cost. The
-    // exact full-matching pass below (raw needle AND localized
-    // projections) stays the arbiter, so "top-N per group" semantics are
-    // preserved.
+    // Bounded page + client-side refine (audit: search fan-out): the three
+    // Supabase-backed gateways read the shared bounded newest-first page
+    // (cap 200); the title-only SQL prefilter was deliberately dropped
+    // because it discarded the status/practice-area/localized-label
+    // matches this matcher covers. The exact full-matching pass below
+    // stays the arbiter and the requested limit bounds the rendered groups.
     final int effectiveLimit = limit <= 0 ? searchPageSize : limit;
     final (
       Result<List<Matter>> matters,

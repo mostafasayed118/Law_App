@@ -1,4 +1,4 @@
-import '../../../core/errors/result.dart';
+import 'package:legalhub/core/errors/result.dart';
 import 'invoice.dart';
 
 /// Billing integration boundary (ninth §14 un-deferral, billing slice
@@ -20,5 +20,9 @@ abstract interface class BillingGateway {
   /// the invoice's org AND assigned on its matter, matrix §4 — the
   /// `invoices_select_assigned` RLS gate server-side). Deterministic and
   /// read-only.
-  Future<Result<List<Invoice>>> fetchInvoices();
+  ///
+  /// [matterId] scopes the read server-side (the workspace passes the open
+  /// matter's id); null keeps the caller's full list, so existing callers are
+  /// unchanged.
+  Future<Result<List<Invoice>>> fetchInvoices({String? matterId});
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../app/legalhub_theme.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
 
 /// A horizontally scrollable row of [FilterChip]s for single-select filters:
 /// an "All" chip (clears the selection) followed by one chip per enum value.

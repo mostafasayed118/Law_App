@@ -11,10 +11,12 @@
 --     (26.03-26.05);
 --   - booking-linked create positive and a cross-org booking denial
 --     (26.06-26.07);
---   - member list scoping, cross-org list denial (26.08-26.09);
---   - get scoping, cross-org get denial and the typed not-found (26.10);
---   - member mark-live positive + audit, terminal/live mark-live denials
---     (26.11-26.12);
+--   - participant-scoped list/get (partner sees the org, the creator/matter
+--     reader reads its own session, the booking client reads theirs, an
+--     unrelated active member reads none), cross-org list denial
+--     (26.08-26.10);
+--   - booking-client mark-live positive + audit, terminal/live mark-live
+--     denials (26.11-26.12);
 --   - end by creator positive, end by partner positive, unrelated-client
 --     denial (26.13-26.15);
 --   - direct INSERT/UPDATE/DELETE denied at the privilege layer (26.16);
@@ -505,41 +507,67 @@ begin
 end $$;
 
 -- ############################################################################
--- 26.08 — POS (list scoping): partner-a, client-a and the generated
--- attorney read the five org-a sessions; partner-b reads only org-b's one.
+-- 26.08 — POS/NEG (participant-scoped list): partner-a reads the five org-a
+-- sessions (partner); client-a reads only the booking-linked session;
+-- the generated attorney reads only the session they created on their
+-- matter; orphan (active org-a member, assigned only on matter 4) reads
+-- none; partner-b reads only org-b's one. Direct selects exercise the same
+-- policy.
 -- ############################################################################
 set role authenticated;
 do $$
 declare
-  v_partner bigint;
-  v_client  bigint;
+  v_partner  bigint;
+  v_client   bigint;
   v_attorney bigint;
-  v_cross   bigint;
+  v_orphan   bigint;
+  v_cross    bigint;
+  v_direct   bigint;
 begin
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000002', false);
   perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002"}', false);
   select count(*) into v_partner
     from public.list_video_sessions('20000000-0000-4000-8000-000000000001');
+  select count(*) into v_direct from public.video_sessions;
+  if v_partner <> 5 or v_direct <> 5 then
+    raise exception 'POLICY-BATTERY FAIL 26.08: partner-a sees % rpc / % direct, want 5/5', v_partner, v_direct;
+  end if;
 
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000003', false);
   perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000003"}', false);
   select count(*) into v_client
     from public.list_video_sessions('20000000-0000-4000-8000-000000000001');
+  select count(*) into v_direct from public.video_sessions;
+  if v_client <> 1 or v_direct <> 1 then
+    raise exception 'POLICY-BATTERY FAIL 26.08: client-a sees % rpc / % direct, want 1/1', v_client, v_direct;
+  end if;
 
   perform set_config('request.jwt.claim.sub', current_setting('battery26.attorney'), false);
   perform set_config('request.jwt.claims',
     json_build_object('sub', current_setting('battery26.attorney'))::text, false);
   select count(*) into v_attorney
     from public.list_video_sessions('20000000-0000-4000-8000-000000000001');
+  select count(*) into v_direct from public.video_sessions;
+  if v_attorney <> 1 or v_direct <> 1 then
+    raise exception 'POLICY-BATTERY FAIL 26.08: attorney sees % rpc / % direct, want 1/1', v_attorney, v_direct;
+  end if;
+
+  perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000007', false);
+  perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000007"}', false);
+  select count(*) into v_orphan
+    from public.list_video_sessions('20000000-0000-4000-8000-000000000001');
+  select count(*) into v_direct from public.video_sessions;
+  if v_orphan <> 0 or v_direct <> 0 then
+    raise exception 'POLICY-BATTERY FAIL 26.08: unrelated active member sees % rpc / % direct, want 0/0', v_orphan, v_direct;
+  end if;
 
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000004', false);
   perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000004"}', false);
   select count(*) into v_cross
     from public.list_video_sessions('20000000-0000-4000-8000-000000000002');
-
-  if v_partner <> 5 or v_client <> 5 or v_attorney <> 5 or v_cross <> 1 then
-    raise exception 'POLICY-BATTERY FAIL 26.08: list scoping drift (partner %, client %, attorney %, cross %)',
-      v_partner, v_client, v_attorney, v_cross;
+  select count(*) into v_direct from public.video_sessions;
+  if v_cross <> 1 or v_direct <> 1 then
+    raise exception 'POLICY-BATTERY FAIL 26.08: partner-b sees % rpc / % direct, want 1/1', v_cross, v_direct;
   end if;
 end $$;
 reset role;
@@ -582,24 +610,24 @@ end $$;
 reset role;
 
 -- ############################################################################
--- 26.10 — POS/NEG (get scoping): client-a reads the org-a seed; partner-a
--- is denied the org-b seed; a random id raises the typed not-found.
+-- 26.10 — POS/NEG (participant-scoped get): partner-a reads the org-a seed;
+-- client-a is denied that seed (unrelated active member) but reads the
+-- booking-linked session; partner-a is denied the org-b seed; a random id
+-- raises the typed not-found.
 -- ############################################################################
 set role authenticated;
 do $$
 declare
   v_row public.video_sessions;
 begin
-  perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000003', false);
-  perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000003"}', false);
+  perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000002', false);
+  perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002"}', false);
   v_row := public.get_video_session(current_setting('battery26.seed_a')::uuid);
   if v_row.id is distinct from current_setting('battery26.seed_a')::uuid
      or v_row.organization_id <> '20000000-0000-4000-8000-000000000001' then
-    raise exception 'POLICY-BATTERY FAIL 26.10: client-a get drift: %', row_to_json(v_row);
+    raise exception 'POLICY-BATTERY FAIL 26.10: partner-a get drift: %', row_to_json(v_row);
   end if;
 
-  perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000002', false);
-  perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002"}', false);
   begin
     perform public.get_video_session(current_setting('battery26.seed_b')::uuid);
     raise exception 'POLICY-BATTERY FAIL 26.10: partner-a cross-org get succeeded';
@@ -623,12 +651,32 @@ begin
       raise exception 'POLICY-BATTERY FAIL 26.10: missing get raised "%"', sqlerrm;
     end if;
   end;
+
+  perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000003', false);
+  perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000003"}', false);
+  begin
+    perform public.get_video_session(current_setting('battery26.seed_a')::uuid);
+    raise exception 'POLICY-BATTERY FAIL 26.10: unrelated client-a get succeeded';
+  exception when raise_exception then
+    if sqlerrm like '%POLICY-BATTERY FAIL%' then
+      raise;
+    end if;
+    if sqlerrm <> 'permission denied' then
+      raise exception 'POLICY-BATTERY FAIL 26.10: unrelated get raised "%"', sqlerrm;
+    end if;
+  end;
+
+  v_row := public.get_video_session(current_setting('battery26.session_booking')::uuid);
+  if v_row.id is distinct from current_setting('battery26.session_booking')::uuid
+     or v_row.booking_id is distinct from 'e0000000-0000-4000-8000-000000000001' then
+    raise exception 'POLICY-BATTERY FAIL 26.10: booking-client get drift: %', row_to_json(v_row);
+  end if;
 end $$;
 reset role;
 
 -- ############################################################################
--- 26.11 — POS (member mark-live + audit): client-a is an active org-a member
--- and starts partner-a's scheduled session.
+-- 26.11 — POS (booking-client mark-live + audit): client-a is the client on
+-- the session's linked booking and starts that scheduled session.
 -- ############################################################################
 set role authenticated;
 do $$
@@ -636,13 +684,13 @@ begin
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000003', false);
   perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000003"}', false);
   perform public.mark_video_session_live(
-    current_setting('battery26.session_partner')::uuid);
+    current_setting('battery26.session_booking')::uuid);
 end $$;
 reset role;
 
 do $$
 declare
-  v_id  uuid := current_setting('battery26.session_partner')::uuid;
+  v_id  uuid := current_setting('battery26.session_booking')::uuid;
   v_row public.video_sessions;
   v_aud bigint;
   v_bad bigint;
@@ -700,7 +748,7 @@ begin
   end;
 
   begin
-    perform public.mark_video_session_live(current_setting('battery26.session_partner')::uuid);
+    perform public.mark_video_session_live(current_setting('battery26.session_booking')::uuid);
     raise exception 'POLICY-BATTERY FAIL 26.12: mark-live on live succeeded';
   exception when raise_exception then
     if sqlerrm like '%POLICY-BATTERY FAIL%' then
@@ -725,7 +773,7 @@ begin
 end $$;
 
 -- ############################################################################
--- 26.13 — POS (end by creator): partner-a ends the scheduled booking-linked
+-- 26.13 — POS (end by creator): partner-a ends the live booking-linked
 -- session they created.
 -- ############################################################################
 set role authenticated;
@@ -789,8 +837,9 @@ end $$;
 
 -- ############################################################################
 -- 26.15 — NEG (unrelated client end): client-a is an active member but is
--- neither the creator nor a partner — the live session stays live and no
--- audit row is written.
+-- neither the creator nor a partner — and holds no participant access to
+-- this session — so the scheduled session stays scheduled and no audit row
+-- is written.
 -- ############################################################################
 set role authenticated;
 do $$
@@ -818,7 +867,8 @@ declare
 begin
   select * into v_row from public.video_sessions
    where id = current_setting('battery26.session_partner')::uuid;
-  if v_row.status <> 'live' or v_row.ended_at is not null then
+  if v_row.status <> 'scheduled' or v_row.ended_at is not null
+     or v_row.started_at is not null then
     raise exception 'POLICY-BATTERY FAIL 26.15: denied end changed state: %', row_to_json(v_row);
   end if;
   select count(*) into v_aud
@@ -873,7 +923,7 @@ begin
   select * into v_row from public.video_sessions
    where id = current_setting('battery26.session_partner')::uuid;
   select count(*) into v_cnt from public.video_sessions;
-  if v_row.status <> 'live' or v_cnt <> 6 then
+  if v_row.status <> 'scheduled' or v_cnt <> 6 then
     raise exception 'POLICY-BATTERY FAIL 26.16: direct-write denials changed state (status %, sessions %)',
       v_row.status, v_cnt;
   end if;
@@ -1069,7 +1119,7 @@ begin
     from public.video_sessions where organization_id = '20000000-0000-4000-8000-000000000001';
   select count(*) into v_org_b
     from public.video_sessions where organization_id = '20000000-0000-4000-8000-000000000002';
-  if v_sessions <> 6 or v_scheduled <> 2 or v_ended <> 3 or v_org_a <> 5 or v_org_b <> 1 then
+  if v_sessions <> 6 or v_scheduled <> 3 or v_ended <> 3 or v_org_a <> 5 or v_org_b <> 1 then
     raise exception 'POLICY-BATTERY FAIL 26.19: session census drift (total %, scheduled %, ended %, org-a %, org-b %)',
       v_sessions, v_scheduled, v_ended, v_org_a, v_org_b;
   end if;
@@ -1077,18 +1127,20 @@ begin
   if not exists (
     select 1 from public.video_sessions
      where id = current_setting('battery26.session_partner')::uuid
-       and status = 'live'
+       and status = 'scheduled'
+       and started_at is null
        and ended_at is null
   ) then
-    raise exception 'POLICY-BATTERY FAIL 26.19: session_partner is not the expected live session';
+    raise exception 'POLICY-BATTERY FAIL 26.19: session_partner is not the expected scheduled session';
   end if;
 
   if not exists (
     select 1 from public.video_sessions
      where id = current_setting('battery26.session_booking')::uuid
        and booking_id = 'e0000000-0000-4000-8000-000000000001'
+       and status = 'ended'
   ) then
-    raise exception 'POLICY-BATTERY FAIL 26.19: booking link was not persisted';
+    raise exception 'POLICY-BATTERY FAIL 26.19: booking link/status was not persisted';
   end if;
 end $$;
 

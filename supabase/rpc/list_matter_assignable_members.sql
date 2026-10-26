@@ -21,8 +21,15 @@
 -- Projection is deliberately minimal: user_id + display_name only — no email,
 -- no invitation token, no role. Read-only: this path writes NO audit row (§8
 -- audits writes; the roster read has no side effects).
+--
+-- Bounded 2026-10-24 (D2): p_limit/p_offset default to 200/0 and are clamped
+-- server-side to 1..500 and >= 0; the existing p_matter_id call stays valid.
 
-create or replace function public.list_matter_assignable_members(p_matter_id uuid)
+create or replace function public.list_matter_assignable_members(
+  p_matter_id uuid,
+  p_limit     int default 200,
+  p_offset    int default 0
+)
 returns table (
   user_id      uuid,
   display_name text
@@ -50,7 +57,11 @@ language sql stable security definer set search_path = public as $$
       where pc.owner_user_id = mb.user_id
    )
    order by coalesce(nullif(btrim(p.display_name), ''), 'Member'), mb.user_id
+   limit least(greatest(coalesce(p_limit, 200), 1), 500)
+   offset greatest(coalesce(p_offset, 0), 0)
 $$;
 
-revoke execute on function public.list_matter_assignable_members(uuid) from public, anon;
-grant execute on function public.list_matter_assignable_members(uuid) to authenticated;
+drop function if exists public.list_matter_assignable_members(uuid);
+
+revoke execute on function public.list_matter_assignable_members(uuid, int, int) from public, anon;
+grant execute on function public.list_matter_assignable_members(uuid, int, int) to authenticated;

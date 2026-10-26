@@ -1,7 +1,7 @@
-import '../../core/errors/app_error.dart';
-import '../../core/errors/result.dart';
-import '../../features/billing/domain/billing_gateway.dart';
-import '../../features/billing/domain/invoice.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/billing/domain/billing_gateway.dart';
+import 'package:legalhub/features/billing/domain/invoice.dart';
 import 'supabase_billing_api.dart';
 
 /// [BillingGateway] backed by the Supabase provider via [SupabaseBillingApi].
@@ -26,9 +26,11 @@ class SupabaseBillingGateway implements BillingGateway {
   final SupabaseBillingApi _api;
 
   @override
-  Future<Result<List<Invoice>>> fetchInvoices() async {
+  Future<Result<List<Invoice>>> fetchInvoices({String? matterId}) async {
     try {
-      final List<Map<String, dynamic>> rows = await _api.fetchInvoices();
+      final List<Map<String, dynamic>> rows = await _api.fetchInvoices(
+        matterId: matterId,
+      );
       return Result<List<Invoice>>.success(
         List<Invoice>.unmodifiable(rows.map(_invoiceFromRow)),
       );
@@ -93,6 +95,7 @@ class SupabaseBillingGateway implements BillingGateway {
       // absent embed falls back to the raw matter id, never a fabricated
       // title (the listMyMemberships null-embed pattern).
       matterRef: _matterRefFromRow(row, matterId),
+      matterId: matterId,
       invoiceNumber: invoiceNumber,
       amountCents: amountCents,
       currency: currency,

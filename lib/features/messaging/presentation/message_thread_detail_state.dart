@@ -1,7 +1,8 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/state/view_state.dart';
-import '../domain/message.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/messaging/domain/message.dart';
 
 /// Immutable state of the thread-detail surface (sixth §14 un-deferral,
 /// realtime slice D-RT5; write + live-delivery surface realtime push slice
@@ -25,8 +26,9 @@ class MessageThreadDetailState extends Equatable {
   /// True while a send is in flight (the composer's button is disabled).
   final bool sending;
 
-  /// A failed send's user-facing message, cleared on the next send attempt.
-  final String? sendError;
+  /// A failed send's typed error, cleared on the next send attempt. The
+  /// composer maps it to localized copy at render time.
+  final AppError? sendError;
 
   static const Object _unset = Object();
 
@@ -40,7 +42,7 @@ class MessageThreadDetailState extends Equatable {
       sending: sending ?? this.sending,
       sendError: identical(sendError, _unset)
           ? this.sendError
-          : sendError as String?,
+          : sendError as AppError?,
     );
   }
 

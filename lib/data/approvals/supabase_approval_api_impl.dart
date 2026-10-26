@@ -1,7 +1,7 @@
+import 'package:legalhub/data/postgrest_failures.dart';
+import 'package:legalhub/data/supabase_seam.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../postgrest_failures.dart';
-import '../supabase_seam.dart';
 import 'supabase_approval_api.dart';
 
 /// A PostgREST RPC call: function name + named params → response.
@@ -133,7 +133,7 @@ class SupabaseApprovalApiImpl implements SupabaseApprovalApi {
       rethrow;
     } on PostgrestException catch (e) {
       throw SupabaseApprovalException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       throw const SupabaseApprovalException(
         kind: SupabaseApprovalFailureKind.providerUnavailable,
         message: 'Provider unavailable.',

@@ -1,8 +1,8 @@
-import '../../core/errors/app_error.dart';
-import '../../core/errors/result.dart';
-import '../../features/video/domain/video_gateway.dart';
-import '../../features/video/domain/video_session.dart';
-import '../../features/video/domain/video_token.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/video/domain/video_gateway.dart';
+import 'package:legalhub/features/video/domain/video_session.dart';
+import 'package:legalhub/features/video/domain/video_token.dart';
 import 'supabase_video_api.dart';
 
 /// Video gateway backed by the five audited RPCs + `video-token` (design §6).

@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/state/view_state.dart';
-import '../domain/search_results.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/search/domain/search_results.dart';
 
 /// Immutable state of the unified search surface (Phase 11, slice 11.0).
 ///

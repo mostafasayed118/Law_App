@@ -71,8 +71,28 @@ void main() {
       expect(notification.category, NotificationCategory.activity);
       expect(notification.type, 'matter_updated');
       expect(notification.summary, 'Demo notification — matter status update');
-      expect(notification.serverTimestamp, DateTime.utc(2026, 7, 18, 14, 5));
+      expect(
+        notification.serverTimestamp,
+        DateTime.utc(2026, 7, 18, 14, 5).toLocal(),
+      );
       expect(notification.isRead, isFalse);
+    });
+
+    test('maps server_timestamp to local time', () async {
+      api.rows = <Map<String, dynamic>>[
+        _row(serverTimestamp: DateTime.utc(2026, 7, 18, 14, 5)),
+      ];
+
+      final Notification notification =
+          (await gateway.fetchNotifications()).valueOrNull!.single;
+
+      expect(notification.serverTimestamp.isUtc, isFalse);
+      expect(
+        notification.serverTimestamp.isAtSameMomentAs(
+          DateTime.utc(2026, 7, 18, 14, 5),
+        ),
+        isTrue,
+      );
     });
 
     test('maps every D-N4 category string to its enum', () async {
@@ -272,7 +292,8 @@ void main() {
 
     test('a non-seam failure maps to the typed unavailable AppError', () async {
       api.markError = null;
-      // Force a non-seam failure path: a throwing stub (Object branch).
+      // Force a non-seam transport failure: a throwing stub (the defensive
+      // Exception branch).
       final _ThrowingApi throwing = _ThrowingApi();
       final SupabaseNotificationGateway throwingGateway =
           SupabaseNotificationGateway(throwing);
@@ -287,8 +308,8 @@ void main() {
   });
 }
 
-/// An api stub whose mark call throws a raw non-seam exception (drives the
-/// gateway's defensive Object branch without a provider).
+/// An api stub whose mark call throws a raw non-seam transport exception
+/// (drives the gateway's defensive Exception branch without a provider).
 class _ThrowingApi implements SupabaseNotificationApi {
   @override
   Future<List<Map<String, dynamic>>> fetchNotifications() async =>
@@ -296,5 +317,5 @@ class _ThrowingApi implements SupabaseNotificationApi {
 
   @override
   Future<int> markNotificationsRead(List<String> ids) async =>
-      throw StateError('transport down');
+      throw Exception('transport down');
 }

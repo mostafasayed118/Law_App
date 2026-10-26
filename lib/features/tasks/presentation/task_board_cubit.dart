@@ -1,13 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../../../core/organizations/organization_gateway.dart';
-import '../../../core/state/view_state.dart';
-import '../../matters/domain/matter.dart';
-import '../../matters/domain/matter_gateway.dart';
-import '../domain/task_gateway.dart';
-import '../domain/task_item.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/organizations/organization_gateway.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/matters/domain/matter.dart';
+import 'package:legalhub/features/matters/domain/matter_gateway.dart';
+import 'package:legalhub/features/tasks/domain/task_gateway.dart';
+import 'package:legalhub/features/tasks/domain/task_item.dart';
+import 'package:legalhub/shared/state/write_gate.dart';
 import 'task_board_state.dart';
 
 /// Owns the task-board list (v1 queue, 2026-08-09).
@@ -34,6 +35,8 @@ class TaskBoardCubit extends Cubit<TaskBoardState> {
   final TaskBoardGateway _gateway;
   final MatterGateway _matterGateway;
   final OrganizationGateway _organizationGateway;
+
+  final WriteGate _writeGate = WriteGate();
 
   bool _loading = false;
 
@@ -124,30 +127,46 @@ class TaskBoardCubit extends Cubit<TaskBoardState> {
 
   /// Runs one write: marks the row acting (a global act for create),
   /// clears the previous error, then patches the returned row into the
-  /// list on success or surfaces the failure's user message on denial.
-  /// Returns the [AppError] on failure, null on success.
+  /// list on success or surfaces the failure's typed error on denial.
+  /// Returns the [AppError] on failure, null on success. A write that loses
+  /// the in-flight race returns [WriteGate.busyError] without touching state.
   Future<AppError?> _runWrite(
     Future<Result<TaskItem>> Function() write, {
     required String? taskId,
   }) async {
+    Result<TaskItem>? writeResult;
+    bool started = false;
+    final AppError? error = await _writeGate.run<TaskItem>(
+      isClosed: () => isClosed,
+      write: () async {
+        started = true;
+        emit(state.copyWith(actionError: null, actingTaskId: taskId));
+        final Result<TaskItem> result = await write();
+        writeResult = result;
+        return result;
+      },
+      onSuccess: () async {
+        final Result<TaskItem>? result = writeResult;
+        if (result is Success<TaskItem>) {
+          emit(
+            state.copyWith(
+              tasks: _patchedTasks(result.value),
+              actingTaskId: null,
+            ),
+          );
+        }
+      },
+    );
     if (isClosed) {
-      return null;
+      return error;
     }
-    emit(state.copyWith(actionError: null, actingTaskId: taskId));
-    final Result<TaskItem> result = await write();
-    if (isClosed) {
-      return null;
+    if (!started) {
+      return error;
     }
-    switch (result) {
-      case Success<TaskItem>(value: final TaskItem updated):
-        emit(state.copyWith(tasks: _patchedTasks(updated), actingTaskId: null));
-        return null;
-      case Failure<TaskItem>(error: final AppError error):
-        emit(
-          state.copyWith(actionError: error.userMessage, actingTaskId: null),
-        );
-        return error;
+    if (error != null) {
+      emit(state.copyWith(actionError: error, actingTaskId: null));
     }
+    return error;
   }
 
   /// Returns the current success list with [updated] patched in by id

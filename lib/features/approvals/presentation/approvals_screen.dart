@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/features/approvals/domain/approvals_gateway.dart';
+import 'package:legalhub/features/approvals/domain/pending_approval.dart';
+import 'package:legalhub/features/matters/domain/matter_gateway.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
 
-import '../../../app/legalhub_theme.dart';
-import '../../../app/service_locator.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/widgets/widgets.dart';
-import '../../matters/domain/matter_gateway.dart';
-import '../domain/approvals_gateway.dart';
-import '../domain/pending_approval.dart';
 import 'approval_create_sheet.dart';
 import 'approval_detail_sheet.dart';
 import 'approval_labels.dart';

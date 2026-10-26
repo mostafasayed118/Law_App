@@ -18,6 +18,18 @@ void main() {
       expect(first, hasLength(5));
     });
 
+    test('scopes the list to one matter id', () async {
+      final FakeDocumentGateway gateway = FakeDocumentGateway();
+
+      final List<Document> documents = (await gateway.fetchDocuments(
+        matterId: 'matter-1',
+      )).valueOrNull!;
+
+      expect(documents, hasLength(1));
+      expect(documents.single.id, 'doc-1');
+      expect(documents.single.matterId, 'matter-1');
+    });
+
     test('documents carry only non-PII metadata fields (D-V4 shape)', () async {
       final FakeDocumentGateway gateway = FakeDocumentGateway();
 

@@ -1,11 +1,6 @@
 {
   "applinks": {
     "apps": [],
-    "details": [
-      {
-        "appID": "REPLACE_WITH_TEAM_ID.com.legalhub.app",
-        "paths": ["/accept-invite*", "/auth/v1/callback*"]
-      }
-    ]
+    "details": []
   }
 }

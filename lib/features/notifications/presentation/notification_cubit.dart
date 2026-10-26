@@ -1,12 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../../../core/state/view_state.dart';
-import '../domain/notification.dart';
-import '../domain/notification_gateway.dart';
-import '../domain/notification_prefs_store.dart';
-import '../domain/visible_notifications.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/notifications/domain/notification.dart';
+import 'package:legalhub/features/notifications/domain/notification_gateway.dart';
+import 'package:legalhub/features/notifications/domain/notification_prefs_store.dart';
+import 'package:legalhub/features/notifications/domain/visible_notifications.dart';
 import 'notification_state.dart';
 
 /// Owns the notification-feed list surface (notification-feed slice, D-N1).
@@ -52,9 +52,13 @@ class NotificationCubit extends Cubit<NotificationState> {
       return;
     }
     _loading = true;
-    if (state.notifications is! ViewLoading<List<Notification>>) {
+    if (state.notifications is! ViewLoading<List<Notification>> ||
+        state.actionError != null) {
       emit(
-        state.copyWith(notifications: const ViewLoading<List<Notification>>()),
+        state.copyWith(
+          notifications: const ViewLoading<List<Notification>>(),
+          actionError: null,
+        ),
       );
     }
     final Result<List<Notification>> result = await _gateway
@@ -104,14 +108,17 @@ class NotificationCubit extends Cubit<NotificationState> {
   /// place and the unread affordance reflects it immediately, with NO full
   /// feed reload (audit: the reload re-fetched the whole capped list for a
   /// single-flag change). List order is untouched (the server flip carries
-  /// no reorder signal). A failure renders the ViewError arm (the
-  /// load-failure posture) and leaves the row as-is — no optimistic flip
-  /// on a failed write, no silent drop.
+  /// no reorder signal). A failure leaves the loaded list on screen and sets
+  /// [NotificationState.actionError] instead of replacing it with an error
+  /// arm; the next mark-read or load clears it.
   Future<void> markRead(String id) async {
     if (isClosed || _loading || id.isEmpty) {
       return;
     }
     _loading = true;
+    if (state.actionError != null) {
+      emit(state.copyWith(actionError: null));
+    }
     final Result<int> result = await _gateway.markNotificationsRead(<String>[
       id,
     ]);
@@ -123,11 +130,7 @@ class NotificationCubit extends Cubit<NotificationState> {
       case Success<int>():
         _flipReadLocal(id);
       case Failure<int>(error: final AppError error):
-        emit(
-          state.copyWith(
-            notifications: viewStateForFailure<List<Notification>>(error),
-          ),
-        );
+        emit(state.copyWith(actionError: error));
     }
   }
 

@@ -1,6 +1,6 @@
+import 'package:legalhub/data/supabase_seam.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../supabase_seam.dart';
 import 'supabase_matter_write_api.dart';
 
 /// A PostgREST RPC call: function name + named params → response.
@@ -76,7 +76,7 @@ class SupabaseMatterWriteApiImpl implements SupabaseMatterWriteApi {
       rethrow;
     } on PostgrestException catch (e) {
       throw SupabaseMatterWriteException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       // Same defensive catch as the messaging impl: a non-Postgrest provider
       // failure is a typed unavailable, never a raw exception across the seam.
       throw const SupabaseMatterWriteException(

@@ -14,6 +14,18 @@ library;
 typedef BillingTableCaller =
     Future<List<Map<String, dynamic>>> Function(String table, String columns);
 
+/// A server-side matter-scoped SELECT: table + columns + matter id → raw map
+/// rows.
+///
+/// Separate callable (rather than widening [BillingTableCaller]) so existing
+/// test injections of the two-arg fetch shape keep compiling.
+typedef BillingMatterTableCaller =
+    Future<List<Map<String, dynamic>>> Function(
+      String table,
+      String columns,
+      String matterId,
+    );
+
 /// Typed reasons the invoices read can fail, mapped from the PostgREST
 /// surface. The read path is a plain RLS-scoped SELECT — the RPC-specific
 /// kinds of the organization seam cannot occur here.
@@ -55,5 +67,8 @@ abstract interface class SupabaseBillingApi {
   /// Columns requested: `id`, `matter_id`, `invoice_number`, `amount_cents`,
   /// `currency`, `status`, `issued_at`, `due_at`, `matters(title)` — the
   /// metadata-only read surface the [Invoice] VO needs (D-BI1).
-  Future<List<Map<String, dynamic>>> fetchInvoices();
+  ///
+  /// When [matterId] is present the SELECT is additionally filtered
+  /// `.eq('matter_id', matterId)` server-side.
+  Future<List<Map<String, dynamic>>> fetchInvoices({String? matterId});
 }

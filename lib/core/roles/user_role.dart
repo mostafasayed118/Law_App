@@ -14,9 +14,7 @@ enum UserRole {
 /// Adding a capability is now a two-line change: one enum value here plus
 /// one optional constructor parameter with its default below — the
 /// `roleCapabilities` map only mentions roles that differ from the default.
-/// Prefer [RoleCapability.has] over the legacy `canX` getters in new code;
-/// the getters stay as the backward-compatible read path (24 pinned test
-/// call sites construct them explicitly).
+/// Capability reads go through the `canX` getters.
 enum Capability {
   viewHome,
   viewSettings,
@@ -152,42 +150,6 @@ class RoleCapability extends Equatable {
   /// partner; denied to client, complianceOfficer, admin.
   final bool canUseAiResearch;
 
-  /// Set-membership read path for new code: `cap.has(Capability.viewAudit)`.
-  /// Equivalent to the matching `canX` getter; backed by the same fields so
-  /// both reads can never disagree.
-  bool has(Capability capability) {
-    switch (capability) {
-      case Capability.viewHome:
-        return canViewHome;
-      case Capability.viewSettings:
-        return canViewSettings;
-      case Capability.bookConsultation:
-        return canBookConsultation;
-      case Capability.viewAttorneyDiscovery:
-        return canViewAttorneyDiscovery;
-      case Capability.viewMatters:
-        return canViewMatters;
-      case Capability.viewDocuments:
-        return canViewDocuments;
-      case Capability.viewMessages:
-        return canViewMessages;
-      case Capability.viewFiles:
-        return canViewFiles;
-      case Capability.viewAudit:
-        return canViewAudit;
-      case Capability.viewNotifications:
-        return canViewNotifications;
-      case Capability.viewAlerts:
-        return canViewAlerts;
-      case Capability.viewTasks:
-        return canViewTasks;
-      case Capability.viewApprovals:
-        return canViewApprovals;
-      case Capability.useAiResearch:
-        return canUseAiResearch;
-    }
-  }
-
   /// The granted capabilities as a set. Round-trips:
   /// `RoleCapability.fromSet(cap.asSet) == cap`.
   Set<Capability> get asSet => <Capability>{
@@ -206,43 +168,6 @@ class RoleCapability extends Equatable {
     if (canViewApprovals) Capability.viewApprovals,
     if (canUseAiResearch) Capability.useAiResearch,
   };
-
-  /// Copies this capability set with selective overrides. New flags only
-  /// need a nullable parameter here — no map-wide churn.
-  RoleCapability copyWith({
-    bool? canViewHome,
-    bool? canViewSettings,
-    bool? canBookConsultation,
-    bool? canViewAttorneyDiscovery,
-    bool? canViewMatters,
-    bool? canViewDocuments,
-    bool? canViewMessages,
-    bool? canViewFiles,
-    bool? canViewAudit,
-    bool? canViewNotifications,
-    bool? canViewAlerts,
-    bool? canViewTasks,
-    bool? canViewApprovals,
-    bool? canUseAiResearch,
-  }) {
-    return RoleCapability(
-      canViewHome: canViewHome ?? this.canViewHome,
-      canViewSettings: canViewSettings ?? this.canViewSettings,
-      canBookConsultation: canBookConsultation ?? this.canBookConsultation,
-      canViewAttorneyDiscovery:
-          canViewAttorneyDiscovery ?? this.canViewAttorneyDiscovery,
-      canViewMatters: canViewMatters ?? this.canViewMatters,
-      canViewDocuments: canViewDocuments ?? this.canViewDocuments,
-      canViewMessages: canViewMessages ?? this.canViewMessages,
-      canViewFiles: canViewFiles ?? this.canViewFiles,
-      canViewAudit: canViewAudit ?? this.canViewAudit,
-      canViewNotifications: canViewNotifications ?? this.canViewNotifications,
-      canViewAlerts: canViewAlerts ?? this.canViewAlerts,
-      canViewTasks: canViewTasks ?? this.canViewTasks,
-      canViewApprovals: canViewApprovals ?? this.canViewApprovals,
-      canUseAiResearch: canUseAiResearch ?? this.canUseAiResearch,
-    );
-  }
 
   @override
   List<Object?> get props => <Object?>[

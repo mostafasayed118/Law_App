@@ -1,5 +1,5 @@
-import '../../core/organizations/organization_gateway.dart';
-import '../../core/roles/user_role.dart';
+import 'package:legalhub/core/organizations/organization_gateway.dart';
+import 'package:legalhub/core/roles/user_role.dart';
 import 'supabase_org_api.dart';
 
 part 'supabase_organization_gateway_mapping.dart';
@@ -35,7 +35,7 @@ class SupabaseOrganizationGateway implements OrganizationGateway {
       );
     } on SupabaseOrgException catch (e) {
       return OrgOutcome<OrganizationSummary>.failure(
-        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+        OrgFailure(kind: _mapKind(e.kind), message: orgRequestFailedMessage),
       );
     }
   }
@@ -49,22 +49,28 @@ class SupabaseOrganizationGateway implements OrganizationGateway {
         organizationId: organizationId,
       );
       return OrgOutcome<List<OrgMember>>.success(
-        rows.map(_memberFromRow).toList(growable: false),
+        rows.map(_memberFromRow).whereType<OrgMember>().toList(growable: false),
       );
     } on SupabaseOrgException catch (e) {
       return OrgOutcome<List<OrgMember>>.failure(
-        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+        OrgFailure(kind: _mapKind(e.kind), message: orgRequestFailedMessage),
       );
-    } on FormatException catch (e) {
-      // Provider drift (unexpected role/status name) surfaces loudly, never
-      // as a silently wrong member.
-      return OrgOutcome<List<OrgMember>>.failure(
-        OrgFailure(kind: OrgFailureKind.unknown, message: e.message),
+    } on FormatException {
+      // Provider drift (unexpected status/row shape) is a typed failure,
+      // never a silently wrong member; the internal detail stays out of UI.
+      return const OrgOutcome<List<OrgMember>>.failure(
+        OrgFailure(
+          kind: OrgFailureKind.unknown,
+          message: orgRequestFailedMessage,
+        ),
       );
-    } on TypeError catch (e) {
+    } on TypeError {
       // Defense-in-depth: no raw TypeError ever crosses the boundary.
-      return OrgOutcome<List<OrgMember>>.failure(
-        OrgFailure(kind: OrgFailureKind.unknown, message: e.toString()),
+      return const OrgOutcome<List<OrgMember>>.failure(
+        OrgFailure(
+          kind: OrgFailureKind.unknown,
+          message: orgRequestFailedMessage,
+        ),
       );
     }
   }
@@ -82,18 +88,24 @@ class SupabaseOrganizationGateway implements OrganizationGateway {
       );
     } on SupabaseOrgException catch (e) {
       return OrgOutcome<List<AssignableMember>>.failure(
-        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+        OrgFailure(kind: _mapKind(e.kind), message: orgRequestFailedMessage),
       );
-    } on FormatException catch (e) {
-      // Provider drift (unexpected row shape) surfaces loudly, never as a
+    } on FormatException {
+      // Provider drift (unexpected row shape) is a typed failure, never a
       // silently wrong assignee.
-      return OrgOutcome<List<AssignableMember>>.failure(
-        OrgFailure(kind: OrgFailureKind.unknown, message: e.message),
+      return const OrgOutcome<List<AssignableMember>>.failure(
+        OrgFailure(
+          kind: OrgFailureKind.unknown,
+          message: orgRequestFailedMessage,
+        ),
       );
-    } on TypeError catch (e) {
+    } on TypeError {
       // Defense-in-depth: no raw TypeError ever crosses the boundary.
-      return OrgOutcome<List<AssignableMember>>.failure(
-        OrgFailure(kind: OrgFailureKind.unknown, message: e.toString()),
+      return const OrgOutcome<List<AssignableMember>>.failure(
+        OrgFailure(
+          kind: OrgFailureKind.unknown,
+          message: orgRequestFailedMessage,
+        ),
       );
     }
   }
@@ -130,7 +142,7 @@ class SupabaseOrganizationGateway implements OrganizationGateway {
       );
     } on SupabaseOrgException catch (e) {
       return OrgOutcome<InviteResult>.failure(
-        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+        OrgFailure(kind: _mapKind(e.kind), message: orgRequestFailedMessage),
       );
     }
   }
@@ -191,7 +203,7 @@ class SupabaseOrganizationGateway implements OrganizationGateway {
       return OrgOutcome<String>.success(token);
     } on SupabaseOrgException catch (e) {
       return OrgOutcome<String>.failure(
-        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+        OrgFailure(kind: _mapKind(e.kind), message: orgRequestFailedMessage),
       );
     }
   }
@@ -218,7 +230,7 @@ class SupabaseOrganizationGateway implements OrganizationGateway {
       return OrgOutcome<String>.success(membershipId);
     } on SupabaseOrgException catch (e) {
       return OrgOutcome<String>.failure(
-        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+        OrgFailure(kind: _mapKind(e.kind), message: orgRequestFailedMessage),
       );
     }
   }
@@ -236,18 +248,24 @@ class SupabaseOrganizationGateway implements OrganizationGateway {
       );
     } on SupabaseOrgException catch (e) {
       return OrgOutcome<List<AuditEntry>>.failure(
-        OrgFailure(kind: _mapKind(e.kind), message: e.message),
+        OrgFailure(kind: _mapKind(e.kind), message: orgRequestFailedMessage),
       );
-    } on FormatException catch (e) {
-      // Provider drift (unexpected row shape) surfaces loudly, never as a
+    } on FormatException {
+      // Provider drift (unexpected row shape) is a typed failure, never a
       // silently wrong audit entry.
-      return OrgOutcome<List<AuditEntry>>.failure(
-        OrgFailure(kind: OrgFailureKind.unknown, message: e.message),
+      return const OrgOutcome<List<AuditEntry>>.failure(
+        OrgFailure(
+          kind: OrgFailureKind.unknown,
+          message: orgRequestFailedMessage,
+        ),
       );
-    } on TypeError catch (e) {
+    } on TypeError {
       // Defense-in-depth: no raw TypeError ever crosses the boundary.
-      return OrgOutcome<List<AuditEntry>>.failure(
-        OrgFailure(kind: OrgFailureKind.unknown, message: e.toString()),
+      return const OrgOutcome<List<AuditEntry>>.failure(
+        OrgFailure(
+          kind: OrgFailureKind.unknown,
+          message: orgRequestFailedMessage,
+        ),
       );
     }
   }

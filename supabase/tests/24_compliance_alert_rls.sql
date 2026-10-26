@@ -9,9 +9,11 @@
 --     a cross-org matter, a suspended member and anon are denied; invalid
 --     kind/severity and title/description bounds raise check_violation
 --     (24.01-24.07);
---   - list: active-member scoping, cross-org denial, newest-first ordering,
---     the exact status and severity filters, and both read policies exercised
---     directly (24.08-24.09, 24.19);
+--   - list: participant-scoped reads (partner/officer see the org queue, a
+--     matter assignee sees its alert, an unrelated active member sees none),
+--     cross-org denial, newest-first ordering, the exact status and severity
+--     filters, and both read policies exercised directly (24.08-24.09,
+--     24.19);
 --   - acknowledge: any active member positive with event + audit; a resolved
 --     alert and an already-acknowledged alert are refused (24.10-24.12);
 --   - resolve: partner and compliance-officer positives with event + audit;
@@ -517,15 +519,18 @@ end $$;
 reset role;
 
 -- ############################################################################
--- 24.08 — POS (list scoping): partner-a, client-a and the officer each read
--- the four org-a rows; partner-b reads zero org-b rows. Direct selects and
--- the event read policy are exercised too.
+-- 24.08 — POS/NEG (participant-scoped list): partner-a and the officer read
+-- the four org-a rows; client-a (assigned on matter 2) reads only the
+-- matter-2 alert; orphan (active org-a member, assigned only on matter 4)
+-- reads none; partner-b reads zero org-b rows. Direct selects and the event
+-- read policy are exercised too.
 -- ############################################################################
 set role authenticated;
 do $$
 declare
   v_total  bigint;
   v_events bigint;
+  v_only   uuid;
 begin
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000002', false);
   perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000002"}', false);
@@ -556,8 +561,18 @@ begin
   perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000003"}', false);
   select count(*) into v_total
     from public.list_compliance_alerts('20000000-0000-4000-8000-000000000001', null, null);
-  if v_total <> 4 then
-    raise exception 'POLICY-BATTERY FAIL 24.08: client-a sees % org-a rows, want 4', v_total;
+  if v_total <> 1 then
+    raise exception 'POLICY-BATTERY FAIL 24.08: client-a sees % org-a rows, want 1', v_total;
+  end if;
+  select id into v_only
+    from public.list_compliance_alerts('20000000-0000-4000-8000-000000000001', null, null);
+  if v_only is distinct from current_setting('battery24.b')::uuid then
+    raise exception 'POLICY-BATTERY FAIL 24.08: client-a sees % instead of its matter-linked alert', v_only;
+  end if;
+  select count(*) into v_total from public.compliance_alerts;
+  select count(*) into v_events from public.compliance_alert_events;
+  if v_total <> 1 or v_events <> 1 then
+    raise exception 'POLICY-BATTERY FAIL 24.08: client-a direct select drift (alerts %, events %)', v_total, v_events;
   end if;
 
   perform set_config('request.jwt.claim.sub', current_setting('battery24.officer'), false);
@@ -567,6 +582,15 @@ begin
     from public.list_compliance_alerts('20000000-0000-4000-8000-000000000001', null, null);
   if v_total <> 4 then
     raise exception 'POLICY-BATTERY FAIL 24.08: officer sees % org-a rows, want 4', v_total;
+  end if;
+
+  perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000007', false);
+  perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000007"}', false);
+  select count(*) into v_total
+    from public.list_compliance_alerts('20000000-0000-4000-8000-000000000001', null, null);
+  select count(*) into v_events from public.compliance_alerts;
+  if v_total <> 0 or v_events <> 0 then
+    raise exception 'POLICY-BATTERY FAIL 24.08: unrelated active member sees rows (rpc %, direct %)', v_total, v_events;
   end if;
 
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000004', false);

@@ -1,7 +1,7 @@
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../domain/approvals_gateway.dart';
-import '../domain/pending_approval.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/approvals/domain/approvals_gateway.dart';
+import 'package:legalhub/features/approvals/domain/pending_approval.dart';
 
 /// Development-only approvals implementation: an in-memory mutable list of
 /// five synthetic, fully-redacted demo rows.

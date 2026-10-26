@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import '../../core/errors/app_error.dart';
-import '../../core/errors/result.dart';
-import '../../features/messaging/domain/message.dart';
-import '../../features/messaging/domain/message_gateway.dart';
-import '../../features/messaging/domain/message_realtime_event.dart';
-import '../../features/messaging/domain/message_thread.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/messaging/domain/message.dart';
+import 'package:legalhub/features/messaging/domain/message_gateway.dart';
+import 'package:legalhub/features/messaging/domain/message_realtime_event.dart';
+import 'package:legalhub/features/messaging/domain/message_thread.dart';
 import 'supabase_message_api.dart';
 import 'supabase_message_realtime_api.dart';
 part 'supabase_message_gateway_base.dart';
@@ -34,8 +34,8 @@ class SupabaseMessageGateway extends _SupabaseMessageBase
   SupabaseMessageGateway(super._api, super._realtimeApi);
 
   @override
-  Future<Result<List<MessageThread>>> fetchThreads() =>
-      _runThreads(_api.fetchMessageThreads);
+  Future<Result<List<MessageThread>>> fetchThreads({String? matterId}) =>
+      _runThreads(() => _api.fetchMessageThreads(matterId: matterId));
 
   @override
   Future<Result<List<MessageThread>>> searchThreads(
@@ -97,30 +97,33 @@ class SupabaseMessageGateway extends _SupabaseMessageBase
     if (lastActivityAt is! String || lastActivityAt.isEmpty) {
       throw FormatException('Thread row has no last_activity_at');
     }
+    // D-MSR4: the embedded matters(title) join resolves under the same RLS
+    // gate (the policy guarantees the reader passes the matter check). Both
+    // fields stay null when the embed is absent — the list surface then
+    // renders no reverse link (the safe fallback, never a fabricated title).
+    final String? matterTitle = _matterTitleFromRow(row);
     return MessageThread(
       id: id,
       title: title,
-      // D-MSR4: the embedded matters(title) join resolves under the same RLS
-      // gate (the policy guarantees the reader passes the matter check); an
-      // absent embed falls back to the raw matter id, never a fabricated
-      // title (the listMyMemberships null-embed pattern).
-      matterRef: _matterRefFromRow(row, matterId),
+      matterRef: matterTitle ?? matterId,
+      matterId: matterId,
+      matterTitle: matterTitle,
       participants: _participantsFromRow(row),
       lastActivityAt: DateTime.parse(lastActivityAt).toLocal(),
       messageCount: messageCount,
     );
   }
 
-  /// Resolves the VO's title-keyed `matterRef` from the embedded
-  /// `matters(title)` select, falling back to the raw matter id (D-MSR4).
-  String _matterRefFromRow(Map<String, dynamic> row, String matterId) {
+  /// Resolves the embedded `matters(title)` value, or null when the embed is
+  /// absent/empty (D-MSR4's fallback path).
+  String? _matterTitleFromRow(Map<String, dynamic> row) {
     final Object? matters = row['matters'];
     final Object? embeddedTitle = matters is Map<String, dynamic>
         ? matters['title']
         : null;
     return (embeddedTitle is String && embeddedTitle.isNotEmpty)
         ? embeddedTitle
-        : matterId;
+        : null;
   }
 
   /// Maps the `participants` text[] column to the VO's `List<String>`.

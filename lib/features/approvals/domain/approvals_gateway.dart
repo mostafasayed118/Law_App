@@ -1,4 +1,4 @@
-import '../../../core/errors/result.dart';
+import 'package:legalhub/core/errors/result.dart';
 import 'pending_approval.dart';
 
 /// The create intent for one org-scoped approval request (design §3).

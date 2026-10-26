@@ -6,7 +6,7 @@ library;
 ///
 /// Sealed so the consumer (the app-link listener) must handle every case:
 /// an accept-invitation share link, a Supabase auth callback (owned by the
-/// provider's `detectSessionInUri` observer — this feature must NOT consume
+/// explicit data-layer `AuthCallbackObserver` — this feature must NOT consume
 /// it, to avoid double-consuming the PKCE code), or a non-app link.
 sealed class AppLinkIntent {
   const AppLinkIntent();
@@ -26,10 +26,11 @@ final class AcceptInviteIntent extends AppLinkIntent {
 }
 
 /// A Supabase auth callback URI (`com.legalhub.app://auth/v1/callback` —
-/// recovery/sign-in links). supabase_flutter's `detectSessionInUri` observer
-/// owns these; the app-link listener classifies them so it can leave them
-/// alone (the recovery half of Phase 4.1 is already shipped and routed via
-/// the `passwordRecovery` auth event).
+/// recovery/sign-in links). The explicit `AuthCallbackObserver` in
+/// `lib/data/auth/` owns these (it validates the location and exchanges the
+/// query-only PKCE code); the app-link listener classifies them so it can
+/// leave them alone (the recovery half of Phase 4.1 is already shipped and
+/// routed via the `passwordRecovery` auth event).
 final class RecoveryIntent extends AppLinkIntent {
   const RecoveryIntent();
 }
@@ -87,25 +88,6 @@ class AppLinkParser {
     return Uri(
       scheme: appScheme,
       host: acceptInviteHost,
-      queryParameters: <String, String>{'token': trimmed},
-    );
-  }
-
-  /// Verified-link twin of [acceptInviteUri]:
-  /// `https://legalhub.app/accept-invite?token=<one-time-token>`.
-  ///
-  /// Prefer this producer once the site association is deployed (see
-  /// `web/.well-known/`); `parse` round-trips both shapes to the identical
-  /// `AcceptInviteIntent`.
-  static Uri acceptInviteHttpsUri(String token) {
-    final String trimmed = token.trim();
-    if (trimmed.isEmpty) {
-      throw ArgumentError.value(token, 'token', 'must be a non-empty token');
-    }
-    return Uri(
-      scheme: 'https',
-      host: verifiedHost,
-      path: '/$acceptInviteHost',
       queryParameters: <String, String>{'token': trimmed},
     );
   }

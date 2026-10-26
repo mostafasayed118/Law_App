@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../app/legalhub_theme.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
 
 /// A standardized list row card: an optional leading (avatar or icon), a
 /// title/subtitle pair, an optional trailing widget (e.g., a status-chip

@@ -1,7 +1,7 @@
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../domain/task_gateway.dart';
-import '../domain/task_item.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/tasks/domain/task_gateway.dart';
+import 'package:legalhub/features/tasks/domain/task_item.dart';
 
 /// Development-only task-board implementation: a fixed synthetic list of 5
 /// deterministic non-PII task rows (v1 queue, 2026-08-09) plus an

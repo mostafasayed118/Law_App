@@ -5,8 +5,9 @@
 --
 -- Gates (row locked FOR UPDATE):
 --   - the session must exist ('video session not found');
---   - the caller must be an ACTIVE MEMBER of the session's organization
---     ('permission denied') — any active member may start the call;
+--   - public.can_access_video_session must pass ('permission denied'): the
+--     caller is an active member of the session's organization AND a partner,
+--     the creator, a linked-matter reader, or the linked booking's client;
 --   - ended/cancelled raises 'video session has already ended';
 --   - only 'scheduled' can transition; a live session raises
 --     'video session is not scheduled'.
@@ -31,7 +32,7 @@ begin
   if v_org is null then
     raise exception 'video session not found';
   end if;
-  if not public.is_active_member(v_org) then
+  if not public.can_access_video_session(p_id) then
     raise exception 'permission denied';
   end if;
   if v_status in ('ended', 'cancelled') then

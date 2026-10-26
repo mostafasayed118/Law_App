@@ -1,8 +1,8 @@
-import '../../core/errors/app_error.dart';
-import '../../core/errors/result.dart';
-import '../../features/billing/domain/payment_gateway.dart';
-import '../../features/billing/domain/payment_session.dart';
-import '../../features/billing/domain/payment_status.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/billing/domain/payment_gateway.dart';
+import 'package:legalhub/features/billing/domain/payment_session.dart';
+import 'package:legalhub/features/billing/domain/payment_status.dart';
 import 'supabase_payment_api.dart';
 
 /// [PaymentGateway] backed by the payments slice's server contract.

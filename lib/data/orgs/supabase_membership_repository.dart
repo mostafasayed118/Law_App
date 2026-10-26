@@ -1,19 +1,21 @@
-import '../../core/auth/session.dart';
-import '../../core/observability/app_log.dart';
-import '../../core/organizations/membership_repository.dart';
-import '../../core/organizations/organization_models.dart';
-import '../../core/roles/user_role.dart';
+import 'package:legalhub/core/auth/session.dart';
+import 'package:legalhub/core/observability/app_log.dart';
+import 'package:legalhub/core/organizations/membership_repository.dart';
+import 'package:legalhub/core/organizations/organization_models.dart';
+import 'package:legalhub/core/roles/user_role.dart';
 import 'supabase_org_api.dart';
 
 /// [MembershipRepository] backed by the RLS-scoped SELECT surface
 /// ([SupabaseOrgApi.listMyMemberships]).
 ///
 /// Row → [OrganizationMembership] mapping happens here, strictly below the
-/// domain seam: role/status go through the existing server-name mappers
-/// (D-T5), unknown schema roles/statuses are **dropped loudly** (D-P32.1 —
-/// never projected as a capability the client does not understand), and a
-/// null org name (suspended/removed membership) is tolerated per the plan
-/// §6 name-resolution note. No DTOs or tokens cross this boundary.
+/// domain seam: rows not owned by the caller's `user_id` are dropped (the
+/// memberships policy also admits active co-members), role/status go through
+/// the existing server-name mappers (D-T5), unknown schema roles/statuses are
+/// **dropped loudly** (D-P32.1 — never projected as a capability the client
+/// does not understand), and a null org name (suspended/removed membership)
+/// is tolerated per the plan §6 name-resolution note. No DTOs or tokens cross
+/// this boundary.
 ///
 /// A provider read failure is a typed [HydrationFailed] (never a fabricated
 /// membership, never a session invalidation) so the cubit seam can surface
@@ -28,10 +30,21 @@ class SupabaseMembershipRepository implements MembershipRepository {
     required String userId,
   }) async {
     try {
-      final List<Map<String, dynamic>> rows = await _api.listMyMemberships();
+      final List<Map<String, dynamic>> rows = await _api.listMyMemberships(
+        userId: userId,
+      );
       final List<OrganizationMembership> memberships =
           <OrganizationMembership>[];
       for (final Map<String, dynamic> row in rows) {
+        // Own-membership only: the RLS policy also exposes active
+        // co-members' rows, so a foreign row must never be mapped into this
+        // session (another member's role is not the caller's role).
+        if (row['user_id'] != userId) {
+          AppLog.diagnostic(
+            'membership hydration: dropping a row for a different user',
+          );
+          continue;
+        }
         final OrganizationMembership? membership = _fromRow(row);
         if (membership != null) {
           memberships.add(membership);
@@ -40,7 +53,7 @@ class SupabaseMembershipRepository implements MembershipRepository {
       return HydrationSucceeded(memberships);
     } on SupabaseOrgException catch (e) {
       return HydrationFailed(_mapFailureKind(e.kind));
-    } on Object {
+    } on Exception {
       // R6 (2026-09-24): a transport failure (timeout/offline/closed client)
       // is a typed unavailable, never a raw exception across the seam (the
       // matter/document/message api impls' defensive-catch precedent). The

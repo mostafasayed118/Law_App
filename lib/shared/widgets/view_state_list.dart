@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../app/legalhub_theme.dart';
-import '../../core/state/view_state.dart';
-import '../../l10n/app_localizations.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
 
 part 'view_state_success_list.dart';
 

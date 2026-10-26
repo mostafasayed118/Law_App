@@ -1,5 +1,5 @@
-import '../../../l10n/app_localizations.dart';
-import '../domain/matter.dart';
+import 'package:legalhub/features/matters/domain/matter.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
 
 /// Localized label for a [MatterStatus], shared by the list surface (and the
 /// slice 7.2 details surface).

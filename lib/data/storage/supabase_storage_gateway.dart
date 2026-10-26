@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 
-import '../../core/errors/app_error.dart';
-import '../../core/errors/result.dart';
-import '../../features/storage/domain/file_metadata.dart';
-import '../../features/storage/domain/storage_gateway.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/storage/domain/file_metadata.dart';
+import 'package:legalhub/features/storage/domain/storage_gateway.dart';
 import 'supabase_storage_api.dart';
 
 /// [StorageGateway] backed by the Supabase provider via [SupabaseStorageApi].
@@ -20,9 +20,11 @@ class SupabaseStorageGateway implements StorageGateway {
   final SupabaseStorageApi _api;
 
   @override
-  Future<Result<List<FileMetadata>>> fetchFiles() async {
+  Future<Result<List<FileMetadata>>> fetchFiles({String? matterId}) async {
     try {
-      final List<Map<String, dynamic>> rows = await _api.fetchFiles();
+      final List<Map<String, dynamic>> rows = await _api.fetchFiles(
+        matterId: matterId,
+      );
       return Result<List<FileMetadata>>.success(
         List<FileMetadata>.unmodifiable(rows.map(_fileFromRow)),
       );
@@ -199,6 +201,7 @@ class SupabaseStorageGateway implements StorageGateway {
       matterRef: (matterTitle != null && matterTitle.isNotEmpty)
           ? matterTitle
           : _matterRefFromRow(row, matterId),
+      matterId: matterId,
       mimeType: mimeType,
       sizeBytes: sizeBytes,
       storagePath: storagePath,

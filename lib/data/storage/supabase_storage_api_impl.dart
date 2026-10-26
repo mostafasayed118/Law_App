@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 
+import 'package:legalhub/data/postgrest_failures.dart';
+import 'package:legalhub/data/supabase_seam.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../postgrest_failures.dart';
-import '../supabase_seam.dart';
 import 'supabase_storage_api.dart';
 
 /// [SupabaseStorageApi] backed by PostgREST + Storage.
@@ -16,11 +16,13 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
   SupabaseStorageApiImpl(
     this._table, {
     StorageMatterCaller? matterCaller,
+    StorageMatterTableCaller? matterTableCaller,
     StorageObjectUploader? objectUploader,
     StorageSignedUrlCreator? signedUrlCreator,
     StorageObjectRemover? objectRemover,
     StorageRpcCaller? rpcCaller,
   }) : _matterCaller = matterCaller ?? _boundMatter,
+       _matterTable = matterTableCaller ?? _boundMatterTable,
        _objectUploader = objectUploader ?? _boundUpload,
        _signedUrlCreator = signedUrlCreator ?? _boundSignedUrl,
        _objectRemover = objectRemover ?? _boundRemove,
@@ -50,6 +52,22 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
         .maybeSingle()
         .timeout(const Duration(seconds: 15));
     return row ?? const <String, dynamic>{};
+  }
+
+  /// Binds the matter-scoped file read to the app-level client via the
+  /// shared filtered binding: the same cap + order as [boundTable], with
+  /// `.eq('matter_id', …)` applied server-side.
+  static Future<List<Map<String, dynamic>>> _boundMatterTable(
+    String table,
+    String columns,
+    String matterId,
+  ) {
+    return SupabaseSeam.boundFilteredTable(
+      table,
+      columns,
+      filterColumn: 'matter_id',
+      filterValue: matterId,
+    );
   }
 
   /// Uploads to the private bucket. `upsert: false` keeps a name collision a
@@ -92,25 +110,28 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
 
   final StorageTableCaller _table;
   final StorageMatterCaller _matterCaller;
+  final StorageMatterTableCaller _matterTable;
   final StorageObjectUploader _objectUploader;
   final StorageSignedUrlCreator _signedUrlCreator;
   final StorageObjectRemover _objectRemover;
   final StorageRpcCaller _rpcCaller;
 
   @override
-  Future<List<Map<String, dynamic>>> fetchFiles() async {
+  Future<List<Map<String, dynamic>>> fetchFiles({String? matterId}) async {
     try {
       // RLS-scoped (D-STR1/D-STR2): `files_select_assigned` returns only the
       // caller's rows; the matterRef title comes from the embedded
       // matters(title) select (D-STR5), never a blocked `profiles` join.
-      return await _table(
-        'files',
-        'id, matter_id, name, mime_type, size_bytes, storage_path, '
-            'matters(title)',
-      );
+      // A non-null [matterId] narrows the transfer to the open matter.
+      const String columns =
+          'id, matter_id, name, mime_type, size_bytes, storage_path, '
+          'matters(title)';
+      return matterId == null
+          ? await _table('files', columns)
+          : await _matterTable('files', columns, matterId);
     } on PostgrestException catch (e) {
       throw SupabaseStorageException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       // A non-Postgrest provider failure (network/transport) is a typed
       // unavailable, never a raw exception across the seam (the auth
       // impl's defensive-catch precedent).
@@ -130,7 +151,7 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
       rethrow;
     } on PostgrestException catch (e) {
       throw SupabaseStorageException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       throw const SupabaseStorageException(
         kind: SupabaseStorageFailureKind.providerUnavailable,
         message: 'Provider unavailable.',
@@ -155,7 +176,7 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
       );
     } on PostgrestException catch (e) {
       throw SupabaseStorageException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       throw const SupabaseStorageException(
         kind: SupabaseStorageFailureKind.providerUnavailable,
         message: 'Provider unavailable.',
@@ -174,7 +195,7 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
         kind: _kindForStorage(e),
         message: e.message,
       );
-    } on Object {
+    } on Exception {
       throw const SupabaseStorageException(
         kind: SupabaseStorageFailureKind.providerUnavailable,
         message: 'Provider unavailable.',
@@ -193,7 +214,7 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
         kind: _kindForStorage(e),
         message: e.message,
       );
-    } on Object {
+    } on Exception {
       throw const SupabaseStorageException(
         kind: SupabaseStorageFailureKind.providerUnavailable,
         message: 'Provider unavailable.',
@@ -229,7 +250,7 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
       rethrow;
     } on PostgrestException catch (e) {
       throw SupabaseStorageException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       throw const SupabaseStorageException(
         kind: SupabaseStorageFailureKind.providerUnavailable,
         message: 'Provider unavailable.',

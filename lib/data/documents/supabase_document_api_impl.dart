@@ -1,7 +1,7 @@
+import 'package:legalhub/data/postgrest_failures.dart';
+import 'package:legalhub/data/supabase_seam.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../postgrest_failures.dart';
-import '../supabase_seam.dart';
 import 'supabase_document_api.dart';
 
 /// [SupabaseDocumentApi] backed by the PostgREST client.
@@ -10,8 +10,12 @@ import 'supabase_document_api.dart';
 /// holding the provider import: a table SELECT in, plain map rows out, and
 /// PostgrestExceptions mapped to [SupabaseDocumentException]s at the seam.
 class SupabaseDocumentApiImpl implements SupabaseDocumentApi {
-  SupabaseDocumentApiImpl(this._table, {DocumentSearchCaller? searchCaller})
-    : _searchCaller = searchCaller ?? _boundSearch;
+  SupabaseDocumentApiImpl(
+    this._table, {
+    DocumentSearchCaller? searchCaller,
+    DocumentMatterTableCaller? matterTableCaller,
+  }) : _searchCaller = searchCaller ?? _boundSearch,
+       _matterTable = matterTableCaller ?? _boundMatterTable;
 
   /// Binds to the app-level client after `Supabase.initialize`. Kept a
   /// factory so tests can construct the impl with any callable stub.
@@ -46,22 +50,41 @@ class SupabaseDocumentApiImpl implements SupabaseDocumentApi {
     return SupabaseSeam.boundTable(table, columns);
   }
 
+  /// Binds the matter-scoped read to the app-level client via the shared
+  /// filtered binding: the same cap + order as [boundTable], with
+  /// `.eq('matter_id', …)` applied server-side.
+  static Future<List<Map<String, dynamic>>> _boundMatterTable(
+    String table,
+    String columns,
+    String matterId,
+  ) {
+    return SupabaseSeam.boundFilteredTable(
+      table,
+      columns,
+      filterColumn: 'matter_id',
+      filterValue: matterId,
+    );
+  }
+
   final DocumentTableCaller _table;
   final DocumentSearchCaller _searchCaller;
+  final DocumentMatterTableCaller _matterTable;
 
   @override
-  Future<List<Map<String, dynamic>>> fetchDocuments() async {
+  Future<List<Map<String, dynamic>>> fetchDocuments({String? matterId}) async {
     try {
       // RLS-scoped (D-DR1/D-DR2): `documents_select_assigned` returns only
       // the caller's rows; the matterRef title comes from the embedded
       // matters(title) select (D-DR4), never a blocked `profiles` join.
-      return await _table(
-        'documents',
-        'id, matter_id, title, document_type, created_at, matters(title)',
-      );
+      // A non-null [matterId] narrows the transfer to the open matter.
+      const String columns =
+          'id, matter_id, title, document_type, created_at, matters(title)';
+      return matterId == null
+          ? await _table('documents', columns)
+          : await _matterTable('documents', columns, matterId);
     } on PostgrestException catch (e) {
       throw SupabaseDocumentException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       // A non-Postgrest provider failure (network/transport) is a typed
       // unavailable, never a raw exception across the seam (the auth
       // impl's defensive-catch precedent).
@@ -104,7 +127,7 @@ class SupabaseDocumentApiImpl implements SupabaseDocumentApi {
       );
     } on PostgrestException catch (e) {
       throw SupabaseDocumentException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       throw const SupabaseDocumentException(
         kind: SupabaseDocumentFailureKind.providerUnavailable,
         message: 'Provider unavailable.',

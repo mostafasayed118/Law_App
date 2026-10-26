@@ -5,15 +5,12 @@ import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/features/billing/domain/billing_gateway.dart';
-import 'package:legalhub/features/discovery/presentation/discovery_entry_card.dart';
 import 'package:legalhub/features/documents/domain/document_gateway.dart';
 import 'package:legalhub/features/matters/presentation/matter_documents_section.dart';
-import 'package:legalhub/features/matters/presentation/matter_entry_card.dart';
 import 'package:legalhub/features/matters/presentation/matter_messages_section.dart';
 import 'package:legalhub/features/matters/presentation/matter_workspace_cubit.dart';
 import 'package:legalhub/features/messaging/domain/message_gateway.dart';
 import 'package:legalhub/features/messaging/presentation/message_count_chip.dart';
-import 'package:legalhub/features/messaging/presentation/message_entry_card.dart';
 import 'package:legalhub/features/search/presentation/search_screen.dart';
 import 'package:legalhub/features/storage/domain/storage_gateway.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
@@ -520,8 +517,19 @@ void main() {
 
       // Message-count chip label (slice 9.1) — a count, never content.
       expect(en.messagesMessageCount(12), '12 messages');
-      expect(ar.messagesMessageCount(12), '12 رسائل');
+      expect(ar.messagesMessageCount(12), '12 رسالة');
       expect(tr.messagesMessageCount(12), '12 mesaj');
+      // ICU plural branches resolve per locale (Arabic carries all six).
+      expect(en.messagesMessageCount(0), 'No messages');
+      expect(en.messagesMessageCount(1), '1 message');
+      expect(ar.messagesMessageCount(0), 'لا رسائل');
+      expect(ar.messagesMessageCount(1), 'رسالة واحدة');
+      expect(ar.messagesMessageCount(2), 'رسالتان');
+      expect(ar.messagesMessageCount(3), '3 رسائل');
+      expect(ar.messagesMessageCount(11), '11 رسالة');
+      expect(ar.messagesMessageCount(100), '100 رسالة');
+      expect(tr.messagesMessageCount(0), 'Mesaj yok');
+      expect(tr.messagesMessageCount(1), '1 mesaj');
 
       // Real per-locale wording, not silent copies of EN.
       expect(tr.messagesTitle, isNot(en.messagesTitle));
@@ -529,6 +537,27 @@ void main() {
       expect(tr.messagesEntryTitle, isNot(en.messagesEntryTitle));
       expect(ar.messagesLocalOnlyNote, isNot(en.messagesLocalOnlyNote));
       expect(ar.messagesMessageCount(12), isNot(en.messagesMessageCount(12)));
+    });
+
+    test('resolves the count plural forms in every locale (2026-10-24)', () {
+      final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
+      final AppLocalizations ar = lookupAppLocalizations(const Locale('ar'));
+      final AppLocalizations tr = lookupAppLocalizations(const Locale('tr'));
+
+      expect(en.bookingDurationMinutes(1), '1 min');
+      expect(en.bookingDurationMinutes(30), '30 min');
+      expect(ar.bookingDurationMinutes(1), 'دقيقة واحدة');
+      expect(ar.bookingDurationMinutes(2), 'دقيقتان');
+      expect(ar.bookingDurationMinutes(5), '5 دقائق');
+      expect(ar.bookingDurationMinutes(15), '15 دقيقة');
+      expect(tr.bookingDurationMinutes(1), '1 dk');
+      expect(en.validatorMinLength(1), 'Must be at least 1 character.');
+      expect(en.validatorMinLength(8), 'Must be at least 8 characters.');
+      expect(ar.validatorMinLength(1), 'يجب أن يكون على الأقل حرف واحد.');
+      expect(ar.validatorMinLength(2), 'يجب أن يكون على الأقل حرفان.');
+      expect(ar.validatorMinLength(8), 'يجب أن يكون على الأقل 8 أحرف.');
+      expect(ar.validatorPasswordLength(12), 'يجب أن يكون على الأقل 12 حرفًا.');
+      expect(tr.validatorPasswordLength(12), 'En az 12 karakter olmalıdır.');
     });
 
     test('messaging copy is local-only wording, no send/realtime/legal-advice '
@@ -1484,81 +1513,6 @@ void main() {
       expect(find.text('Loading'), findsNothing);
     });
 
-    testWidgets('renders the discovery entry card in AR and TR, not the EN '
-        'fallback (6.3 pin)', (tester) async {
-      Future<void> pumpAt(Locale locale) async {
-        await tester.pumpWidget(
-          MaterialApp(
-            locale: locale,
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(body: DiscoveryEntryCard(onTap: null)),
-          ),
-        );
-        await tester.pumpAndSettle();
-      }
-
-      await pumpAt(const Locale('ar'));
-      expect(find.text('ابحث عن محامٍ'), findsOneWidget);
-      expect(find.text('Find an attorney'), findsNothing);
-
-      await pumpAt(const Locale('tr'));
-      expect(find.text('Bir avukat bul'), findsOneWidget);
-      expect(find.text('Find an attorney'), findsNothing);
-    });
-
-    testWidgets(
-      'renders the matter entry card in AR and TR, not the EN fallback '
-      '(7.3 pin)',
-      (tester) async {
-        Future<void> pumpAt(Locale locale) async {
-          await tester.pumpWidget(
-            MaterialApp(
-              locale: locale,
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
-              supportedLocales: AppLocalizations.supportedLocales,
-              home: Scaffold(body: MatterEntryCard(onTap: null)),
-            ),
-          );
-          await tester.pumpAndSettle();
-        }
-
-        await pumpAt(const Locale('ar'));
-        expect(find.text('قضاياي'), findsOneWidget);
-        expect(find.text('My matters'), findsNothing);
-
-        await pumpAt(const Locale('tr'));
-        expect(find.text('Davalarım'), findsOneWidget);
-        expect(find.text('My matters'), findsNothing);
-      },
-    );
-
-    testWidgets(
-      'renders the message entry card in AR and TR, not the EN fallback '
-      '(9.2 pin)',
-      (tester) async {
-        Future<void> pumpAt(Locale locale) async {
-          await tester.pumpWidget(
-            MaterialApp(
-              locale: locale,
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
-              supportedLocales: AppLocalizations.supportedLocales,
-              home: Scaffold(body: MessageEntryCard(onTap: null)),
-            ),
-          );
-          await tester.pumpAndSettle();
-        }
-
-        await pumpAt(const Locale('ar'));
-        expect(find.text('الرسائل'), findsOneWidget);
-        expect(find.text('Messages'), findsNothing);
-
-        await pumpAt(const Locale('tr'));
-        expect(find.text('Mesajlar'), findsOneWidget);
-        expect(find.text('Messages'), findsNothing);
-      },
-    );
-
     testWidgets(
       'renders the message count chip with the AR and TR label, not the EN '
       'fallback (9.2 pin)',
@@ -1606,9 +1560,9 @@ void main() {
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
-                // An unmatched matterRef filters the synthetic list to the
+                // An unmatched matter id scopes the synthetic read to the
                 // per-matter empty state (D-W2: every known matter owns at
-                // least one document, so only an unknown ref can empty it).
+                // least one document, so only an unknown id can empty it).
                 // The section reads the workspace composite (Phase 2), so a
                 // service-locator-backed cubit is provided above it.
                 body: BlocProvider<MatterWorkspaceCubit>(
@@ -1617,10 +1571,9 @@ void main() {
                     serviceLocator<DocumentGateway>(),
                     serviceLocator<BillingGateway>(),
                     serviceLocator<StorageGateway>(),
+                    matterId: 'no-such-matter',
                   ),
-                  child: const MatterDocumentsSection(
-                    matterRef: 'no-such-matter',
-                  ),
+                  child: const MatterDocumentsSection(),
                 ),
               ),
             ),
@@ -1661,7 +1614,7 @@ void main() {
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
-                // An unmatched matterRef filters the synthetic list to the
+                // An unmatched matter id scopes the synthetic read to the
                 // per-matter empty state. The section reads the workspace
                 // composite (Phase 2), so a service-locator-backed cubit is
                 // provided above it.
@@ -1671,10 +1624,9 @@ void main() {
                     serviceLocator<DocumentGateway>(),
                     serviceLocator<BillingGateway>(),
                     serviceLocator<StorageGateway>(),
+                    matterId: 'no-such-matter',
                   ),
-                  child: const MatterMessagesSection(
-                    matterRef: 'no-such-matter',
-                  ),
+                  child: const MatterMessagesSection(),
                 ),
               ),
             ),

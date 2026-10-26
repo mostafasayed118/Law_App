@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/core/practice_area.dart';
+import 'package:legalhub/features/discovery/domain/attorney.dart';
+import 'package:legalhub/features/discovery/domain/attorney_admin_gateway.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
 
-import '../../../app/legalhub_theme.dart';
-import '../../../core/practice_area.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/widgets/widgets.dart';
-import '../../discovery/domain/attorney.dart';
-import '../../discovery/domain/attorney_admin_gateway.dart';
 import 'attorney_admin_cubit.dart';
 import 'attorney_admin_state.dart';
 

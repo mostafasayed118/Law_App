@@ -20,9 +20,15 @@ class FileMetadata extends Equatable {
     required this.mimeType,
     required this.sizeBytes,
     required this.storagePath,
+    this.matterId,
   });
 
   final String id;
+
+  /// The raw `matter_id` when the provider row carries one; the workspace's
+  /// server-side matter filter keys on it (the demo rows carry the synthetic
+  /// ids).
+  final String? matterId;
 
   /// Generic demo wording — never a real client, case, or file reference.
   final String name;
@@ -51,5 +57,6 @@ class FileMetadata extends Equatable {
     mimeType,
     sizeBytes,
     storagePath,
+    matterId,
   ];
 }

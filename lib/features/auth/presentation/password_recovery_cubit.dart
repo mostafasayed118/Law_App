@@ -1,10 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../../../core/state/view_state.dart';
-import '../domain/password_recovery_gateway.dart';
-import '../domain/password_recovery_request.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/auth/domain/password_recovery_gateway.dart';
+import 'package:legalhub/features/auth/domain/password_recovery_request.dart';
 
 /// Owns the password-recovery submission lifecycle.
 ///

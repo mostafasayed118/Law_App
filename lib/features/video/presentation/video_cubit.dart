@@ -1,13 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../../../core/state/view_state.dart';
-import '../../matters/domain/matter.dart';
-import '../../matters/domain/matter_gateway.dart';
-import '../domain/video_gateway.dart';
-import '../domain/video_session.dart';
-import '../domain/video_token.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/matters/domain/matter.dart';
+import 'package:legalhub/features/matters/domain/matter_gateway.dart';
+import 'package:legalhub/features/video/domain/video_gateway.dart';
+import 'package:legalhub/features/video/domain/video_session.dart';
+import 'package:legalhub/features/video/domain/video_token.dart';
+import 'package:legalhub/shared/state/write_gate.dart';
+import 'package:legalhub/shared/text/trim.dart';
 import 'video_state.dart';
 
 /// Owns the video-consultation surface's reads and lifecycle writes.
@@ -27,7 +29,7 @@ class VideoCubit extends Cubit<VideoState> {
   /// triggered by a write must not be overwritten by an older read.
   int _request = 0;
 
-  bool _acting = false;
+  final WriteGate _writeGate = WriteGate();
 
   Future<void> load() async {
     final int request = ++_request;
@@ -68,47 +70,25 @@ class VideoCubit extends Cubit<VideoState> {
     String? matterId,
     String? bookingId,
     DateTime? scheduledAt,
-  }) async {
-    if (isClosed || _acting) {
-      return null;
-    }
-    _acting = true;
-    final Result<String> result = await _gateway.createSession(
-      matterId: _trimOrNull(matterId),
-      bookingId: _trimOrNull(bookingId),
-      scheduledAt: scheduledAt,
+  }) {
+    return _writeGate.run<String>(
+      isClosed: () => isClosed,
+      write: () => _gateway.createSession(
+        matterId: trimOrNull(matterId),
+        bookingId: trimOrNull(bookingId),
+        scheduledAt: scheduledAt,
+      ),
+      onSuccess: load,
     );
-    _acting = false;
-    if (isClosed) {
-      return null;
-    }
-    switch (result) {
-      case Success<String>():
-        await load();
-        return null;
-      case Failure<String>(error: final AppError error):
-        return error;
-    }
   }
 
   /// Ends [id]. Returns null on success, the failure's [AppError] otherwise.
-  Future<AppError?> end(String id) async {
-    if (isClosed || _acting) {
-      return null;
-    }
-    _acting = true;
-    final Result<void> result = await _gateway.end(id);
-    _acting = false;
-    if (isClosed) {
-      return null;
-    }
-    switch (result) {
-      case Success<void>():
-        await load();
-        return null;
-      case Failure<void>(error: final AppError error):
-        return error;
-    }
+  Future<AppError?> end(String id) {
+    return _writeGate.run<void>(
+      isClosed: () => isClosed,
+      write: () => _gateway.end(id),
+      onSuccess: load,
+    );
   }
 
   /// Live first, then upcoming (soonest first), then ended/cancelled
@@ -145,12 +125,4 @@ class VideoCubit extends Cubit<VideoState> {
     VideoSessionStatus.ended => 2,
     VideoSessionStatus.cancelled => 3,
   };
-
-  String? _trimOrNull(String? value) {
-    if (value == null) {
-      return null;
-    }
-    final String trimmed = value.trim();
-    return trimmed.isEmpty ? null : trimmed;
-  }
 }

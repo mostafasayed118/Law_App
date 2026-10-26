@@ -84,7 +84,7 @@ void main() {
     test(
       'fetchTasks maps a non-Postgrest failure to providerUnavailable',
       () async {
-        objectErrors['tasks'] = StateError('transport down');
+        objectErrors['tasks'] = Exception('transport down');
 
         await expectLater(
           api.fetchTasks(),

@@ -1,4 +1,4 @@
-import '../../../core/errors/result.dart';
+import 'package:legalhub/core/errors/result.dart';
 import 'task_item.dart';
 
 /// Collaboration task-board integration boundary (v1 queue, 2026-08-09).

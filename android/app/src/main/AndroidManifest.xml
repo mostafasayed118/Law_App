@@ -36,18 +36,34 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            <!-- Phase 4.1: deep-link entry for the link-based + PKCE
-                  recovery variant (and any future auth deep links). The
-                  custom scheme matches the Supabase dashboard Redirect URL
-                  (`<scheme>://auth/v1/callback`) and stays as the
-                  fallback. `${deepLinkScheme}` resolves per flavor
-                  (development → com.legalhub.app.dev, production →
-                  com.legalhub.app) from build.gradle.kts. -->
+            <!-- Phase 4.1 custom-scheme entry for the link-based + PKCE
+                  recovery variant and the accept-invite share link. The
+                  scheme is per flavor (`development` →
+                  com.legalhub.app.dev, `production` → com.legalhub.app) from
+                  build.gradle.kts and matches the Supabase dashboard
+                  Redirect URL (`<scheme>://auth/v1/callback`).
+                  AUDIT NOTE (custom-scheme hijack): any app can register a
+                  custom scheme, so these filters cannot be trusted to prove
+                  provenance. They stay because shipped producers still emit
+                  them: `AppLinkParser.acceptInviteUri` (share link) and
+                  `SupabaseAuthApiImpl`'s recovery `emailRedirectTo`. They are
+                  host-scoped to the two real entry points (accept-invite and
+                  the auth callback) so unrelated custom-scheme URIs do not
+                  launch the app. Removal is gated on switching both producers
+                  to the verified https links + allowlisting the https
+                  redirect; exact steps in
+                  docs/deep_link_release_checklist.md. Dev flavor unaffected. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="${deepLinkScheme}"/>
+                <data android:scheme="${deepLinkScheme}" android:host="accept-invite"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="${deepLinkScheme}" android:host="auth" android:path="/v1/callback"/>
             </intent-filter>
             <!-- Verified App Links (audit: custom-scheme hijack): the OS
                   verifies `legalhub.app` against
@@ -56,13 +72,12 @@
                   https invite/recovery links. `autoVerify` is what promotes
                   this filter to verified; without it the link opens the
                   disambiguation dialog. NOTE: this protects ONLY the https
-                  filter below — the custom-scheme filter above stays
-                  hijackable by any app registering the same scheme until
-                  `assetlinks.json` is deployed AND the custom-scheme
-                  filter is removed.
-                  OWNER STEP: deploy `web/.well-known/assetlinks.json` with
-                  the real release signing-cert SHA-256 to legalhub.app,
-                  verify, then delete the custom-scheme intent-filter. -->
+                  filter below — the custom-scheme filters above stay
+                  hijackable by any app registering the same scheme.
+                  OWNER STEP: deploy `web/.well-known/assetlinks.json` (the
+                  release-cert SHA-256 is filled in) and run the checks in
+                  docs/deep_link_release_checklist.md. Keep the custom-scheme
+                  filters until the producers switch to https. -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>

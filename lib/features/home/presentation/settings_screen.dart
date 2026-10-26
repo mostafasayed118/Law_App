@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../../app/legalhub_theme.dart';
-import '../../../app/localization/locale_cubit.dart';
-import '../../../app/router.dart';
-import '../../../app/service_locator.dart';
-import '../../../app/theme/theme_cubit.dart';
-import '../../../core/auth/auth_state.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/widgets/widgets.dart';
-import '../../auth/presentation/auth_cubit.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/localization/locale_cubit.dart';
+import 'package:legalhub/app/router.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/app/theme/theme_cubit.dart';
+import 'package:legalhub/core/auth/auth_state.dart';
+import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});

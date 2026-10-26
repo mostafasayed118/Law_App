@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/practice_area.dart';
-import '../../../core/state/view_state.dart';
-import '../domain/attorney.dart';
+import 'package:legalhub/core/practice_area.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/discovery/domain/attorney.dart';
 
 /// Immutable state of the attorney-discovery surfaces (design §2).
 ///

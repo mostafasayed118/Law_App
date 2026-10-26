@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/observability/error_reporter.dart';
-import '../../../core/validation/uuid.dart';
+import 'package:legalhub/core/observability/error_reporter.dart';
+import 'package:legalhub/core/validation/uuid.dart';
 import 'booking_category.dart';
 import 'booking_slot.dart';
 

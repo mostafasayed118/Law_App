@@ -1,7 +1,7 @@
+import 'package:legalhub/data/postgrest_failures.dart';
+import 'package:legalhub/data/supabase_seam.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../postgrest_failures.dart';
-import '../supabase_seam.dart';
 import 'supabase_compliance_api.dart';
 
 /// A PostgREST RPC call: function name + named params → response.
@@ -132,7 +132,7 @@ class SupabaseComplianceApiImpl implements SupabaseComplianceApi {
       rethrow;
     } on PostgrestException catch (e) {
       throw SupabaseComplianceException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       throw const SupabaseComplianceException(
         kind: SupabaseComplianceFailureKind.providerUnavailable,
         message: 'Provider unavailable.',

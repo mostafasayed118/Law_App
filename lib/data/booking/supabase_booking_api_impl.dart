@@ -1,7 +1,7 @@
+import 'package:legalhub/data/postgrest_failures.dart';
+import 'package:legalhub/data/supabase_seam.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../postgrest_failures.dart';
-import '../supabase_seam.dart';
 import 'supabase_booking_api.dart';
 
 /// A PostgREST table SELECT: table name + columns → raw map rows.
@@ -66,7 +66,7 @@ class SupabaseBookingApiImpl implements SupabaseBookingApi {
       return await _table('consultation_slots', _slotColumns);
     } on PostgrestException catch (e) {
       throw SupabaseBookingException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       // A non-Postgrest provider failure (network/transport) is a typed
       // unavailable, never a raw exception across the seam.
       throw const SupabaseBookingException(
@@ -107,7 +107,7 @@ class SupabaseBookingApiImpl implements SupabaseBookingApi {
       rethrow;
     } on PostgrestException catch (e) {
       throw SupabaseBookingException(kind: _kindFor(e), message: e.message);
-    } on Object {
+    } on Exception {
       throw const SupabaseBookingException(
         kind: SupabaseBookingFailureKind.providerUnavailable,
         message: 'Provider unavailable.',

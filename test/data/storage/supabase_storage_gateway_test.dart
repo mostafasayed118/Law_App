@@ -38,7 +38,7 @@ class _StubSupabaseStorageApi implements SupabaseStorageApi {
   SupabaseStorageException? registerError;
 
   @override
-  Future<List<Map<String, dynamic>>> fetchFiles() async {
+  Future<List<Map<String, dynamic>>> fetchFiles({String? matterId}) async {
     if (error != null) {
       throw error!;
     }

@@ -13,7 +13,7 @@ class _StubSupabaseDocumentApi implements SupabaseDocumentApi {
   SupabaseDocumentException? error;
 
   @override
-  Future<List<Map<String, dynamic>>> fetchDocuments() async {
+  Future<List<Map<String, dynamic>>> fetchDocuments({String? matterId}) async {
     if (error != null) {
       throw error!;
     }

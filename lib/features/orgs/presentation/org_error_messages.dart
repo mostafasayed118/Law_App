@@ -1,5 +1,5 @@
-import '../../../core/organizations/organization_gateway.dart';
-import '../../../l10n/app_localizations.dart';
+import 'package:legalhub/core/organizations/organization_gateway.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
 
 /// Localized, non-sensitive message for an [OrgFailureKind].
 ///
@@ -16,5 +16,6 @@ String orgErrorMessage(AppLocalizations l10n, OrgFailureKind kind) {
     OrgFailureKind.invalidInvitation => l10n.orgErrorInvalidInvitation,
     OrgFailureKind.providerUnavailable => l10n.orgErrorProviderUnavailable,
     OrgFailureKind.unknown => l10n.orgErrorUnknown,
+    OrgFailureKind.busy => l10n.actionInProgress,
   };
 }

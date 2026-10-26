@@ -13,7 +13,6 @@ import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/core/organizations/membership_repository.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
-import 'package:legalhub/core/sample_service.dart';
 import 'package:legalhub/data/admin/fake_platform_admin_gateway.dart';
 import 'package:legalhub/data/admin/supabase_platform_admin_api.dart';
 import 'package:legalhub/data/admin/supabase_platform_admin_gateway.dart';
@@ -152,8 +151,9 @@ class _FakeSupabaseOrgApi implements SupabaseOrgApi {
   }) async => <Map<String, dynamic>>[];
 
   @override
-  Future<List<Map<String, dynamic>>> listMyMemberships() async =>
-      <Map<String, dynamic>>[];
+  Future<List<Map<String, dynamic>>> listMyMemberships({
+    required String userId,
+  }) async => <Map<String, dynamic>>[];
 
   @override
   Future<String> inviteMember({
@@ -274,7 +274,7 @@ class _FakeSupabaseMatterWriteApi implements SupabaseMatterWriteApi {
 /// (same discipline as [_FakeSupabaseMatterApi]).
 class _FakeSupabaseDocumentApi implements SupabaseDocumentApi {
   @override
-  Future<List<Map<String, dynamic>>> fetchDocuments() async =>
+  Future<List<Map<String, dynamic>>> fetchDocuments({String? matterId}) async =>
       <Map<String, dynamic>>[];
 
   @override
@@ -288,8 +288,9 @@ class _FakeSupabaseDocumentApi implements SupabaseDocumentApi {
 /// (same discipline as [_FakeSupabaseDocumentApi]).
 class _FakeSupabaseMessageApi implements SupabaseMessageApi {
   @override
-  Future<List<Map<String, dynamic>>> fetchMessageThreads() async =>
-      <Map<String, dynamic>>[];
+  Future<List<Map<String, dynamic>>> fetchMessageThreads({
+    String? matterId,
+  }) async => <Map<String, dynamic>>[];
 
   @override
   Future<List<Map<String, dynamic>>> searchMessageThreads(
@@ -330,7 +331,7 @@ class _FakeSupabaseMessageRealtimeApi implements SupabaseMessageRealtimeApi {
 /// (same discipline as [_FakeSupabaseMessageApi]).
 class _FakeSupabaseStorageApi implements SupabaseStorageApi {
   @override
-  Future<List<Map<String, dynamic>>> fetchFiles() async =>
+  Future<List<Map<String, dynamic>>> fetchFiles({String? matterId}) async =>
       <Map<String, dynamic>>[];
 
   @override
@@ -365,7 +366,7 @@ class _FakeSupabaseStorageApi implements SupabaseStorageApi {
 /// (same discipline as [_FakeSupabaseStorageApi]).
 class _FakeSupabaseBillingApi implements SupabaseBillingApi {
   @override
-  Future<List<Map<String, dynamic>>> fetchInvoices() async =>
+  Future<List<Map<String, dynamic>>> fetchInvoices({String? matterId}) async =>
       <Map<String, dynamic>>[];
 }
 
@@ -416,21 +417,21 @@ void main() {
   tearDown(resetServiceLocator);
 
   group('configureDependencies (B3 DI foundation)', () {
-    test('registers SampleService', () {
+    test('registers the core seams', () {
       configureDependencies();
 
-      expect(serviceLocator.isRegistered<SampleService>(), isTrue);
+      expect(serviceLocator.isRegistered<ErrorReporter>(), isTrue);
+      expect(serviceLocator.isRegistered<LocaleStore>(), isTrue);
     });
 
-    test('resolves SampleService as a lazy singleton', () {
+    test('resolves ErrorReporter as a lazy singleton', () {
       configureDependencies();
 
-      final SampleService first = serviceLocator<SampleService>();
-      final SampleService second = serviceLocator<SampleService>();
+      final ErrorReporter first = serviceLocator<ErrorReporter>();
+      final ErrorReporter second = serviceLocator<ErrorReporter>();
 
       // Lazy singleton: same instance across resolutions.
       expect(identical(first, second), isTrue);
-      expect(first.name, 'SampleService');
     });
 
     test('is idempotent when called more than once', () {
@@ -438,24 +439,23 @@ void main() {
       // Calling again must not throw (guard prevents double registration).
       configureDependencies();
 
-      expect(serviceLocator.isRegistered<SampleService>(), isTrue);
+      expect(serviceLocator.isRegistered<ErrorReporter>(), isTrue);
     });
 
     test('throws when resolving an unregistered dependency', () {
       // Before configureDependencies() runs, nothing is registered.
-      expect(() => serviceLocator<SampleService>(), throwsStateError);
+      expect(() => serviceLocator<_NeverRegistered>(), throwsStateError);
     });
   });
 
   // The full DI graph: configureDependencies() registers every application
-  // dependency. The earlier group only proved SampleService. These tests pin
+  // dependency. The earlier group only proved the core seams. These tests pin
   // each registration so a future refactor that drops a wiring line fails
   // loudly instead of breaking at runtime in a screen test.
   group('configureDependencies full registration graph', () {
     test('registers every application dependency', () {
       configureDependencies();
 
-      expect(serviceLocator.isRegistered<SampleService>(), isTrue);
       expect(serviceLocator.isRegistered<AuthGateway>(), isTrue);
       expect(serviceLocator.isRegistered<ErrorReporter>(), isTrue);
       expect(serviceLocator.isRegistered<LocaleStore>(), isTrue);
@@ -1120,13 +1120,16 @@ void main() {
 
     test('clears every registration on resetServiceLocator', () async {
       configureDependencies();
-      expect(serviceLocator.isRegistered<SampleService>(), isTrue);
+      expect(serviceLocator.isRegistered<ErrorReporter>(), isTrue);
 
       await resetServiceLocator();
 
-      expect(serviceLocator.isRegistered<SampleService>(), isFalse);
+      expect(serviceLocator.isRegistered<ErrorReporter>(), isFalse);
       expect(serviceLocator.isRegistered<AuthCubit>(), isFalse);
       expect(serviceLocator.isRegistered<LocaleCubit>(), isFalse);
     });
   });
 }
+
+/// Sentinel type that is never registered, for the unregistered-resolution test.
+class _NeverRegistered {}

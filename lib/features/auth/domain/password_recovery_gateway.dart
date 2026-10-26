@@ -1,4 +1,4 @@
-import '../../../core/errors/result.dart';
+import 'package:legalhub/core/errors/result.dart';
 import 'password_recovery_request.dart';
 
 /// Password-recovery integration boundary.

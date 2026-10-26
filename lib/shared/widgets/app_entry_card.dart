@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../app/legalhub_theme.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
 
 /// A tappable dashboard entry tile: an icon bubble, a title/subtitle pair,
 /// and a trailing chevron inside an outlined card.

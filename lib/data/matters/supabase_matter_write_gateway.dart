@@ -1,6 +1,6 @@
-import '../../core/errors/app_error.dart';
-import '../../core/errors/result.dart';
-import '../../features/matters/domain/matter_write_gateway.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/matters/domain/matter_write_gateway.dart';
 import 'supabase_matter_write_api.dart';
 
 /// [MatterWriteGateway] backed by the Supabase provider via

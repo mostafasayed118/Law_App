@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/router.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/practice_area.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/booking/domain/booking_prefill.dart';
+import 'package:legalhub/features/discovery/domain/attorney.dart';
+import 'package:legalhub/features/discovery/domain/attorney_gateway.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/demo_labels.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
 
-import '../../../app/legalhub_theme.dart';
-import '../../../app/router.dart';
-import '../../../app/service_locator.dart';
-import '../../../core/practice_area.dart';
-import '../../../core/state/view_state.dart';
-import '../../../features/booking/domain/booking_prefill.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/demo_labels.dart';
-import '../../../shared/widgets/widgets.dart';
-import '../domain/attorney.dart';
-import '../domain/attorney_gateway.dart';
 import 'discovery_cubit.dart';
 import 'discovery_state.dart';
 

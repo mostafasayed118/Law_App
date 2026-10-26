@@ -21,6 +21,18 @@ void main() {
       expect(first, hasLength(5));
     });
 
+    test('scopes the list to one matter id', () async {
+      final FakeStorageGateway gateway = FakeStorageGateway();
+
+      final List<FileMetadata> files = (await gateway.fetchFiles(
+        matterId: 'matter-1',
+      )).valueOrNull!;
+
+      expect(files, hasLength(1));
+      expect(files.single.id, 'file-1');
+      expect(files.single.matterId, 'matter-1');
+    });
+
     test('files carry only non-PII metadata fields (D-STR3 shape)', () async {
       final FakeStorageGateway gateway = FakeStorageGateway();
 

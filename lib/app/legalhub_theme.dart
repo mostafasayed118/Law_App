@@ -71,15 +71,11 @@ class LegalHubTheme {
   // tokens back icons/labels that already carry text, and are available to
   // screens via the [LegalHubColorScheme] extension.
   static const Color success = Color(0xFF1B5E20);
-  static const Color onSuccess = Color(0xFFFFFFFF);
   static const Color warning = Color(0xFF7A5900);
-  static const Color onWarning = Color(0xFFFFFFFF);
   static const Color info = Color(0xFF00608C);
   static const Color onInfo = Color(0xFFFFFFFF);
   static const Color darkSuccess = Color(0xFF7AC98B);
-  static const Color darkOnSuccess = Color(0xFF00391B);
   static const Color darkWarning = Color(0xFFE8C16D);
-  static const Color darkOnWarning = Color(0xFF3F2E00);
   static const Color darkInfo = Color(0xFF8FD0F0);
   static const Color darkOnInfo = Color(0xFF00354C);
 

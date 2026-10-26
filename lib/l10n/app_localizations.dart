@@ -229,7 +229,7 @@ abstract class AppLocalizations {
   /// No description provided for @stateError.
   ///
   /// In en, this message translates to:
-  /// **'Unable to load this placeholder'**
+  /// **'Something went wrong. Please try again.'**
   String get stateError;
 
   /// No description provided for @stateOffline.
@@ -796,72 +796,6 @@ abstract class AppLocalizations {
   /// **'Demo: update matter timeline'**
   String get demoTaskTitle5;
 
-  /// No description provided for @demoApprovalRefInviteReview.
-  ///
-  /// In en, this message translates to:
-  /// **'Demo invite — review'**
-  String get demoApprovalRefInviteReview;
-
-  /// No description provided for @demoApprovalRefRoleChange.
-  ///
-  /// In en, this message translates to:
-  /// **'Demo role change'**
-  String get demoApprovalRefRoleChange;
-
-  /// No description provided for @demoApprovalRefInviteExpired.
-  ///
-  /// In en, this message translates to:
-  /// **'Sample invite — expired'**
-  String get demoApprovalRefInviteExpired;
-
-  /// No description provided for @demoApprovalRefSuspension.
-  ///
-  /// In en, this message translates to:
-  /// **'Demo suspension review'**
-  String get demoApprovalRefSuspension;
-
-  /// No description provided for @demoApprovalEntityInvitation.
-  ///
-  /// In en, this message translates to:
-  /// **'Invitation'**
-  String get demoApprovalEntityInvitation;
-
-  /// No description provided for @demoApprovalEntityMembership.
-  ///
-  /// In en, this message translates to:
-  /// **'Membership'**
-  String get demoApprovalEntityMembership;
-
-  /// No description provided for @demoApprovalEntityDocument.
-  ///
-  /// In en, this message translates to:
-  /// **'Document'**
-  String get demoApprovalEntityDocument;
-
-  /// No description provided for @demoVideoTopic1.
-  ///
-  /// In en, this message translates to:
-  /// **'Contract review — kickoff'**
-  String get demoVideoTopic1;
-
-  /// No description provided for @demoVideoTopic2.
-  ///
-  /// In en, this message translates to:
-  /// **'Incorporation walkthrough'**
-  String get demoVideoTopic2;
-
-  /// No description provided for @demoVideoTopic3.
-  ///
-  /// In en, this message translates to:
-  /// **'Employment dispute — follow-up'**
-  String get demoVideoTopic3;
-
-  /// No description provided for @demoVideoTopic4.
-  ///
-  /// In en, this message translates to:
-  /// **'Family law consultation'**
-  String get demoVideoTopic4;
-
   /// No description provided for @researchHeadline.
   ///
   /// In en, this message translates to:
@@ -1153,7 +1087,7 @@ abstract class AppLocalizations {
   /// No description provided for @validatorMinLength.
   ///
   /// In en, this message translates to:
-  /// **'Must be at least {count} characters.'**
+  /// **'{count, plural, =1{Must be at least 1 character.} other{Must be at least {count} characters.}}'**
   String validatorMinLength(int count);
 
   /// No description provided for @validatorMismatch.
@@ -1165,7 +1099,7 @@ abstract class AppLocalizations {
   /// No description provided for @validatorPasswordLength.
   ///
   /// In en, this message translates to:
-  /// **'Must be at least {count} characters.'**
+  /// **'{count, plural, =1{Must be at least 1 character.} other{Must be at least {count} characters.}}'**
   String validatorPasswordLength(int count);
 
   /// No description provided for @validatorPasswordClasses.
@@ -1636,6 +1570,12 @@ abstract class AppLocalizations {
   /// **'Something went wrong. Please try again.'**
   String get orgErrorUnknown;
 
+  /// No description provided for @actionInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'An action is already in progress.'**
+  String get actionInProgress;
+
   /// No description provided for @signUpCheckInboxTitle.
   ///
   /// In en, this message translates to:
@@ -1735,7 +1675,7 @@ abstract class AppLocalizations {
   /// No description provided for @bookingDurationMinutes.
   ///
   /// In en, this message translates to:
-  /// **'{minutes} min'**
+  /// **'{minutes, plural, =1{1 min} other{{minutes} min}}'**
   String bookingDurationMinutes(int minutes);
 
   /// No description provided for @bookingReviewStep.
@@ -2443,8 +2383,8 @@ abstract class AppLocalizations {
   /// No description provided for @messagesMessageCount.
   ///
   /// In en, this message translates to:
-  /// **'{count} messages'**
-  String messagesMessageCount(Object count);
+  /// **'{count, plural, =0{No messages} =1{1 message} other{{count} messages}}'**
+  String messagesMessageCount(int count);
 
   /// No description provided for @messageThreadDetailTitle.
   ///
@@ -2475,6 +2415,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Send'**
   String get messageSend;
+
+  /// No description provided for @messageErrorTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Message is too long. The maximum is {max} characters.'**
+  String messageErrorTooLong(int max);
+
+  /// No description provided for @messageErrorDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to send messages on this thread.'**
+  String get messageErrorDenied;
+
+  /// No description provided for @messageErrorUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending is temporarily unavailable. Please try again.'**
+  String get messageErrorUnavailable;
+
+  /// No description provided for @messageErrorFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to send the message. Please try again.'**
+  String get messageErrorFailed;
 
   /// No description provided for @searchTitle.
   ///
@@ -2607,6 +2571,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unable to open the file. Please try again.'**
   String get fileOpenFailed;
+
+  /// No description provided for @fileSizeMb.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} MB'**
+  String fileSizeMb(String value);
+
+  /// No description provided for @fileSizeKb.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} KB'**
+  String fileSizeKb(String value);
+
+  /// No description provided for @fileSizeBytes.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} B'**
+  String fileSizeBytes(String value);
 
   /// No description provided for @matterWorkspaceInvoicesTitle.
   ///
@@ -2871,12 +2853,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Compliance alerts'**
   String get alertsTitle;
-
-  /// No description provided for @alertsEmpty.
-  ///
-  /// In en, this message translates to:
-  /// **'No compliance alerts are available.'**
-  String get alertsEmpty;
 
   /// No description provided for @alertsError.
   ///
@@ -3376,12 +3352,6 @@ abstract class AppLocalizations {
   /// **'Pending approvals'**
   String get approvalsTitle;
 
-  /// No description provided for @approvalsEmpty.
-  ///
-  /// In en, this message translates to:
-  /// **'No pending approvals are available.'**
-  String get approvalsEmpty;
-
   /// No description provided for @approvalsError.
   ///
   /// In en, this message translates to:
@@ -3873,12 +3843,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Join call'**
   String get videoJoin;
-
-  /// No description provided for @videoCallLiveBadge.
-  ///
-  /// In en, this message translates to:
-  /// **'Live'**
-  String get videoCallLiveBadge;
 
   /// No description provided for @videoCallElapsed.
   ///

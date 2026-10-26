@@ -24,7 +24,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 /// [listMyMemberships] with a canned denial, everything else unimplemented.
 class _DeniedOrgApi implements SupabaseOrgApi {
   @override
-  Future<List<Map<String, dynamic>>> listMyMemberships() async {
+  Future<List<Map<String, dynamic>>> listMyMemberships({
+    required String userId,
+  }) async {
     throw const SupabaseOrgException(
       kind: SupabaseOrgFailureKind.denied,
       message: 'permission denied',

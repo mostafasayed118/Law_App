@@ -1,13 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/errors/app_error.dart';
-import '../../../core/errors/result.dart';
-import '../../../core/state/view_state.dart';
-import '../domain/booking_category.dart';
-import '../domain/booking_confirmation.dart';
-import '../domain/booking_gateway.dart';
-import '../domain/booking_request.dart';
-import '../domain/booking_slot.dart';
+import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/booking/domain/booking_category.dart';
+import 'package:legalhub/features/booking/domain/booking_confirmation.dart';
+import 'package:legalhub/features/booking/domain/booking_gateway.dart';
+import 'package:legalhub/features/booking/domain/booking_request.dart';
+import 'package:legalhub/features/booking/domain/booking_slot.dart';
 import 'booking_state.dart';
 
 /// Owns the 4-step consultation booking state machine (approved SPEC/PLAN):

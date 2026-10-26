@@ -1,6 +1,6 @@
-import '../../../core/errors/result.dart';
-import '../domain/notification.dart';
-import '../domain/notification_gateway.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/notifications/domain/notification.dart';
+import 'package:legalhub/features/notifications/domain/notification_gateway.dart';
 
 /// Development-only notification-feed implementation: a fixed synthetic list
 /// of non-PII notification **metadata**.

@@ -1,4 +1,4 @@
-import '../../../core/errors/result.dart';
+import 'package:legalhub/core/errors/result.dart';
 import 'matter.dart';
 
 /// Matter dashboard integration boundary (Phase 7, slice 7.1).
@@ -26,7 +26,7 @@ abstract interface class MatterGateway {
   /// in-memory backends return their full list — no network cost to
   /// save). Callers MUST still apply their full matching pass
   /// (localized labels, status/practice-area names): this is a transfer
-  /// optimization, never the final arbiter. [limit] mirrors
-  /// `kSearchPageSize` without importing the data layer (layer rule).
+  /// optimization, never the final arbiter. [limit] mirrors the shared
+  /// 30-row search page size without importing the data layer (layer rule).
   Future<Result<List<Matter>>> searchMatters(String query, {int limit = 30});
 }

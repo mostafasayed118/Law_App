@@ -112,7 +112,7 @@ void main() {
     );
 
     test(
-      'maps email-in-use to a typed AppError with the redacted context',
+      'treats email-in-use as a generic pending success (anti-enumeration)',
       () async {
         final _FakeAuthApi api = _FakeAuthApi(
           const SupabaseSignUpFailed(
@@ -126,12 +126,10 @@ void main() {
 
         final Result<void> result = await gateway.submit(request);
 
-        expect(result.isSuccess, isFalse);
-        // ADR-0003: the failure context is the redacted request map, never raw
-        // credentials.
-        expect(result.errorOrNull?.code, 'emailInUse');
-        expect(result.errorOrNull?.context['password'], '[REDACTED]');
-        expect(result.errorOrNull?.context['email'], '[REDACTED]');
+        // An existing address must be indistinguishable from a new one: the
+        // screen shows the same "check your email" outcome either way.
+        expect(result.isSuccess, isTrue);
+        expect(result.errorOrNull, isNull);
       },
     );
 

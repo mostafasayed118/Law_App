@@ -111,7 +111,7 @@ void main() {
     });
 
     test(
-      'maps an unspecified raise to unknown with the message preserved',
+      'maps an unspecified raise to unknown with the fixed message (A5)',
       () async {
         errors['list_members_metadata'] = const PostgrestException(
           message: 'provider hiccup',
@@ -126,7 +126,11 @@ void main() {
                   'kind',
                   SupabasePlatformAdminFailureKind.unknown,
                 )
-                .having((e) => e.message, 'message', 'provider hiccup'),
+                .having(
+                  (e) => e.message,
+                  'message',
+                  platformAdminRequestFailedMessage,
+                ),
           ),
         );
       },
@@ -155,6 +159,67 @@ void main() {
       expect(calls, <String>['read_org_audit:org-1']);
     });
 
+    test('readOrgAudit falls back to the live zero-arg RPC when the '
+        'parameterized signature is missing (A4)', () async {
+      int attempts = 0;
+      final SupabasePlatformAdminApiImpl fallbackApi =
+          SupabasePlatformAdminApiImpl((
+            String function,
+            Map<String, dynamic> params,
+          ) async {
+            attempts += 1;
+            if (attempts == 1) {
+              throw const PostgrestException(
+                message: 'function read_org_audit(uuid) does not exist',
+                code: '42883',
+              );
+            }
+            expect(function, 'read_org_audit');
+            expect(params, isEmpty);
+            return PostgrestResponse<dynamic>(
+              data: <dynamic>[
+                <String, dynamic>{'id': 2, 'action': 'member_invited'},
+              ],
+              count: 0,
+            );
+          });
+
+      final List<Map<String, dynamic>> rows = await fallbackApi.readOrgAudit(
+        'org-1',
+      );
+
+      expect(rows, hasLength(1));
+      expect(rows.single['action'], 'member_invited');
+      expect(attempts, 2);
+    });
+
+    test(
+      'readOrgAudit does not retry a non-missing-function failure (A4)',
+      () async {
+        int attempts = 0;
+        final SupabasePlatformAdminApiImpl deniedApi =
+            SupabasePlatformAdminApiImpl((
+              String function,
+              Map<String, dynamic> params,
+            ) async {
+              attempts += 1;
+              throw const PostgrestException(message: 'permission denied');
+            });
+
+        await expectLater(
+          deniedApi.readOrgAudit('org-1'),
+          throwsA(
+            isA<SupabasePlatformAdminException>().having(
+              (e) => e.kind,
+              'kind',
+              SupabasePlatformAdminFailureKind.denied,
+            ),
+          ),
+        );
+        expect(attempts, 1);
+      },
+    );
+
     test('maps a non-owner audit denial to the denied kind', () async {
       errors['read_platform_audit'] = const PostgrestException(
         message: 'permission denied',
@@ -173,15 +238,15 @@ void main() {
     });
 
     test('maps a non-Postgrest audit failure to providerUnavailable', () async {
-      // The stub's PostgrestException path is bypassed by a raw throw from
-      // the injected caller — the impl's defensive `on Object` catch turns
+      // The stub's PostgrestException path is bypassed by a raw transport
+      // throw from the injected caller — the impl's `on Exception` catch turns
       // it into a typed unavailable (the storage/auth precedent).
       final SupabasePlatformAdminApiImpl throwing =
           SupabasePlatformAdminApiImpl((
             String function,
             Map<String, dynamic> params,
           ) async {
-            throw StateError('network down');
+            throw Exception('network down');
           });
 
       await expectLater(

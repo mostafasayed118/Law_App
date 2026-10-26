@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../app/legalhub_theme.dart';
-import '../../core/state/view_state.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/core/state/view_state.dart';
 import 'view_state_list.dart';
 
 part 'cubit_list_surface_body.dart';
@@ -21,8 +21,8 @@ part 'cubit_list_surface_body.dart';
 /// the state→rows projection, the load call, the row tile, and the copy.
 ///
 /// Not every list screen fits: `document_list_screen` and
-/// `message_list_screen` each drive **two** cubits (their list plus the matter
-/// list that resolves the matter-ref chips), so they keep their own shells.
+/// `message_list_screen` need their own shells for the vault/thread tiles and
+/// the reverse matter cross-link, so they keep bespoke surfaces.
 class CubitListSurface<C extends Cubit<S>, S, ItemT> extends StatelessWidget {
   const CubitListSurface({
     required this.createCubit,

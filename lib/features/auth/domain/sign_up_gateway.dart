@@ -1,4 +1,4 @@
-import '../../../core/errors/result.dart';
+import 'package:legalhub/core/errors/result.dart';
 import 'sign_up_request.dart';
 
 /// Sign-up integration boundary.

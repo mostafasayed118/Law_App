@@ -142,7 +142,7 @@ class _ComposerState extends State<_Composer> {
                 if (state.sendError != null) ...<Widget>[
                   const SizedBox(height: LegalHubTheme.spaceSm),
                   Text(
-                    state.sendError!,
+                    messageSendErrorMessage(l10n, state.sendError!),
                     style: text.bodySmall?.copyWith(color: scheme.error),
                   ),
                 ],

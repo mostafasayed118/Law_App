@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/features/compliance/domain/compliance_alert.dart';
+import 'package:legalhub/features/compliance/domain/compliance_gateway.dart';
+import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/demo_labels.dart';
+import 'package:legalhub/shared/widgets/widgets.dart';
 
-import '../../../app/legalhub_theme.dart';
-import '../../../app/service_locator.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../shared/demo_labels.dart';
-import '../../../shared/widgets/widgets.dart';
-import '../domain/compliance_alert.dart';
-import '../domain/compliance_gateway.dart';
 import 'compliance_alert_create_sheet.dart';
 import 'compliance_alert_detail_sheet.dart';
 import 'compliance_alert_labels.dart';

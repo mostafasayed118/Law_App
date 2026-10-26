@@ -1,4 +1,4 @@
-import '../../../core/errors/result.dart';
+import 'package:legalhub/core/errors/result.dart';
 import 'attorney.dart';
 
 /// Attorney-discovery integration boundary (design §2).

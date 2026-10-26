@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/practice_area.dart';
-import '../../../core/validation/uuid.dart';
+import 'package:legalhub/core/practice_area.dart';
+import 'package:legalhub/core/validation/uuid.dart';
 
 /// One attorney-directory profile (design §2).
 ///

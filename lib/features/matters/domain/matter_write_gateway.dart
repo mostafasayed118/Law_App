@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../core/errors/result.dart';
-import '../../../core/practice_area.dart';
+import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/practice_area.dart';
 
 /// A matter-creation intent (F-01 step 2 client swap).
 ///
