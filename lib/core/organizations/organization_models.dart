@@ -12,6 +12,7 @@ UserRole? userRoleFromServerName(String? name) {
     'client' => UserRole.client,
     'attorney' => UserRole.attorney,
     'partner' => UserRole.partner,
+    'compliance_officer' => UserRole.complianceOfficer,
     _ => null,
   };
 }
@@ -155,6 +156,9 @@ enum OrgFailureKind {
 
   /// An unspecified failure.
   unknown,
+
+  /// A write is already in flight; the duplicate action was refused.
+  busy,
 }
 
 /// A typed, safe organization failure crossing the domain boundary.

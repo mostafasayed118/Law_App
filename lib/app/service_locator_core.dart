@@ -1,12 +1,8 @@
 part of 'service_locator.dart';
 
-/// Core stateless seams + app-scoped store/cubit singletons (the
-/// bootstrap §4.5 local set: sample service, error reporting, locale,
-/// notification prefs, org selection, theme).
+/// Core stateless seams + app-scoped store/cubit singletons (error
+/// reporting, locale, onboarding, notification prefs, org selection, theme).
 void _registerCoreServices({SharedPreferences? preferences}) {
-  if (!serviceLocator.isRegistered<SampleService>()) {
-    serviceLocator.registerLazySingleton<SampleService>(SampleServiceImpl.new);
-  }
   if (!serviceLocator.isRegistered<ErrorReporter>()) {
     serviceLocator.registerLazySingleton<ErrorReporter>(
       ConsoleErrorReporter.new,

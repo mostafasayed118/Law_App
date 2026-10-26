@@ -5,7 +5,6 @@ import 'package:legalhub/core/backend_posture.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/core/organizations/membership_repository.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
-import 'package:legalhub/core/sample_service.dart';
 import 'package:legalhub/data/admin/fake_platform_admin_gateway.dart';
 import 'package:legalhub/data/admin/supabase_platform_admin_api.dart';
 import 'package:legalhub/data/admin/supabase_platform_admin_api_impl.dart';
@@ -146,9 +145,10 @@ part 'service_locator_orgs.dart';
 /// The application's single GetIt service-locator instance.
 ///
 /// Bootstrap spec §4.5 authorizes GetIt as the dependency-injection mechanism.
-/// The bootstrap registrations contain only local seams: fake auth, locale
-/// persistence, and error reporting. No network, real credentials, or legal
-/// data services are registered.
+/// Device-local seams and app-scoped state (locales, onboarding, notification
+/// prefs, org selection, theme, error reporting) are always registered; the
+/// network-backed gateways are env-gated and only replace their credential-free
+/// fakes when the build injects a Supabase environment.
 final GetIt serviceLocator = GetIt.instance;
 
 /// Registers all application dependencies.

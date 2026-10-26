@@ -29,6 +29,13 @@ class Redactor {
     'pwd',
     'email',
     'phone',
+    // Identity and matter/document metadata: a remote sink must never retain
+    // a person's name or a privileged title verbatim.
+    'name',
+    'display_name',
+    'title',
+    'matter_title',
+    'document_title',
     // Payments: provider handles/tokens and card data must never be retained
     // in diagnostics (PCI surface stays structural).
     'payment_token',
