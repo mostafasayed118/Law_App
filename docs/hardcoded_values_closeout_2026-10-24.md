@@ -291,16 +291,19 @@ campaign changes were 3-way merged onto it (no commits, no push):
 - Gates on the merged tree: `flutter analyze` → **No issues found!**; full
   suite → **1989 passed**, exit 0. README and `verify_ledger.sh` carry the
   merged **1983 declarations / 1989 runtime** counts.
-- The merged worktree is uncommitted; the main tree and the audit branch were
-  not modified. The integration still requires the owner's commit/push GO.
+- The campaign is committed as `5ea0218` on
+  `refactor/hardcoded-values-merged` (from `0b52374`), 230 files, clean tree;
+  no push. The main tree and the audit branch were not modified.
 
 ## 12. Integration review (2026-10-26)
 
-Independent review of the merged tree returned **merge-ready pending owner GO**
-with no code fixes. Verified: no conflict markers or duplicate ARB keys; the
-campaign message keys and the audit busy/closed guard coexist; audit keys were
-not lost; generated l10n matches the ARBs; `fake_async` is a direct dev
-dependency; README 1983/1989 matches the static census; ledger 115/0/0; format
-677/0; analyzer clean. One process action remains: the merged worktree is a
-**detached HEAD** at `0b52374`, so create a branch before committing. The owner
-review package is `docs/hardcoded_values_owner_review_2026-10-26.md`.
+Independent review of the merged tree returned **merge-ready** with no code
+fixes. Verified: no conflict markers or duplicate ARB keys; the campaign message
+keys and the audit busy/closed guard coexist; audit keys were not lost;
+generated l10n matches the ARBs; `fake_async` is a direct dev dependency; README
+1983/1989 matches the static census; ledger 115/0/0; format 677/0; analyzer
+clean. The campaign is committed as `5ea0218` on
+`refactor/hardcoded-values-merged` (the original branch name is held by the
+stale campaign worktree). Post-commit gates: analyze clean, 1989 tests, ledger
+115/0/0. The owner review package is
+`docs/hardcoded_values_owner_review_2026-10-26.md`.

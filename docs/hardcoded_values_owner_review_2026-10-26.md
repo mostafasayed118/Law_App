@@ -3,8 +3,8 @@
 - **Date:** 2026-10-26
 - **Merged worktree:** `C:\flutter_projects\law_app_merged`
 - **Integration base:** `0b52374` (`fix/audit-remediation` tip; audit campaign landed)
-- **State:** detached HEAD, uncommitted campaign changes, no push
-- **Verdict:** **Merge-ready pending owner GO**
+- **State:** committed on `refactor/hardcoded-values-merged` at `5ea0218`; clean tree; no push
+- **Verdict:** **Committed — pending push GO**
 
 ## Gates (merged tree)
 
@@ -39,13 +39,12 @@
 
 ## Deferred / owner decisions
 
-1. **Commit GO.** The merged worktree is detached at `0b52374`; create a
-   branch first (`git switch -c refactor/hardcoded-values`), then commit the
-   campaign manifest. No commit/push has been made.
-2. **Push GO.** Separate window; push is not included in this review.
-3. **Human AR/TR review.** 156 `[REVIEW]` entries each; the translation review
+1. **Push GO (next).** The campaign is committed as `5ea0218` on
+   `refactor/hardcoded-values-merged` (from `0b52374`); the tree is clean and
+   the post-commit gates are green. Push remains a separate GO.
+2. **Human AR/TR review.** 156 `[REVIEW]` entries each; the translation review
    doc lists every key and checkbox.
-4. **Accepted minors.** 38 review minors are itemized in the close-out and
+3. **Accepted minors.** 38 review minors are itemized in the close-out and
    inventory; none are merge-blocking. One keyed message-too-long copy is not
    user-visible because the composer uses its older localized mapping (Minor).
 
