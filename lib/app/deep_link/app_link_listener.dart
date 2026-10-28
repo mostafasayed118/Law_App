@@ -11,7 +11,7 @@ import 'pending_accept_invite_store.dart';
 /// buffered in the [PendingAcceptInviteStore] and the caller is nudged to
 /// open the accept surface. Recovery/auth-callback URIs are deliberately
 /// **untouched** here — the explicit
-/// `AuthCallbackObserver` in `lib/data/auth/` owns them (registered callback
+/// `AuthCallbackObserver` in `lib/features/auth/data/` owns them (registered callback
 /// location + query-only PKCE code), so this listener only forwards
 /// `AcceptInviteIntent`s.
 ///

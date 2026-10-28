@@ -5,12 +5,12 @@ import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/backend_posture.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/core/roles/user_role.dart';
-import 'package:legalhub/data/auth/fake_auth_gateway.dart';
-import 'package:legalhub/data/orgs/fake_membership_repository.dart';
-import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
+import 'package:legalhub/features/auth/data/fake_auth_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/home/domain/home_entries.dart';
 import 'package:legalhub/features/home/presentation/home_screen.dart';
+import 'package:legalhub/features/orgs/data/fake_membership_repository.dart';
+import 'package:legalhub/features/orgs/data/fake_organization_gateway.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
 /// W3 / device finding F1: in a configured (real-backend) build the

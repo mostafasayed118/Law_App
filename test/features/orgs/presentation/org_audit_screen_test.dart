@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/service_locator.dart';
-import 'package:legalhub/core/organizations/organization_gateway.dart';
-import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
+import 'package:legalhub/features/orgs/data/fake_organization_gateway.dart';
+import 'package:legalhub/features/orgs/domain/organization_gateway.dart';
 import 'package:legalhub/features/orgs/presentation/org_audit_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 

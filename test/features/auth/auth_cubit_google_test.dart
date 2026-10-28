@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/core/auth/auth_gateway.dart';
-import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
-import 'package:legalhub/data/orgs/fake_membership_repository.dart';
-import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
+import 'package:legalhub/features/auth/domain/auth_gateway.dart';
+import 'package:legalhub/features/auth/domain/auth_state.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
+import 'package:legalhub/features/orgs/data/fake_membership_repository.dart';
+import 'package:legalhub/features/orgs/data/fake_organization_gateway.dart';
 
 /// Contract-§5 session used by the synthetic gateways.
 Session _session() => Session(

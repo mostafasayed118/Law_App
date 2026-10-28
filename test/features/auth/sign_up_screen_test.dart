@@ -7,12 +7,12 @@ import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
-import 'package:legalhub/data/auth/fake_auth_gateway.dart';
-import 'package:legalhub/data/orgs/fake_membership_repository.dart';
-import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
+import 'package:legalhub/features/auth/data/fake_auth_gateway.dart';
 import 'package:legalhub/features/auth/domain/sign_up_gateway.dart';
 import 'package:legalhub/features/auth/domain/sign_up_request.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
+import 'package:legalhub/features/orgs/data/fake_membership_repository.dart';
+import 'package:legalhub/features/orgs/data/fake_organization_gateway.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
 // SignUpScreen now builds a redaction-safe SignUpRequest on submit and hands

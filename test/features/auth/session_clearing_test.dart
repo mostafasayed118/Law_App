@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
-import 'package:legalhub/data/auth/fake_auth_gateway.dart';
-import 'package:legalhub/data/orgs/fake_membership_repository.dart';
-import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
+import 'package:legalhub/features/auth/data/fake_auth_gateway.dart';
+import 'package:legalhub/features/auth/domain/auth_state.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
+import 'package:legalhub/features/orgs/data/fake_membership_repository.dart';
+import 'package:legalhub/features/orgs/data/fake_organization_gateway.dart';
 
 /// R10 — session/token clearing on sign-out and account deletion
 /// (2026-09-24).

@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:legalhub/core/onboarding/onboarding_store.dart';
+import 'package:legalhub/core/persistence/onboarding_store.dart';
 
 /// Presentation-layer seam over [OnboardingStore].
 ///

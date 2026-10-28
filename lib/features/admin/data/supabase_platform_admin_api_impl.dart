@@ -1,0 +1,229 @@
+import 'dart:async';
+
+import 'package:legalhub/core/supabase/postgrest_failures.dart';
+import 'package:legalhub/core/supabase/supabase_seam.dart';
+import 'package:legalhub/core/supabase/supabase_wire.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'supabase_platform_admin_api.dart';
+
+/// A PostgREST RPC call: function name + named params → response.
+///
+/// Kept a plain function type so tests inject a closure and the impl is the
+/// only file that ever touches provider types (the production binding below
+/// adapts the real client). Mirrors the organization seam's `OrgRpcCaller`.
+typedef PlatformAdminRpcCaller =
+    Future<PostgrestResponse<dynamic>> Function(
+      String function,
+      Map<String, dynamic> params,
+    );
+
+/// [SupabasePlatformAdminApi] backed by the PostgREST client.
+///
+/// A data-layer file whose only job is holding the provider import:
+/// parameters in, plain map rows/scalars out, and PostgrestExceptions mapped
+/// to [SupabasePlatformAdminException]s at the seam.
+class SupabasePlatformAdminApiImpl implements SupabasePlatformAdminApi {
+  SupabasePlatformAdminApiImpl(this._rpcCaller);
+
+  /// Binds to the app-level client after `Supabase.initialize`. Kept a
+  /// factory so tests can construct the impl with any callable stub.
+  factory SupabasePlatformAdminApiImpl.bind() =>
+      SupabasePlatformAdminApiImpl(_boundRpc);
+
+  /// Shared seam binding ([SupabaseSeam.boundRpc]).
+  static Future<PostgrestResponse<dynamic>> _boundRpc(
+    String function,
+    Map<String, dynamic> params,
+  ) {
+    return SupabaseSeam.boundRpc(function, params);
+  }
+
+  final PlatformAdminRpcCaller _rpcCaller;
+
+  /// Every RPC goes through here so the shared seam deadline
+  /// ([SupabaseSeam.boundRpc]) can never cross this boundary as a raw
+  /// [TimeoutException] (audit 2026-10-27, F3). A stalled transport is a
+  /// typed unavailable; the existing `on PostgrestException` mapping on each
+  /// method is untouched (PostgREST failures pass through unchanged).
+  Future<PostgrestResponse<dynamic>> _rpc(
+    String function,
+    Map<String, dynamic> params,
+  ) async {
+    try {
+      return await _rpcCaller(function, params);
+    } on TimeoutException {
+      throw const SupabasePlatformAdminException(
+        kind: SupabasePlatformAdminFailureKind.providerUnavailable,
+        message: platformAdminRequestFailedMessage,
+      );
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> listOrganizations() async {
+    try {
+      final PostgrestResponse<dynamic> response = await _rpc(
+        SupabaseRpcs.listOrganizationsMetadata,
+        const <String, dynamic>{},
+      );
+      final Object? data = response.data;
+      if (data is! List<dynamic>) {
+        return const <Map<String, dynamic>>[];
+      }
+      return data.whereType<Map<String, dynamic>>().toList(growable: false);
+    } on PostgrestException catch (e) {
+      throw SupabasePlatformAdminException(
+        kind: _kindFor(e),
+        message: platformAdminRequestFailedMessage,
+      );
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> listMembers() async {
+    try {
+      final PostgrestResponse<dynamic> response = await _rpc(
+        SupabaseRpcs.listMembersMetadata,
+        const <String, dynamic>{},
+      );
+      final Object? data = response.data;
+      if (data is! List<dynamic>) {
+        return const <Map<String, dynamic>>[];
+      }
+      return data.whereType<Map<String, dynamic>>().toList(growable: false);
+    } on PostgrestException catch (e) {
+      throw SupabasePlatformAdminException(
+        kind: _kindFor(e),
+        message: platformAdminRequestFailedMessage,
+      );
+    }
+  }
+
+  @override
+  Future<void> suspendMembership({
+    required String organizationId,
+    required String userId,
+  }) => _runVoidRpc(SupabaseRpcs.suspendMembershipPlatform, <String, dynamic>{
+    'p_organization_id': organizationId,
+    'p_user_id': userId,
+  });
+
+  @override
+  Future<void> reactivateMembership({
+    required String organizationId,
+    required String userId,
+  }) => _runVoidRpc(
+    SupabaseRpcs.reactivateMembershipPlatform,
+    <String, dynamic>{'p_organization_id': organizationId, 'p_user_id': userId},
+  );
+
+  @override
+  Future<void> deleteDemoAccount({required String userId}) => _runVoidRpc(
+    SupabaseRpcs.deleteDemoAccount,
+    <String, dynamic>{'p_user_id': userId},
+  );
+
+  @override
+  Future<List<Map<String, dynamic>>> readPlatformAudit() async {
+    try {
+      return _rowsFrom(
+        await _rpc(SupabaseRpcs.readPlatformAudit, const <String, dynamic>{}),
+      );
+    } on PostgrestException catch (e) {
+      throw SupabasePlatformAdminException(
+        kind: _kindFor(e),
+        message: platformAdminRequestFailedMessage,
+      );
+    } on Exception {
+      // A non-Postgrest provider failure (network/transport) is a typed
+      // unavailable, never a raw exception across the seam (the auth/storage
+      // impls' defensive-catch precedent).
+      throw const SupabasePlatformAdminException(
+        kind: SupabasePlatformAdminFailureKind.providerUnavailable,
+        message: platformAdminRequestFailedMessage,
+      );
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> readOrgAudit(String organizationId) async {
+    try {
+      return _rowsFrom(await _readOrgAuditRpc(organizationId));
+    } on PostgrestException catch (e) {
+      throw SupabasePlatformAdminException(
+        kind: _kindFor(e),
+        message: platformAdminRequestFailedMessage,
+      );
+    } on Exception {
+      throw const SupabasePlatformAdminException(
+        kind: SupabasePlatformAdminFailureKind.providerUnavailable,
+        message: platformAdminRequestFailedMessage,
+      );
+    }
+  }
+
+  /// Calls the parameterized `read_org_audit` and falls back to the live
+  /// zero-argument signature when the former is not installed yet
+  /// (`PGRST202` / `42883` / an explicit function-or-signature-not-found
+  /// message). Any other failure propagates to the caller's typed mapping.
+  Future<PostgrestResponse<dynamic>> _readOrgAuditRpc(
+    String organizationId,
+  ) async {
+    try {
+      return await _rpc(SupabaseRpcs.readOrgAudit, <String, dynamic>{
+        'p_organization_id': organizationId,
+      });
+    } on PostgrestException catch (e) {
+      if (!_isFunctionNotFound(e)) {
+        rethrow;
+      }
+      return _rpc(SupabaseRpcs.readOrgAudit, const <String, dynamic>{});
+    }
+  }
+
+  /// True when PostgREST reports that the called function (or that exact
+  /// signature) is not installed — the live-DB compatibility fallback trigger.
+  bool _isFunctionNotFound(PostgrestException e) {
+    if (e.code == PostgrestCodes.schemaCacheMiss ||
+        e.code == PostgrestCodes.undefinedFunction) {
+      return true;
+    }
+    final String message = e.message.toLowerCase();
+    return message.contains('could not find the function') ||
+        (message.contains('function') && message.contains('does not exist'));
+  }
+
+  /// Extracts the plain map rows from an RPC response, skipping any
+  /// non-map entries (the list-shaped RPCs' shared shape guard).
+  List<Map<String, dynamic>> _rowsFrom(PostgrestResponse<dynamic> response) {
+    final Object? data = response.data;
+    if (data is! List<dynamic>) {
+      return const <Map<String, dynamic>>[];
+    }
+    return data.whereType<Map<String, dynamic>>().toList(growable: false);
+  }
+
+  Future<void> _runVoidRpc(String function, Map<String, dynamic> params) async {
+    try {
+      await _rpc(function, params);
+    } on PostgrestException catch (e) {
+      throw SupabasePlatformAdminException(
+        kind: _kindFor(e),
+        message: platformAdminRequestFailedMessage,
+      );
+    }
+  }
+
+  /// Maps a PostgrestException to the provider-neutral failure kind.
+  /// Message fragments are the stable RPC raise texts; everything else is
+  /// [SupabasePlatformAdminFailureKind.unknown] with the message preserved.
+  SupabasePlatformAdminFailureKind _kindFor(PostgrestException e) {
+    final String message = e.message.toLowerCase();
+    if (message.contains('permission denied') ||
+        message.contains('cannot delete your own account')) {
+      return SupabasePlatformAdminFailureKind.denied;
+    }
+    return SupabasePlatformAdminFailureKind.unknown;
+  }
+}

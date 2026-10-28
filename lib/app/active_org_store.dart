@@ -1,10 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-
-import 'package:legalhub/core/auth/session.dart';
 import 'package:legalhub/core/observability/app_log.dart';
-import 'package:legalhub/data/local/org_selection_store.dart';
+import 'package:legalhub/core/persistence/org_selection_store.dart';
+import 'package:legalhub/features/auth/domain/session.dart';
 
 /// Client-side active-organization context (Phase 7 slice 7.0, D-M7/D-08;
 /// persistence added in P3.2, D-P32.2).
@@ -22,9 +21,10 @@ import 'package:legalhub/data/local/org_selection_store.dart';
 /// sibling of the locale/theme cubits), not presentation: it owns
 /// persistence and encodes the D-08 session-authority rule, so keeping it
 /// under a feature's `presentation/` made the layer boundary read as
-/// one silent exception (audit 2026-09-21, M-6). It deliberately did NOT
-/// move to `core/` — it imports `data/local/`, and `core/ → data/` is a
-/// dependency direction the codebase has never opened (0 imports today).
+/// one silent exception (audit 2026-09-21, M-6). It sits beside the cubits
+/// rather than in `core/` because it binds the session to the UI: the
+/// storage contract it satisfies lives in `core/persistence/`, while this
+/// class decides what to apply from the session.
 ///
 /// Persistence semantics (D-P32.2):
 /// - **Restore:** the persisted id is read once at construction and applied

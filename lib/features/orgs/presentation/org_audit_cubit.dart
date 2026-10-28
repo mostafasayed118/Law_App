@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:legalhub/core/errors/app_error.dart';
-import 'package:legalhub/core/organizations/organization_gateway.dart';
+import 'package:legalhub/features/orgs/domain/organization_gateway.dart';
 
 /// Sealed presentation state for the org-audit read surface
 /// (`/organizations/audit`, partner org-audit slice 2026-08-09).

@@ -1,10 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
-import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/features/orgs/domain/organization_gateway.dart';
 import 'package:legalhub/shared/state/write_gate.dart';
 
 part 'org_state.dart';

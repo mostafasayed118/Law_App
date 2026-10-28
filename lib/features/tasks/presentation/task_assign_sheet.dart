@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/core/errors/app_error.dart';
-import 'package:legalhub/core/organizations/organization_gateway.dart';
+import 'package:legalhub/features/orgs/domain/organization_gateway.dart';
 import 'package:legalhub/features/tasks/domain/task_item.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 

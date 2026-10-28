@@ -1,7 +1,7 @@
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
-import 'package:legalhub/data/auth/supabase_auth_api.dart';
+import 'package:legalhub/features/auth/data/supabase_auth_api.dart';
 import 'package:legalhub/features/auth/domain/password_recovery_gateway.dart';
 import 'package:legalhub/features/auth/domain/password_recovery_request.dart';
 

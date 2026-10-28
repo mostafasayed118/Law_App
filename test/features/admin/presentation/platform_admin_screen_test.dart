@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/core/admin/platform_admin_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
-import 'package:legalhub/data/admin/fake_platform_admin_gateway.dart';
-import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
+import 'package:legalhub/features/admin/data/fake_platform_admin_gateway.dart';
+import 'package:legalhub/features/admin/domain/platform_admin_gateway.dart';
 import 'package:legalhub/features/admin/presentation/platform_admin_screen.dart';
+import 'package:legalhub/features/orgs/data/fake_organization_gateway.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
 /// A mutable [PlatformAdminGateway] stub for the screen tests: canned lists

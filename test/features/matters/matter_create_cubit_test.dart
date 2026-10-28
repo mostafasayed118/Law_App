@@ -2,13 +2,13 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
-import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/practice_area.dart';
 import 'package:legalhub/core/roles/user_role.dart';
-import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/matters/domain/matter_write_gateway.dart';
 import 'package:legalhub/features/matters/presentation/matter_create_cubit.dart';
 import 'package:legalhub/features/matters/presentation/matter_create_state.dart';
+import 'package:legalhub/features/orgs/data/fake_organization_gateway.dart';
+import 'package:legalhub/features/orgs/domain/organization_gateway.dart';
 
 void main() {
   late _StubMatterWriteGateway gateway;

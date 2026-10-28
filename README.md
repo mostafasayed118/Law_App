@@ -156,7 +156,7 @@ recorded prerequisites are approved — see
   mapper, widget and cubit levels, plus the two deliberate in-flight clears in
   `PlatformAdminCubit`'s audit section; prior 2026-09-21 — the audit-fix + P1
   slice: the bounded-SELECT guard + ordering-table unit tests
-  (`test/data/list_query_guards_test.dart`),
+  (`test/core/supabase/list_query_guards_test.dart`),
   the capped message-read chronological reversal + its regression test, the
   ViewStateList harness repairs, the concurrent roster-resolution fix, the
   demo-shortcut seam gate (`AuthGateway.supportsDemoSession`) + its
@@ -400,12 +400,14 @@ tokens never cross to presentation (contract §2.6).
   and privileged credentials belong only in controlled server/edge-function
   environments.
 - The only backend SDK imported anywhere in `lib/` is `supabase_flutter`, and
-  every import sits in a `lib/data/**/supabase_*_impl.dart` adapter (auth, orgs,
-  matters, documents, messaging, billing, notifications, storage, tasks,
-  platform admin). Feature `domain/` and `presentation/` files never import it:
-  they consume provider-neutral seams, and DTOs/tokens are stripped at the
-  adapter boundary. No `firebase`, `paymob`, `http`, `dio`, `sqflite`, or
-  `hive` appears in `lib/`.
+  every import sits either in a feature adapter under
+  `lib/features/<feature>/data/` (auth, orgs, matters, documents, messaging,
+  billing, notifications, storage, tasks, platform admin, approvals, booking,
+  compliance, discovery, research, video) or in a provider primitive under
+  `lib/core/supabase/`. Feature `domain/` and `presentation/` files never
+  import it: they consume provider-neutral seams, and DTOs/tokens are stripped
+  at the adapter boundary. No `firebase`, `paymob`, `http`, `dio`, `sqflite`,
+  or `hive` appears in `lib/`.
 
 ## Run and verify
 
@@ -447,8 +449,8 @@ Xcode project. Dart-side defaults live in `lib/app/flavor.dart`
 runs env-less on the credential-free fakes.
 
 **Verified against:** postgrest 2.8.0 / supabase-dart 2.14.0. Five contract
-pins in `test/data/orgs/` run against a real `SupabaseClient` with a mocked
-HTTP layer and lock the exact postgrest await shape the app depends on —
+pins in `test/features/orgs/data/` run against a real `SupabaseClient` with a
+mocked HTTP layer and lock the exact postgrest await shape the app depends on —
 `supabase_rpc_await_contract_test.dart` (3: scalar RPC → raw `String`, not a
 `PostgrestResponse`; set-returning RPC → raw `List`; non-2xx →
 `PostgrestException`) and `supabase_table_select_await_contract_test.dart`

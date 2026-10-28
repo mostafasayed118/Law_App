@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/async/with_timeout.dart';
-import 'package:legalhub/data/supabase_seam.dart';
+import 'package:legalhub/core/supabase/supabase_seam.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() {

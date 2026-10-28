@@ -1,0 +1,547 @@
+import 'dart:async';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:legalhub/features/auth/data/supabase_auth_api.dart';
+import 'package:legalhub/features/auth/data/supabase_auth_gateway.dart';
+import 'package:legalhub/features/auth/domain/auth_gateway.dart';
+
+/// Hand-rolled fake of the [SupabaseAuthApi] seam (codebase convention:
+/// fakes over mocks for the auth boundary). Snapshot values are controlled
+/// per test; no GoTrue types appear anywhere in the gateway tests.
+class _FakeSupabaseAuthApi implements SupabaseAuthApi {
+  _FakeSupabaseAuthApi(this.currentSnapshot);
+
+  /// Configurable Google-launch result; the default reports "not launched"
+  /// so a test must opt in to a successful browser hand-off.
+  bool googleLaunched = false;
+  int googleLaunchCalls = 0;
+  String? googleRedirectTo;
+
+  @override
+  Future<bool> signInWithGoogle({required String redirectTo}) async {
+    googleLaunchCalls++;
+    googleRedirectTo = redirectTo;
+    return googleLaunched;
+  }
+
+  final StreamController<SupabaseAuthSnapshot?> _changes =
+      StreamController<SupabaseAuthSnapshot?>.broadcast();
+
+  @override
+  SupabaseAuthSnapshot? currentSnapshot;
+
+  int restoreCalls = 0;
+  int signOutCalls = 0;
+
+  @override
+  Stream<SupabaseAuthSnapshot?> get snapshotChanges => _changes.stream;
+
+  @override
+  Future<SupabaseAuthSnapshot?> restore() async {
+    restoreCalls++;
+    return currentSnapshot;
+  }
+
+  @override
+  Future<void> signOut() async {
+    signOutCalls++;
+    currentSnapshot = null;
+    _changes.add(null);
+  }
+
+  @override
+  Future<void> dispose() async => _changes.close();
+
+  void emit(SupabaseAuthSnapshot? snapshot) {
+    currentSnapshot = snapshot;
+    _changes.add(snapshot);
+  }
+
+  /// Configurable result for [signInWithPassword]; the default rejects so
+  /// sign-in tests must opt in to a success.
+  SupabaseAuthResult signInResult = const SupabaseAuthFailed(
+    SupabaseAuthFailure(kind: SupabaseAuthFailureKind.invalidCredentials),
+  );
+  int signInCalls = 0;
+
+  @override
+  Future<SupabaseAuthResult> signInWithPassword({
+    required String email,
+    required String password,
+  }) async {
+    signInCalls++;
+    return signInResult;
+  }
+
+  @override
+  Future<SupabaseSignUpResult> signUp({
+    required String email,
+    required String password,
+    required String displayName,
+  }) async => const SupabaseSignUpPending();
+
+  @override
+  Future<SupabaseAuthResult> resetPasswordForEmail(String email) async =>
+      const SupabaseAuthSuccess(null);
+
+  @override
+  Future<SupabaseAuthResult> verifyOtp({
+    required String email,
+    required String code,
+  }) async => const SupabaseAuthSuccess(null);
+
+  @override
+  Future<SupabaseAuthResult> updateUserPassword(String newPassword) async =>
+      const SupabaseAuthSuccess(null);
+}
+
+void main() {
+  group('SupabaseAuthGateway.restore', () {
+    test('resolves a valid snapshot to an authenticated Session', () async {
+      final DateTime expiresAt = DateTime.now().add(const Duration(hours: 8));
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(
+        SupabaseAuthSnapshot(
+          userId: 'u-1',
+          displayName: 'Amira Hassan',
+          expiresAt: expiresAt,
+        ),
+      );
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      final AuthOutcome<Session> outcome = await gateway.restore();
+
+      expect(outcome.isSuccess, isTrue);
+      final Session session = outcome.valueOrNull!;
+      expect(session.userId, 'u-1');
+      expect(session.displayName, 'Amira Hassan');
+      // Zero tables in the dev project: no memberships to map yet.
+      expect(session.memberships, isEmpty);
+      expect(session.expiresAt, expiresAt);
+      expect(session.isExpired, isFalse);
+      expect(api.restoreCalls, 1);
+    });
+
+    test('resolves signed-out to AuthFailed(signedOut)', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null);
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      final AuthOutcome<Session> outcome = await gateway.restore();
+
+      expect(outcome.isSuccess, isFalse);
+      expect(outcome.failureOrNull?.kind, AuthFailureKind.signedOut);
+      expect(api.restoreCalls, 1);
+    });
+
+    test('resolves an expired snapshot to sessionExpired', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(
+        SupabaseAuthSnapshot(
+          userId: 'u-1',
+          displayName: 'Amira',
+          expiresAt: DateTime.now().subtract(const Duration(hours: 1)),
+        ),
+      );
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      final AuthOutcome<Session> outcome = await gateway.restore();
+
+      expect(outcome.failureOrNull?.kind, AuthFailureKind.sessionExpired);
+    });
+
+    test(
+      'a missing expiry maps to an already-expired session (never unbounded)',
+      () async {
+        final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(
+          const SupabaseAuthSnapshot(userId: 'u-1', displayName: 'Amira'),
+        );
+        final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+        addTearDown(gateway.dispose);
+
+        final AuthOutcome<Session> outcome = await gateway.restore();
+
+        expect(outcome.failureOrNull?.kind, AuthFailureKind.sessionExpired);
+      },
+    );
+  });
+
+  group('SupabaseAuthGateway token non-leak', () {
+    test(
+      'the seam snapshot surface is exactly userId/displayName/expiresAt',
+      () {
+        const SupabaseAuthSnapshot snapshot = SupabaseAuthSnapshot(
+          userId: 'u-1',
+          displayName: 'Amira',
+          expiresAt: null,
+        );
+
+        // Pins the seam surface: no accessToken/refreshToken can be added to
+        // the snapshot without this test failing (contract §2.6 redaction).
+        // recoveredViaLink is the Phase 4.1 recovery marker (false here).
+        expect(snapshot.props, <Object?>['u-1', 'Amira', null, false]);
+      },
+    );
+
+    test('AuthFailure carries only kind and a non-sensitive message', () {
+      const AuthFailure failure = AuthFailure(
+        kind: AuthFailureKind.membershipDenied,
+        message: 'Demo sessions are not available with a real provider.',
+      );
+
+      expect(failure.props, <Object?>[
+        AuthFailureKind.membershipDenied,
+        'Demo sessions are not available with a real provider.',
+      ]);
+    });
+  });
+
+  group('SupabaseAuthGateway sessionChanges', () {
+    test('forwards provider changes as domain sessions', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null);
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      final List<Session?> seen = <Session?>[];
+      final StreamSubscription<Session?> subscription = gateway.sessionChanges
+          .listen(seen.add);
+      addTearDown(() => subscription.cancel());
+
+      api.emit(
+        SupabaseAuthSnapshot(
+          userId: 'u-2',
+          displayName: 'Mona',
+          expiresAt: DateTime.now().add(const Duration(hours: 1)),
+        ),
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(seen.single?.userId, 'u-2');
+      expect(seen.single?.displayName, 'Mona');
+
+      api.emit(null);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(seen.last, isNull);
+    });
+  });
+
+  group('SupabaseAuthGateway recoveryPending', () {
+    test('reflects the recovery marker of the current snapshot', () async {
+      final DateTime expiresAt = DateTime.now().add(const Duration(hours: 8));
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(
+        SupabaseAuthSnapshot(
+          userId: 'u-1',
+          displayName: 'Amira',
+          expiresAt: expiresAt,
+          recoveredViaLink: true,
+        ),
+      );
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      expect(gateway.recoveryPending, isTrue);
+
+      await gateway.restore();
+
+      expect(gateway.recoveryPending, isTrue);
+    });
+
+    test('tracks the marker across snapshot changes', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null);
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      expect(gateway.recoveryPending, isFalse);
+
+      api.emit(
+        SupabaseAuthSnapshot(
+          userId: 'u-1',
+          expiresAt: DateTime.now().add(const Duration(hours: 1)),
+          recoveredViaLink: true,
+        ),
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(gateway.recoveryPending, isTrue);
+
+      // A normal session replaces the recovery session: marker clears.
+      api.emit(
+        SupabaseAuthSnapshot(
+          userId: 'u-1',
+          expiresAt: DateTime.now().add(const Duration(hours: 1)),
+        ),
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(gateway.recoveryPending, isFalse);
+    });
+
+    test('clears the marker on sign-out', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(
+        SupabaseAuthSnapshot(
+          userId: 'u-1',
+          expiresAt: DateTime.now().add(const Duration(hours: 1)),
+          recoveredViaLink: true,
+        ),
+      );
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      await gateway.signOut();
+
+      expect(gateway.recoveryPending, isFalse);
+      expect(gateway.currentSession, isNull);
+    });
+  });
+
+  group('SupabaseAuthGateway signOut', () {
+    test('signs out through the provider and clears the session', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(
+        SupabaseAuthSnapshot(
+          userId: 'u-1',
+          expiresAt: DateTime.now().add(const Duration(hours: 1)),
+        ),
+      );
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      await gateway.signOut();
+
+      expect(api.signOutCalls, 1);
+      expect(gateway.currentSession, isNull);
+    });
+  });
+
+  group('SupabaseAuthGateway startDemoSession', () {
+    test('denies the demo session (membershipDenied) — never fabricates '
+        'authority', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null);
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      final AuthOutcome<Session> outcome = await gateway.startDemoSession();
+
+      expect(outcome.isSuccess, isFalse);
+      expect(outcome.failureOrNull?.kind, AuthFailureKind.membershipDenied);
+      expect(gateway.currentSession, isNull);
+    });
+
+    test('reports the unsupported demo posture (supportsDemoSession false) — '
+        'presentation hides the shortcut (audit 2026-09-21, H-5)', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null);
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      expect(gateway.supportsDemoSession, isFalse);
+    });
+  });
+
+  group('SupabaseAuthGateway signIn', () {
+    test('resolves a valid sign-in to an authenticated Session', () async {
+      final DateTime expiresAt = DateTime.now().add(const Duration(hours: 8));
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null)
+        ..signInResult = SupabaseAuthSuccess(
+          SupabaseAuthSnapshot(
+            userId: 'u-1',
+            displayName: 'Amira Hassan',
+            expiresAt: expiresAt,
+          ),
+        );
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      final AuthOutcome<Session> outcome = await gateway.signIn(
+        email: 'amira@example.com',
+        password: 'any-password',
+      );
+
+      expect(outcome.isSuccess, isTrue);
+      final Session session = outcome.valueOrNull!;
+      expect(session.userId, 'u-1');
+      expect(session.displayName, 'Amira Hassan');
+      expect(session.memberships, isEmpty);
+      expect(session.expiresAt, expiresAt);
+      expect(session.isExpired, isFalse);
+      expect(api.signInCalls, 1);
+    });
+
+    test('maps a null sign-in snapshot to signedOut', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null)
+        ..signInResult = const SupabaseAuthSuccess(null);
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      final AuthOutcome<Session> outcome = await gateway.signIn(
+        email: 'amira@example.com',
+        password: 'any-password',
+      );
+
+      expect(outcome.failureOrNull?.kind, AuthFailureKind.signedOut);
+    });
+
+    test('maps an expired sign-in snapshot to sessionExpired', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null)
+        ..signInResult = SupabaseAuthSuccess(
+          const SupabaseAuthSnapshot(
+            userId: 'u-1',
+            displayName: 'Amira',
+            expiresAt: null,
+          ),
+        );
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      final AuthOutcome<Session> outcome = await gateway.signIn(
+        email: 'amira@example.com',
+        password: 'any-password',
+      );
+
+      // A missing expiry maps to an already-expired session (never
+      // unbounded), so sign-in resolves to sessionExpired.
+      expect(outcome.failureOrNull?.kind, AuthFailureKind.sessionExpired);
+    });
+
+    test(
+      'maps invalidCredentials through the typed failure vocabulary',
+      () async {
+        final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null)
+          ..signInResult = const SupabaseAuthFailed(
+            SupabaseAuthFailure(
+              kind: SupabaseAuthFailureKind.invalidCredentials,
+            ),
+          );
+        final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+        addTearDown(gateway.dispose);
+
+        final AuthOutcome<Session> outcome = await gateway.signIn(
+          email: 'amira@example.com',
+          password: 'wrong-password',
+        );
+
+        expect(outcome.failureOrNull?.kind, AuthFailureKind.invalidCredentials);
+      },
+    );
+
+    test(
+      'maps emailNotConfirmed through the typed failure vocabulary',
+      () async {
+        final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null)
+          ..signInResult = const SupabaseAuthFailed(
+            SupabaseAuthFailure(
+              kind: SupabaseAuthFailureKind.emailNotConfirmed,
+            ),
+          );
+        final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+        addTearDown(gateway.dispose);
+
+        final AuthOutcome<Session> outcome = await gateway.signIn(
+          email: 'amira@example.com',
+          password: 'any-password',
+        );
+
+        expect(outcome.failureOrNull?.kind, AuthFailureKind.emailNotConfirmed);
+      },
+    );
+
+    test('maps rateLimited through the typed failure vocabulary', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null)
+        ..signInResult = const SupabaseAuthFailed(
+          SupabaseAuthFailure(kind: SupabaseAuthFailureKind.rateLimited),
+        );
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      final AuthOutcome<Session> outcome = await gateway.signIn(
+        email: 'amira@example.com',
+        password: 'any-password',
+      );
+
+      expect(outcome.failureOrNull?.kind, AuthFailureKind.rateLimited);
+    });
+
+    test(
+      'maps providerUnavailable through the typed failure vocabulary',
+      () async {
+        final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null)
+          ..signInResult = const SupabaseAuthFailed(
+            SupabaseAuthFailure(
+              kind: SupabaseAuthFailureKind.providerUnavailable,
+            ),
+          );
+        final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+        addTearDown(gateway.dispose);
+
+        final AuthOutcome<Session> outcome = await gateway.signIn(
+          email: 'amira@example.com',
+          password: 'any-password',
+        );
+
+        expect(
+          outcome.failureOrNull?.kind,
+          AuthFailureKind.providerUnavailable,
+        );
+      },
+    );
+
+    test(
+      'maps emailInUse defensively to invalidCredentials on sign-in',
+      () async {
+        final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null)
+          ..signInResult = const SupabaseAuthFailed(
+            SupabaseAuthFailure(kind: SupabaseAuthFailureKind.emailInUse),
+          );
+        final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+        addTearDown(gateway.dispose);
+
+        final AuthOutcome<Session> outcome = await gateway.signIn(
+          email: 'amira@example.com',
+          password: 'any-password',
+        );
+
+        expect(outcome.failureOrNull?.kind, AuthFailureKind.invalidCredentials);
+      },
+    );
+  });
+  group('startGoogleSignIn', () {
+    test(
+      'forwards the injected flavor callback and reports the launch',
+      () async {
+        final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null)
+          ..googleLaunched = true;
+        final SupabaseAuthGateway gateway = SupabaseAuthGateway(
+          api,
+          oauthRedirectUri: 'com.legalhub.app.dev://auth/v1/callback',
+        );
+        addTearDown(gateway.dispose);
+
+        expect(await gateway.startGoogleSignIn(), isTrue);
+        expect(api.googleRedirectTo, 'com.legalhub.app.dev://auth/v1/callback');
+        // Launching the browser must never fabricate a local session: the
+        // session only exists once the callback code is exchanged.
+        expect(gateway.currentSession, isNull);
+      },
+    );
+
+    test('defaults to the production callback when none is injected', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null)
+        ..googleLaunched = true;
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      await gateway.startGoogleSignIn();
+
+      expect(api.googleRedirectTo, 'com.legalhub.app://auth/v1/callback');
+    });
+
+    test('maps a refused launch to false', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null);
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      expect(await gateway.startGoogleSignIn(), isFalse);
+      expect(api.googleLaunchCalls, 1);
+      expect(gateway.currentSession, isNull);
+    });
+  });
+}

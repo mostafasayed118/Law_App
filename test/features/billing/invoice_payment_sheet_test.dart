@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/result.dart';
-import 'package:legalhub/data/billing/fake_payment_gateway.dart';
+import 'package:legalhub/features/billing/data/fake_payment_gateway.dart';
 import 'package:legalhub/features/billing/domain/checkout_launcher.dart';
 import 'package:legalhub/features/billing/domain/invoice.dart';
 import 'package:legalhub/features/billing/domain/payment_gateway.dart';

@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
-import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/features/matters/domain/matter_write_gateway.dart';
+import 'package:legalhub/features/orgs/domain/organization_gateway.dart';
+
 import 'matter_create_state.dart';
 
 /// Owns the matter-creation submit lifecycle (F-01 step 2 client swap, C-D6).

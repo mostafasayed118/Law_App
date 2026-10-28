@@ -1,14 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
-import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/features/matters/domain/matter.dart';
 import 'package:legalhub/features/matters/domain/matter_gateway.dart';
+import 'package:legalhub/features/orgs/domain/organization_gateway.dart';
 import 'package:legalhub/features/tasks/domain/task_gateway.dart';
 import 'package:legalhub/features/tasks/domain/task_item.dart';
 import 'package:legalhub/shared/state/write_gate.dart';
+
 import 'task_board_state.dart';
 
 /// Owns the task-board list (v1 queue, 2026-08-09).

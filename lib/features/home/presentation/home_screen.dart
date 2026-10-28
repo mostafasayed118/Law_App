@@ -4,9 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/app/router.dart';
 import 'package:legalhub/app/service_locator.dart';
-import 'package:legalhub/core/auth/session.dart';
 import 'package:legalhub/core/practice_area.dart';
 import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/features/auth/domain/session.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart'
     show AuthCubit;
 import 'package:legalhub/features/home/domain/home_entries.dart';

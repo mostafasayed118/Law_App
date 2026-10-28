@@ -63,7 +63,7 @@ class SearchCubit extends Cubit<SearchState> {
   /// Maximum rows kept per result group (bounds the eager tile build to
   /// 4 × 30 tiles). Mirrors the shared 30-row search page size without
   /// importing the data layer — presentation must never depend on
-  /// `lib/data/` (layer rule). The server reads the shared 200-row page.
+  /// a feature's `data/` (layer rule). The server reads the shared 200-row page.
   static const int searchPageSize = kSearchPageSize;
 
   final MatterGateway _matterGateway;

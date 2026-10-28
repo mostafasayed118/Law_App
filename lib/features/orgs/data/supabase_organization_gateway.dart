@@ -1,0 +1,273 @@
+import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/features/orgs/domain/organization_gateway.dart';
+
+import 'supabase_org_api.dart';
+
+part 'supabase_organization_gateway_mapping.dart';
+
+/// [OrganizationGateway] backed by the Supabase provider via [SupabaseOrgApi].
+///
+/// Domain mapping happens here: raw rows/scalars from the seam become
+/// [OrgMember]/[OrganizationSummary]/[InviteResult], roles are validated
+/// against the server-assignable surface before any call, and typed
+/// [OrgFailure]s replace [SupabaseOrgException]s (contract §5 pattern).
+class SupabaseOrganizationGateway implements OrganizationGateway {
+  SupabaseOrganizationGateway(this._api);
+
+  final SupabaseOrgApi _api;
+
+  @override
+  Future<OrgOutcome<OrganizationSummary>> createOrganization({
+    required String name,
+  }) async {
+    if (name.trim().isEmpty) {
+      return const OrgOutcome<OrganizationSummary>.failure(
+        OrgFailure(kind: OrgFailureKind.invalidName),
+      );
+    }
+    try {
+      final String id = await _api.createOrganization(name: name.trim());
+      return OrgOutcome<OrganizationSummary>.success(
+        OrganizationSummary(
+          id: id,
+          name: name.trim(),
+          createdAt: DateTime.now(),
+        ),
+      );
+    } on SupabaseOrgException catch (e) {
+      return OrgOutcome<OrganizationSummary>.failure(
+        OrgFailure(kind: _mapKind(e.kind), message: orgRequestFailedMessage),
+      );
+    }
+  }
+
+  @override
+  Future<OrgOutcome<List<OrgMember>>> listMembers({
+    required String organizationId,
+  }) async {
+    try {
+      final List<Map<String, dynamic>> rows = await _api.listMembers(
+        organizationId: organizationId,
+      );
+      return OrgOutcome<List<OrgMember>>.success(
+        rows.map(_memberFromRow).whereType<OrgMember>().toList(growable: false),
+      );
+    } on SupabaseOrgException catch (e) {
+      return OrgOutcome<List<OrgMember>>.failure(
+        OrgFailure(kind: _mapKind(e.kind), message: orgRequestFailedMessage),
+      );
+    } on FormatException {
+      // Provider drift (unexpected status/row shape) is a typed failure,
+      // never a silently wrong member; the internal detail stays out of UI.
+      return const OrgOutcome<List<OrgMember>>.failure(
+        OrgFailure(
+          kind: OrgFailureKind.unknown,
+          message: orgRequestFailedMessage,
+        ),
+      );
+    } on TypeError {
+      // Defense-in-depth: no raw TypeError ever crosses the boundary.
+      return const OrgOutcome<List<OrgMember>>.failure(
+        OrgFailure(
+          kind: OrgFailureKind.unknown,
+          message: orgRequestFailedMessage,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<OrgOutcome<List<AssignableMember>>> listAssignableMembers({
+    required String matterId,
+  }) async {
+    try {
+      final List<Map<String, dynamic>> rows = await _api.listAssignableMembers(
+        matterId: matterId,
+      );
+      return OrgOutcome<List<AssignableMember>>.success(
+        rows.map(_assignableMemberFromRow).toList(growable: false),
+      );
+    } on SupabaseOrgException catch (e) {
+      return OrgOutcome<List<AssignableMember>>.failure(
+        OrgFailure(kind: _mapKind(e.kind), message: orgRequestFailedMessage),
+      );
+    } on FormatException {
+      // Provider drift (unexpected row shape) is a typed failure, never a
+      // silently wrong assignee.
+      return const OrgOutcome<List<AssignableMember>>.failure(
+        OrgFailure(
+          kind: OrgFailureKind.unknown,
+          message: orgRequestFailedMessage,
+        ),
+      );
+    } on TypeError {
+      // Defense-in-depth: no raw TypeError ever crosses the boundary.
+      return const OrgOutcome<List<AssignableMember>>.failure(
+        OrgFailure(
+          kind: OrgFailureKind.unknown,
+          message: orgRequestFailedMessage,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<OrgOutcome<InviteResult>> inviteMember({
+    required String organizationId,
+    required String email,
+    required UserRole role,
+  }) async {
+    final String? roleName = _assignableRoleName(role);
+    if (roleName == null) {
+      return const OrgOutcome<InviteResult>.failure(
+        OrgFailure(kind: OrgFailureKind.invalidRole),
+      );
+    }
+    if (email.trim().isEmpty) {
+      return const OrgOutcome<InviteResult>.failure(
+        OrgFailure(kind: OrgFailureKind.unknown, message: 'Email is required.'),
+      );
+    }
+    try {
+      final String token = await _api.inviteMember(
+        organizationId: organizationId,
+        email: email.trim(),
+        role: roleName,
+      );
+      return OrgOutcome<InviteResult>.success(
+        InviteResult(
+          organizationId: organizationId,
+          email: email.trim(),
+          token: token,
+        ),
+      );
+    } on SupabaseOrgException catch (e) {
+      return OrgOutcome<InviteResult>.failure(
+        OrgFailure(kind: _mapKind(e.kind), message: orgRequestFailedMessage),
+      );
+    }
+  }
+
+  @override
+  Future<OrgOutcome<void>> changeMemberRole({
+    required String organizationId,
+    required String userId,
+    required UserRole role,
+  }) async {
+    final String? roleName = _assignableRoleName(role);
+    if (roleName == null) {
+      return const OrgOutcome<void>.failure(
+        OrgFailure(kind: OrgFailureKind.invalidRole),
+      );
+    }
+    return _runVoid(
+      () => _api.changeMemberRole(
+        organizationId: organizationId,
+        userId: userId,
+        role: roleName,
+      ),
+    );
+  }
+
+  @override
+  Future<OrgOutcome<void>> suspendMember({
+    required String organizationId,
+    required String userId,
+  }) => _runVoid(
+    () => _api.suspendMember(organizationId: organizationId, userId: userId),
+  );
+
+  @override
+  Future<OrgOutcome<void>> reactivateMember({
+    required String organizationId,
+    required String userId,
+  }) => _runVoid(
+    () => _api.reactivateMember(organizationId: organizationId, userId: userId),
+  );
+
+  @override
+  Future<OrgOutcome<void>> removeMember({
+    required String organizationId,
+    required String userId,
+  }) => _runVoid(
+    () => _api.removeMember(organizationId: organizationId, userId: userId),
+  );
+
+  @override
+  Future<OrgOutcome<String>> resendInvitation({
+    required String invitationId,
+  }) async {
+    try {
+      final String token = await _api.resendInvitation(
+        invitationId: invitationId,
+      );
+      return OrgOutcome<String>.success(token);
+    } on SupabaseOrgException catch (e) {
+      return OrgOutcome<String>.failure(
+        OrgFailure(kind: _mapKind(e.kind), message: orgRequestFailedMessage),
+      );
+    }
+  }
+
+  @override
+  Future<OrgOutcome<void>> revokeInvitation({required String invitationId}) =>
+      _runVoid(() => _api.revokeInvitation(invitationId: invitationId));
+
+  @override
+  Future<OrgOutcome<void>> deleteMyAccount() =>
+      _runVoid(() => _api.deleteMyAccount());
+
+  @override
+  Future<OrgOutcome<String>> acceptInvitation({required String token}) async {
+    if (token.trim().isEmpty) {
+      return const OrgOutcome<String>.failure(
+        OrgFailure(kind: OrgFailureKind.invalidInvitation),
+      );
+    }
+    try {
+      final String membershipId = await _api.acceptInvitation(
+        token: token.trim(),
+      );
+      return OrgOutcome<String>.success(membershipId);
+    } on SupabaseOrgException catch (e) {
+      return OrgOutcome<String>.failure(
+        OrgFailure(kind: _mapKind(e.kind), message: orgRequestFailedMessage),
+      );
+    }
+  }
+
+  @override
+  Future<OrgOutcome<List<AuditEntry>>> readOrgAudit({
+    required String organizationId,
+  }) async {
+    try {
+      final List<Map<String, dynamic>> rows = await _api.readOrgAudit(
+        organizationId: organizationId,
+      );
+      return OrgOutcome<List<AuditEntry>>.success(
+        rows.map(_auditEntryFromRow).toList(growable: false),
+      );
+    } on SupabaseOrgException catch (e) {
+      return OrgOutcome<List<AuditEntry>>.failure(
+        OrgFailure(kind: _mapKind(e.kind), message: orgRequestFailedMessage),
+      );
+    } on FormatException {
+      // Provider drift (unexpected row shape) is a typed failure, never a
+      // silently wrong audit entry.
+      return const OrgOutcome<List<AuditEntry>>.failure(
+        OrgFailure(
+          kind: OrgFailureKind.unknown,
+          message: orgRequestFailedMessage,
+        ),
+      );
+    } on TypeError {
+      // Defense-in-depth: no raw TypeError ever crosses the boundary.
+      return const OrgOutcome<List<AuditEntry>>.failure(
+        OrgFailure(
+          kind: OrgFailureKind.unknown,
+          message: orgRequestFailedMessage,
+        ),
+      );
+    }
+  }
+}
