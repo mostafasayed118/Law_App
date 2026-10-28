@@ -1,8 +1,7 @@
 # Live apply — 2026-10-26 audit follow-ups (29 indexes + 30 profiles contract)
 
-**STATUS: NOT APPLIED.** This document is the forward-only apply plan for this
-change. Nothing here was run against a live database, and no edge function or
-client was deployed.
+**STATUS: APPLIED 2026-10-28** (see `docs/live_apply_2026-10-28_audit_followups.md`).
+This document is the forward-only apply plan for this change.
 
 **Scope:** `supabase/migrations/29_membership_and_order_indexes.sql` and
 `supabase/migrations/30_profiles_mutations_rpc_only.sql`, plus their companion
