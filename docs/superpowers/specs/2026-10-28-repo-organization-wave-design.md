@@ -111,11 +111,14 @@ The filename already encodes the lifecycle phase: `_scope` (24), `_plan` (25), `
 
 | From | To | Files |
 |---|---|---|
-| `lib/data/<feature>/*` | `lib/features/<feature>/data/` | 71 across 16 features |
+| `lib/data/<feature>/*` | `lib/features/<feature>/data/` | 70 across 16 features |
 | `lib/data/local/*` | `lib/core/persistence/` | 11 |
 | `lib/data/files/*` | `lib/core/platform/` | 2 |
 | `lib/data/*.dart` | `lib/core/supabase/` | 5 |
+| `lib/data/auth/supabase_env.dart` | `lib/core/supabase/` | 1 (build-time config consumed by `main.dart` before any feature exists) |
 | `lib/data/.gitkeep` | deleted | 1 |
+
+Reference scale (measured recursively): **334** `package:legalhub/data/<dir>/…` references and **61** `package:legalhub/data/<file>.dart` references across roughly 130 files, plus exactly **2** relative imports in `lib/main.dart`. All other imports are `package:legalhub/…`, and the 279 intra-folder relative imports survive a folder move unchanged.
 
 Rationale: `lib/features/<x>/` becomes self-contained for 20 of 20 features; the 28 inverted imports disappear because `features/<x>/data` importing `features/<x>/domain` is an intra-feature dependency, not a cross-tree one.
 
@@ -137,13 +140,15 @@ Authoring stays in the 83 readable files: `policies/` and `rpc/` remain the sour
 
 **Rejected:** folding 4,626 SQL lines into the table migrations — true single-source, but it rewrites the policy battery's file-list assertions and makes policy review harder. **Rejected:** documenting the limitation and changing nothing — leaves a fresh environment without RLS.
 
-### D4 — Domain placement rule (proposed, owner decision — **not** in P1)
+### D4 — Domain placement rule (**accepted 2026-10-28**)
 
 > `lib/core/` holds no product noun.
 
 Under that rule, `core/auth` → `features/auth/domain/`, `core/admin` → `features/admin/domain/`, `core/organizations` → `features/orgs/domain/`, and `core/onboarding/onboarding_store.dart` joins `lib/core/persistence/`. Total: 10 files, and **5 import sites across the three domain directories** (`core/auth` 2, `core/organizations` 2, `core/admin` 1); the onboarding store's own import sites need counting during execution.
 
-Cost is negligible, but it is a *different* claim from D1 (it moves domain, not data), so it is parked as an explicit owner decision rather than bundled. If declined, `lib/core` keeps three product domains and the README must say so.
+**D4 is required by D1, not optional.** `INSTRUCTIONS.md` L252 documents the pre-existing rule ("a *core-owned* contract is implemented in `lib/data/<name>/`"), introduced by audit 2026-09-21 finding H-2 to end three coexisting conventions. Executing D1 while keeping that rule would put `auth`/`orgs`/`admin` contracts in `core/` and their implementations in `features/` — re-creating the split D1 removes. D4 supersedes L252, and P1 rewrites that section in the same commit.
+
+Note the repo is already mid-migration under the old rule: `matters`, `documents`, `messaging`, `storage`, `billing`, `notifications` were documented as moving to `features/<x>/data/` "when next touched". This wave is that moment.
 
 ---
 
@@ -210,17 +215,26 @@ Each phase is independently landable, independently revertable, and leaves the r
 
 **Gates:** `verify_ledger.sh`, `verify_policy_tests.sh --check`.
 
-### P1 — Consolidate the data layer (D1)
+### P1 — Consolidate the data layer (D1 + D4)
 
-Three landable commits, in this order (least entangled first):
+Seven landable commits, least entangled first. Every commit leaves `flutter analyze` clean and the suite green.
 
-1. **Extract shared primitives** — 5 files to `lib/core/supabase/`, 11 to `lib/core/persistence/`, 2 to `lib/core/platform/`; rewrite imports mechanically.
-2. **Move per-feature implementations** — 71 files into `lib/features/<x>/data/`.
-3. **Delete `lib/data/`** — remove the directory and `.gitkeep`; update `lib/app/service_locator*.dart` (5 files) if any path-based references remain.
+1. **`lib/core/supabase/`** — the 5 provider primitives + `supabase_env.dart`; rewrite 61 package refs and 1 of the 2 `main.dart` relative imports.
+2. **`lib/core/persistence/`** — 11 stores from `data/local/` + `core/onboarding/onboarding_store.dart`; rewrite 48 refs.
+3. **`lib/core/platform/`** — 2 adapters from `data/files/`; rewrite 4 refs.
+4. **Feature-owned seams** (13 features) — 44 files into `features/<x>/data/`; 142 refs.
+5. **Core-owned seams** (D4) — 9 contracts into `features/{auth,admin,orgs}/domain/`, then 26 implementations into `features/<x>/data/`; 140 refs + 5 contract import sites.
+6. **`test/data/` mirror** — 17 subdirectories and 6 root files into `test/features/<x>/data/`, `test/core/persistence/`, `test/core/supabase/`.
+7. **Delete `lib/data/`** and run the docs truth pass: `README.md` L403, `INSTRUCTIONS.md` L252 (the superseded adapter-placement rule), and `docs/superpowers/specs/2026-10-28-repo-organization-wave-design.md`.
 
 Filenames and class names are unchanged throughout, so the diff is import lines plus `git mv` renames.
 
-**Acceptance:** `Test-Path lib/data` → False · `flutter analyze` clean · `flutter test` count equals the pre-P1 baseline · zero `package:legalhub/data/` imports · zero `package:legalhub/features/` imports originating outside `features/` and `app/` · `verify_ledger.sh` exits 0.
+**Verified gate facts:**
+- `verify_ledger.sh`'s file-presence block runs `git cat-file -e "f7621df:$f"` — a **historical** commit. Moving `lib/data/auth/fake_auth_gateway.dart` does not break it.
+- No test asserts the adapter-placement paths; `test/bootstrap_boundaries_test.dart` covers `Result`/`ViewState`/`Redactor` behavior only.
+- Frozen campaign records under `docs/` mention `lib/data` in ~50 files. They are history and must **not** be rewritten.
+
+**Acceptance:** `Test-Path lib/data` → False · `flutter analyze` clean · suite count equals the pre-P1 baseline (2119 declarations, matching `README.md` L458) · zero `package:legalhub/data/` references · zero imports of `core/{auth,admin,organizations}` · `verify_ledger.sh` exits 0 · `verify_format.sh` exits 0.
 
 **Rollback:** `git revert` per commit.
 
@@ -283,7 +297,7 @@ Filenames and class names are unchanged throughout, so the diff is import lines 
 
 ## 9. Open owner decisions
 
-1. **D4** — adopt "`lib/core/` holds no product noun" (moves `auth`/`admin`/`organizations` domain, 10 files, 5 import sites)? Recommend **yes**, as a P1 follow-up commit.
+1. ~~**D4** — adopt "`lib/core/` holds no product noun"?~~ **Accepted 2026-10-28**; it ships as part of P1 (commit 5).
 2. **P0** — confirm the nested worktree `.kilo/worktrees/trail-fall` can be removed.
 3. **P0** — confirm the destination for the 20 MB design archive (`C:\flutter_projects\_design_refs\legalhub_stitch\`).
 4. **Order** — P2 and P3 are independent. If you prefer the riskiest move last, run P0 → P1 → P3 → P2 → P4.
