@@ -11,6 +11,7 @@ import 'package:legalhub/core/admin/platform_admin_gateway.dart';
 import 'package:legalhub/core/auth/auth_gateway.dart';
 import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
+import 'package:legalhub/core/onboarding/onboarding_store.dart';
 import 'package:legalhub/core/organizations/membership_repository.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/data/admin/fake_platform_admin_gateway.dart';
@@ -27,16 +28,13 @@ import 'package:legalhub/data/billing/supabase_payment_api.dart';
 import 'package:legalhub/data/billing/supabase_payment_gateway.dart';
 import 'package:legalhub/data/billing/url_launcher_checkout_launcher.dart';
 import 'package:legalhub/data/booking/supabase_booking_api.dart';
-import 'package:legalhub/data/booking/supabase_booking_gateway.dart';
 import 'package:legalhub/data/discovery/supabase_attorney_api_impl.dart';
-import 'package:legalhub/data/discovery/supabase_attorney_gateway.dart';
 import 'package:legalhub/data/documents/supabase_document_api.dart';
 import 'package:legalhub/data/documents/supabase_document_gateway.dart';
 import 'package:legalhub/data/files/file_selector_file_picker.dart';
 import 'package:legalhub/data/files/url_launcher_uri_opener.dart';
 import 'package:legalhub/data/local/in_memory_org_selection_store.dart';
 import 'package:legalhub/data/local/locale_store.dart';
-import 'package:legalhub/data/local/onboarding_store.dart';
 import 'package:legalhub/data/local/org_selection_store.dart';
 import 'package:legalhub/data/matters/supabase_matter_api.dart';
 import 'package:legalhub/data/matters/supabase_matter_gateway.dart';
@@ -64,10 +62,12 @@ import 'package:legalhub/features/billing/domain/checkout_launcher.dart';
 import 'package:legalhub/features/billing/domain/payment_gateway.dart';
 import 'package:legalhub/features/billing/domain/payment_mode.dart';
 import 'package:legalhub/features/booking/data/fake_booking_gateway.dart';
+import 'package:legalhub/features/booking/data/supabase_booking_gateway.dart';
 import 'package:legalhub/features/booking/domain/booking_gateway.dart';
 import 'package:legalhub/features/booking/domain/booking_prefill.dart';
 import 'package:legalhub/features/discovery/data/fake_attorney_admin_gateway.dart';
 import 'package:legalhub/features/discovery/data/fake_attorney_gateway.dart';
+import 'package:legalhub/features/discovery/data/supabase_attorney_gateway.dart';
 import 'package:legalhub/features/discovery/domain/attorney_admin_gateway.dart';
 import 'package:legalhub/features/discovery/domain/attorney_gateway.dart';
 import 'package:legalhub/features/documents/data/fake_document_gateway.dart';
@@ -89,6 +89,9 @@ import 'package:legalhub/features/storage/domain/uri_opener.dart';
 /// The real `SupabaseAuthApiImpl.bind()` needs a running `Supabase.instance`,
 /// which no test should spin up — the flip's test seam injects this instead.
 class _FakeSupabaseAuthApi implements SupabaseAuthApi {
+  @override
+  Future<bool> signInWithGoogle({required String redirectTo}) async => false;
+
   final StreamController<SupabaseAuthSnapshot?> _changes =
       StreamController<SupabaseAuthSnapshot?>.broadcast();
 

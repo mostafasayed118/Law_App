@@ -16,9 +16,6 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
   final TextEditingController _question = TextEditingController();
   final Set<String> _selectedDocumentIds = <String>{};
 
-  Result<List<Matter>>? _matters;
-  Result<List<Document>>? _documents;
-  bool _loadingLookups = true;
   String? _selectedMatterId;
 
   @override
@@ -28,8 +25,9 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
       if (!mounted) {
         return;
       }
-      context.read<AiResearchCubit>().loadRuns();
-      _loadLookups();
+      final AiResearchCubit cubit = context.read<AiResearchCubit>();
+      cubit.loadRuns();
+      cubit.loadLookups();
     });
   }
 
@@ -39,63 +37,55 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
     super.dispose();
   }
 
-  /// Loads both optional pickers in parallel. A failed lookup renders inline
-  /// with its own reload affordance and never blocks generation — the matter
-  /// and documents are optional context.
-  Future<void> _loadLookups() async {
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _loadingLookups = true;
-      _matters = null;
-      _documents = null;
-    });
-    final Future<Result<List<Matter>>> mattersFuture =
-        serviceLocator<MatterGateway>().fetchMatters();
-    final Future<Result<List<Document>>> documentsFuture =
-        serviceLocator<DocumentGateway>().fetchDocuments();
-    final Result<List<Matter>> matters = await mattersFuture;
-    final Result<List<Document>> documents = await documentsFuture;
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _matters = matters;
-      _documents = documents;
-      _loadingLookups = false;
-      final List<Matter> matterRows = matters.valueOrNull ?? const <Matter>[];
-      if (_selectedMatterId != null &&
-          !matterRows.any((Matter m) => m.id == _selectedMatterId)) {
-        _selectedMatterId = null;
-      }
-      final Set<String> available = <String>{
-        for (final Document document
-            in documents.valueOrNull ?? const <Document>[])
-          document.id,
-      };
-      _selectedDocumentIds.removeWhere((String id) => !available.contains(id));
-    });
+  void _reloadLookups() {
+    context.read<AiResearchCubit>().loadLookups();
   }
 
-  /// The active organization. The env-less demo has no session-backed org, so
-  /// it sends a clearly non-UUID demo value to the synthetic engine only; a
-  /// configured build never fabricates one and blocks generation instead.
-  String? get _organizationId {
-    final String? active = serviceLocator.isRegistered<ActiveOrgStore>()
-        ? serviceLocator<ActiveOrgStore>().activeOrganizationId
-        : null;
-    if (active != null && active.isNotEmpty) {
-      return active;
+  /// Drops a picked matter/document that the settled lookups no longer
+  /// contain, so a request never carries an id the picker cannot show. Runs
+  /// only on settled arms — a reload must not clear a still-valid selection
+  /// while the new rows are in flight.
+  void _pruneSelections(AiResearchState state) {
+    if (state.matters is ViewLoading<List<Matter>> ||
+        state.documents is ViewLoading<List<Document>>) {
+      return;
     }
-    return backendIsLocalOnly ? 'demo-organization' : null;
+    List<Matter> matterRows = const <Matter>[];
+    if (state.matters case ViewSuccess<List<Matter>>(
+      data: final List<Matter> rows,
+    )) {
+      matterRows = rows;
+    }
+    final Set<String> documentIds = <String>{};
+    if (state.documents case ViewSuccess<List<Document>>(
+      data: final List<Document> rows,
+    )) {
+      documentIds.addAll(rows.map((Document document) => document.id));
+    }
+    final bool matterStale =
+        _selectedMatterId != null &&
+        !matterRows.any((Matter matter) => matter.id == _selectedMatterId);
+    final bool documentsStale = _selectedDocumentIds.any(
+      (String id) => !documentIds.contains(id),
+    );
+    if (!matterStale && !documentsStale) {
+      return;
+    }
+    setState(() {
+      if (matterStale) {
+        _selectedMatterId = null;
+      }
+      _selectedDocumentIds.removeWhere(
+        (String id) => !documentIds.contains(id),
+      );
+    });
   }
 
   void _submit() {
     if (!(_formKey.currentState?.validate() ?? false)) {
       return;
     }
-    final String? organizationId = _organizationId;
+    final String? organizationId = _researchOrganizationId();
     if (organizationId == null) {
       return;
     }
@@ -112,93 +102,104 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final bool hasOrganization = backendIsLocalOnly || _organizationId != null;
+    final bool hasOrganization =
+        backendIsLocalOnly || _researchOrganizationId() != null;
     return SafeArea(
-      child: BlocBuilder<AiResearchCubit, AiResearchState>(
-        buildWhen: (AiResearchState previous, AiResearchState current) =>
-            previous.findings != current.findings ||
-            previous.runs != current.runs ||
-            previous.lastQuery != current.lastQuery ||
-            previous.lastError != current.lastError,
-        builder: (BuildContext context, AiResearchState state) {
-          final bool loading = state.findings is ViewLoading<List<AiFinding>>;
-          final List<Widget> sections = <Widget>[
-            _AdvisoryBanner(localOnly: backendIsLocalOnly),
-            const SizedBox(height: LegalHubTheme.spaceMd),
-            LegalHubTextField(
-              controller: _question,
-              label: l10n.aiResearchQuestionLabel,
-              hint: l10n.aiResearchFieldHint,
-              prefixIcon: Icons.auto_awesome_outlined,
-              maxLength: ResearchRequest.maxQuestionLength,
-              textInputAction: TextInputAction.search,
-              validator: (String? value) => _validateQuestion(l10n, value),
-              onSubmitted: (String _) {
-                if (!loading) {
-                  _submit();
-                }
-              },
-            ),
-            const SizedBox(height: LegalHubTheme.spaceSm),
-            _matterPicker(l10n, locked: loading),
-            const SizedBox(height: LegalHubTheme.spaceMd),
-            _documentsPicker(l10n, locked: loading),
-            const SizedBox(height: LegalHubTheme.spaceMd),
-            if (!hasOrganization) ...<Widget>[
-              Text(
-                l10n.aiResearchErrorNoOrg,
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
+      child: BlocListener<AiResearchCubit, AiResearchState>(
+        listenWhen: (AiResearchState previous, AiResearchState current) =>
+            previous.matters != current.matters ||
+            previous.documents != current.documents,
+        listener: (BuildContext context, AiResearchState state) =>
+            _pruneSelections(state),
+        child: BlocBuilder<AiResearchCubit, AiResearchState>(
+          buildWhen: (AiResearchState previous, AiResearchState current) =>
+              previous.findings != current.findings ||
+              previous.runs != current.runs ||
+              previous.matters != current.matters ||
+              previous.documents != current.documents ||
+              previous.lastQuery != current.lastQuery ||
+              previous.lastError != current.lastError,
+          builder: (BuildContext context, AiResearchState state) {
+            final bool loading = state.findings is ViewLoading<List<AiFinding>>;
+            final List<Widget> sections = <Widget>[
+              _AdvisoryBanner(localOnly: backendIsLocalOnly),
+              const SizedBox(height: LegalHubTheme.spaceMd),
+              LegalHubTextField(
+                controller: _question,
+                label: l10n.aiResearchQuestionLabel,
+                hint: l10n.aiResearchFieldHint,
+                prefixIcon: Icons.auto_awesome_outlined,
+                maxLength: ResearchRequest.maxQuestionLength,
+                textInputAction: TextInputAction.search,
+                validator: (String? value) => _validateQuestion(l10n, value),
+                onSubmitted: (String _) {
+                  if (!loading) {
+                    _submit();
+                  }
+                },
               ),
               const SizedBox(height: LegalHubTheme.spaceSm),
-            ],
-            FilledButton(
-              onPressed: loading || !hasOrganization ? null : _submit,
-              child: loading
-                  ? Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        const SizedBox.square(
-                          dimension: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                        const SizedBox(width: LegalHubTheme.spaceSm),
-                        Text(l10n.stateLoading),
-                      ],
-                    )
-                  : Text(l10n.aiResearchGenerate),
-            ),
-            const SizedBox(height: LegalHubTheme.spaceLg),
-            _RunsHistory(
-              runs: state.runs,
-              onOpen: (ResearchRun run) =>
-                  context.read<AiResearchCubit>().loadRunFindings(run.id),
-              onRetry: () => context.read<AiResearchCubit>().loadRuns(),
-            ),
-            const SizedBox(height: LegalHubTheme.spaceLg),
-            _FindingsSection(state: state, onRetry: _submit),
-            const SizedBox(height: LegalHubTheme.spaceLg),
-            Text(
-              backendIsLocalOnly
-                  ? l10n.aiResearchLocalOnlyNote
-                  : l10n.aiResearchStoredNote,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              _matterPicker(l10n, state, locked: loading),
+              const SizedBox(height: LegalHubTheme.spaceMd),
+              _documentsPicker(l10n, state, locked: loading),
+              const SizedBox(height: LegalHubTheme.spaceMd),
+              if (!hasOrganization) ...<Widget>[
+                Text(
+                  l10n.aiResearchErrorNoOrg,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+                const SizedBox(height: LegalHubTheme.spaceSm),
+              ],
+              FilledButton(
+                onPressed: loading || !hasOrganization ? null : _submit,
+                child: loading
+                    ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          const SizedBox.square(
+                            dimension: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                          const SizedBox(width: LegalHubTheme.spaceSm),
+                          Text(l10n.stateLoading),
+                        ],
+                      )
+                    : Text(l10n.aiResearchGenerate),
               ),
-            ),
-          ];
-          return Form(
-            key: _formKey,
-            // Lazy list: the sections inflate on demand instead of expanding
-            // the whole form tree on every state emission.
-            child: ListView.builder(
-              padding: const EdgeInsetsDirectional.all(
-                LegalHubTheme.marginMobile,
+              const SizedBox(height: LegalHubTheme.spaceLg),
+              _RunsHistory(
+                runs: state.runs,
+                onOpen: (ResearchRun run) =>
+                    context.read<AiResearchCubit>().loadRunFindings(run.id),
+                onRetry: () => context.read<AiResearchCubit>().loadRuns(),
               ),
-              itemCount: sections.length,
-              itemBuilder: (BuildContext context, int index) => sections[index],
-            ),
-          );
-        },
+              const SizedBox(height: LegalHubTheme.spaceLg),
+              _FindingsSection(state: state, onRetry: _submit),
+              const SizedBox(height: LegalHubTheme.spaceLg),
+              Text(
+                backendIsLocalOnly
+                    ? l10n.aiResearchLocalOnlyNote
+                    : l10n.aiResearchStoredNote,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ];
+            return Form(
+              key: _formKey,
+              // Lazy list: the sections inflate on demand instead of
+              // expanding the whole form tree on every state emission.
+              child: ListView.builder(
+                padding: const EdgeInsetsDirectional.all(
+                  LegalHubTheme.marginMobile,
+                ),
+                itemCount: sections.length,
+                itemBuilder: (BuildContext context, int index) =>
+                    sections[index],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -214,17 +215,26 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
     return null;
   }
 
-  Widget _matterPicker(AppLocalizations l10n, {required bool locked}) {
-    if (_loadingLookups) {
+  Widget _matterPicker(
+    AppLocalizations l10n,
+    AiResearchState state, {
+    required bool locked,
+  }) {
+    final ViewState<List<Matter>> lookup = state.matters;
+    if (lookup is ViewLoading<List<Matter>>) {
       return const LinearProgressIndicator();
     }
-    if (_matters is Failure<List<Matter>>) {
+    if (lookup is ViewError<List<Matter>> ||
+        lookup is ViewOffline<List<Matter>> ||
+        lookup is ViewUnauthorized<List<Matter>>) {
       return _LookupError(
         message: l10n.aiResearchMattersError,
-        onReload: _loadLookups,
+        onReload: _reloadLookups,
       );
     }
-    final List<Matter> matters = _matters?.valueOrNull ?? const <Matter>[];
+    final List<Matter> matters = lookup is ViewSuccess<List<Matter>>
+        ? lookup.data
+        : const <Matter>[];
     return DropdownButtonFormField<String?>(
       initialValue: _selectedMatterId,
       isExpanded: true,
@@ -246,30 +256,32 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
     );
   }
 
-  Widget _documentsPicker(AppLocalizations l10n, {required bool locked}) {
-    if (_loadingLookups) {
+  Widget _documentsPicker(
+    AppLocalizations l10n,
+    AiResearchState state, {
+    required bool locked,
+  }) {
+    final ViewState<List<Document>> lookup = state.documents;
+    if (lookup is ViewLoading<List<Document>>) {
       return const LinearProgressIndicator();
     }
-    final Widget rows = switch (_documents) {
-      Failure<List<Document>>() => _LookupError(
+    final Widget rows;
+    if (lookup is ViewError<List<Document>> ||
+        lookup is ViewOffline<List<Document>> ||
+        lookup is ViewUnauthorized<List<Document>>) {
+      rows = _LookupError(
         message: l10n.aiResearchDocumentsError,
-        onReload: _loadLookups,
-      ),
-      Success<List<Document>>(value: final List<Document> documents)
-          when documents.isEmpty =>
-        Text(
-          l10n.aiResearchDocumentsNone,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-        ),
-      Success<List<Document>>(value: final List<Document> documents) => Wrap(
+        onReload: _reloadLookups,
+      );
+    } else if (lookup is ViewSuccess<List<Document>> &&
+        lookup.data.isNotEmpty) {
+      rows = Wrap(
         spacing: LegalHubTheme.spaceXs,
         runSpacing: LegalHubTheme.spaceXs,
         children: <Widget>[
           // shortcut: only the first _maxDocumentChips render as pickable
           // chips; add paging if a matter's vault routinely exceeds that.
-          for (final Document document in documents.take(_maxDocumentChips))
+          for (final Document document in lookup.data.take(_maxDocumentChips))
             FilterChip(
               label: Text(demoDocumentTitle(l10n, document.title)),
               selected: _selectedDocumentIds.contains(document.id),
@@ -286,9 +298,15 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
                     },
             ),
         ],
-      ),
-      _ => const SizedBox.shrink(),
-    };
+      );
+    } else {
+      rows = Text(
+        l10n.aiResearchDocumentsNone,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[

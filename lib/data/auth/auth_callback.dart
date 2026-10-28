@@ -34,6 +34,14 @@ class AuthCallbackUri {
   static const String _appCallbackPath = '/v1/callback';
   static const String _httpsCallbackPath = '/auth/v1/callback';
 
+  /// The auth-callback URI for a build whose custom scheme is [scheme].
+  ///
+  /// This is the single source of truth for the OAuth `redirectTo`: it is the
+  /// exact location [pkceCode] accepts back from the provider, so the two can
+  /// never drift apart.
+  static String callbackUriFor(String scheme) =>
+      '$scheme://$_authHost$_appCallbackPath';
+
   /// Implicit-flow material the PKCE exchange must never receive.
   static const Set<String> _implicitSessionParameters = <String>{
     'access_token',

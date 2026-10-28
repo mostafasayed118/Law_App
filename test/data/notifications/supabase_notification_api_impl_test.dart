@@ -3,49 +3,34 @@ import 'package:legalhub/data/notifications/supabase_notification_api.dart';
 import 'package:legalhub/data/notifications/supabase_notification_api_impl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../support/supabase_api_stub.dart';
+
 void main() {
   group('SupabaseNotificationApiImpl', () {
-    late List<String> calls;
-    late Map<String, List<Map<String, dynamic>>> tableData;
-    late Map<String, PostgrestException> tableErrors;
-    late Map<String, Object> objectErrors;
+    late SupabaseApiStub stub;
     late SupabaseNotificationApiImpl api;
 
     setUp(() {
-      calls = <String>[];
-      tableData = <String, List<Map<String, dynamic>>>{};
-      tableErrors = <String, PostgrestException>{};
-      objectErrors = <String, Object>{};
-      api = SupabaseNotificationApiImpl((String table, String columns) async {
-        calls.add('$table:$columns');
-        final Object? objectError = objectErrors[table];
-        if (objectError != null) {
-          throw objectError;
-        }
-        final PostgrestException? error = tableErrors[table];
-        if (error != null) {
-          throw error;
-        }
-        return tableData[table] ?? const <Map<String, dynamic>>[];
-      });
+      stub = SupabaseApiStub();
+      api = SupabaseNotificationApiImpl(stub.tableCaller);
     });
 
     test('fetchNotifications selects the notifications table with the VO '
         'columns', () async {
-      tableData['notifications'] = <Map<String, dynamic>>[
+      stub.tableData['notifications'] = <Map<String, dynamic>>[
         <String, dynamic>{'id': 'notification-1'},
       ];
 
       final List<Map<String, dynamic>> rows = await api.fetchNotifications();
 
       expect(rows, hasLength(1));
-      expect(calls, <String>[
+      expect(stub.calls, <String>[
         'notifications:id, category, type, summary, server_timestamp, is_read',
       ]);
     });
 
     test('fetchNotifications maps a table denial to the denied kind', () async {
-      tableErrors['notifications'] = const PostgrestException(
+      stub.tableErrors['notifications'] = const PostgrestException(
         message: 'permission denied',
       );
 
@@ -64,7 +49,7 @@ void main() {
     test(
       'fetchNotifications maps an RLS denial text to the denied kind',
       () async {
-        tableErrors['notifications'] = const PostgrestException(
+        stub.tableErrors['notifications'] = const PostgrestException(
           message: 'new row violates row-level security policy',
         );
 
@@ -84,7 +69,7 @@ void main() {
     test(
       'fetchNotifications maps an unknown PostgrestException to unknown',
       () async {
-        tableErrors['notifications'] = const PostgrestException(
+        stub.tableErrors['notifications'] = const PostgrestException(
           message: 'something else',
         );
 
@@ -104,7 +89,7 @@ void main() {
     test(
       'fetchNotifications maps a non-Postgrest error to providerUnavailable',
       () async {
-        objectErrors['notifications'] = Exception('network down');
+        stub.objectErrors['notifications'] = Exception('network down');
 
         await expectLater(
           api.fetchNotifications(),
@@ -124,7 +109,9 @@ void main() {
       () async {
         // C2: `on Exception` — a TypeError/StateError is a programming error
         // and must not be swallowed as providerUnavailable.
-        objectErrors['notifications'] = StateError('client closed by a bug');
+        stub.objectErrors['notifications'] = StateError(
+          'client closed by a bug',
+        );
 
         await expectLater(api.fetchNotifications(), throwsA(isA<StateError>()));
       },

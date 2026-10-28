@@ -1,11 +1,12 @@
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/data/research/supabase_research_api.dart';
+import 'package:legalhub/data/row_reader.dart';
 import 'package:legalhub/features/research/domain/ai_finding.dart';
 import 'package:legalhub/features/research/domain/ai_gateway.dart';
 import 'package:legalhub/features/research/domain/research_outcome.dart';
 import 'package:legalhub/features/research/domain/research_request.dart';
 import 'package:legalhub/features/research/domain/research_run.dart';
-import 'supabase_research_api.dart';
 
 /// Research gateway backed by the Supabase function + read RPCs (design §5).
 ///
@@ -123,7 +124,7 @@ class SupabaseResearchGateway implements AiGateway {
   /// Maps the 200 body to an outcome. A completed contract carries 1..12
   /// findings; an empty or out-of-range list is provider drift.
   ResearchOutcome _outcomeFrom(Map<String, dynamic> payload) {
-    final String runId = _requiredString(payload, 'run_id');
+    final String runId = requiredString(payload, 'run_id');
     final ResearchRunStatus status = _statusOf(payload['status']);
     final Object? raw = payload['findings'];
     if (raw is! List<dynamic>) {
@@ -158,7 +159,7 @@ class SupabaseResearchGateway implements AiGateway {
     return ResearchOutcome(
       runId: runId,
       status: status,
-      model: _optionalString(payload['model']),
+      model: optionalString(payload['model']),
       findings: List<AiFinding>.unmodifiable(findings),
     );
   }
@@ -169,7 +170,7 @@ class SupabaseResearchGateway implements AiGateway {
     required int index,
   }) {
     final AiSourceKind kind = _sourceKindOf(row['source_type']);
-    final String? sourceId = _optionalString(row['source_id']);
+    final String? sourceId = optionalString(row['source_id']);
     if (kind != AiSourceKind.none && sourceId == null) {
       throw const FormatException(
         'Research finding cites a source but carries no source id',
@@ -177,9 +178,9 @@ class SupabaseResearchGateway implements AiGateway {
     }
     return AiFinding(
       id: '$runId-$index',
-      headline: _requiredString(row, 'headline'),
-      summary: _requiredString(row, 'summary'),
-      excerpt: _optionalString(row['excerpt']) ?? '',
+      headline: requiredString(row, 'headline'),
+      summary: requiredString(row, 'summary'),
+      excerpt: optionalString(row['excerpt']) ?? '',
       sources: <AiSource>[
         AiSource(
           kind: kind,
@@ -195,10 +196,10 @@ class SupabaseResearchGateway implements AiGateway {
   AiFinding _storedFindingFrom(Map<String, dynamic> row) {
     final AiSourceKind kind = _sourceKindOf(row['source_type']);
     return AiFinding(
-      id: _requiredString(row, 'id'),
-      headline: _requiredString(row, 'headline'),
-      summary: _requiredString(row, 'summary'),
-      excerpt: _optionalString(row['excerpt']) ?? '',
+      id: requiredString(row, 'id'),
+      headline: requiredString(row, 'headline'),
+      summary: requiredString(row, 'summary'),
+      excerpt: optionalString(row['excerpt']) ?? '',
       sources: <AiSource>[
         AiSource(
           kind: kind,
@@ -206,7 +207,7 @@ class SupabaseResearchGateway implements AiGateway {
           detail: '',
           sourceId: kind == AiSourceKind.none
               ? null
-              : _optionalString(row['source_id']),
+              : optionalString(row['source_id']),
         ),
       ],
     );
@@ -215,15 +216,15 @@ class SupabaseResearchGateway implements AiGateway {
   /// One persisted `research_runs` row.
   ResearchRun _runFrom(Map<String, dynamic> row) {
     return ResearchRun(
-      id: _requiredString(row, 'id'),
-      organizationId: _requiredString(row, 'organization_id'),
-      matterId: _optionalString(row['matter_id']),
+      id: requiredString(row, 'id'),
+      organizationId: requiredString(row, 'organization_id'),
+      matterId: optionalString(row['matter_id']),
       status: _statusOf(row['status']),
-      model: _optionalString(row['model']),
-      promptSummary: _requiredString(row, 'prompt_summary'),
-      errorCode: _optionalString(row['error_code']),
-      createdAt: _requiredDate(row, 'created_at'),
-      completedAt: _optionalDate(row['completed_at']),
+      model: optionalString(row['model']),
+      promptSummary: requiredString(row, 'prompt_summary'),
+      errorCode: optionalString(row['error_code']),
+      createdAt: requiredDate(row, 'created_at'),
+      completedAt: optionalDate(row['completed_at']),
     );
   }
 
@@ -240,45 +241,6 @@ class SupabaseResearchGateway implements AiGateway {
     'none' => AiSourceKind.none,
     _ => throw const FormatException('Research finding has an unknown source'),
   };
-
-  String _requiredString(Map<String, dynamic> row, String field) {
-    final Object? value = row[field];
-    if (value is! String || value.trim().isEmpty) {
-      throw FormatException('Research row has no $field');
-    }
-    return value;
-  }
-
-  DateTime _requiredDate(Map<String, dynamic> row, String field) {
-    final Object? value = row[field];
-    if (value is! String) {
-      throw FormatException('Research row has no $field');
-    }
-    final DateTime? parsed = DateTime.tryParse(value);
-    if (parsed == null) {
-      throw FormatException('Research row has an invalid $field');
-    }
-    return parsed;
-  }
-
-  DateTime? _optionalDate(Object? value) {
-    if (value is! String || value.isEmpty) {
-      return null;
-    }
-    final DateTime? parsed = DateTime.tryParse(value);
-    if (parsed == null) {
-      throw const FormatException('Research row has an invalid date');
-    }
-    return parsed;
-  }
-
-  String? _optionalString(Object? value) {
-    if (value is! String) {
-      return null;
-    }
-    final String trimmed = value.trim();
-    return trimmed.isEmpty ? null : trimmed;
-  }
 
   /// Maps a seam failure to a redaction-safe [AppError]. The question and
   /// document bodies never cross into errors; only the provider's own message

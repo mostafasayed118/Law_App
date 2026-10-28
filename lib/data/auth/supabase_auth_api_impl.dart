@@ -149,6 +149,26 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
   }
 
   @override
+  Future<bool> signInWithGoogle({required String redirectTo}) async {
+    try {
+      // `externalApplication` hands the consent page to the platform browser
+      // instead of an embedded WebView: Google refuses OAuth in embedded
+      // webviews, and the PKCE verifier stays with this app's secure storage.
+      // The returned bool only proves the browser opened — the session arrives
+      // through the callback observer.
+      return await _client.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: redirectTo,
+        authScreenLaunchMode: LaunchMode.externalApplication,
+      );
+    } on AuthException {
+      return false;
+    } on Exception {
+      return false;
+    }
+  }
+
+  @override
   Future<SupabaseSignUpResult> signUp({
     required String email,
     required String password,

@@ -890,6 +890,9 @@ late _StagedHydrationRepository _stagedHydrationRepository;
 
 class _NullSessionGateway implements AuthGateway {
   @override
+  Future<bool> startGoogleSignIn() async => false;
+
+  @override
   Session? get currentSession => null;
 
   @override
@@ -924,6 +927,9 @@ class _NullSessionGateway implements AuthGateway {
 class _PreauthenticatedGateway implements AuthGateway {
   _PreauthenticatedGateway(this.session);
 
+  @override
+  Future<bool> startGoogleSignIn() async => false;
+
   final Session session;
 
   @override
@@ -957,6 +963,9 @@ class _PreauthenticatedGateway implements AuthGateway {
 }
 
 class _ExpiredSessionGateway implements AuthGateway {
+  @override
+  Future<bool> startGoogleSignIn() async => false;
+
   @override
   Session? get currentSession => Session(
     userId: 'expired-user',
@@ -1003,6 +1012,9 @@ class _ExpiredSessionGateway implements AuthGateway {
 
 class _FailingAuthGateway implements AuthGateway {
   _FailingAuthGateway(this.failure);
+
+  @override
+  Future<bool> startGoogleSignIn() async => false;
 
   final AuthFailure failure;
 
@@ -1126,6 +1138,9 @@ class _HydrationRepository implements MembershipRepository {
 }
 
 class _CountingAuthGateway implements AuthGateway {
+  @override
+  Future<bool> startGoogleSignIn() async => false;
+
   int calls = 0;
 
   @override

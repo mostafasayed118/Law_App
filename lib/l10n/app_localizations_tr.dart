@@ -132,7 +132,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get socialSignInUnavailable =>
-      'Sosyal medya ile giriş henüz kullanılamıyor. E-postayı veya demo oturumunu kullanın.';
+      'Apple ile giriş henüz kullanılamıyor. Google, e-posta veya demo oturumunu kullanın.';
 
   @override
   String get newToLegalHub => 'LegalHub\'te yeni misiniz?';

@@ -18,6 +18,9 @@ import 'package:legalhub/l10n/app_localizations.dart';
 class _FixedAuthGateway implements AuthGateway {
   _FixedAuthGateway(this._session);
 
+  @override
+  Future<bool> startGoogleSignIn() async => false;
+
   final Session _session;
 
   @override

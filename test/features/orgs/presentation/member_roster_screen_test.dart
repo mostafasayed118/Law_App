@@ -20,6 +20,9 @@ import 'package:legalhub/l10n/app_localizations.dart';
 class _RoleAuthGateway implements AuthGateway {
   _RoleAuthGateway(this._session);
 
+  @override
+  Future<bool> startGoogleSignIn() async => false;
+
   final Session _session;
 
   @override

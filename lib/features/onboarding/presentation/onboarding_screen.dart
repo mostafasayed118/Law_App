@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/app/router.dart';
 import 'package:legalhub/app/service_locator.dart';
-import 'package:legalhub/data/local/onboarding_store.dart';
+import 'package:legalhub/features/onboarding/presentation/onboarding_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
 
@@ -14,9 +14,9 @@ part 'onboarding_page.dart';
 /// `stitch_legalhub_mobile_app/onboarding`.
 ///
 /// On completion it routes to the onboarding-success screen. Skip (and the
-/// success action) mark the first-run flag in [OnboardingStore] so the next
-/// launch starts at sign-in. Images in the designs are remote placeholders,
-/// so a tonal surface is used instead.
+/// success action) mark the first-run flag through [OnboardingCubit] so the
+/// next launch starts at sign-in. Images in the designs are remote
+/// placeholders, so a tonal surface is used instead.
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -35,9 +35,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _complete(BuildContext context) async {
-    if (serviceLocator.isRegistered<OnboardingStore>()) {
-      await serviceLocator<OnboardingStore>().markCompleted();
-    }
+    final OnboardingCubit cubit = serviceLocator<OnboardingCubit>();
+    await cubit.complete();
     if (context.mounted) {
       context.go(AppRoutes.signIn);
     }

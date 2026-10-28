@@ -131,7 +131,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get socialSignInUnavailable =>
-      'تسجيل الدخول عبر وسائل التواصل غير متاح بعد. استخدم البريد الإلكتروني أو الجلسة التجريبية.';
+      'تسجيل الدخول عبر Apple غير متاح بعد. استخدم Google أو البريد الإلكتروني أو الجلسة التجريبية.';
 
   @override
   String get newToLegalHub => 'جديد على LegalHub؟';

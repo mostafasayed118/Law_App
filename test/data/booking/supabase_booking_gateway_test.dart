@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/data/booking/supabase_booking_api.dart';
-import 'package:legalhub/data/booking/supabase_booking_gateway.dart';
+import 'package:legalhub/features/booking/data/supabase_booking_gateway.dart';
 import 'package:legalhub/features/booking/domain/booking_category.dart';
 import 'package:legalhub/features/booking/domain/booking_confirmation.dart';
 import 'package:legalhub/features/booking/domain/booking_gateway.dart';

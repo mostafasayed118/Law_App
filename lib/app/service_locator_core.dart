@@ -22,6 +22,12 @@ void _registerCoreServices({SharedPreferences? preferences}) {
           : SharedPreferencesOnboardingStore(preferences),
     );
   }
+  if (!serviceLocator.isRegistered<OnboardingCubit>()) {
+    // Factory: the cubit holds no state beyond the store seam.
+    serviceLocator.registerFactory<OnboardingCubit>(
+      () => OnboardingCubit(serviceLocator<OnboardingStore>()),
+    );
+  }
   if (!serviceLocator.isRegistered<NotificationPrefsStore>()) {
     serviceLocator.registerLazySingleton<NotificationPrefsStore>(
       () => preferences == null

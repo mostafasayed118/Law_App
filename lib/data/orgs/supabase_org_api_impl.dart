@@ -16,14 +16,20 @@ typedef OrgRpcCaller =
       Map<String, dynamic> params,
     );
 
-/// A PostgREST table SELECT: table name + columns → raw map rows.
+/// A PostgREST table SELECT: table name + columns → raw map rows, with an
+/// optional server-side equality filter.
 ///
 /// The second callable the impl injects (alongside [OrgRpcCaller]) for the
 /// P3.2 membership-hydration SELECT. Same seam discipline: plain function
 /// type for test injection, provider types confined to the production
 /// binding below.
 typedef OrgTableCaller =
-    Future<List<Map<String, dynamic>>> Function(String table, String columns);
+    Future<List<Map<String, dynamic>>> Function(
+      String table,
+      String columns, {
+      String? filterColumn,
+      Object? filterValue,
+    });
 
 /// [SupabaseOrgApi] backed by the PostgREST client.
 ///
@@ -46,15 +52,22 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
     return SupabaseSeam.boundRpc(function, params);
   }
 
-  /// Shared seam binding ([SupabaseSeam.boundTable]): a hard row cap, no
-  /// ordering (the caller-scoped `memberships` read is bounded by the
-  /// user's own org count; no deterministic column is contractually
-  /// meaningful) (audit 2026-09-21, P1).
+  /// Shared seam binding ([SupabaseSeam.boundFilteredTable]): an optional
+  /// equality filter + a hard row cap, no ordering (the `memberships` read
+  /// is scoped to the caller's `user_id`; no deterministic column is
+  /// contractually meaningful) (audit 2026-09-21, P1).
   static Future<List<Map<String, dynamic>>> _boundTable(
     String table,
-    String columns,
-  ) {
-    return SupabaseSeam.boundTable(table, columns);
+    String columns, {
+    String? filterColumn,
+    Object? filterValue,
+  }) {
+    return SupabaseSeam.boundFilteredTable(
+      table,
+      columns,
+      filterColumn: filterColumn,
+      filterValue: filterValue,
+    );
   }
 
   final OrgRpcCaller _rpc;
@@ -133,14 +146,17 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
   }) async {
     try {
       // RLS-scoped: the memberships policy = own-row OR active-member, so it
-      // can return co-members' rows. `user_id` is selected and projected here
-      // before the repository's own guard (defense in depth). The embedded
+      // can return co-members' rows. Filtering `user_id` server-side keeps
+      // the caller's own rows inside the hard 200-row cap; the Dart
+      // projection below stays as defense in depth. The embedded
       // organizations(name) join resolves for active memberships and is null
       // for suspended/removed ones (org row not visible) — the repository
       // mapper tolerates the null name (plan §6).
       final List<Map<String, dynamic>> rows = await _table(
         'memberships',
         'organization_id, user_id, role, status, organizations(name)',
+        filterColumn: 'user_id',
+        filterValue: userId,
       );
       return rows
           .where((Map<String, dynamic> row) => row['user_id'] == userId)

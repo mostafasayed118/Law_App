@@ -132,7 +132,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get socialSignInUnavailable =>
-      'Social sign-in is not available yet. Use email or the demo session.';
+      'Apple sign-in is not available yet. Use Google, email, or the demo session.';
 
   @override
   String get newToLegalHub => 'New to LegalHub?';

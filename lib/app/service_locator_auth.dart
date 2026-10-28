@@ -14,9 +14,16 @@ void _registerAuthSeams(
       // Audit A02: refuse a cleartext URL on the same path (defense in
       // depth alongside the bootstrap guard — tests inject env directly).
       SupabaseEnv.ensureHttpsUrl(env.url);
+      // The OAuth redirect must carry THIS build's scheme: a dev build only
+      // registers `com.legalhub.app.dev`, so the production scheme would be
+      // handed to a browser no installed app can answer.
+      final String oauthRedirectUri = AuthCallbackUri.callbackUriFor(
+        AppConfig.fromEnvironment().deepLinkScheme,
+      );
       serviceLocator.registerLazySingleton<AuthGateway>(
         () => SupabaseAuthGateway(
           (supabaseAuthApiFactory ?? SupabaseAuthApiImpl.bind)(),
+          oauthRedirectUri: oauthRedirectUri,
         ),
         dispose: (AuthGateway gateway) =>
             (gateway as SupabaseAuthGateway).dispose(),

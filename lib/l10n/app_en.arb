@@ -40,7 +40,7 @@
   "orContinueWith": "OR CONTINUE WITH",
   "continueWithGoogle": "Google",
   "continueWithApple": "Apple",
-  "socialSignInUnavailable": "Social sign-in is not available yet. Use email or the demo session.",
+  "socialSignInUnavailable": "Apple sign-in is not available yet. Use Google, email, or the demo session.",
   "newToLegalHub": "New to LegalHub?",
   "createAccount": "Create an account",
   "signUpErrorEmailInUse": "An account with this email already exists.",

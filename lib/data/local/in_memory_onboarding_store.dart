@@ -1,4 +1,4 @@
-import 'onboarding_store.dart';
+import 'package:legalhub/core/onboarding/onboarding_store.dart';
 
 class InMemoryOnboardingStore implements OnboardingStore {
   InMemoryOnboardingStore({bool completed = false}) {

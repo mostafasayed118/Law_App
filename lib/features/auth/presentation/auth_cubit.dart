@@ -65,6 +65,39 @@ class AuthCubit extends _AuthCubitBase with _AuthHydration {
     }
   }
 
+  /// Google OAuth sign-in (browser hand-off).
+  ///
+  /// The flow is two-legged and this call owns only the first: launching the
+  /// provider browser. A `true` launch returns the surface to signed-out while
+  /// the user consents — the authenticated session arrives later through the
+  /// gateway stream (the callback observer's PKCE exchange), which
+  /// [_onSessionChange] maps without needing this call to stay in flight.
+  /// A `false` launch is a real failure and takes the normal error path.
+  Future<void> signInWithGoogle() async {
+    if (state.status == AuthStatus.loading || state.isAuthenticated) {
+      return;
+    }
+    emit(const AuthState(status: AuthStatus.loading));
+    _explicitOperationInFlight = true;
+    try {
+      final bool launched = await _gateway.startGoogleSignIn();
+      if (!launched) {
+        await _handleFailure(
+          const AuthFailure(
+            kind: AuthFailureKind.providerUnavailable,
+            message: 'Google sign-in could not be started.',
+          ),
+        );
+        return;
+      }
+      // The browser owns the flow now. Drop the loading state so the pending
+      // callback (which may take a while) does not look like a hung request.
+      _emitIfChanged(const AuthState.unauthenticated());
+    } finally {
+      _explicitOperationInFlight = false;
+    }
+  }
+
   Future<void> startDemoSession() async {
     if (state.status == AuthStatus.loading || state.isAuthenticated) {
       return;

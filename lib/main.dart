@@ -16,9 +16,9 @@ import 'app/localization/locale_cubit.dart';
 import 'app/router.dart';
 import 'app/service_locator.dart';
 import 'app/theme/theme_cubit.dart';
+import 'core/onboarding/onboarding_store.dart';
 import 'data/auth/supabase_auth_api_impl.dart';
 import 'data/auth/supabase_env.dart';
-import 'data/local/onboarding_store.dart';
 import 'features/auth/presentation/auth_cubit.dart';
 import 'l10n/app_localizations.dart';
 

@@ -204,34 +204,67 @@ void main() {
 
   // E2E BUG-2 regression (2026-09-24): both social buttons were wired
   // `onTap: () => context.go(AppRoutes.signUp)`, so tapping "Continue with
-  // Google/Apple" silently opened the Create Account form. No provider is
-  // wired yet, so the honest posture is a genuinely DISABLED button plus a
-  // disclosure — never a misleading navigation. This pin fails on the
-  // pre-fix code (onTap non-null) and passes once they are disabled.
-  testWidgets('the social buttons are disabled and disclose unavailability', (
+  // Google/Apple" silently opened the Create Account form. A provider button
+  // may only ever start its own provider flow or be disabled.
+  testWidgets('Google starts its provider flow; Apple stays disabled', (
     tester,
   ) async {
     await tester.pumpWidget(pumpIsolated());
     await tester.pumpAndSettle();
 
-    final Iterable<SocialButton> socials = tester.widgetList<SocialButton>(
-      find.byType(SocialButton),
-    );
+    final List<SocialButton> socials = tester
+        .widgetList<SocialButton>(find.byType(SocialButton))
+        .toList();
     expect(socials, isNotEmpty, reason: 'both social buttons should render');
-    for (final SocialButton button in socials) {
-      expect(
-        button.onTap,
-        isNull,
-        reason:
-            'A social button with no wired provider must be disabled — it must '
-            'never navigate to the sign-up form (E2E BUG-2).',
-      );
-    }
 
-    // The honest disclosure is present so the disabled state is explained.
+    final SocialButton google = socials.firstWhere(
+      (SocialButton button) => button.icon == Icons.g_mobiledata_outlined,
+    );
+    final SocialButton apple = socials.firstWhere(
+      (SocialButton button) => button.icon == Icons.apple,
+    );
+    expect(
+      google.onTap,
+      isNotNull,
+      reason: 'Google is wired to the OAuth browser hand-off.',
+    );
+    expect(
+      apple.onTap,
+      isNull,
+      reason:
+          'Apple has no provider wired, so it must be disabled — it must '
+          'never navigate to the sign-up form (E2E BUG-2).',
+    );
+
+    // The honest disclosure explains the still-disabled Apple button.
     expect(
       find.text(
-        'Social sign-in is not available yet. Use email or the demo session.',
+        'Apple sign-in is not available yet. Use Google, email, or the demo '
+        'session.',
+      ),
+      findsOneWidget,
+    );
+  });
+
+  // The dev fake has no browser flow: it reports "not launched", so the
+  // surface must show the sign-in error instead of pretending consent opened.
+  testWidgets('a failed Google launch surfaces the sign-in error', (
+    tester,
+  ) async {
+    await tester.pumpWidget(pumpIsolated());
+    await tester.pumpAndSettle();
+
+    final SocialButton google = tester
+        .widgetList<SocialButton>(find.byType(SocialButton))
+        .firstWhere(
+          (SocialButton button) => button.icon == Icons.g_mobiledata_outlined,
+        );
+    google.onTap!();
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        'Unable to sign in. Please check your credentials and try again.',
       ),
       findsOneWidget,
     );

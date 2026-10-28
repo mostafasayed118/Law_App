@@ -1,8 +1,8 @@
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/data/tasks/supabase_task_api.dart';
 import 'package:legalhub/features/tasks/domain/task_gateway.dart';
 import 'package:legalhub/features/tasks/domain/task_item.dart';
-import 'supabase_task_api.dart';
 
 /// [TaskBoardGateway] backed by the Supabase provider via [SupabaseTaskApi].
 ///

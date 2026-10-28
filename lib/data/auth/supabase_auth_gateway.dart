@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:legalhub/core/auth/auth_gateway.dart';
+import 'auth_callback.dart';
 import 'supabase_auth_api.dart';
 
 /// [AuthGateway] backed by the Supabase provider via [SupabaseAuthApi].
@@ -9,7 +10,15 @@ import 'supabase_auth_api.dart';
 /// [Session]. The gateway never sees raw GoTrue DTOs or tokens — the
 /// [SupabaseAuthApi] seam already stripped them.
 class SupabaseAuthGateway implements AuthGateway {
-  SupabaseAuthGateway(this._api) {
+  /// [oauthRedirectUri] is the flavor's registered callback deep link
+  /// (`com.legalhub.app://auth/v1/callback` in production,
+  /// `com.legalhub.app.dev://auth/v1/callback` in development). It defaults to
+  /// the production scheme so the mapping tests stay flavor-agnostic; the
+  /// service locator always passes the build's real scheme.
+  SupabaseAuthGateway(this._api, {String? oauthRedirectUri})
+    : _oauthRedirectUri =
+          oauthRedirectUri ??
+          AuthCallbackUri.callbackUriFor(AuthCallbackUri.appScheme) {
     _session = _toSession(_api.currentSnapshot);
     _recoveryPending = _api.currentSnapshot?.recoveredViaLink ?? false;
     _subscription = _api.snapshotChanges.listen((
@@ -22,6 +31,7 @@ class SupabaseAuthGateway implements AuthGateway {
   }
 
   final SupabaseAuthApi _api;
+  final String _oauthRedirectUri;
   final StreamController<Session?> _changes =
       StreamController<Session?>.broadcast();
   late final StreamSubscription<SupabaseAuthSnapshot?> _subscription;
@@ -93,6 +103,10 @@ class SupabaseAuthGateway implements AuthGateway {
         return AuthOutcome<Session>.failure(_mapFailure(failure));
     }
   }
+
+  @override
+  Future<bool> startGoogleSignIn() =>
+      _api.signInWithGoogle(redirectTo: _oauthRedirectUri);
 
   /// Maps the DTO-free API failure to the domain [AuthFailure] vocabulary.
   /// [SupabaseAuthFailureKind.emailInUse] cannot occur on sign-in; it is

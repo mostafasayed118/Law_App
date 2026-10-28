@@ -42,6 +42,9 @@ class _FlakyOrgSelectionStore implements OrgSelectionStore {
 /// above the seam) and every explicit operation is announced on
 /// [sessionChanges].
 class _ProviderSnapshotGateway implements AuthGateway {
+  @override
+  Future<bool> startGoogleSignIn() async => false;
+
   final String userId = 'user-1';
   Session? _session;
   bool _recoveryPending = false;

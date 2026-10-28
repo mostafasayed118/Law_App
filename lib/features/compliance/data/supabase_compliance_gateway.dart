@@ -1,8 +1,9 @@
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/data/compliance/supabase_compliance_api.dart';
+import 'package:legalhub/data/row_reader.dart';
 import 'package:legalhub/features/compliance/domain/compliance_alert.dart';
 import 'package:legalhub/features/compliance/domain/compliance_gateway.dart';
-import 'supabase_compliance_api.dart';
 
 /// Compliance-alert gateway backed by the Supabase provider (design §4).
 ///
@@ -153,18 +154,22 @@ class SupabaseComplianceGateway implements ComplianceAlertsGateway {
   /// `FormatException` rather than a raw cast error across the boundary.
   ComplianceAlert _fromRow(Map<String, dynamic> row) {
     return ComplianceAlert(
-      id: _requiredString(row, 'id'),
-      organizationId: _requiredString(row, 'organization_id'),
-      matterId: _optionalString(row['matter_id']),
-      title: _requiredString(row, 'title'),
-      description: _optionalString(row['description']),
+      id: requiredString(row, 'id', allowWhitespaceOnly: true),
+      organizationId: requiredString(
+        row,
+        'organization_id',
+        allowWhitespaceOnly: true,
+      ),
+      matterId: optionalString(row['matter_id']),
+      title: requiredString(row, 'title', allowWhitespaceOnly: true),
+      description: optionalString(row['description']),
       kind: _kindOf(row['kind']),
       severity: _severityOf(row['severity']),
       status: _statusOf(row['status']),
-      dueAt: _optionalDate(row['due_at']),
-      acknowledgedAt: _optionalDate(row['acknowledged_at']),
-      resolvedAt: _optionalDate(row['resolved_at']),
-      createdAt: _requiredDate(row, 'created_at'),
+      dueAt: optionalDate(row['due_at']),
+      acknowledgedAt: optionalDate(row['acknowledged_at']),
+      resolvedAt: optionalDate(row['resolved_at']),
+      createdAt: requiredDate(row, 'created_at'),
     );
   }
 
@@ -206,45 +211,6 @@ class SupabaseComplianceGateway implements ComplianceAlertsGateway {
     AlertSeverity.high => 'high',
     AlertSeverity.critical => 'critical',
   };
-
-  String _requiredString(Map<String, dynamic> row, String field) {
-    final Object? value = row[field];
-    if (value is! String || value.isEmpty) {
-      throw FormatException('Compliance alert has no $field');
-    }
-    return value;
-  }
-
-  DateTime _requiredDate(Map<String, dynamic> row, String field) {
-    final Object? value = row[field];
-    if (value is! String) {
-      throw FormatException('Compliance alert has no $field');
-    }
-    final DateTime? parsed = DateTime.tryParse(value);
-    if (parsed == null) {
-      throw FormatException('Compliance alert has an invalid $field');
-    }
-    return parsed;
-  }
-
-  DateTime? _optionalDate(Object? value) {
-    if (value is! String || value.isEmpty) {
-      return null;
-    }
-    final DateTime? parsed = DateTime.tryParse(value);
-    if (parsed == null) {
-      throw const FormatException('Compliance alert has an invalid date');
-    }
-    return parsed;
-  }
-
-  String? _optionalString(Object? value) {
-    if (value is! String) {
-      return null;
-    }
-    final String trimmed = value.trim();
-    return trimmed.isEmpty ? null : trimmed;
-  }
 
   /// Maps a seam failure to a redaction-safe [AppError]. Alert content never
   /// crosses into errors; only the provider's own message crosses as the

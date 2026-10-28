@@ -90,6 +90,11 @@ class FakeAuthGateway implements AuthGateway {
     return startDemoSession();
   }
 
+  /// The demo seam has no browser flow: report "not launched" so the caller
+  /// surfaces an honest failure instead of a phantom consent screen.
+  @override
+  Future<bool> startGoogleSignIn() async => false;
+
   @override
   Future<AuthOutcome<Session>> startDemoSession() async {
     final Session session = Session(
