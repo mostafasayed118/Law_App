@@ -1,7 +1,9 @@
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/tasks/domain/task_gateway.dart';
 import 'package:legalhub/features/tasks/domain/task_item.dart';
+import 'package:legalhub/shared/demo/demo_corpus.dart';
 
 /// Development-only task-board implementation: a fixed synthetic list of 5
 /// deterministic non-PII task rows (v1 queue, 2026-08-09) plus an
@@ -16,62 +18,52 @@ import 'package:legalhub/features/tasks/domain/task_item.dart';
 class FakeTaskGateway implements TaskBoardGateway {
   FakeTaskGateway() : _tasks = List<TaskItem>.of(syntheticTasks);
 
-  static const String demoOrganizationId = 'org-demo';
-
-  /// The synthetic matter titles the fake board references (no cross-feature
-  /// fake import — the title map is local to this fake).
-  static const Map<String, String> matterTitles = <String, String>{
-    'matter-1': 'Demo acquisition review',
-    'matter-2': 'Commercial lease consultation',
-    'matter-3': 'Procedural review matter',
-    'matter-4': 'Family status consultation',
-    'matter-5': 'Startup formation advisory',
-  };
+  static const String demoOrganizationId = DemoCorpus.organizationId;
 
   static final List<TaskItem> syntheticTasks = <TaskItem>[
     TaskItem(
       id: 'task-1',
       organizationId: demoOrganizationId,
-      matterId: 'matter-1',
+      matterId: DemoCorpus.matterIds[0],
       title: 'Demo: draft response checklist',
-      matterRef: 'Demo acquisition review',
+      matterRef: DemoCorpus.matterTitleAcquisition,
       status: TaskStatus.todo,
       dueAt: DateTime.utc(2026, 8, 15),
-      assigneeId: 'demo-attorney',
+      assigneeId: DemoCorpus.attorneyId,
     ),
     TaskItem(
       id: 'task-2',
       organizationId: demoOrganizationId,
-      matterId: 'matter-2',
+      matterId: DemoCorpus.matterIds[1],
       title: 'Demo: gather documents',
-      matterRef: 'Commercial lease consultation',
+      matterRef: DemoCorpus.matterTitleLease,
       status: TaskStatus.inProgress,
       dueAt: DateTime.utc(2026, 8, 12),
     ),
     TaskItem(
       id: 'task-3',
       organizationId: demoOrganizationId,
-      matterId: 'matter-4',
+      matterId: DemoCorpus.matterIds[3],
       title: 'Demo: review client notes',
-      matterRef: 'Family status consultation',
+      matterRef: DemoCorpus.matterTitleFamily,
       status: TaskStatus.blocked,
       dueAt: DateTime.utc(2026, 8, 18),
     ),
     TaskItem(
       id: 'task-4',
       organizationId: demoOrganizationId,
-      matterId: 'matter-5',
+      matterId: DemoCorpus.matterIds[4],
       title: 'Demo: schedule follow-up',
-      matterRef: 'Startup formation advisory',
+      matterRef: DemoCorpus.matterTitleStartup,
       status: TaskStatus.done,
       dueAt: DateTime.utc(2026, 8, 5),
     ),
     TaskItem(
       id: 'task-5',
       organizationId: demoOrganizationId,
-      matterId: 'matter-2',
+      matterId: DemoCorpus.matterIds[1],
       title: 'Demo: update matter timeline',
-      matterRef: 'Commercial lease consultation',
+      matterRef: DemoCorpus.matterTitleLease,
       status: TaskStatus.inProgress,
       dueAt: DateTime.utc(2026, 8, 20),
     ),
@@ -102,6 +94,7 @@ class FakeTaskGateway implements TaskBoardGateway {
           code: 'task_create_invalid',
           userMessage:
               'The task could not be created. Check the title and try again.',
+          messageKey: AppMessageKey.errTheTaskCouldNotBeCreatedCheckThe,
           technicalMessage: 'FakeTaskGateway: empty title.',
         ),
       );
@@ -112,7 +105,7 @@ class FakeTaskGateway implements TaskBoardGateway {
       organizationId: demoOrganizationId,
       matterId: matterId,
       title: trimmed,
-      matterRef: matterTitles[matterId] ?? matterId,
+      matterRef: DemoCorpus.matterTitlesById[matterId] ?? matterId,
       status: TaskStatus.todo,
       dueAt: DateTime.utc(2026, 9, 30),
       assigneeId: assigneeId,
@@ -129,6 +122,7 @@ class FakeTaskGateway implements TaskBoardGateway {
         const AppError(
           code: 'task_advance_denied',
           userMessage: 'You do not have permission to advance this task.',
+          messageKey: AppMessageKey.errYouDoNotHavePermissionToAdvanceThis,
           technicalMessage: 'FakeTaskGateway: unknown task id.',
         ),
       );
@@ -140,6 +134,7 @@ class FakeTaskGateway implements TaskBoardGateway {
           code: 'task_advance_invalid',
           userMessage:
               'The task cannot move to that status. It may already be done.',
+          messageKey: AppMessageKey.errTheTaskCannotMoveToThatStatusIt,
           technicalMessage:
               'FakeTaskGateway: illegal transition '
               '${current.status.name} -> ${to.name}.',
@@ -179,6 +174,7 @@ class FakeTaskGateway implements TaskBoardGateway {
         const AppError(
           code: 'task_assign_denied',
           userMessage: 'You do not have permission to re-assign this task.',
+          messageKey: AppMessageKey.errYouDoNotHavePermissionToReAssign,
           technicalMessage: 'FakeTaskGateway: unknown task id.',
         ),
       );
@@ -209,6 +205,8 @@ class FakeTaskGateway implements TaskBoardGateway {
         const AppError(
           code: 'task_acknowledge_denied',
           userMessage: 'Only the assigned person can acknowledge this task.',
+          messageKey:
+              AppMessageKey.errOnlyTheAssignedPersonCanAcknowledgeThisTask,
           technicalMessage: 'FakeTaskGateway: unknown task id.',
         ),
       );

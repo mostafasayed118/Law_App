@@ -1,3 +1,5 @@
+import 'package:legalhub/core/async/with_timeout.dart';
+import 'package:legalhub/core/contracts/network.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'list_query_guards.dart';
@@ -38,7 +40,7 @@ class SupabaseSeam {
   ) async {
     final dynamic data = await Supabase.instance.client
         .rpc<dynamic>(function, params: params)
-        .timeout(const Duration(seconds: 15));
+        .timeout(kSupabaseRequestTimeout);
     return wrapRpcData(data);
   }
 
@@ -50,8 +52,16 @@ class SupabaseSeam {
   ) {
     return Supabase.instance.client
         .rpc<Object?>(function, params: params)
-        .timeout(const Duration(seconds: 15));
+        .timeout(kSupabaseRequestTimeout);
   }
+
+  /// Shared Edge Function invoke binding with the app-wide request deadline.
+  ///
+  /// The caller supplies the invoke closure so the timeout wiring is testable
+  /// without a live Supabase client.
+  static Future<FunctionResponse> invokeWithTimeout(
+    Future<FunctionResponse> Function() call,
+  ) => withRequestTimeout(call());
 
   /// Shared table-SELECT binding: the bounded, deterministically ordered
   /// read from [boundedTableSelect] (hard row cap + index-backed order).

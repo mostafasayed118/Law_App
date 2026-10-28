@@ -1,7 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/features/billing/domain/billing_gateway.dart';
@@ -15,6 +19,13 @@ import 'package:legalhub/features/search/presentation/search_screen.dart';
 import 'package:legalhub/features/storage/domain/storage_gateway.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/view_state_view.dart';
+
+const List<String> _arbLocales = <String>['en', 'ar', 'tr'];
+
+Map<String, dynamic> _readArb(String code) {
+  final String raw = File('lib/l10n/app_$code.arb').readAsStringSync();
+  return jsonDecode(raw.replaceFirst('\uFEFF', '')) as Map<String, dynamic>;
+}
 
 void main() {
   group('AppLocalizations locale loading', () {
@@ -1491,6 +1502,105 @@ void main() {
         expect(en.signOutConfigured, isNot(contains('demo')));
       },
     );
+  });
+
+  group('AppMessageKey ARB parity', () {
+    test('every locale ARB defines exactly the AppMessageKey err* set', () {
+      final Set<String> enumKeys = AppMessageKey.values
+          .map((AppMessageKey key) => key.name)
+          .toSet();
+
+      for (final String code in _arbLocales) {
+        final Map<String, dynamic> arb = _readArb(code);
+        final Set<String> arbKeys = arb.keys
+            .where((String key) => key.startsWith('err'))
+            .toSet();
+
+        expect(
+          arbKeys,
+          enumKeys,
+          reason: 'app_$code.arb err* keys differ from AppMessageKey',
+        );
+      }
+    });
+
+    test('every locale ARB lists each err* key exactly once', () {
+      for (final String code in _arbLocales) {
+        final String raw = File('lib/l10n/app_$code.arb').readAsStringSync();
+        final List<String> occurrences = RegExp(
+          r'^  "(err[^"]+)"\s*:',
+          multiLine: true,
+        ).allMatches(raw).map((RegExpMatch match) => match.group(1)!).toList();
+
+        expect(
+          occurrences,
+          hasLength(129),
+          reason: 'app_$code.arb must define 129 err* keys',
+        );
+        expect(
+          occurrences.toSet(),
+          hasLength(occurrences.length),
+          reason: 'duplicate err* key in app_$code.arb',
+        );
+      }
+    });
+
+    test('every AR and TR @err* description carries [REVIEW]', () {
+      for (final String code in const <String>['ar', 'tr']) {
+        final Map<String, dynamic> arb = _readArb(code);
+        final Iterable<String> errKeys = arb.keys.where(
+          (String key) => key.startsWith('err'),
+        );
+
+        for (final String key in errKeys) {
+          final Map<String, dynamic> meta =
+              arb['@$key'] as Map<String, dynamic>? ?? <String, dynamic>{};
+          final Object? description = meta['description'];
+
+          expect(
+            description,
+            isA<String>(),
+            reason: 'missing description for @$key in app_$code.arb',
+          );
+          expect(
+            description ?? '',
+            contains('[REVIEW]'),
+            reason: '@$key in app_$code.arb lacks [REVIEW]',
+          );
+        }
+      }
+    });
+
+    test('interpolated keys keep their placeholders in every locale', () {
+      const Map<String, List<String>> placeholders = <String, List<String>>{
+        'errMessageIsTooLongMaxMaxMessageLengthCharacters': <String>[
+          '{maxMessageLength}',
+        ],
+        'errEnterAQuestionBetweenResearchRequestMinQuestionLengthAndResearchRequest':
+            <String>['{minQuestionLength}', '{maxQuestionLength}'],
+      };
+
+      for (final String code in _arbLocales) {
+        final Map<String, dynamic> arb = _readArb(code);
+        for (final MapEntry<String, List<String>> entry
+            in placeholders.entries) {
+          final Object? value = arb[entry.key];
+
+          expect(
+            value,
+            isA<String>(),
+            reason: 'missing ${entry.key} in app_$code.arb',
+          );
+          for (final String placeholder in entry.value) {
+            expect(
+              value ?? '',
+              contains(placeholder),
+              reason: '${entry.key} in app_$code.arb lost $placeholder',
+            );
+          }
+        }
+      }
+    });
   });
 
   group('AppLocalizations widget rendering', () {

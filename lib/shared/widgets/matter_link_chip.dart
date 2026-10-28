@@ -36,7 +36,7 @@ class MatterLinkChip extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsetsDirectional.symmetric(
             horizontal: LegalHubTheme.spaceSm,
-            vertical: 4,
+            vertical: LegalHubTheme.spaceXs,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -46,7 +46,7 @@ class MatterLinkChip extends StatelessWidget {
                 size: 14,
                 color: scheme.onSecondaryContainer,
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: LegalHubTheme.spaceXs),
               // Flexible + ellipsis lets the chip shrink (instead of
               // overflowing) when a tight transient layout or large text
               // scale squeezes the row it sits in.

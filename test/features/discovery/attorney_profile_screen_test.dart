@@ -7,7 +7,11 @@ import 'package:legalhub/l10n/app_localizations.dart';
 void main() {
   tearDown(resetServiceLocator);
 
-  Future<void> pumpProfile(WidgetTester tester, String attorneyId) async {
+  Future<void> pumpProfile(
+    WidgetTester tester,
+    String attorneyId, {
+    Locale locale = const Locale('en'),
+  }) async {
     // AttorneyProfileScreen resolves AttorneyGateway from the locator (the
     // dev fake in env-less runs).
     configureDependencies();
@@ -19,6 +23,7 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
+        locale: locale,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: AttorneyProfileScreen(attorneyId: attorneyId),
@@ -67,6 +72,18 @@ void main() {
 
       // The synthetic profile must never read as a real directory entry.
       expect(find.textContaining('synthetic profiles only'), findsOneWidget);
+    });
+
+    testWidgets('maps the synthetic headline in local mode (Task 26)', (
+      tester,
+    ) async {
+      final AppLocalizations ar = await AppLocalizations.delegate.load(
+        const Locale('ar'),
+      );
+      await pumpProfile(tester, 'atty-1', locale: const Locale('ar'));
+
+      expect(find.text(ar.demoAttorneyHeadlineCorporate), findsOneWidget);
+      expect(find.text('Corporate and governance counsel'), findsNothing);
     });
 
     testWidgets('an unknown id renders the localized not-found state', (

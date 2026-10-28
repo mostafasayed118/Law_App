@@ -23,27 +23,39 @@ AppError _messageFailureFor(
   required String deniedMessage,
   required String unavailableMessage,
   required String failedMessage,
+  required AppMessageKey deniedKey,
+  required AppMessageKey unavailableKey,
+  required AppMessageKey failedKey,
 }) {
-  final (String code, String userMessage, AppErrorKind kind) = switch (e.kind) {
+  final (
+    String code,
+    String userMessage,
+    AppErrorKind kind,
+    AppMessageKey key,
+  ) = switch (e.kind) {
     SupabaseMessageFailureKind.denied => (
       '${codePrefix}_denied',
       deniedMessage,
       AppErrorKind.denied,
+      deniedKey,
     ),
     SupabaseMessageFailureKind.providerUnavailable => (
       '${codePrefix}_unavailable',
       unavailableMessage,
       AppErrorKind.unavailable,
+      unavailableKey,
     ),
     SupabaseMessageFailureKind.unknown => (
       '${codePrefix}_failed',
       failedMessage,
       AppErrorKind.unknown,
+      failedKey,
     ),
   };
   return AppError(
     code: code,
     userMessage: userMessage,
+    messageKey: key,
     kind: kind,
     technicalMessage: e.message,
   );

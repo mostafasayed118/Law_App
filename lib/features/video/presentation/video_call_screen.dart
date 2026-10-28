@@ -519,7 +519,7 @@ class _ParticipantTile extends StatelessWidget {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final String initial = label.isEmpty ? '?' : label.substring(0, 1);
     return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(LegalHubTheme.radiusXl),
       child: ColoredBox(
         color: scheme.surfaceContainerHighest,
         child: Stack(
@@ -557,7 +557,7 @@ class _ParticipantTile extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: scheme.surface.withValues(alpha: 0.82),
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(LegalHubTheme.radiusMd),
                 ),
                 child: Text(
                   label,

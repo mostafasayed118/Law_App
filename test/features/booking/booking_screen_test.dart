@@ -454,5 +454,18 @@ void main() {
         expect(serviceLocator<BookingPrefill>().attorneyName, isNull);
       },
     );
+
+    testWidgets('the topic field caps at the server limit', (tester) async {
+      await pumpBooking(tester);
+
+      await tester.enterText(find.byType(TextFormField), 'a' * 2001);
+      await tester.pump();
+
+      final TextFormField topicField = tester.widget<TextFormField>(
+        find.byType(TextFormField),
+      );
+      expect(topicField.controller?.text.length, 2000);
+      expect(topicField.controller?.text, 'a' * 2000);
+    });
   });
 }

@@ -7,6 +7,23 @@ import 'package:equatable/equatable.dart';
 /// Supabase row mapper translates `rejected` into it.
 enum ApprovalStatus { pending, approved, denied, cancelled }
 
+/// Maps a domain [ApprovalStatus] to its `approval_requests.status` wire value.
+String approvalStatusToWire(ApprovalStatus status) => switch (status) {
+  ApprovalStatus.pending => 'pending',
+  ApprovalStatus.approved => 'approved',
+  ApprovalStatus.denied => 'rejected',
+  ApprovalStatus.cancelled => 'cancelled',
+};
+
+/// Maps an `approval_requests.status` wire value to the domain enum.
+ApprovalStatus approvalStatusFromWire(String status) => switch (status) {
+  'pending' => ApprovalStatus.pending,
+  'approved' => ApprovalStatus.approved,
+  'rejected' => ApprovalStatus.denied,
+  'cancelled' => ApprovalStatus.cancelled,
+  _ => throw const FormatException('Approval row has an unknown status'),
+};
+
 /// The request category (design §3 `kind` enum).
 enum ApprovalKind { conflict, waiver, filing, expense, other }
 

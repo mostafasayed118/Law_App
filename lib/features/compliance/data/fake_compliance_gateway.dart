@@ -1,7 +1,9 @@
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/compliance/domain/compliance_alert.dart';
 import 'package:legalhub/features/compliance/domain/compliance_gateway.dart';
+import 'package:legalhub/shared/demo/demo_corpus.dart';
 
 /// Development-only compliance-alerts implementation: an in-memory mutable
 /// list of five deterministic non-PII demo alerts.
@@ -16,7 +18,7 @@ class FakeComplianceGateway implements ComplianceAlertsGateway {
   static final List<ComplianceAlert> syntheticAlerts = <ComplianceAlert>[
     ComplianceAlert(
       id: 'alert-1',
-      organizationId: 'demo-org',
+      organizationId: DemoCorpus.organizationId,
       title: 'Demo: review pending invitations',
       kind: AlertKind.filing,
       severity: AlertSeverity.low,
@@ -25,7 +27,7 @@ class FakeComplianceGateway implements ComplianceAlertsGateway {
     ),
     ComplianceAlert(
       id: 'alert-2',
-      organizationId: 'demo-org',
+      organizationId: DemoCorpus.organizationId,
       title: 'Demo: data-access review due',
       kind: AlertKind.retention,
       severity: AlertSeverity.medium,
@@ -36,7 +38,7 @@ class FakeComplianceGateway implements ComplianceAlertsGateway {
     ),
     ComplianceAlert(
       id: 'alert-3',
-      organizationId: 'demo-org',
+      organizationId: DemoCorpus.organizationId,
       title: 'Demo: sample alert — high traffic',
       kind: AlertKind.other,
       severity: AlertSeverity.high,
@@ -46,7 +48,7 @@ class FakeComplianceGateway implements ComplianceAlertsGateway {
     ),
     ComplianceAlert(
       id: 'alert-4',
-      organizationId: 'demo-org',
+      organizationId: DemoCorpus.organizationId,
       title: 'Demo: retention window expiring',
       kind: AlertKind.retention,
       severity: AlertSeverity.critical,
@@ -56,7 +58,7 @@ class FakeComplianceGateway implements ComplianceAlertsGateway {
     ),
     ComplianceAlert(
       id: 'alert-5',
-      organizationId: 'demo-org',
+      organizationId: DemoCorpus.organizationId,
       title: 'Demo: review completed',
       kind: AlertKind.deadline,
       severity: AlertSeverity.low,
@@ -170,15 +172,18 @@ class FakeComplianceGateway implements ComplianceAlertsGateway {
   static const AppError _notFound = AppError(
     code: 'compliance_not_found',
     userMessage: 'Compliance alert not found.',
+    messageKey: AppMessageKey.errComplianceAlertNotFound,
   );
 
   static const AppError _notOpen = AppError(
     code: 'compliance_acknowledge_invalid',
     userMessage: 'The alert can no longer be acknowledged.',
+    messageKey: AppMessageKey.errTheAlertCanNoLongerBeAcknowledged,
   );
 
   static const AppError _alreadyResolved = AppError(
     code: 'compliance_resolve_invalid',
     userMessage: 'The alert can no longer be resolved.',
+    messageKey: AppMessageKey.errTheAlertCanNoLongerBeResolved,
   );
 }

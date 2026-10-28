@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/deep_link/app_link_parser.dart';
+import 'package:legalhub/app/deep_link/deep_link_config.dart';
 
 void main() {
   group('AppLinkParser', () {
@@ -71,17 +72,17 @@ void main() {
     });
   });
 
-  group('AppLinkParser.acceptInviteUri (produce side)', () {
+  group('DeepLinkConfig.acceptInviteUri (produce side)', () {
     test('builds the canonical accept-invite share link', () {
       expect(
-        AppLinkParser.acceptInviteUri('token-1'),
+        const DeepLinkConfig.production().acceptInviteUri('token-1'),
         Uri.parse('com.legalhub.app://accept-invite?token=token-1'),
       );
     });
 
     test('round-trips: parse(acceptInviteUri(t)) is AcceptInviteIntent(t)', () {
       final AppLinkIntent intent = const AppLinkParser().parse(
-        AppLinkParser.acceptInviteUri('t-42'),
+        const DeepLinkConfig.production().acceptInviteUri('t-42'),
       );
 
       expect(intent, isA<AcceptInviteIntent>());
@@ -91,7 +92,7 @@ void main() {
     test('encodes token characters via the query, then round-trips', () {
       const String token = 'a&b c=12';
       final AppLinkIntent intent = const AppLinkParser().parse(
-        AppLinkParser.acceptInviteUri(token),
+        const DeepLinkConfig.production().acceptInviteUri(token),
       );
 
       expect(intent, isA<AcceptInviteIntent>());
@@ -100,13 +101,16 @@ void main() {
 
     test('trims accidental whitespace before building the link', () {
       expect(
-        AppLinkParser.acceptInviteUri('  token-1  '),
+        const DeepLinkConfig.production().acceptInviteUri('  token-1  '),
         Uri.parse('com.legalhub.app://accept-invite?token=token-1'),
       );
     });
 
     test('rejects a blank token (an accept link needs its token)', () {
-      expect(() => AppLinkParser.acceptInviteUri('   '), throwsArgumentError);
+      expect(
+        () => const DeepLinkConfig.production().acceptInviteUri('   '),
+        throwsArgumentError,
+      );
     });
   });
 }

@@ -1,4 +1,5 @@
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/pagination.dart';
 import 'document.dart';
 
 /// Document vault integration boundary (Phase 8, slice 8.0).
@@ -33,6 +34,6 @@ abstract interface class DocumentGateway {
   /// size without importing the data layer (layer rule).
   Future<Result<List<Document>>> searchDocuments(
     String query, {
-    int limit = 30,
+    int limit = kSearchPageSize,
   });
 }

@@ -26,6 +26,9 @@ class OtpFieldRow extends StatefulWidget {
 }
 
 class OtpFieldRowState extends State<OtpFieldRow> {
+  static const double _cellHeight = 56;
+  static const double _maxRowWidth = 360;
+
   late final List<TextEditingController> _controllers;
   late final List<FocusNode> _nodes;
 
@@ -89,7 +92,7 @@ class OtpFieldRowState extends State<OtpFieldRow> {
       cells.add(
         Expanded(
           child: SizedBox(
-            height: 56,
+            height: _cellHeight,
             child: TextField(
               controller: _controllers[i],
               focusNode: _nodes[i],
@@ -133,7 +136,7 @@ class OtpFieldRowState extends State<OtpFieldRow> {
     }
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 360),
+        constraints: const BoxConstraints(maxWidth: _maxRowWidth),
         // The digit cells stay LTR even in an RTL locale: a verification
         // code reads first-digit-leftmost, and the sliding focus order must
         // follow the same visual order the user types in.

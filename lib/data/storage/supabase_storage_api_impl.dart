@@ -1,7 +1,10 @@
 import 'dart:typed_data';
 
+import 'package:legalhub/core/contracts/http_status.dart';
+import 'package:legalhub/core/contracts/network.dart';
 import 'package:legalhub/data/postgrest_failures.dart';
 import 'package:legalhub/data/supabase_seam.dart';
+import 'package:legalhub/data/supabase_wire.dart';
 import 'package:legalhub/features/storage/domain/storage_gateway.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -47,11 +50,11 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
   /// an empty map, not an exception, so the gateway can map it to a denial.
   static Future<Map<String, dynamic>> _boundMatter(String matterId) async {
     final Map<String, dynamic>? row = await Supabase.instance.client
-        .from('matters')
+        .from(SupabaseTables.matters)
         .select('id, organization_id, title')
         .eq('id', matterId)
         .maybeSingle()
-        .timeout(const Duration(seconds: 15));
+        .timeout(kSupabaseRequestTimeout);
     return row ?? const <String, dynamic>{};
   }
 
@@ -86,7 +89,7 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
     String contentType,
   ) async {
     await Supabase.instance.client.storage
-        .from('matter-files')
+        .from(SupabaseBuckets.matterFiles)
         .uploadBinary(
           path,
           bytes,
@@ -97,16 +100,16 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
 
   static Future<String> _boundSignedUrl(String path, int expiresInSeconds) {
     return Supabase.instance.client.storage
-        .from('matter-files')
+        .from(SupabaseBuckets.matterFiles)
         .createSignedUrl(path, expiresInSeconds)
-        .timeout(const Duration(seconds: 15));
+        .timeout(kSupabaseRequestTimeout);
   }
 
   static Future<void> _boundRemove(String path) async {
     await Supabase.instance.client.storage
-        .from('matter-files')
+        .from(SupabaseBuckets.matterFiles)
         .remove(<String>[path])
-        .timeout(const Duration(seconds: 15));
+        .timeout(kSupabaseRequestTimeout);
   }
 
   static Future<Object?> _boundRpc(
@@ -135,8 +138,8 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
           'id, matter_id, name, mime_type, size_bytes, storage_path, '
           'matters(title)';
       return matterId == null
-          ? await _table('files', columns)
-          : await _matterTable('files', columns, matterId);
+          ? await _table(SupabaseTables.files, columns)
+          : await _matterTable(SupabaseTables.files, columns, matterId);
     } on PostgrestException catch (e) {
       throw SupabaseStorageException(kind: _kindFor(e), message: e.message);
     } on Exception {
@@ -240,7 +243,7 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
   }) async {
     try {
       final Object? data =
-          await _rpcCaller('register_matter_file', <String, dynamic>{
+          await _rpcCaller(SupabaseRpcs.registerMatterFile, <String, dynamic>{
             'p_matter_id': matterId,
             'p_name': name,
             'p_mime_type': mimeType,
@@ -272,11 +275,13 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
   /// the request), never a denial.
   SupabaseStorageFailureKind _kindForStorage(StorageException e) {
     return switch (e.statusCode) {
-      '413' => SupabaseStorageFailureKind.tooLarge,
-      '415' => SupabaseStorageFailureKind.unsupportedType,
-      '403' => SupabaseStorageFailureKind.denied,
-      '404' => SupabaseStorageFailureKind.notFound,
-      '409' => SupabaseStorageFailureKind.conflict,
+      HttpStatusCodes.payloadTooLargeText =>
+        SupabaseStorageFailureKind.tooLarge,
+      HttpStatusCodes.unsupportedMediaTypeText =>
+        SupabaseStorageFailureKind.unsupportedType,
+      HttpStatusCodes.forbiddenText => SupabaseStorageFailureKind.denied,
+      HttpStatusCodes.notFoundText => SupabaseStorageFailureKind.notFound,
+      HttpStatusCodes.conflictText => SupabaseStorageFailureKind.conflict,
       null => SupabaseStorageFailureKind.providerUnavailable,
       _ => SupabaseStorageFailureKind.unknown,
     };

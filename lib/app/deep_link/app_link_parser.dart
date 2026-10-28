@@ -2,6 +2,8 @@
 /// (D-P34.2 hook — `docs/p4_1_deeplink_recovery_plan_2026-08-07.md`).
 library;
 
+import 'package:legalhub/app/deep_link/deep_link_config.dart';
+
 /// A classified app deep link.
 ///
 /// Sealed so the consumer (the app-link listener) must handle every case:
@@ -13,7 +15,7 @@ sealed class AppLinkIntent {
 }
 
 /// An accept-invitation share link carrying the one-time token:
-/// `com.legalhub.app://accept-invite?token=<one-time-token>`.
+/// `<scheme>://accept-invite?token=<one-time-token>`.
 ///
 /// The token is transient in-memory only (contract §8): it travels from the
 /// OS intent to the accept screen via the pending store / router `extra` —
@@ -25,7 +27,7 @@ final class AcceptInviteIntent extends AppLinkIntent {
   final String token;
 }
 
-/// A Supabase auth callback URI (`com.legalhub.app://auth/v1/callback` —
+/// A Supabase auth callback URI (`<scheme>://auth/v1/callback` —
 /// recovery/sign-in links). The explicit `AuthCallbackObserver` in
 /// `lib/data/auth/` owns these (it validates the location and exchanges the
 /// query-only PKCE code); the app-link listener classifies them so it can
@@ -46,32 +48,16 @@ final class NoAppLinkIntent extends AppLinkIntent {
 /// Pure and dependency-free so it is trivially unit-testable: scheme →
 /// host/path/query rules only, no platform code. The registered app scheme
 /// must match the Android intent filter, the iOS `CFBundleURLTypes`, and
-/// `SupabaseAuthApiImpl`'s `emailRedirectTo` (`com.legalhub.app`).
+/// `SupabaseAuthApiImpl`'s `emailRedirectTo` for the same flavor — see
+/// [DeepLinkConfig].
 class AppLinkParser {
-  const AppLinkParser();
+  const AppLinkParser({this.config = const DeepLinkConfig.production()});
 
-  /// The registered app scheme (Android manifest + iOS Info.plist + the
-  /// Supabase dashboard Redirect URL).
-  static const String appScheme = 'com.legalhub.app';
-
-  /// The verified https host for OS-verified App Links / Universal Links
-  /// (Android `autoVerify` + `assetlinks.json`, iOS `applinks` +
-  /// `apple-app-site-association`, both served from
-  /// `https://legalhub.app/.well-known/`). The custom scheme above stays
-  /// as the fallback for environments without the site association; both
-  /// shapes classify identically below.
-  static const String verifiedHost = 'legalhub.app';
-
-  /// The accept-invitation share-link host.
-  static const String acceptInviteHost = 'accept-invite';
-
-  /// The Supabase auth callback host + path prefix. Recovery/sign-in links
-  /// land here and are owned by the provider observer.
-  static const String authCallbackHost = 'auth';
-  static const String authCallbackPathPrefix = '/v1/callback';
+  /// The build's deep-link identity (custom scheme + verified host).
+  final DeepLinkConfig config;
 
   /// Builds an accept-invitation share link carrying [token]:
-  /// `com.legalhub.app://accept-invite?token=<one-time-token>`.
+  /// `<scheme>://accept-invite?token=<one-time-token>`.
   ///
   /// The produce side of the D-P34.2 deep link, mirroring the consume-side
   /// guarantees: the token is trimmed, and a blank token is rejected (an
@@ -80,17 +66,7 @@ class AppLinkParser {
   /// §8). The URI uses [Uri.queryParameters] so any token character is
   /// encoded; round-trips: `parse(acceptInviteUri(t))` is
   /// `AcceptInviteIntent(t)`.
-  static Uri acceptInviteUri(String token) {
-    final String trimmed = token.trim();
-    if (trimmed.isEmpty) {
-      throw ArgumentError.value(token, 'token', 'must be a non-empty token');
-    }
-    return Uri(
-      scheme: appScheme,
-      host: acceptInviteHost,
-      queryParameters: <String, String>{'token': trimmed},
-    );
-  }
+  Uri acceptInviteUri(String token) => config.acceptInviteUri(token);
 
   AppLinkIntent parse(Uri uri) {
     // Verified https shape first: `https://legalhub.app/accept-invite?...`
@@ -98,18 +74,19 @@ class AppLinkParser {
     // their custom-scheme twins (OS-verified, not interceptable by a
     // third-party app claiming the scheme). Any other https host stays
     // foreign.
-    if (uri.scheme == 'https' && uri.host == verifiedHost) {
+    if (uri.scheme == 'https' && uri.host == config.verifiedHost) {
       return _parsePath(uri);
     }
-    if (uri.scheme != appScheme) {
+    if (uri.scheme != config.scheme) {
       return const NoAppLinkIntent();
     }
     return _parsePath(uri);
   }
 
   AppLinkIntent _parsePath(Uri uri) {
-    if (uri.host == acceptInviteHost ||
-        (uri.scheme == 'https' && uri.path == '/$acceptInviteHost')) {
+    if (uri.host == DeepLinkConfig.acceptInviteHost ||
+        (uri.scheme == 'https' &&
+            uri.path == '/${DeepLinkConfig.acceptInviteHost}')) {
       final String? token = uri.queryParameters['token'];
       if (token == null || token.trim().isEmpty) {
         // Never mint an empty-token intent: an accept link without its
@@ -118,12 +95,14 @@ class AppLinkParser {
       }
       return AcceptInviteIntent(token.trim());
     }
-    if (uri.host == authCallbackHost &&
-        uri.path.startsWith(authCallbackPathPrefix)) {
+    if (uri.host == DeepLinkConfig.authHost &&
+        uri.path.startsWith(DeepLinkConfig.appCallbackPath)) {
       return const RecoveryIntent();
     }
     if (uri.scheme == 'https' &&
-        uri.path.startsWith('/$authCallbackHost$authCallbackPathPrefix')) {
+        uri.path.startsWith(
+          '/${DeepLinkConfig.authHost}${DeepLinkConfig.appCallbackPath}',
+        )) {
       return const RecoveryIntent();
     }
     return const NoAppLinkIntent();

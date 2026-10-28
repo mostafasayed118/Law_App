@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 
 void main() {
   group('AppError', () {
@@ -24,6 +25,25 @@ void main() {
     test('distinguishes errors that differ by code', () {
       const AppError a = AppError(code: 'a', userMessage: 'm');
       const AppError b = AppError(code: 'b', userMessage: 'm');
+
+      expect(a, isNot(equals(b)));
+    });
+
+    test('distinguishes errors that differ only by messageArgs', () {
+      const AppError a = AppError(
+        code: 'message_too_long',
+        userMessage: 'm',
+        messageKey:
+            AppMessageKey.errMessageIsTooLongMaxMaxMessageLengthCharacters,
+        messageArgs: <String, Object?>{'maxMessageLength': 2000},
+      );
+      const AppError b = AppError(
+        code: 'message_too_long',
+        userMessage: 'm',
+        messageKey:
+            AppMessageKey.errMessageIsTooLongMaxMaxMessageLengthCharacters,
+        messageArgs: <String, Object?>{'maxMessageLength': 3000},
+      );
 
       expect(a, isNot(equals(b)));
     });

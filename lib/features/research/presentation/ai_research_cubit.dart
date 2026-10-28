@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/features/documents/domain/document.dart';
@@ -12,6 +13,7 @@ import 'package:legalhub/features/research/domain/ai_gateway.dart';
 import 'package:legalhub/features/research/domain/research_outcome.dart';
 import 'package:legalhub/features/research/domain/research_request.dart';
 import 'package:legalhub/features/research/domain/research_run.dart';
+import 'package:legalhub/features/research/domain/research_wire_codes.dart';
 import 'ai_research_state.dart';
 
 /// Owns the research surface (AI research slice 1.1; design §5).
@@ -151,9 +153,15 @@ class AiResearchCubit extends Cubit<AiResearchState> {
     }
     if (!request.isValid) {
       const AppError error = AppError(
-        code: 'invalid_request',
+        code: ResearchWireCodes.invalidRequest,
         userMessage:
-            'Enter a question between 2 and 500 characters and select an organization.',
+            'Enter a question between ${ResearchRequest.minQuestionLength} and ${ResearchRequest.maxQuestionLength} characters and select an organization.',
+        messageKey: AppMessageKey
+            .errEnterAQuestionBetweenResearchRequestMinQuestionLengthAndResearchRequest,
+        messageArgs: <String, Object?>{
+          'minQuestionLength': ResearchRequest.minQuestionLength,
+          'maxQuestionLength': ResearchRequest.maxQuestionLength,
+        },
       );
       emit(
         state.copyWith(
@@ -195,7 +203,7 @@ class AiResearchCubit extends Cubit<AiResearchState> {
       case Failure<ResearchOutcome>(error: final AppError error):
         emit(
           state.copyWith(
-            findings: error.code == 'provider_not_configured'
+            findings: error.code == ResearchWireCodes.providerNotConfigured
                 ? const ViewEmpty<List<AiFinding>>()
                 : viewStateForFailure<List<AiFinding>>(error),
             lastError: error,

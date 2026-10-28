@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:legalhub/data/postgrest_failures.dart';
 import 'package:legalhub/data/supabase_seam.dart';
+import 'package:legalhub/data/supabase_wire.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_platform_admin_api.dart';
@@ -62,7 +64,7 @@ class SupabasePlatformAdminApiImpl implements SupabasePlatformAdminApi {
   Future<List<Map<String, dynamic>>> listOrganizations() async {
     try {
       final PostgrestResponse<dynamic> response = await _rpc(
-        'list_organizations_metadata',
+        SupabaseRpcs.listOrganizationsMetadata,
         const <String, dynamic>{},
       );
       final Object? data = response.data;
@@ -82,7 +84,7 @@ class SupabasePlatformAdminApiImpl implements SupabasePlatformAdminApi {
   Future<List<Map<String, dynamic>>> listMembers() async {
     try {
       final PostgrestResponse<dynamic> response = await _rpc(
-        'list_members_metadata',
+        SupabaseRpcs.listMembersMetadata,
         const <String, dynamic>{},
       );
       final Object? data = response.data;
@@ -102,7 +104,7 @@ class SupabasePlatformAdminApiImpl implements SupabasePlatformAdminApi {
   Future<void> suspendMembership({
     required String organizationId,
     required String userId,
-  }) => _runVoidRpc('suspend_membership_platform', <String, dynamic>{
+  }) => _runVoidRpc(SupabaseRpcs.suspendMembershipPlatform, <String, dynamic>{
     'p_organization_id': organizationId,
     'p_user_id': userId,
   });
@@ -111,14 +113,14 @@ class SupabasePlatformAdminApiImpl implements SupabasePlatformAdminApi {
   Future<void> reactivateMembership({
     required String organizationId,
     required String userId,
-  }) => _runVoidRpc('reactivate_membership_platform', <String, dynamic>{
-    'p_organization_id': organizationId,
-    'p_user_id': userId,
-  });
+  }) => _runVoidRpc(
+    SupabaseRpcs.reactivateMembershipPlatform,
+    <String, dynamic>{'p_organization_id': organizationId, 'p_user_id': userId},
+  );
 
   @override
   Future<void> deleteDemoAccount({required String userId}) => _runVoidRpc(
-    'delete_demo_account',
+    SupabaseRpcs.deleteDemoAccount,
     <String, dynamic>{'p_user_id': userId},
   );
 
@@ -126,7 +128,7 @@ class SupabasePlatformAdminApiImpl implements SupabasePlatformAdminApi {
   Future<List<Map<String, dynamic>>> readPlatformAudit() async {
     try {
       return _rowsFrom(
-        await _rpc('read_platform_audit', const <String, dynamic>{}),
+        await _rpc(SupabaseRpcs.readPlatformAudit, const <String, dynamic>{}),
       );
     } on PostgrestException catch (e) {
       throw SupabasePlatformAdminException(
@@ -169,21 +171,22 @@ class SupabasePlatformAdminApiImpl implements SupabasePlatformAdminApi {
     String organizationId,
   ) async {
     try {
-      return await _rpc('read_org_audit', <String, dynamic>{
+      return await _rpc(SupabaseRpcs.readOrgAudit, <String, dynamic>{
         'p_organization_id': organizationId,
       });
     } on PostgrestException catch (e) {
       if (!_isFunctionNotFound(e)) {
         rethrow;
       }
-      return _rpc('read_org_audit', const <String, dynamic>{});
+      return _rpc(SupabaseRpcs.readOrgAudit, const <String, dynamic>{});
     }
   }
 
   /// True when PostgREST reports that the called function (or that exact
   /// signature) is not installed — the live-DB compatibility fallback trigger.
   bool _isFunctionNotFound(PostgrestException e) {
-    if (e.code == 'PGRST202' || e.code == '42883') {
+    if (e.code == PostgrestCodes.schemaCacheMiss ||
+        e.code == PostgrestCodes.undefinedFunction) {
       return true;
     }
     final String message = e.message.toLowerCase();

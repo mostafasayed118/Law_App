@@ -79,7 +79,10 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
     return ListView(
       padding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
       children: <Widget>[
-        Text(demoMatterTitle(l10n, matter.title), style: text.headlineSmall),
+        Text(
+          DemoLabels(l10n, localOnly: localOnly).matterTitle(matter.title),
+          style: text.headlineSmall,
+        ),
         const SizedBox(height: LegalHubTheme.spaceMd),
         Align(
           alignment: AlignmentDirectional.centerStart,
@@ -106,7 +109,7 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
         if (widget.capabilities.canViewDocuments) ...<Widget>[
           AppSectionHeader(
             title: l10n.matterWorkspaceDocumentsTitle,
-            titleStyle: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+            titleStyle: _workspaceHeaderStyle(text),
             children: <Widget>[const MatterDocumentsSection()],
           ),
           const SizedBox(height: LegalHubTheme.spaceXl),
@@ -118,7 +121,7 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
         if (widget.capabilities.canViewDocuments) ...<Widget>[
           AppSectionHeader(
             title: l10n.matterWorkspaceInvoicesTitle,
-            titleStyle: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+            titleStyle: _workspaceHeaderStyle(text),
             children: <Widget>[const MatterInvoicesSection()],
           ),
           const SizedBox(height: LegalHubTheme.spaceXl),
@@ -126,7 +129,7 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
         if (widget.capabilities.canViewFiles) ...<Widget>[
           AppSectionHeader(
             title: l10n.matterWorkspaceFilesTitle,
-            titleStyle: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+            titleStyle: _workspaceHeaderStyle(text),
             children: <Widget>[MatterFilesSection(matterId: matter.id)],
           ),
           const SizedBox(height: LegalHubTheme.spaceXl),
@@ -134,7 +137,7 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
         if (widget.capabilities.canViewMessages) ...<Widget>[
           AppSectionHeader(
             title: l10n.matterWorkspaceMessagesTitle,
-            titleStyle: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+            titleStyle: _workspaceHeaderStyle(text),
             children: <Widget>[const MatterMessagesSection()],
           ),
           const SizedBox(height: LegalHubTheme.spaceXl),
@@ -148,3 +151,6 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
     );
   }
 }
+
+TextStyle? _workspaceHeaderStyle(TextTheme text) =>
+    text.titleSmall?.copyWith(fontWeight: FontWeight.w700);

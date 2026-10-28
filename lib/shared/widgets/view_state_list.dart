@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/l10n/app_error_label.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
 part 'view_state_success_list.dart';
@@ -134,12 +135,12 @@ class ViewStateList<ItemT> extends StatelessWidget {
           ),
         ],
       ),
-      ViewError<List<ItemT>>() => ListView(
+      ViewError<List<ItemT>>(error: final error) => ListView(
         padding: listPadding,
         children: <Widget>[
           ...header,
           Text(
-            errorCopy,
+            appErrorLabel(l10n, error, fallback: errorCopy),
             style: text.bodyMedium?.copyWith(color: scheme.error),
           ),
           TextButton(onPressed: onRetry, child: Text(l10n.retry)),

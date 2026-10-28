@@ -10,7 +10,7 @@ part of 'supabase_auth_api_impl.dart';
 /// diagnostics.
 SupabaseAuthFailureKind _failureKindFor(AuthException e) {
   // GoTrue reports the status code as a String (gotrue >= 2.26).
-  if (e.statusCode == '429') {
+  if (e.statusCode == HttpStatusCodes.tooManyRequestsText) {
     return SupabaseAuthFailureKind.rateLimited;
   }
   final String message = e.message.toLowerCase();

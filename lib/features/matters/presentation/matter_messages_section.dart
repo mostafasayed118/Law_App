@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/features/messaging/domain/message_thread.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/demo_labels.dart';
@@ -45,6 +46,7 @@ class _MatterMessagesSectionState extends State<MatterMessagesSection> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final DemoLabels labels = DemoLabels(l10n, localOnly: backendIsLocalOnly);
     return BlocBuilder<MatterWorkspaceCubit, MatterWorkspaceState>(
       buildWhen:
           (MatterWorkspaceState previous, MatterWorkspaceState current) =>
@@ -57,7 +59,7 @@ class _MatterMessagesSectionState extends State<MatterMessagesSection> {
           emptyCopy: l10n.matterWorkspaceMessagesEmpty,
           viewAllCopy: l10n.viewAll,
           itemBuilder: (BuildContext context, MessageThread thread) => AppTile(
-            title: demoThreadTitle(l10n, thread.title),
+            title: labels.threadTitle(thread.title),
             subtitles: <String>[
               '${thread.participants.join(', ')} · '
                   '${formatMediumDate(l10n, thread.lastActivityAt)}',

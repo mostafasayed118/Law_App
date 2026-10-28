@@ -37,7 +37,7 @@ screens behind an auth-aware GoRouter shell.
   collection stays disabled until the Paymob secrets and a dated D-11 exception
   are in place. `research-analyze` and `video-token` are deployed but return
   `provider_not_configured` until `RIVER_*` / `LIVEKIT_*` are added.
-- **Quality gates** — 2062 tests, analyzer-clean, `dart format` pinned to the
+- **Quality gates** — 2119 tests, analyzer-clean, `dart format` pinned to the
   CI toolchain, a hash-pinned governance ledger (`scripts/verify_ledger.sh`)
   reconciling docs claims against the git object database, and
   `docs/audit/LegalHub_AUDIT_2026-09-21.md` as the running build journal.
@@ -102,7 +102,7 @@ recorded prerequisites are approved — see
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (2062 total) — full suite green 2026-10-28 (2068 at runtime): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (2119 total) — full suite green 2026-10-28 (2125 at runtime): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), ThemeCubit (mode persistence + restart
   restore), Redactor (password/OTP/email/Bearer redaction with leak guards),
@@ -455,8 +455,8 @@ HTTP layer and lock the exact postgrest await shape the app depends on —
 (2: `from().select()` plain + chained `.eq()` → raw row list). A future
 postgrest upgrade that changes the await contract fails loudly in CI, not on
 a device (the on-device create-org crash this class caused is recorded in
-`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **2062 tests**
-(2062 tracked declarations, 2068 at runtime; ledger `verify_ledger.sh` PASS).
+`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **2119 tests**
+(2119 tracked declarations, 2125 at runtime; ledger `verify_ledger.sh` PASS).
 
 ## Fonts and licenses
 

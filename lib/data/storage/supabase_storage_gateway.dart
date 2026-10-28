@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/storage/domain/file_metadata.dart';
 import 'package:legalhub/features/storage/domain/storage_gateway.dart';
@@ -37,6 +38,7 @@ class SupabaseStorageGateway implements StorageGateway {
         AppError(
           code: 'file_read_failed',
           userMessage: 'Unable to load files. Please try again.',
+          messageKey: AppMessageKey.errUnableToLoadFilesPleaseTryAgain,
           technicalMessage: e.message,
         ),
       );
@@ -72,6 +74,7 @@ class SupabaseStorageGateway implements StorageGateway {
           const AppError(
             code: 'file_upload_too_large',
             userMessage: 'This file is too large.',
+            messageKey: AppMessageKey.errThisFileIsTooLarge,
             technicalMessage: 'File exceeds the 25 MiB bucket limit.',
           ),
         );
@@ -81,6 +84,7 @@ class SupabaseStorageGateway implements StorageGateway {
           const AppError(
             code: 'file_upload_unsupported_type',
             userMessage: 'This file type is not supported.',
+            messageKey: AppMessageKey.errThisFileTypeIsNotSupported,
             technicalMessage: 'MIME type is not in the bucket allowlist.',
           ),
         );
@@ -134,6 +138,7 @@ class SupabaseStorageGateway implements StorageGateway {
         AppError(
           code: 'file_upload_failed',
           userMessage: 'Unable to upload the file. Please try again.',
+          messageKey: AppMessageKey.errUnableToUploadTheFilePleaseTryAgain,
           technicalMessage: e.message,
         ),
       );
@@ -143,7 +148,7 @@ class SupabaseStorageGateway implements StorageGateway {
   @override
   Future<Result<Uri>> createDownloadUrl(
     FileMetadata file, {
-    Duration ttl = const Duration(seconds: 60),
+    Duration ttl = kSignedUrlTtl,
   }) async {
     try {
       final String url = await _api.createSignedUrl(
@@ -245,6 +250,7 @@ class SupabaseStorageGateway implements StorageGateway {
     return const AppError(
       code: 'file_upload_denied',
       userMessage: 'You do not have permission to upload files to this matter.',
+      messageKey: AppMessageKey.errYouDoNotHavePermissionToUploadFiles,
       technicalMessage: 'Matter is not readable under the caller gate.',
       kind: AppErrorKind.denied,
     );
@@ -254,6 +260,7 @@ class SupabaseStorageGateway implements StorageGateway {
     return const AppError(
       code: 'file_open_failed',
       userMessage: 'Unable to open the file. Please try again.',
+      messageKey: AppMessageKey.errUnableToOpenTheFilePleaseTryAgain,
       technicalMessage: 'Signed URL is not a usable https URL.',
     );
   }
@@ -266,42 +273,50 @@ class SupabaseStorageGateway implements StorageGateway {
       String code,
       String userMessage,
       AppErrorKind kind,
+      AppMessageKey? messageKey,
     ) = switch (e.kind) {
       SupabaseStorageFailureKind.denied => (
         'file_upload_denied',
         'You do not have permission to upload files to this matter.',
         AppErrorKind.denied,
+        AppMessageKey.errYouDoNotHavePermissionToUploadFiles,
       ),
       SupabaseStorageFailureKind.tooLarge => (
         'file_upload_too_large',
         'This file is too large.',
         AppErrorKind.unknown,
+        AppMessageKey.errThisFileIsTooLarge,
       ),
       SupabaseStorageFailureKind.unsupportedType => (
         'file_upload_unsupported_type',
         'This file type is not supported.',
         AppErrorKind.unknown,
+        AppMessageKey.errThisFileTypeIsNotSupported,
       ),
       SupabaseStorageFailureKind.conflict => (
         'file_upload_conflict',
         'A file with this name already exists. Please try again.',
         AppErrorKind.unknown,
+        null,
       ),
       SupabaseStorageFailureKind.providerUnavailable => (
         'file_upload_unavailable',
         'File uploads are temporarily unavailable. Please try again.',
         AppErrorKind.unavailable,
+        null,
       ),
       SupabaseStorageFailureKind.notFound ||
       SupabaseStorageFailureKind.unknown => (
         'file_upload_failed',
         'Unable to upload the file. Please try again.',
         AppErrorKind.unknown,
+        AppMessageKey.errUnableToUploadTheFilePleaseTryAgain,
       ),
     };
     return AppError(
       code: code,
       userMessage: userMessage,
+      messageKey: messageKey,
       kind: kind,
       technicalMessage: 'Upload failed (${e.kind.name}).',
     );
@@ -314,26 +329,31 @@ class SupabaseStorageGateway implements StorageGateway {
       String code,
       String userMessage,
       AppErrorKind kind,
+      AppMessageKey? messageKey,
     ) = switch (e.kind) {
       SupabaseStorageFailureKind.denied => (
         'file_open_denied',
         'You do not have permission to open this file.',
         AppErrorKind.denied,
+        null,
       ),
       SupabaseStorageFailureKind.providerUnavailable => (
         'file_open_unavailable',
         'Files are temporarily unavailable. Please try again.',
         AppErrorKind.unavailable,
+        null,
       ),
       _ => (
         'file_open_failed',
         'Unable to open the file. Please try again.',
         AppErrorKind.unknown,
+        AppMessageKey.errUnableToOpenTheFilePleaseTryAgain,
       ),
     };
     return AppError(
       code: code,
       userMessage: userMessage,
+      messageKey: messageKey,
       kind: kind,
       technicalMessage: 'Download URL failed (${e.kind.name}).',
     );
@@ -347,26 +367,31 @@ class SupabaseStorageGateway implements StorageGateway {
       String code,
       String userMessage,
       AppErrorKind kind,
+      AppMessageKey? messageKey,
     ) = switch (e.kind) {
       SupabaseStorageFailureKind.denied => (
         'file_read_denied',
         'You do not have permission to view these files.',
         AppErrorKind.denied,
+        null,
       ),
       SupabaseStorageFailureKind.providerUnavailable => (
         'file_read_unavailable',
         'Files are temporarily unavailable. Please try again.',
         AppErrorKind.unavailable,
+        null,
       ),
       _ => (
         'file_read_failed',
         'Unable to load files. Please try again.',
         AppErrorKind.unknown,
+        AppMessageKey.errUnableToLoadFilesPleaseTryAgain,
       ),
     };
     return AppError(
       code: code,
       userMessage: userMessage,
+      messageKey: messageKey,
       kind: kind,
       technicalMessage: e.message,
     );

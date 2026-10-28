@@ -1,6 +1,7 @@
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/billing/domain/billing_gateway.dart';
 import 'package:legalhub/features/billing/domain/invoice.dart';
+import 'package:legalhub/shared/demo/demo_corpus.dart';
 
 /// Development-only billing implementation: a fixed synthetic list of
 /// non-PII invoice **metadata**.
@@ -20,8 +21,8 @@ class FakeBillingGateway implements BillingGateway {
   static final List<Invoice> syntheticInvoices = <Invoice>[
     Invoice(
       id: 'invoice-1',
-      matterId: 'matter-1',
-      matterRef: 'Demo acquisition review',
+      matterId: DemoCorpus.matterIds[0],
+      matterRef: DemoCorpus.matterTitleAcquisition,
       invoiceNumber: 'INV-2026-0001',
       amountCents: 125000,
       currency: 'EGP',
@@ -31,8 +32,8 @@ class FakeBillingGateway implements BillingGateway {
     ),
     Invoice(
       id: 'invoice-2',
-      matterId: 'matter-2',
-      matterRef: 'Commercial lease consultation',
+      matterId: DemoCorpus.matterIds[1],
+      matterRef: DemoCorpus.matterTitleLease,
       invoiceNumber: 'INV-2026-0002',
       amountCents: 87500,
       currency: 'EGP',
@@ -42,8 +43,8 @@ class FakeBillingGateway implements BillingGateway {
     ),
     Invoice(
       id: 'invoice-3',
-      matterId: 'matter-3',
-      matterRef: 'Procedural review matter',
+      matterId: DemoCorpus.matterIds[2],
+      matterRef: DemoCorpus.matterTitleProcedural,
       invoiceNumber: 'INV-2026-0003',
       amountCents: 62000,
       currency: 'EGP',
@@ -53,8 +54,8 @@ class FakeBillingGateway implements BillingGateway {
     ),
     Invoice(
       id: 'invoice-4',
-      matterId: 'matter-4',
-      matterRef: 'Family status consultation',
+      matterId: DemoCorpus.matterIds[3],
+      matterRef: DemoCorpus.matterTitleFamily,
       invoiceNumber: 'INV-2026-0004',
       amountCents: 45000,
       currency: 'EGP',
@@ -64,8 +65,8 @@ class FakeBillingGateway implements BillingGateway {
     ),
     Invoice(
       id: 'invoice-5',
-      matterId: 'matter-5',
-      matterRef: 'Startup formation advisory',
+      matterId: DemoCorpus.matterIds[4],
+      matterRef: DemoCorpus.matterTitleStartup,
       invoiceNumber: 'INV-2026-0005',
       amountCents: 98000,
       currency: 'EGP',

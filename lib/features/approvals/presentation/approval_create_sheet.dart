@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/contracts/server_limits.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/approvals/domain/approvals_gateway.dart';
@@ -52,9 +53,6 @@ class ApprovalCreateSheet extends StatefulWidget {
 }
 
 class _ApprovalCreateSheetState extends State<ApprovalCreateSheet> {
-  static const int _titleMaxLength = 160;
-  static const int _descriptionMaxLength = 4000;
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _title = TextEditingController();
   final TextEditingController _description = TextEditingController();
@@ -205,7 +203,7 @@ class _ApprovalCreateSheetState extends State<ApprovalCreateSheet> {
           TextFormField(
             controller: _title,
             enabled: !_submitting,
-            maxLength: _titleMaxLength,
+            maxLength: kTitleMaxLength,
             decoration: InputDecoration(
               labelText: l10n.approvalCreateTitleLabel,
               hintText: l10n.approvalCreateTitleHint,
@@ -255,13 +253,13 @@ class _ApprovalCreateSheetState extends State<ApprovalCreateSheet> {
             controller: _description,
             enabled: !_submitting,
             maxLines: 4,
-            maxLength: _descriptionMaxLength,
+            maxLength: kDescriptionMaxLength,
             decoration: InputDecoration(
               labelText: l10n.approvalCreateDescriptionLabel,
               border: const OutlineInputBorder(),
             ),
             validator: (String? value) {
-              if ((value ?? '').length > _descriptionMaxLength) {
+              if ((value ?? '').length > kDescriptionMaxLength) {
                 return l10n.approvalCreateDescriptionTooLong;
               }
               return null;
@@ -285,6 +283,7 @@ class _ApprovalCreateSheetState extends State<ApprovalCreateSheet> {
   };
 
   Widget _matterDropdown(AppLocalizations l10n, List<Matter> matters) {
+    final DemoLabels labels = DemoLabels(l10n, localOnly: backendIsLocalOnly);
     return DropdownButtonFormField<String?>(
       initialValue: _selectedMatterId,
       decoration: InputDecoration(
@@ -296,7 +295,7 @@ class _ApprovalCreateSheetState extends State<ApprovalCreateSheet> {
         for (final Matter matter in matters)
           DropdownMenuItem<String?>(
             value: matter.id,
-            child: Text(demoMatterTitle(l10n, matter.title)),
+            child: Text(labels.matterTitle(matter.title)),
           ),
       ],
       onChanged: _submitting
@@ -310,7 +309,7 @@ class _ApprovalCreateSheetState extends State<ApprovalCreateSheet> {
     if (text.length < 2) {
       return l10n.approvalCreateTitleTooShort;
     }
-    if (text.length > _titleMaxLength) {
+    if (text.length > kTitleMaxLength) {
       return l10n.approvalCreateTitleTooLong;
     }
     return null;

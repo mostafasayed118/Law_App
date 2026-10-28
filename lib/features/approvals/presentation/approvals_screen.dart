@@ -49,6 +49,7 @@ class _ApprovalsScreenState extends State<ApprovalsScreen> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final bool localOnly = backendIsLocalOnly;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.approvalsScreenTitle)),
       floatingActionButton: FloatingActionButton.extended(
@@ -63,6 +64,7 @@ class _ApprovalsScreenState extends State<ApprovalsScreen> {
         tileBuilder: (BuildContext context, PendingApproval approval) =>
             _ApprovalTile(
               approval: approval,
+              localOnly: localOnly,
               onTap: () => _openDetail(approval),
             ),
         header: <Widget>[
@@ -92,7 +94,7 @@ class _ApprovalsScreenState extends State<ApprovalsScreen> {
           ),
         ),
         errorCopy: l10n.approvalsError,
-        localOnlyNote: backendIsLocalOnly
+        localOnlyNote: localOnly
             ? l10n.approvalsLocalOnlyNote
             : l10n.approvalsStoredNote,
       ),

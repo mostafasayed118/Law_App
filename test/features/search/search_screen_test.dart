@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/backend_posture.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/practice_area.dart';
@@ -34,7 +35,15 @@ void main() {
     WidgetTester tester, {
     String initialQuery = 'Demo',
     RoleCapability? caps,
+    bool localOnly = true,
   }) async {
+    // A configured build registers the real-backend posture; the env-less
+    // default keeps the historical local-only posture.
+    if (!localOnly) {
+      serviceLocator.registerSingleton<BackendPosture>(
+        const BackendPosture(isLocalOnly: false),
+      );
+    }
     // SearchScreen resolves the four gateways from the locator (the dev
     // fakes in env-less runs).
     configureDependencies();
@@ -91,7 +100,43 @@ void main() {
         ),
         findsOneWidget,
       );
+      // The local-only note is part of the demo posture's truthful copy.
+      expect(find.textContaining('Demo mode'), findsOneWidget);
       expect(find.text('Demo acquisition review'), findsNothing);
+    });
+
+    testWidgets(
+      'configured posture hides the demo note and uses neutral no-query copy',
+      (tester) async {
+        await pumpSearch(tester, initialQuery: '   ', localOnly: false);
+
+        expect(
+          find.text(
+            'Type a search term to search matters, documents, messages, and '
+            'attorneys.',
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.text(
+            'Type a search term to find demo matters, documents, messages, or '
+            'attorneys.',
+          ),
+          findsNothing,
+        );
+        // A configured build searches server data: neither the synthetic-list
+        // note nor any "demo mode" wording may render.
+        expect(find.textContaining('Demo mode'), findsNothing);
+        expect(find.textContaining('synthetic lists only'), findsNothing);
+      },
+    );
+
+    testWidgets('configured results never carry the demo note', (tester) async {
+      await pumpSearch(tester, localOnly: false);
+
+      expect(find.text('Demo acquisition review'), findsOneWidget);
+      expect(find.textContaining('Demo mode'), findsNothing);
+      expect(find.textContaining('synthetic lists only'), findsNothing);
     });
 
     testWidgets('a query with no matches renders the localized empty state', (

@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import 'package:legalhub/core/errors/app_message_key.dart';
+
 /// The typed class of an [AppError] — what kind of failure this is, as opposed
 /// to the free-form [AppError.code] string.
 ///
@@ -31,6 +33,8 @@ class AppError extends Equatable {
   const AppError({
     required this.code,
     required this.userMessage,
+    this.messageKey,
+    this.messageArgs = const <String, Object?>{},
     this.technicalMessage,
     this.context = const <String, Object?>{},
     this.kind = AppErrorKind.unknown,
@@ -38,6 +42,15 @@ class AppError extends Equatable {
 
   final String code;
   final String userMessage;
+
+  /// The stable localization key for this failure, when the call site has one.
+  /// Presentation renders [messageKey] through `appMessage`; a null key falls
+  /// back to the generic `stateError` copy.
+  final AppMessageKey? messageKey;
+
+  /// Presentation-only placeholder values for [messageKey]. Never logged.
+  final Map<String, Object?> messageArgs;
+
   final String? technicalMessage;
   final Map<String, Object?> context;
 
@@ -55,6 +68,8 @@ class AppError extends Equatable {
   List<Object?> get props => <Object?>[
     code,
     userMessage,
+    messageKey,
+    messageArgs,
     technicalMessage,
     context,
     kind,

@@ -83,7 +83,7 @@ class TaskBoardScreen extends StatelessWidget {
           ),
         ],
         tileBuilder: (BuildContext context, TaskItem task) =>
-            _TaskTile(task: task),
+            _TaskTile(task: task, localOnly: localOnly),
         empty: (BuildContext context, TaskBoardState state) => Padding(
           padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
           child: Text(

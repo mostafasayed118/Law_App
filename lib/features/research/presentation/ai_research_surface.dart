@@ -220,6 +220,7 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
     AiResearchState state, {
     required bool locked,
   }) {
+    final DemoLabels labels = DemoLabels(l10n, localOnly: backendIsLocalOnly);
     final ViewState<List<Matter>> lookup = state.matters;
     if (lookup is ViewLoading<List<Matter>>) {
       return const LinearProgressIndicator();
@@ -247,7 +248,7 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
         for (final Matter matter in matters)
           DropdownMenuItem<String?>(
             value: matter.id,
-            child: Text(demoMatterTitle(l10n, matter.title)),
+            child: Text(labels.matterTitle(matter.title)),
           ),
       ],
       onChanged: locked
@@ -261,6 +262,7 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
     AiResearchState state, {
     required bool locked,
   }) {
+    final DemoLabels labels = DemoLabels(l10n, localOnly: backendIsLocalOnly);
     final ViewState<List<Document>> lookup = state.documents;
     if (lookup is ViewLoading<List<Document>>) {
       return const LinearProgressIndicator();
@@ -283,7 +285,7 @@ class _ResearchSurfaceState extends State<_ResearchSurface> {
           // chips; add paging if a matter's vault routinely exceeds that.
           for (final Document document in lookup.data.take(_maxDocumentChips))
             FilterChip(
-              label: Text(demoDocumentTitle(l10n, document.title)),
+              label: Text(labels.documentTitle(document.title)),
               selected: _selectedDocumentIds.contains(document.id),
               onSelected: locked
                   ? null

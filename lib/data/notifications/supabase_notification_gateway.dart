@@ -1,4 +1,5 @@
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/notifications/domain/notification.dart';
 import 'package:legalhub/features/notifications/domain/notification_gateway.dart';
@@ -46,6 +47,7 @@ class SupabaseNotificationGateway implements NotificationGateway {
         AppError(
           code: 'notification_read_failed',
           userMessage: 'Unable to load notifications. Please try again.',
+          messageKey: AppMessageKey.errUnableToLoadNotificationsPleaseTryAgain,
           technicalMessage: e.message,
         ),
       );
@@ -128,26 +130,31 @@ class SupabaseNotificationGateway implements NotificationGateway {
       String code,
       String userMessage,
       AppErrorKind kind,
+      AppMessageKey? messageKey,
     ) = switch (e.kind) {
       SupabaseNotificationFailureKind.denied => (
         'notification_read_denied',
         'You do not have permission to view these notifications.',
         AppErrorKind.denied,
+        null,
       ),
       SupabaseNotificationFailureKind.providerUnavailable => (
         'notification_read_unavailable',
         'Notifications are temporarily unavailable. Please try again.',
         AppErrorKind.unavailable,
+        AppMessageKey.errNotificationsAreTemporarilyUnavailablePleaseTryAgain,
       ),
       SupabaseNotificationFailureKind.unknown => (
         'notification_read_failed',
         'Unable to load notifications. Please try again.',
         AppErrorKind.unknown,
+        AppMessageKey.errUnableToLoadNotificationsPleaseTryAgain,
       ),
     };
     return AppError(
       code: code,
       userMessage: userMessage,
+      messageKey: messageKey,
       kind: kind,
       technicalMessage: e.message,
     );
@@ -172,6 +179,8 @@ class SupabaseNotificationGateway implements NotificationGateway {
           code: 'notification_mark_unavailable',
           userMessage:
               'Notifications are temporarily unavailable. Please try again.',
+          messageKey: AppMessageKey
+              .errNotificationsAreTemporarilyUnavailablePleaseTryAgain,
         ),
       );
     }

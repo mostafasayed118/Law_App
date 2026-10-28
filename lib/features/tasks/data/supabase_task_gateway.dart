@@ -1,4 +1,5 @@
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/data/tasks/supabase_task_api.dart';
 import 'package:legalhub/features/tasks/domain/task_gateway.dart';
@@ -36,6 +37,11 @@ class SupabaseTaskGateway implements TaskBoardGateway {
           unavailableMessage:
               'Tasks are temporarily unavailable. Please try again.',
           failedMessage: 'Unable to load tasks. Please try again.',
+          deniedKey: AppMessageKey.errYouDoNotHavePermissionToViewThese2,
+          validationKey: AppMessageKey.errUnableToLoadTasksPleaseTryAgain,
+          unavailableKey:
+              AppMessageKey.errTasksAreTemporarilyUnavailablePleaseTryAgain,
+          failedKey: AppMessageKey.errUnableToLoadTasksPleaseTryAgain,
         ),
       );
     } on FormatException catch (e) {
@@ -45,6 +51,7 @@ class SupabaseTaskGateway implements TaskBoardGateway {
         AppError(
           code: 'task_read_failed',
           userMessage: 'Unable to load tasks. Please try again.',
+          messageKey: AppMessageKey.errUnableToLoadTasksPleaseTryAgain,
           technicalMessage: e.message,
         ),
       );
@@ -76,6 +83,11 @@ class SupabaseTaskGateway implements TaskBoardGateway {
           unavailableMessage:
               'Creating the task is temporarily unavailable. Please try again.',
           failedMessage: 'Unable to create the task. Please try again.',
+          deniedKey: AppMessageKey.errYouDoNotHavePermissionToCreateTasks,
+          validationKey: AppMessageKey.errTheTaskCouldNotBeCreatedCheckThe,
+          unavailableKey:
+              AppMessageKey.errCreatingTheTaskIsTemporarilyUnavailablePleaseTry,
+          failedKey: AppMessageKey.errUnableToCreateTheTaskPleaseTryAgain,
         ),
       );
     } on FormatException catch (e) {
@@ -83,6 +95,7 @@ class SupabaseTaskGateway implements TaskBoardGateway {
         AppError(
           code: 'task_create_failed',
           userMessage: 'Unable to create the task. Please try again.',
+          messageKey: AppMessageKey.errUnableToCreateTheTaskPleaseTryAgain,
           technicalMessage: e.message,
         ),
       );
@@ -100,6 +113,11 @@ class SupabaseTaskGateway implements TaskBoardGateway {
       unavailableMessage:
           'Updating the task is temporarily unavailable. Please try again.',
       failedMessage: 'Unable to update the task. Please try again.',
+      deniedKey: AppMessageKey.errYouDoNotHavePermissionToAdvanceThis,
+      validationKey: AppMessageKey.errTheTaskCannotMoveToThatStatusIt,
+      unavailableKey:
+          AppMessageKey.errUpdatingTheTaskIsTemporarilyUnavailablePleaseTry,
+      failedKey: AppMessageKey.errUnableToUpdateTheTaskPleaseTryAgain,
     );
   }
 
@@ -114,6 +132,11 @@ class SupabaseTaskGateway implements TaskBoardGateway {
       unavailableMessage:
           'Re-assigning the task is temporarily unavailable. Please try again.',
       failedMessage: 'Unable to re-assign the task. Please try again.',
+      deniedKey: AppMessageKey.errYouDoNotHavePermissionToReAssign,
+      validationKey: AppMessageKey.errThatPersonCannotBeAssignedThisTaskChoose,
+      unavailableKey:
+          AppMessageKey.errReAssigningTheTaskIsTemporarilyUnavailablePlease,
+      failedKey: AppMessageKey.errUnableToReAssignTheTaskPleaseTry,
     );
   }
 
@@ -127,6 +150,11 @@ class SupabaseTaskGateway implements TaskBoardGateway {
       unavailableMessage:
           'Acknowledging the task is temporarily unavailable. Please try again.',
       failedMessage: 'Unable to acknowledge the task. Please try again.',
+      deniedKey: AppMessageKey.errOnlyTheAssignedPersonCanAcknowledgeThisTask,
+      validationKey: AppMessageKey.errUnableToAcknowledgeTheTaskPleaseTryAgain,
+      unavailableKey: AppMessageKey
+          .errAcknowledgingTheTaskIsTemporarilyUnavailablePleaseTry,
+      failedKey: AppMessageKey.errUnableToAcknowledgeTheTaskPleaseTryAgain,
     );
   }
 
@@ -138,6 +166,10 @@ class SupabaseTaskGateway implements TaskBoardGateway {
     required String validationMessage,
     required String unavailableMessage,
     required String failedMessage,
+    required AppMessageKey deniedKey,
+    required AppMessageKey validationKey,
+    required AppMessageKey unavailableKey,
+    required AppMessageKey failedKey,
   }) async {
     try {
       return Result<TaskItem>.success(_taskFromRow(await write()));
@@ -150,6 +182,10 @@ class SupabaseTaskGateway implements TaskBoardGateway {
           validationMessage: validationMessage,
           unavailableMessage: unavailableMessage,
           failedMessage: failedMessage,
+          deniedKey: deniedKey,
+          validationKey: validationKey,
+          unavailableKey: unavailableKey,
+          failedKey: failedKey,
         ),
       );
     } on FormatException catch (e) {
@@ -159,6 +195,7 @@ class SupabaseTaskGateway implements TaskBoardGateway {
         AppError(
           code: '${codePrefix}_failed',
           userMessage: failedMessage,
+          messageKey: failedKey,
           technicalMessage: e.message,
         ),
       );
@@ -272,29 +309,37 @@ class SupabaseTaskGateway implements TaskBoardGateway {
     required String validationMessage,
     required String unavailableMessage,
     required String failedMessage,
+    required AppMessageKey deniedKey,
+    required AppMessageKey validationKey,
+    required AppMessageKey unavailableKey,
+    required AppMessageKey failedKey,
   }) {
     return switch (e.kind) {
       SupabaseTaskFailureKind.denied => AppError(
         code: '${codePrefix}_denied',
         userMessage: deniedMessage,
+        messageKey: deniedKey,
         kind: AppErrorKind.denied,
         technicalMessage: e.message,
       ),
       SupabaseTaskFailureKind.validation => AppError(
         code: '${codePrefix}_invalid',
         userMessage: validationMessage,
+        messageKey: validationKey,
         kind: AppErrorKind.unknown,
         technicalMessage: e.message,
       ),
       SupabaseTaskFailureKind.providerUnavailable => AppError(
         code: '${codePrefix}_unavailable',
         userMessage: unavailableMessage,
+        messageKey: unavailableKey,
         kind: AppErrorKind.unavailable,
         technicalMessage: e.message,
       ),
       SupabaseTaskFailureKind.unknown => AppError(
         code: '${codePrefix}_failed',
         userMessage: failedMessage,
+        messageKey: failedKey,
         kind: AppErrorKind.unknown,
         technicalMessage: e.message,
       ),

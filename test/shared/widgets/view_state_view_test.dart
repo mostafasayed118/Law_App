@@ -1,18 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/view_state_view.dart';
 
 void main() {
-  Widget pumpViewState<T>(ViewState<T> state, {VoidCallback? onRetry}) {
+  Widget pumpViewState<T>(
+    ViewState<T> state, {
+    VoidCallback? onRetry,
+    String? errorFallback,
+    Locale locale = const Locale('en'),
+  }) {
     return MaterialApp(
-      locale: const Locale('en'),
+      locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(
-        body: ViewStateView<T>(state: state, onRetry: onRetry),
+        body: ViewStateView<T>(
+          state: state,
+          onRetry: onRetry,
+          errorFallback: errorFallback,
+        ),
       ),
     );
   }
@@ -46,7 +56,7 @@ void main() {
       expect(find.byIcon(Icons.inbox_outlined), findsOneWidget);
     });
 
-    testWidgets('error branch renders the user message and a retry action', (
+    testWidgets('keyed error renders the localized pilot copy and retry', (
       tester,
     ) async {
       var retried = false;
@@ -54,15 +64,20 @@ void main() {
       await tester.pumpWidget(
         pumpViewState<String>(
           ViewError<String>(
-            const AppError(code: 'load_failed', userMessage: 'Something broke'),
+            const AppError(
+              code: 'task_read_failed',
+              userMessage: 'Unable to load tasks. Please try again.',
+              messageKey: AppMessageKey.errUnableToLoadTasksPleaseTryAgain,
+            ),
           ),
           onRetry: () => retried = true,
         ),
       );
 
-      // The error surface carries the AppError.userMessage, not a generic
-      // label — this is what distinguishes it from the other branches.
-      expect(find.text('Something broke'), findsOneWidget);
+      expect(
+        find.text('Unable to load tasks. Please try again.'),
+        findsOneWidget,
+      );
       expect(find.byIcon(Icons.error_outline), findsOneWidget);
 
       // The retry affordance is localized and wired to onRetry.
@@ -71,24 +86,60 @@ void main() {
       expect(retried, isTrue);
     });
 
-    testWidgets(
-      'error branch renders no retry affordance when onRetry is null',
-      (tester) async {
-        await tester.pumpWidget(
-          pumpViewState<String>(
-            ViewError<String>(
-              const AppError(
-                code: 'load_failed',
-                userMessage: 'Something broke',
-              ),
+    testWidgets('unkeyed error renders the generic localized copy', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        pumpViewState<String>(
+          ViewError<String>(
+            const AppError(code: 'load_failed', userMessage: 'Something broke'),
+          ),
+        ),
+      );
+
+      expect(
+        find.text('Something went wrong. Please try again.'),
+        findsOneWidget,
+      );
+      expect(find.text('Something broke'), findsNothing);
+      expect(find.text('Retry'), findsNothing);
+    });
+
+    testWidgets('unkeyed error renders the caller-provided fallback', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        pumpViewState<String>(
+          const ViewError<String>(
+            AppError(code: 'x', userMessage: 'raw producer text'),
+          ),
+          errorFallback: 'Localized screen copy',
+        ),
+      );
+
+      expect(find.text('Localized screen copy'), findsOneWidget);
+      expect(find.text('raw producer text'), findsNothing);
+    });
+
+    testWidgets('keyed error renders localized copy in Arabic', (tester) async {
+      await tester.pumpWidget(
+        pumpViewState<String>(
+          const ViewError<String>(
+            AppError(
+              code: 'task_read_failed',
+              userMessage: 'Unable to load tasks. Please try again.',
+              messageKey: AppMessageKey.errUnableToLoadTasksPleaseTryAgain,
             ),
           ),
-        );
+          locale: const Locale('ar'),
+        ),
+      );
 
-        expect(find.text('Something broke'), findsOneWidget);
-        expect(find.text('Retry'), findsNothing);
-      },
-    );
+      expect(
+        find.text('تعذر تحميل المهام. يرجى المحاولة مرة أخرى.'),
+        findsOneWidget,
+      );
+    });
 
     testWidgets('offline branch renders the offline label', (tester) async {
       await tester.pumpWidget(

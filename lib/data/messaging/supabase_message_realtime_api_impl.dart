@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:legalhub/data/supabase_wire.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_message_realtime_api.dart';
@@ -180,7 +181,7 @@ class SupabaseMessageRealtimeApiImpl implements SupabaseMessageRealtimeApi {
       ..onPostgresChanges(
         event: PostgresChangeEvent.insert,
         schema: 'public',
-        table: 'messages',
+        table: SupabaseTables.messages,
         filter: PostgresChangeFilter(
           type: PostgresChangeFilterType.eq,
           column: 'thread_id',

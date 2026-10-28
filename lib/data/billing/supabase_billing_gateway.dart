@@ -1,4 +1,5 @@
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/billing/domain/billing_gateway.dart';
 import 'package:legalhub/features/billing/domain/invoice.dart';
@@ -43,6 +44,7 @@ class SupabaseBillingGateway implements BillingGateway {
         AppError(
           code: 'invoice_read_failed',
           userMessage: 'Unable to load invoices. Please try again.',
+          messageKey: AppMessageKey.errUnableToLoadInvoicesPleaseTryAgain,
           technicalMessage: e.message,
         ),
       );
@@ -146,26 +148,31 @@ class SupabaseBillingGateway implements BillingGateway {
       String code,
       String userMessage,
       AppErrorKind kind,
+      AppMessageKey? messageKey,
     ) = switch (e.kind) {
       SupabaseBillingFailureKind.denied => (
         'invoice_read_denied',
         'You do not have permission to view these invoices.',
         AppErrorKind.denied,
+        null,
       ),
       SupabaseBillingFailureKind.providerUnavailable => (
         'invoice_read_unavailable',
         'Invoices are temporarily unavailable. Please try again.',
         AppErrorKind.unavailable,
+        null,
       ),
       SupabaseBillingFailureKind.unknown => (
         'invoice_read_failed',
         'Unable to load invoices. Please try again.',
         AppErrorKind.unknown,
+        AppMessageKey.errUnableToLoadInvoicesPleaseTryAgain,
       ),
     };
     return AppError(
       code: code,
       userMessage: userMessage,
+      messageKey: messageKey,
       kind: kind,
       technicalMessage: e.message,
     );

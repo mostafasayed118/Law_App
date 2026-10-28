@@ -17,12 +17,7 @@ extension _FakeOrganizationGatewayHelpers on _FakeOrgState {
   }
 
   String? _assignableRoleName(UserRole role) {
-    return switch (role) {
-      UserRole.client => 'client',
-      UserRole.attorney => 'attorney',
-      UserRole.partner => 'partner',
-      _ => null,
-    };
+    return userRoleToAssignableServerName(role);
   }
 
   OrgMember _copy(

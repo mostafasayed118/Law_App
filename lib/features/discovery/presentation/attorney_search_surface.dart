@@ -60,6 +60,7 @@ class _SearchSurfaceState extends State<_SearchSurface> {
     ColorScheme scheme,
   ) {
     final DiscoveryCubit cubit = context.read<DiscoveryCubit>();
+    final bool localOnly = backendIsLocalOnly;
     final Widget empty = Padding(
       padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
       child: Text(
@@ -72,6 +73,7 @@ class _SearchSurfaceState extends State<_SearchSurface> {
       onRetry: cubit.load,
       tileBuilder: (BuildContext context, Attorney attorney) => _AttorneyTile(
         attorney: attorney,
+        localOnly: localOnly,
         // E2E BUG-1 fix: search result → attorney profile is a forward nav.
         onTap: () => context.push(AppRoutes.attorneyProfile(attorney.id)),
       ),
@@ -89,7 +91,7 @@ class _SearchSurfaceState extends State<_SearchSurface> {
       ],
       empty: empty,
       errorCopy: l10n.discoveryError,
-      localOnlyNote: backendIsLocalOnly
+      localOnlyNote: localOnly
           ? l10n.discoveryLocalOnlyNote
           : l10n.discoveryDirectoryNote,
       listPadding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),

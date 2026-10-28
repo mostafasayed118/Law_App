@@ -89,7 +89,7 @@ class AppTile extends StatelessWidget {
                   style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 for (final String line in subtitles) ...<Widget>[
-                  const SizedBox(height: 2),
+                  const SizedBox(height: LegalHubTheme.space2xs),
                   Text(
                     line,
                     style: text.bodySmall?.copyWith(

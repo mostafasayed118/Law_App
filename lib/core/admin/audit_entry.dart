@@ -1,5 +1,14 @@
 import 'package:equatable/equatable.dart';
 
+/// The server-side audit outcome values.
+///
+/// [AuditEntry.outcome] stays a `String`: the wire is the authority, so an
+/// unrecognized value passes through and renders verbatim.
+abstract final class AuditOutcomes {
+  static const String allowed = 'allowed';
+  static const String denied = 'denied';
+}
+
 /// A single redacted audit-trail row as returned by the owner-only audit
 /// RPCs (`read_platform_audit`, `read_org_audit`).
 ///

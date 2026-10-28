@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:legalhub/core/contracts/http_status.dart';
 import 'package:legalhub/data/postgrest_failures.dart';
 import 'package:legalhub/data/supabase_seam.dart';
+import 'package:legalhub/data/supabase_wire.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_video_api.dart';
@@ -37,8 +39,9 @@ class SupabaseVideoApiImpl implements SupabaseVideoApi {
     String function,
     Map<String, dynamic> body,
   ) async {
-    final FunctionResponse response = await Supabase.instance.client.functions
-        .invoke(function, body: body);
+    final FunctionResponse response = await SupabaseSeam.invokeWithTimeout(
+      () => Supabase.instance.client.functions.invoke(function, body: body),
+    );
     return response.data;
   }
 
@@ -58,10 +61,10 @@ class SupabaseVideoApiImpl implements SupabaseVideoApi {
   }) {
     return _guardRpc(() async {
       final PostgrestResponse<dynamic> response = await _rpcCaller(
-        'list_video_sessions',
+        SupabaseRpcs.listVideoSessions,
         <String, dynamic>{'p_organization_id': organizationId},
       );
-      return _rowsFrom(response.data, 'list_video_sessions');
+      return _rowsFrom(response.data, SupabaseRpcs.listVideoSessions);
     });
   }
 
@@ -74,7 +77,7 @@ class SupabaseVideoApiImpl implements SupabaseVideoApi {
   }) {
     return _guardRpc(() async {
       final PostgrestResponse<dynamic> response =
-          await _rpcCaller('create_video_session', <String, dynamic>{
+          await _rpcCaller(SupabaseRpcs.createVideoSession, <String, dynamic>{
             'p_organization_id': organizationId,
             'p_matter_id': matterId,
             'p_booking_id': bookingId,
@@ -95,7 +98,7 @@ class SupabaseVideoApiImpl implements SupabaseVideoApi {
   Future<Map<String, dynamic>> fetchToken(String sessionId) async {
     try {
       final Object? data = await _functionCaller(
-        'video-token',
+        SupabaseEdgeFunctions.videoToken,
         <String, dynamic>{'session_id': sessionId},
       );
       if (data is! Map) {
@@ -134,7 +137,7 @@ class SupabaseVideoApiImpl implements SupabaseVideoApi {
   @override
   Future<void> markLive(String id) {
     return _guardRpc(() async {
-      await _rpcCaller('mark_video_session_live', <String, dynamic>{
+      await _rpcCaller(SupabaseRpcs.markVideoSessionLive, <String, dynamic>{
         'p_id': id,
       });
     });
@@ -143,7 +146,9 @@ class SupabaseVideoApiImpl implements SupabaseVideoApi {
   @override
   Future<void> end(String id) {
     return _guardRpc(() async {
-      await _rpcCaller('end_video_session', <String, dynamic>{'p_id': id});
+      await _rpcCaller(SupabaseRpcs.endVideoSession, <String, dynamic>{
+        'p_id': id,
+      });
     });
   }
 
@@ -205,7 +210,8 @@ class SupabaseVideoApiImpl implements SupabaseVideoApi {
   /// `video session is not scheduled`, and `video session has already ended`.
   SupabaseVideoFailureKind _kindForPostgrest(PostgrestException e) {
     final String message = e.message.toLowerCase();
-    if (message.contains('not found') || e.code == 'PGRST116') {
+    if (message.contains('not found') ||
+        e.code == PostgrestCodes.invalidResponse) {
       return SupabaseVideoFailureKind.notFound;
     }
     if (message.contains('already ended')) {
@@ -264,13 +270,16 @@ class SupabaseVideoApiImpl implements SupabaseVideoApi {
         return SupabaseVideoFailureKind.unknown;
     }
     return switch (e.status) {
-      401 => SupabaseVideoFailureKind.unauthorized,
-      403 => SupabaseVideoFailureKind.forbidden,
-      404 => SupabaseVideoFailureKind.notFound,
-      400 => SupabaseVideoFailureKind.validation,
-      409 => SupabaseVideoFailureKind.providerNotConfigured,
-      500 => SupabaseVideoFailureKind.unknown,
-      502 || 503 || 504 => SupabaseVideoFailureKind.unavailable,
+      HttpStatusCodes.unauthorized => SupabaseVideoFailureKind.unauthorized,
+      HttpStatusCodes.forbidden => SupabaseVideoFailureKind.forbidden,
+      HttpStatusCodes.notFound => SupabaseVideoFailureKind.notFound,
+      HttpStatusCodes.badRequest => SupabaseVideoFailureKind.validation,
+      HttpStatusCodes.conflict =>
+        SupabaseVideoFailureKind.providerNotConfigured,
+      HttpStatusCodes.internalServerError => SupabaseVideoFailureKind.unknown,
+      HttpStatusCodes.badGateway ||
+      HttpStatusCodes.serviceUnavailable ||
+      HttpStatusCodes.gatewayTimeout => SupabaseVideoFailureKind.unavailable,
       0 => SupabaseVideoFailureKind.unavailable,
       _ => SupabaseVideoFailureKind.unknown,
     };

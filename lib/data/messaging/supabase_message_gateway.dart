@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/pagination.dart';
 import 'package:legalhub/features/messaging/domain/message.dart';
 import 'package:legalhub/features/messaging/domain/message_gateway.dart';
 import 'package:legalhub/features/messaging/domain/message_realtime_event.dart';
@@ -40,7 +42,7 @@ class SupabaseMessageGateway extends _SupabaseMessageBase
   @override
   Future<Result<List<MessageThread>>> searchThreads(
     String query, {
-    int limit = 30,
+    int limit = kSearchPageSize,
   }) => _runThreads(() => _api.searchMessageThreads(query, limit: limit));
 
   /// Runs a thread read (full fetch or title-prefiltered search) through
@@ -64,6 +66,7 @@ class SupabaseMessageGateway extends _SupabaseMessageBase
         AppError(
           code: 'message_read_failed',
           userMessage: 'Unable to load threads. Please try again.',
+          messageKey: AppMessageKey.errUnableToLoadThreadsPleaseTryAgain,
           technicalMessage: e.message,
         ),
       );

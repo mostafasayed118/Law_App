@@ -4,6 +4,7 @@ import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/backend_posture.dart';
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/local/in_memory_org_selection_store.dart';
@@ -20,6 +21,7 @@ import 'package:legalhub/features/research/domain/research_request.dart';
 import 'package:legalhub/features/research/domain/research_run.dart';
 import 'package:legalhub/features/research/presentation/ai_research_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/demo/demo_corpus.dart';
 
 /// Registers a synthetic engine over stubbed upstream seams so screen tests
 /// control the corpus results deterministically (the DI-pin pattern).
@@ -176,6 +178,7 @@ void main() {
     AiGateway? aiGateway,
     bool localOnly = true,
     String? activeOrganizationId,
+    Locale locale = const Locale('en'),
   }) async {
     if (aiGateway != null) {
       serviceLocator.registerLazySingleton<AiGateway>(() => aiGateway);
@@ -197,6 +200,7 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
+        locale: locale,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: AiResearchScreen(capabilities: capabilities),
@@ -269,8 +273,38 @@ void main() {
         find.text('No matches in the demo corpus. Try different words.'),
         findsOneWidget,
       );
+      expect(find.text('No matches found. Try different words.'), findsNothing);
       // The banner persists through the empty arm (C-3).
       expect(find.textContaining('AI-suggested'), findsOneWidget);
+    });
+
+    testWidgets('configured no-match uses neutral copy, not the demo corpus', (
+      tester,
+    ) async {
+      await _registerStub(
+        documents: FakeDocumentGateway.syntheticDocuments,
+        matters: FakeMatterGateway.syntheticMatters,
+      );
+      await pumpResearch(
+        tester,
+        localOnly: false,
+        activeOrganizationId: 'org-1',
+      );
+
+      await tester.enterText(find.byType(TextField), 'zzz unmatched topic zzz');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('No matches found. Try different words.'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('No matches in the demo corpus. Try different words.'),
+        findsNothing,
+      );
+      expect(find.textContaining('demo corpus'), findsNothing);
+      expect(find.textContaining('Demo mode'), findsNothing);
     });
 
     testWidgets('failure renders error + retry reissues (AC-3)', (
@@ -432,7 +466,7 @@ void main() {
 
         expect(stub.lastRequest?.question, 'What changed in the draft?');
         expect(stub.lastRequest?.documentIds, contains('doc-5'));
-        expect(stub.lastRequest?.organizationId, 'demo-organization');
+        expect(stub.lastRequest?.organizationId, DemoCorpus.organizationId);
         expect(find.text('Server headline'), findsOneWidget);
         expect(find.text('Server summary.'), findsOneWidget);
         expect(find.text('Document — doc-5'), findsOneWidget);
@@ -477,6 +511,44 @@ void main() {
           findsNothing,
           reason: 'a missing provider secret is not a retryable failure',
         );
+      },
+    );
+
+    testWidgets(
+      'a keyed failure for an unknown code renders the localized keyed copy',
+      (tester) async {
+        final _StubAiGateway stub = _StubAiGateway(
+          analyzeError: const AppError(
+            code: 'mystery_wire_code',
+            userMessage: 'raw provider text that must not render',
+            messageKey: AppMessageKey.errUnableToRunAIResearchPleaseTryAgain,
+          ),
+        );
+        await _registerStub(
+          documents: FakeDocumentGateway.syntheticDocuments,
+          matters: FakeMatterGateway.syntheticMatters,
+        );
+        await pumpResearch(
+          tester,
+          aiGateway: stub,
+          localOnly: false,
+          activeOrganizationId: 'org-1',
+        );
+        await tester.pumpAndSettle();
+
+        await tester.enterText(find.byType(TextField), 'A valid question');
+        await tester.tap(find.text('Generate findings'));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('Unable to run AI research. Please try again.'),
+          findsOneWidget,
+        );
+        expect(
+          find.text('raw provider text that must not render'),
+          findsNothing,
+        );
+        expect(find.text('Unable to run the research query.'), findsNothing);
       },
     );
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/backend_posture.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/approvals/domain/approvals_gateway.dart';
@@ -37,6 +38,40 @@ void main() {
       expect(find.text('Court filing'), findsOneWidget);
       expect(find.text('Filing · Approved'), findsOneWidget);
     });
+
+    testWidgets(
+      'configured rows keep the server title; local rows map the demo title '
+      '(Task 26)',
+      (tester) async {
+        final AppLocalizations ar = await AppLocalizations.delegate.load(
+          const Locale('ar'),
+        );
+        await pumpApprovals(
+          tester,
+          configured: true,
+          locale: const Locale('ar'),
+          gateway: _StubApprovalsGateway(
+            rows: <PendingApproval>[
+              _row(id: 'a1', title: 'Demo engagement waiver'),
+            ],
+          ),
+        );
+        expect(find.text('Demo engagement waiver'), findsOneWidget);
+        expect(find.text(ar.demoApprovalTitleEngagementWaiver), findsNothing);
+
+        await resetServiceLocator();
+        await pumpApprovals(
+          tester,
+          locale: const Locale('ar'),
+          gateway: _StubApprovalsGateway(
+            rows: <PendingApproval>[
+              _row(id: 'a1', title: 'Demo engagement waiver'),
+            ],
+          ),
+        );
+        expect(find.text(ar.demoApprovalTitleEngagementWaiver), findsOneWidget);
+      },
+    );
 
     testWidgets('filter chips re-read with the selected status', (
       tester,
@@ -302,11 +337,15 @@ void main() {
       expect(find.text('Cancel request'), findsNothing);
     });
 
-    testWidgets('a demo-corpus title renders the localized kind label', (
+    testWidgets('a demo-corpus title renders the localized approval title', (
       tester,
     ) async {
+      final AppLocalizations ar = await AppLocalizations.delegate.load(
+        const Locale('ar'),
+      );
       await pumpApprovals(
         tester,
+        locale: const Locale('ar'),
         gateway: _StubApprovalsGateway(
           rows: <PendingApproval>[
             _row(id: 'a1', title: 'Demo engagement waiver'),
@@ -314,16 +353,21 @@ void main() {
         ),
       );
 
-      // The fake gateway's English title is data; the tile maps it.
+      // The fake gateway's English title is data; the Arabic build maps it
+      // through the dedicated demo-approval key.
       expect(find.text('Demo engagement waiver'), findsNothing);
-      expect(find.text('Waiver'), findsOneWidget);
+      expect(find.text(ar.demoApprovalTitleEngagementWaiver), findsOneWidget);
     });
 
     testWidgets('the detail sheet localizes the demo title like the tile', (
       tester,
     ) async {
+      final AppLocalizations ar = await AppLocalizations.delegate.load(
+        const Locale('ar'),
+      );
       await pumpApprovals(
         tester,
+        locale: const Locale('ar'),
         gateway: _StubApprovalsGateway(
           rows: <PendingApproval>[
             _row(
@@ -335,12 +379,12 @@ void main() {
         ),
       );
 
-      await tester.tap(find.text('Filing'));
+      await tester.tap(find.text(ar.demoApprovalTitleCourtFiling));
       await tester.pumpAndSettle();
 
       // Tile title + sheet title both read the mapped label; the raw demo
       // string never reaches the sheet.
-      expect(find.text('Filing'), findsNWidgets(2));
+      expect(find.text(ar.demoApprovalTitleCourtFiling), findsNWidgets(2));
       expect(find.text('Demo court filing approval'), findsNothing);
     });
 
@@ -406,9 +450,21 @@ Future<void> pumpApprovals(
   WidgetTester tester, {
   required ApprovalsGateway gateway,
   bool canDecide = false,
+  bool configured = false,
+  Locale locale = const Locale('en'),
   String? currentUserId,
 }) async {
   serviceLocator.registerLazySingleton<ApprovalsGateway>(() => gateway);
+  // Test isolation: a previous case may have left a configured posture in
+  // the locator. Clear it so the demo-corpus label mapping is exercised.
+  if (serviceLocator.isRegistered<BackendPosture>()) {
+    serviceLocator.unregister<BackendPosture>();
+  }
+  if (configured) {
+    serviceLocator.registerSingleton<BackendPosture>(
+      const BackendPosture(isLocalOnly: false),
+    );
+  }
   configureDependencies();
   serviceLocator<ActiveOrgStore>().select('org-1');
   tester.view.physicalSize = const Size(800, 1600);
@@ -417,6 +473,7 @@ Future<void> pumpApprovals(
   addTearDown(tester.view.resetDevicePixelRatio);
   await tester.pumpWidget(
     MaterialApp(
+      locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: ApprovalsScreen(canDecide: canDecide, currentUserId: currentUserId),

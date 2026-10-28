@@ -29,6 +29,7 @@ mixin _SupabaseMessageMethods on _SupabaseMessageBase {
         AppError(
           code: 'message_body_read_failed',
           userMessage: 'Unable to load messages. Please try again.',
+          messageKey: AppMessageKey.errUnableToLoadMessagesPleaseTryAgain,
           technicalMessage: e.message,
         ),
       );
@@ -76,6 +77,10 @@ mixin _SupabaseMessageMethods on _SupabaseMessageBase {
       unavailableMessage:
           'Threads are temporarily unavailable. Please try again.',
       failedMessage: 'Unable to load threads. Please try again.',
+      deniedKey: AppMessageKey.errYouDoNotHavePermissionToViewThese3,
+      unavailableKey:
+          AppMessageKey.errThreadsAreTemporarilyUnavailablePleaseTryAgain,
+      failedKey: AppMessageKey.errUnableToLoadThreadsPleaseTryAgain,
     );
   }
 
@@ -110,6 +115,7 @@ mixin _SupabaseMessageMethods on _SupabaseMessageBase {
         AppError(
           code: 'message_send_failed',
           userMessage: 'Unable to send the message. Please try again.',
+          messageKey: AppMessageKey.errUnableToSendTheMessagePleaseTryAgain,
           technicalMessage: e.message,
         ),
       );
@@ -158,6 +164,10 @@ mixin _SupabaseMessageMethods on _SupabaseMessageBase {
       unavailableMessage:
           'Sending is temporarily unavailable. Please try again.',
       failedMessage: 'Unable to send the message. Please try again.',
+      deniedKey: AppMessageKey.errYouDoNotHavePermissionToSendMessages,
+      unavailableKey:
+          AppMessageKey.errSendingIsTemporarilyUnavailablePleaseTryAgain,
+      failedKey: AppMessageKey.errUnableToSendTheMessagePleaseTryAgain,
     );
   }
 
@@ -174,6 +184,10 @@ mixin _SupabaseMessageMethods on _SupabaseMessageBase {
       unavailableMessage:
           'Messages are temporarily unavailable. Please try again.',
       failedMessage: 'Unable to load messages. Please try again.',
+      deniedKey: AppMessageKey.errYouDoNotHavePermissionToViewThese,
+      unavailableKey:
+          AppMessageKey.errMessagesAreTemporarilyUnavailablePleaseTryAgain,
+      failedKey: AppMessageKey.errUnableToLoadMessagesPleaseTryAgain,
     );
   }
 }

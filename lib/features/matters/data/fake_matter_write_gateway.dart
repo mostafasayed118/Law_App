@@ -1,6 +1,7 @@
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/matters/domain/matter_write_gateway.dart';
+import 'package:legalhub/shared/demo/demo_corpus.dart';
 
 /// Development-only matter-creation implementation (F-01 step 2 client swap,
 /// C-D3): a deterministic in-memory create path that mirrors the server
@@ -24,14 +25,14 @@ class FakeMatterWriteGateway implements MatterWriteGateway {
   static const String platformOwnerId = '10000000-0000-4000-8000-000000000001';
 
   /// The demo org id (mirrors `FakeOrganizationGateway.demoOrganizationId`).
-  static const String demoOrganizationId = 'org-demo';
+  static const String demoOrganizationId = DemoCorpus.organizationId;
 
   /// The fake's roster = the demo org's active members (mirrors the
   /// `FakeOrganizationGateway` seed: the demo org has exactly one member —
   /// the demo user). The assignee dropdowns (roster seam) offer exactly
   /// this set in env-less runs, so the fake and the form stay consistent.
   static const Map<String, String> roster = <String, String>{
-    'demo-user': 'Demo user',
+    DemoCorpus.ownerId: DemoCorpus.ownerName,
   };
 
   /// Instance-scoped created matters (the determinism pin): a test or dev

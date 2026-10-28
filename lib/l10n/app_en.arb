@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "en",
   "appTitle": "LegalHub",
   "continueAsDemo": "Continue with demo session",
@@ -94,7 +94,13 @@
   "demoThreadTitle4": "Family matter thread — demo",
   "demoThreadTitle5": "Startup advisory — demo",
   "demoMessageBody": "Demo message {count} — generic demo content, no real client or legal data.",
-  "@demoMessageBody": {"placeholders": {"count": {"type": "int"}}},
+  "@demoMessageBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "demoAuthorAttorney": "Demo attorney",
   "demoAuthorClient": "Demo client",
   "demoDocumentTitle1": "Demo engagement letter",
@@ -118,15 +124,54 @@
   "demoTaskTitle4": "Demo: schedule follow-up",
   "demoTaskTitle5": "Demo: update matter timeline",
   "researchHeadline": "Research note — {title}",
-  "@researchHeadline": {"placeholders": {"title": {"type": "String"}}},
+  "@researchHeadline": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "researchSummaryDoc": "Demo research note compiled from the synthetic corpus row \"{title}\" ({ref}). This is static demo copy generated for the demo corpus — not legal analysis.",
-  "@researchSummaryDoc": {"placeholders": {"title": {"type": "String"}, "ref": {"type": "String"}}},
+  "@researchSummaryDoc": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "ref": {
+        "type": "String"
+      }
+    }
+  },
   "researchSummaryMatter": "Demo research note compiled from the synthetic corpus row \"{title}\" ({area}). This is static demo copy generated for the demo corpus — not legal analysis.",
-  "@researchSummaryMatter": {"placeholders": {"title": {"type": "String"}, "area": {"type": "String"}}},
+  "@researchSummaryMatter": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
   "researchExcerptDoc": "Corpus excerpt: {type} metadata row, matter ref \"{ref}\".",
-  "@researchExcerptDoc": {"placeholders": {"type": {"type": "String"}, "ref": {"type": "String"}}},
+  "@researchExcerptDoc": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "ref": {
+        "type": "String"
+      }
+    }
+  },
   "researchExcerptMatter": "Corpus excerpt: matter row, practice area \"{area}\".",
-  "@researchExcerptMatter": {"placeholders": {"area": {"type": "String"}}},
+  "@researchExcerptMatter": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      }
+    }
+  },
   "researchRelatedMatter": "related demo matter",
   "resendCode": "Resend Code",
   "resendHelp": "Didn't receive the email? Check your spam folder or contact support.",
@@ -148,7 +193,13 @@
   "onboardingSuccessBody": "Your secure legal workstation is ready. Sign in to begin.",
   "onboardingSuccessAction": "Continue to Sign In",
   "homeGreeting": "Hello, {name}",
-  "@homeGreeting": {"placeholders": {"name": {"type": "String"}}},
+  "@homeGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "homeFallbackName": "Guest",
   "homeSubtitle": "How can we assist you with your legal needs today?",
   "searchPlaceholder": "Find a lawyer or legal topic...",
@@ -172,10 +223,22 @@
   "validatorRequired": "This field is required.",
   "validatorEmailInvalid": "Enter a valid email address.",
   "validatorMinLength": "{count, plural, =1{Must be at least 1 character.} other{Must be at least {count} characters.}}",
-  "@validatorMinLength": {"placeholders": {"count": {"type": "int"}}},
+  "@validatorMinLength": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "validatorMismatch": "Passwords do not match.",
   "validatorPasswordLength": "{count, plural, =1{Must be at least 1 character.} other{Must be at least {count} characters.}}",
-  "@validatorPasswordLength": {"placeholders": {"count": {"type": "int"}}},
+  "@validatorPasswordLength": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "validatorPasswordClasses": "Include at least 3 of 4: uppercase, lowercase, digit, symbol.",
   "validatorPasswordEmail": "Don't include your email address in the password.",
   "passwordStrengthWeak": "Weak",
@@ -219,7 +282,13 @@
   "inviteTokenLabel": "One-time token",
   "inviteSendButton": "Send Invitation",
   "inviteTokenBody": "Share this one-time token with {email}. It cannot be shown again.",
-  "@inviteTokenBody": {"placeholders": {"email": {"type": "String"}}},
+  "@inviteTokenBody": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
   "inviteTokenCopy": "Copy token",
   "inviteTokenCopied": "Token copied to clipboard.",
   "inviteShareLink": "Copy invite link",
@@ -228,7 +297,13 @@
   "actionRevokeInvitation": "Revoke invitation",
   "invitationRevoked": "Invitation revoked.",
   "inviteTokenResentBody": "A fresh one-time token for {email}. It cannot be shown again.",
-  "@inviteTokenResentBody": {"placeholders": {"email": {"type": "String"}}},
+  "@inviteTokenResentBody": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
   "memberStatusInvited": "INVITED",
   "memberStatusActive": "ACTIVE",
   "memberStatusSuspended": "SUSPENDED",
@@ -238,7 +313,13 @@
   "actionRemove": "Remove",
   "removeMemberConfirmTitle": "Remove member?",
   "removeMemberConfirmBody": "Remove {name} from this organization?",
-  "@removeMemberConfirmBody": {"placeholders": {"name": {"type": "String"}}},
+  "@removeMemberConfirmBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "removeMemberConfirmAction": "Remove",
   "platformAdminTitle": "Platform admin",
   "platformAdminOrganizations": "Organizations",
@@ -246,7 +327,13 @@
   "platformAdminDeleteDemo": "Delete demo account",
   "platformAdminDeleteConfirmTitle": "Delete demo account?",
   "platformAdminDeleteConfirmBody": "Delete the demo account for {name}? This cannot be undone.",
-  "@platformAdminDeleteConfirmBody": {"placeholders": {"name": {"type": "String"}}},
+  "@platformAdminDeleteConfirmBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "platformAdminDeleteConfirmAction": "Delete",
   "platformAdminAudit": "Audit log",
   "platformAdminAuditPlatform": "Platform activity",
@@ -261,8 +348,7 @@
   "actionInProgress": "An action is already in progress.",
   "signUpCheckInboxTitle": "Check Your Inbox",
   "signUpCheckInboxBody": "We've sent a verification link to your email. Open it to activate your account, then sign in.",
-  "signUpCheckInboxAction": "Continue to Sign In"
-,
+  "signUpCheckInboxAction": "Continue to Sign In",
   "bookingTitle": "Book a Consultation",
   "bookingLocalOnlyNote": "Demo mode — no consultation is actually booked or sent.",
   "bookingNoPaymentNote": "No payment is taken at this step.",
@@ -332,7 +418,13 @@
   "discoveryProfileSpecialties": "Specialties",
   "discoveryProfileLanguages": "Languages",
   "discoveryProfileYears": "{years} years of experience",
-  "@discoveryProfileYears": {"placeholders": {"years": {"type": "int"}}},
+  "@discoveryProfileYears": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
   "attorneyStatusActive": "Active",
   "attorneyStatusInactive": "Inactive",
   "attorneyAdminTitle": "Attorney directory",
@@ -344,7 +436,13 @@
   "attorneyAdminDeactivate": "Deactivate",
   "attorneyAdminDeactivateTitle": "Deactivate attorney?",
   "attorneyAdminDeactivateBody": "Deactivate {name}? The profile stays in the admin list but leaves the public directory.",
-  "@attorneyAdminDeactivateBody": {"placeholders": {"name": {"type": "String"}}},
+  "@attorneyAdminDeactivateBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "attorneyAdminDeactivateFailed": "Unable to deactivate the profile. Please try again.",
   "attorneyAdminEmpty": "No attorney profiles yet.",
   "attorneyAdminError": "Unable to load attorney profiles.",
@@ -392,7 +490,9 @@
   "matterCreateSuccessBody": "Matter {id} was created.",
   "@matterCreateSuccessBody": {
     "placeholders": {
-      "id": {"type": "String"}
+      "id": {
+        "type": "String"
+      }
     }
   },
   "matterCreateSuccessNote": "You see it now because you created it. Others see it once it is assigned to them.",
@@ -423,14 +523,26 @@
   "messagesEntrySubtitle": "Browse demo message threads — development demo.",
   "messagesEntrySubtitleConfigured": "Browse your message threads.",
   "messagesMessageCount": "{count, plural, =0{No messages} =1{1 message} other{{count} messages}}",
-  "@messagesMessageCount": {"placeholders": {"count": {"type": "int"}}},
+  "@messagesMessageCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "messageThreadDetailTitle": "Thread messages",
   "messagesDetailEmpty": "No messages are available in this thread.",
   "messagesDetailError": "Unable to load messages.",
   "messageComposerHint": "Type a message",
   "messageSend": "Send",
   "messageErrorTooLong": "Message is too long. The maximum is {max} characters.",
-  "@messageErrorTooLong": {"placeholders": {"max": {"type": "int"}}},
+  "@messageErrorTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "messageErrorDenied": "You do not have permission to send messages on this thread.",
   "messageErrorUnavailable": "Sending is temporarily unavailable. Please try again.",
   "messageErrorFailed": "Unable to send the message. Please try again.",
@@ -464,11 +576,29 @@
   "fileOpenAction": "Open",
   "fileOpenFailed": "Unable to open the file. Please try again.",
   "fileSizeMb": "{value} MB",
-  "@fileSizeMb": {"placeholders": {"value": {"type": "String"}}},
+  "@fileSizeMb": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "fileSizeKb": "{value} KB",
-  "@fileSizeKb": {"placeholders": {"value": {"type": "String"}}},
+  "@fileSizeKb": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "fileSizeBytes": "{value} B",
-  "@fileSizeBytes": {"placeholders": {"value": {"type": "String"}}},
+  "@fileSizeBytes": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "matterWorkspaceInvoicesTitle": "Invoices",
   "matterWorkspaceInvoicesEmpty": "No invoices are available for this matter.",
   "invoicesTitle": "Invoices",
@@ -818,5 +948,178 @@
   "aiResearchErrorNoOrg": "Select an organization to run research.",
   "aiResearchNoSourceCited": "No source cited.",
   "aiResearchSourceDocument": "Document",
-  "aiResearchSourceMatter": "Matter"
+  "aiResearchSourceMatter": "Matter",
+  "demoApprovalTitleConflictNew": "Demo conflict check — new intake",
+  "demoApprovalTitleEngagementWaiver": "Demo engagement waiver",
+  "demoApprovalTitleCourtFiling": "Demo court filing approval",
+  "demoApprovalTitleExpense": "Demo expense approval",
+  "demoApprovalTitleConflictOpposing": "Demo conflict check — opposing counsel",
+  "demoApprovalDescriptionWaiver": "Synthetic demo request — no real client or case data.",
+  "demoApprovalDecisionApproved": "Demo decision — approved.",
+  "demoApprovalDecisionRejected": "Demo decision — rejected.",
+  "demoAlertDescriptionReview": "Synthetic demo alert — no real compliance event is shown.",
+  "demoAttorneyHeadlineCorporate": "Corporate and governance counsel",
+  "demoAttorneyHeadlineCivil": "Civil litigation and contracts",
+  "demoAttorneyHeadlineCriminal": "Criminal defense and procedure",
+  "demoAttorneyHeadlineFamily": "Family law and personal status",
+  "demoAttorneyHeadlineStartup": "Startup formation and advisory",
+  "demoAuditOrganizationCreated": "Organization created (metadata only)",
+  "demoAuditMemberInvited": "Member invited (metadata only)",
+  "demoAuditMemberRoleChanged": "Member role changed (metadata only)",
+  "demoAuditMembershipSuspended": "Membership suspended (metadata only)",
+  "demoAuditDemoAccountDeleted": "Demo account deleted (metadata only)",
+  "demoAuditRoleChange": "role change",
+  "demoAuditInvitationSent": "invitation sent",
+  "demoAuditSuspensionDenied": "suspension denied",
+  "homeActivityEmpty": "No recent activity yet.",
+  "discoveryEntrySubtitleConfigured": "Browse attorney profiles and practice areas.",
+  "searchNoQueryConfigured": "Type a search term to search matters, documents, messages, and attorneys.",
+  "aiResearchNoMatchesConfigured": "No matches found. Try different words.",
+  "aiResearchEntrySubtitleConfigured": "Ask the research assistant across your matters and documents — advisory only.",
+  "errYouDoNotHavePermissionToViewThese2": "You do not have permission to view these tasks.",
+  "errUnableToLoadTasksPleaseTryAgain": "Unable to load tasks. Please try again.",
+  "errARejectionNoteIsRequired": "A rejection note is required.",
+  "errAcknowledgingTheAlertIsTemporarilyUnavailablePleaseTry": "Acknowledging the alert is temporarily unavailable. Please try again.",
+  "errApprovalRequestNotFound": "Approval request not found.",
+  "errApprovalsAreTemporarilyUnavailablePleaseTryAgain": "Approvals are temporarily unavailable. Please try again.",
+  "errCancellingTheRequestIsTemporarilyUnavailablePleaseTry": "Cancelling the request is temporarily unavailable. Please try again.",
+  "errComplianceAlertNotFound": "Compliance alert not found.",
+  "errComplianceAlertsAreTemporarilyUnavailablePleaseTryAgain": "Compliance alerts are temporarily unavailable. Please try again.",
+  "errCreatingTheAlertIsTemporarilyUnavailablePleaseTry": "Creating the alert is temporarily unavailable. Please try again.",
+  "errCreatingTheRequestIsTemporarilyUnavailablePleaseTry": "Creating the request is temporarily unavailable. Please try again.",
+  "errDecidingTheRequestIsTemporarilyUnavailablePleaseTry": "Deciding the request is temporarily unavailable. Please try again.",
+  "errOnlyAPartnerCanDecideThisRequest": "Only a partner can decide this request.",
+  "errOnlyAPartnerOrComplianceOfficerCanCreate": "Only a partner or compliance officer can create alerts.",
+  "errOnlyAPartnerOrComplianceOfficerCanResolve": "Only a partner or compliance officer can resolve alerts.",
+  "errOnlyAnActiveOrganizationMemberCanAcknowledgeAlerts": "Only an active organization member can acknowledge alerts.",
+  "errOnlyTheRequesterOrAPartnerCanCancel": "Only the requester or a partner can cancel this request.",
+  "errResolvingTheAlertIsTemporarilyUnavailablePleaseTry": "Resolving the alert is temporarily unavailable. Please try again.",
+  "errSelectAnOrganizationToViewApprovals": "Select an organization to view approvals.",
+  "errSelectAnOrganizationToViewComplianceAlerts": "Select an organization to view compliance alerts.",
+  "errTheAlertCanNoLongerBeAcknowledged": "The alert can no longer be acknowledged.",
+  "errTheAlertCanNoLongerBeResolved": "The alert can no longer be resolved.",
+  "errTheAlertCouldNotBeCreatedCheckThe": "The alert could not be created. Check the details and try again.",
+  "errTheRequestCanNoLongerBeCancelled": "The request can no longer be cancelled.",
+  "errTheRequestCouldNotBeCreatedCheckThe": "The request could not be created. Check the details and try again.",
+  "errTheRequestCouldNotBeDecidedItMay": "The request could not be decided. It may no longer be pending, or the note is missing.",
+  "errTheRequestIsNoLongerPending": "The request is no longer pending.",
+  "errUnableToAcknowledgeTheAlertPleaseTryAgain": "Unable to acknowledge the alert. Please try again.",
+  "errUnableToCancelTheRequestPleaseTryAgain": "Unable to cancel the request. Please try again.",
+  "errUnableToCreateTheAlertPleaseTryAgain": "Unable to create the alert. Please try again.",
+  "errUnableToCreateTheRequestPleaseTryAgain": "Unable to create the request. Please try again.",
+  "errUnableToDecideTheRequestPleaseTryAgain": "Unable to decide the request. Please try again.",
+  "errUnableToLoadApprovalsPleaseTryAgain": "Unable to load approvals. Please try again.",
+  "errUnableToLoadComplianceAlertsPleaseTryAgain": "Unable to load compliance alerts. Please try again.",
+  "errUnableToResolveTheAlertPleaseTryAgain": "Unable to resolve the alert. Please try again.",
+  "errYouDoNotHavePermissionToCreateApproval": "You do not have permission to create approval requests.",
+  "errYouDoNotHavePermissionToViewApprovals": "You do not have permission to view approvals.",
+  "errYouDoNotHavePermissionToViewCompliance": "You do not have permission to view compliance alerts.",
+  "errAcknowledgingTheTaskIsTemporarilyUnavailablePleaseTry": "Acknowledging the task is temporarily unavailable. Please try again.",
+  "errAvailableTimesAreTemporarilyUnavailablePleaseTryAgain": "Available times are temporarily unavailable. Please try again.",
+  "errBookingIsTemporarilyUnavailablePleaseTryAgain": "Booking is temporarily unavailable. Please try again.",
+  "errCreatingTheTaskIsTemporarilyUnavailablePleaseTry": "Creating the task is temporarily unavailable. Please try again.",
+  "errMessageIsTooLongMaxMaxMessageLengthCharacters": "Message is too long (max {maxMessageLength} characters).",
+  "@errMessageIsTooLongMaxMaxMessageLengthCharacters": {
+    "placeholders": {
+      "maxMessageLength": {
+        "type": "int"
+      }
+    }
+  },
+  "errMessagesAreTemporarilyUnavailablePleaseTryAgain": "Messages are temporarily unavailable. Please try again.",
+  "errOnlyTheAssignedPersonCanAcknowledgeThisTask": "Only the assigned person can acknowledge this task.",
+  "errReAssigningTheTaskIsTemporarilyUnavailablePlease": "Re-assigning the task is temporarily unavailable. Please try again.",
+  "errSendingIsTemporarilyUnavailablePleaseTryAgain": "Sending is temporarily unavailable. Please try again.",
+  "errTasksAreTemporarilyUnavailablePleaseTryAgain": "Tasks are temporarily unavailable. Please try again.",
+  "errThatPersonCannotBeAssignedThisTaskChoose": "That person cannot be assigned this task. Choose an active member of the organization.",
+  "errThatTimeIsNoLongerAvailableChooseAnother": "That time is no longer available. Choose another time.",
+  "errTheBookingDetailsAreInvalidCheckThemAnd": "The booking details are invalid. Check them and try again.",
+  "errTheTaskCannotMoveToThatStatusIt": "The task cannot move to that status. It may already be done.",
+  "errTheTaskCouldNotBeCreatedCheckThe": "The task could not be created. Check the title and try again.",
+  "errThreadsAreTemporarilyUnavailablePleaseTryAgain": "Threads are temporarily unavailable. Please try again.",
+  "errUnableToAcknowledgeTheTaskPleaseTryAgain": "Unable to acknowledge the task. Please try again.",
+  "errUnableToConfirmPleaseTryAgain": "Unable to confirm. Please try again.",
+  "errUnableToCreateTheTaskPleaseTryAgain": "Unable to create the task. Please try again.",
+  "errUnableToLoadAvailableTimesPleaseTryAgain": "Unable to load available times. Please try again.",
+  "errUnableToLoadMessagesPleaseTryAgain": "Unable to load messages. Please try again.",
+  "errUnableToLoadThreadsPleaseTryAgain": "Unable to load threads. Please try again.",
+  "errUnableToReAssignTheTaskPleaseTry": "Unable to re-assign the task. Please try again.",
+  "errUnableToSendTheMessagePleaseTryAgain": "Unable to send the message. Please try again.",
+  "errUnableToUpdateTheTaskPleaseTryAgain": "Unable to update the task. Please try again.",
+  "errUpdatingTheTaskIsTemporarilyUnavailablePleaseTry": "Updating the task is temporarily unavailable. Please try again.",
+  "errYouDoNotHavePermissionToAdvanceThis": "You do not have permission to advance this task.",
+  "errYouDoNotHavePermissionToBookThis": "You do not have permission to book this consultation.",
+  "errYouDoNotHavePermissionToCreateTasks": "You do not have permission to create tasks on this matter.",
+  "errYouDoNotHavePermissionToReAssign": "You do not have permission to re-assign this task.",
+  "errYouDoNotHavePermissionToSendMessages": "You do not have permission to send messages on this thread.",
+  "errYouDoNotHavePermissionToViewAvailable": "You do not have permission to view available times.",
+  "errYouDoNotHavePermissionToViewThese": "You do not have permission to view these messages.",
+  "errYouDoNotHavePermissionToViewThese3": "You do not have permission to view these threads.",
+  "errAttorneyNotFound": "Attorney not found.",
+  "errTheDirectoryIsTemporarilyUnavailableTryAgain": "The directory is temporarily unavailable. Try again.",
+  "errTheProfileDetailsAreInvalidCheckThemAnd": "The profile details are invalid. Check them and retry.",
+  "errUnableToLoadTheDirectoryPleaseTryAgain": "Unable to load the directory. Please try again.",
+  "errYouDoNotHavePermissionToManageThe": "You do not have permission to manage the directory.",
+  "errYouDoNotHavePermissionToViewThe": "You do not have permission to view the directory.",
+  "errNotificationsAreTemporarilyUnavailablePleaseTryAgain": "Notifications are temporarily unavailable. Please try again.",
+  "errThisFileIsTooLarge": "This file is too large.",
+  "errThisFileTypeIsNotSupported": "This file type is not supported.",
+  "errUnableToCheckThePaymentStatusPleaseTry": "Unable to check the payment status. Please try again.",
+  "errUnableToLoadDocumentsPleaseTryAgain": "Unable to load documents. Please try again.",
+  "errUnableToLoadFilesPleaseTryAgain": "Unable to load files. Please try again.",
+  "errUnableToLoadInvoicesPleaseTryAgain": "Unable to load invoices. Please try again.",
+  "errUnableToLoadMattersPleaseTryAgain": "Unable to load matters. Please try again.",
+  "errUnableToLoadNotificationsPleaseTryAgain": "Unable to load notifications. Please try again.",
+  "errUnableToOpenTheFilePleaseTryAgain": "Unable to open the file. Please try again.",
+  "errUnableToStartThePaymentPleaseTryAgain": "Unable to start the payment. Please try again.",
+  "errUnableToUploadTheFilePleaseTryAgain": "Unable to upload the file. Please try again.",
+  "errYouDoNotHavePermissionToUploadFiles": "You do not have permission to upload files to this matter.",
+  "errAIResearchIsNotConfiguredForThisDeployment": "AI research is not configured for this deployment. No analysis was run.",
+  "errAnActionIsAlreadyInProgress": "An action is already in progress.",
+  "errEndingTheConsultationIsTemporarilyUnavailablePleaseTry": "Ending the consultation is temporarily unavailable. Please try again.",
+  "errEnterAQuestionBetweenResearchRequestMinQuestionLengthAndResearchRequest": "Enter a question between {minQuestionLength} and {maxQuestionLength} characters and select an organization.",
+  "@errEnterAQuestionBetweenResearchRequestMinQuestionLengthAndResearchRequest": {
+    "placeholders": {
+      "minQuestionLength": {
+        "type": "int"
+      },
+      "maxQuestionLength": {
+        "type": "int"
+      }
+    }
+  },
+  "errOnlyAPartnerOrAttorneyCanScheduleA": "Only a partner or attorney can schedule a video consultation.",
+  "errOnlyTheCreatorOrAPartnerCanEnd": "Only the creator or a partner can end this consultation.",
+  "errOrganizationMembershipsCouldNotBeLoaded": "Organization memberships could not be loaded.",
+  "errSchedulingAConsultationIsTemporarilyUnavailablePleaseTry": "Scheduling a consultation is temporarily unavailable. Please try again.",
+  "errSelectAResearchRunToViewItsFindings": "Select a research run to view its findings.",
+  "errSelectAVideoConsultationToJoin": "Select a video consultation to join.",
+  "errSelectAnOrganizationToScheduleAConsultation": "Select an organization to schedule a consultation.",
+  "errSelectAnOrganizationToViewResearchRuns": "Select an organization to view research runs.",
+  "errSelectAnOrganizationToViewVideoConsultations": "Select an organization to view video consultations.",
+  "errSignInAgainToUseVideoConsultations": "Sign in again to use video consultations.",
+  "errStartingTheConsultationIsTemporarilyUnavailablePleaseTry": "Starting the consultation is temporarily unavailable. Please try again.",
+  "errTheAIProviderReturnedAnUnexpectedResponsePlease": "The AI provider returned an unexpected response. Please try again.",
+  "errTheConsultationCouldNotBeScheduledCheckThe": "The consultation could not be scheduled. Check the details and try again.",
+  "errTheConsultationIsNotAvailableToJoinRight": "The consultation is not available to join right now.",
+  "errTheSelectedContextIsTooLargeRemoveDocuments": "The selected context is too large. Remove documents and try again.",
+  "errTheSelectedResearchRunWasNotFound": "The selected research run was not found.",
+  "errThisConsultationCanNoLongerBeEnded": "This consultation can no longer be ended.",
+  "errThisConsultationCanNoLongerBeStarted": "This consultation can no longer be started.",
+  "errThisVideoConsultationHasAlreadyEnded": "This video consultation has already ended.",
+  "errThisVideoConsultationWasNotFound": "This video consultation was not found.",
+  "errUnableToEndTheConsultationPleaseTryAgain": "Unable to end the consultation. Please try again.",
+  "errUnableToJoinTheConsultationPleaseTryAgain": "Unable to join the consultation. Please try again.",
+  "errUnableToLoadVideoConsultationsPleaseTryAgain": "Unable to load video consultations. Please try again.",
+  "errUnableToReadTheVideoConsultationPleaseTry": "Unable to read the video consultation. Please try again.",
+  "errUnableToRunAIResearchPleaseTryAgain": "Unable to run AI research. Please try again.",
+  "errUnableToScheduleTheConsultationPleaseTryAgain": "Unable to schedule the consultation. Please try again.",
+  "errUnableToStartTheConsultationPleaseTryAgain": "Unable to start the consultation. Please try again.",
+  "errVideoCallsAreNotConfiguredForThisDeployment": "Video calls are not configured for this deployment. No call was started.",
+  "errVideoCallsAreTemporarilyUnavailablePleaseTryAgain": "Video calls are temporarily unavailable. Please try again.",
+  "errVideoConsultationsAreTemporarilyUnavailablePleaseTryAgain": "Video consultations are temporarily unavailable. Please try again.",
+  "errWeCouldnTCompleteThatRequestPleaseTry": "We couldn't complete that request. Please try again.",
+  "errYouDoNotHavePermissionToJoinThis": "You do not have permission to join this consultation.",
+  "errYouDoNotHavePermissionToStartThis": "You do not have permission to start this consultation.",
+  "errYouDoNotHavePermissionToViewVideo": "You do not have permission to view video consultations."
 }

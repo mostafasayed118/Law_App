@@ -1,4 +1,5 @@
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/observability/app_log.dart';
 
@@ -17,6 +18,7 @@ class WriteGate {
   static const AppError busyError = AppError(
     code: 'busy',
     userMessage: 'An action is already in progress.',
+    messageKey: AppMessageKey.errAnActionIsAlreadyInProgress,
   );
 
   bool _inFlight = false;

@@ -67,6 +67,66 @@ void main() {
       );
     });
 
+    testWidgets('configured rows keep the server title/description (Task 26)', (
+      tester,
+    ) async {
+      final AppLocalizations ar = await AppLocalizations.delegate.load(
+        const Locale('ar'),
+      );
+      await pumpAlerts(
+        tester,
+        gateway: _StubComplianceGateway(
+          rows: <ComplianceAlert>[
+            _row(
+              id: 'a1',
+              title: 'Demo: review pending invitations',
+              description:
+                  'Synthetic demo alert — no real compliance event is shown.',
+            ),
+          ],
+        ),
+        configured: true,
+        locale: const Locale('ar'),
+      );
+      expect(find.text('Demo: review pending invitations'), findsOneWidget);
+      expect(find.text(ar.demoAlertTitle1), findsNothing);
+
+      // The description renders in the detail sheet: a configured build
+      // keeps the server copy.
+      await tester.tap(find.text('Demo: review pending invitations'));
+      await tester.pumpAndSettle();
+      expect(
+        find.text('Synthetic demo alert — no real compliance event is shown.'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('local rows map the demo title/description (Task 26)', (
+      tester,
+    ) async {
+      final AppLocalizations ar = await AppLocalizations.delegate.load(
+        const Locale('ar'),
+      );
+      await pumpAlerts(
+        tester,
+        locale: const Locale('ar'),
+        gateway: _StubComplianceGateway(
+          rows: <ComplianceAlert>[
+            _row(
+              id: 'a1',
+              title: 'Demo: review pending invitations',
+              description:
+                  'Synthetic demo alert — no real compliance event is shown.',
+            ),
+          ],
+        ),
+      );
+      expect(find.text(ar.demoAlertTitle1), findsOneWidget);
+      await tester.tap(find.text(ar.demoAlertTitle1));
+      await tester.pumpAndSettle();
+      expect(find.text(ar.demoAlertDescriptionReview), findsOneWidget);
+    });
+
     testWidgets('empty state renders the filtered copy', (tester) async {
       await pumpAlerts(
         tester,

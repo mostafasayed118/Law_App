@@ -34,6 +34,7 @@ class _DetailSurfaceState extends State<_DetailSurface> {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final bool localOnly = backendIsLocalOnly;
+    final DemoLabels labels = DemoLabels(l10n, localOnly: localOnly);
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
     return Scaffold(
@@ -41,7 +42,7 @@ class _DetailSurfaceState extends State<_DetailSurface> {
         title: Text(
           widget.threadTitle == null
               ? l10n.messageThreadDetailTitle
-              : demoThreadTitle(l10n, widget.threadTitle!),
+              : labels.threadTitle(widget.threadTitle!),
         ),
       ),
       body: SafeArea(
@@ -87,7 +88,14 @@ class _DetailSurfaceState extends State<_DetailSurface> {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
-      child: _resultsView(context, state, l10n, text, scheme),
+      child: _resultsView(
+        context,
+        state,
+        l10n,
+        text,
+        scheme,
+        localOnly: backendIsLocalOnly,
+      ),
     );
   }
 
@@ -96,8 +104,9 @@ class _DetailSurfaceState extends State<_DetailSurface> {
     MessageThreadDetailState state,
     AppLocalizations l10n,
     TextTheme text,
-    ColorScheme scheme,
-  ) {
+    ColorScheme scheme, {
+    required bool localOnly,
+  }) {
     final MessageThreadDetailCubit cubit = context
         .read<MessageThreadDetailCubit>();
     final Widget empty = Padding(
@@ -120,7 +129,10 @@ class _DetailSurfaceState extends State<_DetailSurface> {
               itemCount: messages.length,
               itemBuilder: (BuildContext context, int index) {
                 final Message message = messages[index];
-                final Widget tile = _MessageTile(message: message);
+                final Widget tile = _MessageTile(
+                  message: message,
+                  localOnly: localOnly,
+                );
                 if (index == messages.length - 1) {
                   return tile;
                 }

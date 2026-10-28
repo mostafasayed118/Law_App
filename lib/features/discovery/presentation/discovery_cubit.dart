@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:legalhub/app/legalhub_motion.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/practice_area.dart';
@@ -24,7 +25,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
 
   /// Typing pause before a server query runs. The local projection already
   /// filters the current page, so the debounce only controls re-fetching.
-  static const Duration searchDebounce = Duration(milliseconds: 300);
+  static const Duration searchDebounce = LegalHubMotion.debounce;
 
   final AttorneyGateway _gateway;
 

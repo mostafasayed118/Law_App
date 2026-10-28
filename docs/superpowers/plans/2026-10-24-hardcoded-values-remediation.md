@@ -101,7 +101,7 @@ class Rule {
   final Set<String> exempt;
 }
 
-const List<Rule> rules = <Rule>[
+final List<Rule> rules = <Rule>[
   Rule('raw-color', RegExp(r'Color\(0x[0-9A-Fa-f]{6,8}\)'),
       exempt: <String>{'lib/app/legalhub_theme.dart'}),
   Rule('material-color', RegExp(r'Colors\.[a-zA-Z]+')),
@@ -115,6 +115,13 @@ const List<Rule> rules = <Rule>[
   Rule('max-length', RegExp(r'maxLength:\s*(\d+)')),
   Rule('duration-seconds', RegExp(r'Duration\(seconds:\s*(\d+)\)')),
   Rule('raw-font-size', RegExp(r'fontSize:\s*(\d+)')),
+  Rule(
+    'failure-copy',
+    RegExp(
+      r"(userMessage|deniedMessage|validationMessage|unavailableMessage|failedMessage)"
+      r"\s*:\s*'",
+    ),
+  ),
 ];
 
 void main() {
@@ -125,8 +132,8 @@ void main() {
       .where((File f) => !f.path.contains('app_localizations'))
       .toList()
     ..sort((File a, File b) => a.path.compareTo(b.path));
-  print('| rule | file:line | literal |');
-  print('|---|---|---|');
+  stdout.writeln('| rule | file:line | literal |');
+  stdout.writeln('|---|---|---|');
   for (final File file in files) {
     final String relative = file.path.replaceAll('\\', '/');
     final List<String> lines = file.readAsLinesSync();
@@ -138,7 +145,7 @@ void main() {
         final RegExpMatch? match = rule.pattern.firstMatch(lines[i]);
         if (match != null) {
           final String literal = match.group(0)!.replaceAll('|', r'\|');
-          print('| ${rule.name} | $relative:${i + 1} | `$literal` |');
+          stdout.writeln('| ${rule.name} | $relative:${i + 1} | `$literal` |');
         }
       }
     }
@@ -153,11 +160,18 @@ dart run tool/hardcoded_inventory.dart > docs/hardcoded_values_inventory_2026-10
 (Get-Content docs/hardcoded_values_inventory_2026-10-24.md | Measure-Object -Line).Lines
 ```
 
-Expected: at least 700 rows. Append a header and four columns (`verdict`, `wave`, `status`) to the generated table; fill every row with `extract`, `component-local`, or `leave`.
+Expected: the tool's data rows plus a clearly labeled supplement for sites the
+regexes cannot see. Do not force 700 rows: the census anchor ceiling is ~325.
+Append a header and three columns (`verdict`, `wave`, `status`); fill every row
+with `extract`, `component-local`, or `leave`.
 
 - [ ] **Step 3: Cross-check the census totals**
 
-Confirm the ledger contains the census anchors: 53 color matches, 24 `Duration(`, 10 table names, 48 RPC names, 3 edge functions, 175 failure-copy occurrences. Any mismatch is recorded as a deviation in the ledger header.
+Confirm the ledger contains the census anchors: 53 color matches, 24
+`Duration(`, 10 table names, 48 RPC names, 3 edge functions, and the measured
+failure-copy occurrences. The 175 census figure was not reproducible at
+baseline (161 occurrences / 127 distinct); record the deviation and carry the
+measured count into Task 16.
 
 - [ ] **Step 4: Stage and report**
 
@@ -266,7 +280,7 @@ No commit.
 ### Task 4: Spacing, radius, and component-local dimensions
 
 **Files:**
-- Modify: `lib/app/legalhub_theme.dart`, `lib/features/admin/presentation/attorney_admin_tile.dart:53`, `lib/shared/widgets/app_tile.dart:90`, `lib/features/matters/presentation/matter_detail_row.dart:25`, `lib/features/discovery/presentation/attorney_search_tile.dart:53`, `lib/shared/widgets/view_state_message.dart:25,27,29`, `lib/shared/widgets/loading_elevated_button.dart:33`, `lib/features/matters/presentation/matter_link_chip.dart:39,49`, `lib/features/video/presentation/video_call_screen.dart:461,498,499`, `lib/features/notifications/presentation/notification_feed_screen.dart:106`, `lib/shared/widgets/label_chip.dart:46`, `lib/shared/widgets/social_button.dart:28`, `lib/features/onboarding/presentation/onboarding_screen.dart:109`
+- Modify: `lib/app/legalhub_theme.dart`, `lib/features/admin/presentation/attorney_admin_tile.dart:53`, `lib/shared/widgets/app_tile.dart:90`, `lib/features/matters/presentation/matter_detail_row.dart:25`, `lib/features/discovery/presentation/attorney_search_tile.dart:53`, `lib/shared/widgets/view_state_message.dart:25,27,29`, `lib/features/auth/presentation/widgets/loading_elevated_button.dart:33`, `lib/features/matters/presentation/matter_link_chip.dart:39,49`, `lib/features/video/presentation/video_call_screen.dart:461,498,499`, `lib/features/notifications/presentation/notification_feed_screen.dart:106`, `lib/shared/widgets/label_chip.dart:46`, `lib/features/auth/presentation/widgets/social_button.dart:28`, `lib/features/onboarding/presentation/onboarding_screen.dart:109`
 - Modify for component constants: `attorney_profile_surface.dart` (avatar 40), `otp_field_row.dart` (56), `onboarding_screen.dart` (240), home card files (160x192, maxWidths 520/360/320)
 
 **Interfaces:**
@@ -286,7 +300,13 @@ static const double radius2xl = 24;
 
 - [ ] **Step 3: Replace exact-match one-offs**
 
-Map `2 → space2xs` (only where the dimension is spacing/padding), `4 → spaceXs`, `8 → spaceSm`, `12 → spaceMd`, `6 → radiusMd`, `8-radius → radiusLg`, `12-radius → radiusXl`, `24-radius → radius2xl`. Do not change a value that is not an exact semantic match.
+Map `2 → space2xs` (only where the dimension is spacing/padding),
+`4 → spaceXs`, `8 → spaceSm`, `6 → radiusMd`, `8-radius → radiusLg`,
+`12-radius → radiusXl`, `24-radius → radius2xl`. There is **no 12 spacing
+token** on the 4/8/16/24/32 scale: a `12` spacing/padding value must become a
+component-local `static const double _gap = 12` in its owning widget, never
+rounded up to `spaceMd` (16). Do not change a value that is not an exact
+semantic match.
 
 - [ ] **Step 4: Name component-only dimensions**
 
@@ -317,22 +337,33 @@ No commit.
 **Interfaces:**
 - Consumes: `AppSectionHeader` from `lib/shared/widgets/app_section_header.dart`.
 
-- [ ] **Step 1: Compare the local style with `AppSectionHeader`**
+- [ ] **Step 1: Confirm the real duplication**
 
-Read `matter_details_surface.dart:109` and `app_section_header.dart:46`. If padding, spacing, or semantics differ, STOP and keep the local style with a `static const` name.
+The four call sites already use `AppSectionHeader`; the duplication is the
+explicit `titleStyle: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)`
+override. Removing the override would switch the visual hierarchy to
+`titleMedium`, so it must stay.
 
-- [ ] **Step 2: If pixel-equivalent, replace the four call sites**
+- [ ] **Step 2: Name the repeated style**
 
-Replace `text.titleSmall?.copyWith(fontWeight: FontWeight.w700)` headers with `AppSectionHeader`.
+Add a top-level helper in the part file:
+
+```dart
+TextStyle? _workspaceHeaderStyle(TextTheme text) =>
+    text.titleSmall?.copyWith(fontWeight: FontWeight.w700);
+```
+
+Replace the four inline overrides with `titleStyle: _workspaceHeaderStyle(text)`.
+No other change.
 
 - [ ] **Step 3: Run the matter tests**
 
 Run: `flutter test test/features/matters/matter_details_screen_test.dart`
 Expected: PASS with no assertion updates.
 
-- [ ] **Step 4: Stage or record the skip**
+- [ ] **Step 4: Stage the file**
 
-If skipped, record the reason in the inventory ledger. Otherwise stage the file.
+Stage only `lib/features/matters/presentation/matter_details_surface.dart`.
 
 No commit.
 
@@ -404,8 +435,13 @@ abstract final class SupabaseBuckets {
 
 - [ ] **Step 4: Replace the literals**
 
-Run: `rg -n "from\('(matters|documents|files|billing_invoices|message_threads|messages|notifications|tasks|consultation_slots|memberships)'\)" lib`
-Replace with `from(SupabaseTables.<name>)`. Repeat for `'matter-files'` with `SupabaseBuckets.matterFiles`, including the realtime schema/table pair (`public`, `messages`).
+Use the inventory ledger's `table-from` rows plus the supplement's `table wire
+sites` (18 rows) to locate all 19 sites. The parked seam refactor hides most
+names behind `_table`, `_matterTable`, `table:`, and `_searchCaller`, so a
+plain `from('literal')` grep finds only one. Replace each with
+`SupabaseTables.<name>`. Repeat for `'matter-files'` with
+`SupabaseBuckets.matterFiles`, including the realtime schema/table pair
+(`public`, `messages`).
 
 - [ ] **Step 5: Run data tests**
 
@@ -522,7 +558,7 @@ No commit.
 
 **Files:**
 - Create: `lib/core/contracts/network.dart`, `lib/core/async/with_timeout.dart`, `test/core/async/with_timeout_test.dart`
-- Modify: `lib/data/supabase_seam.dart:41,53`, `lib/data/storage/supabase_storage_api_impl.dart:53,87,94,101`, `lib/data/video/supabase_video_api_impl.dart:41`, `lib/data/billing/supabase_payment_api_impl.dart:24`, `lib/data/research/supabase_research_api_impl.dart:42`
+- Modify: `lib/data/supabase_seam.dart:41,53`, `lib/data/storage/supabase_storage_api_impl.dart:53,87,94,101`, `lib/data/video/supabase_video_api_impl.dart:41`, `lib/data/billing/supabase_payment_api_impl.dart:24`, `lib/data/research/supabase_research_api_impl.dart:42`, `lib/data/list_query_guards.dart:19`
 
 **Interfaces:**
 - Produces: `kSupabaseRequestTimeout` and `withRequestTimeout<T>(Future<T>, {Duration timeout})`.
@@ -571,7 +607,7 @@ Future<T> withRequestTimeout<T>(
 
 - [ ] **Step 4: Replace the seven literals and wrap the three invokes**
 
-In `supabase_seam.dart`, `storage_api_impl`, and the storage gateway, replace `Duration(seconds: 15)` with `kSupabaseRequestTimeout`. In the three `_boundInvoke` helpers, wrap the invoke:
+In `supabase_seam.dart`, `storage_api_impl`, and the storage gateway, replace `Duration(seconds: 15)` with `kSupabaseRequestTimeout`. Replace the `kSupabaseListReadTimeout` definition in `lib/data/list_query_guards.dart:19` with `const Duration kSupabaseListReadTimeout = kSupabaseRequestTimeout;` so there is one source of truth. In the three `_boundInvoke` helpers, wrap the invoke:
 
 ```dart
 final FunctionResponse response = await withRequestTimeout(
@@ -594,10 +630,10 @@ No commit.
 
 **Files:**
 - Create: `lib/app/deep_link/deep_link_config.dart`, `test/app/deep_link/deep_link_config_test.dart`
-- Modify: `lib/app/deep_link/app_link_parser.dart:55,63,89,104`, `lib/data/auth/auth_callback.dart:23-35,49-53`, `lib/main.dart:93`, `test/app/deep_link/app_link_parser_test.dart`, `test/data/auth/auth_callback_test.dart`
+- Modify: `lib/app/deep_link/app_link_parser.dart:55,63,89,104`, `lib/data/auth/auth_callback.dart:23-35,49-53`, `lib/data/auth/supabase_auth_api_impl.dart:108-109,206`, `lib/features/orgs/presentation/invite_member_sheet.dart:301`, `lib/main.dart:93`, `test/app/deep_link/app_link_parser_test.dart`, `test/data/auth/auth_callback_test.dart`, `test/data/auth/supabase_auth_api_impl_test.dart`
 
 **Interfaces:**
-- Produces: `DeepLinkConfig({required String scheme, String verifiedHost})`, `DeepLinkConfig.forConfig(AppConfig)`, `.acceptInviteUri(token)`, `.isAcceptInvite(Uri)`, `.isAuthCallback(Uri)`.
+- Produces: `DeepLinkConfig({required String scheme, String verifiedHost})`, `DeepLinkConfig.forConfig(AppConfig)`, `.acceptInviteUri(token)`, `.authCallbackUri()`, `.isAcceptInvite(Uri)`, `.isAuthCallback(Uri)`.
 
 - [ ] **Step 1: Write the failing dev-scheme test**
 
@@ -670,12 +706,22 @@ class DeepLinkConfig {
     host: acceptInviteHost,
     queryParameters: <String, String>{'token': token},
   );
+
+  Uri authCallbackUri() => Uri(
+    scheme: scheme,
+    host: authHost,
+    path: appCallbackPath,
+  );
 }
 ```
 
 - [ ] **Step 4: Wire the parser**
 
-Change `AppLinkParser` to `const AppLinkParser({this.config = const DeepLinkConfig.production()})`; use `config.scheme` at the scheme check and `config.acceptInviteUri` for the produce side. Keep a static `productionAcceptInviteUri` only if a call site cannot access an instance.
+Change `AppLinkParser` to `const AppLinkParser({this.config = const DeepLinkConfig.production()})`; use `config.scheme` at the scheme check and an instance `acceptInviteUri` for the produce side. Update the invite-share producer:
+`DeepLinkConfig(scheme: AppConfig.fromEnvironment().deepLinkScheme)
+.acceptInviteUri(token)`. Update the parser tests from the removed static to
+`const AppLinkParser().acceptInviteUri` or
+`const DeepLinkConfig.production().acceptInviteUri`.
 
 - [ ] **Step 5: Wire `AuthCallbackUri`**
 
@@ -689,16 +735,39 @@ final AppLinkParser(
 )
 ```
 
+- [ ] **Step 6b: Wire the recovery producer**
+
+In `lib/data/auth/supabase_auth_api_impl.dart`, replace the hardcoded
+`_recoveryDeepLinkUri` with the configured scheme:
+
+```dart
+static const String _applicationId = String.fromEnvironment(
+  'APPLICATION_ID',
+  defaultValue: 'com.legalhub.app',
+);
+
+String get _recoveryDeepLinkUri =>
+    DeepLinkConfig(scheme: _applicationId).authCallbackUri().toString();
+```
+
+`emailRedirectTo: _recoveryDeepLinkUri` stays. Add the import. The dev
+`.env.development` already sets `APPLICATION_ID=com.legalhub.app.dev`.
+
 - [ ] **Step 7: Update the parser/auth tests and run them**
 
 Update any test that constructs `AppLinkParser.acceptInviteUri` to use `const DeepLinkConfig.production().acceptInviteUri`. Add the dev case.
 
-Run: `flutter test test/app/deep_link test/data/auth/auth_callback_test.dart test/app/flavor_test.dart`
+Add a test that
+`DeepLinkConfig(scheme: 'com.legalhub.app.dev').authCallbackUri()` is
+`com.legalhub.app.dev://auth/v1/callback`.
+
+Run: `flutter test test/app/deep_link test/data/auth/auth_callback_test.dart test/data/auth/supabase_auth_api_impl_test.dart test/app/flavor_test.dart`
 Expected: PASS.
 
-- [ ] **Step 8: Stage and report**
+- [ ] **Step 8: Baseline-copy and report**
 
-No commit.
+`main.dart` and `supabase_auth_api_impl.dart` are audit-interleaved. Copy every
+edited file to `task-9-baseline/` before editing; stage nothing. No commit.
 
 ---
 
@@ -737,7 +806,7 @@ No commit.
 
 **Files:**
 - Create: `lib/core/contracts/server_limits.dart`, `test/core/contracts/server_limits_test.dart`
-- Modify: `lib/features/approvals/presentation/approval_create_sheet.dart:54,55`, `lib/features/approvals/presentation/approval_detail_sheet.dart:211`, `lib/features/compliance/presentation/compliance_alert_create_sheet.dart:52,53`, `lib/features/compliance/presentation/compliance_alert_detail_sheet.dart:191`, `lib/features/admin/presentation/attorney_admin_form.dart:97-121,175`, `lib/features/booking/presentation/booking_topic_field.dart:34`, `lib/features/messaging/presentation/message_thread_detail_cubit.dart:33`, `lib/features/research/domain/research_request.dart:25-26`, `lib/data/research/supabase_research_gateway.dart:132`
+- Modify: `lib/features/approvals/presentation/approval_create_sheet.dart:54,55`, `lib/features/approvals/presentation/approval_detail_sheet.dart:211`, `lib/features/compliance/presentation/compliance_alert_create_sheet.dart:52,53`, `lib/features/compliance/presentation/compliance_alert_detail_sheet.dart:191`, `lib/features/admin/presentation/attorney_admin_form.dart:97-121,175`, `lib/features/booking/presentation/booking_topic_field.dart:34`, `lib/features/research/domain/research_request.dart:25-26`, `lib/features/research/presentation/ai_research_cubit.dart:74`, `lib/data/research/supabase_research_gateway.dart:52,132`
 
 **Interfaces:**
 - Produces: the seven `k*MaxLength`/`kResearchFindingsMax` constants.
@@ -779,11 +848,14 @@ const int kBookingTopicMaxLength = 2000;
 const int kResearchFindingsMax = 12;
 ```
 
-Replace the private `_titleMaxLength`/`_descriptionMaxLength` and raw `maxLength:` values. Add the missing 120 cap to the attorney display-name validator and the 2000 cap to the booking topic field. Reuse `ResearchRequest.minQuestionLength`/`maxQuestionLength` instead of the hardcoded copy.
+Replace the private `_titleMaxLength`/`_descriptionMaxLength` and raw `maxLength:` values. Add the missing caps at input, consistent with the headline/city fields: `maxLength: kAttorneyNameMaxLength` on the attorney name field and `maxLength: kBookingTopicMaxLength` on the booking topic field (no new validator string). Reuse `ResearchRequest.minQuestionLength`/`maxQuestionLength` in both the gateway validation copy and `ai_research_cubit.dart` instead of the duplicated literals. Leave `message_thread_detail_cubit.maxMessageLength` as the feature's already-named business constant (no DB mirror).
 
 - [ ] **Step 4: Add widget boundary tests**
 
-In `test/features/admin/presentation/attorney_admin_screen_test.dart`, type a 121-character name and assert the validator error. In `test/features/booking/booking_screen_test.dart`, type 2001 characters and assert the cap.
+In `test/features/admin/presentation/attorney_admin_screen_test.dart`, type a
+121-character name and assert the field caps at 120. In
+`test/features/booking/booking_screen_test.dart`, type 2001 characters and
+assert the topic caps at 2000.
 
 - [ ] **Step 5: Run the feature tests**
 
@@ -979,7 +1051,7 @@ No commit.
 
 **Files:**
 - Create: `tool/error_copy_inventory.dart`, `docs/l10n/error_copy_inventory_2026-10-24.tsv`
-- Read: the 175 occurrences listed by the census
+- Read: the ledger's `failure-copy` rows (measured 161 occurrences / 127 distinct at baseline; the census 175 was not reproducible)
 
 **Interfaces:**
 - Produces: TSV `literal<TAB>suggested_key<TAB>occurrences<TAB>files`, consumed by Tasks 17-22.
@@ -1045,7 +1117,10 @@ dart run tool/error_copy_inventory.dart > docs/l10n/error_copy_inventory_2026-10
 (Get-Content docs/l10n/error_copy_inventory_2026-10-24.tsv | Measure-Object -Line).Lines
 ```
 
-Expected: a row per distinct literal; the occurrence column sums to 175. Any unmatched interpolated string is listed under `# UNPARSED` for manual handling.
+Expected: a row per distinct literal; record the measured occurrence sum (161
+occurrences / 127 distinct at the 2026-10-24 baseline; the census 175 was not
+reproducible). Any unmatched interpolated string is listed under `# UNPARSED`
+for manual handling.
 
 - [ ] **Step 3: Stage and report**
 
@@ -1154,11 +1229,13 @@ Files: `lib/data/tasks/**`, `lib/data/booking/**`, `lib/data/messaging/**`, matc
 **Batch 20 — discovery + admin + orgs**
 Files: `lib/data/discovery/**`, `lib/data/admin/**`, `lib/data/orgs/**`, matching features.
 
-**Batch 21 — storage + billing + notifications**
-Files: `lib/data/storage/**`, `lib/data/billing/**`, `lib/data/notifications/**`, matching features.
+**Batch 21 — storage + billing + notifications + documents + matters**
+Files: `lib/data/storage/**`, `lib/data/billing/**`, `lib/data/notifications/**`, `lib/data/documents/**`, `lib/data/matters/**`, matching features.
+Owns the two remaining load keys: `errUnableToLoadDocumentsPleaseTryAgain` and `errUnableToLoadMattersPleaseTryAgain`.
 
-**Batch 22 — research + video + auth + shared**
-Files: `lib/data/research/**`, `lib/data/video/**`, `lib/data/auth/**`, `lib/features/research/**`, `lib/features/video/**`, `lib/shared/**`.
+**Batch 22 — research + video + auth + profile + shared**
+Files: `lib/data/research/**`, `lib/data/video/**`, `lib/data/auth/**`, `lib/features/research/**`, `lib/features/video/**`, `lib/features/auth/**`, `lib/features/profile/**`, `lib/shared/**`.
+Owns the auth/recovery keys, including `errOrganizationMembershipsCouldNotBeLoaded` and `errWeCouldnTCompleteThatRequestPleaseTry` (both assigned to Batch 22).
 
 For each batch:
 
@@ -1419,6 +1496,6 @@ Do not commit or push. Await explicit approval.
 ## Self-Review Notes
 
 - **Spec coverage:** every spec §3 home has a task; §5 behavior changes map to Tasks 9, 8, 11, 17-23, 25, 14; §6 gates map to Task 28; §7 risks are enforced by the global constraints and per-task gates.
-- **No placeholders:** repetitive edits name exact files, patterns, and constants. The 175 error literals are produced by Task 16's deterministic extractor; the plan does not pretend to know them.
+- **No placeholders:** repetitive edits name exact files, patterns, and constants. The distinct failure literals (~127 measured, 161 occurrences) are produced by Task 16's deterministic extractor; the plan does not pretend to know them.
 - **Type consistency:** `AppMessageKey`, `appMessage`, `DeepLinkConfig`, `SupabaseTables/Rpcs`, `DemoLabels`, and `server_limits` names are used identically across tasks.
 - **Deliberate omission:** pagination UI/`p_offset` is not in any task, matching the spec.

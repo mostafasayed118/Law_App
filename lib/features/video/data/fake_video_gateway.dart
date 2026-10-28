@@ -1,8 +1,10 @@
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/video/domain/video_gateway.dart';
 import 'package:legalhub/features/video/domain/video_session.dart';
 import 'package:legalhub/features/video/domain/video_token.dart';
+import 'package:legalhub/shared/demo/demo_corpus.dart';
 
 /// Development-only video gateway: a fixed synthetic schedule plus in-memory
 /// create/end transitions (design §1.3 — the fake is registered only in
@@ -20,39 +22,39 @@ class FakeVideoGateway implements VideoGateway {
   static final List<VideoSession> syntheticSessions = <VideoSession>[
     VideoSession(
       id: 'video-1',
-      organizationId: 'org-demo',
-      matterId: 'matter-1',
+      organizationId: DemoCorpus.organizationId,
+      matterId: DemoCorpus.matterIds[0],
       roomName: 'room_demo000000000001',
       status: VideoSessionStatus.scheduled,
       scheduledAt: DateTime.utc(2026, 10, 25, 10, 0),
-      createdBy: 'demo-user',
+      createdBy: DemoCorpus.ownerId,
     ),
     VideoSession(
       id: 'video-2',
-      organizationId: 'org-demo',
+      organizationId: DemoCorpus.organizationId,
       roomName: 'room_demo000000000002',
       status: VideoSessionStatus.live,
       scheduledAt: DateTime.utc(2026, 10, 22, 9, 0),
       startedAt: DateTime.utc(2026, 10, 22, 9, 5),
-      createdBy: 'demo-attorney',
+      createdBy: DemoCorpus.attorneyId,
     ),
     VideoSession(
       id: 'video-3',
-      organizationId: 'org-demo',
+      organizationId: DemoCorpus.organizationId,
       roomName: 'room_demo000000000003',
       status: VideoSessionStatus.ended,
       scheduledAt: DateTime.utc(2026, 10, 20, 14, 0),
       startedAt: DateTime.utc(2026, 10, 20, 14, 2),
       endedAt: DateTime.utc(2026, 10, 20, 14, 40),
-      createdBy: 'demo-user',
+      createdBy: DemoCorpus.ownerId,
     ),
     VideoSession(
       id: 'video-4',
-      organizationId: 'org-demo',
+      organizationId: DemoCorpus.organizationId,
       roomName: 'room_demo000000000004',
       status: VideoSessionStatus.cancelled,
       scheduledAt: DateTime.utc(2026, 10, 21, 11, 0),
-      createdBy: 'demo-attorney',
+      createdBy: DemoCorpus.attorneyId,
     ),
   ];
 
@@ -77,14 +79,14 @@ class FakeVideoGateway implements VideoGateway {
     _sessions.add(
       VideoSession(
         id: id,
-        organizationId: 'org-demo',
+        organizationId: DemoCorpus.organizationId,
         matterId: matterId,
         bookingId: bookingId,
         roomName: 'room_demo${number.toString().padLeft(16, '0')}',
         status: VideoSessionStatus.scheduled,
         scheduledAt:
             scheduledAt ?? DateTime.now().add(const Duration(hours: 1)),
-        createdBy: 'demo-user',
+        createdBy: DemoCorpus.ownerId,
       ),
     );
     return Result<String>.success(id);
@@ -98,6 +100,8 @@ class FakeVideoGateway implements VideoGateway {
         code: 'provider_not_configured',
         userMessage:
             'Video calls are not configured for this deployment. No call was started.',
+        messageKey:
+            AppMessageKey.errVideoCallsAreNotConfiguredForThisDeployment,
         kind: AppErrorKind.unavailable,
       ),
     );
@@ -111,6 +115,7 @@ class FakeVideoGateway implements VideoGateway {
       to: VideoSessionStatus.live,
       errorCode: 'video_live_invalid',
       errorMessage: 'This consultation can no longer be started.',
+      errorKey: AppMessageKey.errThisConsultationCanNoLongerBeStarted,
     );
   }
 
@@ -125,6 +130,7 @@ class FakeVideoGateway implements VideoGateway {
       to: VideoSessionStatus.ended,
       errorCode: 'video_session_ended',
       errorMessage: 'This consultation can no longer be ended.',
+      errorKey: AppMessageKey.errThisConsultationCanNoLongerBeEnded,
     );
   }
 
@@ -134,6 +140,7 @@ class FakeVideoGateway implements VideoGateway {
     required VideoSessionStatus to,
     required String errorCode,
     required String errorMessage,
+    required AppMessageKey errorKey,
   }) async {
     final int index = _sessions.indexWhere((VideoSession s) => s.id == id);
     if (index < 0) {
@@ -141,13 +148,18 @@ class FakeVideoGateway implements VideoGateway {
         const AppError(
           code: 'video_session_not_found',
           userMessage: 'This video consultation was not found.',
+          messageKey: AppMessageKey.errThisVideoConsultationWasNotFound,
         ),
       );
     }
     final VideoSession current = _sessions[index];
     if (!from.contains(current.status)) {
       return Result<void>.failure(
-        AppError(code: errorCode, userMessage: errorMessage),
+        AppError(
+          code: errorCode,
+          userMessage: errorMessage,
+          messageKey: errorKey,
+        ),
       );
     }
     final DateTime now = DateTime.now();

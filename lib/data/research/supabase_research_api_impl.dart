@@ -1,7 +1,10 @@
 import 'dart:convert';
 
+import 'package:legalhub/core/contracts/http_status.dart';
 import 'package:legalhub/data/postgrest_failures.dart';
 import 'package:legalhub/data/supabase_seam.dart';
+import 'package:legalhub/data/supabase_wire.dart';
+import 'package:legalhub/features/research/domain/research_wire_codes.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_research_api.dart';
@@ -38,8 +41,9 @@ class SupabaseResearchApiImpl implements SupabaseResearchApi {
     String function,
     Map<String, dynamic> body,
   ) async {
-    final FunctionResponse response = await Supabase.instance.client.functions
-        .invoke(function, body: body);
+    final FunctionResponse response = await SupabaseSeam.invokeWithTimeout(
+      () => Supabase.instance.client.functions.invoke(function, body: body),
+    );
     return response.data;
   }
 
@@ -61,13 +65,15 @@ class SupabaseResearchApiImpl implements SupabaseResearchApi {
     required String question,
   }) async {
     try {
-      final Object? data =
-          await _functionCaller('research-analyze', <String, dynamic>{
-            'organization_id': organizationId,
-            'matter_id': matterId,
-            'document_ids': documentIds,
-            'question': question,
-          });
+      final Object? data = await _functionCaller(
+        SupabaseEdgeFunctions.researchAnalyze,
+        <String, dynamic>{
+          'organization_id': organizationId,
+          'matter_id': matterId,
+          'document_ids': documentIds,
+          'question': question,
+        },
+      );
       if (data is! Map) {
         throw const SupabaseResearchException(
           kind: SupabaseResearchFailureKind.invalidResponse,
@@ -108,12 +114,12 @@ class SupabaseResearchApiImpl implements SupabaseResearchApi {
   }) {
     return _guardRpc(() async {
       final PostgrestResponse<dynamic> response = await _rpcCaller(
-        'list_research_runs',
+        SupabaseRpcs.listResearchRuns,
         <String, dynamic>{'p_organization_id': organizationId},
       );
       final List<Map<String, dynamic>> rows = _rowsFrom(
         response.data,
-        'list_research_runs',
+        SupabaseRpcs.listResearchRuns,
       );
       final int capped = limit < 0 ? 0 : limit;
       return rows.take(capped).toList(growable: false);
@@ -124,10 +130,10 @@ class SupabaseResearchApiImpl implements SupabaseResearchApi {
   Future<List<Map<String, dynamic>>> listFindings(String runId) {
     return _guardRpc(() async {
       final PostgrestResponse<dynamic> response = await _rpcCaller(
-        'list_research_findings',
+        SupabaseRpcs.listResearchFindings,
         <String, dynamic>{'p_run_id': runId},
       );
-      return _rowsFrom(response.data, 'list_research_findings');
+      return _rowsFrom(response.data, SupabaseRpcs.listResearchFindings);
     });
   }
 
@@ -189,7 +195,8 @@ class SupabaseResearchApiImpl implements SupabaseResearchApi {
   /// forbidden; everything else stays unknown for the gateway to classify.
   SupabaseResearchFailureKind _kindForPostgrest(PostgrestException e) {
     final String message = e.message.toLowerCase();
-    if (message.contains('not found') || e.code == 'PGRST116') {
+    if (message.contains('not found') ||
+        e.code == PostgrestCodes.invalidResponse) {
       return SupabaseResearchFailureKind.notFound;
     }
     return postgrestKindFor(
@@ -228,29 +235,35 @@ class SupabaseResearchApiImpl implements SupabaseResearchApi {
   /// strips the JSON body.
   SupabaseResearchFailureKind _kindForFunction(FunctionException e) {
     switch (_errorCode(e.details)) {
-      case 'unauthorized':
+      case ResearchWireCodes.unauthorized:
         return SupabaseResearchFailureKind.unauthorized;
-      case 'forbidden':
+      case ResearchWireCodes.forbidden:
         return SupabaseResearchFailureKind.forbidden;
-      case 'invalid_request':
+      case ResearchWireCodes.invalidRequest:
         return SupabaseResearchFailureKind.invalidRequest;
-      case 'context_too_large':
+      case ResearchWireCodes.contextTooLarge:
         return SupabaseResearchFailureKind.contextTooLarge;
-      case 'provider_not_configured':
+      case ResearchWireCodes.providerNotConfigured:
         return SupabaseResearchFailureKind.providerNotConfigured;
-      case 'provider_unavailable':
+      case ResearchWireCodes.providerUnavailable:
         return SupabaseResearchFailureKind.providerUnavailable;
-      case 'invalid_response':
+      case ResearchWireCodes.invalidResponse:
         return SupabaseResearchFailureKind.invalidResponse;
     }
     return switch (e.status) {
-      401 => SupabaseResearchFailureKind.unauthorized,
-      403 => SupabaseResearchFailureKind.forbidden,
-      400 => SupabaseResearchFailureKind.invalidRequest,
-      409 => SupabaseResearchFailureKind.providerNotConfigured,
-      422 => SupabaseResearchFailureKind.contextTooLarge,
-      500 => SupabaseResearchFailureKind.invalidResponse,
-      502 || 503 || 504 => SupabaseResearchFailureKind.providerUnavailable,
+      HttpStatusCodes.unauthorized => SupabaseResearchFailureKind.unauthorized,
+      HttpStatusCodes.forbidden => SupabaseResearchFailureKind.forbidden,
+      HttpStatusCodes.badRequest => SupabaseResearchFailureKind.invalidRequest,
+      HttpStatusCodes.conflict =>
+        SupabaseResearchFailureKind.providerNotConfigured,
+      HttpStatusCodes.unprocessableEntity =>
+        SupabaseResearchFailureKind.contextTooLarge,
+      HttpStatusCodes.internalServerError =>
+        SupabaseResearchFailureKind.invalidResponse,
+      HttpStatusCodes.badGateway ||
+      HttpStatusCodes.serviceUnavailable ||
+      HttpStatusCodes.gatewayTimeout =>
+        SupabaseResearchFailureKind.providerUnavailable,
       0 => SupabaseResearchFailureKind.providerUnavailable,
       _ => SupabaseResearchFailureKind.unknown,
     };

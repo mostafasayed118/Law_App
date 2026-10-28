@@ -34,6 +34,7 @@ class _SearchSurfaceState extends State<_SearchSurface> {
         context.read<SearchCubit>().search(
           widget.initialQuery,
           l10n: AppLocalizations.of(context),
+          localOnly: backendIsLocalOnly,
         );
       }
     });
@@ -41,11 +42,12 @@ class _SearchSurfaceState extends State<_SearchSurface> {
 
   void _onChanged(String value) {
     _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 300), () {
+    _debounce = Timer(LegalHubMotion.debounce, () {
       if (mounted) {
         context.read<SearchCubit>().search(
           value,
           l10n: AppLocalizations.of(context),
+          localOnly: backendIsLocalOnly,
         );
       }
     });
@@ -56,6 +58,7 @@ class _SearchSurfaceState extends State<_SearchSurface> {
     context.read<SearchCubit>().search(
       value,
       l10n: AppLocalizations.of(context),
+      localOnly: backendIsLocalOnly,
     );
   }
 
@@ -98,11 +101,16 @@ class _SearchSurfaceState extends State<_SearchSurface> {
                 return _resultsView(context, state, l10n, text, scheme);
               },
             ),
-            const SizedBox(height: LegalHubTheme.spaceLg),
-            Text(
-              l10n.searchLocalOnlyNote,
-              style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-            ),
+            // The demo note is truthful only on the credential-free fakes; a
+            // configured build searches server data and must not claim
+            // synthetic lists.
+            if (backendIsLocalOnly) ...<Widget>[
+              const SizedBox(height: LegalHubTheme.spaceLg),
+              Text(
+                l10n.searchLocalOnlyNote,
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+              ),
+            ],
           ],
         ),
       ),
@@ -120,7 +128,7 @@ class _SearchSurfaceState extends State<_SearchSurface> {
     final Widget noQuery = Padding(
       padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
       child: Text(
-        l10n.searchNoQuery,
+        backendIsLocalOnly ? l10n.searchNoQuery : l10n.searchNoQueryConfigured,
         style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
       ),
     );
@@ -137,7 +145,8 @@ class _SearchSurfaceState extends State<_SearchSurface> {
     }
     return ViewStateSwitch<SearchResults>(
       state: state.results,
-      onRetry: () => cubit.search(state.query, l10n: l10n),
+      onRetry: () =>
+          cubit.search(state.query, l10n: l10n, localOnly: backendIsLocalOnly),
       builder: (BuildContext context, SearchResults results) =>
           _grouped(context, results, l10n, empty),
       empty: empty,
@@ -277,7 +286,10 @@ class _SearchSurfaceState extends State<_SearchSurface> {
   ) {
     return AppTile(
       icon: Icons.folder_outlined,
-      title: demoMatterTitle(l10n, matter.title),
+      title: DemoLabels(
+        l10n,
+        localOnly: backendIsLocalOnly,
+      ).matterTitle(matter.title),
       subtitles: <String>[
         '${practiceAreaLabel(l10n, matter.practiceArea)} · ${matter.assignedAttorneyName}',
       ],
@@ -298,7 +310,10 @@ class _SearchSurfaceState extends State<_SearchSurface> {
   ) {
     return AppTile(
       icon: Icons.folder_outlined,
-      title: demoDocumentTitle(l10n, document.title),
+      title: DemoLabels(
+        l10n,
+        localOnly: backendIsLocalOnly,
+      ).documentTitle(document.title),
       subtitles: <String>[
         '${documentTypeLabel(l10n, document.type)} · ${formatMediumDate(l10n, document.createdAt)}',
       ],
@@ -318,7 +333,10 @@ class _SearchSurfaceState extends State<_SearchSurface> {
   ) {
     return AppTile(
       icon: Icons.forum_outlined,
-      title: demoThreadTitle(l10n, thread.title),
+      title: DemoLabels(
+        l10n,
+        localOnly: backendIsLocalOnly,
+      ).threadTitle(thread.title),
       subtitles: <String>[
         '${thread.participants.join(', ')} · ${formatMediumDate(l10n, thread.lastActivityAt)}',
       ],

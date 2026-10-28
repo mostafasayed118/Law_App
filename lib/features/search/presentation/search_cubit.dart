@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/pagination.dart';
 import 'package:legalhub/core/practice_area.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/features/discovery/domain/attorney.dart';
@@ -63,7 +64,7 @@ class SearchCubit extends Cubit<SearchState> {
   /// 4 × 30 tiles). Mirrors the shared 30-row search page size without
   /// importing the data layer — presentation must never depend on
   /// `lib/data/` (layer rule). The server reads the shared 200-row page.
-  static const int searchPageSize = 30;
+  static const int searchPageSize = kSearchPageSize;
 
   final MatterGateway _matterGateway;
   final DocumentGateway _documentGateway;
@@ -112,11 +113,15 @@ class SearchCubit extends Cubit<SearchState> {
   Future<void> search(
     String query, {
     AppLocalizations? l10n,
+    bool localOnly = true,
     int limit = searchPageSize,
   }) async {
     if (isClosed) {
       return;
     }
+    final DemoLabels? labels = l10n == null
+        ? null
+        : DemoLabels(l10n, localOnly: localOnly);
     final int seq = ++_requestSeq;
     final String trimmed = query.trim();
     emit(state.copyWith(query: query));
@@ -170,7 +175,7 @@ class SearchCubit extends Cubit<SearchState> {
     switch (matters) {
       case Success<List<Matter>>(value: final List<Matter> value):
         matterRows = value
-            .where((Matter m) => _matterMatches(m, needle, l10n))
+            .where((Matter m) => _matterMatches(m, needle, labels))
             .take(effectiveLimit)
             .toList(growable: false);
       case Failure<List<Matter>>(error: final AppError error):
@@ -180,7 +185,7 @@ class SearchCubit extends Cubit<SearchState> {
     switch (documents) {
       case Success<List<Document>>(value: final List<Document> value):
         documentRows = value
-            .where((Document d) => _documentMatches(d, needle, l10n))
+            .where((Document d) => _documentMatches(d, needle, labels))
             .take(effectiveLimit)
             .toList(growable: false);
       case Failure<List<Document>>(error: final AppError error):
@@ -190,7 +195,7 @@ class SearchCubit extends Cubit<SearchState> {
     switch (threads) {
       case Success<List<MessageThread>>(value: final List<MessageThread> value):
         threadRows = value
-            .where((MessageThread t) => _threadMatches(t, needle, l10n))
+            .where((MessageThread t) => _threadMatches(t, needle, labels))
             .take(effectiveLimit)
             .toList(growable: false);
       case Failure<List<MessageThread>>(error: final AppError error):
@@ -201,7 +206,7 @@ class SearchCubit extends Cubit<SearchState> {
       case Success<List<Attorney>>(value: final List<Attorney> value):
         _attorneyCache = value;
         attorneyRows = value
-            .where((Attorney a) => _attorneyMatches(a, needle, l10n))
+            .where((Attorney a) => _attorneyMatches(a, needle, labels))
             .take(effectiveLimit)
             .toList(growable: false);
       case Failure<List<Attorney>>(error: final AppError error):
@@ -235,43 +240,35 @@ class SearchCubit extends Cubit<SearchState> {
   bool _contains(String field, String needle) =>
       field.toLowerCase().contains(needle);
 
-  bool _matterMatches(Matter matter, String needle, AppLocalizations? l10n) {
+  bool _matterMatches(Matter matter, String needle, DemoLabels? labels) {
     if (_contains(matter.title, needle) ||
         _contains(matter.status.name, needle) ||
         _contains(matter.practiceArea.name, needle)) {
       return true;
     }
-    if (l10n == null) {
+    if (labels == null) {
       return false;
     }
-    return _contains(demoMatterTitle(l10n, matter.title), needle) ||
-        _contains(matterStatusLabel(l10n, matter.status), needle) ||
-        _contains(practiceAreaLabel(l10n, matter.practiceArea), needle);
+    return _contains(labels.matterTitle(matter.title), needle) ||
+        _contains(matterStatusLabel(labels.l10n, matter.status), needle) ||
+        _contains(practiceAreaLabel(labels.l10n, matter.practiceArea), needle);
   }
 
-  bool _documentMatches(
-    Document document,
-    String needle,
-    AppLocalizations? l10n,
-  ) {
+  bool _documentMatches(Document document, String needle, DemoLabels? labels) {
     if (_contains(document.title, needle) ||
         _contains(document.type.name, needle) ||
         _contains(document.matterRef, needle)) {
       return true;
     }
-    if (l10n == null) {
+    if (labels == null) {
       return false;
     }
-    return _contains(demoDocumentTitle(l10n, document.title), needle) ||
-        _contains(documentTypeLabel(l10n, document.type), needle) ||
-        _contains(demoMatterTitle(l10n, document.matterRef), needle);
+    return _contains(labels.documentTitle(document.title), needle) ||
+        _contains(documentTypeLabel(labels.l10n, document.type), needle) ||
+        _contains(labels.matterTitle(document.matterRef), needle);
   }
 
-  bool _threadMatches(
-    MessageThread thread,
-    String needle,
-    AppLocalizations? l10n,
-  ) {
+  bool _threadMatches(MessageThread thread, String needle, DemoLabels? labels) {
     if (_contains(thread.title, needle) ||
         _contains(thread.matterRef, needle)) {
       return true;
@@ -279,31 +276,27 @@ class SearchCubit extends Cubit<SearchState> {
     if (thread.participants.any((String p) => _contains(p, needle))) {
       return true;
     }
-    if (l10n == null) {
+    if (labels == null) {
       return false;
     }
-    if (_contains(demoThreadTitle(l10n, thread.title), needle) ||
-        _contains(demoMatterTitle(l10n, thread.matterRef), needle)) {
+    if (_contains(labels.threadTitle(thread.title), needle) ||
+        _contains(labels.matterTitle(thread.matterRef), needle)) {
       return true;
     }
     return thread.participants.any(
-      (String p) => _contains(demoAuthorName(l10n, p), needle),
+      (String p) => _contains(labels.authorName(p), needle),
     );
   }
 
-  bool _attorneyMatches(
-    Attorney attorney,
-    String needle,
-    AppLocalizations? l10n,
-  ) {
+  bool _attorneyMatches(Attorney attorney, String needle, DemoLabels? labels) {
     final PracticeArea? area = attorney.practiceArea;
     if (_contains(attorney.name, needle) ||
         (area != null && _contains(area.name, needle))) {
       return true;
     }
-    if (l10n == null || area == null) {
+    if (labels == null || area == null) {
       return false;
     }
-    return _contains(practiceAreaLabel(l10n, area), needle);
+    return _contains(practiceAreaLabel(labels.l10n, area), needle);
   }
 }

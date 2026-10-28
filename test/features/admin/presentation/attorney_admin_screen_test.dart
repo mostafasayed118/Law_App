@@ -187,6 +187,25 @@ void main() {
       expect(find.text('Nadia Fahmy'), findsOneWidget);
     });
 
+    testWidgets('the display name field caps at the server limit', (
+      tester,
+    ) async {
+      final _StubAttorneyAdminGateway gateway = _StubAttorneyAdminGateway();
+
+      await pumpScreen(tester, gateway);
+      await tester.tap(find.widgetWithText(FilledButton, 'Add attorney'));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextFormField).first, 'a' * 121);
+      await tester.pump();
+
+      final TextFormField nameField = tester.widget<TextFormField>(
+        find.byType(TextFormField).first,
+      );
+      expect(nameField.controller?.text.length, 120);
+      expect(nameField.controller?.text, 'a' * 120);
+    });
+
     testWidgets('deactivate asks for confirmation and flips the status', (
       tester,
     ) async {

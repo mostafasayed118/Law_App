@@ -1,4 +1,5 @@
 import 'package:legalhub/data/supabase_seam.dart';
+import 'package:legalhub/data/supabase_wire.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_matter_write_api.dart';
@@ -57,7 +58,7 @@ class SupabaseMatterWriteApiImpl implements SupabaseMatterWriteApi {
       // (F2-D4) in-function — no org pre-read, no client-side authorization
       // (F-11). The function returns the persisted matter id (uuid).
       final PostgrestResponse<dynamic> response =
-          await _rpcCaller('create_matter', <String, dynamic>{
+          await _rpcCaller(SupabaseRpcs.createMatter, <String, dynamic>{
             'p_organization_id': organizationId,
             'p_title': title.trim(),
             'p_practice_area': practiceArea,

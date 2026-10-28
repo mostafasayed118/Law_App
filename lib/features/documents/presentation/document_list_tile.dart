@@ -6,9 +6,14 @@ part of 'document_list_screen.dart';
 /// resolved row: the compact `MatterLinkChip`, which is the ONLY InkWell in
 /// the list (D-C2). The AC-2 pin asserts these absences structurally.
 class _DocumentTile extends StatelessWidget {
-  const _DocumentTile({required this.document, required this.onViewMatter});
+  const _DocumentTile({
+    required this.document,
+    required this.localOnly,
+    required this.onViewMatter,
+  });
 
   final Document document;
+  final bool localOnly;
 
   /// The reverse cross-link tap, or null when the row renders no chip
   /// (no embedded matter title or the nav hint not granted, D-C2/D-C4).
@@ -26,7 +31,10 @@ class _DocumentTile extends StatelessWidget {
     final String date = formatMediumDate(l10n, document.createdAt);
     return AppTile(
       icon: Icons.folder_outlined,
-      title: demoDocumentTitle(l10n, document.title),
+      title: DemoLabels(
+        l10n,
+        localOnly: localOnly,
+      ).documentTitle(document.title),
       subtitles: <String>['${documentTypeLabel(l10n, document.type)} · $date'],
       // The chips wrap beneath the metadata line (the roster pattern); the
       // link chip stays the only tap target in the row (D-C2), so the card

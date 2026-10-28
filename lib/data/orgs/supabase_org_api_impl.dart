@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:legalhub/data/postgrest_failures.dart';
 import 'package:legalhub/data/supabase_seam.dart';
+import 'package:legalhub/data/supabase_wire.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_org_api.dart';
@@ -98,7 +100,7 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
   Future<String> createOrganization({required String name}) async {
     try {
       final PostgrestResponse<dynamic> response = await _rpc(
-        'create_organization',
+        SupabaseRpcs.createOrganization,
         <String, dynamic>{'p_name': name},
       );
       final Object? id = response.data;
@@ -123,7 +125,7 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
   }) async {
     try {
       final PostgrestResponse<dynamic> response = await _rpc(
-        'list_org_members_metadata',
+        SupabaseRpcs.listOrgMembersMetadata,
         <String, dynamic>{'p_organization_id': organizationId},
       );
       final Object? data = response.data;
@@ -145,7 +147,7 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
   }) async {
     try {
       final PostgrestResponse<dynamic> response = await _rpc(
-        'list_matter_assignable_members',
+        SupabaseRpcs.listMatterAssignableMembers,
         <String, dynamic>{'p_matter_id': matterId},
       );
       final Object? data = response.data;
@@ -174,7 +176,7 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
       // for suspended/removed ones (org row not visible) — the repository
       // mapper tolerates the null name (plan §6).
       final List<Map<String, dynamic>> rows = await _table(
-        'memberships',
+        SupabaseTables.memberships,
         'organization_id, user_id, role, status, organizations(name)',
         filterColumn: 'user_id',
         filterValue: userId,
@@ -198,7 +200,7 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
   }) async {
     try {
       final PostgrestResponse<dynamic> response = await _rpc(
-        'invite_member',
+        SupabaseRpcs.inviteMember,
         <String, dynamic>{
           'p_organization_id': organizationId,
           'p_email': email,
@@ -227,7 +229,7 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
     required String userId,
     required String role,
   }) async {
-    await _runVoidRpc('change_member_role', <String, dynamic>{
+    await _runVoidRpc(SupabaseRpcs.changeMemberRole, <String, dynamic>{
       'p_organization_id': organizationId,
       'p_user_id': userId,
       'p_role': role,
@@ -239,7 +241,7 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
     required String organizationId,
     required String userId,
   }) async {
-    await _runVoidRpc('suspend_membership', <String, dynamic>{
+    await _runVoidRpc(SupabaseRpcs.suspendMembership, <String, dynamic>{
       'p_organization_id': organizationId,
       'p_user_id': userId,
     });
@@ -250,7 +252,7 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
     required String organizationId,
     required String userId,
   }) async {
-    await _runVoidRpc('reactivate_membership', <String, dynamic>{
+    await _runVoidRpc(SupabaseRpcs.reactivateMembership, <String, dynamic>{
       'p_organization_id': organizationId,
       'p_user_id': userId,
     });
@@ -261,7 +263,7 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
     required String organizationId,
     required String userId,
   }) async {
-    await _runVoidRpc('remove_membership', <String, dynamic>{
+    await _runVoidRpc(SupabaseRpcs.removeMembership, <String, dynamic>{
       'p_organization_id': organizationId,
       'p_user_id': userId,
     });
@@ -271,7 +273,7 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
   Future<String> resendInvitation({required String invitationId}) async {
     try {
       final PostgrestResponse<dynamic> response = await _rpc(
-        'resend_invitation',
+        SupabaseRpcs.resendInvitation,
         <String, dynamic>{'p_invitation_id': invitationId},
       );
       final Object? token = response.data;
@@ -292,21 +294,21 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
 
   @override
   Future<void> revokeInvitation({required String invitationId}) async {
-    await _runVoidRpc('revoke_invitation', <String, dynamic>{
+    await _runVoidRpc(SupabaseRpcs.revokeInvitation, <String, dynamic>{
       'p_invitation_id': invitationId,
     });
   }
 
   @override
   Future<void> deleteMyAccount() async {
-    await _runVoidRpc('delete_my_account', const <String, dynamic>{});
+    await _runVoidRpc(SupabaseRpcs.deleteMyAccount, const <String, dynamic>{});
   }
 
   @override
   Future<String> acceptInvitation({required String token}) async {
     try {
       final PostgrestResponse<dynamic> response = await _rpc(
-        'accept_invitation',
+        SupabaseRpcs.acceptInvitation,
         <String, dynamic>{'p_token': token},
       );
       final Object? membershipId = response.data;
@@ -354,21 +356,22 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
     String organizationId,
   ) async {
     try {
-      return await _rpc('read_org_audit', <String, dynamic>{
+      return await _rpc(SupabaseRpcs.readOrgAudit, <String, dynamic>{
         'p_organization_id': organizationId,
       });
     } on PostgrestException catch (e) {
       if (!_isFunctionNotFound(e)) {
         rethrow;
       }
-      return _rpc('read_org_audit', const <String, dynamic>{});
+      return _rpc(SupabaseRpcs.readOrgAudit, const <String, dynamic>{});
     }
   }
 
   /// True when PostgREST reports that the called function (or that exact
   /// signature) is not installed — the live-DB compatibility fallback trigger.
   bool _isFunctionNotFound(PostgrestException e) {
-    if (e.code == 'PGRST202' || e.code == '42883') {
+    if (e.code == PostgrestCodes.schemaCacheMiss ||
+        e.code == PostgrestCodes.undefinedFunction) {
       return true;
     }
     final String message = e.message.toLowerCase();

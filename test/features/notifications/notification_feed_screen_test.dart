@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' hide Notification;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/backend_posture.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/notifications/data/fake_notification_gateway.dart';
@@ -44,21 +45,18 @@ void main() {
       final AppLocalizations en = await AppLocalizations.delegate.load(
         const Locale('en'),
       );
+      final DemoLabels labels = DemoLabels(en, localOnly: true);
       for (final Notification notification
           in FakeNotificationGateway.syntheticNotifications) {
         // Demo localization (2026-09-24): rows render the mapped display
         // strings, not the raw wire values.
         expect(
-          find.text(demoNotificationType(en, notification.type)),
+          find.text(labels.notificationType(notification.type)),
           findsOneWidget,
         );
         expect(
           find.text(
-            demoNotificationSummary(
-              en,
-              notification.type,
-              notification.summary,
-            ),
+            labels.notificationSummary(notification.type, notification.summary),
           ),
           findsOneWidget,
         );
@@ -70,6 +68,43 @@ void main() {
       // The newest row renders first.
       expect(find.text('Invoice issued'), findsOneWidget);
     });
+
+    testWidgets(
+      'a configured row renders the localized wire type and server summary '
+      '(Task 26)',
+      (tester) async {
+        await resetServiceLocator();
+        serviceLocator.registerSingleton<BackendPosture>(
+          const BackendPosture(isLocalOnly: false),
+        );
+        serviceLocator.registerLazySingleton<NotificationGateway>(
+          () => _StubNotificationGateway(<Result<List<Notification>>>[
+            Result<List<Notification>>.success(<Notification>[
+              Notification(
+                id: 'server-1',
+                category: NotificationCategory.system,
+                type: 'invoice_status',
+                summary: 'Server invoice paid',
+                serverTimestamp: DateTime.utc(2026, 10, 26, 9),
+                isRead: true,
+              ),
+            ]),
+          ]),
+        );
+        await pumpFeed(tester);
+
+        // The summary map is keyed by the local corpus wire type, so a
+        // configured row must never show the demo summary. The type itself is
+        // a wire-to-label map and stays localized in every posture.
+        final AppLocalizations en = await AppLocalizations.delegate.load(
+          const Locale('en'),
+        );
+        expect(find.text(en.notifTypeInvoiceStatus), findsOneWidget);
+        expect(find.text('Server invoice paid'), findsOneWidget);
+        expect(find.text('invoice_status'), findsNothing);
+        expect(find.text('Demo notification — invoice issued'), findsNothing);
+      },
+    );
 
     testWidgets(
       'unread rows are tappable; read rows stay non-interactive (D-F6 re-scope)',

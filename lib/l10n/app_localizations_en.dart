@@ -2326,4 +2326,616 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiResearchSourceMatter => 'Matter';
+
+  @override
+  String get demoApprovalTitleConflictNew => 'Demo conflict check — new intake';
+
+  @override
+  String get demoApprovalTitleEngagementWaiver => 'Demo engagement waiver';
+
+  @override
+  String get demoApprovalTitleCourtFiling => 'Demo court filing approval';
+
+  @override
+  String get demoApprovalTitleExpense => 'Demo expense approval';
+
+  @override
+  String get demoApprovalTitleConflictOpposing =>
+      'Demo conflict check — opposing counsel';
+
+  @override
+  String get demoApprovalDescriptionWaiver =>
+      'Synthetic demo request — no real client or case data.';
+
+  @override
+  String get demoApprovalDecisionApproved => 'Demo decision — approved.';
+
+  @override
+  String get demoApprovalDecisionRejected => 'Demo decision — rejected.';
+
+  @override
+  String get demoAlertDescriptionReview =>
+      'Synthetic demo alert — no real compliance event is shown.';
+
+  @override
+  String get demoAttorneyHeadlineCorporate =>
+      'Corporate and governance counsel';
+
+  @override
+  String get demoAttorneyHeadlineCivil => 'Civil litigation and contracts';
+
+  @override
+  String get demoAttorneyHeadlineCriminal => 'Criminal defense and procedure';
+
+  @override
+  String get demoAttorneyHeadlineFamily => 'Family law and personal status';
+
+  @override
+  String get demoAttorneyHeadlineStartup => 'Startup formation and advisory';
+
+  @override
+  String get demoAuditOrganizationCreated =>
+      'Organization created (metadata only)';
+
+  @override
+  String get demoAuditMemberInvited => 'Member invited (metadata only)';
+
+  @override
+  String get demoAuditMemberRoleChanged =>
+      'Member role changed (metadata only)';
+
+  @override
+  String get demoAuditMembershipSuspended =>
+      'Membership suspended (metadata only)';
+
+  @override
+  String get demoAuditDemoAccountDeleted =>
+      'Demo account deleted (metadata only)';
+
+  @override
+  String get demoAuditRoleChange => 'role change';
+
+  @override
+  String get demoAuditInvitationSent => 'invitation sent';
+
+  @override
+  String get demoAuditSuspensionDenied => 'suspension denied';
+
+  @override
+  String get homeActivityEmpty => 'No recent activity yet.';
+
+  @override
+  String get discoveryEntrySubtitleConfigured =>
+      'Browse attorney profiles and practice areas.';
+
+  @override
+  String get searchNoQueryConfigured =>
+      'Type a search term to search matters, documents, messages, and attorneys.';
+
+  @override
+  String get aiResearchNoMatchesConfigured =>
+      'No matches found. Try different words.';
+
+  @override
+  String get aiResearchEntrySubtitleConfigured =>
+      'Ask the research assistant across your matters and documents — advisory only.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewThese2 =>
+      'You do not have permission to view these tasks.';
+
+  @override
+  String get errUnableToLoadTasksPleaseTryAgain =>
+      'Unable to load tasks. Please try again.';
+
+  @override
+  String get errARejectionNoteIsRequired => 'A rejection note is required.';
+
+  @override
+  String get errAcknowledgingTheAlertIsTemporarilyUnavailablePleaseTry =>
+      'Acknowledging the alert is temporarily unavailable. Please try again.';
+
+  @override
+  String get errApprovalRequestNotFound => 'Approval request not found.';
+
+  @override
+  String get errApprovalsAreTemporarilyUnavailablePleaseTryAgain =>
+      'Approvals are temporarily unavailable. Please try again.';
+
+  @override
+  String get errCancellingTheRequestIsTemporarilyUnavailablePleaseTry =>
+      'Cancelling the request is temporarily unavailable. Please try again.';
+
+  @override
+  String get errComplianceAlertNotFound => 'Compliance alert not found.';
+
+  @override
+  String get errComplianceAlertsAreTemporarilyUnavailablePleaseTryAgain =>
+      'Compliance alerts are temporarily unavailable. Please try again.';
+
+  @override
+  String get errCreatingTheAlertIsTemporarilyUnavailablePleaseTry =>
+      'Creating the alert is temporarily unavailable. Please try again.';
+
+  @override
+  String get errCreatingTheRequestIsTemporarilyUnavailablePleaseTry =>
+      'Creating the request is temporarily unavailable. Please try again.';
+
+  @override
+  String get errDecidingTheRequestIsTemporarilyUnavailablePleaseTry =>
+      'Deciding the request is temporarily unavailable. Please try again.';
+
+  @override
+  String get errOnlyAPartnerCanDecideThisRequest =>
+      'Only a partner can decide this request.';
+
+  @override
+  String get errOnlyAPartnerOrComplianceOfficerCanCreate =>
+      'Only a partner or compliance officer can create alerts.';
+
+  @override
+  String get errOnlyAPartnerOrComplianceOfficerCanResolve =>
+      'Only a partner or compliance officer can resolve alerts.';
+
+  @override
+  String get errOnlyAnActiveOrganizationMemberCanAcknowledgeAlerts =>
+      'Only an active organization member can acknowledge alerts.';
+
+  @override
+  String get errOnlyTheRequesterOrAPartnerCanCancel =>
+      'Only the requester or a partner can cancel this request.';
+
+  @override
+  String get errResolvingTheAlertIsTemporarilyUnavailablePleaseTry =>
+      'Resolving the alert is temporarily unavailable. Please try again.';
+
+  @override
+  String get errSelectAnOrganizationToViewApprovals =>
+      'Select an organization to view approvals.';
+
+  @override
+  String get errSelectAnOrganizationToViewComplianceAlerts =>
+      'Select an organization to view compliance alerts.';
+
+  @override
+  String get errTheAlertCanNoLongerBeAcknowledged =>
+      'The alert can no longer be acknowledged.';
+
+  @override
+  String get errTheAlertCanNoLongerBeResolved =>
+      'The alert can no longer be resolved.';
+
+  @override
+  String get errTheAlertCouldNotBeCreatedCheckThe =>
+      'The alert could not be created. Check the details and try again.';
+
+  @override
+  String get errTheRequestCanNoLongerBeCancelled =>
+      'The request can no longer be cancelled.';
+
+  @override
+  String get errTheRequestCouldNotBeCreatedCheckThe =>
+      'The request could not be created. Check the details and try again.';
+
+  @override
+  String get errTheRequestCouldNotBeDecidedItMay =>
+      'The request could not be decided. It may no longer be pending, or the note is missing.';
+
+  @override
+  String get errTheRequestIsNoLongerPending =>
+      'The request is no longer pending.';
+
+  @override
+  String get errUnableToAcknowledgeTheAlertPleaseTryAgain =>
+      'Unable to acknowledge the alert. Please try again.';
+
+  @override
+  String get errUnableToCancelTheRequestPleaseTryAgain =>
+      'Unable to cancel the request. Please try again.';
+
+  @override
+  String get errUnableToCreateTheAlertPleaseTryAgain =>
+      'Unable to create the alert. Please try again.';
+
+  @override
+  String get errUnableToCreateTheRequestPleaseTryAgain =>
+      'Unable to create the request. Please try again.';
+
+  @override
+  String get errUnableToDecideTheRequestPleaseTryAgain =>
+      'Unable to decide the request. Please try again.';
+
+  @override
+  String get errUnableToLoadApprovalsPleaseTryAgain =>
+      'Unable to load approvals. Please try again.';
+
+  @override
+  String get errUnableToLoadComplianceAlertsPleaseTryAgain =>
+      'Unable to load compliance alerts. Please try again.';
+
+  @override
+  String get errUnableToResolveTheAlertPleaseTryAgain =>
+      'Unable to resolve the alert. Please try again.';
+
+  @override
+  String get errYouDoNotHavePermissionToCreateApproval =>
+      'You do not have permission to create approval requests.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewApprovals =>
+      'You do not have permission to view approvals.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewCompliance =>
+      'You do not have permission to view compliance alerts.';
+
+  @override
+  String get errAcknowledgingTheTaskIsTemporarilyUnavailablePleaseTry =>
+      'Acknowledging the task is temporarily unavailable. Please try again.';
+
+  @override
+  String get errAvailableTimesAreTemporarilyUnavailablePleaseTryAgain =>
+      'Available times are temporarily unavailable. Please try again.';
+
+  @override
+  String get errBookingIsTemporarilyUnavailablePleaseTryAgain =>
+      'Booking is temporarily unavailable. Please try again.';
+
+  @override
+  String get errCreatingTheTaskIsTemporarilyUnavailablePleaseTry =>
+      'Creating the task is temporarily unavailable. Please try again.';
+
+  @override
+  String errMessageIsTooLongMaxMaxMessageLengthCharacters(
+    int maxMessageLength,
+  ) {
+    return 'Message is too long (max $maxMessageLength characters).';
+  }
+
+  @override
+  String get errMessagesAreTemporarilyUnavailablePleaseTryAgain =>
+      'Messages are temporarily unavailable. Please try again.';
+
+  @override
+  String get errOnlyTheAssignedPersonCanAcknowledgeThisTask =>
+      'Only the assigned person can acknowledge this task.';
+
+  @override
+  String get errReAssigningTheTaskIsTemporarilyUnavailablePlease =>
+      'Re-assigning the task is temporarily unavailable. Please try again.';
+
+  @override
+  String get errSendingIsTemporarilyUnavailablePleaseTryAgain =>
+      'Sending is temporarily unavailable. Please try again.';
+
+  @override
+  String get errTasksAreTemporarilyUnavailablePleaseTryAgain =>
+      'Tasks are temporarily unavailable. Please try again.';
+
+  @override
+  String get errThatPersonCannotBeAssignedThisTaskChoose =>
+      'That person cannot be assigned this task. Choose an active member of the organization.';
+
+  @override
+  String get errThatTimeIsNoLongerAvailableChooseAnother =>
+      'That time is no longer available. Choose another time.';
+
+  @override
+  String get errTheBookingDetailsAreInvalidCheckThemAnd =>
+      'The booking details are invalid. Check them and try again.';
+
+  @override
+  String get errTheTaskCannotMoveToThatStatusIt =>
+      'The task cannot move to that status. It may already be done.';
+
+  @override
+  String get errTheTaskCouldNotBeCreatedCheckThe =>
+      'The task could not be created. Check the title and try again.';
+
+  @override
+  String get errThreadsAreTemporarilyUnavailablePleaseTryAgain =>
+      'Threads are temporarily unavailable. Please try again.';
+
+  @override
+  String get errUnableToAcknowledgeTheTaskPleaseTryAgain =>
+      'Unable to acknowledge the task. Please try again.';
+
+  @override
+  String get errUnableToConfirmPleaseTryAgain =>
+      'Unable to confirm. Please try again.';
+
+  @override
+  String get errUnableToCreateTheTaskPleaseTryAgain =>
+      'Unable to create the task. Please try again.';
+
+  @override
+  String get errUnableToLoadAvailableTimesPleaseTryAgain =>
+      'Unable to load available times. Please try again.';
+
+  @override
+  String get errUnableToLoadMessagesPleaseTryAgain =>
+      'Unable to load messages. Please try again.';
+
+  @override
+  String get errUnableToLoadThreadsPleaseTryAgain =>
+      'Unable to load threads. Please try again.';
+
+  @override
+  String get errUnableToReAssignTheTaskPleaseTry =>
+      'Unable to re-assign the task. Please try again.';
+
+  @override
+  String get errUnableToSendTheMessagePleaseTryAgain =>
+      'Unable to send the message. Please try again.';
+
+  @override
+  String get errUnableToUpdateTheTaskPleaseTryAgain =>
+      'Unable to update the task. Please try again.';
+
+  @override
+  String get errUpdatingTheTaskIsTemporarilyUnavailablePleaseTry =>
+      'Updating the task is temporarily unavailable. Please try again.';
+
+  @override
+  String get errYouDoNotHavePermissionToAdvanceThis =>
+      'You do not have permission to advance this task.';
+
+  @override
+  String get errYouDoNotHavePermissionToBookThis =>
+      'You do not have permission to book this consultation.';
+
+  @override
+  String get errYouDoNotHavePermissionToCreateTasks =>
+      'You do not have permission to create tasks on this matter.';
+
+  @override
+  String get errYouDoNotHavePermissionToReAssign =>
+      'You do not have permission to re-assign this task.';
+
+  @override
+  String get errYouDoNotHavePermissionToSendMessages =>
+      'You do not have permission to send messages on this thread.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewAvailable =>
+      'You do not have permission to view available times.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewThese =>
+      'You do not have permission to view these messages.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewThese3 =>
+      'You do not have permission to view these threads.';
+
+  @override
+  String get errAttorneyNotFound => 'Attorney not found.';
+
+  @override
+  String get errTheDirectoryIsTemporarilyUnavailableTryAgain =>
+      'The directory is temporarily unavailable. Try again.';
+
+  @override
+  String get errTheProfileDetailsAreInvalidCheckThemAnd =>
+      'The profile details are invalid. Check them and retry.';
+
+  @override
+  String get errUnableToLoadTheDirectoryPleaseTryAgain =>
+      'Unable to load the directory. Please try again.';
+
+  @override
+  String get errYouDoNotHavePermissionToManageThe =>
+      'You do not have permission to manage the directory.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewThe =>
+      'You do not have permission to view the directory.';
+
+  @override
+  String get errNotificationsAreTemporarilyUnavailablePleaseTryAgain =>
+      'Notifications are temporarily unavailable. Please try again.';
+
+  @override
+  String get errThisFileIsTooLarge => 'This file is too large.';
+
+  @override
+  String get errThisFileTypeIsNotSupported =>
+      'This file type is not supported.';
+
+  @override
+  String get errUnableToCheckThePaymentStatusPleaseTry =>
+      'Unable to check the payment status. Please try again.';
+
+  @override
+  String get errUnableToLoadDocumentsPleaseTryAgain =>
+      'Unable to load documents. Please try again.';
+
+  @override
+  String get errUnableToLoadFilesPleaseTryAgain =>
+      'Unable to load files. Please try again.';
+
+  @override
+  String get errUnableToLoadInvoicesPleaseTryAgain =>
+      'Unable to load invoices. Please try again.';
+
+  @override
+  String get errUnableToLoadMattersPleaseTryAgain =>
+      'Unable to load matters. Please try again.';
+
+  @override
+  String get errUnableToLoadNotificationsPleaseTryAgain =>
+      'Unable to load notifications. Please try again.';
+
+  @override
+  String get errUnableToOpenTheFilePleaseTryAgain =>
+      'Unable to open the file. Please try again.';
+
+  @override
+  String get errUnableToStartThePaymentPleaseTryAgain =>
+      'Unable to start the payment. Please try again.';
+
+  @override
+  String get errUnableToUploadTheFilePleaseTryAgain =>
+      'Unable to upload the file. Please try again.';
+
+  @override
+  String get errYouDoNotHavePermissionToUploadFiles =>
+      'You do not have permission to upload files to this matter.';
+
+  @override
+  String get errAIResearchIsNotConfiguredForThisDeployment =>
+      'AI research is not configured for this deployment. No analysis was run.';
+
+  @override
+  String get errAnActionIsAlreadyInProgress =>
+      'An action is already in progress.';
+
+  @override
+  String get errEndingTheConsultationIsTemporarilyUnavailablePleaseTry =>
+      'Ending the consultation is temporarily unavailable. Please try again.';
+
+  @override
+  String
+  errEnterAQuestionBetweenResearchRequestMinQuestionLengthAndResearchRequest(
+    int minQuestionLength,
+    int maxQuestionLength,
+  ) {
+    return 'Enter a question between $minQuestionLength and $maxQuestionLength characters and select an organization.';
+  }
+
+  @override
+  String get errOnlyAPartnerOrAttorneyCanScheduleA =>
+      'Only a partner or attorney can schedule a video consultation.';
+
+  @override
+  String get errOnlyTheCreatorOrAPartnerCanEnd =>
+      'Only the creator or a partner can end this consultation.';
+
+  @override
+  String get errOrganizationMembershipsCouldNotBeLoaded =>
+      'Organization memberships could not be loaded.';
+
+  @override
+  String get errSchedulingAConsultationIsTemporarilyUnavailablePleaseTry =>
+      'Scheduling a consultation is temporarily unavailable. Please try again.';
+
+  @override
+  String get errSelectAResearchRunToViewItsFindings =>
+      'Select a research run to view its findings.';
+
+  @override
+  String get errSelectAVideoConsultationToJoin =>
+      'Select a video consultation to join.';
+
+  @override
+  String get errSelectAnOrganizationToScheduleAConsultation =>
+      'Select an organization to schedule a consultation.';
+
+  @override
+  String get errSelectAnOrganizationToViewResearchRuns =>
+      'Select an organization to view research runs.';
+
+  @override
+  String get errSelectAnOrganizationToViewVideoConsultations =>
+      'Select an organization to view video consultations.';
+
+  @override
+  String get errSignInAgainToUseVideoConsultations =>
+      'Sign in again to use video consultations.';
+
+  @override
+  String get errStartingTheConsultationIsTemporarilyUnavailablePleaseTry =>
+      'Starting the consultation is temporarily unavailable. Please try again.';
+
+  @override
+  String get errTheAIProviderReturnedAnUnexpectedResponsePlease =>
+      'The AI provider returned an unexpected response. Please try again.';
+
+  @override
+  String get errTheConsultationCouldNotBeScheduledCheckThe =>
+      'The consultation could not be scheduled. Check the details and try again.';
+
+  @override
+  String get errTheConsultationIsNotAvailableToJoinRight =>
+      'The consultation is not available to join right now.';
+
+  @override
+  String get errTheSelectedContextIsTooLargeRemoveDocuments =>
+      'The selected context is too large. Remove documents and try again.';
+
+  @override
+  String get errTheSelectedResearchRunWasNotFound =>
+      'The selected research run was not found.';
+
+  @override
+  String get errThisConsultationCanNoLongerBeEnded =>
+      'This consultation can no longer be ended.';
+
+  @override
+  String get errThisConsultationCanNoLongerBeStarted =>
+      'This consultation can no longer be started.';
+
+  @override
+  String get errThisVideoConsultationHasAlreadyEnded =>
+      'This video consultation has already ended.';
+
+  @override
+  String get errThisVideoConsultationWasNotFound =>
+      'This video consultation was not found.';
+
+  @override
+  String get errUnableToEndTheConsultationPleaseTryAgain =>
+      'Unable to end the consultation. Please try again.';
+
+  @override
+  String get errUnableToJoinTheConsultationPleaseTryAgain =>
+      'Unable to join the consultation. Please try again.';
+
+  @override
+  String get errUnableToLoadVideoConsultationsPleaseTryAgain =>
+      'Unable to load video consultations. Please try again.';
+
+  @override
+  String get errUnableToReadTheVideoConsultationPleaseTry =>
+      'Unable to read the video consultation. Please try again.';
+
+  @override
+  String get errUnableToRunAIResearchPleaseTryAgain =>
+      'Unable to run AI research. Please try again.';
+
+  @override
+  String get errUnableToScheduleTheConsultationPleaseTryAgain =>
+      'Unable to schedule the consultation. Please try again.';
+
+  @override
+  String get errUnableToStartTheConsultationPleaseTryAgain =>
+      'Unable to start the consultation. Please try again.';
+
+  @override
+  String get errVideoCallsAreNotConfiguredForThisDeployment =>
+      'Video calls are not configured for this deployment. No call was started.';
+
+  @override
+  String get errVideoCallsAreTemporarilyUnavailablePleaseTryAgain =>
+      'Video calls are temporarily unavailable. Please try again.';
+
+  @override
+  String get errVideoConsultationsAreTemporarilyUnavailablePleaseTryAgain =>
+      'Video consultations are temporarily unavailable. Please try again.';
+
+  @override
+  String get errWeCouldnTCompleteThatRequestPleaseTry =>
+      'We couldn\'t complete that request. Please try again.';
+
+  @override
+  String get errYouDoNotHavePermissionToJoinThis =>
+      'You do not have permission to join this consultation.';
+
+  @override
+  String get errYouDoNotHavePermissionToStartThis =>
+      'You do not have permission to start this consultation.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewVideo =>
+      'You do not have permission to view video consultations.';
 }

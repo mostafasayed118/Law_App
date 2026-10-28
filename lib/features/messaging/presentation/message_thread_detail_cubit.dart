@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/features/messaging/domain/message.dart';
@@ -223,6 +224,11 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
             code: 'message_too_long',
             userMessage:
                 'Message is too long (max $maxMessageLength characters).',
+            messageKey:
+                AppMessageKey.errMessageIsTooLongMaxMaxMessageLengthCharacters,
+            messageArgs: <String, Object?>{
+              'maxMessageLength': maxMessageLength,
+            },
           ),
         ),
       );

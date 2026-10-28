@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/view_state_switch.dart';
@@ -24,9 +25,10 @@ void main() {
     EdgeInsetsGeometry errorPadding = const EdgeInsetsDirectional.only(top: 16),
     TextStyle? errorTextStyle,
     TextDirection direction = TextDirection.ltr,
+    Locale locale = const Locale('en'),
   }) {
     return MaterialApp(
-      locale: const Locale('en'),
+      locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: Directionality(
@@ -110,6 +112,51 @@ void main() {
 
     await tester.tap(find.text('Retry'));
     expect(retries, 1);
+  });
+
+  testWidgets('keyed error renders the EN pilot copy over errorCopy', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      pumpViewState<String>(
+        const ViewError<String>(
+          AppError(
+            code: 'task_read_failed',
+            userMessage: 'Unable to load tasks. Please try again.',
+            messageKey: AppMessageKey.errUnableToLoadTasksPleaseTryAgain,
+          ),
+        ),
+      ),
+    );
+
+    expect(
+      find.text('Unable to load tasks. Please try again.'),
+      findsOneWidget,
+    );
+    expect(find.text('Error copy'), findsNothing);
+  });
+
+  testWidgets('keyed error renders the Arabic pilot copy over errorCopy', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      pumpViewState<String>(
+        const ViewError<String>(
+          AppError(
+            code: 'task_read_failed',
+            userMessage: 'Unable to load tasks. Please try again.',
+            messageKey: AppMessageKey.errUnableToLoadTasksPleaseTryAgain,
+          ),
+        ),
+        locale: const Locale('ar'),
+      ),
+    );
+
+    expect(
+      find.text('تعذر تحميل المهام. يرجى المحاولة مرة أخرى.'),
+      findsOneWidget,
+    );
+    expect(find.text('Error copy'), findsNothing);
   });
 
   testWidgets('success branch delegates to the builder with the data', (

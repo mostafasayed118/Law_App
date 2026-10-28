@@ -2330,4 +2330,613 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get aiResearchSourceMatter => 'Dosya';
+
+  @override
+  String get demoApprovalTitleConflictNew =>
+      'Demo çıkar çatışması kontrolü — yeni başvuru';
+
+  @override
+  String get demoApprovalTitleEngagementWaiver => 'Demo görev feragatnamesi';
+
+  @override
+  String get demoApprovalTitleCourtFiling => 'Demo mahkeme başvurusu onayı';
+
+  @override
+  String get demoApprovalTitleExpense => 'Demo masraf onayı';
+
+  @override
+  String get demoApprovalTitleConflictOpposing =>
+      'Demo çıkar çatışması kontrolü — karşı taraf';
+
+  @override
+  String get demoApprovalDescriptionWaiver =>
+      'Sentetik demo talebi — gerçek müvekkil veya dava verisi yok.';
+
+  @override
+  String get demoApprovalDecisionApproved => 'Demo kararı — onaylandı.';
+
+  @override
+  String get demoApprovalDecisionRejected => 'Demo kararı — reddedildi.';
+
+  @override
+  String get demoAlertDescriptionReview =>
+      'Sentetik demo uyarısı — gerçek bir uyum olayı gösterilmez.';
+
+  @override
+  String get demoAttorneyHeadlineCorporate => 'Kurumsal ve yönetişim danışmanı';
+
+  @override
+  String get demoAttorneyHeadlineCivil => 'Medeni dava ve sözleşmeler';
+
+  @override
+  String get demoAttorneyHeadlineCriminal => 'Ceza savunması ve usul';
+
+  @override
+  String get demoAttorneyHeadlineFamily => 'Aile hukuku ve kişisel statü';
+
+  @override
+  String get demoAttorneyHeadlineStartup => 'Girişim kuruluşu ve danışmanlık';
+
+  @override
+  String get demoAuditOrganizationCreated =>
+      'Kuruluş oluşturuldu (yalnızca meta veri)';
+
+  @override
+  String get demoAuditMemberInvited => 'Üye davet edildi (yalnızca meta veri)';
+
+  @override
+  String get demoAuditMemberRoleChanged =>
+      'Üye rolü değiştirildi (yalnızca meta veri)';
+
+  @override
+  String get demoAuditMembershipSuspended =>
+      'Üyelik askıya alındı (yalnızca meta veri)';
+
+  @override
+  String get demoAuditDemoAccountDeleted =>
+      'Demo hesap silindi (yalnızca meta veri)';
+
+  @override
+  String get demoAuditRoleChange => 'rol değişikliği';
+
+  @override
+  String get demoAuditInvitationSent => 'davet gönderildi';
+
+  @override
+  String get demoAuditSuspensionDenied => 'askıya alma reddedildi';
+
+  @override
+  String get homeActivityEmpty => 'Henüz yeni etkinlik yok.';
+
+  @override
+  String get discoveryEntrySubtitleConfigured =>
+      'Avukat profillerine ve uygulama alanlarına göz atın.';
+
+  @override
+  String get searchNoQueryConfigured =>
+      'Davalar, belgeler, mesajlar veya avukatlar arasında arama yapmak için bir arama terimi yazın.';
+
+  @override
+  String get aiResearchNoMatchesConfigured =>
+      'Eşleşme bulunamadı. Farklı kelimeler deneyin.';
+
+  @override
+  String get aiResearchEntrySubtitleConfigured =>
+      'Araştırma asistanına davalarınız ve belgeleriniz üzerinden sorun — yalnızca tavsiye niteliğinde.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewThese2 =>
+      'Bu görevleri görüntüleme izniniz yok.';
+
+  @override
+  String get errUnableToLoadTasksPleaseTryAgain =>
+      'Görevler yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errARejectionNoteIsRequired => 'Ret notu gerekli.';
+
+  @override
+  String get errAcknowledgingTheAlertIsTemporarilyUnavailablePleaseTry =>
+      'Uyarıyı görüldü olarak işaretlemek geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errApprovalRequestNotFound => 'Onay talebi bulunamadı.';
+
+  @override
+  String get errApprovalsAreTemporarilyUnavailablePleaseTryAgain =>
+      'Onaylar geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errCancellingTheRequestIsTemporarilyUnavailablePleaseTry =>
+      'Talebi iptal etmek geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errComplianceAlertNotFound => 'Uyum uyarısı bulunamadı.';
+
+  @override
+  String get errComplianceAlertsAreTemporarilyUnavailablePleaseTryAgain =>
+      'Uyum uyarıları geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errCreatingTheAlertIsTemporarilyUnavailablePleaseTry =>
+      'Uyarı oluşturmak geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errCreatingTheRequestIsTemporarilyUnavailablePleaseTry =>
+      'Talep oluşturmak geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errDecidingTheRequestIsTemporarilyUnavailablePleaseTry =>
+      'Talebe karar vermek geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errOnlyAPartnerCanDecideThisRequest =>
+      'Bu talebe yalnızca bir ortak karar verebilir.';
+
+  @override
+  String get errOnlyAPartnerOrComplianceOfficerCanCreate =>
+      'Uyarıları yalnızca bir ortak veya uyum görevlisi oluşturabilir.';
+
+  @override
+  String get errOnlyAPartnerOrComplianceOfficerCanResolve =>
+      'Uyarıları yalnızca bir ortak veya uyum görevlisi çözebilir.';
+
+  @override
+  String get errOnlyAnActiveOrganizationMemberCanAcknowledgeAlerts =>
+      'Uyarıları yalnızca etkin bir kuruluş üyesi görüldü olarak işaretleyebilir.';
+
+  @override
+  String get errOnlyTheRequesterOrAPartnerCanCancel =>
+      'Bu talebi yalnızca talebi oluşturan veya bir ortak iptal edebilir.';
+
+  @override
+  String get errResolvingTheAlertIsTemporarilyUnavailablePleaseTry =>
+      'Uyarıyı çözmek geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errSelectAnOrganizationToViewApprovals =>
+      'Onayları görmek için bir kuruluş seçin.';
+
+  @override
+  String get errSelectAnOrganizationToViewComplianceAlerts =>
+      'Uyum uyarılarını görmek için bir kuruluş seçin.';
+
+  @override
+  String get errTheAlertCanNoLongerBeAcknowledged =>
+      'Uyarı artık görüldü olarak işaretlenemiyor.';
+
+  @override
+  String get errTheAlertCanNoLongerBeResolved => 'Uyarı artık çözülemiyor.';
+
+  @override
+  String get errTheAlertCouldNotBeCreatedCheckThe =>
+      'Uyarı oluşturulamadı. Ayrıntıları kontrol edip tekrar deneyin.';
+
+  @override
+  String get errTheRequestCanNoLongerBeCancelled =>
+      'Talep artık iptal edilemiyor.';
+
+  @override
+  String get errTheRequestCouldNotBeCreatedCheckThe =>
+      'Talep oluşturulamadı. Ayrıntıları kontrol edip tekrar deneyin.';
+
+  @override
+  String get errTheRequestCouldNotBeDecidedItMay =>
+      'Talebe karar verilemedi. Talep artık beklemede olmayabilir veya not eksik olabilir.';
+
+  @override
+  String get errTheRequestIsNoLongerPending => 'Talep artık beklemede değil.';
+
+  @override
+  String get errUnableToAcknowledgeTheAlertPleaseTryAgain =>
+      'Uyarı görüldü olarak işaretlenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToCancelTheRequestPleaseTryAgain =>
+      'Talep iptal edilemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToCreateTheAlertPleaseTryAgain =>
+      'Uyarı oluşturulamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToCreateTheRequestPleaseTryAgain =>
+      'Talep oluşturulamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToDecideTheRequestPleaseTryAgain =>
+      'Talebe karar verilemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToLoadApprovalsPleaseTryAgain =>
+      'Onaylar yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToLoadComplianceAlertsPleaseTryAgain =>
+      'Uyum uyarıları yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToResolveTheAlertPleaseTryAgain =>
+      'Uyarı çözülemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errYouDoNotHavePermissionToCreateApproval =>
+      'Onay talebi oluşturma izniniz yok.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewApprovals =>
+      'Onayları görüntüleme izniniz yok.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewCompliance =>
+      'Uyum uyarılarını görüntüleme izniniz yok.';
+
+  @override
+  String get errAcknowledgingTheTaskIsTemporarilyUnavailablePleaseTry =>
+      'Görevi onaylama geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errAvailableTimesAreTemporarilyUnavailablePleaseTryAgain =>
+      'Uygun zamanlar geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errBookingIsTemporarilyUnavailablePleaseTryAgain =>
+      'Rezervasyon geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errCreatingTheTaskIsTemporarilyUnavailablePleaseTry =>
+      'Görev oluşturma geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String errMessageIsTooLongMaxMaxMessageLengthCharacters(
+    int maxMessageLength,
+  ) {
+    return 'Mesaj çok uzun (en fazla $maxMessageLength karakter).';
+  }
+
+  @override
+  String get errMessagesAreTemporarilyUnavailablePleaseTryAgain =>
+      'Mesajlar geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errOnlyTheAssignedPersonCanAcknowledgeThisTask =>
+      'Bu görevi yalnızca atanan kişi onaylayabilir.';
+
+  @override
+  String get errReAssigningTheTaskIsTemporarilyUnavailablePlease =>
+      'Görevi yeniden atama geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errSendingIsTemporarilyUnavailablePleaseTryAgain =>
+      'Gönderme geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errTasksAreTemporarilyUnavailablePleaseTryAgain =>
+      'Görevler geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errThatPersonCannotBeAssignedThisTaskChoose =>
+      'Bu görev o kişiye atanamaz. Kuruluşun etkin bir üyesini seçin.';
+
+  @override
+  String get errThatTimeIsNoLongerAvailableChooseAnother =>
+      'Bu saat artık müsait değil. Başka bir saat seçin.';
+
+  @override
+  String get errTheBookingDetailsAreInvalidCheckThemAnd =>
+      'Rezervasyon ayrıntıları geçersiz. Kontrol edip tekrar deneyin.';
+
+  @override
+  String get errTheTaskCannotMoveToThatStatusIt =>
+      'Görev bu duruma taşınamaz. Zaten tamamlanmış olabilir.';
+
+  @override
+  String get errTheTaskCouldNotBeCreatedCheckThe =>
+      'Görev oluşturulamadı. Başlığı kontrol edip tekrar deneyin.';
+
+  @override
+  String get errThreadsAreTemporarilyUnavailablePleaseTryAgain =>
+      'Mesaj dizileri geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToAcknowledgeTheTaskPleaseTryAgain =>
+      'Görev onaylanamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToConfirmPleaseTryAgain =>
+      'Onaylanamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToCreateTheTaskPleaseTryAgain =>
+      'Görev oluşturulamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToLoadAvailableTimesPleaseTryAgain =>
+      'Uygun zamanlar yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToLoadMessagesPleaseTryAgain =>
+      'Mesajlar yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToLoadThreadsPleaseTryAgain =>
+      'Mesaj dizileri yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToReAssignTheTaskPleaseTry =>
+      'Görev yeniden atanamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToSendTheMessagePleaseTryAgain =>
+      'Mesaj gönderilemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToUpdateTheTaskPleaseTryAgain =>
+      'Görev güncellenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUpdatingTheTaskIsTemporarilyUnavailablePleaseTry =>
+      'Görev güncelleme geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errYouDoNotHavePermissionToAdvanceThis =>
+      'Bu görevi ilerletme izniniz yok.';
+
+  @override
+  String get errYouDoNotHavePermissionToBookThis =>
+      'Bu danışmayı rezerve etme izniniz yok.';
+
+  @override
+  String get errYouDoNotHavePermissionToCreateTasks =>
+      'Bu dosyada görev oluşturma izniniz yok.';
+
+  @override
+  String get errYouDoNotHavePermissionToReAssign =>
+      'Bu görevi yeniden atama izniniz yok.';
+
+  @override
+  String get errYouDoNotHavePermissionToSendMessages =>
+      'Bu mesaj dizisinde mesaj gönderme izniniz yok.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewAvailable =>
+      'Uygun zamanları görüntüleme izniniz yok.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewThese =>
+      'Bu mesajları görüntüleme izniniz yok.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewThese3 =>
+      'Bu mesaj dizilerini görüntüleme izniniz yok.';
+
+  @override
+  String get errAttorneyNotFound => 'Avukat bulunamadı.';
+
+  @override
+  String get errTheDirectoryIsTemporarilyUnavailableTryAgain =>
+      'Dizin geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errTheProfileDetailsAreInvalidCheckThemAnd =>
+      'Profil bilgileri geçersiz. Kontrol edip tekrar deneyin.';
+
+  @override
+  String get errUnableToLoadTheDirectoryPleaseTryAgain =>
+      'Dizin yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errYouDoNotHavePermissionToManageThe =>
+      'Dizini yönetme izniniz yok.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewThe =>
+      'Dizini görüntüleme izniniz yok.';
+
+  @override
+  String get errNotificationsAreTemporarilyUnavailablePleaseTryAgain =>
+      'Bildirimler geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errThisFileIsTooLarge => 'Bu dosya çok büyük.';
+
+  @override
+  String get errThisFileTypeIsNotSupported => 'Bu dosya türü desteklenmiyor.';
+
+  @override
+  String get errUnableToCheckThePaymentStatusPleaseTry =>
+      'Ödeme durumu kontrol edilemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToLoadDocumentsPleaseTryAgain =>
+      'Belgeler yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToLoadFilesPleaseTryAgain =>
+      'Dosyalar yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToLoadInvoicesPleaseTryAgain =>
+      'Faturalar yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToLoadMattersPleaseTryAgain =>
+      'Davalar yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToLoadNotificationsPleaseTryAgain =>
+      'Bildirimler yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToOpenTheFilePleaseTryAgain =>
+      'Dosya açılamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToStartThePaymentPleaseTryAgain =>
+      'Ödeme başlatılamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToUploadTheFilePleaseTryAgain =>
+      'Dosya yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errYouDoNotHavePermissionToUploadFiles =>
+      'Bu davaya dosya yükleme izniniz yok.';
+
+  @override
+  String get errAIResearchIsNotConfiguredForThisDeployment =>
+      'Yapay zekâ araştırması bu dağıtım için yapılandırılmamış. Hiçbir analiz çalıştırılmadı.';
+
+  @override
+  String get errAnActionIsAlreadyInProgress =>
+      'Zaten devam eden bir işlem var.';
+
+  @override
+  String get errEndingTheConsultationIsTemporarilyUnavailablePleaseTry =>
+      'Görüşmeyi sonlandırma geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String
+  errEnterAQuestionBetweenResearchRequestMinQuestionLengthAndResearchRequest(
+    int minQuestionLength,
+    int maxQuestionLength,
+  ) {
+    return '$minQuestionLength ile $maxQuestionLength karakter arasında bir soru girin ve bir kuruluş seçin.';
+  }
+
+  @override
+  String get errOnlyAPartnerOrAttorneyCanScheduleA =>
+      'Video görüşmesini yalnızca bir ortak veya avukat planlayabilir.';
+
+  @override
+  String get errOnlyTheCreatorOrAPartnerCanEnd =>
+      'Bu görüşmeyi yalnızca oluşturan kişi veya bir ortak sonlandırabilir.';
+
+  @override
+  String get errOrganizationMembershipsCouldNotBeLoaded =>
+      'Kuruluş üyelikleri yüklenemedi.';
+
+  @override
+  String get errSchedulingAConsultationIsTemporarilyUnavailablePleaseTry =>
+      'Görüşme planlama geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errSelectAResearchRunToViewItsFindings =>
+      'Bulgularını görüntülemek için bir araştırma çalışması seçin.';
+
+  @override
+  String get errSelectAVideoConsultationToJoin =>
+      'Katılmak için bir video görüşmesi seçin.';
+
+  @override
+  String get errSelectAnOrganizationToScheduleAConsultation =>
+      'Görüşme planlamak için bir kuruluş seçin.';
+
+  @override
+  String get errSelectAnOrganizationToViewResearchRuns =>
+      'Araştırma çalışmalarını görüntülemek için bir kuruluş seçin.';
+
+  @override
+  String get errSelectAnOrganizationToViewVideoConsultations =>
+      'Video görüşmelerini görüntülemek için bir kuruluş seçin.';
+
+  @override
+  String get errSignInAgainToUseVideoConsultations =>
+      'Video görüşmelerini kullanmak için tekrar oturum açın.';
+
+  @override
+  String get errStartingTheConsultationIsTemporarilyUnavailablePleaseTry =>
+      'Görüşmeyi başlatma geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errTheAIProviderReturnedAnUnexpectedResponsePlease =>
+      'Yapay zekâ sağlayıcısı beklenmeyen bir yanıt döndürdü. Lütfen tekrar deneyin.';
+
+  @override
+  String get errTheConsultationCouldNotBeScheduledCheckThe =>
+      'Görüşme planlanamadı. Ayrıntıları kontrol edip tekrar deneyin.';
+
+  @override
+  String get errTheConsultationIsNotAvailableToJoinRight =>
+      'Görüşmeye şu anda katılmak mümkün değil.';
+
+  @override
+  String get errTheSelectedContextIsTooLargeRemoveDocuments =>
+      'Seçilen bağlam çok büyük. Bazı belgeleri kaldırıp tekrar deneyin.';
+
+  @override
+  String get errTheSelectedResearchRunWasNotFound =>
+      'Seçilen araştırma çalışması bulunamadı.';
+
+  @override
+  String get errThisConsultationCanNoLongerBeEnded =>
+      'Bu görüşme artık sonlandırılamaz.';
+
+  @override
+  String get errThisConsultationCanNoLongerBeStarted =>
+      'Bu görüşme artık başlatılamaz.';
+
+  @override
+  String get errThisVideoConsultationHasAlreadyEnded =>
+      'Bu video görüşmesi zaten sona erdi.';
+
+  @override
+  String get errThisVideoConsultationWasNotFound =>
+      'Bu video görüşmesi bulunamadı.';
+
+  @override
+  String get errUnableToEndTheConsultationPleaseTryAgain =>
+      'Görüşme sonlandırılamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToJoinTheConsultationPleaseTryAgain =>
+      'Görüşmeye katılınamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToLoadVideoConsultationsPleaseTryAgain =>
+      'Video görüşmeleri yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToReadTheVideoConsultationPleaseTry =>
+      'Video görüşmesi okunamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToRunAIResearchPleaseTryAgain =>
+      'Yapay zekâ araştırması çalıştırılamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToScheduleTheConsultationPleaseTryAgain =>
+      'Görüşme planlanamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToStartTheConsultationPleaseTryAgain =>
+      'Görüşme başlatılamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get errVideoCallsAreNotConfiguredForThisDeployment =>
+      'Video aramaları bu dağıtım için yapılandırılmamış. Hiçbir arama başlatılmadı.';
+
+  @override
+  String get errVideoCallsAreTemporarilyUnavailablePleaseTryAgain =>
+      'Video aramaları geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errVideoConsultationsAreTemporarilyUnavailablePleaseTryAgain =>
+      'Video görüşmeleri geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
+
+  @override
+  String get errWeCouldnTCompleteThatRequestPleaseTry =>
+      'Bu isteği tamamlayamadık. Lütfen tekrar deneyin.';
+
+  @override
+  String get errYouDoNotHavePermissionToJoinThis =>
+      'Bu görüşmeye katılma izniniz yok.';
+
+  @override
+  String get errYouDoNotHavePermissionToStartThis =>
+      'Bu görüşmeyi başlatma izniniz yok.';
+
+  @override
+  String get errYouDoNotHavePermissionToViewVideo =>
+      'Video görüşmelerini görüntüleme izniniz yok.';
 }

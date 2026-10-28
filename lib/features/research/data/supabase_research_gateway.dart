@@ -1,4 +1,6 @@
+import 'package:legalhub/core/contracts/server_limits.dart';
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/data/research/supabase_research_api.dart';
 import 'package:legalhub/data/row_reader.dart';
@@ -7,6 +9,7 @@ import 'package:legalhub/features/research/domain/ai_gateway.dart';
 import 'package:legalhub/features/research/domain/research_outcome.dart';
 import 'package:legalhub/features/research/domain/research_request.dart';
 import 'package:legalhub/features/research/domain/research_run.dart';
+import 'package:legalhub/features/research/domain/research_wire_codes.dart';
 
 /// Research gateway backed by the Supabase function + read RPCs (design §5).
 ///
@@ -48,9 +51,15 @@ class SupabaseResearchGateway implements AiGateway {
     if (!request.isValid) {
       return Result<ResearchOutcome>.failure(
         const AppError(
-          code: 'invalid_request',
+          code: ResearchWireCodes.invalidRequest,
           userMessage:
-              'Enter a question between 2 and 500 characters and select an organization.',
+              'Enter a question between ${ResearchRequest.minQuestionLength} and ${ResearchRequest.maxQuestionLength} characters and select an organization.',
+          messageKey: AppMessageKey
+              .errEnterAQuestionBetweenResearchRequestMinQuestionLengthAndResearchRequest,
+          messageArgs: <String, Object?>{
+            'minQuestionLength': ResearchRequest.minQuestionLength,
+            'maxQuestionLength': ResearchRequest.maxQuestionLength,
+          },
         ),
       );
     }
@@ -70,7 +79,9 @@ class SupabaseResearchGateway implements AiGateway {
   }
 
   @override
-  Future<Result<List<ResearchRun>>> fetchRuns({int limit = 20}) async {
+  Future<Result<List<ResearchRun>>> fetchRuns({
+    int limit = kResearchRunPageSize,
+  }) async {
     if (limit <= 0) {
       return const Result<List<ResearchRun>>.success(<ResearchRun>[]);
     }
@@ -78,8 +89,9 @@ class SupabaseResearchGateway implements AiGateway {
     if (organizationId == null || organizationId.isEmpty) {
       return Result<List<ResearchRun>>.failure(
         const AppError(
-          code: 'invalid_request',
+          code: ResearchWireCodes.invalidRequest,
           userMessage: 'Select an organization to view research runs.',
+          messageKey: AppMessageKey.errSelectAnOrganizationToViewResearchRuns,
         ),
       );
     }
@@ -104,8 +116,9 @@ class SupabaseResearchGateway implements AiGateway {
     if (id.isEmpty) {
       return Result<List<AiFinding>>.failure(
         const AppError(
-          code: 'invalid_request',
+          code: ResearchWireCodes.invalidRequest,
           userMessage: 'Select a research run to view its findings.',
+          messageKey: AppMessageKey.errSelectAResearchRunToViewItsFindings,
         ),
       );
     }
@@ -130,9 +143,9 @@ class SupabaseResearchGateway implements AiGateway {
     if (raw is! List<dynamic>) {
       throw const FormatException('Research response has no findings list');
     }
-    if (raw.isEmpty || raw.length > 12) {
+    if (raw.isEmpty || raw.length > kResearchFindingsMax) {
       throw const FormatException(
-        'Research response must carry between 1 and 12 findings',
+        'Research response must carry between 1 and $kResearchFindingsMax findings',
       );
     }
     final List<AiFinding> findings = <AiFinding>[];
@@ -248,7 +261,7 @@ class SupabaseResearchGateway implements AiGateway {
   AppError _errorFor(SupabaseResearchException e, {required bool read}) {
     return switch (e.kind) {
       SupabaseResearchFailureKind.unauthorized => AppError(
-        code: 'unauthorized',
+        code: ResearchWireCodes.unauthorized,
         userMessage: read
             ? 'Sign in again to view research history.'
             : 'Sign in again to use AI research.',
@@ -256,7 +269,7 @@ class SupabaseResearchGateway implements AiGateway {
         technicalMessage: e.message,
       ),
       SupabaseResearchFailureKind.forbidden => AppError(
-        code: 'forbidden',
+        code: ResearchWireCodes.forbidden,
         userMessage: read
             ? 'You do not have permission to view research history.'
             : 'Your role cannot run AI research.',
@@ -264,27 +277,30 @@ class SupabaseResearchGateway implements AiGateway {
         technicalMessage: e.message,
       ),
       SupabaseResearchFailureKind.invalidRequest => AppError(
-        code: 'invalid_request',
+        code: ResearchWireCodes.invalidRequest,
         userMessage: read
             ? 'Unable to load research history. Please try again.'
             : 'Check the question and selected items, then try again.',
         technicalMessage: e.message,
       ),
       SupabaseResearchFailureKind.contextTooLarge => AppError(
-        code: 'context_too_large',
+        code: ResearchWireCodes.contextTooLarge,
         userMessage:
             'The selected context is too large. Remove documents and try again.',
+        messageKey:
+            AppMessageKey.errTheSelectedContextIsTooLargeRemoveDocuments,
         technicalMessage: e.message,
       ),
       SupabaseResearchFailureKind.providerNotConfigured => AppError(
-        code: 'provider_not_configured',
+        code: ResearchWireCodes.providerNotConfigured,
         userMessage:
             'AI research is not configured for this deployment. No analysis was run.',
+        messageKey: AppMessageKey.errAIResearchIsNotConfiguredForThisDeployment,
         kind: AppErrorKind.unavailable,
         technicalMessage: e.message,
       ),
       SupabaseResearchFailureKind.providerUnavailable => AppError(
-        code: 'provider_unavailable',
+        code: ResearchWireCodes.providerUnavailable,
         userMessage: read
             ? 'Research history is temporarily unavailable. Please try again.'
             : 'The AI provider is temporarily unavailable. Please try again.',
@@ -292,19 +308,23 @@ class SupabaseResearchGateway implements AiGateway {
         technicalMessage: e.message,
       ),
       SupabaseResearchFailureKind.invalidResponse => AppError(
-        code: 'invalid_response',
+        code: ResearchWireCodes.invalidResponse,
         userMessage:
             'The AI provider returned an unexpected response. Please try again.',
+        messageKey:
+            AppMessageKey.errTheAIProviderReturnedAnUnexpectedResponsePlease,
         technicalMessage: e.message,
       ),
       SupabaseResearchFailureKind.notFound => AppError(
-        code: 'invalid_request',
+        code: ResearchWireCodes.invalidRequest,
         userMessage: 'The selected research run was not found.',
+        messageKey: AppMessageKey.errTheSelectedResearchRunWasNotFound,
         technicalMessage: e.message,
       ),
       SupabaseResearchFailureKind.unknown => AppError(
-        code: 'research_failed',
+        code: ResearchWireCodes.researchFailed,
         userMessage: 'Unable to run AI research. Please try again.',
+        messageKey: AppMessageKey.errUnableToRunAIResearchPleaseTryAgain,
         technicalMessage: e.message,
       ),
     };
@@ -313,10 +333,13 @@ class SupabaseResearchGateway implements AiGateway {
   /// Provider drift (unexpected row shape) surfaces loudly, never as a
   /// silently wrong finding or run.
   AppError _drift(FormatException e, {required bool read}) => AppError(
-    code: 'invalid_response',
+    code: ResearchWireCodes.invalidResponse,
     userMessage: read
         ? 'Unable to read the research history. Please try again.'
         : 'The AI provider returned an unexpected response. Please try again.',
+    messageKey: read
+        ? null
+        : AppMessageKey.errTheAIProviderReturnedAnUnexpectedResponsePlease,
     technicalMessage: e.message,
   );
 }

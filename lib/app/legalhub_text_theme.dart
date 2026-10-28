@@ -6,7 +6,7 @@ TextTheme _legalHubTextTheme(
   required Color onSurface,
   required Color onSurfaceVariant,
 }) {
-  final bool isArabic = locale.languageCode == 'ar';
+  final bool isArabic = kRtlLocaleCodes.contains(locale.languageCode);
   final String bodyFamily = isArabic ? 'NotoNaskhArabic' : 'NotoSans';
   final String headingFamily = isArabic ? 'NotoNaskhArabic' : 'PlayfairDisplay';
   final Color headingColor = isDark

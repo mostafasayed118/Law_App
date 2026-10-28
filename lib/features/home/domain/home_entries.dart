@@ -47,26 +47,25 @@ class HomeEntry {
 
   /// The subtitle to render in a configured (real-backend) build.
   ///
-  /// `null` for the fake-only entries: their gateway has no Supabase
-  /// implementation, so their data is synthetic in EVERY build and the demo
-  /// wording of [subtitle] is truthful there — changing it would hide the
-  /// truth instead of stating it.
+  /// `null` only for an entry whose gateway has no Supabase implementation:
+  /// its data would be synthetic in EVERY build, so the demo wording of
+  /// [subtitle] stays truthful there. Every current entry is server-backed
+  /// (discovery and AI research included), so all twelve set it.
   final String Function(AppLocalizations l10n)? configuredSubtitle;
 
   /// Whether this entry's data comes from a real (server-backed) gateway in a
   /// configured build — true exactly when [configuredSubtitle] is set.
   ///
-  /// The flag is per entry, not a single global posture: the dashboard mixes
-  /// server-backed entries with fake-only ones, so only the former can drop
-  /// their demo wording in a configured build.
+  /// The flag is per entry, not a single global posture, so a future fake-only
+  /// entry keeps its demo wording while its server-backed siblings do not.
   bool get isServerBacked => configuredSubtitle != null;
 
   /// The subtitle to render for the given backend posture.
   ///
   /// [localOnly] is the app-wide posture seam (`backendIsLocalOnly`): true in
   /// the demo-posture build, false in a configured (real-backend) build. A
-  /// server-backed entry reads as the real feature there; a fake-only entry
-  /// keeps its demo wording, which is the truthful one in every build.
+  /// server-backed entry reads as the real feature there; a (future) fake-only
+  /// entry keeps its demo wording, which is the truthful one in every build.
   String subtitleFor(AppLocalizations l10n, {required bool localOnly}) {
     if (!localOnly && isServerBacked) {
       // Provably non-null: [isServerBacked] is derived from it.
@@ -154,6 +153,7 @@ List<HomeEntry> homeEntriesFor(RoleCapability capabilities) {
       icon: HomeEntryIcon.discovery,
       title: _discoveryTitle,
       subtitle: _discoverySubtitle,
+      configuredSubtitle: _discoveryConfiguredSubtitle,
       route: HomeEntryRoute.discovery,
       isVisible: _canDiscover,
     ),
@@ -234,6 +234,7 @@ List<HomeEntry> homeEntriesFor(RoleCapability capabilities) {
       icon: HomeEntryIcon.research,
       title: _researchTitle,
       subtitle: _researchSubtitle,
+      configuredSubtitle: _researchConfiguredSubtitle,
       route: HomeEntryRoute.research,
       isVisible: _canUseAiResearch,
     ),
@@ -262,6 +263,8 @@ String _videoConfiguredSubtitle(AppLocalizations l10n) =>
     l10n.videoEntrySubtitleConfigured;
 String _discoveryTitle(AppLocalizations l10n) => l10n.discoveryEntryTitle;
 String _discoverySubtitle(AppLocalizations l10n) => l10n.discoveryEntrySubtitle;
+String _discoveryConfiguredSubtitle(AppLocalizations l10n) =>
+    l10n.discoveryEntrySubtitleConfigured;
 String _mattersTitle(AppLocalizations l10n) => l10n.matterEntryTitle;
 String _mattersSubtitle(AppLocalizations l10n) => l10n.matterEntrySubtitle;
 String _mattersConfiguredSubtitle(AppLocalizations l10n) =>
@@ -298,3 +301,5 @@ String _approvalsConfiguredSubtitle(AppLocalizations l10n) =>
     l10n.approvalsEntrySubtitleConfigured;
 String _researchTitle(AppLocalizations l10n) => l10n.aiResearchEntryTitle;
 String _researchSubtitle(AppLocalizations l10n) => l10n.aiResearchEntrySubtitle;
+String _researchConfiguredSubtitle(AppLocalizations l10n) =>
+    l10n.aiResearchEntrySubtitleConfigured;

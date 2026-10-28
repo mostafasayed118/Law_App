@@ -28,8 +28,9 @@ policy.
 **In scope**
 
 - Theme/motion cosmetic extraction; component-local named constants.
-- User-facing literal strings (including 175 failure-copy occurrences) → ARB
-  keys, EN/AR/TR, with review flags.
+- User-facing literal strings (failure-copy inventory: 175 census; 161
+  occurrences / 127 distinct measured at baseline) → ARB keys, EN/AR/TR, with
+  review flags.
 - Config: URLs, deep-link scheme/host/path, env templates.
 - Supabase wire names: tables, buckets, RPCs, edge functions.
 - Timeouts, server-mirrored length caps, pagination constants, domain enums,
@@ -137,7 +138,8 @@ verifies every report at source.
 
 ### Wave 4 — Failure copy localization
 
-- Deduplicate the 175 failure-copy occurrences by exact literal.
+- Deduplicate the measured failure-copy set (161 occurrences / 127 distinct at
+  baseline; the census 175 was not reproducible) by exact literal.
 - Add `AppMessageKey`; `AppError` gains `messageKey` + optional placeholder
   args, retaining the English `userMessage` for logs and tests.
 - Add one ARB key per distinct literal in `app_en.arb`, `app_ar.arb`,
@@ -172,8 +174,9 @@ verifies every report at source.
 
 ## 5. Behavior changes (each proven by a test)
 
-1. Dev deep links classify and open with `com.legalhub.app.dev`; production is
-   unchanged.
+1. Dev deep links classify and open with `com.legalhub.app.dev`; dev invite
+   share links and recovery email links target the configured scheme;
+   production is unchanged.
 2. A stalled edge-function call fails after `kSupabaseRequestTimeout` instead
    of hanging.
 3. Attorney display name >120 and booking topic >2000 are rejected client-side
@@ -212,7 +215,7 @@ New tests:
 
 | Risk | Mitigation |
 |---|---|
-| ~175×3 machine-drafted translations | `[REVIEW]` metadata + review doc + explicit release gate |
+| ~127×3 machine-drafted translations | `[REVIEW]` metadata + review doc + explicit release gate |
 | Large cross-cutting diff | isolated worktree, wave-scoped subagent ownership, parent source verification |
 | 46 fixture-pinned test files | imports/expectations only; no assertion weakening |
 | Generated l10n files edited by mistake | regenerate via `flutter gen-l10n`; generated paths are read-only |
@@ -254,5 +257,5 @@ New tests:
 - Census counts: 53 raw color matches (all theme definitions except one
   `Colors.transparent`), 24 `Duration(` matches (7 UI, rest network/fixtures),
   533 spacing matches (~97% already tokens), 10 tables/19 sites, 48 RPCs/51
-  sites, 3 buckets/3 sites, 3 edge functions, 175 failure-copy occurrences, 46
-  fixture-pinned test files.
+  sites, 3 buckets/3 sites, 3 edge functions, 161 measured failure-copy
+  occurrences / 127 distinct (census 175), 46 fixture-pinned test files.

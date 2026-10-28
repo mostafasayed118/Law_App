@@ -12,7 +12,7 @@ class _EmptyAnswer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (state.lastError?.code == 'provider_not_configured') {
+    if (state.lastError?.code == ResearchWireCodes.providerNotConfigured) {
       return const _ProviderNotConfigured();
     }
     final AppLocalizations l10n = AppLocalizations.of(context);
@@ -24,7 +24,9 @@ class _EmptyAnswer extends StatelessWidget {
           ? l10n.aiResearchIdlePrompt
           : l10n.aiResearchIdlePromptReal;
     } else {
-      copy = l10n.aiResearchNoMatches;
+      copy = backendIsLocalOnly
+          ? l10n.aiResearchNoMatches
+          : l10n.aiResearchNoMatchesConfigured;
     }
     return Padding(
       padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceLg),

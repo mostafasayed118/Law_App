@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'app/deep_link/app_link_listener.dart';
 import 'app/deep_link/app_link_parser.dart';
 import 'app/deep_link/app_links_adapter.dart';
+import 'app/deep_link/deep_link_config.dart';
 import 'app/deep_link/pending_accept_invite_store.dart';
 import 'app/flavor.dart';
 import 'app/legalhub_theme.dart';
@@ -137,7 +138,7 @@ Future<void> bootstrap(AppConfig config) async {
   // .md D-P41.2).
   final AppLinkListener appLinkListener = AppLinkListener(
     AppLinksPluginSource(),
-    const AppLinkParser(),
+    AppLinkParser(config: DeepLinkConfig.forConfig(config)),
     serviceLocator<PendingAcceptInviteStore>(),
     () => router.go(AppRoutes.acceptInvitation),
   );

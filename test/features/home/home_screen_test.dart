@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/backend_posture.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
@@ -92,6 +94,54 @@ void main() {
       ),
       findsWidgets,
     );
+  });
+
+  group('recent activity fixture posture (Task 25)', () {
+    void usePosture({required bool localOnly}) {
+      serviceLocator.registerSingleton<BackendPosture>(
+        BackendPosture(isLocalOnly: localOnly),
+      );
+      addTearDown(resetServiceLocator);
+    }
+
+    testWidgets(
+      'configured posture hides the fake case and shows the empty state',
+      (tester) async {
+        usePosture(localOnly: false);
+        await tester.pumpWidget(pumpHome(const Locale('en')));
+        await tester.pumpAndSettle();
+
+        // The configured dashboard has no activity feed yet, so the honest
+        // empty state replaces the deterministic demo fixture entirely.
+        await tester.scrollUntilVisible(
+          find.text('No recent activity yet.'),
+          200,
+          scrollable: find.byType(Scrollable).first,
+        );
+
+        expect(find.text('No recent activity yet.'), findsOneWidget);
+        expect(find.text('Estate of H. Vance vs. City'), findsNothing);
+        expect(find.text('Today, 10:00 AM'), findsNothing);
+        expect(find.text('Atty. R. Sterling'), findsNothing);
+        expect(find.textContaining('preliminary injunction'), findsNothing);
+      },
+    );
+
+    testWidgets('local posture keeps the demo fixture', (tester) async {
+      usePosture(localOnly: true);
+      await tester.pumpWidget(pumpHome(const Locale('en')));
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.text('Estate of H. Vance vs. City'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.text('Estate of H. Vance vs. City'), findsOneWidget);
+      expect(find.text('Today, 10:00 AM'), findsOneWidget);
+      expect(find.text('No recent activity yet.'), findsNothing);
+    });
   });
 
   group('booking entry (Phase 5 slice 5.2)', () {

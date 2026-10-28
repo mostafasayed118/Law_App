@@ -1,4 +1,5 @@
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/practice_area.dart';
 import 'package:legalhub/features/discovery/domain/attorney.dart';
@@ -83,6 +84,7 @@ class FakeAttorneyGateway implements AttorneyGateway {
   static const AppError _notFound = AppError(
     code: 'attorney_not_found',
     userMessage: 'Attorney not found.',
+    messageKey: AppMessageKey.errAttorneyNotFound,
   );
 
   @override

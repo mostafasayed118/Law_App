@@ -81,6 +81,7 @@ class _ListSurfaceState extends State<_ListSurface> {
   ) {
     final MatterCubit cubit = context.read<MatterCubit>();
     final bool localOnly = backendIsLocalOnly;
+    final DemoLabels labels = DemoLabels(l10n, localOnly: localOnly);
     final Widget empty = Padding(
       padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceMd),
       child: Text(
@@ -93,7 +94,7 @@ class _ListSurfaceState extends State<_ListSurface> {
       onRetry: cubit.load,
       tileBuilder: (BuildContext context, Matter matter) => AppTile(
         icon: Icons.folder_outlined,
-        title: demoMatterTitle(l10n, matter.title),
+        title: labels.matterTitle(matter.title),
         subtitles: <String>[
           '${practiceAreaLabel(l10n, matter.practiceArea)} · ${matter.assignedAttorneyName}',
         ],

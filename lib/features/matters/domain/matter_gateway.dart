@@ -1,4 +1,5 @@
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/pagination.dart';
 import 'matter.dart';
 
 /// Matter dashboard integration boundary (Phase 7, slice 7.1).
@@ -28,5 +29,8 @@ abstract interface class MatterGateway {
   /// (localized labels, status/practice-area names): this is a transfer
   /// optimization, never the final arbiter. [limit] mirrors the shared
   /// 30-row search page size without importing the data layer (layer rule).
-  Future<Result<List<Matter>>> searchMatters(String query, {int limit = 30});
+  Future<Result<List<Matter>>> searchMatters(
+    String query, {
+    int limit = kSearchPageSize,
+  });
 }

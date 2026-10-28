@@ -16,6 +16,8 @@ ViewState<void> localizeRecoveryError(
       AppError(
         code: state.error.code,
         userMessage: l10n.recoveryErrorNotice,
+        messageKey: state.error.messageKey,
+        messageArgs: state.error.messageArgs,
         // Preserve the redacted diagnostic context (ADR-0003) and any
         // technical message so diagnostics stay intact.
         technicalMessage: state.error.technicalMessage,

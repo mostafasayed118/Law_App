@@ -1,4 +1,5 @@
 import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/data/row_reader.dart';
 import 'package:legalhub/data/video/supabase_video_api.dart';
@@ -31,6 +32,8 @@ class SupabaseVideoGateway implements VideoGateway {
         const AppError(
           code: 'video_no_org',
           userMessage: 'Select an organization to view video consultations.',
+          messageKey:
+              AppMessageKey.errSelectAnOrganizationToViewVideoConsultations,
         ),
       );
     }
@@ -48,12 +51,19 @@ class SupabaseVideoGateway implements VideoGateway {
           prefix: 'video_read',
           deniedMessage:
               'You do not have permission to view video consultations.',
+          deniedKey: AppMessageKey.errYouDoNotHavePermissionToViewVideo,
           validationMessage:
               'Unable to load video consultations. Please try again.',
+          validationKey:
+              AppMessageKey.errUnableToLoadVideoConsultationsPleaseTryAgain,
           unavailableMessage:
               'Video consultations are temporarily unavailable. Please try again.',
+          unavailableKey: AppMessageKey
+              .errVideoConsultationsAreTemporarilyUnavailablePleaseTryAgain,
           failedMessage:
               'Unable to load video consultations. Please try again.',
+          failedKey:
+              AppMessageKey.errUnableToLoadVideoConsultationsPleaseTryAgain,
         ),
       );
     } on FormatException catch (e) {
@@ -73,6 +83,8 @@ class SupabaseVideoGateway implements VideoGateway {
         const AppError(
           code: 'video_no_org',
           userMessage: 'Select an organization to schedule a consultation.',
+          messageKey:
+              AppMessageKey.errSelectAnOrganizationToScheduleAConsultation,
         ),
       );
     }
@@ -91,12 +103,19 @@ class SupabaseVideoGateway implements VideoGateway {
           prefix: 'video_create',
           deniedMessage:
               'Only a partner or attorney can schedule a video consultation.',
+          deniedKey: AppMessageKey.errOnlyAPartnerOrAttorneyCanScheduleA,
           validationMessage:
               'The consultation could not be scheduled. Check the details and try again.',
+          validationKey:
+              AppMessageKey.errTheConsultationCouldNotBeScheduledCheckThe,
           unavailableMessage:
               'Scheduling a consultation is temporarily unavailable. Please try again.',
+          unavailableKey: AppMessageKey
+              .errSchedulingAConsultationIsTemporarilyUnavailablePleaseTry,
           failedMessage:
               'Unable to schedule the consultation. Please try again.',
+          failedKey:
+              AppMessageKey.errUnableToScheduleTheConsultationPleaseTryAgain,
         ),
       );
     } on FormatException catch (e) {
@@ -112,6 +131,7 @@ class SupabaseVideoGateway implements VideoGateway {
         const AppError(
           code: 'video_invalid_request',
           userMessage: 'Select a video consultation to join.',
+          messageKey: AppMessageKey.errSelectAVideoConsultationToJoin,
         ),
       );
     }
@@ -125,11 +145,17 @@ class SupabaseVideoGateway implements VideoGateway {
           prefix: 'video_join',
           deniedMessage:
               'You do not have permission to join this consultation.',
+          deniedKey: AppMessageKey.errYouDoNotHavePermissionToJoinThis,
           validationMessage:
               'The consultation is not available to join right now.',
+          validationKey:
+              AppMessageKey.errTheConsultationIsNotAvailableToJoinRight,
           unavailableMessage:
               'Video calls are temporarily unavailable. Please try again.',
+          unavailableKey: AppMessageKey
+              .errVideoCallsAreTemporarilyUnavailablePleaseTryAgain,
           failedMessage: 'Unable to join the consultation. Please try again.',
+          failedKey: AppMessageKey.errUnableToJoinTheConsultationPleaseTryAgain,
         ),
       );
     } on FormatException catch (e) {
@@ -143,10 +169,15 @@ class SupabaseVideoGateway implements VideoGateway {
       () => _api.markLive(id.trim()),
       prefix: 'video_live',
       deniedMessage: 'You do not have permission to start this consultation.',
+      deniedKey: AppMessageKey.errYouDoNotHavePermissionToStartThis,
       validationMessage: 'This consultation can no longer be started.',
+      validationKey: AppMessageKey.errThisConsultationCanNoLongerBeStarted,
       unavailableMessage:
           'Starting the consultation is temporarily unavailable. Please try again.',
+      unavailableKey: AppMessageKey
+          .errStartingTheConsultationIsTemporarilyUnavailablePleaseTry,
       failedMessage: 'Unable to start the consultation. Please try again.',
+      failedKey: AppMessageKey.errUnableToStartTheConsultationPleaseTryAgain,
     );
   }
 
@@ -156,10 +187,15 @@ class SupabaseVideoGateway implements VideoGateway {
       () => _api.end(id.trim()),
       prefix: 'video_end',
       deniedMessage: 'Only the creator or a partner can end this consultation.',
+      deniedKey: AppMessageKey.errOnlyTheCreatorOrAPartnerCanEnd,
       validationMessage: 'This consultation can no longer be ended.',
+      validationKey: AppMessageKey.errThisConsultationCanNoLongerBeEnded,
       unavailableMessage:
           'Ending the consultation is temporarily unavailable. Please try again.',
+      unavailableKey: AppMessageKey
+          .errEndingTheConsultationIsTemporarilyUnavailablePleaseTry,
       failedMessage: 'Unable to end the consultation. Please try again.',
+      failedKey: AppMessageKey.errUnableToEndTheConsultationPleaseTryAgain,
     );
   }
 
@@ -167,9 +203,13 @@ class SupabaseVideoGateway implements VideoGateway {
     Future<void> Function() write, {
     required String prefix,
     required String deniedMessage,
+    required AppMessageKey deniedKey,
     required String validationMessage,
+    required AppMessageKey validationKey,
     required String unavailableMessage,
+    required AppMessageKey unavailableKey,
     required String failedMessage,
+    required AppMessageKey failedKey,
   }) async {
     try {
       await write();
@@ -180,9 +220,13 @@ class SupabaseVideoGateway implements VideoGateway {
           e,
           prefix: prefix,
           deniedMessage: deniedMessage,
+          deniedKey: deniedKey,
           validationMessage: validationMessage,
+          validationKey: validationKey,
           unavailableMessage: unavailableMessage,
+          unavailableKey: unavailableKey,
           failedMessage: failedMessage,
+          failedKey: failedKey,
         ),
       );
     } on FormatException catch (e) {
@@ -243,54 +287,67 @@ class SupabaseVideoGateway implements VideoGateway {
     SupabaseVideoException e, {
     required String prefix,
     required String deniedMessage,
+    required AppMessageKey deniedKey,
     required String validationMessage,
+    required AppMessageKey validationKey,
     required String unavailableMessage,
+    required AppMessageKey unavailableKey,
     required String failedMessage,
+    required AppMessageKey failedKey,
   }) {
     return switch (e.kind) {
       SupabaseVideoFailureKind.unauthorized => AppError(
         code: 'video_unauthorized',
         userMessage: 'Sign in again to use video consultations.',
+        messageKey: AppMessageKey.errSignInAgainToUseVideoConsultations,
         kind: AppErrorKind.denied,
         technicalMessage: e.message,
       ),
       SupabaseVideoFailureKind.forbidden => AppError(
         code: 'video_forbidden',
         userMessage: deniedMessage,
+        messageKey: deniedKey,
         kind: AppErrorKind.denied,
         technicalMessage: e.message,
       ),
       SupabaseVideoFailureKind.notFound => AppError(
         code: 'video_session_not_found',
         userMessage: 'This video consultation was not found.',
+        messageKey: AppMessageKey.errThisVideoConsultationWasNotFound,
         technicalMessage: e.message,
       ),
       SupabaseVideoFailureKind.sessionEnded => AppError(
         code: 'video_session_ended',
         userMessage: 'This video consultation has already ended.',
+        messageKey: AppMessageKey.errThisVideoConsultationHasAlreadyEnded,
         technicalMessage: e.message,
       ),
       SupabaseVideoFailureKind.providerNotConfigured => AppError(
         code: 'provider_not_configured',
         userMessage:
             'Video calls are not configured for this deployment. No call was started.',
+        messageKey:
+            AppMessageKey.errVideoCallsAreNotConfiguredForThisDeployment,
         kind: AppErrorKind.unavailable,
         technicalMessage: e.message,
       ),
       SupabaseVideoFailureKind.validation => AppError(
         code: '${prefix}_invalid',
         userMessage: validationMessage,
+        messageKey: validationKey,
         technicalMessage: e.message,
       ),
       SupabaseVideoFailureKind.unavailable => AppError(
         code: '${prefix}_unavailable',
         userMessage: unavailableMessage,
+        messageKey: unavailableKey,
         kind: AppErrorKind.unavailable,
         technicalMessage: e.message,
       ),
       SupabaseVideoFailureKind.unknown => AppError(
         code: '${prefix}_failed',
         userMessage: failedMessage,
+        messageKey: failedKey,
         technicalMessage: e.message,
       ),
     };
@@ -301,6 +358,7 @@ class SupabaseVideoGateway implements VideoGateway {
   AppError _drift(FormatException e) => AppError(
     code: 'video_invalid_response',
     userMessage: 'Unable to read the video consultation. Please try again.',
+    messageKey: AppMessageKey.errUnableToReadTheVideoConsultationPleaseTry,
     technicalMessage: e.message,
   );
 }

@@ -3,6 +3,7 @@ import 'ai_finding.dart';
 import 'research_outcome.dart';
 import 'research_request.dart';
 import 'research_run.dart';
+import 'research_wire_codes.dart';
 
 /// AI research integration boundary (AI research slice, plan 2026-09-02;
 /// real-provider extension, design §5 / plan 2026-10-22 Task 6).
@@ -31,7 +32,9 @@ abstract interface class AiGateway {
   Future<Result<ResearchOutcome>> analyze(ResearchRequest request);
 
   /// The active organization's runs, newest first, capped at [limit].
-  Future<Result<List<ResearchRun>>> fetchRuns({int limit = 20});
+  Future<Result<List<ResearchRun>>> fetchRuns({
+    int limit = kResearchRunPageSize,
+  });
 
   /// The persisted findings of [runId], ordered by `sort_order`.
   Future<Result<List<AiFinding>>> fetchFindings(String runId);

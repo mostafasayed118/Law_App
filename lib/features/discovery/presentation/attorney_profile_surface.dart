@@ -10,6 +10,8 @@ class _ProfileSurface extends StatefulWidget {
 }
 
 class _ProfileSurfaceState extends State<_ProfileSurface> {
+  static const double _avatarRadius = 40;
+
   @override
   void initState() {
     super.initState();
@@ -67,6 +69,7 @@ class _ProfileSurfaceState extends State<_ProfileSurface> {
 
   Widget _profile(BuildContext context, Attorney attorney) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final DemoLabels labels = DemoLabels(l10n, localOnly: backendIsLocalOnly);
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
     final String summary = _summaryLine(l10n, attorney);
@@ -75,7 +78,7 @@ class _ProfileSurfaceState extends State<_ProfileSurface> {
       children: <Widget>[
         Center(
           child: CircleAvatar(
-            radius: 40,
+            radius: _avatarRadius,
             backgroundColor: scheme.primaryContainer,
             child: Text(
               _initialOf(attorney.name),
@@ -92,7 +95,7 @@ class _ProfileSurfaceState extends State<_ProfileSurface> {
         if (attorney.headline != null) ...<Widget>[
           const SizedBox(height: LegalHubTheme.spaceSm),
           Text(
-            attorney.headline!,
+            labels.attorneyHeadline(attorney.headline!),
             textAlign: TextAlign.center,
             style: text.titleMedium?.copyWith(color: scheme.onSurfaceVariant),
           ),
@@ -150,7 +153,7 @@ class _ProfileSurfaceState extends State<_ProfileSurface> {
           const SizedBox(height: LegalHubTheme.spaceXl),
           _SectionLabel(text: l10n.discoveryProfileBio),
           const SizedBox(height: LegalHubTheme.spaceSm),
-          Text(demoAttorneyBio(l10n, attorney.bio), style: text.bodyMedium),
+          Text(labels.attorneyBio(attorney.bio), style: text.bodyMedium),
         ],
         const SizedBox(height: LegalHubTheme.spaceLg),
         Text(

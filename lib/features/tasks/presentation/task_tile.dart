@@ -12,9 +12,10 @@ part of 'task_board_screen.dart';
 /// client can never send an illegal transition. The row's buttons disable
 /// while its write is in flight ([TaskBoardState.actingTaskId]).
 class _TaskTile extends StatelessWidget {
-  const _TaskTile({required this.task});
+  const _TaskTile({required this.task, required this.localOnly});
 
   final TaskItem task;
+  final bool localOnly;
 
   /// The single legal next status the tile may offer, or null when the row
   /// is terminal (`done`) or synthetic-only (`blocked`).
@@ -29,6 +30,7 @@ class _TaskTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final DemoLabels labels = DemoLabels(l10n, localOnly: localOnly);
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final (IconData, String) status = switch (task.status) {
       TaskStatus.todo => (Icons.radio_button_unchecked, l10n.taskStatusTodo),
@@ -43,9 +45,9 @@ class _TaskTile extends StatelessWidget {
     final TaskStatus? next = nextStepFor(task.status);
     return AppTile(
       leading: Icon(status.$1, size: 20, color: scheme.onSurfaceVariant),
-      title: demoTaskTitle(l10n, task.title),
+      title: labels.taskTitle(task.title),
       subtitles: <String>[
-        '${demoMatterTitle(l10n, task.matterRef)} · ${status.$2}',
+        '${labels.matterTitle(task.matterRef)} · ${status.$2}',
         if (task.acknowledged) l10n.taskAcknowledged,
       ],
       trailing: Wrap(

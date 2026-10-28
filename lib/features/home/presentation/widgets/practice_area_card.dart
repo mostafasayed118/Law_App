@@ -16,6 +16,10 @@ class PracticeAreaCard extends StatelessWidget {
   final String label;
   final VoidCallback? onTap;
 
+  static const double _cardWidth = 160;
+  static const double _cardHeight = 192;
+  static const double _iconSize = 40;
+
   @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
@@ -35,9 +39,9 @@ class PracticeAreaCard extends StatelessWidget {
         // original visual posture at the default scale.
         child: ConstrainedBox(
           constraints: const BoxConstraints(
-            minWidth: 160,
-            maxWidth: 160,
-            minHeight: 192,
+            minWidth: _cardWidth,
+            maxWidth: _cardWidth,
+            minHeight: _cardHeight,
           ),
           child: Padding(
             padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
@@ -49,8 +53,8 @@ class PracticeAreaCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Container(
-                  width: 40,
-                  height: 40,
+                  width: _iconSize,
+                  height: _iconSize,
                   margin: const EdgeInsetsDirectional.only(
                     bottom: LegalHubTheme.spaceSm,
                   ),

@@ -53,6 +53,7 @@ class BillingInvoicesScreen extends StatelessWidget {
           mode: mode,
           paymentGateway: paymentGateway,
           launcher: launcher,
+          localOnly: localOnly,
           onSettled: () => context.read<BillingCubit>().load(),
         ),
         empty: (BuildContext context, BillingState state) => Padding(

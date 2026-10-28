@@ -43,7 +43,7 @@ class LabelChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsetsDirectional.symmetric(
         horizontal: LegalHubTheme.spaceSm,
-        vertical: 2,
+        vertical: LegalHubTheme.space2xs,
       ),
       decoration: BoxDecoration(
         color: background,

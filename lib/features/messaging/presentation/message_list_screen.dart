@@ -121,6 +121,7 @@ class _ListSurfaceState extends State<_ListSurface> {
       tileBuilder: (BuildContext context, MessageThread thread) =>
           _MessageThreadTile(
             thread: thread,
+            localOnly: localOnly,
             // E2E BUG-1 fix: list → thread detail is a forward navigation.
             onOpenThread: () => context.push(
               AppRoutes.messageThreadDetailFor(thread.id),

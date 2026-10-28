@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:legalhub/app/legalhub_theme.dart';
+
 /// An [ElevatedButton] that shows a small spinner in place of its label while
 /// [loading] is true and is disabled in that state.
 class LoadingElevatedButton extends StatelessWidget {
@@ -30,7 +32,7 @@ class LoadingElevatedButton extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     Text(label),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: LegalHubTheme.spaceSm),
                     Icon(icon, size: 18),
                   ],
                 ));

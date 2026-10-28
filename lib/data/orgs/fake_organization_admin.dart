@@ -54,7 +54,7 @@ mixin _FakeOrgAdmin on _FakeOrgState {
     roster[FakeOrganizationGateway.demoUserId] = OrgMember(
       organizationId: invitation.organizationId,
       userId: FakeOrganizationGateway.demoUserId,
-      displayName: 'Demo user',
+      displayName: DemoCorpus.ownerName,
       locale: 'en',
       role: invitation.role,
       status: MembershipStatus.active,

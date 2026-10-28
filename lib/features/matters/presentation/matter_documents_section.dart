@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/features/documents/domain/document.dart';
 import 'package:legalhub/features/documents/presentation/document_labels.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
@@ -46,6 +47,7 @@ class _MatterDocumentsSectionState extends State<MatterDocumentsSection> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final DemoLabels labels = DemoLabels(l10n, localOnly: backendIsLocalOnly);
     return BlocBuilder<MatterWorkspaceCubit, MatterWorkspaceState>(
       buildWhen:
           (MatterWorkspaceState previous, MatterWorkspaceState current) =>
@@ -58,7 +60,7 @@ class _MatterDocumentsSectionState extends State<MatterDocumentsSection> {
           emptyCopy: l10n.matterWorkspaceDocumentsEmpty,
           viewAllCopy: l10n.viewAll,
           itemBuilder: (BuildContext context, Document document) => AppTile(
-            title: demoDocumentTitle(l10n, document.title),
+            title: labels.documentTitle(document.title),
             subtitles: <String>[
               '${documentTypeLabel(l10n, document.type)} · '
                   '${formatMediumDate(l10n, document.createdAt)}',

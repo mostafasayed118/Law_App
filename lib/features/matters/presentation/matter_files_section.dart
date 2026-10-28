@@ -129,7 +129,10 @@ class _MatterFilesSectionState extends State<MatterFilesSection> {
                         Tooltip(
                           message: l10n.fileOpenAction,
                           child: AppTile(
-                            title: demoFileName(l10n, file.name),
+                            title: DemoLabels(
+                              l10n,
+                              localOnly: backendIsLocalOnly,
+                            ).fileName(file.name),
                             subtitles: <String>[
                               fileSizeLabel(l10n, file.sizeBytes),
                             ],

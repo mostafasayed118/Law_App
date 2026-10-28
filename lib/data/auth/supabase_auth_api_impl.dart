@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:legalhub/core/contracts/http_status.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'auth_callback.dart';

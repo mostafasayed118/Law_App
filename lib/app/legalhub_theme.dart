@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import 'package:legalhub/core/localization/locale_rules.dart';
+
 part 'legalhub_text_theme.dart';
 part 'legalhub_color_scheme.dart';
 
@@ -79,6 +82,7 @@ class LegalHubTheme {
   static const Color darkInfo = Color(0xFF8FD0F0);
   static const Color darkOnInfo = Color(0xFF00354C);
 
+  static const double space2xs = 2;
   static const double spaceXs = 4;
   static const double spaceSm = 8;
   static const double spaceMd = 16;
@@ -91,6 +95,7 @@ class LegalHubTheme {
   static const double radiusMd = 6;
   static const double radiusLg = 8;
   static const double radiusXl = 12;
+  static const double radius2xl = 24;
   static const double radiusFull = 9999;
 
   static ThemeData get light => forBrightness(Brightness.light);
@@ -189,7 +194,9 @@ class LegalHubTheme {
       brightness: brightness,
       colorScheme: scheme,
       scaffoldBackgroundColor: scaffoldBg,
-      fontFamily: locale.languageCode == 'ar' ? 'NotoNaskhArabic' : 'NotoSans',
+      fontFamily: kRtlLocaleCodes.contains(locale.languageCode)
+          ? 'NotoNaskhArabic'
+          : 'NotoSans',
       textTheme: _legalHubTextTheme(
         locale,
         isDark: isDark,

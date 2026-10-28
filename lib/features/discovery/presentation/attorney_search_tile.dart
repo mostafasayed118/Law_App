@@ -1,9 +1,14 @@
 part of 'attorney_search_screen.dart';
 
 class _AttorneyTile extends StatelessWidget {
-  const _AttorneyTile({required this.attorney, required this.onTap});
+  const _AttorneyTile({
+    required this.attorney,
+    required this.localOnly,
+    required this.onTap,
+  });
 
   final Attorney attorney;
+  final bool localOnly;
 
   /// Phase 6 slice 6.2: tapping a row opens the attorney profile route.
   final VoidCallback onTap;
@@ -50,7 +55,7 @@ class _AttorneyTile extends StatelessWidget {
                       ),
                     ),
                     for (final String line in details) ...<Widget>[
-                      const SizedBox(height: 2),
+                      const SizedBox(height: LegalHubTheme.space2xs),
                       Text(
                         line,
                         style: text.bodySmall?.copyWith(
@@ -86,6 +91,10 @@ class _AttorneyTile extends StatelessWidget {
       return <String>[summary.join(' · ')];
     }
     final String fallback = attorney.headline ?? attorney.city ?? '';
-    return fallback.isEmpty ? const <String>[] : <String>[fallback];
+    final String detail = DemoLabels(
+      l10n,
+      localOnly: localOnly,
+    ).attorneyHeadline(fallback);
+    return detail.isEmpty ? const <String>[] : <String>[detail];
   }
 }

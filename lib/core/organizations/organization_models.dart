@@ -17,6 +17,17 @@ UserRole? userRoleFromServerName(String? name) {
   };
 }
 
+/// Maps a domain [UserRole] to the server `org_role` name, or null when the
+/// role is not part of the assignable server surface.
+String? userRoleToAssignableServerName(UserRole role) {
+  return switch (role) {
+    UserRole.client => 'client',
+    UserRole.attorney => 'attorney',
+    UserRole.partner => 'partner',
+    _ => null,
+  };
+}
+
 /// Maps a server `membership_status` name to the domain [MembershipStatus],
 /// or null when the name is unknown (provider drift — surfaces loudly, never
 /// silently as a status the client does not understand).

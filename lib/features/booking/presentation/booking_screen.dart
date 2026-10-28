@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/app/router.dart';
 import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/contracts/server_limits.dart';
 import 'package:legalhub/features/booking/domain/booking_category.dart';
 import 'package:legalhub/features/booking/domain/booking_gateway.dart';
 import 'package:legalhub/features/booking/domain/booking_prefill.dart';

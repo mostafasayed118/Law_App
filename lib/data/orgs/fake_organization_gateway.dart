@@ -1,6 +1,7 @@
 import 'package:legalhub/core/auth/session.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/shared/demo/demo_corpus.dart';
 part 'fake_organization_state.dart';
 part 'fake_organization_invitations.dart';
 part 'fake_organization_admin.dart';
@@ -25,7 +26,7 @@ class FakeOrganizationGateway extends _FakeOrgState
     _orgs.addAll(<String, OrganizationSummary>{
       demoOrganizationId: OrganizationSummary(
         id: demoOrganizationId,
-        name: 'Demo Firm',
+        name: DemoCorpus.organizationName,
         createdAt: _seedTime,
       ),
     });
@@ -34,7 +35,7 @@ class FakeOrganizationGateway extends _FakeOrgState
         demoUserId: OrgMember(
           organizationId: demoOrganizationId,
           userId: demoUserId,
-          displayName: 'Demo user',
+          displayName: DemoCorpus.ownerName,
           locale: 'en',
           role: UserRole.partner,
           status: MembershipStatus.active,
@@ -49,15 +50,15 @@ class FakeOrganizationGateway extends _FakeOrgState
   }
 
   /// The demo identity shared with the fake auth session.
-  static const String demoUserId = 'demo-user';
-  static const String demoOrganizationId = 'org-demo';
+  static const String demoUserId = DemoCorpus.ownerId;
+  static const String demoOrganizationId = DemoCorpus.organizationId;
 
   /// The fake task board's demo attorney identity (synthetic only).
-  static const String demoAttorneyId = 'demo-attorney';
+  static const String demoAttorneyId = DemoCorpus.attorneyId;
 
   /// The demo identity's email, mirroring the fake auth session's claim (the
   /// server matches `accept_invitation` against the JWT email claim).
-  static const String demoUserEmail = 'demo@firm.com';
+  static const String demoUserEmail = DemoCorpus.ownerEmail;
 
   static final DateTime _seedTime = DateTime.utc(2026, 7, 25);
 
@@ -69,9 +70,9 @@ class FakeOrganizationGateway extends _FakeOrgState
     AuditEntry(
       id: 1,
       action: 'member:role/change',
-      outcome: 'allowed',
+      outcome: AuditOutcomes.allowed,
       resourceType: 'membership',
-      resourceId: 'demo-user',
+      resourceId: DemoCorpus.ownerId,
       correlationId: 'audit-org-demo-1',
       redactedSummary: 'role change',
       serverTimestamp: DateTime.utc(2026, 7, 25, 10, 0),
@@ -79,7 +80,7 @@ class FakeOrganizationGateway extends _FakeOrgState
     AuditEntry(
       id: 2,
       action: 'member:invite',
-      outcome: 'allowed',
+      outcome: AuditOutcomes.allowed,
       resourceType: 'invitation',
       resourceId: 'inv-demo-1',
       correlationId: 'audit-org-demo-2',
@@ -89,7 +90,7 @@ class FakeOrganizationGateway extends _FakeOrgState
     AuditEntry(
       id: 3,
       action: 'member:suspend',
-      outcome: 'denied',
+      outcome: AuditOutcomes.denied,
       resourceType: 'membership',
       resourceId: 'unknown-user',
       correlationId: 'audit-org-demo-3',
@@ -119,7 +120,7 @@ class FakeOrganizationGateway extends _FakeOrgState
       demoUserId: OrgMember(
         organizationId: id,
         userId: demoUserId,
-        displayName: 'Demo user',
+        displayName: DemoCorpus.ownerName,
         locale: 'en',
         role: UserRole.partner,
         status: MembershipStatus.active,
@@ -152,7 +153,7 @@ class FakeOrganizationGateway extends _FakeOrgState
     // Synthetic roster mirroring `list_matter_assignable_members`: active
     // org members only (the platform owner is never in this fake's roster).
     return const OrgOutcome<List<AssignableMember>>.success(<AssignableMember>[
-      AssignableMember(userId: demoUserId, displayName: 'Demo user'),
+      AssignableMember(userId: demoUserId, displayName: DemoCorpus.ownerName),
       AssignableMember(userId: demoAttorneyId, displayName: 'Demo attorney'),
     ]);
   }
