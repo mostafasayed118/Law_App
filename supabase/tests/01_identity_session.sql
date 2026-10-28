@@ -73,31 +73,33 @@ begin
 end $$;
 
 -- ############################################################################
--- §2 — Edit own profile
+-- §2 — Edit own profile (RPC-only contract — migration 30)
 -- ############################################################################
 
--- CHECK 01.04 — POS: member_a updates their own display_name (1 row affected),
--- then restores it (the battery leaves fixture state clean).
+-- Migration 30 revoked both UPDATE ACL layers and dropped profiles_update_own,
+-- so every direct profiles UPDATE must now fail with insufficient_privilege
+-- (SQLSTATE 42501); mutations go through RPC-only paths.
+
+-- CHECK 01.04 — NEG (contract change): member_a can no longer update their own
+-- display_name directly — migration 30 made profiles mutations RPC-only; the
+-- statement must fail with insufficient_privilege (42501). The row is
+-- unchanged, so the former restore step is gone.
 do $$
-declare
-  v_rows bigint;
 begin
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000003', false);
   perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000003"}', false);
-  update public.profiles set display_name = 'Edited by battery'
-   where user_id = auth.uid();
-  get diagnostics v_rows = row_count;
-  if v_rows <> 1 then
-    raise exception 'POLICY-BATTERY FAIL 01.04: own-profile UPDATE affected % rows, want 1', v_rows;
-  end if;
-  update public.profiles set display_name = 'Client A'
-   where user_id = auth.uid();
+  begin
+    update public.profiles set display_name = 'Edited by battery'
+     where user_id = auth.uid();
+    raise exception 'POLICY-BATTERY FAIL 01.04: own-profile UPDATE was not rejected — direct profiles mutations must be RPC-only (migration 30)';
+  exception when insufficient_privilege then
+    null; -- expected: UPDATE privilege revoked (SQLSTATE 42501)
+  end;
 end $$;
 
--- CHECK 01.05 — NEG: member_a cannot move their profile onto another identity
--- (UPDATE ... SET user_id = <other> is denied — the column-level UPDATE grant
--- covers only (display_name, locale), so touching user_id fails at the grant
--- layer, never silently rewritten).
+-- CHECK 01.05 — NEG: member_a cannot move their profile onto another identity.
+-- After migration 30 the whole UPDATE privilege is gone, so the statement is
+-- denied at the privilege layer (42501) before the identity check can matter.
 do $$
 begin
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000003', false);
@@ -106,26 +108,26 @@ begin
     update public.profiles
        set user_id = '10000000-0000-4000-8000-000000000004'
      where user_id = auth.uid();
-    raise exception 'POLICY-BATTERY FAIL 01.05: UPDATE transferring own profile row to another identity succeeded';
+    raise exception 'POLICY-BATTERY FAIL 01.05: UPDATE transferring own profile row to another identity was not rejected';
   exception when insufficient_privilege then
-    null; -- expected: UPDATE touches a non-granted column (user_id) — denied
+    null; -- expected: no UPDATE privilege on profiles (SQLSTATE 42501, migration 30)
   end;
 end $$;
 
--- CHECK 01.06 — NEG: member_a cannot edit another user's profile (0 rows
--- visible to the UPDATE's USING clause).
+-- CHECK 01.06 — NEG: member_a cannot edit another user's profile. The statement
+-- is now rejected at the privilege layer (42501) before any row is considered
+-- (pre-30 it passed the grant and RLS returned 0 rows).
 do $$
-declare
-  v_rows bigint;
 begin
   perform set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000003', false);
   perform set_config('request.jwt.claims', '{"sub":"10000000-0000-4000-8000-000000000003"}', false);
-  update public.profiles set display_name = 'Hijacked'
-   where user_id = '10000000-0000-4000-8000-000000000004';
-  get diagnostics v_rows = row_count;
-  if v_rows <> 0 then
-    raise exception 'POLICY-BATTERY FAIL 01.06: UPDATE touched % foreign profile rows, want 0', v_rows;
-  end if;
+  begin
+    update public.profiles set display_name = 'Hijacked'
+     where user_id = '10000000-0000-4000-8000-000000000004';
+    raise exception 'POLICY-BATTERY FAIL 01.06: foreign-row UPDATE was not rejected — direct profiles mutations must be RPC-only (migration 30)';
+  exception when insufficient_privilege then
+    null; -- expected: no UPDATE privilege on profiles (SQLSTATE 42501)
+  end;
 end $$;
 
 -- ############################################################################
@@ -268,10 +270,10 @@ end $$;
 -- probe so fixture state stays clean.
 --
 -- The DELETE + restore run as the connection role (postgres) via reset role:
--- authenticated holds only `select, update (display_name, locale)` on profiles
--- (01_org_schema.sql) — no INSERT/DELETE grant and no DELETE policy exist, by
--- design — so those two statements must NOT run under the impersonated role.
--- Only the RPC verification runs as partner_a.
+-- authenticated holds only SELECT on profiles (migration 30 revoked UPDATE; no
+-- INSERT/DELETE grant and no DELETE policy exist, by design) — so those two
+-- statements must NOT run under the impersonated role. Only the RPC
+-- verification runs as partner_a.
 reset role;
 delete from public.profiles
  where user_id = '10000000-0000-4000-8000-000000000007';
