@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:legalhub/data/supabase_wire.dart';
+import 'package:legalhub/core/supabase/supabase_wire.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_message_realtime_api.dart';

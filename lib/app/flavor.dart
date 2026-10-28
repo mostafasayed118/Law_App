@@ -1,4 +1,4 @@
-import 'package:legalhub/data/auth/supabase_env.dart';
+import 'package:legalhub/core/supabase/supabase_env.dart';
 
 /// Build flavors for the LegalHub client.
 ///

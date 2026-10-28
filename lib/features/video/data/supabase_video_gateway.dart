@@ -1,7 +1,7 @@
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
-import 'package:legalhub/data/row_reader.dart';
+import 'package:legalhub/core/supabase/row_reader.dart';
 import 'package:legalhub/data/video/supabase_video_api.dart';
 import 'package:legalhub/features/video/domain/video_gateway.dart';
 import 'package:legalhub/features/video/domain/video_session.dart';

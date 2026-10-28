@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:legalhub/core/contracts/http_status.dart';
-import 'package:legalhub/data/postgrest_failures.dart';
-import 'package:legalhub/data/supabase_seam.dart';
-import 'package:legalhub/data/supabase_wire.dart';
+import 'package:legalhub/core/supabase/postgrest_failures.dart';
+import 'package:legalhub/core/supabase/supabase_seam.dart';
+import 'package:legalhub/core/supabase/supabase_wire.dart';
 import 'package:legalhub/features/research/domain/research_wire_codes.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

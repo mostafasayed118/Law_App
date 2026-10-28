@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/data/row_reader.dart';
+import 'package:legalhub/core/supabase/row_reader.dart';
 
 void main() {
   group('requiredString', () {

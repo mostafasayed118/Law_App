@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/data/auth/supabase_env.dart';
+import 'package:legalhub/core/supabase/supabase_env.dart';
 
 /// Builds a JWT-shaped string whose payload carries the given role claim.
 /// Matches the base64url convention used by the supabase adapter tests.

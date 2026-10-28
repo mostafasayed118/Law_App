@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:legalhub/data/list_query_guards.dart';
+import 'package:legalhub/core/supabase/list_query_guards.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Unit tests for the bounded-SELECT decision surface
-/// (`lib/data/list_query_guards.dart`).
+/// (`lib/core/supabase/list_query_guards.dart`).
 ///
 /// The binding itself needs a live `Supabase.instance` client (the api-impl
 /// tests inject a stub `TableCaller`, which bypasses this path entirely),

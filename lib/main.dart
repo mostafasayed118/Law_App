@@ -20,8 +20,8 @@ import 'app/theme/theme_cubit.dart';
 import 'core/observability/crash_boundary.dart';
 import 'core/observability/error_reporter.dart';
 import 'core/onboarding/onboarding_store.dart';
+import 'core/supabase/supabase_env.dart';
 import 'data/auth/supabase_auth_api_impl.dart';
-import 'data/auth/supabase_env.dart';
 import 'features/auth/presentation/auth_cubit.dart';
 import 'l10n/app_localizations.dart';
 

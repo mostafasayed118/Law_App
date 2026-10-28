@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:legalhub/data/postgrest_failures.dart';
-import 'package:legalhub/data/supabase_seam.dart';
-import 'package:legalhub/data/supabase_wire.dart';
+import 'package:legalhub/core/supabase/postgrest_failures.dart';
+import 'package:legalhub/core/supabase/supabase_seam.dart';
+import 'package:legalhub/core/supabase/supabase_wire.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_org_api.dart';

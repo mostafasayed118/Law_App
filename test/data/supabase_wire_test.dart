@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/data/supabase_wire.dart';
+import 'package:legalhub/core/supabase/supabase_wire.dart';
 
 void main() {
   test('table and bucket names pin the exact provider strings', () {

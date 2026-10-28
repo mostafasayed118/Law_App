@@ -1,6 +1,6 @@
 import 'package:legalhub/core/contracts/network.dart';
 import 'package:legalhub/core/pagination.dart';
-import 'package:legalhub/data/supabase_wire.dart';
+import 'package:legalhub/core/supabase/supabase_wire.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Shared guard constants + the bounded SELECT binding for Supabase list
