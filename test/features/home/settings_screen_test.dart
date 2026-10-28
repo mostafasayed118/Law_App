@@ -364,7 +364,11 @@ void main() {
     await tester.pumpWidget(pumpScreen());
     await tester.pumpAndSettle();
 
-    expect(find.text('Theme'), findsWidgets);
+    // One label per control: the field's floating label names it, so a
+    // separate section heading would render the same word twice (audit
+    // 2026-10-29 — settings duplicated "Language" and "Theme").
+    expect(find.text('Language'), findsOneWidget);
+    expect(find.text('Theme'), findsOneWidget);
     // The dropdown's current value (system default) is shown as the
     // selected item.
     expect(find.text('System default'), findsOneWidget);
