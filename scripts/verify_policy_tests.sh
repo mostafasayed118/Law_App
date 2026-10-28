@@ -384,13 +384,17 @@ apply_slice() {
   psql_apply "$SUPABASE_DIR/migrations/25_research.sql" "apply migrations/25_research.sql"
   psql_apply "$SUPABASE_DIR/migrations/26_video_sessions.sql" "apply migrations/26_video_sessions.sql"
   psql_apply "$SUPABASE_DIR/migrations/27_audit_remediation.sql" "apply migrations/27_audit_remediation.sql"
+  psql_apply "$SUPABASE_DIR/migrations/28_audit_indexes_and_list_bounds.sql" "apply migrations/28_audit_indexes_and_list_bounds.sql"
+  psql_apply "$SUPABASE_DIR/migrations/29_membership_and_order_indexes.sql" "apply migrations/29_membership_and_order_indexes.sql"
+  psql_apply "$SUPABASE_DIR/migrations/30_profiles_mutations_rpc_only.sql" "apply migrations/30_profiles_mutations_rpc_only.sql"
+  psql_apply "$SUPABASE_DIR/migrations/31_profile_display_name_and_invite_email.sql" "apply migrations/31_profile_display_name_and_invite_email.sql"
   # 03_platform_config_seed.sql is deliberately NOT applied: its owner token
   # is an apply-time substitution placeholder for the dev project; the
   # battery's fixtures seed the rehearsal project's own owner row (D-P0C3
   # proves the bound; the seed itself is a trusted migration, not a client
   # reachable path).
   note "apply: 03_platform_config_seed.sql skipped by design (apply-time token; fixtures seed the rehearsal owner)"
-  # The structural pins (25 tables/RLS, 23 policies + the storage-surface
+  # The structural pins (25 tables/RLS, 22 policies + the storage-surface
   # pins + the publication pin) and 00_fixtures' matters + documents +
   # message_threads + files + storage.objects + messages +
   # billing_invoices + tasks + consultations resets require every applied
@@ -660,7 +664,7 @@ structural_pins() {
   expect_eq "zero policies on platform_config" \
     "$(run_sql "select count(*) from pg_policies where schemaname='public' and tablename='platform_config';")" "0"
   expect_eq "exactly twenty-three policies across the client tables (12 minus the D-SM3 messages_insert_assigned drop, plus notifications_select_org, tasks_select_assigned, consultation_slots_select_available, consultations_select_own, attorney_profiles_select_active, approval_requests_select_org, approval_events_select_org, compliance_alerts_select_org, compliance_alert_events_select_org, research_runs_select_org, research_findings_select_org and video_sessions_select_org)" \
-    "$(run_sql "select count(*) from pg_policies where schemaname='public';")" "23"
+    "$(run_sql "select count(*) from pg_policies where schemaname='public';")" "22"
 
   note "--- 1f. Forward pin re-scoped (2026-08-08): matters, documents, message_threads, files + messages are the FIRST FIVE §14 un-deferrals ---"
   # D-P0C1(b) originally pinned 'no matter/document/message tables exist'. The
@@ -735,7 +739,7 @@ structural_pins() {
   # research_findings workflow (one read policy each) and re-scopes the pins
   # to 24 tables/RLS and 22 policies. The video slice
   # (26_video_sessions.sql) adds the RPC-only video_sessions table (one read
-  # policy) and re-scopes the pins to 25 tables/RLS and 23 policies.
+  # policy) and re-scopes the pins to 25 tables/RLS and 22 policies.
   expect_eq "notifications present (new-surface feed)" \
     "$(run_sql "select count(*) from information_schema.tables where table_schema='public' and table_name = 'notifications';")" "1"
   expect_eq "tasks present (task-writes slice: org+matter-scoped, RPC-only writes)" \

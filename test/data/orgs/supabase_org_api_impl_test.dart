@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/data/orgs/supabase_org_api.dart';
 import 'package:legalhub/data/orgs/supabase_org_api_impl.dart';
@@ -8,27 +10,43 @@ void main() {
     late List<String> calls;
     late Map<String, Object?> data;
     late Map<String, PostgrestException> errors;
+    late Set<String> timeouts;
     late Map<String, List<Map<String, dynamic>>> tableData;
     late Map<String, PostgrestException> tableErrors;
+    late List<String?> tableFilterColumns;
+    late List<Object?> tableFilterValues;
     late SupabaseOrgApiImpl api;
 
     setUp(() {
       calls = <String>[];
       data = <String, Object?>{};
       errors = <String, PostgrestException>{};
+      timeouts = <String>{};
       tableData = <String, List<Map<String, dynamic>>>{};
       tableErrors = <String, PostgrestException>{};
+      tableFilterColumns = <String?>[];
+      tableFilterValues = <Object?>[];
       api = SupabaseOrgApiImpl(
         (String function, Map<String, dynamic> params) async {
           calls.add('$function:${params.values.join(',')}');
+          if (timeouts.contains(function)) {
+            throw TimeoutException('slow provider');
+          }
           final PostgrestException? error = errors[function];
           if (error != null) {
             throw error;
           }
           return PostgrestResponse<dynamic>(data: data[function], count: 0);
         },
-        (String table, String columns) async {
+        (
+          String table,
+          String columns, {
+          String? filterColumn,
+          Object? filterValue,
+        }) async {
           calls.add('$table:$columns');
+          tableFilterColumns.add(filterColumn);
+          tableFilterValues.add(filterValue);
           final PostgrestException? error = tableErrors[table];
           if (error != null) {
             throw error;
@@ -246,6 +264,19 @@ void main() {
       ]);
     });
 
+    test(
+      'listMyMemberships filters the memberships read by user_id server-side '
+      '(P1: >200 visible co-member rows cannot truncate the caller away)',
+      () async {
+        tableData['memberships'] = const <Map<String, dynamic>>[];
+
+        await api.listMyMemberships(userId: 'u-1');
+
+        expect(tableFilterColumns, <String?>['user_id']);
+        expect(tableFilterValues, <Object?>['u-1']);
+      },
+    );
+
     test('readOrgAudit sends the org id and returns only map rows', () async {
       data['read_org_audit'] = <dynamic>[
         <String, dynamic>{'id': 1, 'action': 'member:role/change'},
@@ -325,28 +356,33 @@ void main() {
     test('readOrgAudit falls back to the live zero-arg RPC when the '
         'parameterized signature is missing (A4)', () async {
       int attempts = 0;
-      final SupabaseOrgApiImpl fallbackApi = SupabaseOrgApiImpl((
-        String function,
-        Map<String, dynamic> params,
-      ) async {
-        attempts += 1;
-        if (attempts == 1) {
-          throw const PostgrestException(
-            message:
-                'Could not find the function public.read_org_audit'
-                '(p_organization_id) in the schema cache',
-            code: 'PGRST202',
+      final SupabaseOrgApiImpl fallbackApi = SupabaseOrgApiImpl(
+        (String function, Map<String, dynamic> params) async {
+          attempts += 1;
+          if (attempts == 1) {
+            throw const PostgrestException(
+              message:
+                  'Could not find the function public.read_org_audit'
+                  '(p_organization_id) in the schema cache',
+              code: 'PGRST202',
+            );
+          }
+          expect(function, 'read_org_audit');
+          expect(params, isEmpty);
+          return PostgrestResponse<dynamic>(
+            data: <dynamic>[
+              <String, dynamic>{'id': 1, 'action': 'member_invited'},
+            ],
+            count: 0,
           );
-        }
-        expect(function, 'read_org_audit');
-        expect(params, isEmpty);
-        return PostgrestResponse<dynamic>(
-          data: <dynamic>[
-            <String, dynamic>{'id': 1, 'action': 'member_invited'},
-          ],
-          count: 0,
-        );
-      }, (String table, String columns) async => <Map<String, dynamic>>[]);
+        },
+        (
+          String table,
+          String columns, {
+          String? filterColumn,
+          Object? filterValue,
+        }) async => <Map<String, dynamic>>[],
+      );
 
       final List<Map<String, dynamic>> rows = await fallbackApi.readOrgAudit(
         organizationId: 'org-1',
@@ -361,13 +397,18 @@ void main() {
       'readOrgAudit does not retry a non-missing-function failure (A4)',
       () async {
         int attempts = 0;
-        final SupabaseOrgApiImpl deniedApi = SupabaseOrgApiImpl((
-          String function,
-          Map<String, dynamic> params,
-        ) async {
-          attempts += 1;
-          throw const PostgrestException(message: 'permission denied');
-        }, (String table, String columns) async => <Map<String, dynamic>>[]);
+        final SupabaseOrgApiImpl deniedApi = SupabaseOrgApiImpl(
+          (String function, Map<String, dynamic> params) async {
+            attempts += 1;
+            throw const PostgrestException(message: 'permission denied');
+          },
+          (
+            String table,
+            String columns, {
+            String? filterColumn,
+            Object? filterValue,
+          }) async => <Map<String, dynamic>>[],
+        );
 
         await expectLater(
           deniedApi.readOrgAudit(organizationId: 'org-1'),
@@ -478,6 +519,41 @@ void main() {
 
         expect(id, 'membership-3');
         expect(calls, <String>['accept_invitation:the-token']);
+      },
+    );
+
+    test('maps a transport timeout to providerUnavailable', () async {
+      timeouts.add('create_organization');
+
+      await expectLater(
+        api.createOrganization(name: 'New Firm'),
+        throwsA(
+          isA<SupabaseOrgException>()
+              .having(
+                (e) => e.kind,
+                'kind',
+                SupabaseOrgFailureKind.providerUnavailable,
+              )
+              .having((e) => e.message, 'message', orgRequestFailedMessage),
+        ),
+      );
+    });
+
+    test(
+      'a void RPC transport timeout is a typed providerUnavailable',
+      () async {
+        timeouts.add('remove_membership');
+
+        await expectLater(
+          api.removeMember(organizationId: 'org-1', userId: 'u-1'),
+          throwsA(
+            isA<SupabaseOrgException>().having(
+              (e) => e.kind,
+              'kind',
+              SupabaseOrgFailureKind.providerUnavailable,
+            ),
+          ),
+        );
       },
     );
   });

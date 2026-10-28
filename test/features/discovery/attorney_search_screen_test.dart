@@ -4,6 +4,7 @@ import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/features/discovery/data/fake_attorney_gateway.dart';
 import 'package:legalhub/features/discovery/domain/attorney.dart';
 import 'package:legalhub/features/discovery/presentation/attorney_search_screen.dart';
+import 'package:legalhub/features/discovery/presentation/discovery_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
 void main() {
@@ -63,6 +64,25 @@ void main() {
       expect(find.text('Layla Mansour'), findsNothing);
       expect(find.text('Sara Khalil'), findsNothing);
     });
+
+    testWidgets(
+      'the local filter applies on the keystroke, before the 300ms server '
+      'debounce (P-6)',
+      (tester) async {
+        await pumpSearch(tester);
+
+        await tester.enterText(find.byType(TextFormField), 'Layla');
+        await tester.pump();
+
+        // buildWhen keeps the query in the rebuild set: the list is already
+        // narrowed on this frame, with the debounced server read still pending.
+        expect(find.text('Omar Farouk'), findsNothing);
+
+        // Let the pending debounce fire so no timer outlives the test.
+        await tester.pump(DiscoveryCubit.searchDebounce);
+        await tester.pumpAndSettle();
+      },
+    );
 
     testWidgets(
       'an empty result set renders the localized empty state (AC-2)',

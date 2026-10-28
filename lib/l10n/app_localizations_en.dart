@@ -132,7 +132,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get socialSignInUnavailable =>
-      'Social sign-in is not available yet. Use email or the demo session.';
+      'Apple sign-in is not available yet. Use Google, email, or the demo session.';
 
   @override
   String get newToLegalHub => 'New to LegalHub?';
@@ -2132,6 +2132,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get videoCreateDateRequired =>
       'Choose a date and time for the session.';
+
+  @override
+  String get videoCreateDateFuture => 'Choose a date and time in the future.';
 
   @override
   String get videoCreateNoOrg =>

@@ -62,6 +62,7 @@ class _MatterInvoicesSectionState extends State<MatterInvoicesSection> {
           onRetry: () => context.read<MatterWorkspaceCubit>().loadInvoices(),
           errorCopy: l10n.invoicesError,
           emptyCopy: l10n.matterWorkspaceInvoicesEmpty,
+          viewAllCopy: l10n.viewAll,
           itemBuilder: (BuildContext context, Invoice invoice) => AppTile(
             title: invoice.invoiceNumber,
             subtitles: <String>[

@@ -6,7 +6,8 @@ notification, task, booking, matter-file storage, payment, attorney
 directory, approval-workflow, compliance-alert, AI-research, and
 video-consultation slices. It is not yet a production legal platform: live
 payment collection is owner-gated (demo mode ships, default disabled);
-provider social sign-in and push-notification delivery are not implemented.
+Google sign-in ships and Apple sign-in is visibly disabled (no Apple
+credentials); push-notification delivery is not implemented.
 The attorney directory is a real platform-managed table, but it carries
 professional profile data only and no credential verification. Compliance
 alerts are recorded records, not an automated legal-verification engine. AI
@@ -20,7 +21,7 @@ LegalHub is a legal-services client app: consultation booking, attorney
 discovery (with practice-area deep links), matter management, a document
 vault, messaging, approvals, task/compliance boards, organization +
 membership administration (create / roster / invites / roles), a
-platform-admin surface, and a demo-posture video-consultation room — 34
+platform-admin surface, and a demo-posture video-consultation room — 36
 screens behind an auth-aware GoRouter shell.
 
 - **Architecture** — feature-first Clean Architecture (domain / data /
@@ -29,11 +30,14 @@ screens behind an auth-aware GoRouter shell.
   as the credential-free fakes, and env-configured builds flip per seam.
 - **Localization** — full EN / AR / TR with RTL layouts and generated
   localizations.
-- **Live backend** — the task, booking, matter-file-write and payment schema
-  and RPCs are applied on the dev project; live payment collection stays
-  disabled until the Paymob secrets and a dated D-11 exception are in place
-  ([apply record](docs/live_apply_2026-10-21.md)).
-- **Quality gates** — 1925 tests, analyzer-clean, `dart format` pinned to the
+- **Live backend** — migrations 01–31, the 22 public policies and the full
+  RPC surface were applied to the dev project on 2026-10-28; RPC writes and the
+  participant read gates are live
+  ([apply record](docs/live_apply_2026-10-28_audit_followups.md)). Live payment
+  collection stays disabled until the Paymob secrets and a dated D-11 exception
+  are in place. `research-analyze` and `video-token` are deployed but return
+  `provider_not_configured` until `RIVER_*` / `LIVEKIT_*` are added.
+- **Quality gates** — 2062 tests, analyzer-clean, `dart format` pinned to the
   CI toolchain, a hash-pinned governance ledger (`scripts/verify_ledger.sh`)
   reconciling docs claims against the git object database, and
   `docs/audit/LegalHub_AUDIT_2026-09-21.md` as the running build journal.
@@ -98,7 +102,7 @@ recorded prerequisites are approved — see
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (1925 total) — full suite green 2026-10-24 (1931 at runtime): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (2062 total) — full suite green 2026-10-28 (2068 at runtime): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), ThemeCubit (mode persistence + restart
   restore), Redactor (password/OTP/email/Bearer redaction with leak guards),
@@ -136,7 +140,7 @@ recorded prerequisites are approved — see
    assertions, and the build-flavor configuration (`AppFlavor` parsing,
    flavor application-ID / deep-link-scheme separation, Supabase-seam
    adaptation, and flavor-pinned entrypoint defaults).
-- Coverage: **1423 tests** (2026-09-23 — the D-15 video-consultation demo
+- Coverage history: **1423 tests** (2026-09-23 — the D-15 video-consultation demo
   slice: the synthetic `VideoGateway` seam + 4-session deterministic fake
   (zero real media, zero writes, posture doc
   `docs/video_scope_decision_2026-08-11.md`), the join/leave call surface
@@ -451,8 +455,8 @@ HTTP layer and lock the exact postgrest await shape the app depends on —
 (2: `from().select()` plain + chained `.eq()` → raw row list). A future
 postgrest upgrade that changes the await contract fails loudly in CI, not on
 a device (the on-device create-org crash this class caused is recorded in
-`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **1925 tests**
-(1925 tracked declarations, 1931 at runtime; ledger `verify_ledger.sh` PASS).
+`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **2062 tests**
+(2062 tracked declarations, 2068 at runtime; ledger `verify_ledger.sh` PASS).
 
 ## Fonts and licenses
 
@@ -461,10 +465,26 @@ are committed under `assets/licenses/`.
 
 ## Deferred work
 
-Product capabilities beyond B13 remain blocked until their prerequisites are
-approved: real authentication/authorization policy, tenant model and RLS,
-privacy and retention controls, legal review of claims and consent, secure
-storage, observability policy, and feature-specific acceptance tests.
+Everything below still needs an owner action or a provider credential; the
+demo/fake seams keep the app usable until then.
+
+- **Live payments** — dated D-11 exception + Paymob secrets
+  (`PAYMOB_*`), and `PAYMENTS_MODE` flipped for the release build.
+- **AI research / video calls** — set `RIVER_*`, `LIVEKIT_*` and
+  `ALLOWED_ORIGINS`; the functions are deployed but fail closed.
+- **Push notifications** — no FCM/OneSignal delivery; the in-app feed is live.
+- **Apple sign-in** — no Apple developer credentials; the control is disabled.
+- **iOS distribution** — Apple Team ID, a populated AASA, and store signing.
+- **Store submission** — phone screenshots (EN/AR), a hosted privacy-policy
+  URL, the data-safety form, content rating, and a contact email.
+- **Release observability** — the error boundary reports through the redacting
+  console reporter; a remote sink (Sentry/OTP) is owner-gated.
+- **CI hardening** — the live RLS battery still runs as an owner-side
+  rehearsal, not in CI; `SUPABASE_URL`/`SUPABASE_ANON_KEY` repo secrets enable
+  the release-AAB CI proof.
+- **Product decisions** — conflict/waiver/regulatory filing clusters,
+  credential verification, invite-email delivery, MFA/SSO, offline-send queue,
+  and provider chat-thread creation remain out of scope per the decision log.
 
 ## Decision log
 

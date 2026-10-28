@@ -74,12 +74,22 @@ class SupabaseNotificationGateway implements NotificationGateway {
     if (summary is! String || summary.isEmpty) {
       throw FormatException('Notification row has no summary');
     }
-    // `server_timestamp` is a timestamptz → PostgREST hands back a Dart
-    // DateTime; anything else is provider drift (the invoices
-    // malformed-row guard baseline). Converted to local time here, at the
-    // mapping boundary, because the tile formats the value directly.
-    final Object? serverTimestamp = row['server_timestamp'];
-    if (serverTimestamp is! DateTime) {
+    // PostgREST returns `timestamptz` as an ISO-8601 string. The DateTime
+    // arm is retained for unit fixtures and legacy callers; anything else
+    // is provider drift and surfaces as a typed failure.
+    final Object? rawTimestamp = row['server_timestamp'];
+    final DateTime serverTimestamp;
+    if (rawTimestamp is DateTime) {
+      serverTimestamp = rawTimestamp;
+    } else if (rawTimestamp is String && rawTimestamp.isNotEmpty) {
+      final DateTime? parsed = DateTime.tryParse(rawTimestamp);
+      if (parsed == null) {
+        throw FormatException(
+          'Notification row has an invalid server_timestamp',
+        );
+      }
+      serverTimestamp = parsed;
+    } else {
       throw FormatException('Notification row has no server_timestamp');
     }
     final Object? isRead = row['is_read'];

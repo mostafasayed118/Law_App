@@ -152,3 +152,24 @@
 ---
 
 > This report was produced by the Software Workshop AI team. All blocking conclusions were re-verified against the source tree at `0dee9cc`; the Go/No-Go decision should nonetheless be confirmed by the engineering owner.
+
+---
+
+## Re-review addendum — 2026-10-28 (not a new Go/No-Go)
+
+The 2026-09-24 report remains the last formal verdict; this addendum only
+records which blockers moved. It is **not** a Go decision — the owner still
+signs that.
+
+| Blocker | 2026-09-24 state | 2026-10-28 state |
+|---|---|---|
+| B1 `context.push` back-stack | open | **fixed** (31 push vs 16 go; `home_back_stack_test`) |
+| B2 Google sign-in | dead control | **fixed** (real `signInWithOAuth`; Apple visibly disabled) |
+| B3 stale sign-in error | open | **fixed** (error cleared on retry) |
+| B4 live RLS proof | no behavioural run | **partially closed** — battery exists; still owner-side, not CI |
+| B5 ABI guard / release proof | open | **fixed** (CI debug-APK ABI assert; release AAB now secret-gated) |
+
+Remaining release blockers: hosted privacy-policy URL, EN/AR screenshots,
+data-safety + content-rating forms, Apple Team ID/AASA, provider secrets
+(Paymob/River/LiveKit), and a remote crash sink. See the README §Deferred work
+and `docs/rollback_plan.md` §4 for the halt procedure.

@@ -131,7 +131,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get socialSignInUnavailable =>
-      'تسجيل الدخول عبر وسائل التواصل غير متاح بعد. استخدم البريد الإلكتروني أو الجلسة التجريبية.';
+      'تسجيل الدخول عبر Apple غير متاح بعد. استخدم Google أو البريد الإلكتروني أو الجلسة التجريبية.';
 
   @override
   String get newToLegalHub => 'جديد على LegalHub؟';
@@ -2116,6 +2116,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get videoCreateDateRequired => 'اختر تاريخًا ووقتًا للجلسة.';
+
+  @override
+  String get videoCreateDateFuture => 'اختر تاريخًا ووقتًا في المستقبل.';
 
   @override
   String get videoCreateNoOrg => 'اختر مؤسسة قبل جدولة جلسة.';

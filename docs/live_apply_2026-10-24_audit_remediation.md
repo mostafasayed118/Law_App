@@ -1,8 +1,8 @@
 # Live apply — 2026-10-24 audit remediation (participant read gates + edge hardening)
 
-**STATUS: NOT YET APPLIED.** This document is the forward-only apply plan for the
-verified security findings fixed in this change. Nothing here was run against a
-live database.
+**STATUS: APPLIED 2026-10-28** (see `docs/live_apply_2026-10-28_audit_followups.md`).
+This document is the forward-only apply plan for the verified security findings
+fixed in this change.
 
 **Scope:** `supabase/migrations/27_audit_remediation.sql`,
 the seven read-policy files under `supabase/policies/`, the seven read RPCs under

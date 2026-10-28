@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/storage/data/fake_storage_gateway.dart';
 import 'package:legalhub/features/storage/domain/file_metadata.dart';
+import 'package:legalhub/features/storage/domain/storage_gateway.dart';
 
 void main() {
   group('FakeStorageGateway.fetchFiles (D-STR7)', () {
@@ -111,6 +112,29 @@ void main() {
         expect(file.storagePath, isNot(startsWith('http')));
         expect(file.storagePath, isNot(contains('?')));
       }
+    });
+  });
+
+  group('uploadTimeoutForBytes (F9 size-aware deadline)', () {
+    test('scales with payload size', () {
+      // 30s base + 1s per 128 KiB: 25 MiB (the bucket cap) → 230s.
+      expect(uploadTimeoutForBytes(0), const Duration(seconds: 30));
+      expect(
+        uploadTimeoutForBytes(25 * 1024 * 1024),
+        const Duration(seconds: 230),
+      );
+    });
+
+    test('rounds a partial slice up and floors a negative size', () {
+      expect(
+        uploadTimeoutForBytes(kUploadBytesPerTimeoutSecond),
+        const Duration(seconds: 31),
+      );
+      expect(
+        uploadTimeoutForBytes(kUploadBytesPerTimeoutSecond + 1),
+        const Duration(seconds: 32),
+      );
+      expect(uploadTimeoutForBytes(-1), kUploadTimeoutBase);
     });
   });
 

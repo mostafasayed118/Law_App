@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:legalhub/core/errors/app_error.dart';
@@ -81,9 +83,26 @@ class FileTransferCubit extends Cubit<FileTransferState> {
         case Failure<FileMetadata>(error: final AppError error):
           emit(FileTransferState.failure(error, fileName: picked.name));
       }
+    } on FileTooLargeException {
+      if (!isClosed) {
+        emit(
+          const FileTransferState.failure(
+            AppError(
+              code: 'file_upload_too_large',
+              userMessage: 'This file is too large.',
+            ),
+          ),
+        );
+      }
     } on FilePickException {
       if (!isClosed) {
         emit(const FileTransferState.failure(_pickFailedError));
+      }
+    } on TimeoutException {
+      // The gateway maps its own deadline; this arm keeps a raw one from
+      // stranding the UI in `uploading` (audit 2026-10-27, F9).
+      if (!isClosed) {
+        emit(const FileTransferState.failure(_uploadTimedOutError));
       }
     } finally {
       _uploading = false;
@@ -132,6 +151,12 @@ class FileTransferCubit extends Cubit<FileTransferState> {
 const AppError _pickFailedError = AppError(
   code: 'file_upload_failed',
   userMessage: 'Unable to upload the file. Please try again.',
+);
+
+const AppError _uploadTimedOutError = AppError(
+  code: 'file_upload_unavailable',
+  userMessage: 'File uploads are temporarily unavailable. Please try again.',
+  kind: AppErrorKind.unavailable,
 );
 
 const AppError _openFailedError = AppError(

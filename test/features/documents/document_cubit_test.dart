@@ -132,6 +132,21 @@ void main() {
       ],
       verify: (_) => expect(gateway.fetchCalls, 2),
     );
+
+    test(
+      'a thrown load resets the guard so a retry reaches the gateway (N1)',
+      () async {
+        gateway = _StubDocumentGateway(throwFirst: true);
+        final DocumentCubit cubit = DocumentCubit(gateway);
+        addTearDown(cubit.close);
+
+        await expectLater(cubit.load(), throwsA(isA<StateError>()));
+        await cubit.load();
+
+        expect(gateway.fetchCalls, 2);
+        expect(cubit.state.documents, ViewSuccess<List<Document>>(_documents));
+      },
+    );
   });
 }
 
@@ -174,23 +189,32 @@ const AppError _unavailableFailure = AppError(
 /// Hand-rolled gateway stub: queue of results (like the matter/discovery
 /// stubs), or a Completer for in-flight tests.
 class _StubDocumentGateway implements DocumentGateway {
-  _StubDocumentGateway({List<Result<List<Document>>>? results})
-    : _queue = results == null
-          ? <Result<List<Document>>>[Result<List<Document>>.success(_documents)]
-          : List<Result<List<Document>>>.of(results),
-      completer = null;
+  _StubDocumentGateway({
+    List<Result<List<Document>>>? results,
+    this.throwFirst = false,
+  }) : _queue = results == null
+           ? <Result<List<Document>>>[
+               Result<List<Document>>.success(_documents),
+             ]
+           : List<Result<List<Document>>>.of(results),
+       completer = null;
 
   _StubDocumentGateway.withCompleter()
     : _queue = const <Result<List<Document>>>[],
-      completer = Completer<Result<List<Document>>>();
+      completer = Completer<Result<List<Document>>>(),
+      throwFirst = false;
 
   final List<Result<List<Document>>> _queue;
   final Completer<Result<List<Document>>>? completer;
+  final bool throwFirst;
   int fetchCalls = 0;
 
   @override
   Future<Result<List<Document>>> fetchDocuments({String? matterId}) {
     fetchCalls += 1;
+    if (throwFirst && fetchCalls == 1) {
+      throw StateError('documents gateway blew up');
+    }
     if (completer != null) {
       return completer!.future;
     }

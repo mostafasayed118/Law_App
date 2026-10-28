@@ -8,6 +8,7 @@ const MAX_CONTEXT_CHARS = 12_000;
 const MAX_DOCUMENTS = 50;
 const MAX_FINDINGS = 12;
 const PROVIDER_TIMEOUT_MS = 30_000;
+const MAX_PROVIDER_BODY_BYTES = 1_048_576;
 
 type FailureCode =
   | "unauthorized"
@@ -83,6 +84,36 @@ function fail(
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function readBoundedText(response: Response, limitBytes: number): Promise<string | null> {
+  if (response.body === null) return Promise.resolve("");
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  return (async () => {
+    try {
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        total += value.byteLength;
+        if (total > limitBytes) {
+          await reader.cancel().catch(() => {});
+          return null;
+        }
+        chunks.push(value);
+      }
+    } finally {
+      reader.releaseLock();
+    }
+    const bytes = new Uint8Array(total);
+    let offset = 0;
+    for (const chunk of chunks) {
+      bytes.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+    return new TextDecoder().decode(bytes);
+  })();
 }
 
 function stripCodeFences(text: string): string {
@@ -417,7 +448,13 @@ Deno.serve(async (request: Request): Promise<Response> => {
 
   let payload: unknown;
   try {
-    payload = JSON.parse(await upstream.text());
+    const bodyText = await readBoundedText(upstream, MAX_PROVIDER_BODY_BYTES);
+    if (bodyText === null) {
+      console.error("research-analyze provider response exceeded the size cap");
+      await recordFailure(runId, "invalid_response");
+      return fail(502, "invalid_response", cors);
+    }
+    payload = JSON.parse(bodyText);
   } catch {
     await recordFailure(runId, "invalid_response");
     return fail(500, "invalid_response", cors);

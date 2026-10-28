@@ -1,8 +1,7 @@
 # Live apply — 2026-10-24 list bounds, audit indexes, payment retry, research scoping
 
-**STATUS: NOT YET APPLIED.** This document is the forward-only apply plan for
-this change. Nothing here was run against a live database, and no edge function
-was deployed.
+**STATUS: APPLIED 2026-10-28** (see `docs/live_apply_2026-10-28_audit_followups.md`).
+This document is the forward-only apply plan for this change.
 
 **Scope:** `supabase/migrations/28_audit_indexes_and_list_bounds.sql`, seven
 bounded list RPCs under `supabase/rpc/`, `supabase/rpc/initiate_invoice_payment.sql`,

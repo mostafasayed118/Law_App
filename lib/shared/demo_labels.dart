@@ -132,6 +132,23 @@ String demoAlertTitle(AppLocalizations l10n, String title) => switch (title) {
   _ => title,
 };
 
+/// Approval-request title.
+///
+/// The five synthetic rows have no dedicated keys, so each resolves to the
+/// existing request-kind label — the same wording the kind line underneath
+/// already renders. The qualifiers that distinguish the two conflict rows
+/// ("new intake" / "opposing counsel") are therefore not localized; adding
+/// them needs new keys.
+String demoApprovalTitle(AppLocalizations l10n, String title) =>
+    switch (title) {
+      'Demo conflict check — new intake' => l10n.approvalKindConflict,
+      'Demo engagement waiver' => l10n.approvalKindWaiver,
+      'Demo court filing approval' => l10n.approvalKindFiling,
+      'Demo expense approval' => l10n.approvalKindExpense,
+      'Demo conflict check — opposing counsel' => l10n.approvalKindConflict,
+      _ => title,
+    };
+
 /// Task-board title.
 String demoTaskTitle(AppLocalizations l10n, String title) => switch (title) {
   'Demo: draft response checklist' => l10n.demoTaskTitle1,

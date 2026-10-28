@@ -12,6 +12,9 @@ import 'package:legalhub/features/auth/domain/sign_up_request.dart';
 class _FakeAuthApi implements SupabaseAuthApi {
   _FakeAuthApi(this.signUpResult);
 
+  @override
+  Future<bool> signInWithGoogle({required String redirectTo}) async => false;
+
   final SupabaseSignUpResult signUpResult;
 
   String? capturedEmail;

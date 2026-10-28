@@ -104,6 +104,21 @@ void main() {
       );
       expect(demoTaskTitle(en, 'Demo: gather documents'), en.demoTaskTitle2);
     });
+
+    test('approval titles map to the request-kind labels', () {
+      expect(
+        demoApprovalTitle(en, 'Demo conflict check — new intake'),
+        en.approvalKindConflict,
+      );
+      expect(
+        demoApprovalTitle(ar, 'Demo court filing approval'),
+        ar.approvalKindFiling,
+      );
+      expect(
+        demoApprovalTitle(en, 'Server-provided title'),
+        'Server-provided title',
+      );
+    });
   });
 
   group('research recomposition helpers', () {

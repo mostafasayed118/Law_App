@@ -9,6 +9,7 @@ import 'package:legalhub/features/matters/domain/matter.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
+import 'package:legalhub/shared/widgets/form_sheet_scaffold.dart';
 
 import 'video_cubit.dart';
 import 'video_error_messages.dart';
@@ -55,6 +56,7 @@ class _VideoCreateSheetState extends State<VideoCreateSheet> {
   String? _selectedMatterId;
   DateTime? _scheduledAt;
   bool _dateMissing = false;
+  bool _dateInPast = false;
   bool _submitting = false;
   AppError? _submitError;
 
@@ -72,9 +74,19 @@ class _VideoCreateSheetState extends State<VideoCreateSheet> {
       _loadingMatters = true;
       _mattersResult = null;
     });
-    final Result<List<Matter>> result = await context
-        .read<VideoCubit>()
-        .loadMatters();
+    Result<List<Matter>>? result;
+    try {
+      result = await context.read<VideoCubit>().loadMatters();
+    } catch (_) {
+      // A thrown picker read lands on the existing failure + retry arm
+      // instead of leaving the sheet on its spinner forever.
+      result = const Result<List<Matter>>.failure(
+        AppError(
+          code: 'matters_failed',
+          userMessage: 'Unable to load matters.',
+        ),
+      );
+    }
     if (!mounted) {
       return;
     }
@@ -112,6 +124,7 @@ class _VideoCreateSheetState extends State<VideoCreateSheet> {
         time.minute,
       );
       _dateMissing = false;
+      _dateInPast = false;
     });
   }
 
@@ -128,25 +141,43 @@ class _VideoCreateSheetState extends State<VideoCreateSheet> {
       setState(() => _dateMissing = true);
       return;
     }
+    if (_scheduledAt!.isBefore(DateTime.now())) {
+      setState(() => _dateInPast = true);
+      return;
+    }
     setState(() {
       _submitting = true;
       _submitError = null;
     });
-    final AppError? error = await context.read<VideoCubit>().create(
-      matterId: _selectedMatterId,
-      scheduledAt: _scheduledAt,
-    );
-    if (!mounted) {
-      return;
+    try {
+      final AppError? error = await context.read<VideoCubit>().create(
+        matterId: _selectedMatterId,
+        scheduledAt: _scheduledAt,
+      );
+      if (!mounted) {
+        return;
+      }
+      if (error == null) {
+        Navigator.of(context).pop(true);
+        return;
+      }
+      setState(() => _submitError = error);
+    } catch (_) {
+      // A thrown write must re-enable the button, not leave it spinning.
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _submitError = const AppError(
+          code: 'video_create_failed',
+          userMessage: 'Unable to schedule the session. Please try again.',
+        );
+      });
+    } finally {
+      if (mounted) {
+        setState(() => _submitting = false);
+      }
     }
-    if (error == null) {
-      Navigator.of(context).pop(true);
-      return;
-    }
-    setState(() {
-      _submitting = false;
-      _submitError = error;
-    });
   }
 
   @override
@@ -154,38 +185,40 @@ class _VideoCreateSheetState extends State<VideoCreateSheet> {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final bool hasOrganization =
         serviceLocator<ActiveOrgStore>().activeOrganizationId != null;
-    return SafeArea(
-      child: Padding(
-        padding: EdgeInsetsDirectional.only(
-          bottom: MediaQuery.viewInsetsOf(context).bottom,
-        ),
-        child: SingleChildScrollView(
-          padding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Text(
-                l10n.videoCreateTitle,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: LegalHubTheme.spaceMd),
-              if (!hasOrganization) ...<Widget>[
-                Text(
-                  l10n.videoCreateNoOrg,
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
-                ),
-                const SizedBox(height: LegalHubTheme.spaceMd),
-              ],
-              _buildForm(l10n, enabled: hasOrganization),
-            ],
+    return FormSheetScaffold(
+      title: l10n.videoCreateTitle,
+      body: <Widget>[
+        if (!hasOrganization) ...<Widget>[
+          Text(
+            l10n.videoCreateNoOrg,
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
           ),
+          const SizedBox(height: LegalHubTheme.spaceMd),
+        ],
+        _buildForm(l10n),
+      ],
+      actions: <Widget>[
+        FilledButton(
+          onPressed: _submitting || !hasOrganization ? null : _submit,
+          child: _submitting
+              ? const SizedBox.square(
+                  dimension: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(l10n.videoCreateSubmit),
         ),
-      ),
+        const SizedBox(height: LegalHubTheme.spaceSm),
+        TextButton(
+          onPressed: _submitting
+              ? null
+              : () => Navigator.of(context).pop(false),
+          child: Text(l10n.cancel),
+        ),
+      ],
     );
   }
 
-  Widget _buildForm(AppLocalizations l10n, {required bool enabled}) {
+  Widget _buildForm(AppLocalizations l10n) {
     return Form(
       key: _formKey,
       child: Column(
@@ -218,10 +251,12 @@ class _VideoCreateSheetState extends State<VideoCreateSheet> {
               ),
             ),
           ),
-          if (_dateMissing) ...<Widget>[
+          if (_dateMissing || _dateInPast) ...<Widget>[
             const SizedBox(height: LegalHubTheme.spaceXs),
             Text(
-              l10n.videoCreateDateRequired,
+              _dateInPast
+                  ? l10n.videoCreateDateFuture
+                  : l10n.videoCreateDateRequired,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.error,
                 fontSize: 12,
@@ -236,22 +271,6 @@ class _VideoCreateSheetState extends State<VideoCreateSheet> {
             ),
           ],
           const SizedBox(height: LegalHubTheme.spaceMd),
-          FilledButton(
-            onPressed: _submitting || !enabled ? null : _submit,
-            child: _submitting
-                ? const SizedBox.square(
-                    dimension: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Text(l10n.videoCreateSubmit),
-          ),
-          const SizedBox(height: LegalHubTheme.spaceSm),
-          TextButton(
-            onPressed: _submitting
-                ? null
-                : () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancel),
-          ),
         ],
       ),
     );

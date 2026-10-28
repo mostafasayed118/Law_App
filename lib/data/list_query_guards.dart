@@ -24,8 +24,8 @@ const Duration kSupabaseListReadTimeout = Duration(seconds: 15);
 /// created_at`, `08_messages.sent_at` + `messages_thread_sent` index,
 /// `14_notifications.server_timestamp` + `notifications_org_ts` index,
 /// `06_message_threads.last_activity_at`, `10_billing_invoices.issued_at`).
-/// Tables without an entry (e.g. the caller-scoped `memberships` read,
-/// whose row count is bounded by the user's own orgs) get the cap only.
+/// Tables without an entry (e.g. the `memberships` read, which is scoped
+/// to the caller's own rows by an equality filter) get the cap only.
 const Map<String, (String, bool)> kSupabaseListOrderings =
     <String, (String, bool)>{
       'matters': ('created_at', true),
@@ -88,6 +88,7 @@ const Map<String, Set<String>> kSupabaseFilterableColumns =
       },
       'messages': <String>{'id', 'thread_id'},
       'message_threads': <String>{'id', 'matter_id', 'title'},
+      'memberships': <String>{'user_id'},
     };
 
 /// Throws [ArgumentError] unless [column] is an allowed filter on [table].

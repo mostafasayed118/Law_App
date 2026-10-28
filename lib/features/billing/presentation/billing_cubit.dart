@@ -38,8 +38,13 @@ class BillingCubit extends Cubit<BillingState> {
     if (state.invoices is! ViewLoading<List<Invoice>>) {
       emit(state.copyWith(invoices: const ViewLoading<List<Invoice>>()));
     }
-    final Result<List<Invoice>> result = await _gateway.fetchInvoices();
-    _loading = false;
+    final Result<List<Invoice>> result;
+    try {
+      result = await _gateway.fetchInvoices();
+    } finally {
+      // Reset on throw too: a blown read must not wedge the retry guard.
+      _loading = false;
+    }
     if (isClosed) {
       return;
     }

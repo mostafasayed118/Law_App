@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/data/admin/supabase_platform_admin_api.dart';
 import 'package:legalhub/data/admin/supabase_platform_admin_api_impl.dart';
@@ -8,12 +10,14 @@ void main() {
     late List<String> calls;
     late Map<String, Object?> data;
     late Map<String, PostgrestException> errors;
+    late Set<String> timeouts;
     late SupabasePlatformAdminApiImpl api;
 
     setUp(() {
       calls = <String>[];
       data = <String, Object?>{};
       errors = <String, PostgrestException>{};
+      timeouts = <String>{};
       api = SupabasePlatformAdminApiImpl((
         String function,
         Map<String, dynamic> params,
@@ -21,6 +25,9 @@ void main() {
         calls.add(
           params.isEmpty ? function : '$function:${params.values.join(',')}',
         );
+        if (timeouts.contains(function)) {
+          throw TimeoutException('slow provider');
+        }
         final PostgrestException? error = errors[function];
         if (error != null) {
           throw error;
@@ -260,5 +267,44 @@ void main() {
         ),
       );
     });
+
+    test('maps a transport timeout to providerUnavailable', () async {
+      timeouts.add('list_organizations_metadata');
+
+      await expectLater(
+        api.listOrganizations(),
+        throwsA(
+          isA<SupabasePlatformAdminException>()
+              .having(
+                (e) => e.kind,
+                'kind',
+                SupabasePlatformAdminFailureKind.providerUnavailable,
+              )
+              .having(
+                (e) => e.message,
+                'message',
+                platformAdminRequestFailedMessage,
+              ),
+        ),
+      );
+    });
+
+    test(
+      'a void RPC transport timeout is a typed providerUnavailable',
+      () async {
+        timeouts.add('delete_demo_account');
+
+        await expectLater(
+          api.deleteDemoAccount(userId: 'u-9'),
+          throwsA(
+            isA<SupabasePlatformAdminException>().having(
+              (e) => e.kind,
+              'kind',
+              SupabasePlatformAdminFailureKind.providerUnavailable,
+            ),
+          ),
+        );
+      },
+    );
   });
 }

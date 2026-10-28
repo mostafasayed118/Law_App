@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<!-- Universal Links. This is an entitlement, not an Info.plist key:
+		     iOS reads it from the code-signed entitlements blob, which is why
+		     it lives here and no longer in Runner/Info.plist.
+		     The host below is the one the repository serves the association
+		     file from (web/.well-known/apple-app-site-association →
+		     https://legalhub.app/.well-known/apple-app-site-association) and
+		     matches the Android App Links host. PENDING OWNER DOMAIN: no
+		     custom domain is confirmed live yet — if the final production
+		     domain differs, update this string, the Android intent filters,
+		     and deploy the AASA with the real Apple Team ID.
+		     OWNER STEP: the AASA is deliberately inert (`details: []`) until
+		     the 10-character Team ID is supplied; see
+		     docs/deep_link_release_checklist.md §3. -->
+		<string>applinks:legalhub.app</string>
+	</array>
+</dict>
+</plist>

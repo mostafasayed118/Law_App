@@ -16,7 +16,22 @@ typedef VideoRoomConnector =
 /// Tears a room down. Injected by tests in place of the real LiveKit calls.
 typedef VideoRoomTeardown = Future<void> Function(Room room);
 
-Room _createRoom() => Room();
+/// The call profile: 360p at 15fps, with adaptive stream and dynacast so
+/// off-screen remote video and unused publisher layers stop consuming
+/// bandwidth/CPU (audit 2026-10-27, F8).
+RoomOptions videoRoomOptions() => const RoomOptions(
+  adaptiveStream: true,
+  dynacast: true,
+  defaultCameraCaptureOptions: CameraCaptureOptions(
+    params: VideoParametersPresets.h360_169,
+    maxFrameRate: 15,
+  ),
+  defaultVideoPublishOptions: VideoPublishOptions(
+    videoEncoding: VideoEncoding(maxBitrate: 450000, maxFramerate: 15),
+  ),
+);
+
+Room _createRoom() => Room(roomOptions: videoRoomOptions());
 
 Future<void> _connectRoom(Room room, String url, String token) =>
     room.connect(url, token);
@@ -70,29 +85,75 @@ class VideoCallScreen extends StatefulWidget {
   State<VideoCallScreen> createState() => _VideoCallScreenState();
 }
 
-class _VideoCallScreenState extends State<VideoCallScreen> {
+class _VideoCallScreenState extends State<VideoCallScreen>
+    with WidgetsBindingObserver {
   Room? _room;
   bool _connecting = true;
   bool _failed = false;
   bool _leaving = false;
   bool _mediaWarning = false;
+
+  /// The user's intent. A lifecycle pause must not change these: they are
+  /// what the camera/mic are restored to when the app resumes.
   bool _micOn = true;
   bool _cameraOn = true;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     unawaited(_connect());
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     final Room? room = _room;
     _room = null;
     if (room != null) {
       unawaited((widget.teardown ?? teardownVideoRoom)(room));
     }
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final Room? room = _room;
+    if (room == null) {
+      return;
+    }
+    switch (state) {
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.hidden:
+        // A backgrounded call must stop capturing and publishing; the
+        // intent flags stay untouched for the resume branch.
+        unawaited(_setMedia(room, camera: false, microphone: false));
+      case AppLifecycleState.resumed:
+        unawaited(_setMedia(room, camera: _cameraOn, microphone: _micOn));
+      case AppLifecycleState.detached:
+        break;
+    }
+  }
+
+  /// Applies [camera]/[microphone] to the local participant. Teardown races
+  /// (the room is already gone) are swallowed: a lifecycle failure is never
+  /// a call failure.
+  Future<void> _setMedia(
+    Room room, {
+    required bool camera,
+    required bool microphone,
+  }) async {
+    final LocalParticipant? local = room.localParticipant;
+    if (local == null) {
+      return;
+    }
+    try {
+      await local.setCameraEnabled(camera);
+      await local.setMicrophoneEnabled(microphone);
+    } on Object {
+      // The room may already be tearing down.
+    }
   }
 
   VideoRoomTeardown get _teardownRoom => widget.teardown ?? teardownVideoRoom;

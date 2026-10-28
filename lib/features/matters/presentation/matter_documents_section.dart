@@ -56,6 +56,7 @@ class _MatterDocumentsSectionState extends State<MatterDocumentsSection> {
           onRetry: () => context.read<MatterWorkspaceCubit>().loadDocuments(),
           errorCopy: l10n.vaultError,
           emptyCopy: l10n.matterWorkspaceDocumentsEmpty,
+          viewAllCopy: l10n.viewAll,
           itemBuilder: (BuildContext context, Document document) => AppTile(
             title: demoDocumentTitle(l10n, document.title),
             subtitles: <String>[

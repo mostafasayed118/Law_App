@@ -49,7 +49,7 @@ collects no real personal data, does not provide actual legal advice, and
 is not a substitute for a licensed lawyer.
 
 ENGINEERING QUALITY
-34 screens, 1,400+ automated tests, clean architecture, and a governed
+34 screens, 2,000+ automated tests, clean architecture, and a governed
 release pipeline.
 ```
 

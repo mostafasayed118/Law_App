@@ -89,8 +89,11 @@ class SupabaseStorageGateway implements StorageGateway {
       final String path =
           '$organizationId/$matterId/'
           '${DateTime.now().microsecondsSinceEpoch}-${_safeFileName(name)}';
-      await _api.uploadObject(path, bytes, mimeType);
+      // Register the key before the write: if the upload times out (or lands
+      // late) the object can still exist without a metadata row, and the
+      // failure arm below must know what to delete (audit 2026-10-27, F9).
       uploadedPath = path;
+      await _api.uploadObject(path, bytes, mimeType);
 
       final Map<String, dynamic> response = await _api.registerMatterFile(
         matterId: matterId,

@@ -38,8 +38,13 @@ class MessageCubit extends Cubit<MessageState> {
     if (state.threads is! ViewLoading<List<MessageThread>>) {
       emit(state.copyWith(threads: const ViewLoading<List<MessageThread>>()));
     }
-    final Result<List<MessageThread>> result = await _gateway.fetchThreads();
-    _loading = false;
+    final Result<List<MessageThread>> result;
+    try {
+      result = await _gateway.fetchThreads();
+    } finally {
+      // Reset on throw too: a blown read must not wedge the retry guard.
+      _loading = false;
+    }
     if (isClosed) {
       return;
     }

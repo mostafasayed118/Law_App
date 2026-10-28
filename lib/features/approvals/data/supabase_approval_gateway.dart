@@ -1,8 +1,9 @@
-﻿import 'package:legalhub/core/errors/app_error.dart';
+import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/data/approvals/supabase_approval_api.dart';
+import 'package:legalhub/data/row_reader.dart';
 import 'package:legalhub/features/approvals/domain/approvals_gateway.dart';
 import 'package:legalhub/features/approvals/domain/pending_approval.dart';
-import 'supabase_approval_api.dart';
 
 /// Approval-request gateway backed by the Supabase provider (design §3).
 ///
@@ -153,22 +154,30 @@ class SupabaseApprovalGateway implements ApprovalsGateway {
   /// created_at) so a malformed row surfaces as a typed `FormatException`
   /// rather than a raw cast error across the boundary.
   PendingApproval _fromRow(Map<String, dynamic> row) {
-    final String id = _requiredString(row, 'id');
-    final String organizationId = _requiredString(row, 'organization_id');
-    final String title = _requiredString(row, 'title');
+    final String id = requiredString(row, 'id', allowWhitespaceOnly: true);
+    final String organizationId = requiredString(
+      row,
+      'organization_id',
+      allowWhitespaceOnly: true,
+    );
+    final String title = requiredString(
+      row,
+      'title',
+      allowWhitespaceOnly: true,
+    );
     return PendingApproval(
       id: id,
       organizationId: organizationId,
-      matterId: _optionalString(row['matter_id']),
+      matterId: optionalString(row['matter_id']),
       title: title,
-      description: _optionalString(row['description']),
+      description: optionalString(row['description']),
       kind: _kindOf(row['kind']),
       status: _statusOf(row['status']),
-      requestedBy: _optionalString(row['requested_by']),
-      decidedBy: _optionalString(row['decided_by']),
-      decidedAt: _optionalDate(row['decided_at']),
-      decisionNote: _optionalString(row['decision_note']),
-      createdAt: _requiredDate(row, 'created_at'),
+      requestedBy: optionalString(row['requested_by']),
+      decidedBy: optionalString(row['decided_by']),
+      decidedAt: optionalDate(row['decided_at']),
+      decisionNote: optionalString(row['decision_note']),
+      createdAt: requiredDate(row, 'created_at'),
     );
   }
 
@@ -195,45 +204,6 @@ class SupabaseApprovalGateway implements ApprovalsGateway {
     ApprovalStatus.denied => 'rejected',
     ApprovalStatus.cancelled => 'cancelled',
   };
-
-  String _requiredString(Map<String, dynamic> row, String field) {
-    final Object? value = row[field];
-    if (value is! String || value.isEmpty) {
-      throw FormatException('Approval row has no $field');
-    }
-    return value;
-  }
-
-  DateTime _requiredDate(Map<String, dynamic> row, String field) {
-    final Object? value = row[field];
-    if (value is! String) {
-      throw FormatException('Approval row has no $field');
-    }
-    final DateTime? parsed = DateTime.tryParse(value);
-    if (parsed == null) {
-      throw FormatException('Approval row has an invalid $field');
-    }
-    return parsed;
-  }
-
-  DateTime? _optionalDate(Object? value) {
-    if (value is! String || value.isEmpty) {
-      return null;
-    }
-    final DateTime? parsed = DateTime.tryParse(value);
-    if (parsed == null) {
-      throw const FormatException('Approval row has an invalid date');
-    }
-    return parsed;
-  }
-
-  String? _optionalString(Object? value) {
-    if (value is! String) {
-      return null;
-    }
-    final String trimmed = value.trim();
-    return trimmed.isEmpty ? null : trimmed;
-  }
 
   /// Maps a seam failure to a redaction-safe [AppError]. Request content never
   /// crosses into errors; only the provider's own message crosses as the

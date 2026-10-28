@@ -30,12 +30,21 @@ class PracticeAreaCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        child: SizedBox(
-          width: 160,
-          height: 192,
+        // Min-height (not a fixed 192) so the label can grow at large text
+        // scales instead of overflowing; the bottom-aligned column keeps the
+        // original visual posture at the default scale.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            minWidth: 160,
+            maxWidth: 160,
+            minHeight: 192,
+          ),
           child: Padding(
             padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
             child: Column(
+              // min + the ConstrainedBox floor: short labels keep the original
+              // 192px card with the content bottom-aligned, long ones grow.
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -54,6 +63,8 @@ class PracticeAreaCard extends StatelessWidget {
                 ),
                 Text(
                   label,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: scheme.onSurface,

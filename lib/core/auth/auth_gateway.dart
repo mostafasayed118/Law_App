@@ -35,6 +35,16 @@ abstract interface class AuthGateway {
     required String password,
   });
 
+  /// Starts the Google OAuth browser flow.
+  ///
+  /// Returns true when the provider browser was launched. The session does not
+  /// come back from this call: the user completes consent in the browser, the
+  /// provider redirects to the app's registered callback deep link, and the
+  /// authenticated session arrives asynchronously through [sessionChanges].
+  /// A false return is a launch failure (provider unavailable), never a
+  /// silent success.
+  Future<bool> startGoogleSignIn();
+
   /// Bootstrap-only demo path — not an authentication mechanism and must not
   /// be used as production authorization.
   Future<AuthOutcome<Session>> startDemoSession();

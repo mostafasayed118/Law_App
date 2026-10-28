@@ -124,6 +124,7 @@ class _MatterFilesSectionState extends State<MatterFilesSection> {
                         context.read<MatterWorkspaceCubit>().loadFiles(),
                     errorCopy: l10n.filesError,
                     emptyCopy: l10n.matterWorkspaceFilesEmpty,
+                    viewAllCopy: l10n.viewAll,
                     itemBuilder: (BuildContext context, FileMetadata file) =>
                         Tooltip(
                           message: l10n.fileOpenAction,

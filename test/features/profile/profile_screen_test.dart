@@ -293,6 +293,9 @@ void main() {
 /// and the profile error surface can be exercised.
 class FailingAuthGateway implements AuthGateway {
   @override
+  Future<bool> startGoogleSignIn() async => false;
+
+  @override
   Session? get currentSession => null;
 
   @override
@@ -435,6 +438,9 @@ class _FailingDeleteOrgGateway implements OrganizationGateway {
 /// AuthCubit reaches reauthRequired and the screen must surface the
 /// localized expired message instead of stale identity.
 class ExpiredSessionGateway implements AuthGateway {
+  @override
+  Future<bool> startGoogleSignIn() async => false;
+
   @override
   Session? get currentSession => null;
 

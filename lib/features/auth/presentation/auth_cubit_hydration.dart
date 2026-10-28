@@ -76,7 +76,9 @@ mixin _AuthHydration on _AuthCubitBase {
   /// The provider stream path (Phase 4.1 deep-link) maps without hydration
   /// by design. The first-class refresh seam for an already-authenticated
   /// session is [hydrate] (P3.3) — presentation calls it after an org
-  /// mutation; the next explicit auth op re-hydrates as well.
+  /// mutation; the next explicit auth op re-hydrates as well. Bootstrap also
+  /// skips this path: `restore(hydrateMemberships: false)` emits the local
+  /// session and `main` calls [hydrate] after the first frame (F2).
   Future<void> _applyAuthenticatedSession(Session session) async {
     // This explicit hydration is fresher than any in-flight [hydrate]
     // refresh (Slice A review fix — see [_hydrationEpoch]).

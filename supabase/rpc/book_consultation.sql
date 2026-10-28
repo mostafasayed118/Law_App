@@ -25,8 +25,8 @@
 create or replace function public.book_consultation(
   p_slot_id      uuid,
   p_category     text,
-  p_topic        text default null,
-  p_attorney_ref text default null
+  p_topic        text,
+  p_attorney_ref text
 ) returns jsonb
 language plpgsql security definer set search_path = public as $$
 declare

@@ -47,8 +47,8 @@ create or replace function public.create_matter(
   p_organization_id    uuid,
   p_title              text,
   p_practice_area      text,
-  p_assigned_client_id   uuid default null,
-  p_assigned_attorney_id uuid default null
+  p_assigned_client_id   uuid,
+  p_assigned_attorney_id uuid
 ) returns uuid
 language plpgsql security definer set search_path = public as $$
 declare

@@ -109,6 +109,39 @@ void main() {
     );
 
     test(
+      'a thrown load resets the guard so a retry reaches the gateway (N1)',
+      () async {
+        gateway = _StubAttorneyGateway(throwFirst: true);
+        final DiscoveryCubit cubit = DiscoveryCubit(gateway);
+        addTearDown(cubit.close);
+
+        await expectLater(cubit.load(), throwsA(isA<StateError>()));
+        await cubit.load();
+
+        expect(gateway.fetchCalls, 2);
+        expect(cubit.state.attorneys, ViewSuccess<List<Attorney>>(_attorneys));
+      },
+    );
+
+    test(
+      'a thrown profile load resets its guard so a retry reaches the gateway (N1)',
+      () async {
+        gateway = _StubAttorneyGateway(throwProfileFirst: true);
+        final DiscoveryCubit cubit = DiscoveryCubit(gateway);
+        addTearDown(cubit.close);
+
+        await expectLater(
+          cubit.loadProfile('attorney-1'),
+          throwsA(isA<StateError>()),
+        );
+        await cubit.loadProfile('attorney-1');
+
+        expect(gateway.profileCalls, 2);
+        expect(cubit.state.profile, isA<ViewEmpty<Attorney>>());
+      },
+    );
+
+    test(
       'load forwards the current query to the gateway (design §2)',
       () async {
         final DiscoveryCubit cubit = DiscoveryCubit(gateway);
@@ -250,25 +283,38 @@ final AppError _loadFailure = AppError(
 /// Hand-rolled gateway stub: queue of results (like the booking stub), or a
 /// Completer for in-flight tests.
 class _StubAttorneyGateway implements AttorneyGateway {
-  _StubAttorneyGateway({List<Result<List<Attorney>>>? results})
-    : _queue = results == null
-          ? <Result<List<Attorney>>>[Result<List<Attorney>>.success(_attorneys)]
-          : List<Result<List<Attorney>>>.of(results),
-      completer = null;
+  _StubAttorneyGateway({
+    List<Result<List<Attorney>>>? results,
+    this.throwFirst = false,
+    this.throwProfileFirst = false,
+  }) : _queue = results == null
+           ? <Result<List<Attorney>>>[
+               Result<List<Attorney>>.success(_attorneys),
+             ]
+           : List<Result<List<Attorney>>>.of(results),
+       completer = null;
 
   _StubAttorneyGateway.withCompleter()
     : _queue = const <Result<List<Attorney>>>[],
-      completer = Completer<Result<List<Attorney>>>();
+      completer = Completer<Result<List<Attorney>>>(),
+      throwFirst = false,
+      throwProfileFirst = false;
 
   final List<Result<List<Attorney>>> _queue;
   final Completer<Result<List<Attorney>>>? completer;
+  final bool throwFirst;
+  final bool throwProfileFirst;
   int fetchCalls = 0;
+  int profileCalls = 0;
   String lastQuery = '';
 
   @override
   Future<Result<List<Attorney>>> fetchAttorneys({String query = ''}) {
     fetchCalls += 1;
     lastQuery = query;
+    if (throwFirst && fetchCalls == 1) {
+      throw StateError('discovery gateway blew up');
+    }
     if (completer != null) {
       return completer!.future;
     }
@@ -277,6 +323,10 @@ class _StubAttorneyGateway implements AttorneyGateway {
 
   @override
   Future<Result<Attorney>> fetchAttorney(String id) {
+    profileCalls += 1;
+    if (throwProfileFirst && profileCalls == 1) {
+      throw StateError('profile gateway blew up');
+    }
     return Future<Result<Attorney>>.value(
       const Result<Attorney>.failure(
         AppError(code: 'attorney_not_found', userMessage: 'Not found'),

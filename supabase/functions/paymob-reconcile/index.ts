@@ -11,7 +11,11 @@ import {
   type PaymobOutcome,
 } from "../_shared/paymob.ts";
 
-const STALE_AFTER = "15 minutes";
+// The payment-key TTL is 60 minutes (supabase/functions/_shared/paymob.ts).
+// The sweep must never outlive it, or a user who completes 3DS after the
+// sweep has their payment expired while the provider still collects the
+// money (audit H1). Keep a 5-minute margin above the key TTL.
+const STALE_AFTER = "65 minutes";
 const STALE_LIMIT = 50;
 
 type StalePayment = {

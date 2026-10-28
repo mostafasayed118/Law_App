@@ -132,7 +132,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get socialSignInUnavailable =>
-      'Sosyal medya ile giriş henüz kullanılamıyor. E-postayı veya demo oturumunu kullanın.';
+      'Apple ile giriş henüz kullanılamıyor. Google, e-posta veya demo oturumunu kullanın.';
 
   @override
   String get newToLegalHub => 'LegalHub\'te yeni misiniz?';
@@ -2133,6 +2133,9 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get videoCreateDateRequired => 'Oturum için bir tarih ve saat seçin.';
+
+  @override
+  String get videoCreateDateFuture => 'Gelecekte bir tarih ve saat seçin.';
 
   @override
   String get videoCreateNoOrg => 'Oturum planlamadan önce bir kuruluş seçin.';

@@ -29,9 +29,18 @@ begin
   -- setup). Without it the match always fails with the generic denial —
   -- intentional (no enumeration), but a known precondition, not a silent
   -- failure. README refinement #8.
+  -- The redeeming account must also have a confirmed address: an unverified
+  -- signup could otherwise register the invitee's address and redeem an
+  -- intercepted token (audit 2026-10-28, M5).
   if not found
      or v_inv.expires_at <= now()
-     or lower(v_inv.email) <> lower(coalesce(auth.jwt() ->> 'email', '')) then
+     or lower(v_inv.email) <> lower(coalesce(auth.jwt() ->> 'email', ''))
+     or not exists (
+       select 1
+         from auth.users u
+        where u.id = auth.uid()
+          and u.email_confirmed_at is not null
+     ) then
     raise exception 'invalid invitation';
   end if;
 

@@ -27,7 +27,7 @@
 create or replace function public.create_task(
   p_matter_id    uuid,
   p_title        text,
-  p_assignee_id  uuid default null
+  p_assignee_id  uuid
 ) returns jsonb
 language plpgsql security definer set search_path = public as $$
 declare

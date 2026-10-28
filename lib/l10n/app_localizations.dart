@@ -343,7 +343,7 @@ abstract class AppLocalizations {
   /// No description provided for @socialSignInUnavailable.
   ///
   /// In en, this message translates to:
-  /// **'Social sign-in is not available yet. Use email or the demo session.'**
+  /// **'Apple sign-in is not available yet. Use Google, email, or the demo session.'**
   String get socialSignInUnavailable;
 
   /// No description provided for @newToLegalHub.
@@ -3933,6 +3933,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose a date and time for the session.'**
   String get videoCreateDateRequired;
+
+  /// No description provided for @videoCreateDateFuture.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a date and time in the future.'**
+  String get videoCreateDateFuture;
 
   /// No description provided for @videoCreateNoOrg.
   ///

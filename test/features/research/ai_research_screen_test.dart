@@ -302,6 +302,35 @@ void main() {
       );
     });
 
+    testWidgets(
+      'a failed optional lookup renders inline and never blocks generation',
+      (tester) async {
+        await resetServiceLocator();
+        serviceLocator.registerLazySingleton<DocumentGateway>(
+          _FailingDocumentGateway.new,
+        );
+        serviceLocator.registerLazySingleton<MatterGateway>(
+          _FailingMatterGateway.new,
+        );
+        final _StubAiGateway stub = _StubAiGateway(
+          outcome: _outcome(<AiFinding>[_serverFinding()]),
+        );
+        await pumpResearch(tester, aiGateway: stub);
+        await tester.pumpAndSettle();
+
+        expect(find.text('Unable to load matters.'), findsOneWidget);
+        expect(find.text('Unable to load documents.'), findsOneWidget);
+        expect(find.text('Reload'), findsNWidgets(2));
+
+        await tester.enterText(find.byType(TextField), 'A valid question');
+        await tester.tap(find.text('Generate findings'));
+        await tester.pumpAndSettle();
+
+        expect(stub.lastRequest?.question, 'A valid question');
+        expect(find.text('Server headline'), findsOneWidget);
+      },
+    );
+
     testWidgets('no save/apply/export affordance exists anywhere (AC-5 pin)', (
       tester,
     ) async {

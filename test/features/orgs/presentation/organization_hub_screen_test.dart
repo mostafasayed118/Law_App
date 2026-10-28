@@ -18,6 +18,9 @@ import 'package:legalhub/l10n/app_localizations.dart';
 class _FixedAuthGateway implements AuthGateway {
   _FixedAuthGateway(this._session);
 
+  @override
+  Future<bool> startGoogleSignIn() async => false;
+
   final Session _session;
 
   @override
@@ -110,7 +113,11 @@ void main() {
 
   tearDown(() => resetServiceLocator());
 
-  Widget harness(AuthCubit authCubit, {RoleCapability? capabilities}) {
+  Widget harness(
+    AuthCubit authCubit, {
+    RoleCapability? capabilities,
+    TextDirection direction = TextDirection.ltr,
+  }) {
     return MultiBlocProvider(
       providers: <BlocProvider<dynamic>>[
         BlocProvider<AuthCubit>.value(value: authCubit),
@@ -119,7 +126,10 @@ void main() {
         locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: OrganizationHubScreen(capabilities: capabilities),
+        home: Directionality(
+          textDirection: direction,
+          child: OrganizationHubScreen(capabilities: capabilities),
+        ),
       ),
     );
   }
@@ -379,6 +389,40 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('View audit trail'), findsOneWidget);
+    });
+
+    testWidgets('mirrors the audit chevron under RTL (U-1)', (tester) async {
+      final AuthCubit authCubit = partnerHubCubit();
+      addTearDown(authCubit.close);
+      await authCubit.restore();
+
+      await tester.pumpWidget(
+        harness(
+          authCubit,
+          direction: TextDirection.rtl,
+          capabilities: const RoleCapability(
+            canViewHome: true,
+            canViewSettings: true,
+            canBookConsultation: true,
+            canViewAttorneyDiscovery: true,
+            canViewMatters: true,
+            canViewDocuments: true,
+            canViewMessages: true,
+            canViewFiles: true,
+            canViewAudit: true,
+            canViewNotifications: true,
+            canViewAlerts: true,
+            canViewTasks: true,
+            canViewApprovals: true,
+            canUseAiResearch: false,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // The entry's forward chevron follows the reading direction.
+      expect(find.byIcon(Icons.chevron_left), findsOneWidget);
+      expect(find.byIcon(Icons.chevron_right), findsNothing);
     });
 
     testWidgets('hides the entry when canViewAudit is not granted (nav hint '

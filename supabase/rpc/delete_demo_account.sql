@@ -18,6 +18,18 @@ begin
   if p_user_id = auth.uid() then
     raise exception 'cannot delete your own account via this path; use delete_my_account';
   end if;
+  -- Synthetic-only guard (audit 2026-10-28, M3): without it the platform
+  -- owner could hard-delete any real client/attorney and cascade their
+  -- memberships, matters and profile. Real-account deletion must go through
+  -- delete_my_account or an explicit data-request procedure.
+  if not exists (
+    select 1
+      from auth.users u
+     where u.id = p_user_id
+       and (u.email like '%@legalhub.test' or u.email like '%@legalhub.local')
+  ) then
+    raise exception 'target is not a synthetic demo account';
+  end if;
 
   perform public.write_audit(
     'platform:delete_demo_account', 'allowed',

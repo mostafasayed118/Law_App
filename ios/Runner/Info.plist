@@ -52,17 +52,6 @@
 			</array>
 		</dict>
 	</array>
-	<key>com.apple.developer.associated-domains</key>
-	<array>
-		<!-- Verified Universal Links (audit: custom-scheme hijack): iOS
-		     verifies legalhub.app against
-		     https://legalhub.app/.well-known/apple-app-site-association
-		     before routing here. The custom scheme above stays as the
-		     fallback. OWNER STEP: deploy
-		     web/.well-known/apple-app-site-association to legalhub.app
-		     with the real Team ID + Bundle ID. -->
-		<string>applinks:legalhub.app</string>
-	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>

@@ -13,6 +13,7 @@ import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
 
+import 'join_gate.dart';
 import 'video_call_screen.dart';
 import 'video_create_sheet.dart';
 import 'video_cubit.dart';
@@ -51,6 +52,10 @@ class _VideoConsultationScreenState extends State<VideoConsultationScreen> {
     _gateway,
     serviceLocator<MatterGateway>(),
   );
+
+  /// One Join at a time: a double tap must not stack progress dialogs or push
+  /// two call screens (audit 2026-10-27, F16).
+  final JoinGate _joinGate = JoinGate();
 
   @override
   Widget build(BuildContext context) {
@@ -105,19 +110,34 @@ class _VideoConsultationScreenState extends State<VideoConsultationScreen> {
   }
 
   Future<void> _join(VideoSession session) async {
+    if (!_joinGate.tryBegin()) {
+      return;
+    }
     final NavigatorState navigator = Navigator.of(context, rootNavigator: true);
-    unawaited(
-      showDialog<void>(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext dialogContext) => const _JoinProgressDialog(),
-      ),
+    // Push an explicit route and keep the handle: the dismissal below must
+    // close exactly this dialog, never whatever happens to be topmost when
+    // the token call settles (audit 2026-10-27, F16).
+    final DialogRoute<void> progressRoute = DialogRoute<void>(
+      context: context,
+      barrierDismissible: false,
+      themes: InheritedTheme.capture(from: context, to: navigator.context),
+      builder: (BuildContext dialogContext) => const _JoinProgressDialog(),
     );
-    final Result<VideoToken> result = await _cubit.fetchToken(session.id);
+    unawaited(navigator.push<void>(progressRoute));
+    final Result<VideoToken> result;
+    try {
+      result = await _cubit.fetchToken(session.id);
+    } finally {
+      _joinGate.end();
+      // The progress dialog belongs to the root navigator; close it even when
+      // the token call throws or the list route unmounts mid-flight.
+      if (navigator.mounted && progressRoute.isActive) {
+        navigator.removeRoute(progressRoute);
+      }
+    }
     if (!mounted) {
       return;
     }
-    navigator.pop();
     switch (result) {
       case Success<VideoToken>(value: final VideoToken token):
         await Navigator.of(context).push<void>(

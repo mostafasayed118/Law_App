@@ -10,6 +10,7 @@ import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/widgets/directional_icon.dart';
 
 import 'create_organization_screen.dart';
 import 'member_roster_screen.dart';

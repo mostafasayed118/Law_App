@@ -11,9 +11,13 @@
 --   - validate the amount, the currency and the outcome allow-list BEFORE
 --     any state change (check_violation);
 --   - pending -> succeeded | failed | expired | cancelled | refunded;
---   - terminal attempts are IMMUTABLE: the same outcome is an idempotent
---     replay (already_processed = true, NO second audit, NO invoice change);
---     a conflicting outcome is check_violation;
+--   - terminal attempts are IMMUTABLE, with ONE exception: a signed
+--     late success may move 'expired' -> 'succeeded' while the invoice is
+--     still 'issued' (the provider key outlives the stale sweep; refusing
+--     it would collect money with no recorded settlement) (audit H1);
+--     the same outcome is an idempotent replay (already_processed = true,
+--     NO second audit, NO invoice change); any other conflict is
+--     check_violation;
 --   - ONLY 'succeeded' settles the invoice (billing_invoices 'issued' ->
 --     'paid'); every other outcome leaves the invoice issued, so a fresh
 --     attempt can be initiated (the retry path);
@@ -29,7 +33,7 @@ create or replace function public.apply_paymob_transaction(
   p_outcome                 text,
   p_amount_cents            bigint,
   p_currency                text,
-  p_failure_code            text default null
+  p_failure_code            text
 ) returns jsonb
 language plpgsql security definer set search_path = public as $$
 declare
@@ -68,6 +72,10 @@ begin
   end if;
 
   -- Terminal idempotency: same outcome = replay; different = contradiction.
+  -- Exception: a signed late success may settle an attempt the stale sweeper
+  -- already expired (the provider checkout key is valid longer than the
+  -- sweep window). The money was collected, so refusing it loses the
+  -- settlement record while the invoice stays 'issued' (audit H1).
   if v_pay.status <> 'pending' then
     if v_pay.status = p_outcome then
       return jsonb_build_object(
@@ -77,7 +85,9 @@ begin
         'already_processed', true
       );
     end if;
-    raise exception 'payment is already final' using errcode = 'check_violation';
+    if not (v_pay.status = 'expired' and p_outcome = 'succeeded') then
+      raise exception 'payment is already final' using errcode = 'check_violation';
+    end if;
   end if;
 
   if exists (

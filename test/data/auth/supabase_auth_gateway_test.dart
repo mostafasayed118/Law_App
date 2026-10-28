@@ -11,6 +11,19 @@ import 'package:legalhub/data/auth/supabase_auth_gateway.dart';
 class _FakeSupabaseAuthApi implements SupabaseAuthApi {
   _FakeSupabaseAuthApi(this.currentSnapshot);
 
+  /// Configurable Google-launch result; the default reports "not launched"
+  /// so a test must opt in to a successful browser hand-off.
+  bool googleLaunched = false;
+  int googleLaunchCalls = 0;
+  String? googleRedirectTo;
+
+  @override
+  Future<bool> signInWithGoogle({required String redirectTo}) async {
+    googleLaunchCalls++;
+    googleRedirectTo = redirectTo;
+    return googleLaunched;
+  }
+
   final StreamController<SupabaseAuthSnapshot?> _changes =
       StreamController<SupabaseAuthSnapshot?>.broadcast();
 
@@ -489,5 +502,46 @@ void main() {
         expect(outcome.failureOrNull?.kind, AuthFailureKind.invalidCredentials);
       },
     );
+  });
+  group('startGoogleSignIn', () {
+    test(
+      'forwards the injected flavor callback and reports the launch',
+      () async {
+        final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null)
+          ..googleLaunched = true;
+        final SupabaseAuthGateway gateway = SupabaseAuthGateway(
+          api,
+          oauthRedirectUri: 'com.legalhub.app.dev://auth/v1/callback',
+        );
+        addTearDown(gateway.dispose);
+
+        expect(await gateway.startGoogleSignIn(), isTrue);
+        expect(api.googleRedirectTo, 'com.legalhub.app.dev://auth/v1/callback');
+        // Launching the browser must never fabricate a local session: the
+        // session only exists once the callback code is exchanged.
+        expect(gateway.currentSession, isNull);
+      },
+    );
+
+    test('defaults to the production callback when none is injected', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null)
+        ..googleLaunched = true;
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      await gateway.startGoogleSignIn();
+
+      expect(api.googleRedirectTo, 'com.legalhub.app://auth/v1/callback');
+    });
+
+    test('maps a refused launch to false', () async {
+      final _FakeSupabaseAuthApi api = _FakeSupabaseAuthApi(null);
+      final SupabaseAuthGateway gateway = SupabaseAuthGateway(api);
+      addTearDown(gateway.dispose);
+
+      expect(await gateway.startGoogleSignIn(), isFalse);
+      expect(api.googleLaunchCalls, 1);
+      expect(gateway.currentSession, isNull);
+    });
   });
 }

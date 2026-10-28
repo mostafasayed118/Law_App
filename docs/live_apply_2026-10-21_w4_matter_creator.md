@@ -73,7 +73,13 @@ Editor result: **"Success. No rows returned"**.
 not apply to them and their readers stay the assignees. Nothing was backfilled from
 the audit log (the §8 audit rows carry no creator id).
 
-## 4. Incident — PostgREST schema cache lost its function section (OPEN)
+## 4. Incident — PostgREST schema cache lost its function section (**RESOLVED 2026-10-28**)
+
+> **Resolution (2026-10-28):** the function section is populated again — the
+> OpenAPI root exposes 41 RPCs and both `list_organizations_metadata` and
+> `create_matter` execute (function-level `P0001`, not `PGRST202`). The
+> post-incident signatures are default-free and are now the repo signatures.
+> See `docs/live_apply_2026-10-28_audit_followups.md`.
 
 **Symptom.** Every PostgREST **RPC** call now returns
 `404 PGRST202 "Could not find the function … in the schema cache"` — for

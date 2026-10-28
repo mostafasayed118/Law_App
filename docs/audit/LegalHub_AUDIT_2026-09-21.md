@@ -1214,3 +1214,40 @@ parsing error — the list endpoint's array is `workflow_runs`, not `runs`.
 The correction is recorded here so the false alarm doesn't circulate.) The
 run on `a5dd29a` is the **first to carry the `release-build-proof` job**
 (§12.20) — its outcome is the first live exercise of the amended B2 scope.
+
+---
+
+## 12.24 — 2026-10-28 remediation closeout (P0 → release hardening)
+
+The 2026-10-27 read-only audit found 18 defects (F1–F18); the repo also carried
+an in-flight 90-file refactor and an unapplied 22–30 migration set. This session
+closed the executed waves:
+
+- **Tree safety:** the in-flight adapter/onboarding/feature refactor landed in
+  `1c6fa1c`; the dead `pump_app.dart` harness was removed (0 importers).
+- **P0 correctness (`93be8de`):** F1 notification ISO timestamps, F2 first-frame
+  hydration deferral, F3 timeout mapping + TypeError drift, F4 sign-out
+  finally-clear, F5/N1 write-gate and 16 cubit/sheet in-flight reset, F12
+  post-await `isClosed`, F13 non-string membership drops.
+- **Security:** the signup trigger no longer falls back to email, migration 31
+  backfilled email-named profiles, `accept_invitation` requires a confirmed
+  address, `delete_demo_account` is synthetic-only, and the Paymob late-success
+  path settles an expired attempt (stale sweep 65m vs a 60m key).
+- **Performance/UX:** F6 realtime epoch scoping, F7 transcript cap, F8 360p/15fps
+  + background media pause, F9 size-aware upload + orphan compensation, F10
+  directory cache, F11 five-row previews, F14/F15/F16 auth singleton + recovery
+  scheme + Join guard, F17 2.32 MB dead font removed, and the U-1…U-8 RTL/a11y/
+  text-scale fixes.
+- **Release:** CI release AAB is secret-gated and uses `.env.ci`; global error
+  handlers report through the redacting reporter; iOS entitlements moved out of
+  `Info.plist`; rollback plan rewritten for the live project.
+- **Live backend:** migrations 22–31, 8 policies, 56 RPCs and 3 edge functions
+  applied 2026-10-28; member/cross-tenant/payment/PII/invite/delete probes
+  passed. Record: `docs/live_apply_2026-10-28_audit_followups.md`.
+- **Gates at the closeout:** `flutter analyze` clean, **2068/2068 tests**, `dart
+  format` 0 changed, ledger PASS (2062 declarations), policy `--check` PASS.
+
+Still owner-gated: Push delivery, Apple sign-in/Team ID, live Paymob/River/
+LiveKit credentials, store screenshots/privacy/data-safety, a remote crash sink,
+and the CI RLS battery on an ephemeral stack. Nothing was pushed in this
+session.

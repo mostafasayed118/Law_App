@@ -47,10 +47,16 @@
 1. migrations/01_org_schema.sql
 2. migrations/02_rls_functions.sql
 3. migrations/03_platform_config_seed.sql   ← fill OWNER_USER_ID token from verified id first
-4. migrations/27_audit_remediation.sql      ← participant read helpers (after 18/21 exist)
-5. policies/*.sql                           (order irrelevant; all reference 01/02/27 objects)
-6. rpc/*.sql                                (all reference 01/02/27 objects)
+4. migrations/04_matters.sql … 11_matter_write.sql
+5. migrations/14_notifications.sql … 21_matter_creator.sql
+6. migrations/22_attorney_directory.sql … 31_profile_display_name_and_invite_email.sql
+7. policies/*.sql                           (all reference 01/02/27 objects)
+8. rpc/*.sql                                (all reference 01/02/27 objects)
 ```
+
+`03_platform_config_seed.sql` is apply-time only (owner-token substitution);
+the harness seeds its own owner fixture. The exact executable order lives in
+`scripts/verify_policy_tests.sh` (`apply_slice`).
 
 Each step verified with `supabase db diff` before/after per `rollback_plan.md` §1.
 
@@ -176,11 +182,11 @@ scripts/verify_policy_tests.sh --check        # static validation, no database
   `17_tasks.sql`, `18_booking.sql`, `19_storage_write.sql`, `20_payments.sql`,
   `21_matter_creator.sql`, `22_attorney_directory.sql`, `23_approvals.sql`,
   `24_compliance_alerts.sql`, `25_research.sql`, `26_video_sessions.sql`,
-  `27_audit_remediation.sql`, then `policies/*.sql`, `rpc/*.sql` in the apply
-  order above. The harness `--apply` list includes migration 27 (see
-  `docs/live_apply_2026-10-24_audit_remediation.md`); the list-bounds wave's
-  `28_audit_indexes_and_list_bounds.sql` is **not yet** in that list (follow-up),
-  see `docs/live_apply_2026-10-24_list_bounds.md`.
+  `27_audit_remediation.sql`, `28_audit_indexes_and_list_bounds.sql`,
+  `29_membership_and_order_indexes.sql`, `30_profiles_mutations_rpc_only.sql`,
+  `31_profile_display_name_and_invite_email.sql`, then `policies/*.sql`,
+  `rpc/*.sql` in the apply order above. The harness `--apply` list includes
+  27-31 (see `docs/live_apply_2026-10-28_audit_followups.md`).
   **`03_platform_config_seed.sql` is NOT applied**: its owner token is an
   apply-time substitution placeholder for the dev project; the battery seeds
   its own fixture owner row and proves the single-account bound (D-P0C3)

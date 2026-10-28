@@ -107,6 +107,21 @@ void main() {
       verify: (_) => expect(gateway.fetchCalls, 2),
     );
 
+    test(
+      'a thrown load resets the guard so a retry reaches the gateway (N1)',
+      () async {
+        gateway = _StubMatterGateway(throwFirst: true);
+        final MatterCubit cubit = MatterCubit(gateway);
+        addTearDown(cubit.close);
+
+        await expectLater(cubit.load(), throwsA(isA<StateError>()));
+        await cubit.load();
+
+        expect(gateway.fetchCalls, 2);
+        expect(cubit.state.matters, ViewSuccess<List<Matter>>(_matters));
+      },
+    );
+
     test('setStatus narrows; All restores the full list (AC-2)', () async {
       final MatterCubit cubit = MatterCubit(gateway);
       addTearDown(cubit.close);
@@ -163,23 +178,30 @@ final AppError _loadFailure = AppError(
 /// Hand-rolled gateway stub: queue of results (like the discovery/booking
 /// stubs), or a Completer for in-flight tests.
 class _StubMatterGateway implements MatterGateway {
-  _StubMatterGateway({List<Result<List<Matter>>>? results})
-    : _queue = results == null
-          ? <Result<List<Matter>>>[Result<List<Matter>>.success(_matters)]
-          : List<Result<List<Matter>>>.of(results),
-      completer = null;
+  _StubMatterGateway({
+    List<Result<List<Matter>>>? results,
+    this.throwFirst = false,
+  }) : _queue = results == null
+           ? <Result<List<Matter>>>[Result<List<Matter>>.success(_matters)]
+           : List<Result<List<Matter>>>.of(results),
+       completer = null;
 
   _StubMatterGateway.withCompleter()
     : _queue = const <Result<List<Matter>>>[],
-      completer = Completer<Result<List<Matter>>>();
+      completer = Completer<Result<List<Matter>>>(),
+      throwFirst = false;
 
   final List<Result<List<Matter>>> _queue;
   final Completer<Result<List<Matter>>>? completer;
+  final bool throwFirst;
   int fetchCalls = 0;
 
   @override
   Future<Result<List<Matter>>> fetchMatters() {
     fetchCalls += 1;
+    if (throwFirst && fetchCalls == 1) {
+      throw StateError('matters gateway blew up');
+    }
     if (completer != null) {
       return completer!.future;
     }

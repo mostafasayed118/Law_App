@@ -77,6 +77,9 @@ void main() {
 class _FailingAuthGateway implements AuthGateway {
   _FailingAuthGateway(this.failure);
 
+  @override
+  Future<bool> startGoogleSignIn() async => false;
+
   final AuthFailure failure;
 
   @override

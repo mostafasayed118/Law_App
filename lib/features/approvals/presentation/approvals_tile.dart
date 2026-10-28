@@ -18,7 +18,7 @@ class _ApprovalTile extends StatelessWidget {
         size: 20,
         color: scheme.onSurfaceVariant,
       ),
-      title: approval.title,
+      title: demoApprovalTitle(l10n, approval.title),
       subtitles: <String>[
         '${approvalKindLabel(l10n, approval.kind)} · '
             '${approvalStatusLabel(l10n, approval.status)}',
