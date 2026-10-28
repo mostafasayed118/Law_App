@@ -50,11 +50,6 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
         children: <Widget>[
-          Text(
-            l10n.languageLabel,
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          const SizedBox(height: LegalHubTheme.spaceSm),
           DropdownButtonFormField<Locale>(
             initialValue: locale,
             decoration: InputDecoration(labelText: l10n.languageLabel),
@@ -73,11 +68,6 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
           const SizedBox(height: LegalHubTheme.spaceXl),
-          Text(
-            l10n.themeLabel,
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          const SizedBox(height: LegalHubTheme.spaceSm),
           DropdownButtonFormField<ThemeMode>(
             initialValue: themeMode,
             // isExpanded lets the selected label ellipsize inside the field
