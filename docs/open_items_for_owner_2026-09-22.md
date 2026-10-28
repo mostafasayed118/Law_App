@@ -1,5 +1,12 @@
 # Open items — what I need from you
 
+> **SUPERSEDED SNAPSHOT (2026-09-22).** The counts and commit list below are
+> historical. For the 2026-10-28 state see
+> `docs/live_apply_2026-10-28_audit_followups.md`, the README §Deferred work,
+> and the closeout section in `docs/audit/LegalHub_AUDIT_2026-09-21.md` §12.24.
+> Most decisions below were answered; the remaining owner gates are listed in
+> the README.
+
 > **Generated:** 2026-09-22 05:15 (audit session close)
 > **Context:** `docs/audit/LegalHub_AUDIT_2026-09-21.md` · **P1.1 plan:** `docs/p1_1_gateway_call_migration_plan_2026-09-22.md`
 > **How to use:** §1 is actions only you can take. §2 is the decisions that unblock the next slice. §3 is a menu. §4 is optional polish. §5 lists what I deliberately will **not** do without an answer.

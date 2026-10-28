@@ -262,7 +262,7 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
   and `test/service_locator_test.dart` pins it as such.~~ **Also removed
   (`2b9abf9`, together with its DI registration and test pins); the file is
   absent at HEAD `0b52374` (re-verified 2026-10-26).**
-- **Status:** **TRACKED (2026-09-22).** No code change in this entry.
+- **Status:** **RESOLVED (2026-10-26).** No code change was needed in this entry; the heading and the update below record the closure.
 - **Owner:** Project Owner (github.com/mostafasayed118) — decision pending.
 - **Cross-reference:** `docs/audit/LegalHub_AUDIT_2026-09-21.md` §5 (M-15);
   `docs/codebase_audit_plan.md` Batch 5; `INSTRUCTIONS.md` §4.1.

@@ -10,6 +10,14 @@
 
 **Spec:** This document, §Audit Findings. Source evidence: the read-only performance/bug audit run on 2026-10-27 against `fix/audit-remediation` @ `0b52374` (dirty tree).
 
+> **EXECUTION RECORD (2026-10-28):** Tasks 1–13 are landed in commits
+> `93be8de` (P0: F1–F5, F12, F13, N1) and the performance/UX wave that
+> follows it (F6–F11, F14–F17, U-1…U-8). The suite is 2062 declarations /
+> 2068 runtime, analyze clean, ledger PASS. Task 14 (final gates) was run on
+> 2026-10-28. Live migrations 22–31 are applied — see
+> `docs/live_apply_2026-10-28_audit_followups.md`. The 10 owner decisions in
+> §Deferred remain open.
+
 ---
 
 ## START GATE — DO NOT SKIP
