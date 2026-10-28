@@ -667,6 +667,7 @@
   "videoCreateMattersError": "تعذر تحميل الملفات.",
   "videoCreateDateLabel": "التاريخ والوقت",
   "videoCreateDateRequired": "اختر تاريخًا ووقتًا للجلسة.",
+  "videoCreateDateFuture": "اختر تاريخًا ووقتًا في المستقبل.",
   "videoCreateNoOrg": "اختر مؤسسة قبل جدولة جلسة.",
   "videoCreateSubmit": "جدولة الجلسة",
   "videoCreateSuccess": "تمت جدولة استشارة الفيديو.",

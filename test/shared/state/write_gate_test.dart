@@ -63,6 +63,21 @@ void main() {
       },
     );
 
+    test(
+      'a throwing post-write refresh does not turn success into failure',
+      () async {
+        final WriteGate gate = WriteGate();
+
+        final AppError? error = await gate.run<int>(
+          isClosed: () => false,
+          write: () async => const Result<int>.success(1),
+          onSuccess: () async => throw StateError('reload failed'),
+        );
+
+        expect(error, isNull);
+      },
+    );
+
     test('a closed cubit never writes', () async {
       final WriteGate gate = WriteGate();
       int writes = 0;

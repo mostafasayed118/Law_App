@@ -2118,6 +2118,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get videoCreateDateRequired => 'اختر تاريخًا ووقتًا للجلسة.';
 
   @override
+  String get videoCreateDateFuture => 'اختر تاريخًا ووقتًا في المستقبل.';
+
+  @override
   String get videoCreateNoOrg => 'اختر مؤسسة قبل جدولة جلسة.';
 
   @override

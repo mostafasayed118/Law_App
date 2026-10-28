@@ -3934,6 +3934,12 @@ abstract class AppLocalizations {
   /// **'Choose a date and time for the session.'**
   String get videoCreateDateRequired;
 
+  /// No description provided for @videoCreateDateFuture.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a date and time in the future.'**
+  String get videoCreateDateFuture;
+
   /// No description provided for @videoCreateNoOrg.
   ///
   /// In en, this message translates to:

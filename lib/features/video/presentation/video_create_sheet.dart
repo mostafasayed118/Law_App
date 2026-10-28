@@ -56,6 +56,7 @@ class _VideoCreateSheetState extends State<VideoCreateSheet> {
   String? _selectedMatterId;
   DateTime? _scheduledAt;
   bool _dateMissing = false;
+  bool _dateInPast = false;
   bool _submitting = false;
   AppError? _submitError;
 
@@ -123,6 +124,7 @@ class _VideoCreateSheetState extends State<VideoCreateSheet> {
         time.minute,
       );
       _dateMissing = false;
+      _dateInPast = false;
     });
   }
 
@@ -137,6 +139,10 @@ class _VideoCreateSheetState extends State<VideoCreateSheet> {
     }
     if (_scheduledAt == null) {
       setState(() => _dateMissing = true);
+      return;
+    }
+    if (_scheduledAt!.isBefore(DateTime.now())) {
+      setState(() => _dateInPast = true);
       return;
     }
     setState(() {
@@ -245,10 +251,12 @@ class _VideoCreateSheetState extends State<VideoCreateSheet> {
               ),
             ),
           ),
-          if (_dateMissing) ...<Widget>[
+          if (_dateMissing || _dateInPast) ...<Widget>[
             const SizedBox(height: LegalHubTheme.spaceXs),
             Text(
-              l10n.videoCreateDateRequired,
+              _dateInPast
+                  ? l10n.videoCreateDateFuture
+                  : l10n.videoCreateDateRequired,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.error,
                 fontSize: 12,

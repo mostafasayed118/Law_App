@@ -30,8 +30,10 @@ on:
     branches:
       - main
 
-# Least privilege: read-only on the triggering repo. No secrets are required or
-# used by these checks (the B1 widget test needs no environment configuration).
+# Least privilege: read-only on the triggering repo. The quality gates need no
+# secrets at all (the B1 widget test needs no environment configuration); the
+# release job below optionally reads the public Supabase URL + anon key
+# (repo secrets), never the service-role key.
 permissions:
   contents: read
 
@@ -131,6 +133,17 @@ jobs:
     # Pre-launch extension (2026-09-24, R3/R4/B5): the same job also builds
     # the debug APK and asserts its native ABI set, guarding the B5 class
     # (corrupt/stale local builds shipping without lib/x86_64/libflutter.so).
+    #
+    # R1 (2026-10-28): the release AAB used to build with no dart-defines, so
+    # the production entrypoint tripped its own kReleaseMode guard
+    # (`lib/main.dart`: production + release + missing env = StateError before
+    # `runApp`) — the "proof" artifact could only crash on launch. The bundle
+    # is now built ONLY when the repo secrets SUPABASE_URL / SUPABASE_ANON_KEY
+    # are both present, injected via --dart-define-from-file=.env.ci. When they
+    # are absent the step is skipped with a warning (owner-gated), and the
+    # debug APK ABI guard below still runs unconditionally. This remains a
+    # build-only artifact: store AABs stay owner-run, signed with the upload
+    # keystore (audit §12.19).
     name: release bundle + debug APK ABI
     needs: quality-gates
     runs-on: ubuntu-latest
@@ -160,7 +173,33 @@ jobs:
       - name: Download dependencies
         run: flutter pub get
 
+      - name: Prepare build environment
+        # R1: feed the production entrypoint its build-time config. Both values
+        # are public client config (the anon key is shipped in every release
+        # anyway); the anon-key guard in SupabaseEnv still rejects anything
+        # that is not an anon key. HAVE_ENV is exported to later steps only —
+        # a cancelled/absent secret pair must not silently build a release
+        # artifact that throws before runApp.
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_ANON_KEY" ]; then
+            {
+              echo "APP_FLAVOR=production"
+              echo "SUPABASE_URL=$SUPABASE_URL"
+              echo "SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY"
+            } > .env.ci
+            echo "HAVE_ENV=true" >> "$GITHUB_ENV"
+            echo "Build environment ready (.env.ci): the release AAB will be built."
+          else
+            echo "HAVE_ENV=false" >> "$GITHUB_ENV"
+            echo "::warning::SUPABASE_URL / SUPABASE_ANON_KEY repository secrets are not set. The release AAB is owner-gated and skipped; the debug APK ABI guard still runs."
+          fi
+
       - name: Build release app bundle
+        # Skipped unless Prepare build environment found both secrets.
+        if: env.HAVE_ENV == 'true'
         env:
           # R4 opt-in: CI holds no signing secrets, so the compile proof is
           # explicitly (not silently) debug-signed. Never a store artifact.
@@ -169,9 +208,10 @@ jobs:
         # an unflavored build would emit one artifact per flavor and the
         # assert below would not resolve. The store path is always the
         # production flavor (audit doc §12.19: its applicationId is frozen).
-        run: flutter build appbundle --release --flavor production -t lib/main_production.dart
+        run: flutter build appbundle --release --flavor production -t lib/main_production.dart --dart-define-from-file=.env.ci
 
       - name: Assert bundle exists and report size
+        if: env.HAVE_ENV == 'true'
         run: |
           test -s build/app/outputs/bundle/productionRelease/app-production-release.aab
           du -h build/app/outputs/bundle/productionRelease/app-production-release.aab

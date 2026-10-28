@@ -760,6 +760,7 @@
   "videoCreateMattersError": "Unable to load matters.",
   "videoCreateDateLabel": "Date and time",
   "videoCreateDateRequired": "Choose a date and time for the session.",
+  "videoCreateDateFuture": "Choose a date and time in the future.",
   "videoCreateNoOrg": "Select an organization before scheduling a session.",
   "videoCreateSubmit": "Schedule session",
   "videoCreateSuccess": "Video consultation scheduled.",

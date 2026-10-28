@@ -2134,6 +2134,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Choose a date and time for the session.';
 
   @override
+  String get videoCreateDateFuture => 'Choose a date and time in the future.';
+
+  @override
   String get videoCreateNoOrg =>
       'Select an organization before scheduling a session.';
 

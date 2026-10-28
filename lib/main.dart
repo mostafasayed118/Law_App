@@ -16,14 +16,46 @@ import 'app/localization/locale_cubit.dart';
 import 'app/router.dart';
 import 'app/service_locator.dart';
 import 'app/theme/theme_cubit.dart';
+import 'core/observability/crash_boundary.dart';
+import 'core/observability/error_reporter.dart';
 import 'core/onboarding/onboarding_store.dart';
 import 'data/auth/supabase_auth_api_impl.dart';
 import 'data/auth/supabase_env.dart';
 import 'features/auth/presentation/auth_cubit.dart';
 import 'l10n/app_localizations.dart';
 
+/// Every entrypoint's error boundary (R2). Module-level so the bootstrap zone
+/// and [bootstrap] itself report through the same dedupe window: [main]
+/// installs the pre-DI console fallback, [bootstrap] swaps the sink once the
+/// service locator owns the reporter.
+CrashBoundary? _crashBoundary;
+
 Future<void> main() async {
-  await bootstrap(AppConfig.fromEnvironment());
+  // From the first line of the process every uncaught error reaches a sink:
+  // the pre-DI fallback is a console reporter (no dependency, no network).
+  // `bootstrap` re-points this same boundary at the DI reporter as soon as
+  // one exists. A remote sink (Sentry/Firebase) stays owner-gated.
+  final CrashBoundary boundary = installGlobalErrorHandlers(
+    ConsoleErrorReporter(),
+  );
+  _crashBoundary = boundary;
+  // The binding is initialized inside the guarded zone (in `bootstrap`) so
+  // every framework callback inherits the zone.
+  await runZonedGuarded<Future<void>>(
+    () => bootstrap(AppConfig.fromEnvironment()),
+    boundary.reportUncaught,
+  );
+}
+
+/// Runs a flavor entrypoint inside the same crash boundary [main] uses.
+///
+/// `main_development` / `main_production` call [bootstrap] directly; without
+/// this wrapper they would get the engine hooks but not the guarded zone.
+Future<void> runGuardedEntrypoint(Future<void> Function() body) {
+  final CrashBoundary boundary = _crashBoundary ??=
+      installGlobalErrorHandlers(ConsoleErrorReporter());
+  return runZonedGuarded<Future<void>>(body, boundary.reportUncaught) ??
+      Future<void>.value();
 }
 
 /// Shared bootstrap for every flavor entrypoint
@@ -35,6 +67,10 @@ Future<void> main() async {
 /// stays on the fake gateway and no provider is initialized — env-less runs
 /// and tests keep working.
 Future<void> bootstrap(AppConfig config) async {
+  // Flavor entrypoints (`main_development` / `main_production`) call bootstrap
+  // directly instead of `main`, so install the pre-DI console fallback here
+  // too — before any config guard can throw. A no-op when `main` already did.
+  _crashBoundary ??= installGlobalErrorHandlers(ConsoleErrorReporter());
   WidgetsFlutterBinding.ensureInitialized();
   final SupabaseEnv supabaseEnv = config.toSupabaseEnv();
   if (config.isConfigured) {
@@ -59,6 +95,14 @@ Future<void> bootstrap(AppConfig config) async {
   }
   final SharedPreferences preferences = await SharedPreferences.getInstance();
   configureDependencies(preferences: preferences);
+  // R2: once the service locator owns the reporter, uncaught engine/zone
+  // errors go through it (still ConsoleErrorReporter today — a remote sink
+  // stays owner-gated). `main` may already have installed the pre-DI console
+  // boundary; reusing it keeps the dedupe window across the sink swap.
+  final ErrorReporter errorReporter = serviceLocator<ErrorReporter>();
+  final CrashBoundary crashBoundary = _crashBoundary ??=
+      installGlobalErrorHandlers(errorReporter);
+  crashBoundary.useReporter(errorReporter);
   final LocaleCubit localeCubit = serviceLocator<LocaleCubit>();
   final ThemeCubit themeCubit = serviceLocator<ThemeCubit>();
   final AuthCubit authCubit = serviceLocator<AuthCubit>();

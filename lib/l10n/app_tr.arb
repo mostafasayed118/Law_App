@@ -667,6 +667,7 @@
   "videoCreateMattersError": "Dosyalar yüklenemedi.",
   "videoCreateDateLabel": "Tarih ve saat",
   "videoCreateDateRequired": "Oturum için bir tarih ve saat seçin.",
+  "videoCreateDateFuture": "Gelecekte bir tarih ve saat seçin.",
   "videoCreateNoOrg": "Oturum planlamadan önce bir kuruluş seçin.",
   "videoCreateSubmit": "Oturumu planla",
   "videoCreateSuccess": "Görüntülü görüşme planlandı.",

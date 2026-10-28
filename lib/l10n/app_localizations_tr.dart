@@ -2135,6 +2135,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get videoCreateDateRequired => 'Oturum için bir tarih ve saat seçin.';
 
   @override
+  String get videoCreateDateFuture => 'Gelecekte bir tarih ve saat seçin.';
+
+  @override
   String get videoCreateNoOrg => 'Oturum planlamadan önce bir kuruluş seçin.';
 
   @override
