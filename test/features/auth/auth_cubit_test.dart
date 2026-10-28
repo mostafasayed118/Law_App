@@ -310,6 +310,34 @@ void main() {
         const AuthState(status: AuthStatus.error, error: _gatewayAppError),
       ],
     );
+
+    test(
+      'restore(hydrateMemberships: false) emits authenticated before the '
+      'membership read (F2 — the first frame never awaits the network)',
+      () async {
+        final _CountingMembershipRepository repository =
+            _CountingMembershipRepository();
+        final AuthCubit cubit = AuthCubit(
+          _PreauthenticatedGateway(demoSession()),
+          InMemoryErrorReporter(),
+          repository,
+          FakeOrganizationGateway(),
+        );
+        addTearDown(cubit.close);
+
+        await cubit.restore(hydrateMemberships: false);
+
+        expect(cubit.state.status, AuthStatus.authenticated);
+        expect(repository.calls, 0);
+
+        // The deferred background refresh performs exactly one read and
+        // fills the RLS-scoped memberships.
+        await cubit.hydrate();
+
+        expect(repository.calls, 1);
+        expect(cubit.state.session!.memberships, isNotEmpty);
+      },
+    );
   });
 
   group('AuthCubit signOut', () {
@@ -337,6 +365,23 @@ void main() {
         const AuthState(status: AuthStatus.unauthenticated),
       ],
     );
+
+    test('a provider sign-out failure still clears the local state', () async {
+      final AuthCubit cubit = AuthCubit(
+        _ThrowingSignOutGateway(demoSession()),
+        InMemoryErrorReporter(),
+        FakeMembershipRepository(),
+        FakeOrganizationGateway(),
+      );
+      addTearDown(cubit.close);
+
+      await cubit.restore(hydrateMemberships: false);
+      expect(cubit.state.status, AuthStatus.authenticated);
+
+      await cubit.signOut();
+
+      expect(cubit.state.status, AuthStatus.unauthenticated);
+    });
   });
 
   group('AuthCubit provider stream callback (Phase 4.1)', () {
@@ -1135,6 +1180,32 @@ class _HydrationRepository implements MembershipRepository {
     userIds.add(userId);
     return result;
   }
+}
+
+/// Counts membership reads only (F2): pins that `restore(hydrateMemberships:
+/// false)` performs zero of them and the deferred [AuthCubit.hydrate] exactly
+/// one.
+class _CountingMembershipRepository implements MembershipRepository {
+  int calls = 0;
+
+  @override
+  Future<MembershipHydrationResult> loadMemberships({
+    required String userId,
+  }) async {
+    calls += 1;
+    return const HydrationSucceeded(<OrganizationMembership>[
+      FakeMembershipRepository.demoMembership,
+    ]);
+  }
+}
+
+/// A pre-authenticated gateway whose sign-out fails at the transport level
+/// (F4): the provider throws after it already dropped the local session.
+class _ThrowingSignOutGateway extends _PreauthenticatedGateway {
+  _ThrowingSignOutGateway(super.session);
+
+  @override
+  Future<void> signOut() async => throw StateError('offline sign-out');
 }
 
 class _CountingAuthGateway implements AuthGateway {

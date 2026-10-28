@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
@@ -228,6 +230,30 @@ void main() {
 
       expect(gateway.markCallIds, isNull);
     });
+
+    test(
+      'closing while the prefs read is pending does not emit after close (F12)',
+      () async {
+        final Completer<NotificationPrefs?> prefs =
+            Completer<NotificationPrefs?>();
+        final NotificationCubit cubit = NotificationCubit(
+          _StubNotificationGateway(),
+          _DelayedPrefsStore(prefs.future),
+        );
+
+        final Future<void> load = cubit.load();
+        // The gateway is immediate; this microtask lets load reach the prefs
+        // read, which stays pending until the completer resolves.
+        await Future<void>.delayed(Duration.zero);
+        await cubit.close();
+        prefs.complete(null);
+
+        // The second await (`_visibleNotifications`) resumes after close; the
+        // cubit must not emit (StateError: Cannot emit new states after
+        // calling close) and load must still complete normally.
+        await expectLater(load, completes);
+      },
+    );
   });
 
   group('NotificationCubit prefs filtering (D-N5, plan 2026-09-02)', () {
@@ -328,6 +354,20 @@ class _InMemoryPrefsStore implements NotificationPrefsStore {
 
   @override
   Future<NotificationPrefs?> read() async => _prefs;
+
+  @override
+  Future<void> write(NotificationPrefs prefs) async {}
+}
+
+/// Prefs store whose read stays pending until the given future resolves —
+/// used to close the cubit in the middle of `load()`'s second await.
+class _DelayedPrefsStore implements NotificationPrefsStore {
+  _DelayedPrefsStore(this._read);
+
+  final Future<NotificationPrefs?> _read;
+
+  @override
+  Future<NotificationPrefs?> read() => _read;
 
   @override
   Future<void> write(NotificationPrefs prefs) async {}

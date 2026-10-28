@@ -104,6 +104,21 @@ void main() {
       ],
       verify: (_) => expect(gateway.fetchCalls, 2),
     );
+
+    test(
+      'a thrown load resets the guard so a retry reaches the gateway (N1)',
+      () async {
+        gateway = _StubMessageGateway(throwFirst: true);
+        final MessageCubit cubit = MessageCubit(gateway);
+        addTearDown(cubit.close);
+
+        await expectLater(cubit.load(), throwsA(isA<StateError>()));
+        await cubit.load();
+
+        expect(gateway.fetchCalls, 2);
+        expect(cubit.state.threads, ViewSuccess<List<MessageThread>>(_threads));
+      },
+    );
   });
 }
 
@@ -134,25 +149,32 @@ final AppError _loadFailure = AppError(
 /// Hand-rolled gateway stub: queue of results (like the vault/matter
 /// stubs), or a Completer for in-flight tests.
 class _StubMessageGateway implements MessageGateway {
-  _StubMessageGateway({List<Result<List<MessageThread>>>? results})
-    : _queue = results == null
-          ? <Result<List<MessageThread>>>[
-              Result<List<MessageThread>>.success(_threads),
-            ]
-          : List<Result<List<MessageThread>>>.of(results),
-      completer = null;
+  _StubMessageGateway({
+    List<Result<List<MessageThread>>>? results,
+    this.throwFirst = false,
+  }) : _queue = results == null
+           ? <Result<List<MessageThread>>>[
+               Result<List<MessageThread>>.success(_threads),
+             ]
+           : List<Result<List<MessageThread>>>.of(results),
+       completer = null;
 
   _StubMessageGateway.withCompleter()
     : _queue = const <Result<List<MessageThread>>>[],
-      completer = Completer<Result<List<MessageThread>>>();
+      completer = Completer<Result<List<MessageThread>>>(),
+      throwFirst = false;
 
   final List<Result<List<MessageThread>>> _queue;
   final Completer<Result<List<MessageThread>>>? completer;
+  final bool throwFirst;
   int fetchCalls = 0;
 
   @override
   Future<Result<List<MessageThread>>> fetchThreads({String? matterId}) {
     fetchCalls += 1;
+    if (throwFirst && fetchCalls == 1) {
+      throw StateError('messages gateway blew up');
+    }
     if (completer != null) {
       return completer!.future;
     }

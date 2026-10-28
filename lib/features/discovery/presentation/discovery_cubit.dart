@@ -52,10 +52,13 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     if (state.attorneys is! ViewLoading<List<Attorney>>) {
       emit(state.copyWith(attorneys: const ViewLoading<List<Attorney>>()));
     }
-    final Result<List<Attorney>> result = await _gateway.fetchAttorneys(
-      query: query,
-    );
-    _loading = false;
+    final Result<List<Attorney>> result;
+    try {
+      result = await _gateway.fetchAttorneys(query: query);
+    } finally {
+      // Reset on throw too: a blown read must not wedge the retry guard.
+      _loading = false;
+    }
     if (isClosed) {
       return;
     }
@@ -90,8 +93,13 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     if (state.profile is! ViewLoading<Attorney>) {
       emit(state.copyWith(profile: const ViewLoading<Attorney>()));
     }
-    final Result<Attorney> result = await _gateway.fetchAttorney(id);
-    _profileLoading = false;
+    final Result<Attorney> result;
+    try {
+      result = await _gateway.fetchAttorney(id);
+    } finally {
+      // Reset on throw too: a blown profile read must not wedge the retry.
+      _profileLoading = false;
+    }
     if (isClosed) {
       return;
     }

@@ -73,9 +73,19 @@ class _VideoCreateSheetState extends State<VideoCreateSheet> {
       _loadingMatters = true;
       _mattersResult = null;
     });
-    final Result<List<Matter>> result = await context
-        .read<VideoCubit>()
-        .loadMatters();
+    Result<List<Matter>>? result;
+    try {
+      result = await context.read<VideoCubit>().loadMatters();
+    } catch (_) {
+      // A thrown picker read lands on the existing failure + retry arm
+      // instead of leaving the sheet on its spinner forever.
+      result = const Result<List<Matter>>.failure(
+        AppError(
+          code: 'matters_failed',
+          userMessage: 'Unable to load matters.',
+        ),
+      );
+    }
     if (!mounted) {
       return;
     }
@@ -133,21 +143,35 @@ class _VideoCreateSheetState extends State<VideoCreateSheet> {
       _submitting = true;
       _submitError = null;
     });
-    final AppError? error = await context.read<VideoCubit>().create(
-      matterId: _selectedMatterId,
-      scheduledAt: _scheduledAt,
-    );
-    if (!mounted) {
-      return;
+    try {
+      final AppError? error = await context.read<VideoCubit>().create(
+        matterId: _selectedMatterId,
+        scheduledAt: _scheduledAt,
+      );
+      if (!mounted) {
+        return;
+      }
+      if (error == null) {
+        Navigator.of(context).pop(true);
+        return;
+      }
+      setState(() => _submitError = error);
+    } catch (_) {
+      // A thrown write must re-enable the button, not leave it spinning.
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _submitError = const AppError(
+          code: 'video_create_failed',
+          userMessage: 'Unable to schedule the session. Please try again.',
+        );
+      });
+    } finally {
+      if (mounted) {
+        setState(() => _submitting = false);
+      }
     }
-    if (error == null) {
-      Navigator.of(context).pop(true);
-      return;
-    }
-    setState(() {
-      _submitting = false;
-      _submitError = error;
-    });
   }
 
   @override

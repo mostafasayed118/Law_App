@@ -100,6 +100,21 @@ void main() {
       ],
       verify: (_) => expect(gateway.fetchCalls, 2),
     );
+
+    test(
+      'a thrown load resets the guard so a retry reaches the gateway (N1)',
+      () async {
+        gateway = _StubBillingGateway(throwFirst: true);
+        final BillingCubit cubit = BillingCubit(gateway);
+        addTearDown(cubit.close);
+
+        await expectLater(cubit.load(), throwsA(isA<StateError>()));
+        await cubit.load();
+
+        expect(gateway.fetchCalls, 2);
+        expect(cubit.state.invoices, ViewSuccess<List<Invoice>>(_invoices));
+      },
+    );
   });
 }
 
@@ -134,23 +149,30 @@ final AppError _loadFailure = AppError(
 /// Hand-rolled gateway stub: queue of results (like the matter/discovery
 /// stubs), or a Completer for in-flight tests.
 class _StubBillingGateway implements BillingGateway {
-  _StubBillingGateway({List<Result<List<Invoice>>>? results})
-    : _queue = results == null
-          ? <Result<List<Invoice>>>[Result<List<Invoice>>.success(_invoices)]
-          : List<Result<List<Invoice>>>.of(results),
-      completer = null;
+  _StubBillingGateway({
+    List<Result<List<Invoice>>>? results,
+    this.throwFirst = false,
+  }) : _queue = results == null
+           ? <Result<List<Invoice>>>[Result<List<Invoice>>.success(_invoices)]
+           : List<Result<List<Invoice>>>.of(results),
+       completer = null;
 
   _StubBillingGateway.withCompleter()
     : _queue = const <Result<List<Invoice>>>[],
-      completer = Completer<Result<List<Invoice>>>();
+      completer = Completer<Result<List<Invoice>>>(),
+      throwFirst = false;
 
   final List<Result<List<Invoice>>> _queue;
   final Completer<Result<List<Invoice>>>? completer;
+  final bool throwFirst;
   int fetchCalls = 0;
 
   @override
   Future<Result<List<Invoice>>> fetchInvoices({String? matterId}) {
     fetchCalls += 1;
+    if (throwFirst && fetchCalls == 1) {
+      throw StateError('billing gateway blew up');
+    }
     if (completer != null) {
       return completer!.future;
     }

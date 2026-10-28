@@ -38,8 +38,13 @@ class MatterCubit extends Cubit<MatterState> {
     if (state.matters is! ViewLoading<List<Matter>>) {
       emit(state.copyWith(matters: const ViewLoading<List<Matter>>()));
     }
-    final Result<List<Matter>> result = await _gateway.fetchMatters();
-    _loading = false;
+    final Result<List<Matter>> result;
+    try {
+      result = await _gateway.fetchMatters();
+    } finally {
+      // Reset on throw too: a blown read must not wedge the retry guard.
+      _loading = false;
+    }
     if (isClosed) {
       return;
     }

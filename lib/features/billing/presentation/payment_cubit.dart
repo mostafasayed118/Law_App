@@ -52,8 +52,28 @@ class PaymentCubit extends Cubit<PaymentState> {
     _busy = true;
     _invoiceId = invoiceId;
     emit(const PaymentState(phase: PaymentPhase.initiating));
-    final Result<PaymentSession> result = await _gateway.initiate(invoiceId);
-    _busy = false;
+    final Result<PaymentSession> result;
+    try {
+      result = await _gateway.initiate(invoiceId);
+    } catch (_) {
+      // The initiating phase is itself an in-flight guard, so a thrown
+      // gateway has to land on the failure phase — otherwise every retry
+      // would be refused by the phase check below.
+      if (!isClosed) {
+        emit(
+          const PaymentState(
+            phase: PaymentPhase.failed,
+            error: AppError(
+              code: 'payment_initiate_failed',
+              userMessage: 'Unable to start the payment. Please try again.',
+            ),
+          ),
+        );
+      }
+      return;
+    } finally {
+      _busy = false;
+    }
     if (isClosed) {
       return;
     }
@@ -77,10 +97,13 @@ class PaymentCubit extends Cubit<PaymentState> {
     }
     _checking = true;
     _invoiceId = invoiceId;
-    final Result<PaymentStatusSnapshot> result = await _gateway.fetchStatus(
-      invoiceId,
-    );
-    _checking = false;
+    final Result<PaymentStatusSnapshot> result;
+    try {
+      result = await _gateway.fetchStatus(invoiceId);
+    } finally {
+      // Reset on throw too: the next poll tick must be able to run.
+      _checking = false;
+    }
     if (isClosed) {
       return;
     }

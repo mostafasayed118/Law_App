@@ -104,12 +104,17 @@ class AiResearchCubit extends Cubit<AiResearchState> {
     );
     // Both requests start before the first await, so the lookups run in
     // parallel (the record `.wait` is Future.wait for the two arms).
-    final (Result<List<Matter>>?, Result<List<Document>>?) results = await (
-      matterGateway?.fetchMatters() ?? Future<Result<List<Matter>>?>.value(),
-      documentGateway?.fetchDocuments() ??
-          Future<Result<List<Document>>?>.value(),
-    ).wait;
-    _loadingLookups = false;
+    final (Result<List<Matter>>?, Result<List<Document>>?) results;
+    try {
+      results = await (
+        matterGateway?.fetchMatters() ?? Future<Result<List<Matter>>?>.value(),
+        documentGateway?.fetchDocuments() ??
+            Future<Result<List<Document>>?>.value(),
+      ).wait;
+    } finally {
+      // Reset on throw too: a blown lookup must not wedge the reload guard.
+      _loadingLookups = false;
+    }
     if (isClosed) {
       return;
     }
@@ -167,8 +172,13 @@ class AiResearchCubit extends Cubit<AiResearchState> {
         lastError: null,
       ),
     );
-    final Result<ResearchOutcome> result = await _gateway.analyze(request);
-    _loading = false;
+    final Result<ResearchOutcome> result;
+    try {
+      result = await _gateway.analyze(request);
+    } finally {
+      // Reset on throw too: a blown analysis must not wedge the submit guard.
+      _loading = false;
+    }
     if (isClosed) {
       return;
     }
@@ -221,8 +231,13 @@ class AiResearchCubit extends Cubit<AiResearchState> {
         lastError: null,
       ),
     );
-    final Result<List<AiFinding>> result = await _gateway.fetchFindings(runId);
-    _loading = false;
+    final Result<List<AiFinding>> result;
+    try {
+      result = await _gateway.fetchFindings(runId);
+    } finally {
+      // Reset on throw too: a blown run read must not wedge the submit guard.
+      _loading = false;
+    }
     if (isClosed) {
       return;
     }
@@ -256,8 +271,13 @@ class AiResearchCubit extends Cubit<AiResearchState> {
         lastError: null,
       ),
     );
-    final Result<List<AiFinding>> result = await _gateway.research(query);
-    _loading = false;
+    final Result<List<AiFinding>> result;
+    try {
+      result = await _gateway.research(query);
+    } finally {
+      // Reset on throw too: a blown query must not wedge the submit guard.
+      _loading = false;
+    }
     if (isClosed) {
       return;
     }

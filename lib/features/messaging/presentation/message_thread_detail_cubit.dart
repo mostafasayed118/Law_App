@@ -62,8 +62,13 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
     if (state.messages is! ViewLoading<List<Message>>) {
       emit(state.copyWith(messages: const ViewLoading<List<Message>>()));
     }
-    final Result<List<Message>> result = await _gateway.fetchMessages(threadId);
-    _loading = false;
+    final Result<List<Message>> result;
+    try {
+      result = await _gateway.fetchMessages(threadId);
+    } finally {
+      // Reset on throw too: a blown read must not wedge the retry guard.
+      _loading = false;
+    }
     if (isClosed) {
       return;
     }
@@ -206,11 +211,29 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
       return;
     }
     emit(state.copyWith(sending: true, sendError: null));
-    final Result<Message> result = await _gateway.sendMessage(
-      threadId,
-      trimmed,
-      authorDisplayName: authorDisplayName,
-    );
+    final Result<Message> result;
+    try {
+      result = await _gateway.sendMessage(
+        threadId,
+        trimmed,
+        authorDisplayName: authorDisplayName,
+      );
+    } catch (_) {
+      // `sending` is itself the composer's in-flight guard; a thrown gateway
+      // must land on the existing failure arm or the send button stays dead.
+      if (!isClosed) {
+        emit(
+          state.copyWith(
+            sending: false,
+            sendError: const AppError(
+              code: 'message_send_failed',
+              userMessage: 'Unable to send the message. Please try again.',
+            ),
+          ),
+        );
+      }
+      return;
+    }
     if (isClosed) {
       return;
     }

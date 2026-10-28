@@ -39,6 +39,8 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
           message: platformAdminRequestFailedMessage,
         ),
       );
+    } on TypeError {
+      return _mappingDriftFailure<List<OrganizationSummary>>();
     }
   }
 
@@ -63,6 +65,8 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
           message: platformAdminRequestFailedMessage,
         ),
       );
+    } on TypeError {
+      return _mappingDriftFailure<List<OrgMember>>();
     }
   }
 
@@ -124,6 +128,8 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
           message: platformAdminRequestFailedMessage,
         ),
       );
+    } on TypeError {
+      return _mappingDriftFailure<List<AuditEntry>>();
     }
   }
 
@@ -152,6 +158,8 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
           message: platformAdminRequestFailedMessage,
         ),
       );
+    } on TypeError {
+      return _mappingDriftFailure<List<AuditEntry>>();
     }
   }
 
@@ -282,6 +290,18 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
     }
     return parsed;
   }
+
+  /// The `unknown` failure shared by the row-mapping catches. Provider drift
+  /// is normally a [FormatException], but a value reaching an unguarded cast
+  /// raises a [TypeError] — an Error, not an Exception, which would otherwise
+  /// escape the typed boundary and strand the loading state (audit
+  /// 2026-10-27, F3).
+  OrgOutcome<T> _mappingDriftFailure<T>() => OrgOutcome<T>.failure(
+    const OrgFailure(
+      kind: OrgFailureKind.unknown,
+      message: platformAdminRequestFailedMessage,
+    ),
+  );
 
   OrgFailureKind _mapKind(SupabasePlatformAdminFailureKind kind) {
     return switch (kind) {

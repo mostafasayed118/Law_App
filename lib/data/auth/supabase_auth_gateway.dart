@@ -148,10 +148,16 @@ class SupabaseAuthGateway implements AuthGateway {
 
   @override
   Future<void> signOut() async {
-    await _api.signOut();
-    _session = null;
-    _recoveryPending = false;
-    _changes.add(null);
+    try {
+      await _api.signOut();
+    } finally {
+      // GoTrue removes the local session before it rethrows a transport
+      // failure; the app must mirror that state in every outcome
+      // (audit 2026-10-27, F4). The provider error still propagates.
+      _session = null;
+      _recoveryPending = false;
+      _changes.add(null);
+    }
   }
 
   Session? _toSession(SupabaseAuthSnapshot? snapshot) {

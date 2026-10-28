@@ -309,6 +309,38 @@ void main() {
       expect(await first, isNull);
       expect(cubit.state.actingTaskId, isNull);
     });
+
+    test(
+      'a thrown write clears the acting row and returns the typed failure (N1)',
+      () async {
+        gateway = _StubTaskBoardGateway(throwOnAssign: true);
+        final TaskBoardCubit cubit = buildCubit();
+        addTearDown(cubit.close);
+
+        final AppError? error = await cubit.assignTask('task-1', 'user-2');
+
+        expect(error?.code, 'task_write_failed');
+        expect(cubit.state.actionError?.code, 'task_write_failed');
+        expect(cubit.state.actingTaskId, isNull);
+      },
+    );
+  });
+
+  group('TaskBoardCubit load (N1)', () {
+    test(
+      'a thrown load resets the guard so a retry reaches the gateway',
+      () async {
+        gateway = _StubTaskBoardGateway(throwFirstFetch: true);
+        final TaskBoardCubit cubit = buildCubit();
+        addTearDown(cubit.close);
+
+        await expectLater(cubit.load(), throwsA(isA<StateError>()));
+        await cubit.load();
+
+        expect(gateway.fetchCalls, 2);
+        expect(cubit.state.tasks, isA<ViewEmpty<List<TaskItem>>>());
+      },
+    );
   });
 
   group('TaskBoardCubit picker reads', () {
@@ -348,6 +380,8 @@ class _StubTaskBoardGateway implements TaskBoardGateway {
     List<Result<TaskItem>> advanceResults = const <Result<TaskItem>>[],
     List<Result<TaskItem>> assignResults = const <Result<TaskItem>>[],
     List<Result<TaskItem>> acknowledgeResults = const <Result<TaskItem>>[],
+    this.throwFirstFetch = false,
+    this.throwOnAssign = false,
   }) : _createResults = List<Result<TaskItem>>.of(createResults),
        _advanceResults = List<Result<TaskItem>>.of(advanceResults),
        _assignResults = List<Result<TaskItem>>.of(assignResults),
@@ -363,9 +397,16 @@ class _StubTaskBoardGateway implements TaskBoardGateway {
   final List<List<String>> advanceCalls = <List<String>>[];
   final List<String?> assigneeCalls = <String?>[];
   Completer<void>? assignGate;
+  final bool throwFirstFetch;
+  final bool throwOnAssign;
+  int fetchCalls = 0;
 
   @override
   Future<Result<List<TaskItem>>> fetchTasks() async {
+    fetchCalls += 1;
+    if (throwFirstFetch && fetchCalls == 1) {
+      throw StateError('task board gateway blew up');
+    }
     return Result<List<TaskItem>>.success(_tasks);
   }
 
@@ -388,6 +429,9 @@ class _StubTaskBoardGateway implements TaskBoardGateway {
   @override
   Future<Result<TaskItem>> assignTask(String taskId, String? assigneeId) async {
     assigneeCalls.add(assigneeId);
+    if (throwOnAssign) {
+      throw StateError('task write gateway blew up');
+    }
     final Completer<void>? gate = assignGate;
     if (gate != null) {
       await gate.future;

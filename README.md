@@ -33,7 +33,7 @@ screens behind an auth-aware GoRouter shell.
   and RPCs are applied on the dev project; live payment collection stays
   disabled until the Paymob secrets and a dated D-11 exception are in place
   ([apply record](docs/live_apply_2026-10-21.md)).
-- **Quality gates** — 1960 tests, analyzer-clean, `dart format` pinned to the
+- **Quality gates** — 1994 tests, analyzer-clean, `dart format` pinned to the
   CI toolchain, a hash-pinned governance ledger (`scripts/verify_ledger.sh`)
   reconciling docs claims against the git object database, and
   `docs/audit/LegalHub_AUDIT_2026-09-21.md` as the running build journal.
@@ -98,7 +98,7 @@ recorded prerequisites are approved — see
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (1960 total) — full suite green 2026-10-27 (1966 at runtime): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (1994 total) — full suite green 2026-10-28 (2000 at runtime): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), ThemeCubit (mode persistence + restart
   restore), Redactor (password/OTP/email/Bearer redaction with leak guards),
@@ -136,7 +136,7 @@ recorded prerequisites are approved — see
    assertions, and the build-flavor configuration (`AppFlavor` parsing,
    flavor application-ID / deep-link-scheme separation, Supabase-seam
    adaptation, and flavor-pinned entrypoint defaults).
-- Coverage: **1423 tests** (2026-09-23 — the D-15 video-consultation demo
+- Coverage history: **1423 tests** (2026-09-23 — the D-15 video-consultation demo
   slice: the synthetic `VideoGateway` seam + 4-session deterministic fake
   (zero real media, zero writes, posture doc
   `docs/video_scope_decision_2026-08-11.md`), the join/leave call surface
@@ -451,8 +451,8 @@ HTTP layer and lock the exact postgrest await shape the app depends on —
 (2: `from().select()` plain + chained `.eq()` → raw row list). A future
 postgrest upgrade that changes the await contract fails loudly in CI, not on
 a device (the on-device create-org crash this class caused is recorded in
-`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **1960 tests**
-(1960 tracked declarations, 1966 at runtime; ledger `verify_ledger.sh` PASS).
+`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **1994 tests**
+(1994 tracked declarations, 2000 at runtime; ledger `verify_ledger.sh` PASS).
 
 ## Fonts and licenses
 

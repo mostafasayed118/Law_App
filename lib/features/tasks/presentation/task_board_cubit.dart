@@ -66,8 +66,13 @@ class TaskBoardCubit extends Cubit<TaskBoardState> {
         ),
       );
     }
-    final Result<List<TaskItem>> result = await _gateway.fetchTasks();
-    _loading = false;
+    final Result<List<TaskItem>> result;
+    try {
+      result = await _gateway.fetchTasks();
+    } finally {
+      // Reset on throw too: a blown read must not wedge the retry guard.
+      _loading = false;
+    }
     if (isClosed) {
       return;
     }
@@ -136,27 +141,42 @@ class TaskBoardCubit extends Cubit<TaskBoardState> {
   }) async {
     Result<TaskItem>? writeResult;
     bool started = false;
-    final AppError? error = await _writeGate.run<TaskItem>(
-      isClosed: () => isClosed,
-      write: () async {
-        started = true;
-        emit(state.copyWith(actionError: null, actingTaskId: taskId));
-        final Result<TaskItem> result = await write();
-        writeResult = result;
-        return result;
-      },
-      onSuccess: () async {
-        final Result<TaskItem>? result = writeResult;
-        if (result is Success<TaskItem>) {
-          emit(
-            state.copyWith(
-              tasks: _patchedTasks(result.value),
-              actingTaskId: null,
-            ),
-          );
-        }
-      },
-    );
+    final AppError? error;
+    try {
+      error = await _writeGate.run<TaskItem>(
+        isClosed: () => isClosed,
+        write: () async {
+          started = true;
+          emit(state.copyWith(actionError: null, actingTaskId: taskId));
+          final Result<TaskItem> result = await write();
+          writeResult = result;
+          return result;
+        },
+        onSuccess: () async {
+          final Result<TaskItem>? result = writeResult;
+          if (result is Success<TaskItem>) {
+            emit(
+              state.copyWith(
+                tasks: _patchedTasks(result.value),
+                actingTaskId: null,
+              ),
+            );
+          }
+        },
+      );
+    } catch (_) {
+      // A thrown gateway bypasses both arms above; the row spinner is a
+      // state-level in-flight flag and must still clear so the tile is
+      // tappable again. Mapped to the write's existing failure presentation.
+      const AppError failure = AppError(
+        code: 'task_write_failed',
+        userMessage: 'The task could not be saved. Please try again.',
+      );
+      if (!isClosed && started) {
+        emit(state.copyWith(actionError: failure, actingTaskId: null));
+      }
+      return failure;
+    }
     if (isClosed) {
       return error;
     }

@@ -69,7 +69,9 @@ Future<void> bootstrap(AppConfig config) async {
     // Restore the persisted theme mode before the first frame so the app
     // starts on the user's choice (light/dark/system) instead of the default.
     themeCubit.load(),
-    authCubit.restore(),
+    // Local session restore only. Membership hydration is a network read
+    // and must not hold the first frame (audit 2026-10-27, F2).
+    authCubit.restore(hydrateMemberships: false),
   ]);
   final bool onboardingCompleted = await serviceLocator<OnboardingStore>()
       .hasCompleted();
@@ -105,6 +107,10 @@ Future<void> bootstrap(AppConfig config) async {
       debugBanner: config.flavor == AppFlavor.development,
     ),
   );
+  // The router is attached now; fill the RLS-scoped memberships in the
+  // background. hydrate() no-ops when the session is absent/expired, so an
+  // env-less or signed-out boot pays nothing.
+  unawaited(authCubit.hydrate());
   // Start after runApp so the router is attached; the plugin holds the
   // cold-start link until requested, so nothing is missed.
   unawaited(appLinkListener.start());

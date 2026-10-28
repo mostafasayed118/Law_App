@@ -114,6 +114,23 @@ void main() {
       verify: (_) =>
           expect(gateway.fetchCalls, <String>['thread-1', 'thread-1']),
     );
+
+    test(
+      'a thrown load resets the guard so a retry reaches the gateway (N1)',
+      () async {
+        gateway = _StubMessageGateway(throwFirst: true);
+        final MessageThreadDetailCubit cubit = MessageThreadDetailCubit(
+          gateway,
+        );
+        addTearDown(cubit.close);
+
+        await expectLater(cubit.load('thread-1'), throwsA(isA<StateError>()));
+        await cubit.load('thread-1');
+
+        expect(gateway.fetchCalls, <String>['thread-1', 'thread-1']);
+        expect(cubit.state.messages, ViewSuccess<List<Message>>(_messages));
+      },
+    );
   });
 
   group('MessageThreadDetailCubit live delivery (D-LV4)', () {
@@ -347,6 +364,30 @@ void main() {
     );
 
     blocTest<MessageThreadDetailCubit, MessageThreadDetailState>(
+      'a thrown send surfaces the failure state and re-enables the composer (N1)',
+      setUp: () => gateway.throwOnSend = true,
+      build: () => MessageThreadDetailCubit(gateway),
+      act: (MessageThreadDetailCubit cubit) async {
+        await cubit.load('thread-1');
+        await cubit.send('thread-1', 'A demo send');
+      },
+      expect: () => <MessageThreadDetailState>[
+        MessageThreadDetailState(
+          messages: ViewSuccess<List<Message>>(_messages),
+        ),
+        MessageThreadDetailState(
+          messages: ViewSuccess<List<Message>>(_messages),
+          sending: true,
+        ),
+        MessageThreadDetailState(
+          messages: ViewSuccess<List<Message>>(_messages),
+          sendError: _sendFailure,
+        ),
+      ],
+      verify: (_) => expect(gateway.sendCalls, 1),
+    );
+
+    blocTest<MessageThreadDetailCubit, MessageThreadDetailState>(
       'a whitespace-only send never hits the gateway',
       build: () => MessageThreadDetailCubit(gateway),
       act: (MessageThreadDetailCubit cubit) async {
@@ -418,21 +459,26 @@ final AppError _loadFailure = AppError(
 /// stub), or a Completer for in-flight tests; a scriptable live stream and
 /// a scriptable send result for the D-LV1/D-LV4 paths.
 class _StubMessageGateway implements MessageGateway {
-  _StubMessageGateway({List<Result<List<Message>>>? results})
-    : _queue = results == null
-          ? <Result<List<Message>>>[Result<List<Message>>.success(_messages)]
-          : List<Result<List<Message>>>.of(results),
-      completer = null;
+  _StubMessageGateway({
+    List<Result<List<Message>>>? results,
+    this.throwFirst = false,
+  }) : _queue = results == null
+           ? <Result<List<Message>>>[Result<List<Message>>.success(_messages)]
+           : List<Result<List<Message>>>.of(results),
+       completer = null;
 
   _StubMessageGateway.withCompleter()
     : _queue = const <Result<List<Message>>>[],
-      completer = Completer<Result<List<Message>>>();
+      completer = Completer<Result<List<Message>>>(),
+      throwFirst = false;
 
   final List<Result<List<Message>>> _queue;
   final Completer<Result<List<Message>>>? completer;
+  final bool throwFirst;
   final List<String> fetchCalls = <String>[];
   final StreamController<MessageRealtimeEvent> live =
       StreamController<MessageRealtimeEvent>.broadcast();
+  bool throwOnSend = false;
   Result<Message> sendResult = Result<Message>.success(
     Message(
       id: 'thread-1-sent-1',
@@ -462,6 +508,9 @@ class _StubMessageGateway implements MessageGateway {
   @override
   Future<Result<List<Message>>> fetchMessages(String threadId) {
     fetchCalls.add(threadId);
+    if (throwFirst && fetchCalls.length == 1) {
+      throw StateError('message body gateway blew up');
+    }
     if (completer != null) {
       return completer!.future;
     }
@@ -478,6 +527,9 @@ class _StubMessageGateway implements MessageGateway {
     sentThreadId = threadId;
     sentBody = body;
     sentAuthor = authorDisplayName;
+    if (throwOnSend) {
+      throw StateError('send gateway blew up');
+    }
     return sendResult;
   }
 

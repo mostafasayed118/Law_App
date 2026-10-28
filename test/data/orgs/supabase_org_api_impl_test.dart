@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/data/orgs/supabase_org_api.dart';
 import 'package:legalhub/data/orgs/supabase_org_api_impl.dart';
@@ -8,6 +10,7 @@ void main() {
     late List<String> calls;
     late Map<String, Object?> data;
     late Map<String, PostgrestException> errors;
+    late Set<String> timeouts;
     late Map<String, List<Map<String, dynamic>>> tableData;
     late Map<String, PostgrestException> tableErrors;
     late List<String?> tableFilterColumns;
@@ -18,6 +21,7 @@ void main() {
       calls = <String>[];
       data = <String, Object?>{};
       errors = <String, PostgrestException>{};
+      timeouts = <String>{};
       tableData = <String, List<Map<String, dynamic>>>{};
       tableErrors = <String, PostgrestException>{};
       tableFilterColumns = <String?>[];
@@ -25,6 +29,9 @@ void main() {
       api = SupabaseOrgApiImpl(
         (String function, Map<String, dynamic> params) async {
           calls.add('$function:${params.values.join(',')}');
+          if (timeouts.contains(function)) {
+            throw TimeoutException('slow provider');
+          }
           final PostgrestException? error = errors[function];
           if (error != null) {
             throw error;
@@ -512,6 +519,41 @@ void main() {
 
         expect(id, 'membership-3');
         expect(calls, <String>['accept_invitation:the-token']);
+      },
+    );
+
+    test('maps a transport timeout to providerUnavailable', () async {
+      timeouts.add('create_organization');
+
+      await expectLater(
+        api.createOrganization(name: 'New Firm'),
+        throwsA(
+          isA<SupabaseOrgException>()
+              .having(
+                (e) => e.kind,
+                'kind',
+                SupabaseOrgFailureKind.providerUnavailable,
+              )
+              .having((e) => e.message, 'message', orgRequestFailedMessage),
+        ),
+      );
+    });
+
+    test(
+      'a void RPC transport timeout is a typed providerUnavailable',
+      () async {
+        timeouts.add('remove_membership');
+
+        await expectLater(
+          api.removeMember(organizationId: 'org-1', userId: 'u-1'),
+          throwsA(
+            isA<SupabaseOrgException>().having(
+              (e) => e.kind,
+              'kind',
+              SupabaseOrgFailureKind.providerUnavailable,
+            ),
+          ),
+        );
       },
     );
   });

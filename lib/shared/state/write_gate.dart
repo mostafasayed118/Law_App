@@ -37,8 +37,14 @@ class WriteGate {
       return busyError;
     }
     _inFlight = true;
-    final Result<T> result = await write();
-    _inFlight = false;
+    final Result<T> result;
+    try {
+      result = await write();
+    } finally {
+      // A thrown gateway must not leave the gate closed forever: the next
+      // tap has to be able to run. The original error still propagates.
+      _inFlight = false;
+    }
     if (isClosed()) {
       return null;
     }

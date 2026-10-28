@@ -338,6 +338,37 @@ void main() {
       },
     );
 
+    test('a thrown analysis resets the guard so a retry runs (N1)', () async {
+      final ResearchRequest request = ResearchRequest(
+        organizationId: 'org-1',
+        question: 'What changed?',
+      );
+      when(
+        () => gateway.analyze(any()),
+      ).thenThrow(StateError('analysis gateway blew up'));
+      final AiResearchCubit cubit = AiResearchCubit(gateway);
+      addTearDown(cubit.close);
+
+      await expectLater(cubit.generate(request), throwsA(isA<StateError>()));
+
+      when(() => gateway.analyze(any())).thenAnswer(
+        (_) async => const Result<ResearchOutcome>.success(
+          ResearchOutcome(
+            runId: 'run-1',
+            status: ResearchRunStatus.completed,
+            findings: <AiFinding>[],
+          ),
+        ),
+      );
+      when(() => gateway.fetchRuns()).thenAnswer(
+        (_) async => const Result<List<ResearchRun>>.success(<ResearchRun>[]),
+      );
+      await cubit.generate(request);
+
+      verify(() => gateway.analyze(any())).called(2);
+      expect(cubit.state.findings, isA<ViewSuccess<List<AiFinding>>>());
+    });
+
     test('loadRunFindings labels the answer with the run prompt', () async {
       when(() => gateway.fetchRuns()).thenAnswer(
         (_) async => Result<List<ResearchRun>>.success(<ResearchRun>[run]),
@@ -442,6 +473,27 @@ void main() {
           ),
         ],
       );
+
+      test('a thrown lookup resets the guard so a retry runs (N1)', () async {
+        when(
+          () => matterGateway.fetchMatters(),
+        ).thenThrow(StateError('lookup gateway blew up'));
+        final AiResearchCubit cubit = AiResearchCubit(
+          gateway,
+          mattersGateway: matterGateway,
+        );
+        addTearDown(cubit.close);
+
+        await expectLater(cubit.loadLookups(), throwsA(isA<StateError>()));
+
+        when(() => matterGateway.fetchMatters()).thenAnswer(
+          (_) async => const Result<List<Matter>>.success(<Matter>[]),
+        );
+        await cubit.loadLookups();
+
+        verify(() => matterGateway.fetchMatters()).called(2);
+        expect(cubit.state.matters, isA<ViewSuccess<List<Matter>>>());
+      });
 
       test('a failed lookup never blocks generation', () async {
         when(() => matterGateway.fetchMatters()).thenAnswer(

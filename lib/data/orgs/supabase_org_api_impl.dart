@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:legalhub/data/supabase_seam.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -37,7 +39,7 @@ typedef OrgTableCaller =
 /// holding the provider import: parameters in, plain maps/scalars out, and
 /// PostgrestExceptions mapped to [SupabaseOrgException]s at the seam.
 class SupabaseOrgApiImpl implements SupabaseOrgApi {
-  SupabaseOrgApiImpl(this._rpc, this._table);
+  SupabaseOrgApiImpl(this._rpcCaller, this._table);
 
   /// Binds to the app-level client after `Supabase.initialize`. Kept a
   /// factory so tests can construct the impl with any callable stub.
@@ -70,8 +72,27 @@ class SupabaseOrgApiImpl implements SupabaseOrgApi {
     );
   }
 
-  final OrgRpcCaller _rpc;
+  final OrgRpcCaller _rpcCaller;
   final OrgTableCaller _table;
+
+  /// Every RPC read/write goes through here so the shared seam deadline
+  /// ([SupabaseSeam.boundRpc]) can never cross this boundary as a raw
+  /// [TimeoutException] (audit 2026-10-27, F3). A stalled transport is a
+  /// typed unavailable; the existing `on PostgrestException` mapping on each
+  /// method is untouched (PostgREST failures pass through unchanged).
+  Future<PostgrestResponse<dynamic>> _rpc(
+    String function,
+    Map<String, dynamic> params,
+  ) async {
+    try {
+      return await _rpcCaller(function, params);
+    } on TimeoutException {
+      throw const SupabaseOrgException(
+        kind: SupabaseOrgFailureKind.providerUnavailable,
+        message: orgRequestFailedMessage,
+      );
+    }
+  }
 
   @override
   Future<String> createOrganization({required String name}) async {
