@@ -13,6 +13,9 @@ import 'package:legalhub/features/auth/domain/password_recovery_request.dart';
 class _FakeAuthApi implements SupabaseAuthApi {
   _FakeAuthApi(this.result);
 
+  @override
+  Future<bool> signInWithGoogle({required String redirectTo}) async => false;
+
   final SupabaseAuthResult result;
 
   String? capturedEmail;

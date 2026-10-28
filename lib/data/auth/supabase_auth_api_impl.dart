@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:legalhub/app/deep_link/deep_link_config.dart';
 import 'package:legalhub/core/contracts/http_status.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'auth_callback.dart';
 import 'auth_callback_observer.dart';
 import 'secure_session_storage.dart';
 import 'supabase_auth_api.dart';
@@ -67,7 +67,10 @@ Future<void> initializeSupabase({
 /// [SupabaseAuthResult] / [SupabaseSignUpResult]; a GoTrue [AuthException]
 /// never crosses this seam.
 class SupabaseAuthApiImpl implements SupabaseAuthApi {
-  SupabaseAuthApiImpl(this._client) {
+  SupabaseAuthApiImpl(this._client, {String? recoveryDeepLinkUri})
+    : _recoveryDeepLinkUri =
+          recoveryDeepLinkUri ??
+          AuthCallbackUri.callbackUriFor(AuthCallbackUri.developmentAppScheme) {
     _subscription = _client.onAuthStateChange.listen((AuthState state) {
       _changes.add(
         _toSnapshot(
@@ -88,14 +91,22 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
   /// Binds to the app-level client after `Supabase.initialize`. Kept a
   /// factory so tests can construct the impl with any client-shaped stub.
   ///
+  /// [recoveryDeepLinkUri] is the build's registered callback deep link
+  /// (the service locator injects `AuthCallbackUri.callbackUriFor(
+  /// AppConfig.deepLinkScheme)`). When omitted — a direct construction in a
+  /// test or an env-less run — it stays on the development scheme, never the
+  /// production literal (audit 2026-10-27, F14).
+  ///
   /// [AuthCallbackObserver.ensureStarted] is idempotent: the app-level client
-  /// is a singleton, and the gateway / recovery / sign-up APIs each call this
-  /// factory. Starting here (rather than in `initializeSupabase`) guarantees
-  /// the auth-state listener above is subscribed before a cold-start callback
-  /// can be exchanged.
-  factory SupabaseAuthApiImpl.bind() {
+  /// is a singleton, and the service locator binds exactly ONE api instance
+  /// for the auth, recovery, and sign-up gateways (audit 2026-10-27, F15).
+  /// Starting here (rather than in `initializeSupabase`) guarantees the
+  /// auth-state listener above is subscribed before a cold-start callback can
+  /// be exchanged.
+  factory SupabaseAuthApiImpl.bind({String? recoveryDeepLinkUri}) {
     final SupabaseAuthApiImpl api = SupabaseAuthApiImpl(
       Supabase.instance.client.auth,
+      recoveryDeepLinkUri: recoveryDeepLinkUri,
     );
     AuthCallbackObserver.ensureStarted();
     return api;
@@ -103,19 +114,14 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
 
   final GoTrueClient _client;
 
-  /// The build's application ID, which is also its custom-scheme deep-link
-  /// host. Development builds inject `APPLICATION_ID=com.legalhub.app.dev`
-  /// via `--dart-define-from-file`; the store build keeps the default.
-  static const String _applicationId = String.fromEnvironment(
-    'APPLICATION_ID',
-    defaultValue: 'com.legalhub.app',
-  );
-
-  /// The app's registered deep-link URI (Phase 4.1): the recovery email's
-  /// link target. Must match the Android/iOS intent filters for the same
-  /// application ID.
-  String get _recoveryDeepLinkUri =>
-      DeepLinkConfig(scheme: _applicationId).authCallbackUri().toString();
+  /// The emailed recovery link's target. Must match the Android/iOS intent
+  /// filters of THIS build: a development install registers only
+  /// `com.legalhub.app.dev`, so handing the production scheme to a browser
+  /// strands the recovery on a screen no installed app can answer
+  /// (audit 2026-10-27, F14). The default is the development scheme for the
+  /// env-less/test path; the service locator always injects the build's real
+  /// scheme through [bind].
+  final String _recoveryDeepLinkUri;
 
   final StreamController<SupabaseAuthSnapshot?> _changes =
       StreamController<SupabaseAuthSnapshot?>.broadcast();
@@ -154,6 +160,26 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
       return const SupabaseAuthFailed(
         SupabaseAuthFailure(kind: SupabaseAuthFailureKind.providerUnavailable),
       );
+    }
+  }
+
+  @override
+  Future<bool> signInWithGoogle({required String redirectTo}) async {
+    try {
+      // `externalApplication` hands the consent page to the platform browser
+      // instead of an embedded WebView: Google refuses OAuth in embedded
+      // webviews, and the PKCE verifier stays with this app's secure storage.
+      // The returned bool only proves the browser opened — the session arrives
+      // through the callback observer.
+      return await _client.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: redirectTo,
+        authScreenLaunchMode: LaunchMode.externalApplication,
+      );
+    } on AuthException {
+      return false;
+    } on Exception {
+      return false;
     }
   }
 
@@ -203,12 +229,13 @@ class SupabaseAuthApiImpl implements SupabaseAuthApi {
   @override
   Future<SupabaseAuthResult> resetPasswordForEmail(String email) async {
     try {
-      // Phase 4.1: the emailed recovery link is a deep link into the app
-      // (`com.legalhub.app://auth/v1/callback`, which must be registered as
-      // a Redirect URL on the Supabase dashboard). The dashboard Magic Link
-      // template also renders `{{ .Token }}`, so the 6-digit OTP keeps
-      // arriving alongside the link and the in-app OTP flow is unchanged
-      // (D1 revised, verified live 2026-08-03).
+      // Phase 4.1: the emailed recovery link is a deep link into the app.
+      // Its target is THIS build's registered callback (`_recoveryDeepLinkUri`,
+      // which must also be a Redirect URL on the Supabase dashboard), never a
+      // hardcoded production scheme. The dashboard Magic Link template also
+      // renders `{{ .Token }}`, so the 6-digit OTP keeps arriving alongside the
+      // link and the in-app OTP flow is unchanged (D1 revised, verified live
+      // 2026-08-03).
       await _client.signInWithOtp(
         email: email,
         shouldCreateUser: false,

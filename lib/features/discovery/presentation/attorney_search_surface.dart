@@ -31,6 +31,15 @@ class _SearchSurfaceState extends State<_SearchSurface> {
       appBar: AppBar(title: Text(l10n.discoveryTitle)),
       body: SafeArea(
         child: BlocBuilder<DiscoveryCubit, DiscoveryState>(
+          // Rebuild scope (P-6): the surface renders the visible list, the
+          // active chip, and the local projection of the query — profile
+          // emissions (the same cubit owns the detail load) must not rebuild
+          // the list. The query stays instant: local filtering still runs on
+          // every keystroke, well inside the 300ms server debounce.
+          buildWhen: (DiscoveryState previous, DiscoveryState current) =>
+              previous.attorneys != current.attorneys ||
+              previous.practiceArea != current.practiceArea ||
+              previous.query != current.query,
           builder: (BuildContext context, DiscoveryState state) {
             // Lazy list surface (audit 2026-09-21, M-20): the search field and
             // the practice-area chips stay the header of the same scroll view —

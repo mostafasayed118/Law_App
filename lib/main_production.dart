@@ -6,6 +6,6 @@ import 'package:legalhub/main.dart' as entrypoint;
 /// Run / build with:
 /// `flutter run --flavor production -t lib/main_production.dart
 /// --dart-define-from-file=.env.production`
-Future<void> main() async {
-  await entrypoint.bootstrap(AppConfig.productionFromEnvironment());
-}
+Future<void> main() => entrypoint.runGuardedEntrypoint(
+  () => entrypoint.bootstrap(AppConfig.productionFromEnvironment()),
+);

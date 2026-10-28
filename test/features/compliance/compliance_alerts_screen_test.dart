@@ -288,6 +288,31 @@ void main() {
       expect(find.text('Low · Resolved'), findsOneWidget);
     });
 
+    testWidgets('the detail sheet localizes the demo title like the tile', (
+      tester,
+    ) async {
+      await pumpAlerts(
+        tester,
+        gateway: _StubComplianceGateway(
+          rows: <ComplianceAlert>[
+            _row(id: 'a1', title: 'Demo: review pending invitations'),
+          ],
+        ),
+        locale: const Locale('ar'),
+      );
+
+      // Arabic, because the EN demo values are byte-identical to the fake
+      // corpus — only a non-EN locale proves the mapping is applied.
+      final AppLocalizations ar = await AppLocalizations.delegate.load(
+        const Locale('ar'),
+      );
+      await tester.tap(find.text(ar.demoAlertTitle1));
+      await tester.pumpAndSettle();
+
+      expect(find.text(ar.demoAlertTitle1), findsNWidgets(2));
+      expect(find.text('Demo: review pending invitations'), findsNothing);
+    });
+
     testWidgets('a manager sees resolve on an acknowledged alert', (
       tester,
     ) async {

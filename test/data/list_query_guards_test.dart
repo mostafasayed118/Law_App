@@ -138,6 +138,17 @@ void main() {
       );
     });
 
+    test('accepts the Wave-A caller-scoped memberships read on user_id', () {
+      expect(
+        () => requireFilterableColumn('memberships', 'user_id'),
+        returnsNormally,
+      );
+      expect(
+        () => requireFilterableColumn('memberships', 'organization_id'),
+        throwsArgumentError,
+      );
+    });
+
     test('rejects an unlisted column on a listed table', () {
       expect(
         () => requireFilterableColumn('messages', 'body'),

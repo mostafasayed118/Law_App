@@ -152,6 +152,46 @@ void main() {
     });
 
     blocTest<FileTransferCubit, FileTransferState>(
+      'the picker can reject an oversize file before reading bytes',
+      build: () => FileTransferCubit(gateway, _TooLargePicker(), opener),
+      act: (FileTransferCubit cubit) => cubit.pickAndUpload('m-1'),
+      expect: () => <FileTransferState>[
+        const FileTransferState.failure(
+          AppError(
+            code: 'file_upload_too_large',
+            userMessage: 'This file is too large.',
+          ),
+        ),
+      ],
+      verify: (_) => expect(gateway.uploads, isEmpty),
+    );
+
+    test(
+      'a raw upload timeout fails the state instead of stranding it',
+      () async {
+        picker.picked = picked;
+        gateway.uploadThrow = TimeoutException('upload stalled');
+        final FileTransferCubit cubit = FileTransferCubit(
+          gateway,
+          picker,
+          opener,
+        );
+        addTearDown(cubit.close);
+
+        await cubit.pickAndUpload('m-1');
+
+        expect(cubit.state.phase, FileTransferPhase.failure);
+        expect(cubit.state.error?.code, 'file_upload_unavailable');
+        expect(cubit.state.error?.kind, AppErrorKind.unavailable);
+
+        // The in-flight guard released, so the user can retry immediately.
+        gateway.uploadThrow = null;
+        await cubit.pickAndUpload('m-1');
+        expect(cubit.state.phase, FileTransferPhase.success);
+      },
+    );
+
+    blocTest<FileTransferCubit, FileTransferState>(
       'a picker exception maps to the generic upload failure',
       build: () => FileTransferCubit(gateway, picker, opener),
       setUp: () => picker.error = const FilePickException(),
@@ -268,6 +308,7 @@ class _StubStorageGateway implements StorageGateway {
   );
   int uploadCalls = 0;
   int downloadCalls = 0;
+  Object? uploadThrow;
 
   @override
   Future<Result<List<FileMetadata>>> fetchFiles({String? matterId}) async =>
@@ -291,6 +332,10 @@ class _StubStorageGateway implements StorageGateway {
         bytes: bytes,
       ),
     );
+    final Object? throwable = uploadThrow;
+    if (throwable != null) {
+      throw throwable;
+    }
     return uploadResults.removeAt(0);
   }
 
@@ -334,4 +379,9 @@ class _FakeOpener implements UriOpener {
     opened.add(uri);
     return result;
   }
+}
+
+class _TooLargePicker implements FilePicker {
+  @override
+  Future<PickedFile?> pickFile() async => throw const FileTooLargeException();
 }

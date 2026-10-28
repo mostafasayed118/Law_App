@@ -73,7 +73,17 @@ class NotificationCubit extends Cubit<NotificationState> {
         // store read per load (the inlined version read it once per toggle
         // while claiming a single read) and the allMuted distinction owned
         // there rather than reconstructed here.
-        switch (await _visibleNotifications(list)) {
+        //
+        // This is a SECOND await: the store read may still be pending when
+        // the cubit closes, and emitting afterwards throws
+        // `StateError: Cannot emit new states after calling close`
+        // (audit 2026-10-27, F12). Re-check `isClosed` on the resolved local.
+        final Result<NotificationVisibility> visibilityResult =
+            await _visibleNotifications(list);
+        if (isClosed) {
+          return;
+        }
+        switch (visibilityResult) {
           case Success<NotificationVisibility>(
             value: final NotificationVisibility visibility,
           ):

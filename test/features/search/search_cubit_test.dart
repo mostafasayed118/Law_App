@@ -210,6 +210,35 @@ void main() {
       ],
     );
 
+    test('reuses the attorney directory across searches (F10)', () async {
+      // The three query-dependent seams answer once per search; the
+      // directory stub has a single scripted read, so a second gateway call
+      // would fail the queue (and the call-count pin).
+      matters = _StubMatterGateway(
+        results: <Result<List<Matter>>>[
+          Result<List<Matter>>.success(_matters),
+          Result<List<Matter>>.success(_matters),
+        ],
+      );
+      documents = _StubDocumentGateway(<Result<List<Document>>>[
+        Result<List<Document>>.success(_documents),
+        Result<List<Document>>.success(_documents),
+      ]);
+      threads = _StubMessageGateway(<Result<List<MessageThread>>>[
+        Result<List<MessageThread>>.success(_threads),
+        Result<List<MessageThread>>.success(_threads),
+      ]);
+      final SearchCubit cubit = build();
+      addTearDown(cubit.close);
+
+      await cubit.search('Demo');
+      await cubit.search('Beta');
+
+      // The directory is query-independent: one read per cubit lifetime.
+      expect(attorneys.calls, 1);
+      expect(matters.calls, 2);
+    });
+
     blocTest<SearchCubit, SearchState>(
       'no match in any group emits ViewEmpty (AC-1 no match)',
       build: build,

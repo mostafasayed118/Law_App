@@ -5,7 +5,6 @@ import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/app/router.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/roles/user_role.dart';
-import 'package:legalhub/features/matters/presentation/matter_link_chip.dart';
 import 'package:legalhub/features/messaging/domain/message_gateway.dart';
 import 'package:legalhub/features/messaging/domain/message_thread.dart';
 import 'package:legalhub/l10n/app_localizations.dart';

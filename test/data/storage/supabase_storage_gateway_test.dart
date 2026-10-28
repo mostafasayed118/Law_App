@@ -59,10 +59,12 @@ class _StubSupabaseStorageApi implements SupabaseStorageApi {
     Uint8List bytes,
     String contentType,
   ) async {
+    // Record the attempted key before the failure arm: a timed-out upload is
+    // still a write the gateway must be able to compensate for.
+    uploadedPaths.add(path);
     if (uploadError != null) {
       throw uploadError!;
     }
-    uploadedPaths.add(path);
     uploadedBytes = bytes;
     uploadedContentType = contentType;
   }
@@ -462,6 +464,32 @@ void main() {
       expect(error.technicalMessage, isNot(contains('secret-brief.pdf')));
       expect(error.technicalMessage, isNot(contains('org-1/m-1')));
     });
+
+    test(
+      'a timed-out upload removes the path it was writing (F9 orphan)',
+      () async {
+        // A timeout surfaces as providerUnavailable; the object may have landed
+        // server-side, so the destination key must be compensated even though
+        // `uploadObject` never returned.
+        api.uploadError = const SupabaseStorageException(
+          kind: SupabaseStorageFailureKind.providerUnavailable,
+          message: 'Upload timed out.',
+        );
+
+        final Result<FileMetadata> result = await gateway.uploadFile(
+          matterId: 'm-1',
+          name: 'brief.pdf',
+          mimeType: 'application/pdf',
+          sizeBytes: 3,
+          bytes: bytes,
+        );
+
+        expect(result.errorOrNull?.code, 'file_upload_unavailable');
+        expect(api.uploadedPaths, hasLength(1));
+        expect(api.removedPaths, <String>[api.uploadedPaths.single]);
+        expect(api.registerParams, isNull);
+      },
+    );
 
     test('maps upload statuses to the typed codes', () async {
       const Map<SupabaseStorageFailureKind, String> codes =

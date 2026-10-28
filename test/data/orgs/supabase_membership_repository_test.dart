@@ -4,6 +4,11 @@ import 'package:legalhub/core/organizations/membership_repository.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/data/orgs/supabase_membership_repository.dart';
 import 'package:legalhub/data/orgs/supabase_org_api.dart';
+import 'package:mocktail/mocktail.dart';
+
+/// The seam as a mocktail mock — the plan's shape for the cast-drift case;
+/// [_StubOrgApi] below stays the hand-rolled fake for the happy/typed paths.
+class _MockOrgApi extends Mock implements SupabaseOrgApi {}
 
 /// Hand-rolled fake of the [SupabaseOrgApi] membership SELECT surface:
 /// answers [listMyMemberships] with canned rows or a [SupabaseOrgException].
@@ -232,6 +237,51 @@ void main() {
 
       expect(memberships, isEmpty);
     });
+
+    test(
+      'a non-string role is dropped instead of throwing TypeError (F13)',
+      () async {
+        final _MockOrgApi mockApi = _MockOrgApi();
+        when(() => mockApi.listMyMemberships(userId: 'u-1')).thenAnswer(
+          (_) async => <Map<String, dynamic>>[
+            <String, dynamic>{
+              'user_id': 'u-1',
+              'organization_id': 'org-1',
+              'role': 42,
+              'status': 'active',
+              'organizations': <String, dynamic>{'name': 'Firm'},
+            },
+          ],
+        );
+
+        final SupabaseMembershipRepository mockRepository =
+            SupabaseMembershipRepository(mockApi);
+        final MembershipHydrationResult result = await mockRepository
+            .loadMemberships(userId: 'u-1');
+
+        expect(result, isA<HydrationSucceeded>());
+        expect((result as HydrationSucceeded).memberships, isEmpty);
+      },
+    );
+
+    test(
+      'a non-string status is dropped instead of throwing TypeError (F13)',
+      () async {
+        api.rows = <Map<String, dynamic>>[
+          <String, dynamic>{
+            'user_id': 'u-1',
+            'organization_id': 'org-1',
+            'role': 'partner',
+            'status': 7,
+            'organizations': <String, dynamic>{'name': 'Firm'},
+          },
+        ];
+
+        final List<OrganizationMembership> memberships = await loadSucceeded();
+
+        expect(memberships, isEmpty);
+      },
+    );
 
     test('provider read failure is a typed HydrationFailed (Task 8)', () async {
       api.error = const SupabaseOrgException(

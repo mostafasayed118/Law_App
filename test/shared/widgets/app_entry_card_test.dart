@@ -103,6 +103,15 @@ void main() {
     expect(find.text('Entry subtitle'), findsOneWidget);
   });
 
+  testWidgets('mirrors the trailing chevron under RTL (U-1)', (tester) async {
+    await tester.pumpWidget(
+      pumpAppEntryCard(direction: TextDirection.rtl, onTap: () {}),
+    );
+
+    expect(find.byIcon(Icons.chevron_left), findsOneWidget);
+    expect(find.byIcon(Icons.chevron_right), findsNothing);
+  });
+
   testWidgets('renders at 320px width without overflow', (tester) async {
     await tester.pumpWidget(pumpAppEntryCard(width: 320));
 

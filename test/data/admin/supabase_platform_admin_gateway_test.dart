@@ -126,6 +126,18 @@ void main() {
       expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
     });
 
+    test('surfaces a missing created_at as a typed failure', () async {
+      api.orgRows = <Map<String, dynamic>>[
+        <String, dynamic>{'organization_id': 'org-1', 'name': 'Demo Firm'},
+      ];
+
+      final OrgOutcome<List<OrganizationSummary>> outcome = await gateway
+          .listOrganizations();
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
+      expect(outcome.valueOrNull, isNull);
+    });
+
     test('maps a non-owner denial', () async {
       api.listError = const SupabasePlatformAdminException(
         kind: SupabasePlatformAdminFailureKind.denied,
@@ -142,6 +154,25 @@ void main() {
           message: platformAdminRequestFailedMessage,
         ),
       );
+    });
+
+    test('maps a mapper-drift TypeError to an unknown failure', () async {
+      // A non-string `name` reaches an unguarded `as String?` cast. The
+      // TypeError is an Error, not an Exception, and must not escape the
+      // gateway's typed failure surface.
+      api.orgRows = <Map<String, dynamic>>[
+        <String, dynamic>{
+          'organization_id': 'org-1',
+          'name': 42,
+          'created_at': '2026-07-25T10:00:00.000Z',
+        },
+      ];
+
+      final OrgOutcome<List<OrganizationSummary>> outcome = await gateway
+          .listOrganizations();
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
+      expect(outcome.valueOrNull, isNull);
     });
   });
 
@@ -258,6 +289,64 @@ void main() {
       final OrgOutcome<List<OrgMember>> outcome = await gateway.listMembers();
 
       expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
+    });
+
+    test('surfaces a null organization_id as a typed failure', () async {
+      api.memberRows = <Map<String, dynamic>>[
+        <String, dynamic>{
+          'organization_id': null,
+          'user_id': 'u-1',
+          'display_name': 'Amira',
+          'role': 'client',
+          'status': 'active',
+          'created_at': '2026-07-25T10:00:00.000Z',
+          'updated_at': '2026-07-25T10:00:00.000Z',
+        },
+      ];
+
+      final OrgOutcome<List<OrgMember>> outcome = await gateway.listMembers();
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
+      expect(outcome.valueOrNull, isNull);
+    });
+
+    test('surfaces an unparseable updated_at as a typed failure', () async {
+      api.memberRows = <Map<String, dynamic>>[
+        <String, dynamic>{
+          'organization_id': 'org-1',
+          'user_id': 'u-1',
+          'display_name': 'Amira',
+          'role': 'client',
+          'status': 'active',
+          'created_at': '2026-07-25T10:00:00.000Z',
+          'updated_at': 'not-a-date',
+        },
+      ];
+
+      final OrgOutcome<List<OrgMember>> outcome = await gateway.listMembers();
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
+      expect(outcome.valueOrNull, isNull);
+    });
+
+    test('maps a mapper-drift TypeError to an unknown failure', () async {
+      // A non-string `user_id` reaches an unguarded `as String?` cast.
+      api.memberRows = <Map<String, dynamic>>[
+        <String, dynamic>{
+          'organization_id': 'org-1',
+          'user_id': 42,
+          'display_name': 'Amira',
+          'role': 'client',
+          'status': 'active',
+          'created_at': '2026-07-25T10:00:00.000Z',
+          'updated_at': '2026-07-25T10:00:00.000Z',
+        },
+      ];
+
+      final OrgOutcome<List<OrgMember>> outcome = await gateway.listMembers();
+
+      expect(outcome.failureOrNull?.kind, OrgFailureKind.unknown);
+      expect(outcome.valueOrNull, isNull);
     });
   });
 

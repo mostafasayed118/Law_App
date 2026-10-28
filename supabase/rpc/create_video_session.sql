@@ -77,6 +77,11 @@ begin
     end if;
   end if;
 
+  if p_scheduled_at is null or p_scheduled_at < now() then
+    raise exception 'scheduled_at must be in the future'
+      using errcode = 'check_violation';
+  end if;
+
   v_room := 'room_' || replace(gen_random_uuid()::text, '-', '');
 
   insert into public.video_sessions

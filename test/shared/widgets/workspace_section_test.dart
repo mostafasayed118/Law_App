@@ -20,6 +20,7 @@ void main() {
   Widget pumpWorkspaceSection({
     ViewState<List<String>> state = const ViewSuccess<List<String>>(items),
     VoidCallback? onRetry,
+    String? viewAllCopy,
   }) {
     return MaterialApp(
       theme: LegalHubTheme.light,
@@ -27,13 +28,18 @@ void main() {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(
-        body: WorkspaceSection<String>(
-          state: state,
-          onRetry: onRetry ?? () {},
-          errorCopy: 'Load error',
-          emptyCopy: 'No rows for this matter',
-          itemBuilder: (BuildContext context, String item) =>
-              AppTile(title: item, subtitles: const <String>['Row']),
+        // Tall lists overflow the 600px test viewport; the shell itself is a
+        // plain column, so the scroll lives in the harness.
+        body: SingleChildScrollView(
+          child: WorkspaceSection<String>(
+            state: state,
+            onRetry: onRetry ?? () {},
+            errorCopy: 'Load error',
+            emptyCopy: 'No rows for this matter',
+            viewAllCopy: viewAllCopy,
+            itemBuilder: (BuildContext context, String item) =>
+                AppTile(title: item, subtitles: const <String>['Row']),
+          ),
         ),
       ),
     );
@@ -46,6 +52,44 @@ void main() {
     expect(find.text('Beta · m1'), findsOneWidget);
     expect(find.text('Gamma · m2'), findsOneWidget);
     expect(find.text('No rows for this matter'), findsNothing);
+  });
+
+  testWidgets('success of fifty rows collapses to the five-row preview', (
+    tester,
+  ) async {
+    final List<String> many = List<String>.generate(50, (int i) => 'Row $i');
+
+    await tester.pumpWidget(
+      pumpWorkspaceSection(
+        state: ViewSuccess<List<String>>(many),
+        viewAllCopy: 'VIEW ALL',
+      ),
+    );
+
+    expect(find.byType(AppTile), findsNWidgets(5));
+    expect(find.text('Row 4'), findsOneWidget);
+    expect(find.text('Row 5'), findsNothing);
+    expect(find.text('VIEW ALL'), findsOneWidget);
+
+    await tester.tap(find.text('VIEW ALL'));
+    await tester.pump();
+
+    expect(find.byType(AppTile), findsNWidgets(50));
+    expect(find.text('Row 49'), findsOneWidget);
+    expect(find.text('VIEW ALL'), findsNothing);
+  });
+
+  testWidgets('without a view-all label the section stays at the preview', (
+    tester,
+  ) async {
+    final List<String> many = List<String>.generate(50, (int i) => 'Row $i');
+
+    await tester.pumpWidget(
+      pumpWorkspaceSection(state: ViewSuccess<List<String>>(many)),
+    );
+
+    expect(find.byType(AppTile), findsNWidgets(5));
+    expect(find.text('VIEW ALL'), findsNothing);
   });
 
   testWidgets('success with an empty list renders no rows', (tester) async {

@@ -3,7 +3,7 @@ import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/practice_area.dart';
 import 'package:legalhub/data/discovery/supabase_attorney_api.dart';
-import 'package:legalhub/data/discovery/supabase_attorney_gateway.dart';
+import 'package:legalhub/features/discovery/data/supabase_attorney_gateway.dart';
 import 'package:legalhub/features/discovery/domain/attorney.dart';
 import 'package:legalhub/features/discovery/domain/attorney_admin_gateway.dart';
 

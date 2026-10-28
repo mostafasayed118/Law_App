@@ -38,14 +38,16 @@ Map<String, dynamic> _row({
   String category = 'activity',
   String type = 'matter_updated',
   String summary = 'Demo notification — matter status update',
-  DateTime? serverTimestamp,
+  Object? serverTimestamp,
   bool isRead = false,
 }) => <String, dynamic>{
   'id': id,
   'category': category,
   'type': type,
   'summary': summary,
-  'server_timestamp': serverTimestamp ?? DateTime.utc(2026, 7, 18, 14, 5),
+  // PostgREST returns timestamptz as an ISO-8601 string. The DateTime arm
+  // remains accepted for unit fixtures but is not the provider shape.
+  'server_timestamp': serverTimestamp ?? '2026-07-18T14:05:00.000Z',
   'is_read': isRead,
 };
 
@@ -175,10 +177,28 @@ void main() {
     });
 
     test(
-      'a non-DateTime server_timestamp is provider drift → loud failure',
+      'maps an ISO-8601 string timestamp to local time (PostgREST shape)',
+      () async {
+        api.rows = <Map<String, dynamic>>[_row()];
+
+        final Notification notification =
+            (await gateway.fetchNotifications()).valueOrNull!.single;
+
+        expect(notification.serverTimestamp.isUtc, isFalse);
+        expect(
+          notification.serverTimestamp.isAtSameMomentAs(
+            DateTime.utc(2026, 7, 18, 14, 5),
+          ),
+          isTrue,
+        );
+      },
+    );
+
+    test(
+      'a malformed timestamp string is provider drift → loud failure',
       () async {
         api.rows = <Map<String, dynamic>>[
-          <String, dynamic>{..._row(), 'server_timestamp': '2026-07-18'},
+          <String, dynamic>{..._row(), 'server_timestamp': 'not-a-date'},
         ];
 
         final Result<List<Notification>> result = await gateway

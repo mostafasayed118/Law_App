@@ -4,6 +4,10 @@ import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/state/view_state.dart';
+import 'package:legalhub/features/documents/domain/document.dart';
+import 'package:legalhub/features/documents/domain/document_gateway.dart';
+import 'package:legalhub/features/matters/domain/matter.dart';
+import 'package:legalhub/features/matters/domain/matter_gateway.dart';
 import 'package:legalhub/features/research/domain/ai_finding.dart';
 import 'package:legalhub/features/research/domain/ai_gateway.dart';
 import 'package:legalhub/features/research/domain/research_outcome.dart';
@@ -16,19 +20,34 @@ import 'ai_research_state.dart';
 ///
 /// [generate] submits a [ResearchRequest] through the [AiGateway] seam and
 /// renders the typed lifecycle; [loadRuns] reads the persisted history and
-/// [loadRunFindings] opens one stored run. The legacy [research] entry point
-/// stays for the env-less demo path (the synthetic gateway's corpus query).
-/// Widgets dispatch intents and render [AiResearchState]; they never call the
-/// gateway directly.
+/// [loadRunFindings] opens one stored run; [loadLookups] fills the optional
+/// matter/document pickers. The legacy [research] entry point stays for the
+/// env-less demo path (the synthetic gateway's corpus query). Widgets dispatch
+/// intents and render [AiResearchState]; they never call a gateway directly.
 class AiResearchCubit extends Cubit<AiResearchState> {
-  AiResearchCubit(this._gateway) : super(const AiResearchState());
+  AiResearchCubit(
+    this._gateway, {
+    MatterGateway? mattersGateway,
+    DocumentGateway? documentsGateway,
+  }) : _matters = mattersGateway,
+       _documents = documentsGateway,
+       super(const AiResearchState());
 
   final AiGateway _gateway;
+
+  /// The optional picker seams. A null seam leaves its arm untouched — the
+  /// lookups are optional context, not a requirement for generation.
+  final MatterGateway? _matters;
+  final DocumentGateway? _documents;
 
   /// In-flight guard — the [NotificationCubit] pattern: the flag, not a
   /// state check, distinguishes "request in flight" from "idle", and
   /// duplicate submits while a request is running are ignored.
   bool _loading = false;
+
+  /// The lookup in-flight guard: a reload while the pair is loading is a
+  /// no-op, so a double tap cannot interleave two settled pairs.
+  bool _loadingLookups = false;
 
   /// Monotonic history request id: a refresh while a read is in flight must
   /// not be overwritten by the older response (the SearchCubit pattern).
@@ -60,6 +79,69 @@ class AiResearchCubit extends Cubit<AiResearchState> {
         );
     }
   }
+
+  /// Loads both optional pickers in parallel. Each arm settles on its own
+  /// [ViewState]: a failed lookup renders inline with its own reload
+  /// affordance and never blocks [generate] — the matter and documents are
+  /// optional context. A missing seam keeps that arm at its current state.
+  Future<void> loadLookups() async {
+    if (isClosed || _loadingLookups) {
+      return;
+    }
+    final MatterGateway? matterGateway = _matters;
+    final DocumentGateway? documentGateway = _documents;
+    if (matterGateway == null && documentGateway == null) {
+      return;
+    }
+    _loadingLookups = true;
+    emit(
+      state.copyWith(
+        matters: matterGateway == null
+            ? state.matters
+            : const ViewLoading<List<Matter>>(),
+        documents: documentGateway == null
+            ? state.documents
+            : const ViewLoading<List<Document>>(),
+      ),
+    );
+    // Both requests start before the first await, so the lookups run in
+    // parallel (the record `.wait` is Future.wait for the two arms).
+    final (Result<List<Matter>>?, Result<List<Document>>?) results;
+    try {
+      results = await (
+        matterGateway?.fetchMatters() ?? Future<Result<List<Matter>>?>.value(),
+        documentGateway?.fetchDocuments() ??
+            Future<Result<List<Document>>?>.value(),
+      ).wait;
+    } finally {
+      // Reset on throw too: a blown lookup must not wedge the reload guard.
+      _loadingLookups = false;
+    }
+    if (isClosed) {
+      return;
+    }
+    final Result<List<Matter>>? matterResult = results.$1;
+    final Result<List<Document>>? documentResult = results.$2;
+    emit(
+      state.copyWith(
+        matters: matterResult == null
+            ? state.matters
+            : _lookupState(matterResult),
+        documents: documentResult == null
+            ? state.documents
+            : _lookupState(documentResult),
+      ),
+    );
+  }
+
+  ViewState<List<T>> _lookupState<T>(Result<List<T>> result) =>
+      switch (result) {
+        Success<List<T>>(value: final List<T> rows) => ViewSuccess<List<T>>(
+          rows,
+        ),
+        Failure<List<T>>(error: final AppError error) =>
+          viewStateForFailure<List<T>>(error),
+      };
 
   /// Runs one real analysis. An invalid request is rejected locally with the
   /// same typed code the function uses, so a configured build never sends an
@@ -98,8 +180,13 @@ class AiResearchCubit extends Cubit<AiResearchState> {
         lastError: null,
       ),
     );
-    final Result<ResearchOutcome> result = await _gateway.analyze(request);
-    _loading = false;
+    final Result<ResearchOutcome> result;
+    try {
+      result = await _gateway.analyze(request);
+    } finally {
+      // Reset on throw too: a blown analysis must not wedge the submit guard.
+      _loading = false;
+    }
     if (isClosed) {
       return;
     }
@@ -152,8 +239,13 @@ class AiResearchCubit extends Cubit<AiResearchState> {
         lastError: null,
       ),
     );
-    final Result<List<AiFinding>> result = await _gateway.fetchFindings(runId);
-    _loading = false;
+    final Result<List<AiFinding>> result;
+    try {
+      result = await _gateway.fetchFindings(runId);
+    } finally {
+      // Reset on throw too: a blown run read must not wedge the submit guard.
+      _loading = false;
+    }
     if (isClosed) {
       return;
     }
@@ -187,8 +279,13 @@ class AiResearchCubit extends Cubit<AiResearchState> {
         lastError: null,
       ),
     );
-    final Result<List<AiFinding>> result = await _gateway.research(query);
-    _loading = false;
+    final Result<List<AiFinding>> result;
+    try {
+      result = await _gateway.research(query);
+    } finally {
+      // Reset on throw too: a blown query must not wedge the submit guard.
+      _loading = false;
+    }
     if (isClosed) {
       return;
     }

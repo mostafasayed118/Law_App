@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:legalhub/data/postgrest_failures.dart';
 import 'package:legalhub/data/supabase_seam.dart';
 import 'package:legalhub/data/supabase_wire.dart';
@@ -22,7 +24,7 @@ typedef PlatformAdminRpcCaller =
 /// parameters in, plain map rows/scalars out, and PostgrestExceptions mapped
 /// to [SupabasePlatformAdminException]s at the seam.
 class SupabasePlatformAdminApiImpl implements SupabasePlatformAdminApi {
-  SupabasePlatformAdminApiImpl(this._rpc);
+  SupabasePlatformAdminApiImpl(this._rpcCaller);
 
   /// Binds to the app-level client after `Supabase.initialize`. Kept a
   /// factory so tests can construct the impl with any callable stub.
@@ -37,7 +39,26 @@ class SupabasePlatformAdminApiImpl implements SupabasePlatformAdminApi {
     return SupabaseSeam.boundRpc(function, params);
   }
 
-  final PlatformAdminRpcCaller _rpc;
+  final PlatformAdminRpcCaller _rpcCaller;
+
+  /// Every RPC goes through here so the shared seam deadline
+  /// ([SupabaseSeam.boundRpc]) can never cross this boundary as a raw
+  /// [TimeoutException] (audit 2026-10-27, F3). A stalled transport is a
+  /// typed unavailable; the existing `on PostgrestException` mapping on each
+  /// method is untouched (PostgREST failures pass through unchanged).
+  Future<PostgrestResponse<dynamic>> _rpc(
+    String function,
+    Map<String, dynamic> params,
+  ) async {
+    try {
+      return await _rpcCaller(function, params);
+    } on TimeoutException {
+      throw const SupabasePlatformAdminException(
+        kind: SupabasePlatformAdminFailureKind.providerUnavailable,
+        message: platformAdminRequestFailedMessage,
+      );
+    }
+  }
 
   @override
   Future<List<Map<String, dynamic>>> listOrganizations() async {

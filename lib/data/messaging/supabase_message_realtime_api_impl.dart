@@ -16,7 +16,14 @@ import 'supabase_message_realtime_api.dart';
 /// is a configured-build concern — unit tests exercise the lifecycle with
 /// an injected binding, never a live websocket (review Q4).
 class SupabaseMessageRealtimeApiImpl implements SupabaseMessageRealtimeApi {
-  SupabaseMessageRealtimeApiImpl(this._binder);
+  SupabaseMessageRealtimeApiImpl(this._binder) {
+    _events = StreamController<SupabaseMessageRealtimeEvent>.broadcast(
+      // F6: the last listener leaving is an intentional teardown, not a
+      // channel error — close the channel instead of leaving it bound to a
+      // screen that is gone (and never re-open it from its `closed` status).
+      onCancel: () => unawaited(_closeActiveHandle()),
+    );
+  }
 
   /// Binds to the app-level client after `Supabase.initialize`.
   factory SupabaseMessageRealtimeApiImpl.bind() =>
@@ -24,12 +31,19 @@ class SupabaseMessageRealtimeApiImpl implements SupabaseMessageRealtimeApi {
 
   final MessageRealtimeBinder _binder;
 
-  final StreamController<SupabaseMessageRealtimeEvent> _events =
-      StreamController<SupabaseMessageRealtimeEvent>.broadcast();
+  late final StreamController<SupabaseMessageRealtimeEvent> _events;
   MessageRealtimeSubscriptionHandle? _handle;
   String? _threadId;
+  String? _openingThreadId;
   bool _closed = false;
   bool _reconnecting = false;
+  bool _switching = false;
+
+  /// Binding epoch: bumped on every intentional teardown. A callback captured
+  /// by an older epoch (the replaced binding's inserts, or the `closed`
+  /// subscribe status `realtime_client` reports for an unsubscribe) belongs
+  /// to a dead subscription and must never reconnect or deliver.
+  int _epoch = 0;
 
   @override
   Stream<SupabaseMessageRealtimeEvent> watchMessages(String threadId) {
@@ -47,41 +61,85 @@ class SupabaseMessageRealtimeApiImpl implements SupabaseMessageRealtimeApi {
         // never received live events (stale-thread bug).
         unawaited(_switchThread(threadId));
       }
+    } else if (_handle == null &&
+        _openingThreadId == null &&
+        !_reconnecting &&
+        !_switching) {
+      // The channel was torn down (the last listener cancelled): a fresh
+      // listener needs a fresh channel for the same thread.
+      _open(threadId);
     }
     return _events.stream;
   }
 
   Future<void> _switchThread(String threadId) async {
-    await _handle?.close();
-    _handle = null;
-    if (!_closed) {
+    _switching = true;
+    try {
+      await _closeActiveHandle();
+    } finally {
+      _switching = false;
+    }
+    if (!_closed && _threadId == threadId) {
       _open(threadId);
     }
+  }
+
+  /// Closes the active handle (if any) and advances the epoch so the closed
+  /// channel's late callbacks are recognised as dead.
+  Future<void> _closeActiveHandle() async {
+    _epoch++;
+    final MessageRealtimeSubscriptionHandle? handle = _handle;
+    _handle = null;
+    await handle?.close();
   }
 
   /// Opens the subscription for one thread. The binding resolves
   /// asynchronously; the handle lands when the channel is set up.
   void _open(String threadId) {
+    _openingThreadId = threadId;
+    final int epoch = _epoch;
     unawaited(
       _binder(
         threadId: threadId,
         onInsert: (Map<String, dynamic> row) {
-          if (!_closed) {
+          if (!_closed && _epoch == epoch && _threadId == threadId) {
             _events.add(SupabaseMessageRealtimeInsert(row));
           }
         },
-        onChannelError: (Object error) => _onChannelError(threadId),
-      ).then((MessageRealtimeSubscriptionHandle handle) {
-        _handle = handle;
-      }),
+        onChannelError: (Object error) => _onChannelError(threadId, epoch),
+      ).then(
+        (MessageRealtimeSubscriptionHandle handle) {
+          if (_openingThreadId == threadId) {
+            _openingThreadId = null;
+          }
+          if (_closed || _epoch != epoch || _threadId != threadId) {
+            // The binding landed for a thread that is no longer open.
+            unawaited(handle.close());
+            return;
+          }
+          _handle = handle;
+        },
+        onError: (Object error) {
+          if (_openingThreadId == threadId) {
+            _openingThreadId = null;
+          }
+          if (!_closed && _epoch == epoch && _threadId == threadId) {
+            _onChannelError(threadId, epoch);
+          }
+        },
+      ),
     );
   }
 
   /// A channel error/system message: tear down, re-open, and signal the
   /// consumer to re-backfill. Guarded against re-entry so one error cycle
-  /// never loops on itself.
-  void _onChannelError(String threadId) {
-    if (_closed || _reconnecting) {
+  /// never loops on itself; an intentional teardown is never an error.
+  void _onChannelError(String threadId, int epoch) {
+    if (_closed ||
+        _reconnecting ||
+        _switching ||
+        _epoch != epoch ||
+        _threadId != threadId) {
       return;
     }
     _reconnecting = true;
@@ -89,8 +147,11 @@ class SupabaseMessageRealtimeApiImpl implements SupabaseMessageRealtimeApi {
   }
 
   Future<void> _reconnect(String threadId) async {
-    await _handle?.close();
-    _handle = null;
+    await _closeActiveHandle();
+    if (_closed || _threadId != threadId) {
+      _reconnecting = false;
+      return;
+    }
     _open(threadId);
     _events.add(const SupabaseMessageRealtimeReconnected());
     _reconnecting = false;
@@ -99,8 +160,7 @@ class SupabaseMessageRealtimeApiImpl implements SupabaseMessageRealtimeApi {
   @override
   Future<void> close() async {
     _closed = true;
-    await _handle?.close();
-    _handle = null;
+    await _closeActiveHandle();
     await _events.close();
   }
 

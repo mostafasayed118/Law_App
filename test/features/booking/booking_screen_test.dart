@@ -97,13 +97,19 @@ class _ConflictGateway implements BookingGateway {
 void main() {
   tearDown(resetServiceLocator);
 
-  Future<void> pumpBooking(WidgetTester tester) async {
+  Future<void> pumpBooking(
+    WidgetTester tester, {
+    TextDirection direction = TextDirection.ltr,
+  }) async {
     configureDependencies();
     await tester.pumpWidget(
       MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: const BookingScreen(),
+        home: Directionality(
+          textDirection: direction,
+          child: const BookingScreen(),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -143,6 +149,15 @@ void main() {
         find.byType(ElevatedButton),
       );
       expect(continueButton.onPressed, isNull);
+    });
+
+    testWidgets('mirrors the continue arrow under RTL (U-1)', (tester) async {
+      await pumpBooking(tester, direction: TextDirection.rtl);
+
+      // Both wizard steps use the shared forward arrow; under RTL it must
+      // point left so "continue" reads in the ambient direction.
+      expect(find.byIcon(Icons.arrow_back_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_forward_outlined), findsNothing);
     });
 
     testWidgets('shows the local-only demo note on the category step', (

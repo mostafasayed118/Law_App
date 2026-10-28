@@ -51,8 +51,6 @@ flutter:
     - family: NotoSans
       fonts:
         - asset: assets/fonts/noto_sans/NotoSans-Variable.ttf
-        - asset: assets/fonts/noto_sans/NotoSans-Italic-Variable.ttf
-          style: italic
     - family: NotoNaskhArabic
       fonts:
         - asset: assets/fonts/noto_naskh_arabic/NotoNaskhArabic-Variable.ttf

@@ -39,6 +39,8 @@ class _StubPaymentGateway extends PaymentGateway {
   Result<PaymentStatusSnapshot>? statusResult;
   Completer<Result<PaymentStatusSnapshot>>? statusCompleter;
   Result<PaymentStatusSnapshot>? simulateResult;
+  bool initiateThrows = false;
+  bool statusThrows = false;
 
   @override
   bool get isLive => live;
@@ -49,6 +51,9 @@ class _StubPaymentGateway extends PaymentGateway {
   @override
   Future<Result<PaymentSession>> initiate(String invoiceId) {
     initiateCalls.add(invoiceId);
+    if (initiateThrows) {
+      throw StateError('payment initiate gateway blew up');
+    }
     if (initiateCompleter != null) {
       return initiateCompleter!.future;
     }
@@ -61,6 +66,9 @@ class _StubPaymentGateway extends PaymentGateway {
   @override
   Future<Result<PaymentStatusSnapshot>> fetchStatus(String invoiceId) {
     statusCalls.add(invoiceId);
+    if (statusThrows) {
+      throw StateError('payment status gateway blew up');
+    }
     if (statusCompleter != null) {
       return statusCompleter!.future;
     }
@@ -132,6 +140,28 @@ void main() {
         const PaymentState(phase: PaymentPhase.initiating),
         const PaymentState(phase: PaymentPhase.failed, error: _initiateFailure),
       ],
+    );
+
+    test(
+      'a thrown initiation fails the attempt and a retry reaches the gateway (N1)',
+      () async {
+        gateway.initiateThrows = true;
+        final PaymentCubit cubit = PaymentCubit(gateway);
+        addTearDown(cubit.close);
+
+        await cubit.pay('invoice-1');
+
+        expect(cubit.state.phase, PaymentPhase.failed);
+        expect(cubit.state.error?.code, 'payment_initiate_failed');
+
+        // The failed phase is retryable: the next tap must hit the gateway
+        // instead of being refused as already-initiating.
+        gateway.initiateThrows = false;
+        await cubit.pay('invoice-1');
+
+        expect(gateway.initiateCalls, <String>['invoice-1', 'invoice-1']);
+        expect(cubit.state.phase, PaymentPhase.pending);
+      },
     );
 
     blocTest<PaymentCubit, PaymentState>(
@@ -227,6 +257,26 @@ void main() {
   });
 
   group('PaymentCubit status polling', () {
+    test(
+      'a thrown status read resets the guard so the next poll runs (N1)',
+      () async {
+        gateway.statusThrows = true;
+        final PaymentCubit cubit = PaymentCubit(gateway);
+        addTearDown(cubit.close);
+
+        await expectLater(
+          cubit.checkStatus('invoice-1'),
+          throwsA(isA<StateError>()),
+        );
+
+        gateway.statusThrows = false;
+        await cubit.checkStatus('invoice-1');
+
+        expect(gateway.statusCalls, <String>['invoice-1', 'invoice-1']);
+        expect(cubit.state.phase, PaymentPhase.pending);
+      },
+    );
+
     blocTest<PaymentCubit, PaymentState>(
       'checkStatus maps a succeeded snapshot',
       setUp: () => gateway.statusResult = Result<PaymentStatusSnapshot>.success(

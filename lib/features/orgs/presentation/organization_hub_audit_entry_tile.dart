@@ -38,7 +38,12 @@ class _AuditEntryTile extends StatelessWidget {
                 ),
                 const SizedBox(width: LegalHubTheme.spaceSm),
                 Expanded(child: Text(l10n.orgAuditHubEntry)),
-                Icon(Icons.chevron_right, size: 20, color: scheme.outline),
+                DirectionalIcon(
+                  icon: Icons.chevron_right,
+                  mirroredIcon: Icons.chevron_left,
+                  size: 20,
+                  color: scheme.outline,
+                ),
               ],
             ),
           ),

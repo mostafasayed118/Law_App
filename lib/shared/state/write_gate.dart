@@ -1,6 +1,7 @@
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/core/observability/app_log.dart';
 
 /// Serializes a cubit's writes and maps the gateway result to presentation
 /// copy without losing the in-flight case.
@@ -39,14 +40,27 @@ class WriteGate {
       return busyError;
     }
     _inFlight = true;
-    final Result<T> result = await write();
-    _inFlight = false;
+    final Result<T> result;
+    try {
+      result = await write();
+    } finally {
+      // A thrown gateway must not leave the gate closed forever: the next
+      // tap has to be able to run. The original error still propagates.
+      _inFlight = false;
+    }
     if (isClosed()) {
       return null;
     }
     switch (result) {
       case Success<T>():
-        await onSuccess();
+        try {
+          await onSuccess();
+        } on Object catch (error) {
+          // The write already committed. A refresh/read-back failure here
+          // must not surface as a failed write, or the user retries and
+          // duplicates it (audit 2026-10-28, create-sheet tests).
+          AppLog.diagnostic('WriteGate: post-write refresh failed: $error');
+        }
         return null;
       case Failure<T>(error: final AppError error):
         return error;

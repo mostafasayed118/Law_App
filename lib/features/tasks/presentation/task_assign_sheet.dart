@@ -70,9 +70,18 @@ class _TaskAssignSheetState extends State<TaskAssignSheet> {
       _membersOutcome = null;
       _submitError = null;
     });
-    final OrgOutcome<List<AssignableMember>> outcome = await context
-        .read<TaskBoardCubit>()
-        .loadAssignableMembers(widget.task.matterId);
+    OrgOutcome<List<AssignableMember>>? outcome;
+    try {
+      outcome = await context.read<TaskBoardCubit>().loadAssignableMembers(
+        widget.task.matterId,
+      );
+    } catch (_) {
+      // A thrown roster read lands on the existing failure + retry arm
+      // instead of leaving the sheet on its spinner forever.
+      outcome = const OrgOutcome<List<AssignableMember>>.failure(
+        OrgFailure(kind: OrgFailureKind.unknown),
+      );
+    }
     if (!mounted) {
       return;
     }
@@ -87,21 +96,35 @@ class _TaskAssignSheetState extends State<TaskAssignSheet> {
       _submitting = true;
       _submitError = null;
     });
-    final AppError? error = await context.read<TaskBoardCubit>().assignTask(
-      widget.task.id,
-      _selectedId,
-    );
-    if (!mounted) {
-      return;
+    try {
+      final AppError? error = await context.read<TaskBoardCubit>().assignTask(
+        widget.task.id,
+        _selectedId,
+      );
+      if (!mounted) {
+        return;
+      }
+      if (error == null) {
+        Navigator.of(context).pop(true);
+        return;
+      }
+      setState(() => _submitError = error);
+    } catch (_) {
+      // A thrown write must re-enable the button, not leave it spinning.
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _submitError = const AppError(
+          code: 'task_assign_failed',
+          userMessage: 'Unable to save the assignment. Please try again.',
+        );
+      });
+    } finally {
+      if (mounted) {
+        setState(() => _submitting = false);
+      }
     }
-    if (error == null) {
-      Navigator.of(context).pop(true);
-      return;
-    }
-    setState(() {
-      _submitting = false;
-      _submitError = error;
-    });
   }
 
   @override

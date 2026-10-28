@@ -85,6 +85,11 @@ Deno.serve(async (request: Request): Promise<Response> => {
   const transactionId = txn.id === undefined || txn.id === null ? "" : String(txn.id);
   if (!transactionId) return json(400, { error: "malformed_payload" });
 
+  // The settlement RPC only accepts terminal outcomes. A pending callback is
+  // a valid state, not a transient failure, so acknowledge it without
+  // settling and without triggering Paymob's retry loop.
+  if (outcome === "pending") return json(200, { status: "pending" });
+
   const data = txn.data;
   const failureCode = data !== null && typeof data === "object"
     ? (data as Record<string, unknown>).txn_response_code

@@ -229,14 +229,16 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
   `docs/features_roadmap_2026-08-03.md` §14;
   `docs/p14_plan_complete_2026-08-08.md` §4.
 
-## D-T9: Two declared foundations have zero consumers — **TRACKED (2026-09-22)**
+## D-T9: Two declared foundations have zero consumers — **RESOLVED (2026-10-26)**
 
 - **Where:**
-  - `lib/shared/responsive/responsive_breakpoints.dart` (46 lines —
+  - ~~`lib/shared/responsive/responsive_breakpoints.dart` (46 lines —
     `ResponsiveBreakpoint`, `isCompact`/`isMedium`,
     `responsiveHorizontalPadding`) has **zero references** anywhere in `lib/`
     or `test/` outside its own file. The `responsive.dart` barrel exports it,
-    but that barrel's only consumer uses `responsive_content.dart`.
+    but that barrel's only consumer uses `responsive_content.dart`.~~
+    **Removed (`e72c4ff`, dead-code removal); the barrel no longer exports it
+    and no `lib/`/`test/` reference remains (re-verified 2026-10-26).**
   - `lib/core/use_cases/use_case.dart` (11 lines — `UseCase`/`NoInput`) is
     named as an architectural layer in `INSTRUCTIONS.md` §4.1 but has **no
     production consumer**; its only reference is
@@ -255,10 +257,12 @@ backend-free until the P0 product/legal decisions (D-02–D-09) close.
   implement one real use case or drop the `use_cases/` line from
   `INSTRUCTIONS.md` §4.1 — a layer named in the rules and used nowhere is the
   one place the documented architecture and the code disagree.
-- **Not included:** `lib/core/sample_service.dart` is *not* part of this entry
-  — its own docstring declares it intentional B3 DI-proof scaffolding and
-  `test/service_locator_test.dart` pins it as such.
-- **Status:** **TRACKED (2026-09-22).** No code change in this entry.
+- **Not included:** ~~`lib/core/sample_service.dart` is *not* part of this
+  entry — its own docstring declares it intentional B3 DI-proof scaffolding
+  and `test/service_locator_test.dart` pins it as such.~~ **Also removed
+  (`2b9abf9`, together with its DI registration and test pins); the file is
+  absent at HEAD `0b52374` (re-verified 2026-10-26).**
+- **Status:** **RESOLVED (2026-10-26).** No code change was needed in this entry; the heading and the update below record the closure.
 - **Owner:** Project Owner (github.com/mostafasayed118) — decision pending.
 - **Cross-reference:** `docs/audit/LegalHub_AUDIT_2026-09-21.md` §5 (M-15);
   `docs/codebase_audit_plan.md` Batch 5; `INSTRUCTIONS.md` §4.1.
@@ -277,5 +281,7 @@ The extraction also fixed a contract violation it surfaced: the inlined rule
 read the prefs store **once per toggle** (three reads per load) while its own
 comment claimed D-PF2's "the store is read once per load".
 
-**Still tracked:** the `responsive_breakpoints.dart` half — unchanged, delete
-at the next responsive slice if no feature adopts it.
+**Closed (2026-10-26):** the `responsive_breakpoints.dart` half is removed
+(`e72c4ff`); no feature adopted it. `sample_service.dart`, the entry's
+explicit non-inclusion, was removed separately (`2b9abf9`). D-T9 has no
+remaining tracked file.

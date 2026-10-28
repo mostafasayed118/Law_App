@@ -14,7 +14,7 @@ change only the owner can provide.
 | Tests | `test/data/auth/auth_callback_test.dart` pins accept + reject cases (not run in this change; see §7). |
 | Android custom scheme | Retained (shipped producers still emit it) but host-scoped to `accept-invite` and `auth`/`/v1/callback`. It remains hijackable by design; see §5 for the removal gate. |
 | assetlinks.json | Release/upload keystore SHA-256 filled (see §2). |
-| AASA | Intentionally inert (`details: []`) until the Apple Team ID is known (see §3). No invented values. |
+| AASA | Intentionally inert (`details: []`) until the Apple Team ID is known (see §3). No invented values. The associated-domains entitlement now lives in `ios/Runner/Runner.entitlements` (wired to the six production configs); the AASA itself is still the owner blocker. |
 
 ## 2. Android App Links — sha256_cert_fingerprints
 

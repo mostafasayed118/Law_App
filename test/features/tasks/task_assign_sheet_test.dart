@@ -131,6 +131,21 @@ void main() {
       expect(find.text('Retry'), findsOneWidget);
       expect(find.text('Save assignment'), findsNothing);
     });
+
+    testWidgets(
+      'a thrown roster read shows the retry arm, not a stuck spinner (N1)',
+      (tester) async {
+        orgGateway.throws = true;
+        await openSheet(tester, assigneeId: 'demo-attorney');
+
+        expect(find.byType(LinearProgressIndicator), findsNothing);
+        expect(
+          find.text('Unable to load members. Please try again.'),
+          findsOneWidget,
+        );
+        expect(find.text('Retry'), findsOneWidget);
+      },
+    );
   });
 }
 
@@ -149,6 +164,7 @@ TaskItem _task({String? assigneeId}) {
 
 class _StubOrgGateway extends FakeOrganizationGateway {
   OrgOutcome<List<AssignableMember>>? result;
+  bool throws = false;
   final List<String> matterCalls = <String>[];
 
   @override
@@ -156,6 +172,9 @@ class _StubOrgGateway extends FakeOrganizationGateway {
     required String matterId,
   }) async {
     matterCalls.add(matterId);
+    if (throws) {
+      throw StateError('roster gateway blew up');
+    }
     final OrgOutcome<List<AssignableMember>>? stub = result;
     if (stub != null) {
       return stub;

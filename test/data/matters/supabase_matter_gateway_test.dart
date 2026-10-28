@@ -345,6 +345,26 @@ void main() {
       expect(result.isSuccess, isFalse);
       expect(result.errorOrNull?.code, 'matter_read_failed');
     });
+
+    test(
+      'a mapper-drift TypeError fails the fetch instead of escaping',
+      () async {
+        // `practice_area` reaches an unguarded `as String?` cast: a non-string
+        // value raises a TypeError (an Error, not an Exception) and must map to
+        // the same typed read failure rather than escaping the repository.
+        api.rows = <Map<String, dynamic>>[
+          <String, dynamic>{..._row(), 'practice_area': 42},
+        ];
+
+        final Result<List<Matter>> result = await gateway.fetchMatters();
+
+        expect(result.isSuccess, isFalse);
+        final AppError error = result.errorOrNull!;
+        expect(error.code, 'matter_read_failed');
+        expect(error.userMessage, 'Unable to load matters. Please try again.');
+        expect(error.technicalMessage, contains('not a subtype of'));
+      },
+    );
   });
 
   group('failure mapping (contract §5)', () {

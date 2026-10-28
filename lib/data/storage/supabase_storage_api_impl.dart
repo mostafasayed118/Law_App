@@ -5,6 +5,7 @@ import 'package:legalhub/core/contracts/network.dart';
 import 'package:legalhub/data/postgrest_failures.dart';
 import 'package:legalhub/data/supabase_seam.dart';
 import 'package:legalhub/data/supabase_wire.dart';
+import 'package:legalhub/features/storage/domain/storage_gateway.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_storage_api.dart';
@@ -75,6 +76,13 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
 
   /// Uploads to the private bucket. `upsert: false` keeps a name collision a
   /// typed conflict rather than a silent overwrite.
+  ///
+  /// The deadline is size-aware ([uploadTimeoutForBytes]). The storage client
+  /// exposes no request-cancel handle, so on timeout only the `await` is
+  /// abandoned — the HTTP write may still complete. The gateway therefore
+  /// registers the destination path before calling this and compensates by
+  /// deleting it on failure (best-effort: a write that lands after the delete
+  /// is an orphan nothing in this API can recall).
   static Future<void> _boundUpload(
     String path,
     Uint8List bytes,
@@ -87,7 +95,7 @@ class SupabaseStorageApiImpl implements SupabaseStorageApi {
           bytes,
           fileOptions: FileOptions(contentType: contentType, upsert: false),
         )
-        .timeout(kSupabaseRequestTimeout);
+        .timeout(uploadTimeoutForBytes(bytes.length));
   }
 
   static Future<String> _boundSignedUrl(String path, int expiresInSeconds) {

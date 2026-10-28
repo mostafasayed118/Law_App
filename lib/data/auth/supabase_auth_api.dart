@@ -153,6 +153,15 @@ abstract interface class SupabaseAuthApi {
     required String password,
   });
 
+  /// Starts the Google OAuth browser flow.
+  ///
+  /// Returns true when the provider browser was launched. No session is minted
+  /// here: consent happens in the browser, the provider redirects to
+  /// [redirectTo], and [AuthCallbackObserver] exchanges the PKCE code, whose
+  /// session then surfaces through [snapshotChanges]. A false return is a
+  /// launch failure (provider unavailable), never a silent success.
+  Future<bool> signInWithGoogle({required String redirectTo});
+
   /// Account creation (P3.1). Success resolves to pending email verification
   /// (dev project) or an authenticated snapshot. [displayName] is sent as
   /// `raw_user_meta_data.display_name` (plus the client-side display-name

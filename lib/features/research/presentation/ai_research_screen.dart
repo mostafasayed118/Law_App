@@ -4,7 +4,6 @@ import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/errors/app_error.dart';
-import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/features/documents/domain/document.dart';
@@ -70,10 +69,29 @@ class AiResearchScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context).aiResearchTitle)),
       body: BlocProvider<AiResearchCubit>(
-        create: (BuildContext context) =>
-            AiResearchCubit(serviceLocator<AiGateway>()),
+        create: (BuildContext context) => AiResearchCubit(
+          serviceLocator<AiGateway>(),
+          mattersGateway: serviceLocator<MatterGateway>(),
+          documentsGateway: serviceLocator<DocumentGateway>(),
+        ),
         child: const _ResearchSurface(),
       ),
     );
   }
+}
+
+/// The active organization. The env-less demo has no session-backed org, so
+/// it sends a clearly non-UUID demo value to the synthetic engine only; a
+/// configured build never fabricates one and blocks generation instead.
+///
+/// Resolved here, in the composition file, so the surface reads no service
+/// locator entry itself.
+String? _researchOrganizationId() {
+  final String? active = serviceLocator.isRegistered<ActiveOrgStore>()
+      ? serviceLocator<ActiveOrgStore>().activeOrganizationId
+      : null;
+  if (active != null && active.isNotEmpty) {
+    return active;
+  }
+  return backendIsLocalOnly ? DemoCorpus.organizationId : null;
 }

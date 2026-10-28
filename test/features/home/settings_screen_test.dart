@@ -124,6 +124,25 @@ void main() {
     },
   );
 
+  testWidgets('the role row rescopes to the client label after sign-out', (
+    tester,
+  ) async {
+    await tester.pumpWidget(pumpScreen());
+    await tester.pumpAndSettle();
+
+    await authCubit.startDemoSession();
+    await tester.pumpAndSettle();
+    expect(find.text('Partner'), findsOneWidget);
+
+    await authCubit.signOut();
+    await tester.pumpAndSettle();
+
+    // The row selects only the projected role: clearing the session must
+    // still re-render it (null role → the client label).
+    expect(find.text('Partner'), findsNothing);
+    expect(find.text('Client'), findsOneWidget);
+  });
+
   testWidgets('selecting a locale from the dropdown updates LocaleCubit', (
     tester,
   ) async {

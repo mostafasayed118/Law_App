@@ -14,13 +14,17 @@ void main() {
     int length = 6,
     GlobalKey<OtpFieldRowState>? key,
     ValueNotifier<bool>? notifier,
+    TextDirection direction = TextDirection.ltr,
   }) {
     return MaterialApp(
-      home: Scaffold(
-        body: OtpFieldRow(
-          key: key,
-          length: length,
-          completionNotifier: notifier,
+      home: Directionality(
+        textDirection: direction,
+        child: Scaffold(
+          body: OtpFieldRow(
+            key: key,
+            length: length,
+            completionNotifier: notifier,
+          ),
         ),
       ),
     );
@@ -59,6 +63,27 @@ void main() {
     await tester.pump();
 
     expect(key.currentState?.code, '123456');
+  });
+
+  testWidgets('keeps the first digit cell leftmost under RTL (U-7)', (
+    tester,
+  ) async {
+    await tester.pumpWidget(pumpRow(direction: TextDirection.rtl));
+    await tester.pump();
+
+    // A verification code reads first-digit-leftmost: the cells must stay
+    // LTR (and in typed order) even inside an RTL locale.
+    final double firstLeft = tester.getTopLeft(find.byType(TextField).first).dx;
+    final double lastLeft = tester.getTopLeft(find.byType(TextField).last).dx;
+    expect(firstLeft, lessThan(lastLeft));
+
+    // Typing still fills the visually-leftmost cell first.
+    await tester.enterText(find.byType(TextField).first, '7');
+    await tester.pump();
+    expect(
+      tester.widget<TextField>(find.byType(TextField).first).controller?.text,
+      '7',
+    );
   });
 
   testWidgets('clear() empties every cell and resets code', (tester) async {

@@ -57,6 +57,7 @@ class _MatterMessagesSectionState extends State<MatterMessagesSection> {
           onRetry: () => context.read<MatterWorkspaceCubit>().loadThreads(),
           errorCopy: l10n.messagesError,
           emptyCopy: l10n.matterWorkspaceMessagesEmpty,
+          viewAllCopy: l10n.viewAll,
           itemBuilder: (BuildContext context, MessageThread thread) => AppTile(
             title: labels.threadTitle(thread.title),
             subtitles: <String>[

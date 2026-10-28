@@ -11,6 +11,7 @@ import 'package:legalhub/features/approvals/domain/pending_approval.dart';
 import 'package:legalhub/features/matters/domain/matter.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/demo_labels.dart';
+import 'package:legalhub/shared/widgets/form_sheet_scaffold.dart';
 
 import 'approval_error_messages.dart';
 import 'approval_labels.dart';
@@ -84,9 +85,19 @@ class _ApprovalCreateSheetState extends State<ApprovalCreateSheet> {
       _loadingMatters = true;
       _mattersResult = null;
     });
-    final Result<List<Matter>> result = await context
-        .read<ApprovalsCubit>()
-        .loadMatters();
+    Result<List<Matter>>? result;
+    try {
+      result = await context.read<ApprovalsCubit>().loadMatters();
+    } catch (_) {
+      // A thrown picker read lands on the existing failure + retry arm
+      // instead of leaving the sheet on its spinner forever.
+      result = const Result<List<Matter>>.failure(
+        AppError(
+          code: 'matters_failed',
+          userMessage: 'Unable to load matters.',
+        ),
+      );
+    }
     if (!mounted) {
       return;
     }
@@ -109,26 +120,40 @@ class _ApprovalCreateSheetState extends State<ApprovalCreateSheet> {
       _submitting = true;
       _submitError = null;
     });
-    final AppError? error = await context.read<ApprovalsCubit>().create(
-      ApprovalDraft(
-        organizationId: organizationId,
-        matterId: _selectedMatterId,
-        title: _title.text,
-        kind: _kind,
-        description: _description.text,
-      ),
-    );
-    if (!mounted) {
-      return;
+    try {
+      final AppError? error = await context.read<ApprovalsCubit>().create(
+        ApprovalDraft(
+          organizationId: organizationId,
+          matterId: _selectedMatterId,
+          title: _title.text,
+          kind: _kind,
+          description: _description.text,
+        ),
+      );
+      if (!mounted) {
+        return;
+      }
+      if (error == null) {
+        Navigator.of(context).pop(true);
+        return;
+      }
+      setState(() => _submitError = error);
+    } catch (_) {
+      // A thrown write must re-enable the button, not leave it spinning.
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _submitError = const AppError(
+          code: 'approval_create_failed',
+          userMessage: 'Unable to create the request. Please try again.',
+        );
+      });
+    } finally {
+      if (mounted) {
+        setState(() => _submitting = false);
+      }
     }
-    if (error == null) {
-      Navigator.of(context).pop(true);
-      return;
-    }
-    setState(() {
-      _submitting = false;
-      _submitError = error;
-    });
   }
 
   @override
@@ -136,38 +161,40 @@ class _ApprovalCreateSheetState extends State<ApprovalCreateSheet> {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final bool hasOrganization =
         serviceLocator<ActiveOrgStore>().activeOrganizationId != null;
-    return SafeArea(
-      child: Padding(
-        padding: EdgeInsetsDirectional.only(
-          bottom: MediaQuery.viewInsetsOf(context).bottom,
-        ),
-        child: SingleChildScrollView(
-          padding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Text(
-                l10n.approvalCreateTitle,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: LegalHubTheme.spaceMd),
-              if (!hasOrganization) ...<Widget>[
-                Text(
-                  l10n.approvalCreateNoOrg,
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
-                ),
-                const SizedBox(height: LegalHubTheme.spaceMd),
-              ],
-              _buildForm(l10n, enabled: hasOrganization),
-            ],
+    return FormSheetScaffold(
+      title: l10n.approvalCreateTitle,
+      body: <Widget>[
+        if (!hasOrganization) ...<Widget>[
+          Text(
+            l10n.approvalCreateNoOrg,
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
           ),
+          const SizedBox(height: LegalHubTheme.spaceMd),
+        ],
+        _buildForm(l10n),
+      ],
+      actions: <Widget>[
+        FilledButton(
+          onPressed: _submitting || !hasOrganization ? null : _submit,
+          child: _submitting
+              ? const SizedBox.square(
+                  dimension: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(l10n.approvalCreateSubmit),
         ),
-      ),
+        const SizedBox(height: LegalHubTheme.spaceSm),
+        TextButton(
+          onPressed: _submitting
+              ? null
+              : () => Navigator.of(context).pop(false),
+          child: Text(l10n.cancel),
+        ),
+      ],
     );
   }
 
-  Widget _buildForm(AppLocalizations l10n, {required bool enabled}) {
+  Widget _buildForm(AppLocalizations l10n) {
     return Form(
       key: _formKey,
       child: Column(
@@ -245,22 +272,6 @@ class _ApprovalCreateSheetState extends State<ApprovalCreateSheet> {
             ),
             const SizedBox(height: LegalHubTheme.spaceMd),
           ],
-          FilledButton(
-            onPressed: _submitting || !enabled ? null : _submit,
-            child: _submitting
-                ? const SizedBox.square(
-                    dimension: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Text(l10n.approvalCreateSubmit),
-          ),
-          const SizedBox(height: LegalHubTheme.spaceSm),
-          TextButton(
-            onPressed: _submitting
-                ? null
-                : () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancel),
-          ),
         ],
       ),
     );

@@ -1,10 +1,11 @@
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/data/row_reader.dart';
+import 'package:legalhub/data/video/supabase_video_api.dart';
 import 'package:legalhub/features/video/domain/video_gateway.dart';
 import 'package:legalhub/features/video/domain/video_session.dart';
 import 'package:legalhub/features/video/domain/video_token.dart';
-import 'supabase_video_api.dart';
 
 /// Video gateway backed by the five audited RPCs + `video-token` (design §6).
 ///
@@ -236,30 +237,30 @@ class SupabaseVideoGateway implements VideoGateway {
   /// One persisted `video_sessions` row. The room-name shape is asserted so a
   /// malformed row surfaces as provider drift instead of a bad connect target.
   VideoSession _fromRow(Map<String, dynamic> row) {
-    final String roomName = _requiredString(row, 'room_name');
+    final String roomName = requiredString(row, 'room_name');
     if (!_roomNamePattern.hasMatch(roomName)) {
       throw const FormatException('Video session has an invalid room name');
     }
     return VideoSession(
-      id: _requiredString(row, 'id'),
-      organizationId: _requiredString(row, 'organization_id'),
-      matterId: _optionalString(row['matter_id']),
-      bookingId: _optionalString(row['booking_id']),
+      id: requiredString(row, 'id'),
+      organizationId: requiredString(row, 'organization_id'),
+      matterId: optionalString(row['matter_id']),
+      bookingId: optionalString(row['booking_id']),
       roomName: roomName,
       status: _statusOf(row['status']),
-      scheduledAt: _optionalDate(row['scheduled_at']),
-      startedAt: _optionalDate(row['started_at']),
-      endedAt: _optionalDate(row['ended_at']),
-      createdBy: _optionalString(row['created_by']),
+      scheduledAt: optionalDate(row['scheduled_at']),
+      startedAt: optionalDate(row['started_at']),
+      endedAt: optionalDate(row['ended_at']),
+      createdBy: optionalString(row['created_by']),
     );
   }
 
   /// The `video-token` success body; every field is required and non-empty.
   VideoToken _tokenFrom(Map<String, dynamic> payload) {
     return VideoToken(
-      url: _requiredString(payload, 'url'),
-      token: _requiredString(payload, 'token'),
-      room: _requiredString(payload, 'room'),
+      url: requiredString(payload, 'url'),
+      token: requiredString(payload, 'token'),
+      room: requiredString(payload, 'room'),
     );
   }
 
@@ -270,33 +271,6 @@ class SupabaseVideoGateway implements VideoGateway {
     'cancelled' => VideoSessionStatus.cancelled,
     _ => throw const FormatException('Video session has an unknown status'),
   };
-
-  String _requiredString(Map<String, dynamic> row, String field) {
-    final Object? value = row[field];
-    if (value is! String || value.trim().isEmpty) {
-      throw FormatException('Video response has no $field');
-    }
-    return value;
-  }
-
-  DateTime? _optionalDate(Object? value) {
-    if (value is! String || value.isEmpty) {
-      return null;
-    }
-    final DateTime? parsed = DateTime.tryParse(value);
-    if (parsed == null) {
-      throw const FormatException('Video response has an invalid date');
-    }
-    return parsed;
-  }
-
-  String? _optionalString(Object? value) {
-    if (value is! String) {
-      return null;
-    }
-    final String trimmed = value.trim();
-    return trimmed.isEmpty ? null : trimmed;
-  }
 
   String? _trimOrNull(String? value) {
     if (value == null) {

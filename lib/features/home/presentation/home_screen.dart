@@ -215,6 +215,10 @@ class _PracticeAreasHeader extends StatelessWidget {
         child: SectionHeader(
           title: l10n.practiceAreas,
           actionLabel: l10n.viewAll,
+          // D-S4 wiring: the label used to render with no `onAction`, so it
+          // read as a disabled "VIEW ALL" link. It now opens the discovery
+          // surface (a navigation hint only, never an authorization grant).
+          onAction: () => context.push(AppRoutes.discovery),
         ),
       ),
     );

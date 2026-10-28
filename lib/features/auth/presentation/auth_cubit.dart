@@ -30,7 +30,13 @@ class AuthCubit extends _AuthCubitBase with _AuthHydration {
   /// Contract-§5 restore: `restoring` → authenticated / unauthenticated /
   /// reauthRequired / error. Resolves an expired session to [AuthStatus
   /// .reauthRequired] instead of a misleading authenticated state.
-  Future<void> restore() async {
+  ///
+  /// [hydrateMemberships] defaults to true (every explicit auth outcome
+  /// hydrates). Bootstrap passes false: the membership read is a network call
+  /// and must not hold the first frame (audit 2026-10-27, F2) — the router is
+  /// created and `runApp` runs on the local session, then [hydrate] fills the
+  /// RLS-scoped memberships in the background.
+  Future<void> restore({bool hydrateMemberships = true}) async {
     if (state.status == AuthStatus.restoring ||
         state.status == AuthStatus.loading) {
       return;
@@ -39,7 +45,10 @@ class AuthCubit extends _AuthCubitBase with _AuthHydration {
     _explicitOperationInFlight = true;
     try {
       final AuthOutcome<Session> outcome = await _gateway.restore();
-      await _applySessionOutcome(outcome);
+      await _applySessionOutcome(
+        outcome,
+        hydrateMemberships: hydrateMemberships,
+      );
     } finally {
       _explicitOperationInFlight = false;
     }
@@ -66,6 +75,39 @@ class AuthCubit extends _AuthCubitBase with _AuthHydration {
     }
   }
 
+  /// Google OAuth sign-in (browser hand-off).
+  ///
+  /// The flow is two-legged and this call owns only the first: launching the
+  /// provider browser. A `true` launch returns the surface to signed-out while
+  /// the user consents — the authenticated session arrives later through the
+  /// gateway stream (the callback observer's PKCE exchange), which
+  /// [_onSessionChange] maps without needing this call to stay in flight.
+  /// A `false` launch is a real failure and takes the normal error path.
+  Future<void> signInWithGoogle() async {
+    if (state.status == AuthStatus.loading || state.isAuthenticated) {
+      return;
+    }
+    emit(const AuthState(status: AuthStatus.loading));
+    _explicitOperationInFlight = true;
+    try {
+      final bool launched = await _gateway.startGoogleSignIn();
+      if (!launched) {
+        await _handleFailure(
+          const AuthFailure(
+            kind: AuthFailureKind.providerUnavailable,
+            message: 'Google sign-in could not be started.',
+          ),
+        );
+        return;
+      }
+      // The browser owns the flow now. Drop the loading state so the pending
+      // callback (which may take a while) does not look like a hung request.
+      _emitIfChanged(const AuthState.unauthenticated());
+    } finally {
+      _explicitOperationInFlight = false;
+    }
+  }
+
   Future<void> startDemoSession() async {
     if (state.status == AuthStatus.loading || state.isAuthenticated) {
       return;
@@ -80,10 +122,20 @@ class AuthCubit extends _AuthCubitBase with _AuthHydration {
     }
   }
 
-  Future<void> _applySessionOutcome(AuthOutcome<Session> outcome) async {
+  Future<void> _applySessionOutcome(
+    AuthOutcome<Session> outcome, {
+    bool hydrateMemberships = true,
+  }) async {
     switch (outcome) {
       case AuthSuccess<Session>(value: final Session session):
-        await _applyAuthenticatedSession(session);
+        if (!hydrateMemberships) {
+          // Local session only (bootstrap): emit the gateway snapshot
+          // immediately; the caller runs [hydrate] once the router is
+          // attached. Expiry is still honored by [_stateFor].
+          _emitIfChanged(_stateFor(session));
+        } else {
+          await _applyAuthenticatedSession(session);
+        }
       case AuthFailed<Session>(failure: final AuthFailure failure):
         await _handleFailure(failure);
     }
@@ -115,15 +167,23 @@ class AuthCubit extends _AuthCubitBase with _AuthHydration {
     _explicitOperationInFlight = true;
     try {
       await _gateway.signOut();
+    } catch (error) {
+      // The provider already dropped the local session before it threw
+      // (GoTrue's order), so a transport failure must never leave the app
+      // locally authenticated (audit 2026-10-27, F4). Surface it on the
+      // diagnostic channel and continue to the unauthenticated emission.
+      AppLog.diagnostic(
+        'AuthCubit: provider sign-out failed; local session cleared: $error',
+      );
+    } finally {
       // Invalidate any in-flight [hydrate] refresh (Slice A review fix): a
       // refresh that resolves after sign-out must not re-emit authenticated
       // for the signed-out session.
       _hydrationEpoch += 1;
       // The gateway stream already emitted null (and the listener mapped it);
-      // this explicit emission only matters when the gateway is silent, so it
-      // is deduped against the current state.
+      // this explicit emission only matters when the gateway is silent or
+      // threw, so it is deduped against the current state.
       _emitIfChanged(const AuthState.unauthenticated());
-    } finally {
       _explicitOperationInFlight = false;
     }
   }

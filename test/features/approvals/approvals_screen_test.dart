@@ -337,6 +337,57 @@ void main() {
       expect(find.text('Cancel request'), findsNothing);
     });
 
+    testWidgets('a demo-corpus title renders the localized approval title', (
+      tester,
+    ) async {
+      final AppLocalizations ar = await AppLocalizations.delegate.load(
+        const Locale('ar'),
+      );
+      await pumpApprovals(
+        tester,
+        locale: const Locale('ar'),
+        gateway: _StubApprovalsGateway(
+          rows: <PendingApproval>[
+            _row(id: 'a1', title: 'Demo engagement waiver'),
+          ],
+        ),
+      );
+
+      // The fake gateway's English title is data; the Arabic build maps it
+      // through the dedicated demo-approval key.
+      expect(find.text('Demo engagement waiver'), findsNothing);
+      expect(find.text(ar.demoApprovalTitleEngagementWaiver), findsOneWidget);
+    });
+
+    testWidgets('the detail sheet localizes the demo title like the tile', (
+      tester,
+    ) async {
+      final AppLocalizations ar = await AppLocalizations.delegate.load(
+        const Locale('ar'),
+      );
+      await pumpApprovals(
+        tester,
+        locale: const Locale('ar'),
+        gateway: _StubApprovalsGateway(
+          rows: <PendingApproval>[
+            _row(
+              id: 'a1',
+              title: 'Demo court filing approval',
+              kind: ApprovalKind.filing,
+            ),
+          ],
+        ),
+      );
+
+      await tester.tap(find.text(ar.demoApprovalTitleCourtFiling));
+      await tester.pumpAndSettle();
+
+      // Tile title + sheet title both read the mapped label; the raw demo
+      // string never reaches the sheet.
+      expect(find.text(ar.demoApprovalTitleCourtFiling), findsNWidgets(2));
+      expect(find.text('Demo court filing approval'), findsNothing);
+    });
+
     testWidgets('a decided request shows the decision note and time', (
       tester,
     ) async {
@@ -404,6 +455,11 @@ Future<void> pumpApprovals(
   String? currentUserId,
 }) async {
   serviceLocator.registerLazySingleton<ApprovalsGateway>(() => gateway);
+  // Test isolation: a previous case may have left a configured posture in
+  // the locator. Clear it so the demo-corpus label mapping is exercised.
+  if (serviceLocator.isRegistered<BackendPosture>()) {
+    serviceLocator.unregister<BackendPosture>();
+  }
   if (configured) {
     serviceLocator.registerSingleton<BackendPosture>(
       const BackendPosture(isLocalOnly: false),

@@ -499,6 +499,28 @@ void main() {
     });
   });
 
+  group('practice-areas header (U-3/U-8)', () {
+    testWidgets('the VIEW ALL action is wired, not inert', (tester) async {
+      await tester.pumpWidget(pumpHome(const Locale('en')));
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.text('VIEW ALL'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      final Finder action = find.ancestor(
+        of: find.text('VIEW ALL'),
+        matching: find.byType(TextButton),
+      );
+      expect(action, findsOneWidget);
+      // Inert-link regression: an action label rendered with `onAction: null`
+      // looks like a disabled gold link. It now opens discovery.
+      expect(tester.widget<TextButton>(action).onPressed, isNotNull);
+    });
+  });
+
   group('greeting fallback (D-T3 pin)', () {
     testWidgets(
       'falls back to the localized neutral name when no session is present',

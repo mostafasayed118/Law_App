@@ -14,9 +14,10 @@ import 'widgets/auth_buttons.dart';
 /// Sign-in screen matching `stitch_legalhub_mobile_app/sign_in`.
 ///
 /// The primary "Sign In" action starts the local demo session via
-/// [AuthCubit.startDemoSession] — no real credentials are sent. Social buttons
-/// are presentational placeholders pending a provider integration (later
-/// slice); they are disabled with an honest disclosure.
+/// [AuthCubit.startDemoSession] — no real credentials are sent. The Google
+/// button runs the real OAuth browser hand-off ([AuthCubit.signInWithGoogle]);
+/// Apple has no provider wired yet, so it stays disabled with an honest
+/// disclosure.
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
@@ -167,11 +168,10 @@ class _SignInCredentials extends StatelessWidget {
           validator: (v) => LegalHubValidators.required(l10n, v),
           trailing: TextButton(
             onPressed: () => context.push(AppRoutes.forgotPassword),
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.zero,
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
+            // Compact label, but a real 48px-tall hit target: the previous
+            // Size.zero + shrinkWrap made this the only "Forgot password?"
+            // affordance at label height (~19px).
+            style: TextButton.styleFrom(padding: EdgeInsets.zero),
             child: Text(
               l10n.forgotPassword,
               style: text.labelLarge?.copyWith(color: scheme.secondary),
@@ -249,13 +249,13 @@ class _SignInSubmitButton extends StatelessWidget {
   }
 }
 
-/// E2E BUG-2 fix: no social provider is wired yet, but both buttons used
-/// `context.go(AppRoutes.signUp)` — tapping "Continue with Google/Apple"
-/// silently opened the Create Account form, which misrepresents what
-/// happened. They are now genuinely DISABLED (`onTap: null`) with an honest
-/// disclosure beneath, mirroring the demo-session notice pattern used above.
-/// Wiring a real provider is a separate slice; this keeps the surface
-/// truthful until then.
+/// Google runs the real OAuth browser hand-off; Apple has no provider wired
+/// yet and stays DISABLED (`onTap: null`) with an honest disclosure beneath.
+///
+/// Historical note (E2E BUG-2): both buttons used to call
+/// `context.go(AppRoutes.signUp)`, so tapping either silently opened the
+/// Create Account form. Neither button may ever navigate on its own — a
+/// provider button either starts its provider flow or is disabled.
 class _SocialSignInSection extends StatelessWidget {
   const _SocialSignInSection();
 
@@ -269,24 +269,31 @@ class _SocialSignInSection extends StatelessWidget {
       children: <Widget>[
         EditorialDivider(label: l10n.orContinueWith),
         const SizedBox(height: LegalHubTheme.spaceMd),
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: SocialButton(
-                label: l10n.continueWithGoogle,
-                icon: Icons.g_mobiledata_outlined,
-                onTap: null,
-              ),
-            ),
-            const SizedBox(width: LegalHubTheme.spaceMd),
-            Expanded(
-              child: SocialButton(
-                label: l10n.continueWithApple,
-                icon: Icons.apple,
-                onTap: null,
-              ),
-            ),
-          ],
+        BlocBuilder<AuthCubit, AuthState>(
+          builder: (BuildContext context, AuthState state) {
+            final bool loading = state.status == AuthStatus.loading;
+            return Row(
+              children: <Widget>[
+                Expanded(
+                  child: SocialButton(
+                    label: l10n.continueWithGoogle,
+                    icon: Icons.g_mobiledata_outlined,
+                    onTap: loading
+                        ? null
+                        : () => context.read<AuthCubit>().signInWithGoogle(),
+                  ),
+                ),
+                const SizedBox(width: LegalHubTheme.spaceMd),
+                Expanded(
+                  child: SocialButton(
+                    label: l10n.continueWithApple,
+                    icon: Icons.apple,
+                    onTap: null,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
         const SizedBox(height: LegalHubTheme.spaceXs),
         Text(

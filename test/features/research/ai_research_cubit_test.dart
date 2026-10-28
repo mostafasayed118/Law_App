@@ -4,7 +4,11 @@ import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/features/documents/data/fake_document_gateway.dart';
+import 'package:legalhub/features/documents/domain/document.dart';
+import 'package:legalhub/features/documents/domain/document_gateway.dart';
 import 'package:legalhub/features/matters/data/fake_matter_gateway.dart';
+import 'package:legalhub/features/matters/domain/matter.dart';
+import 'package:legalhub/features/matters/domain/matter_gateway.dart';
 import 'package:legalhub/features/research/data/synthetic_ai_gateway.dart';
 import 'package:legalhub/features/research/domain/ai_finding.dart';
 import 'package:legalhub/features/research/domain/ai_gateway.dart';
@@ -16,6 +20,10 @@ import 'package:legalhub/features/research/presentation/ai_research_state.dart';
 import 'package:mocktail/mocktail.dart';
 
 class _MockAiGateway extends Mock implements AiGateway {}
+
+class _MockMatterGateway extends Mock implements MatterGateway {}
+
+class _MockDocumentGateway extends Mock implements DocumentGateway {}
 
 void main() {
   late _MockAiGateway gateway;
@@ -330,6 +338,37 @@ void main() {
       },
     );
 
+    test('a thrown analysis resets the guard so a retry runs (N1)', () async {
+      final ResearchRequest request = ResearchRequest(
+        organizationId: 'org-1',
+        question: 'What changed?',
+      );
+      when(
+        () => gateway.analyze(any()),
+      ).thenThrow(StateError('analysis gateway blew up'));
+      final AiResearchCubit cubit = AiResearchCubit(gateway);
+      addTearDown(cubit.close);
+
+      await expectLater(cubit.generate(request), throwsA(isA<StateError>()));
+
+      when(() => gateway.analyze(any())).thenAnswer(
+        (_) async => const Result<ResearchOutcome>.success(
+          ResearchOutcome(
+            runId: 'run-1',
+            status: ResearchRunStatus.completed,
+            findings: <AiFinding>[],
+          ),
+        ),
+      );
+      when(() => gateway.fetchRuns()).thenAnswer(
+        (_) async => const Result<List<ResearchRun>>.success(<ResearchRun>[]),
+      );
+      await cubit.generate(request);
+
+      verify(() => gateway.analyze(any())).called(2);
+      expect(cubit.state.findings, isA<ViewSuccess<List<AiFinding>>>());
+    });
+
     test('loadRunFindings labels the answer with the run prompt', () async {
       when(() => gateway.fetchRuns()).thenAnswer(
         (_) async => Result<List<ResearchRun>>.success(<ResearchRun>[run]),
@@ -346,6 +385,210 @@ void main() {
 
       expect(cubit.state.lastQuery, 'What changed?');
       expect(cubit.state.findings, isA<ViewSuccess<List<AiFinding>>>());
+    });
+
+    group('loadLookups', () {
+      late _MockMatterGateway matterGateway;
+      late _MockDocumentGateway documentGateway;
+
+      setUp(() {
+        matterGateway = _MockMatterGateway();
+        documentGateway = _MockDocumentGateway();
+      });
+
+      blocTest<AiResearchCubit, AiResearchState>(
+        'emits loading → success for both optional pickers',
+        build: () {
+          when(() => matterGateway.fetchMatters()).thenAnswer(
+            (_) async => Result<List<Matter>>.success(
+              FakeMatterGateway.syntheticMatters,
+            ),
+          );
+          when(() => documentGateway.fetchDocuments()).thenAnswer(
+            (_) async => Result<List<Document>>.success(
+              FakeDocumentGateway.syntheticDocuments,
+            ),
+          );
+          return AiResearchCubit(
+            gateway,
+            mattersGateway: matterGateway,
+            documentsGateway: documentGateway,
+          );
+        },
+        act: (AiResearchCubit cubit) => cubit.loadLookups(),
+        expect: () => <AiResearchState>[
+          const AiResearchState(
+            matters: ViewLoading<List<Matter>>(),
+            documents: ViewLoading<List<Document>>(),
+          ),
+          AiResearchState(
+            matters: ViewSuccess<List<Matter>>(
+              FakeMatterGateway.syntheticMatters,
+            ),
+            documents: ViewSuccess<List<Document>>(
+              FakeDocumentGateway.syntheticDocuments,
+            ),
+          ),
+        ],
+      );
+
+      blocTest<AiResearchCubit, AiResearchState>(
+        'a failed document lookup leaves the matter arm intact',
+        build: () {
+          when(() => matterGateway.fetchMatters()).thenAnswer(
+            (_) async => Result<List<Matter>>.success(
+              FakeMatterGateway.syntheticMatters,
+            ),
+          );
+          when(() => documentGateway.fetchDocuments()).thenAnswer(
+            (_) async => const Result<List<Document>>.failure(
+              AppError(
+                code: 'documents_failed',
+                userMessage: 'documents unavailable',
+              ),
+            ),
+          );
+          return AiResearchCubit(
+            gateway,
+            mattersGateway: matterGateway,
+            documentsGateway: documentGateway,
+          );
+        },
+        act: (AiResearchCubit cubit) => cubit.loadLookups(),
+        expect: () => <AiResearchState>[
+          const AiResearchState(
+            matters: ViewLoading<List<Matter>>(),
+            documents: ViewLoading<List<Document>>(),
+          ),
+          AiResearchState(
+            matters: ViewSuccess<List<Matter>>(
+              FakeMatterGateway.syntheticMatters,
+            ),
+            documents: const ViewError<List<Document>>(
+              AppError(
+                code: 'documents_failed',
+                userMessage: 'documents unavailable',
+              ),
+            ),
+          ),
+        ],
+      );
+
+      test('a thrown lookup resets the guard so a retry runs (N1)', () async {
+        when(
+          () => matterGateway.fetchMatters(),
+        ).thenThrow(StateError('lookup gateway blew up'));
+        final AiResearchCubit cubit = AiResearchCubit(
+          gateway,
+          mattersGateway: matterGateway,
+        );
+        addTearDown(cubit.close);
+
+        await expectLater(cubit.loadLookups(), throwsA(isA<StateError>()));
+
+        when(() => matterGateway.fetchMatters()).thenAnswer(
+          (_) async => const Result<List<Matter>>.success(<Matter>[]),
+        );
+        await cubit.loadLookups();
+
+        verify(() => matterGateway.fetchMatters()).called(2);
+        expect(cubit.state.matters, isA<ViewSuccess<List<Matter>>>());
+      });
+
+      test('a failed lookup never blocks generation', () async {
+        when(() => matterGateway.fetchMatters()).thenAnswer(
+          (_) async => const Result<List<Matter>>.failure(
+            AppError(code: 'matters_failed', userMessage: 'unavailable'),
+          ),
+        );
+        when(() => documentGateway.fetchDocuments()).thenAnswer(
+          (_) async => const Result<List<Document>>.failure(
+            AppError(code: 'documents_failed', userMessage: 'unavailable'),
+          ),
+        );
+        when(() => gateway.analyze(any())).thenAnswer(
+          (_) async => const Result<ResearchOutcome>.success(
+            ResearchOutcome(
+              runId: 'run-1',
+              status: ResearchRunStatus.completed,
+              findings: <AiFinding>[],
+            ),
+          ),
+        );
+        when(() => gateway.fetchRuns()).thenAnswer(
+          (_) async => const Result<List<ResearchRun>>.success(<ResearchRun>[]),
+        );
+        final AiResearchCubit cubit = AiResearchCubit(
+          gateway,
+          mattersGateway: matterGateway,
+          documentsGateway: documentGateway,
+        );
+        addTearDown(cubit.close);
+
+        await cubit.loadLookups();
+        await cubit.generate(
+          ResearchRequest(organizationId: 'org-1', question: 'Question'),
+        );
+
+        expect(cubit.state.matters, isA<ViewError<List<Matter>>>());
+        expect(cubit.state.documents, isA<ViewError<List<Document>>>());
+        expect(cubit.state.findings, isA<ViewSuccess<List<AiFinding>>>());
+        expect(cubit.state.lastQuery, 'Question');
+      });
+
+      blocTest<AiResearchCubit, AiResearchState>(
+        'without lookup gateways it is a no-op',
+        build: () => AiResearchCubit(gateway),
+        act: (AiResearchCubit cubit) => cubit.loadLookups(),
+        expect: () => <AiResearchState>[],
+      );
+
+      blocTest<AiResearchCubit, AiResearchState>(
+        'a duplicate reload while loading is a no-op',
+        build: () {
+          when(() => matterGateway.fetchMatters()).thenAnswer((_) async {
+            await Future<void>.delayed(const Duration(milliseconds: 20));
+            return Result<List<Matter>>.success(
+              FakeMatterGateway.syntheticMatters,
+            );
+          });
+          when(() => documentGateway.fetchDocuments()).thenAnswer((_) async {
+            await Future<void>.delayed(const Duration(milliseconds: 20));
+            return Result<List<Document>>.success(
+              FakeDocumentGateway.syntheticDocuments,
+            );
+          });
+          return AiResearchCubit(
+            gateway,
+            mattersGateway: matterGateway,
+            documentsGateway: documentGateway,
+          );
+        },
+        act: (AiResearchCubit cubit) async {
+          final Future<void> first = cubit.loadLookups();
+          final Future<void> second = cubit.loadLookups();
+          await first;
+          await second;
+        },
+        expect: () => <AiResearchState>[
+          const AiResearchState(
+            matters: ViewLoading<List<Matter>>(),
+            documents: ViewLoading<List<Document>>(),
+          ),
+          AiResearchState(
+            matters: ViewSuccess<List<Matter>>(
+              FakeMatterGateway.syntheticMatters,
+            ),
+            documents: ViewSuccess<List<Document>>(
+              FakeDocumentGateway.syntheticDocuments,
+            ),
+          ),
+        ],
+        verify: (_) {
+          verify(() => matterGateway.fetchMatters()).called(1);
+          verify(() => documentGateway.fetchDocuments()).called(1);
+        },
+      );
     });
   });
 }

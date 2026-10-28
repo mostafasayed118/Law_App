@@ -22,6 +22,21 @@ import 'package:legalhub/app/deep_link/deep_link_config.dart';
 class AuthCallbackUri {
   const AuthCallbackUri._();
 
+  /// The custom scheme registered for the production build.
+  static const String appScheme = 'com.legalhub.app';
+
+  /// The development flavor's registered scheme. Recovery links built by a
+  /// development build target this scheme, so it must classify identically.
+  static const String developmentAppScheme = 'com.legalhub.app.dev';
+
+  /// The auth-callback URI for a build whose custom scheme is [scheme].
+  ///
+  /// This is the single source of truth for the OAuth `redirectTo`: it is the
+  /// exact location [pkceCode] accepts back from the provider, so the two can
+  /// never drift apart.
+  static String callbackUriFor(String scheme) =>
+      '$scheme://${DeepLinkConfig.authHost}${DeepLinkConfig.appCallbackPath}';
+
   /// Implicit-flow material the PKCE exchange must never receive.
   static const Set<String> _implicitSessionParameters = <String>{
     'access_token',

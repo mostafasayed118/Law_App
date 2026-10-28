@@ -135,6 +135,21 @@ void main() {
       expect(find.text('Retry'), findsOneWidget);
       expect(find.text('Create task'), findsNothing);
     });
+
+    testWidgets(
+      'a thrown matter read shows the retry arm, not a stuck spinner (N1)',
+      (tester) async {
+        matterGateway.throws = true;
+        await openSheet(tester);
+
+        expect(find.byType(LinearProgressIndicator), findsNothing);
+        expect(
+          find.text('Unable to load matters. Please try again.'),
+          findsOneWidget,
+        );
+        expect(find.text('Retry'), findsOneWidget);
+      },
+    );
   });
 }
 
@@ -152,9 +167,13 @@ TaskItem _task({required String id}) {
 
 class _StubMatterGateway extends FakeMatterGateway {
   Result<List<Matter>>? result;
+  bool throws = false;
 
   @override
   Future<Result<List<Matter>>> fetchMatters() async {
+    if (throws) {
+      throw StateError('matters gateway blew up');
+    }
     final Result<List<Matter>>? stub = result;
     if (stub != null) {
       return stub;

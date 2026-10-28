@@ -78,25 +78,39 @@ class SupabaseMembershipRepository implements MembershipRepository {
       };
 
   /// Maps one raw membership row, or null when the row cannot be projected
-  /// safely (unknown role/status per D-P32.1, or a missing organization id).
+  /// safely (unknown role/status per D-P32.1, a non-string role/status, or a
+  /// missing organization id).
   OrganizationMembership? _fromRow(Map<String, dynamic> row) {
-    final UserRole? role = userRoleFromServerName(row['role'] as String?);
+    // Provider drift must be dropped, not thrown. A `row['role'] as String?`
+    // cast on a non-string raises a `TypeError` — an `Error`, not an
+    // `Exception` — so it used to slip past [loadMemberships]' exception
+    // catches and strand sign-in with a raw async error (audit 2026-10-27,
+    // F13). Type-check first; a non-string is dropped like an unknown value.
+    final Object? roleValue = row['role'];
+    if (roleValue is! String) {
+      AppLog.diagnostic('membership hydration: dropping a non-string role');
+      return null;
+    }
+    final UserRole? role = userRoleFromServerName(roleValue);
     if (role == null) {
       // D-P32.1: unknown schema role → drop loudly, never project a
       // capability hint for a role the client does not understand.
       AppLog.diagnostic(
-        'membership hydration: dropping row with unknown role '
-        "${row['role']}",
+        'membership hydration: dropping row with unknown role "$roleValue"',
       );
       return null;
     }
+    final Object? statusValue = row['status'];
+    if (statusValue is! String) {
+      AppLog.diagnostic('membership hydration: dropping a non-string status');
+      return null;
+    }
     final MembershipStatus? status = membershipStatusFromServerName(
-      row['status'] as String?,
+      statusValue,
     );
     if (status == null) {
       AppLog.diagnostic(
-        'membership hydration: dropping row with unknown status '
-        "${row['status']}",
+        'membership hydration: dropping row with unknown status "$statusValue"',
       );
       return null;
     }

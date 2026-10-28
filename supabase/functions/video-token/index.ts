@@ -19,21 +19,41 @@ type VideoSessionRow = {
   status: string;
 };
 
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+function corsHeaders(request: Request): Record<string, string> {
+  const headers: Record<string, string> = {
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Vary": "Origin",
+  };
+  const origin = request.headers.get("Origin");
+  if (!origin) return headers;
+  const allowed = (Deno.env.get("ALLOWED_ORIGINS") ?? "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter((value) => value.length > 0);
+  if (allowed.includes(origin)) {
+    headers["Access-Control-Allow-Origin"] = origin;
+  }
+  return headers;
+}
 
-function json(status: number, body: Record<string, unknown>): Response {
+function json(
+  status: number,
+  body: Record<string, unknown>,
+  headers: Record<string, string>,
+): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...CORS_HEADERS, "content-type": "application/json" },
+    headers: { ...headers, "content-type": "application/json" },
   });
 }
 
-function fail(status: number, error: FailureCode): Response {
-  return json(status, { error });
+function fail(
+  status: number,
+  error: FailureCode,
+  headers: Record<string, string>,
+): Response {
+  return json(status, { error }, headers);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -80,21 +100,22 @@ async function mintLiveKitToken(
 }
 
 Deno.serve(async (request: Request): Promise<Response> => {
+  const cors = corsHeaders(request);
   if (request.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers: CORS_HEADERS });
+    return new Response(null, { status: 204, headers: cors });
   }
-  if (request.method !== "POST") return fail(405, "forbidden");
+  if (request.method !== "POST") return fail(405, "forbidden", cors);
 
   const authorization = request.headers.get("Authorization");
   if (!authorization || !/^bearer\s+\S+$/i.test(authorization)) {
-    return fail(401, "unauthorized");
+    return fail(401, "unauthorized", cors);
   }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? Deno.env.get("SUPABASE_PUBLISHABLE_KEY");
   if (!supabaseUrl || !anonKey) {
     console.error("video-token supabase environment is incomplete");
-    return fail(500, "internal_error");
+    return fail(500, "internal_error", cors);
   }
 
   const userClient = createClient(supabaseUrl, anonKey, {
@@ -103,20 +124,20 @@ Deno.serve(async (request: Request): Promise<Response> => {
   });
 
   const { data: userData, error: userError } = await userClient.auth.getUser();
-  if (userError || !userData?.user) return fail(401, "unauthorized");
+  if (userError || !userData?.user) return fail(401, "unauthorized", cors);
 
   let body: Record<string, unknown>;
   try {
     const parsed: unknown = await request.json();
-    if (!isRecord(parsed)) return fail(400, "session_not_found");
+    if (!isRecord(parsed)) return fail(400, "session_not_found", cors);
     body = parsed;
   } catch {
-    return fail(400, "session_not_found");
+    return fail(400, "session_not_found", cors);
   }
 
   const rawSessionId = body.session_id;
   if (typeof rawSessionId !== "string" || !UUID_RE.test(rawSessionId)) {
-    return fail(400, "session_not_found");
+    return fail(400, "session_not_found", cors);
   }
   const sessionId = rawSessionId.toLowerCase();
 
@@ -135,15 +156,15 @@ Deno.serve(async (request: Request): Promise<Response> => {
     console.error("video-token session read failed", error.code ?? "unknown");
     if (error.code === "42501"
         || /permission denied|row-level security/i.test(error.message ?? "")) {
-      return fail(403, "forbidden");
+      return fail(403, "forbidden", cors);
     }
-    return fail(500, "internal_error");
+    return fail(500, "internal_error", cors);
   }
-  if (!data) return fail(404, "session_not_found");
+  if (!data) return fail(404, "session_not_found", cors);
 
   const session = data as VideoSessionRow;
   if (session.status === "ended" || session.status === "cancelled") {
-    return fail(409, "session_ended");
+    return fail(409, "session_ended", cors);
   }
 
   const livekitUrl = Deno.env.get("LIVEKIT_URL")?.trim().replace(/\/+$/, "");
@@ -151,7 +172,7 @@ Deno.serve(async (request: Request): Promise<Response> => {
   const apiSecret = Deno.env.get("LIVEKIT_API_SECRET")?.trim();
   if (!livekitUrl || !apiKey || !apiSecret) {
     console.error("video-token livekit environment is incomplete");
-    return fail(409, "provider_not_configured");
+    return fail(409, "provider_not_configured", cors);
   }
 
   let token: string;
@@ -165,8 +186,8 @@ Deno.serve(async (request: Request): Promise<Response> => {
     );
   } catch (error) {
     console.error("video-token mint failed", error instanceof Error ? error.name : "unknown");
-    return fail(500, "internal_error");
+    return fail(500, "internal_error", cors);
   }
 
-  return json(200, { url: livekitUrl, token, room: session.room_name });
+  return json(200, { url: livekitUrl, token, room: session.room_name }, cors);
 });

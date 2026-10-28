@@ -5,12 +5,14 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/app/deep_link/pending_accept_invite_store.dart';
+import 'package:legalhub/app/flavor.dart';
 import 'package:legalhub/app/localization/locale_cubit.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/admin/platform_admin_gateway.dart';
 import 'package:legalhub/core/auth/auth_gateway.dart';
 import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
+import 'package:legalhub/core/onboarding/onboarding_store.dart';
 import 'package:legalhub/core/organizations/membership_repository.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/data/admin/fake_platform_admin_gateway.dart';
@@ -27,16 +29,13 @@ import 'package:legalhub/data/billing/supabase_payment_api.dart';
 import 'package:legalhub/data/billing/supabase_payment_gateway.dart';
 import 'package:legalhub/data/billing/url_launcher_checkout_launcher.dart';
 import 'package:legalhub/data/booking/supabase_booking_api.dart';
-import 'package:legalhub/data/booking/supabase_booking_gateway.dart';
 import 'package:legalhub/data/discovery/supabase_attorney_api_impl.dart';
-import 'package:legalhub/data/discovery/supabase_attorney_gateway.dart';
 import 'package:legalhub/data/documents/supabase_document_api.dart';
 import 'package:legalhub/data/documents/supabase_document_gateway.dart';
 import 'package:legalhub/data/files/file_selector_file_picker.dart';
 import 'package:legalhub/data/files/url_launcher_uri_opener.dart';
 import 'package:legalhub/data/local/in_memory_org_selection_store.dart';
 import 'package:legalhub/data/local/locale_store.dart';
-import 'package:legalhub/data/local/onboarding_store.dart';
 import 'package:legalhub/data/local/org_selection_store.dart';
 import 'package:legalhub/data/matters/supabase_matter_api.dart';
 import 'package:legalhub/data/matters/supabase_matter_gateway.dart';
@@ -55,6 +54,7 @@ import 'package:legalhub/data/storage/supabase_storage_gateway.dart';
 import 'package:legalhub/features/auth/data/fake_password_recovery_gateway.dart';
 import 'package:legalhub/features/auth/data/fake_sign_up_gateway.dart';
 import 'package:legalhub/features/auth/data/supabase_password_recovery_gateway.dart';
+import 'package:legalhub/features/auth/data/supabase_sign_up_gateway.dart';
 import 'package:legalhub/features/auth/domain/password_recovery_gateway.dart';
 import 'package:legalhub/features/auth/domain/sign_up_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
@@ -64,10 +64,12 @@ import 'package:legalhub/features/billing/domain/checkout_launcher.dart';
 import 'package:legalhub/features/billing/domain/payment_gateway.dart';
 import 'package:legalhub/features/billing/domain/payment_mode.dart';
 import 'package:legalhub/features/booking/data/fake_booking_gateway.dart';
+import 'package:legalhub/features/booking/data/supabase_booking_gateway.dart';
 import 'package:legalhub/features/booking/domain/booking_gateway.dart';
 import 'package:legalhub/features/booking/domain/booking_prefill.dart';
 import 'package:legalhub/features/discovery/data/fake_attorney_admin_gateway.dart';
 import 'package:legalhub/features/discovery/data/fake_attorney_gateway.dart';
+import 'package:legalhub/features/discovery/data/supabase_attorney_gateway.dart';
 import 'package:legalhub/features/discovery/domain/attorney_admin_gateway.dart';
 import 'package:legalhub/features/discovery/domain/attorney_gateway.dart';
 import 'package:legalhub/features/documents/data/fake_document_gateway.dart';
@@ -89,6 +91,9 @@ import 'package:legalhub/features/storage/domain/uri_opener.dart';
 /// The real `SupabaseAuthApiImpl.bind()` needs a running `Supabase.instance`,
 /// which no test should spin up — the flip's test seam injects this instead.
 class _FakeSupabaseAuthApi implements SupabaseAuthApi {
+  @override
+  Future<bool> signInWithGoogle({required String redirectTo}) async => false;
+
   final StreamController<SupabaseAuthSnapshot?> _changes =
       StreamController<SupabaseAuthSnapshot?>.broadcast();
 
@@ -1074,6 +1079,56 @@ void main() {
       );
 
       expect(serviceLocator<AuthGateway>(), isA<SupabaseAuthGateway>());
+    });
+
+    test('the three auth seams share one API instance (F15)', () {
+      int factoryCalls = 0;
+      configureDependencies(
+        supabaseEnv: SupabaseEnv(
+          url: 'https://example.supabase.co',
+          anonKey: _anonJwt(),
+        ),
+        // The real bind() needs a running Supabase.instance; the counting
+        // factory stands in for the one provider seam instance.
+        supabaseAuthApiFactory: () {
+          factoryCalls += 1;
+          return _FakeSupabaseAuthApi();
+        },
+      );
+
+      // Resolve in dependency order: the session gateway first, then the two
+      // feature-scoped sinks. One bind() -> one auth-state subscription must
+      // serve all three (audit 2026-10-27, F15).
+      expect(serviceLocator<AuthGateway>(), isA<SupabaseAuthGateway>());
+      expect(
+        serviceLocator<PasswordRecoveryGateway>(),
+        isA<SupabasePasswordRecoveryGateway>(),
+      );
+      expect(serviceLocator<SignUpGateway>(), isA<SupabaseSignUpGateway>());
+
+      expect(factoryCalls, 1);
+      expect(
+        identical(
+          serviceLocator<SupabaseAuthApi>(),
+          serviceLocator<SupabaseAuthApi>(),
+        ),
+        isTrue,
+      );
+    });
+
+    test('derives the auth redirect from the build deep-link scheme (F14)', () {
+      // The locator passes this exact URI to SupabaseAuthApiImpl.bind() for
+      // the recovery email and to SupabaseAuthGateway for OAuth. A dev build
+      // targets the .dev scheme its native intent filters register — never
+      // the production literal.
+      expect(
+        authRedirectUriFor(const AppConfig.development()),
+        'com.legalhub.app.dev://auth/v1/callback',
+      );
+      expect(
+        authRedirectUriFor(const AppConfig.production()),
+        'com.legalhub.app://auth/v1/callback',
+      );
     });
 
     test('refuses a non-anon key at configure time (Batch 3.3 guard)', () {

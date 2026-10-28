@@ -8,8 +8,8 @@ import 'package:legalhub/features/documents/data/fake_document_gateway.dart';
 import 'package:legalhub/features/documents/domain/document.dart';
 import 'package:legalhub/features/documents/domain/document_gateway.dart';
 import 'package:legalhub/features/documents/presentation/document_list_screen.dart';
-import 'package:legalhub/features/matters/presentation/matter_link_chip.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/widgets/matter_link_chip.dart';
 
 void main() {
   tearDown(resetServiceLocator);

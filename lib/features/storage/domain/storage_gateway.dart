@@ -9,6 +9,26 @@ const int matterFileMaxBytes = 25 * 1024 * 1024;
 /// Signed download URL lifetime.
 const Duration kSignedUrlTtl = Duration(seconds: 60);
 
+/// Upload deadline: 30s base plus one second per 128 KiB of payload.
+/// 25 MiB → 230s, enough for a ~1 Mbps uplink without hanging forever
+/// (audit 2026-10-27, F9).
+const Duration kUploadTimeoutBase = Duration(seconds: 30);
+const int kUploadBytesPerTimeoutSecond = 128 * 1024;
+
+/// The transport deadline for uploading [bytes].
+///
+/// A fixed deadline punishes the 25 MiB cap (the old 15s could not deliver
+/// it) and gives a small file far more slack than it needs. The payload term
+/// floors at one second per partial 128 KiB slice; a negative size is a
+/// precheck failure, not a payload, so it gets only the base.
+Duration uploadTimeoutForBytes(int bytes) {
+  final int payloadSeconds = bytes <= 0
+      ? 0
+      : (bytes + kUploadBytesPerTimeoutSecond - 1) ~/
+            kUploadBytesPerTimeoutSecond;
+  return kUploadTimeoutBase + Duration(seconds: payloadSeconds);
+}
+
 /// MIME types the server bucket accepts for matter files.
 const Set<String> matterFileAllowedMimeTypes = <String>{
   'application/pdf',

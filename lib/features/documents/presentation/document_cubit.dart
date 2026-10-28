@@ -37,8 +37,13 @@ class DocumentCubit extends Cubit<DocumentState> {
     if (state.documents is! ViewLoading<List<Document>>) {
       emit(state.copyWith(documents: const ViewLoading<List<Document>>()));
     }
-    final Result<List<Document>> result = await _gateway.fetchDocuments();
-    _loading = false;
+    final Result<List<Document>> result;
+    try {
+      result = await _gateway.fetchDocuments();
+    } finally {
+      // Reset on throw too: a blown read must not wedge the retry guard.
+      _loading = false;
+    }
     if (isClosed) {
       return;
     }

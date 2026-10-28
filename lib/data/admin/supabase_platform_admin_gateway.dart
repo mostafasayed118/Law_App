@@ -39,6 +39,8 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
           message: platformAdminRequestFailedMessage,
         ),
       );
+    } on TypeError {
+      return _mappingDriftFailure<List<OrganizationSummary>>();
     }
   }
 
@@ -63,6 +65,8 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
           message: platformAdminRequestFailedMessage,
         ),
       );
+    } on TypeError {
+      return _mappingDriftFailure<List<OrgMember>>();
     }
   }
 
@@ -124,6 +128,8 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
           message: platformAdminRequestFailedMessage,
         ),
       );
+    } on TypeError {
+      return _mappingDriftFailure<List<AuditEntry>>();
     }
   }
 
@@ -152,6 +158,8 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
           message: platformAdminRequestFailedMessage,
         ),
       );
+    } on TypeError {
+      return _mappingDriftFailure<List<AuditEntry>>();
     }
   }
 
@@ -170,16 +178,16 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
   }
 
   OrganizationSummary _organizationFromRow(Map<String, dynamic> row) {
-    final String? id = row['organization_id'] as String?;
+    final String id = _requiredString(row, 'organization_id');
     final String? name = row['name'] as String?;
-    if (id == null || name == null) {
+    if (name == null) {
       // Loud, never a silently wrong organization (provider drift).
-      throw FormatException('Organization metadata row missing id/name');
+      throw FormatException('Organization metadata row missing name');
     }
     return OrganizationSummary(
       id: id,
       name: name,
-      createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
+      createdAt: _requiredDateTime(row, 'created_at').toLocal(),
     );
   }
 
@@ -202,14 +210,14 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
       throw FormatException('Unknown server status name: ${row['status']}');
     }
     return OrgMember(
-      organizationId: row['organization_id'] as String,
+      organizationId: _requiredString(row, 'organization_id'),
       userId: userId,
       displayName: (row['display_name'] as String?) ?? userId,
       locale: row['locale'] as String?,
       role: role,
       status: status,
-      createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
-      updatedAt: DateTime.parse(row['updated_at'] as String).toLocal(),
+      createdAt: _requiredDateTime(row, 'created_at').toLocal(),
+      updatedAt: _requiredDateTime(row, 'updated_at').toLocal(),
     );
   }
 
@@ -265,6 +273,35 @@ class SupabasePlatformAdminGateway implements PlatformAdminGateway {
     }
     throw FormatException('Audit row $key is not a string: $value');
   }
+
+  String _requiredString(Map<String, dynamic> row, String key) {
+    final Object? value = row[key];
+    if (value is String) {
+      return value;
+    }
+    throw FormatException('Row $key is not a string: $value');
+  }
+
+  DateTime _requiredDateTime(Map<String, dynamic> row, String key) {
+    final String value = _requiredString(row, key);
+    final DateTime? parsed = DateTime.tryParse(value);
+    if (parsed == null) {
+      throw FormatException('Row $key is not a valid date: $value');
+    }
+    return parsed;
+  }
+
+  /// The `unknown` failure shared by the row-mapping catches. Provider drift
+  /// is normally a [FormatException], but a value reaching an unguarded cast
+  /// raises a [TypeError] — an Error, not an Exception, which would otherwise
+  /// escape the typed boundary and strand the loading state (audit
+  /// 2026-10-27, F3).
+  OrgOutcome<T> _mappingDriftFailure<T>() => OrgOutcome<T>.failure(
+    const OrgFailure(
+      kind: OrgFailureKind.unknown,
+      message: platformAdminRequestFailedMessage,
+    ),
+  );
 
   OrgFailureKind _mapKind(SupabasePlatformAdminFailureKind kind) {
     return switch (kind) {

@@ -36,11 +36,10 @@ class SectionHeader extends StatelessWidget {
           const SizedBox(width: LegalHubTheme.spaceSm),
           TextButton(
             onPressed: onAction,
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.zero,
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
+            // Compact label, but a real 48px-tall hit target: the previous
+            // Size.zero + shrinkWrap shrank the view-all action to the label
+            // height (~19px).
+            style: TextButton.styleFrom(padding: EdgeInsets.zero),
             child: Text(
               displayUppercase(actionLabel!, Localizations.localeOf(context)),
               style: Theme.of(context).textTheme.labelLarge?.copyWith(

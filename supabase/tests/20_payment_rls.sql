@@ -1145,4 +1145,48 @@ begin
   end if;
 end $$;
 
+-- ############################################################################
+-- 20.29 — POS (late success after expiry): the provider checkout key is valid
+-- longer than the stale sweep. A signed success that arrives after the sweep
+-- expired the attempt must settle the payment and the still-issued invoice;
+-- a later conflicting outcome stays check_violation (audit H1).
+-- ############################################################################
+do $$
+declare
+  v_pay    uuid;
+  v_row    jsonb;
+  v_status text;
+begin
+  insert into public.payments
+    (invoice_id, amount_cents, currency, status, provider_order_id)
+  values
+    ('a0000000-0000-4000-8000-000000000004', 800000, 'EGP', 'pending', 'po-20-late')
+  returning id into v_pay;
+
+  perform public.apply_paymob_transaction(
+    'po-20-late', 'txn-20-late-exp', 'expired', 800000, 'EGP', 'sweep');
+
+  v_row := public.apply_paymob_transaction(
+    'po-20-late', 'txn-20-late-ok', 'succeeded', 800000, 'EGP');
+  if v_row ->> 'payment_status' is distinct from 'succeeded'
+     or (v_row ->> 'already_processed')::boolean then
+    raise exception 'POLICY-BATTERY FAIL 20.29: late success projection drift: %', v_row;
+  end if;
+
+  select status into v_status
+    from public.billing_invoices
+   where id = 'a0000000-0000-4000-8000-000000000004';
+  if v_status is distinct from 'paid' then
+    raise exception 'POLICY-BATTERY FAIL 20.29: late success left the invoice %', v_status;
+  end if;
+
+  begin
+    perform public.apply_paymob_transaction(
+      'po-20-late', 'txn-20-late-bad', 'failed', 800000, 'EGP');
+    raise exception 'POLICY-BATTERY FAIL 20.29: succeeded -> failed was allowed';
+  exception when check_violation then
+    null; -- expected: only expired -> succeeded is exempt
+  end;
+end $$;
+
 rollback;

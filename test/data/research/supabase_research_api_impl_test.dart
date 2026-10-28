@@ -4,7 +4,7 @@ import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/data/research/supabase_research_api.dart';
 import 'package:legalhub/data/research/supabase_research_api_impl.dart';
-import 'package:legalhub/data/research/supabase_research_gateway.dart';
+import 'package:legalhub/features/research/data/supabase_research_gateway.dart';
 import 'package:legalhub/features/research/domain/research_outcome.dart';
 import 'package:legalhub/features/research/domain/research_request.dart';
 import 'package:legalhub/features/research/domain/research_wire_codes.dart';

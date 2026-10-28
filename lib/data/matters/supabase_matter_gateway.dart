@@ -80,6 +80,17 @@ class SupabaseMatterGateway implements MatterGateway {
           technicalMessage: e.message,
         ),
       );
+    } on TypeError catch (e) {
+      // Mapper drift is an Error, not an Exception: an unguarded `as` cast
+      // would otherwise escape the repository and strand the loading state
+      // (audit 2026-10-27, F3).
+      return Result<List<Matter>>.failure(
+        AppError(
+          code: 'matter_read_failed',
+          userMessage: 'Unable to load matters. Please try again.',
+          technicalMessage: e.toString(),
+        ),
+      );
     }
   }
 

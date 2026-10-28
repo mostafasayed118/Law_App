@@ -23,8 +23,8 @@ import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/matters/data/fake_matter_write_gateway.dart';
-import 'package:legalhub/features/matters/presentation/matter_link_chip.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/widgets/matter_link_chip.dart';
 
 void main() {
   late FakeAuthGateway gateway;
@@ -1903,6 +1903,9 @@ void main() {
 /// demo client session.
 class RoleGateway implements AuthGateway {
   RoleGateway(this._session);
+
+  @override
+  Future<bool> startGoogleSignIn() async => false;
 
   final Session _session;
 
