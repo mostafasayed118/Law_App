@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/data/auth/supabase_auth_api.dart';
-import 'package:legalhub/data/auth/supabase_auth_api_impl.dart';
+import 'package:legalhub/features/auth/data/supabase_auth_api.dart';
+import 'package:legalhub/features/auth/data/supabase_auth_api_impl.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

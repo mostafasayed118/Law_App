@@ -1,5 +1,6 @@
-import 'package:legalhub/core/admin/platform_admin_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/features/admin/domain/platform_admin_gateway.dart';
+
 import 'supabase_platform_admin_api.dart';
 
 /// [PlatformAdminGateway] backed by the Supabase provider via

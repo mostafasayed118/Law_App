@@ -1,12 +1,13 @@
-import 'package:legalhub/core/auth/session.dart';
-import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/features/auth/domain/session.dart';
+import 'package:legalhub/features/orgs/domain/organization_gateway.dart';
 import 'package:legalhub/shared/demo/demo_corpus.dart';
-part 'fake_organization_state.dart';
-part 'fake_organization_invitations.dart';
+
 part 'fake_organization_admin.dart';
 part 'fake_organization_demo.dart';
 part 'fake_organization_helpers.dart';
+part 'fake_organization_invitations.dart';
+part 'fake_organization_state.dart';
 part 'fake_organization_support.dart';
 
 /// Development-only organization implementation.

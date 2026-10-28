@@ -4,9 +4,9 @@ import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/app/deep_link/pending_accept_invite_store.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/app/service_locator.dart';
-import 'package:legalhub/core/auth/session.dart';
-import 'package:legalhub/core/organizations/organization_gateway.dart';
+import 'package:legalhub/features/auth/domain/session.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
+import 'package:legalhub/features/orgs/domain/organization_gateway.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
 import 'org_error_messages.dart';

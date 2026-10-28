@@ -2,17 +2,17 @@ import 'dart:async';
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/core/auth/auth_gateway.dart';
-import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
-import 'package:legalhub/core/organizations/membership_repository.dart';
-import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
-import 'package:legalhub/data/auth/fake_auth_gateway.dart';
-import 'package:legalhub/data/orgs/fake_membership_repository.dart';
-import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
+import 'package:legalhub/features/auth/data/fake_auth_gateway.dart';
+import 'package:legalhub/features/auth/domain/auth_gateway.dart';
+import 'package:legalhub/features/auth/domain/auth_state.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
+import 'package:legalhub/features/orgs/data/fake_membership_repository.dart';
+import 'package:legalhub/features/orgs/data/fake_organization_gateway.dart';
+import 'package:legalhub/features/orgs/domain/membership_repository.dart';
+import 'package:legalhub/features/orgs/domain/organization_gateway.dart';
 
 /// A fixed contract-§5 session used by the synthetic fakes so expected states
 /// compare equal to emitted states.

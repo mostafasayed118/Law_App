@@ -1,5 +1,5 @@
-import 'package:legalhub/core/admin/platform_admin_gateway.dart';
-import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
+import 'package:legalhub/features/admin/domain/platform_admin_gateway.dart';
+import 'package:legalhub/features/orgs/data/fake_organization_gateway.dart';
 
 /// Development-only platform-admin implementation.
 ///

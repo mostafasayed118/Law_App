@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/app/router.dart';
-import 'package:legalhub/core/auth/auth_state.dart';
+import 'package:legalhub/features/auth/domain/auth_state.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/forms/validators.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';

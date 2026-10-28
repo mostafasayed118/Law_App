@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
-import 'package:legalhub/data/admin/fake_platform_admin_gateway.dart';
-import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
+import 'package:legalhub/features/admin/data/fake_platform_admin_gateway.dart';
+import 'package:legalhub/features/orgs/data/fake_organization_gateway.dart';
+import 'package:legalhub/features/orgs/domain/organization_gateway.dart';
 
 void main() {
   group('FakePlatformAdminGateway', () {

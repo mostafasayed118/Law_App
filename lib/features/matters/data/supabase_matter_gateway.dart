@@ -2,11 +2,12 @@ import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/observability/app_log.dart';
-import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/pagination.dart';
 import 'package:legalhub/core/practice_area.dart';
 import 'package:legalhub/features/matters/domain/matter.dart';
 import 'package:legalhub/features/matters/domain/matter_gateway.dart';
+import 'package:legalhub/features/orgs/domain/organization_gateway.dart';
+
 import 'supabase_matter_api.dart';
 
 /// [MatterGateway] backed by the Supabase provider via [SupabaseMatterApi].

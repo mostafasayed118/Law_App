@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/core/auth/auth_gateway.dart';
-import 'package:legalhub/data/auth/supabase_auth_api.dart';
-import 'package:legalhub/data/auth/supabase_auth_gateway.dart';
+import 'package:legalhub/features/auth/data/supabase_auth_api.dart';
+import 'package:legalhub/features/auth/data/supabase_auth_gateway.dart';
+import 'package:legalhub/features/auth/domain/auth_gateway.dart';
 
 /// Hand-rolled fake of the [SupabaseAuthApi] seam (codebase convention:
 /// fakes over mocks for the auth boundary). Snapshot values are controlled

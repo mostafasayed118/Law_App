@@ -1,7 +1,8 @@
-import 'package:legalhub/core/auth/session.dart';
-import 'package:legalhub/core/organizations/membership_repository.dart';
 import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/features/auth/domain/session.dart';
+import 'package:legalhub/features/orgs/domain/membership_repository.dart';
 import 'package:legalhub/shared/demo/demo_corpus.dart';
+
 import 'fake_organization_gateway.dart';
 
 /// Development-only membership hydration implementation.

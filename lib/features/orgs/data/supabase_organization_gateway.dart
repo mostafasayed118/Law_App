@@ -1,5 +1,6 @@
-import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/features/orgs/domain/organization_gateway.dart';
+
 import 'supabase_org_api.dart';
 
 part 'supabase_organization_gateway_mapping.dart';

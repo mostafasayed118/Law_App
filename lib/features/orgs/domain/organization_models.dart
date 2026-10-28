@@ -1,9 +1,9 @@
 import 'package:equatable/equatable.dart';
-
-import 'package:legalhub/core/auth/session.dart';
 import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/features/auth/domain/session.dart';
 
-export 'package:legalhub/core/auth/session.dart' show MembershipStatus;
+export 'package:legalhub/features/auth/domain/session.dart'
+    show MembershipStatus;
 
 /// Maps a server `org_role` name to the domain [UserRole], or null when the
 /// name is not part of the assignable server surface.

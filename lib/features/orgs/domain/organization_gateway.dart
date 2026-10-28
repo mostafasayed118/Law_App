@@ -1,8 +1,10 @@
-import 'package:legalhub/core/admin/audit_entry.dart';
 import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/features/admin/domain/audit_entry.dart';
+
 import 'organization_models.dart';
 
-export 'package:legalhub/core/admin/audit_entry.dart';
+export 'package:legalhub/features/admin/domain/audit_entry.dart';
+
 export 'organization_models.dart';
 
 /// Organization and membership integration boundary.

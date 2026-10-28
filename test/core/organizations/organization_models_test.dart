@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/core/organizations/organization_models.dart';
 import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/features/orgs/domain/organization_models.dart';
 
 void main() {
   group('userRoleFromServerName', () {

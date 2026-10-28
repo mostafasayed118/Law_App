@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/core/admin/platform_admin_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/features/admin/domain/platform_admin_gateway.dart';
 import 'package:legalhub/features/admin/presentation/platform_admin_cubit.dart';
 
 /// Hand-rolled stub of the [PlatformAdminGateway] seam: canned outcomes per

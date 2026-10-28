@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
-import 'package:legalhub/data/admin/supabase_platform_admin_api.dart';
-import 'package:legalhub/data/admin/supabase_platform_admin_gateway.dart';
+import 'package:legalhub/features/admin/data/supabase_platform_admin_api.dart';
+import 'package:legalhub/features/admin/data/supabase_platform_admin_gateway.dart';
+import 'package:legalhub/features/orgs/domain/organization_gateway.dart';
 
 /// Hand-rolled fake of the [SupabasePlatformAdminApi] seam: records calls and
 /// answers with canned rows or [SupabasePlatformAdminException]s, so the

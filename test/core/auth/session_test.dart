@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/core/auth/auth_outcome.dart';
-import 'package:legalhub/core/auth/session.dart';
 import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/features/auth/domain/auth_outcome.dart';
+import 'package:legalhub/features/auth/domain/session.dart';
 
 Session _session({
   String userId = 'user-1',

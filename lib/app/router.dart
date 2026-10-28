@@ -2,16 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/app/deep_link/pending_accept_invite_store.dart';
 import 'package:legalhub/app/service_locator.dart';
-import 'package:legalhub/core/auth/session.dart';
 import 'package:legalhub/core/practice_area.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/features/admin/presentation/attorney_admin_screen.dart';
 import 'package:legalhub/features/admin/presentation/platform_admin_screen.dart';
 import 'package:legalhub/features/approvals/presentation/approvals_screen.dart';
+import 'package:legalhub/features/auth/domain/session.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/auth/presentation/forgot_password/forgot_password_email_screen.dart';
 import 'package:legalhub/features/auth/presentation/forgot_password/forgot_password_otp_screen.dart';
@@ -46,10 +45,12 @@ import 'package:legalhub/features/video/presentation/video_consultation_screen.d
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/responsive/responsive.dart';
 import 'package:legalhub/shared/widgets/app_centered_message.dart';
+
 import 'legalhub_theme.dart';
-part 'router_shell_routes.dart';
+
 part 'router_app_shell.dart';
 part 'router_refresh_stream.dart';
+part 'router_shell_routes.dart';
 
 class AppRoutes {
   AppRoutes._();

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/core/auth/auth_outcome.dart';
+import 'package:legalhub/features/auth/domain/auth_outcome.dart';
 
 void main() {
   group('AuthOutcome.success', () {

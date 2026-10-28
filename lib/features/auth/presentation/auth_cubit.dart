@@ -1,15 +1,15 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'package:legalhub/core/auth/auth_gateway.dart';
-import 'package:legalhub/core/auth/auth_state.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/observability/app_log.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
-import 'package:legalhub/core/organizations/membership_repository.dart';
-import 'package:legalhub/core/organizations/organization_gateway.dart';
+import 'package:legalhub/features/auth/domain/auth_gateway.dart';
+import 'package:legalhub/features/auth/domain/auth_state.dart';
+import 'package:legalhub/features/orgs/domain/membership_repository.dart';
+import 'package:legalhub/features/orgs/domain/organization_gateway.dart';
+
 part 'auth_cubit_base.dart';
 part 'auth_cubit_hydration.dart';
 

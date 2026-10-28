@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
-import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
-import 'package:legalhub/data/orgs/supabase_org_api.dart';
-import 'package:legalhub/data/orgs/supabase_organization_gateway.dart';
+import 'package:legalhub/features/orgs/data/fake_organization_gateway.dart';
+import 'package:legalhub/features/orgs/data/supabase_org_api.dart';
+import 'package:legalhub/features/orgs/data/supabase_organization_gateway.dart';
+import 'package:legalhub/features/orgs/domain/organization_gateway.dart';
 
 /// R5 — gateway parity (2026-09-24).
 ///

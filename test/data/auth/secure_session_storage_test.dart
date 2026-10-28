@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/data/auth/secure_session_storage.dart';
+import 'package:legalhub/features/auth/data/secure_session_storage.dart';
 
 /// In-memory fakes: the real seam is a platform plugin (Keychain/Keystore)
 /// that a unit test cannot satisfy.

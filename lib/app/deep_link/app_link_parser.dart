@@ -29,7 +29,7 @@ final class AcceptInviteIntent extends AppLinkIntent {
 
 /// A Supabase auth callback URI (`<scheme>://auth/v1/callback` —
 /// recovery/sign-in links). The explicit `AuthCallbackObserver` in
-/// `lib/data/auth/` owns these (it validates the location and exchanges the
+/// `lib/features/auth/data/` owns these (it validates the location and exchanges the
 /// query-only PKCE code); the app-link listener classifies them so it can
 /// leave them alone (the recovery half of Phase 4.1 is already shipped and
 /// routed via the `passwordRecovery` auth event).

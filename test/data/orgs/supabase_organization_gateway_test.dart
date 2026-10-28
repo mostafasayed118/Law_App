@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
-import 'package:legalhub/data/orgs/supabase_org_api.dart';
-import 'package:legalhub/data/orgs/supabase_organization_gateway.dart';
+import 'package:legalhub/features/orgs/data/supabase_org_api.dart';
+import 'package:legalhub/features/orgs/data/supabase_organization_gateway.dart';
+import 'package:legalhub/features/orgs/domain/organization_gateway.dart';
 
 /// Hand-rolled fake of the [SupabaseOrgApi] seam: records calls and answers
 /// with canned success values or [SupabaseOrgException]s, so the gateway's

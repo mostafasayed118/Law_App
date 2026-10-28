@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/deep_link/deep_link_config.dart';
-import 'package:legalhub/data/auth/auth_callback.dart';
+import 'package:legalhub/features/auth/data/auth_callback.dart';
 
 void main() {
   group('AuthCallbackUri.pkceCode', () {

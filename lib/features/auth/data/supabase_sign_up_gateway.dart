@@ -1,6 +1,6 @@
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
-import 'package:legalhub/data/auth/supabase_auth_api.dart';
+import 'package:legalhub/features/auth/data/supabase_auth_api.dart';
 import 'package:legalhub/features/auth/domain/sign_up_gateway.dart';
 import 'package:legalhub/features/auth/domain/sign_up_request.dart';
 

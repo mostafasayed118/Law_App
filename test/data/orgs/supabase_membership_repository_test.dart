@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/core/auth/session.dart';
-import 'package:legalhub/core/organizations/membership_repository.dart';
 import 'package:legalhub/core/roles/user_role.dart';
-import 'package:legalhub/data/orgs/supabase_membership_repository.dart';
-import 'package:legalhub/data/orgs/supabase_org_api.dart';
+import 'package:legalhub/features/auth/domain/session.dart';
+import 'package:legalhub/features/orgs/data/supabase_membership_repository.dart';
+import 'package:legalhub/features/orgs/data/supabase_org_api.dart';
+import 'package:legalhub/features/orgs/domain/membership_repository.dart';
 import 'package:mocktail/mocktail.dart';
 
 /// The seam as a mocktail mock — the plan's shape for the cast-drift case;

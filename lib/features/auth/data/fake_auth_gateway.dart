@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:legalhub/core/auth/auth_gateway.dart';
 import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/features/auth/domain/auth_gateway.dart';
 import 'package:legalhub/shared/demo/demo_corpus.dart';
 
 /// Development-only session implementation.

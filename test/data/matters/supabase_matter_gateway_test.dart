@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
-import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/core/practice_area.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/features/matters/data/supabase_matter_api.dart';
 import 'package:legalhub/features/matters/data/supabase_matter_gateway.dart';
 import 'package:legalhub/features/matters/domain/matter.dart';
+import 'package:legalhub/features/orgs/domain/organization_gateway.dart';
 
 /// Hand-rolled fake of the [SupabaseMatterApi] seam: records calls and
 /// answers with canned rows or a [SupabaseMatterException], so the gateway's

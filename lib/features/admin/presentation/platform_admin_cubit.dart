@@ -1,13 +1,13 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'package:legalhub/core/admin/platform_admin_gateway.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
+import 'package:legalhub/features/admin/domain/platform_admin_gateway.dart';
 import 'package:legalhub/shared/state/write_gate.dart';
-part 'platform_admin_state.dart';
-part 'platform_admin_cubit_base.dart';
+
 part 'platform_admin_cubit_audit.dart';
+part 'platform_admin_cubit_base.dart';
+part 'platform_admin_state.dart';
 
 /// Owns the platform-admin surface against the [PlatformAdminGateway] seam.
 ///

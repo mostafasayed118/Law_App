@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/data/orgs/supabase_org_api.dart';
-import 'package:legalhub/data/orgs/supabase_org_api_impl.dart';
+import 'package:legalhub/features/orgs/data/supabase_org_api.dart';
+import 'package:legalhub/features/orgs/data/supabase_org_api_impl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() {

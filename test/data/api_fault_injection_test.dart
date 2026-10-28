@@ -1,7 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/core/organizations/membership_repository.dart';
-import 'package:legalhub/data/orgs/supabase_membership_repository.dart';
-import 'package:legalhub/data/orgs/supabase_org_api.dart';
 import 'package:legalhub/features/billing/data/supabase_billing_api.dart';
 import 'package:legalhub/features/billing/data/supabase_billing_api_impl.dart';
 import 'package:legalhub/features/documents/data/supabase_document_api.dart';
@@ -12,6 +9,9 @@ import 'package:legalhub/features/messaging/data/supabase_message_api.dart';
 import 'package:legalhub/features/messaging/data/supabase_message_api_impl.dart';
 import 'package:legalhub/features/notifications/data/supabase_notification_api.dart';
 import 'package:legalhub/features/notifications/data/supabase_notification_api_impl.dart';
+import 'package:legalhub/features/orgs/data/supabase_membership_repository.dart';
+import 'package:legalhub/features/orgs/data/supabase_org_api.dart';
+import 'package:legalhub/features/orgs/domain/membership_repository.dart';
 import 'package:legalhub/features/storage/data/supabase_storage_api.dart';
 import 'package:legalhub/features/storage/data/supabase_storage_api_impl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

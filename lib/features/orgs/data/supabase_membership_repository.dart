@@ -1,8 +1,9 @@
-import 'package:legalhub/core/auth/session.dart';
 import 'package:legalhub/core/observability/app_log.dart';
-import 'package:legalhub/core/organizations/membership_repository.dart';
-import 'package:legalhub/core/organizations/organization_models.dart';
 import 'package:legalhub/core/roles/user_role.dart';
+import 'package:legalhub/features/auth/domain/session.dart';
+import 'package:legalhub/features/orgs/domain/membership_repository.dart';
+import 'package:legalhub/features/orgs/domain/organization_models.dart';
+
 import 'supabase_org_api.dart';
 
 /// [MembershipRepository] backed by the RLS-scoped SELECT surface
