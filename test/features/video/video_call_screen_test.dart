@@ -51,6 +51,8 @@ class _StubVideoGateway implements VideoGateway {
 
 class _MockRoom extends Mock implements Room {}
 
+class _MockLocalParticipant extends Mock implements LocalParticipant {}
+
 _MockRoom _newRoom() {
   final _MockRoom room = _MockRoom();
   when(() => room.localParticipant).thenReturn(null);
@@ -177,6 +179,151 @@ void main() {
       await tester.pump();
 
       expect(tornDown, <Room>[room]);
+    });
+  });
+
+  group('videoRoomOptions (plan Task 8)', () {
+    test('the room uses a 360p/15fps adaptive profile', () {
+      final RoomOptions options = videoRoomOptions();
+
+      expect(options.adaptiveStream, isTrue);
+      expect(options.dynacast, isTrue);
+      expect(
+        options.defaultCameraCaptureOptions.params,
+        VideoParametersPresets.h360_169,
+      );
+      expect(options.defaultCameraCaptureOptions.maxFrameRate, 15);
+      expect(
+        options.defaultVideoPublishOptions.videoEncoding?.maxBitrate,
+        450000,
+      );
+      expect(
+        options.defaultVideoPublishOptions.videoEncoding?.maxFramerate,
+        15,
+      );
+    });
+  });
+
+  group('VideoCallScreen media lifecycle (plan Task 8)', () {
+    /// A local participant mock with the media surface the screen touches.
+    _MockLocalParticipant stubLocal(Room room) {
+      final _MockLocalParticipant local = _MockLocalParticipant();
+      when(() => local.isCameraEnabled()).thenReturn(true);
+      when(() => local.isMicrophoneEnabled()).thenReturn(true);
+      when(() => local.setCameraEnabled(any())).thenAnswer((_) async => null);
+      when(
+        () => local.setMicrophoneEnabled(any()),
+      ).thenAnswer((_) async => null);
+      when(
+        () => local.videoTrackPublications,
+      ).thenReturn(const <LocalTrackPublication<LocalVideoTrack>>[]);
+      when(() => room.localParticipant).thenReturn(local);
+      return local;
+    }
+
+    testWidgets('backgrounding disables camera and mic, resuming re-enables '
+        'them', (tester) async {
+      final _MockRoom room = _newRoom();
+      final _MockLocalParticipant local = stubLocal(room);
+
+      await pumpCall(
+        tester,
+        roomFactory: () => room,
+        connector: (_, _, _) async {},
+      );
+      await tester.pumpAndSettle();
+
+      // Initial enable from _enableMedia.
+      verify(() => local.setCameraEnabled(true)).called(1);
+      verify(() => local.setMicrophoneEnabled(true)).called(1);
+
+      // mocktail's verify consumes the matched calls, so each phase is
+      // counted on its own interactions.
+      clearInteractions(local);
+
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      await tester.pump();
+      verify(() => local.setCameraEnabled(false)).called(1);
+      verify(() => local.setMicrophoneEnabled(false)).called(1);
+      verifyNever(() => local.setCameraEnabled(true));
+      verifyNever(() => local.setMicrophoneEnabled(true));
+
+      clearInteractions(local);
+
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pump();
+      verify(() => local.setCameraEnabled(true)).called(1);
+      verify(() => local.setMicrophoneEnabled(true)).called(1);
+      verifyNever(() => local.setCameraEnabled(false));
+      verifyNever(() => local.setMicrophoneEnabled(false));
+    });
+
+    testWidgets('resuming restores the user intent, not a forced enable', (
+      tester,
+    ) async {
+      final _MockRoom room = _newRoom();
+      final _MockLocalParticipant local = stubLocal(room);
+
+      await pumpCall(
+        tester,
+        roomFactory: () => room,
+        connector: (_, _, _) async {},
+      );
+      await tester.pumpAndSettle();
+
+      // The user mutes the microphone from the in-call controls.
+      await tester.tap(find.byIcon(Icons.mic));
+      await tester.pump();
+      verify(() => local.setMicrophoneEnabled(false)).called(1);
+      clearInteractions(local);
+
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      await tester.pump();
+      verify(() => local.setMicrophoneEnabled(false)).called(1);
+      clearInteractions(local);
+
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pump();
+      // Still muted: the pause must not overwrite the user's intent.
+      verify(() => local.setMicrophoneEnabled(false)).called(1);
+      verifyNever(() => local.setMicrophoneEnabled(true));
+      verify(() => local.setCameraEnabled(true)).called(1);
+    });
+
+    testWidgets('a lifecycle pause before the room connects is ignored', (
+      tester,
+    ) async {
+      final Completer<void> never = Completer<void>();
+      await pumpCall(tester, connector: (_, _, _) => never.future);
+
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Connecting…'), findsOneWidget);
+    });
+
+    testWidgets('a failing pause is swallowed and leaves the call connected', (
+      tester,
+    ) async {
+      final _MockRoom room = _newRoom();
+      final _MockLocalParticipant local = stubLocal(room);
+      when(
+        () => local.setMicrophoneEnabled(false),
+      ).thenThrow(StateError('torn down'));
+
+      await pumpCall(
+        tester,
+        roomFactory: () => room,
+        connector: (_, _, _) async {},
+      );
+      await tester.pumpAndSettle();
+
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      expect(find.byIcon(Icons.call_end), findsOneWidget);
     });
   });
 }

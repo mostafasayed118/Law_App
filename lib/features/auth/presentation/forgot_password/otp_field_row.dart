@@ -134,7 +134,13 @@ class OtpFieldRowState extends State<OtpFieldRow> {
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 360),
-        child: Row(children: cells),
+        // The digit cells stay LTR even in an RTL locale: a verification
+        // code reads first-digit-leftmost, and the sliding focus order must
+        // follow the same visual order the user types in.
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: Row(children: cells),
+        ),
       ),
     );
   }

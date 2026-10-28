@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:legalhub/app/legalhub_theme.dart';
 
+import 'directional_icon.dart';
+
 /// A standardized list row card: an optional leading (avatar or icon), a
 /// title/subtitle pair, an optional trailing widget (e.g., a status-chip
 /// wrap), and — when tappable — a ripple and a trailing chevron.
@@ -101,7 +103,11 @@ class AppTile extends StatelessWidget {
           ),
           if (onTap != null && showChevron) ...<Widget>[
             const SizedBox(width: LegalHubTheme.spaceSm),
-            Icon(Icons.chevron_right, color: scheme.outline),
+            DirectionalIcon(
+              icon: Icons.chevron_right,
+              mirroredIcon: Icons.chevron_left,
+              color: scheme.outline,
+            ),
           ],
         ],
       ),

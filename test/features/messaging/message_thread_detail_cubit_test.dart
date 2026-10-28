@@ -265,6 +265,47 @@ void main() {
       ],
     );
 
+    test('live inserts retain at most 200 messages', () async {
+      final _StubMessageGateway stub = _StubMessageGateway(
+        results: <Result<List<Message>>>[
+          Result<List<Message>>.success(
+            List<Message>.generate(
+              200,
+              (int i) => Message(
+                id: 'm-$i',
+                authorDisplayName: 'A',
+                body: 'body-$i',
+                sentAt: DateTime.utc(2026, 8, 8).add(Duration(minutes: i)),
+              ),
+            ),
+          ),
+        ],
+      );
+      final MessageThreadDetailCubit cubit = MessageThreadDetailCubit(stub);
+      addTearDown(cubit.close);
+
+      await cubit.load('thread-1');
+      await cubit.subscribe('thread-1');
+
+      stub.live.add(
+        MessageLiveInsert(
+          Message(
+            id: 'm-new',
+            authorDisplayName: 'A',
+            body: 'newest',
+            sentAt: DateTime.utc(2026, 8, 9),
+          ),
+        ),
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      final List<Message> messages =
+          (cubit.state.messages as ViewSuccess<List<Message>>).data;
+      expect(messages, hasLength(200));
+      expect(messages.last.id, 'm-new');
+      expect(messages.first.id, 'm-1');
+    });
+
     test('subscribe then close cancels the live subscription', () async {
       final MessageThreadDetailCubit cubit = MessageThreadDetailCubit(gateway);
       await cubit.load('thread-1');
@@ -423,6 +464,43 @@ void main() {
       ],
       verify: (_) => expect(gateway.sendCalls, 0),
     );
+
+    test('a send after a full window keeps the newest 200', () async {
+      final _StubMessageGateway stub = _StubMessageGateway(
+        results: <Result<List<Message>>>[
+          Result<List<Message>>.success(
+            List<Message>.generate(
+              200,
+              (int i) => Message(
+                id: 'm-$i',
+                authorDisplayName: 'A',
+                body: 'body-$i',
+                sentAt: DateTime.utc(2026, 8, 8).add(Duration(minutes: i)),
+              ),
+            ),
+          ),
+        ],
+      );
+      stub.sendResult = Result<Message>.success(
+        Message(
+          id: 'm-new',
+          authorDisplayName: 'A',
+          body: 'newest',
+          sentAt: DateTime.utc(2026, 8, 9),
+        ),
+      );
+      final MessageThreadDetailCubit cubit = MessageThreadDetailCubit(stub);
+      addTearDown(cubit.close);
+
+      await cubit.load('thread-1');
+      await cubit.send('thread-1', 'newest');
+
+      final List<Message> messages =
+          (cubit.state.messages as ViewSuccess<List<Message>>).data;
+      expect(messages, hasLength(200));
+      expect(messages.last.id, 'm-new');
+      expect(messages.first.id, 'm-1');
+    });
   });
 }
 

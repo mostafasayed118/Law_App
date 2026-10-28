@@ -6,7 +6,7 @@ import 'package:legalhub/app/localization/locale_cubit.dart';
 import 'package:legalhub/app/router.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/app/theme/theme_cubit.dart';
-import 'package:legalhub/core/auth/auth_state.dart';
+import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
@@ -29,13 +29,19 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    // Island rebuilds: each row watches only the slice it renders — a
-    // locale change doesn't rebuild the theme row and vice versa.
+    // Island rebuilds: each row selects only the slice it renders — a locale
+    // change doesn't rebuild the theme or role rows and vice versa.
     final Locale locale = context.select<LocaleCubit, Locale>(
       (LocaleCubit cubit) => cubit.state.locale,
     );
-    final AuthState authState = context.watch<AuthCubit>().state;
-    final ThemeMode themeMode = context.watch<ThemeCubit>().state;
+    // The role card reads just the projected role, not the whole auth state:
+    // a status/error change that leaves the role alone must not rebuild it.
+    final UserRole? role = context.select<AuthCubit, UserRole?>(
+      (AuthCubit cubit) => cubit.state.session?.primaryRole,
+    );
+    final ThemeMode themeMode = context.select<ThemeCubit, ThemeMode>(
+      (ThemeCubit cubit) => cubit.state,
+    );
     // The role card and the sign-out label describe the SESSION: a demo
     // session is not a real account, so the copy follows the backend posture
     // instead of calling a configured account a demo.
@@ -108,7 +114,7 @@ class SettingsScreen extends StatelessWidget {
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.person_outline),
-            title: RoleLabel(role: authState.session?.primaryRole),
+            title: RoleLabel(role: role),
             subtitle: Text(
               localOnly ? l10n.demoSessionNotice : l10n.sessionNoticeConfigured,
             ),

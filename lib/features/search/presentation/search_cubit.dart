@@ -43,6 +43,10 @@ import 'search_state.dart';
 /// bounded page is not seen (the page, not the query, is the recall bound).
 /// Fakes (dev/tests) show the ideal — full-list candidates, exact results.
 ///
+/// The attorney directory is query-independent, so [search] reads it once per
+/// cubit lifetime and re-filters it locally for every query (audit
+/// 2026-10-27, F10). A failed read is not cached, so the next search retries.
+///
 /// Metadata only: matching fields are matter title/status/practice-area,
 /// document title/type/`matterRef`, thread title/participants/`matterRef`,
 /// and attorney name/practice-area (enum tokens, same as D-A5). No body,
@@ -69,6 +73,12 @@ class SearchCubit extends Cubit<SearchState> {
   /// Monotonic request token so a stale in-flight search can never overwrite
   /// a newer one (last-submitted wins, regardless of completion order).
   int _requestSeq = 0;
+
+  /// The query-independent attorney directory, read once per cubit lifetime
+  /// and re-filtered client-side for every query (audit 2026-10-27, F10).
+  /// Only successful reads are cached, so a failed read is retried by the
+  /// next search instead of pinning an empty group for the session.
+  List<Attorney>? _attorneyCache;
 
   /// Runs a unified search for [query].
   ///
@@ -124,6 +134,13 @@ class SearchCubit extends Cubit<SearchState> {
     // matches this matcher covers. The exact full-matching pass below
     // stays the arbiter and the requested limit bounds the rendered groups.
     final int effectiveLimit = limit <= 0 ? searchPageSize : limit;
+    // The attorney directory does not depend on the query: serve the cached
+    // one when present so a debounced search never re-reads the listing.
+    final Future<Result<List<Attorney>>> attorneyFuture = _attorneyCache != null
+        ? Future<Result<List<Attorney>>>.value(
+            Result<List<Attorney>>.success(_attorneyCache!),
+          )
+        : _attorneyGateway.fetchAttorneys();
     final (
       Result<List<Matter>> matters,
       Result<List<Document>> documents,
@@ -133,7 +150,7 @@ class SearchCubit extends Cubit<SearchState> {
       _matterGateway.searchMatters(trimmed, limit: effectiveLimit),
       _documentGateway.searchDocuments(trimmed, limit: effectiveLimit),
       _messageGateway.searchThreads(trimmed, limit: effectiveLimit),
-      _attorneyGateway.fetchAttorneys(),
+      attorneyFuture,
     ).wait;
     if (isClosed || seq != _requestSeq) {
       return;
@@ -182,6 +199,7 @@ class SearchCubit extends Cubit<SearchState> {
     }
     switch (attorneys) {
       case Success<List<Attorney>>(value: final List<Attorney> value):
+        _attorneyCache = value;
         attorneyRows = value
             .where((Attorney a) => _attorneyMatches(a, needle, l10n))
             .take(effectiveLimit)

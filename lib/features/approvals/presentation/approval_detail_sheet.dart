@@ -4,6 +4,7 @@ import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/features/approvals/domain/pending_approval.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
 import 'package:legalhub/shared/widgets/confirm_dialog.dart';
 
@@ -171,7 +172,7 @@ class _ApprovalDetailSheetState extends State<ApprovalDetailSheet> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Text(
-                widget.approval.title,
+                demoApprovalTitle(l10n, widget.approval.title),
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: LegalHubTheme.spaceSm),

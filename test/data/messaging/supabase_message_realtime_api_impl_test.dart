@@ -100,17 +100,118 @@ void main() {
         );
       },
     );
+
+    test(
+      'switching threads closes the old handle and opens the new thread',
+      () async {
+        api.watchMessages('thread-a');
+        await Future<void>.delayed(Duration.zero);
+        api.watchMessages('thread-b');
+        await Future<void>.delayed(Duration.zero);
+
+        expect(binder.calls, <String>['thread-a', 'thread-b']);
+        expect(binder.closedHandles, 1);
+      },
+    );
+
+    test('a closed callback during an intentional switch does not reconnect '
+        'the old thread', () async {
+      // `realtime_client` reports the unsubscribe as a `closed` subscribe
+      // status — an intentional teardown, not a channel error.
+      binder.emitClosedOnClose = true;
+
+      api.watchMessages('thread-a');
+      await Future<void>.delayed(Duration.zero);
+      api.watchMessages('thread-b');
+      await Future<void>.delayed(Duration.zero);
+
+      expect(binder.calls, <String>['thread-a', 'thread-b']);
+    });
+
+    test('an insert from the old binding is dropped after a switch', () async {
+      final List<SupabaseMessageRealtimeEvent> events =
+          <SupabaseMessageRealtimeEvent>[];
+      final StreamSubscription<SupabaseMessageRealtimeEvent> sub = api
+          .watchMessages('thread-a')
+          .listen(events.add);
+      addTearDown(sub.cancel);
+      await Future<void>.delayed(Duration.zero);
+
+      api.watchMessages('thread-b');
+      await Future<void>.delayed(Duration.zero);
+
+      binder.bindings.first.onInsert(<String, dynamic>{'id': 'old'});
+      await Future<void>.delayed(Duration.zero);
+
+      expect(events.whereType<SupabaseMessageRealtimeInsert>(), isEmpty);
+    });
+
+    test('cancelling the last listener closes the channel', () async {
+      final StreamSubscription<SupabaseMessageRealtimeEvent> sub = api
+          .watchMessages('thread-a')
+          .listen((_) {});
+      await Future<void>.delayed(Duration.zero);
+
+      await sub.cancel();
+      await Future<void>.delayed(Duration.zero);
+
+      expect(binder.closedHandles, 1);
+    });
+
+    test('a closed status arriving after the last listener cancelled does not '
+        'reconnect', () async {
+      final StreamSubscription<SupabaseMessageRealtimeEvent> sub = api
+          .watchMessages('thread-a')
+          .listen((_) {});
+      await Future<void>.delayed(Duration.zero);
+
+      await sub.cancel();
+      await Future<void>.delayed(Duration.zero);
+
+      // The provider's closed callback can land after the teardown.
+      binder.bindings.first.onChannelError(StateError('closed'));
+      await Future<void>.delayed(Duration.zero);
+
+      expect(binder.calls, <String>['thread-a']);
+    });
+
+    test('a new listener after a cancel opens a fresh channel', () async {
+      final StreamSubscription<SupabaseMessageRealtimeEvent> sub = api
+          .watchMessages('thread-a')
+          .listen((_) {});
+      await Future<void>.delayed(Duration.zero);
+      await sub.cancel();
+      await Future<void>.delayed(Duration.zero);
+
+      final List<SupabaseMessageRealtimeEvent> events =
+          <SupabaseMessageRealtimeEvent>[];
+      final StreamSubscription<SupabaseMessageRealtimeEvent> resub = api
+          .watchMessages('thread-a')
+          .listen(events.add);
+      addTearDown(resub.cancel);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(binder.calls, <String>['thread-a', 'thread-a']);
+
+      binder.emitInsert(<String, dynamic>{'id': 'fresh'});
+      await Future<void>.delayed(Duration.zero);
+      expect(events, hasLength(1));
+    });
   });
 }
 
-/// Records the binder invocations and lets the test drive the callbacks —
-/// the unit-level stand-in for the real RealtimeChannel binding (the real
-/// websocket round-trip is a configured-build concern, never unit-tested).
+/// Records one binding per `bind` call and lets the test drive the captured
+/// callbacks — the unit-level stand-in for the real RealtimeChannel binding
+/// (the real websocket round-trip is a configured-build concern, never
+/// unit-tested).
 class _RecordingBinder {
   final List<String> calls = <String>[];
+  final List<_Binding> bindings = <_Binding>[];
   int closedHandles = 0;
-  void Function(Map<String, dynamic> row)? _onInsert;
-  void Function(Object error)? _onChannelError;
+
+  /// Models `realtime_client`'s `unsubscribe → closed` subscribe callback,
+  /// the intentional teardown F6 misread as a channel error.
+  bool emitClosedOnClose = false;
 
   Future<MessageRealtimeSubscriptionHandle> bind({
     required String threadId,
@@ -118,31 +219,51 @@ class _RecordingBinder {
     required void Function(Object error) onChannelError,
   }) async {
     calls.add(threadId);
-    _onInsert = onInsert;
-    _onChannelError = onChannelError;
-    return _FakeHandle(_onClose);
-  }
-
-  void _onClose() {
-    closedHandles++;
+    final _Binding binding = _Binding(
+      threadId: threadId,
+      onInsert: onInsert,
+      onChannelError: onChannelError,
+      binder: this,
+    );
+    bindings.add(binding);
+    return _FakeHandle(binding);
   }
 
   void emitInsert(Map<String, dynamic> row) {
-    _onInsert?.call(row);
+    bindings.last.onInsert(row);
   }
 
   void emitChannelError(Object error) {
-    _onChannelError?.call(error);
+    bindings.last.onChannelError(error);
   }
 }
 
-class _FakeHandle implements MessageRealtimeSubscriptionHandle {
-  _FakeHandle(this._onClose);
+/// One captured binding: its thread scope, the callbacks the impl handed the
+/// provider, and the binder that counts its teardown.
+class _Binding {
+  _Binding({
+    required this.threadId,
+    required this.onInsert,
+    required this.onChannelError,
+    required this.binder,
+  });
 
-  final void Function() _onClose;
+  final String threadId;
+  final void Function(Map<String, dynamic> row) onInsert;
+  final void Function(Object error) onChannelError;
+  final _RecordingBinder binder;
+}
+
+class _FakeHandle implements MessageRealtimeSubscriptionHandle {
+  _FakeHandle(this._binding);
+
+  final _Binding _binding;
 
   @override
   Future<void> close() async {
-    _onClose();
+    _binding.binder.closedHandles++;
+    if (_binding.binder.emitClosedOnClose) {
+      _binding.onChannelError(StateError('closed'));
+    }
   }
 }

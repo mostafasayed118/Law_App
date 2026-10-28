@@ -16,8 +16,9 @@ import 'message_thread_detail_state.dart';
 /// [load] fetches the tapped thread's message rows on screen open (the
 /// screen wires it after first frame, matching the thread-list/matter
 /// pattern). [subscribe] opens the live INSERT channel (D-LV4): delivered
-/// rows append to the loaded list (deduped by id), and a reconnect signal
-/// re-backfills via the shipped [MessageGateway.fetchMessages] read —
+/// rows append to the loaded list (deduped by id, newest
+/// [maxRetainedMessages] retained), and a reconnect signal re-backfills via
+/// the shipped [MessageGateway.fetchMessages] read —
 /// never a second fetch mechanism. [send] is the insert-only write path
 /// (D-LV1): on success the returned row appends (the live channel may also
 /// deliver it — dedupe handles the double-add); on failure the composer
@@ -31,6 +32,12 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
 
   /// The server-mirrored body cap (`send_message` validation).
   static const int maxMessageLength = 2000;
+
+  /// The retained transcript window (F7): the bounded initial read is capped
+  /// at the newest 200 rows, and every append — live insert, merged pending
+  /// row, sent row — keeps the newest [maxRetainedMessages] so the held
+  /// transcript can never grow without bound.
+  static const int maxRetainedMessages = 200;
 
   /// In-flight guard — the same contract as the thread-list cubit's `load`:
   /// the initial state IS loading, so the flag distinguishes "loading in
@@ -146,9 +153,19 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
     }
     emit(
       state.copyWith(
-        messages: ViewSuccess<List<Message>>(<Message>[...messages, message]),
+        messages: ViewSuccess<List<Message>>(
+          _retained(<Message>[...messages, message]),
+        ),
       ),
     );
+  }
+
+  /// Trims a chronological list to its newest [maxRetainedMessages] rows.
+  List<Message> _retained(List<Message> messages) {
+    if (messages.length <= maxRetainedMessages) {
+      return messages;
+    }
+    return messages.sublist(messages.length - maxRetainedMessages);
   }
 
   /// Buffers one live row for the next successful load (dedupe by id,
@@ -164,7 +181,8 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
   }
 
   /// Merges buffered live rows into a freshly fetched list (dedupe by id —
-  /// the backfill may already contain them), then drains the buffer.
+  /// the backfill may already contain them), then drains the buffer. The
+  /// result keeps the newest [maxRetainedMessages] rows.
   List<Message> _mergePending(List<Message> fetched) {
     if (_pendingLive.isEmpty) {
       return fetched;
@@ -177,7 +195,7 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
       }
     }
     _pendingLive.clear();
-    return merged;
+    return _retained(merged);
   }
 
   /// Sends one message on the thread (D-LV1, insert-only). While in flight
@@ -251,16 +269,16 @@ class MessageThreadDetailCubit extends Cubit<MessageThreadDetailState> {
 
   /// The post-send state: the persisted row appended to a loaded list (when
   /// not already present), with the in-flight flag cleared. When the list
-  /// is not loaded the row joins the live buffer instead of vanishing.
+  /// is not loaded the row joins the live buffer instead of vanishing. The
+  /// append keeps the newest [maxRetainedMessages] rows.
   MessageThreadDetailState _appendedSendState(Message message) {
     final ViewState<List<Message>> current = state.messages;
     if (current is ViewSuccess<List<Message>> &&
         !current.data.any((Message m) => m.id == message.id)) {
       return state.copyWith(
-        messages: ViewSuccess<List<Message>>(<Message>[
-          ...current.data,
-          message,
-        ]),
+        messages: ViewSuccess<List<Message>>(
+          _retained(<Message>[...current.data, message]),
+        ),
         sending: false,
         sendError: null,
       );

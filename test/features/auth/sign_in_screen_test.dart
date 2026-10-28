@@ -166,6 +166,24 @@ void main() {
     expect(authCubit.state.session?.userId, 'demo-user');
   });
 
+  // Audit U-2: the compact "Forgot Password?" trailing action used
+  // `minimumSize: Size.zero` + `tapTargetSize: shrinkWrap`, leaving a ~19px
+  // tall hit area — far below the 48x48 minimum.
+  testWidgets('the forgot-password action has a 48px tap target (U-2)', (
+    tester,
+  ) async {
+    await tester.pumpWidget(pumpIsolated());
+    await tester.pumpAndSettle();
+
+    final Finder link = find.ancestor(
+      of: find.text('Forgot Password?'),
+      matching: find.byType(TextButton),
+    );
+    final Size size = tester.getSize(link);
+    expect(size.height, greaterThanOrEqualTo(48));
+    expect(size.width, greaterThanOrEqualTo(48));
+  });
+
   testWidgets('forgot-password link routes to the forgot-password screen', (
     tester,
   ) async {

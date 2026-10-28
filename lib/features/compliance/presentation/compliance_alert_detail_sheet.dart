@@ -4,6 +4,7 @@ import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/features/compliance/domain/compliance_alert.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
 
 import 'compliance_alert_error_messages.dart';
@@ -135,7 +136,10 @@ class _ComplianceAlertDetailSheetState
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Text(alert.title, style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                demoAlertTitle(l10n, alert.title),
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const SizedBox(height: LegalHubTheme.spaceSm),
               _stateLine(
                 icon: alertSeverityIcon(alert.severity),

@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/app/deep_link/pending_accept_invite_store.dart';
+import 'package:legalhub/app/flavor.dart';
 import 'package:legalhub/app/localization/locale_cubit.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/admin/platform_admin_gateway.dart';
@@ -53,6 +54,7 @@ import 'package:legalhub/data/storage/supabase_storage_gateway.dart';
 import 'package:legalhub/features/auth/data/fake_password_recovery_gateway.dart';
 import 'package:legalhub/features/auth/data/fake_sign_up_gateway.dart';
 import 'package:legalhub/features/auth/data/supabase_password_recovery_gateway.dart';
+import 'package:legalhub/features/auth/data/supabase_sign_up_gateway.dart';
 import 'package:legalhub/features/auth/domain/password_recovery_gateway.dart';
 import 'package:legalhub/features/auth/domain/sign_up_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
@@ -1077,6 +1079,56 @@ void main() {
       );
 
       expect(serviceLocator<AuthGateway>(), isA<SupabaseAuthGateway>());
+    });
+
+    test('the three auth seams share one API instance (F15)', () {
+      int factoryCalls = 0;
+      configureDependencies(
+        supabaseEnv: SupabaseEnv(
+          url: 'https://example.supabase.co',
+          anonKey: _anonJwt(),
+        ),
+        // The real bind() needs a running Supabase.instance; the counting
+        // factory stands in for the one provider seam instance.
+        supabaseAuthApiFactory: () {
+          factoryCalls += 1;
+          return _FakeSupabaseAuthApi();
+        },
+      );
+
+      // Resolve in dependency order: the session gateway first, then the two
+      // feature-scoped sinks. One bind() -> one auth-state subscription must
+      // serve all three (audit 2026-10-27, F15).
+      expect(serviceLocator<AuthGateway>(), isA<SupabaseAuthGateway>());
+      expect(
+        serviceLocator<PasswordRecoveryGateway>(),
+        isA<SupabasePasswordRecoveryGateway>(),
+      );
+      expect(serviceLocator<SignUpGateway>(), isA<SupabaseSignUpGateway>());
+
+      expect(factoryCalls, 1);
+      expect(
+        identical(
+          serviceLocator<SupabaseAuthApi>(),
+          serviceLocator<SupabaseAuthApi>(),
+        ),
+        isTrue,
+      );
+    });
+
+    test('derives the auth redirect from the build deep-link scheme (F14)', () {
+      // The locator passes this exact URI to SupabaseAuthApiImpl.bind() for
+      // the recovery email and to SupabaseAuthGateway for OAuth. A dev build
+      // targets the .dev scheme its native intent filters register — never
+      // the production literal.
+      expect(
+        authRedirectUriFor(const AppConfig.development()),
+        'com.legalhub.app.dev://auth/v1/callback',
+      );
+      expect(
+        authRedirectUriFor(const AppConfig.production()),
+        'com.legalhub.app://auth/v1/callback',
+      );
     });
 
     test('refuses a non-anon key at configure time (Batch 3.3 guard)', () {

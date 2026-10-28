@@ -57,7 +57,10 @@ class _CategoryStep extends StatelessWidget {
           onPressed: state.draft.category == null
               ? null
               : cubit.continueFromCategory,
-          icon: const Icon(Icons.arrow_forward_outlined),
+          icon: const DirectionalIcon(
+            icon: Icons.arrow_forward_outlined,
+            mirroredIcon: Icons.arrow_back_outlined,
+          ),
           label: Text(l10n.bookingContinue),
         ),
       ],

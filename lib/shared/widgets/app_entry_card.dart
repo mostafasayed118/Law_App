@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:legalhub/app/legalhub_theme.dart';
 
+import 'directional_icon.dart';
+
 /// A tappable dashboard entry tile: an icon bubble, a title/subtitle pair,
 /// and a trailing chevron inside an outlined card.
 ///
@@ -92,7 +94,11 @@ class AppEntryCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right, color: scheme.outline),
+              DirectionalIcon(
+                icon: Icons.chevron_right,
+                mirroredIcon: Icons.chevron_left,
+                color: scheme.outline,
+              ),
             ],
           ),
         ),

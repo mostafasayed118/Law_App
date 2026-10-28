@@ -141,6 +141,21 @@ void main() {
     expect(find.text('Tile subtitle'), findsOneWidget);
   });
 
+  testWidgets('mirrors the chevron under RTL (U-1)', (tester) async {
+    await tester.pumpWidget(
+      pumpAppTile(
+        icon: Icons.folder_outlined,
+        onTap: () {},
+        direction: TextDirection.rtl,
+      ),
+    );
+
+    // The row's forward affordance follows the reading direction: a
+    // chevron_right would point "backwards" in an Arabic layout.
+    expect(find.byIcon(Icons.chevron_left), findsOneWidget);
+    expect(find.byIcon(Icons.chevron_right), findsNothing);
+  });
+
   testWidgets('renders multiple subtitle lines (the invoice posture)', (
     tester,
   ) async {

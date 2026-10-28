@@ -302,6 +302,48 @@ void main() {
       expect(find.text('Cancel request'), findsNothing);
     });
 
+    testWidgets('a demo-corpus title renders the localized kind label', (
+      tester,
+    ) async {
+      await pumpApprovals(
+        tester,
+        gateway: _StubApprovalsGateway(
+          rows: <PendingApproval>[
+            _row(id: 'a1', title: 'Demo engagement waiver'),
+          ],
+        ),
+      );
+
+      // The fake gateway's English title is data; the tile maps it.
+      expect(find.text('Demo engagement waiver'), findsNothing);
+      expect(find.text('Waiver'), findsOneWidget);
+    });
+
+    testWidgets('the detail sheet localizes the demo title like the tile', (
+      tester,
+    ) async {
+      await pumpApprovals(
+        tester,
+        gateway: _StubApprovalsGateway(
+          rows: <PendingApproval>[
+            _row(
+              id: 'a1',
+              title: 'Demo court filing approval',
+              kind: ApprovalKind.filing,
+            ),
+          ],
+        ),
+      );
+
+      await tester.tap(find.text('Filing'));
+      await tester.pumpAndSettle();
+
+      // Tile title + sheet title both read the mapped label; the raw demo
+      // string never reaches the sheet.
+      expect(find.text('Filing'), findsNWidgets(2));
+      expect(find.text('Demo court filing approval'), findsNothing);
+    });
+
     testWidgets('a decided request shows the decision note and time', (
       tester,
     ) async {

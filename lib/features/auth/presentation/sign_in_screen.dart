@@ -166,11 +166,10 @@ class _SignInCredentials extends StatelessWidget {
           validator: (v) => LegalHubValidators.required(l10n, v),
           trailing: TextButton(
             onPressed: () => context.push(AppRoutes.forgotPassword),
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.zero,
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
+            // Compact label, but a real 48px-tall hit target: the previous
+            // Size.zero + shrinkWrap made this the only "Forgot password?"
+            // affordance at label height (~19px).
+            style: TextButton.styleFrom(padding: EdgeInsets.zero),
             child: Text(
               l10n.forgotPassword,
               style: text.labelLarge?.copyWith(color: scheme.secondary),

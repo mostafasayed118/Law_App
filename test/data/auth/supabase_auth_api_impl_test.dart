@@ -491,8 +491,44 @@ void main() {
     });
 
     group('resetPasswordForEmail (P3.1)', () {
-      test('delegates via signInWithOtp with the Phase 4.1 deep-link redirect '
-          'and resolves to a generic success with no snapshot', () async {
+      test(
+        'delegates via signInWithOtp with the env-less default deep-link '
+        'redirect and resolves to a generic success with no snapshot',
+        () async {
+          when(
+            () => client.signInWithOtp(
+              email: any(named: 'email'),
+              shouldCreateUser: any(named: 'shouldCreateUser'),
+              emailRedirectTo: any(named: 'emailRedirectTo'),
+            ),
+          ).thenAnswer((_) async => AuthResponse(session: null));
+
+          final SupabaseAuthResult result = await api.resetPasswordForEmail(
+            'amira@example.com',
+          );
+
+          expect(result, isA<SupabaseAuthSuccess>());
+          expect((result as SupabaseAuthSuccess).snapshot, isNull);
+          verify(
+            () => client.signInWithOtp(
+              email: 'amira@example.com',
+              shouldCreateUser: false,
+              // F14: a direct construction without a build injection must never
+              // carry the production literal — the honest default is the
+              // development scheme. The service locator always injects the
+              // build's real scheme via bind().
+              emailRedirectTo: 'com.legalhub.app.dev://auth/v1/callback',
+            ),
+          ).called(1);
+        },
+      );
+
+      test('uses the injected recovery deep link scheme', () async {
+        final SupabaseAuthApiImpl productionApi = SupabaseAuthApiImpl(
+          client,
+          recoveryDeepLinkUri: 'com.legalhub.app://auth/v1/callback',
+        );
+        addTearDown(productionApi.dispose);
         when(
           () => client.signInWithOtp(
             email: any(named: 'email'),
@@ -501,18 +537,13 @@ void main() {
           ),
         ).thenAnswer((_) async => AuthResponse(session: null));
 
-        final SupabaseAuthResult result = await api.resetPasswordForEmail(
-          'amira@example.com',
-        );
+        await productionApi.resetPasswordForEmail('amira@example.com');
 
-        expect(result, isA<SupabaseAuthSuccess>());
-        expect((result as SupabaseAuthSuccess).snapshot, isNull);
+        // F14: the redirect is the build's scheme, not a static constant.
         verify(
           () => client.signInWithOtp(
             email: 'amira@example.com',
             shouldCreateUser: false,
-            // Phase 4.1: the recovery email's link is the app deep link
-            // (never a browser URL), so the PKCE exchange lands in-app.
             emailRedirectTo: 'com.legalhub.app://auth/v1/callback',
           ),
         ).called(1);
