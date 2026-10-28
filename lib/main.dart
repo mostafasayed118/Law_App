@@ -52,8 +52,9 @@ Future<void> main() async {
 /// `main_development` / `main_production` call [bootstrap] directly; without
 /// this wrapper they would get the engine hooks but not the guarded zone.
 Future<void> runGuardedEntrypoint(Future<void> Function() body) {
-  final CrashBoundary boundary = _crashBoundary ??=
-      installGlobalErrorHandlers(ConsoleErrorReporter());
+  final CrashBoundary boundary = _crashBoundary ??= installGlobalErrorHandlers(
+    ConsoleErrorReporter(),
+  );
   return runZonedGuarded<Future<void>>(body, boundary.reportUncaught) ??
       Future<void>.value();
 }
