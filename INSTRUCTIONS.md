@@ -211,7 +211,7 @@ Before reporting completion:
 6. inspect `git diff` and `git status` for accidental secrets, fixtures with real data, generated artifacts, unrelated changes, and migration risk;
 7. report commands actually run and concise outcomes, including failures and unverified areas.
 
-**Hard gate (P0.5, audit 2026-09-21).** No slice is complete while `flutter analyze` reports any error, and none is complete while the full `flutter test` suite is red. The audit found a compile error in an **untracked** file (`lib/data/list_query_guards.dart`) that blocked **all 1356 tests** and would have failed CI's second gate — the work was believed done because the tests were never run. Two consequences, both mandatory:
+**Hard gate (P0.5, audit 2026-09-21).** No slice is complete while `flutter analyze` reports any error, and none is complete while the full `flutter test` suite is red. The audit found a compile error in an **untracked** file (`lib/core/supabase/list_query_guards.dart`) that blocked **all 1356 tests** and would have failed CI's second gate — the work was believed done because the tests were never run. Two consequences, both mandatory:
 
 - run `flutter analyze` before claiming completion; it is the cheapest gate and the only one that catches a total build failure in seconds;
 - `git add` every new file before trusting a suite result, and remember that `git grep`-based checks (including `scripts/verify_ledger.sh`) **cannot see untracked files** — an un-added test file is invisible to the count gates.
@@ -229,8 +229,7 @@ Use the existing repository structure. For new work, prefer the planned shape:
 ```plain
 lib/
   app/              # bootstrap, router, DI, theme, localization
-  core/             # errors, Result, use cases, auth/security/logging primitives
-  data/             # cross-feature Supabase, payment, notification, cache services
+  core/             # primitives with no product noun: errors, Result, use cases, supabase, persistence
   shared/           # genuinely reusable widgets/forms/extensions/services
   features/
     <feature>/
@@ -249,7 +248,7 @@ Rules:
 - Use GetIt registrations deliberately: lazy singletons for stateless/shared services and repositories; factories for feature-scoped Cubits unless lifecycle requirements require otherwise.
 - Use GoRouter route names/typed parameters consistently. Redirects improve navigation UX but do not substitute for server authorization.
 - Put code in `shared/` only after a real second use or a demonstrated app-level cross-cutting responsibility.
-- **Adapter placement — the seam's owner decides the home.** A *feature-owned* contract (declared in `features/<name>/domain/`) is implemented in `features/<name>/data/`, next to its fake. A *core-owned* contract (declared in `core/`) is implemented in `lib/data/<name>/`. `lib/data/` also holds provider-facing helpers no single feature owns (`list_query_guards.dart`, `postgrest_failures.dart`, the `local/` stores). This rule was previously unwritten, which let three conventions coexist (audit 2026-09-21, H-2); it is now explicit, and the tree is mid-migration — `auth`, `orgs`, and `admin` already follow it (core-owned seams, adapter + fake both in `lib/data/`), while `matters`, `documents`, `messaging`, `storage`, `billing`, and `notifications` still implement feature-owned contracts from `lib/data/` with the fake already in the feature. New work follows the rule above; those six move when they are next touched.
+- **Placement rule.** A feature owns its `domain/`, `data/` and `presentation/`; `lib/core/` holds only primitives with no product noun; `lib/data/` no longer exists. Whatever a contract's home — a feature's `domain/` or a `core/` primitive — its implementation lives in the owning feature's `data/`, next to its fake.
 
 ### 4.2 State, errors, and async behavior
 

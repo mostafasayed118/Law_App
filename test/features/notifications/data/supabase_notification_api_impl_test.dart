@@ -3,7 +3,7 @@ import 'package:legalhub/features/notifications/data/supabase_notification_api.d
 import 'package:legalhub/features/notifications/data/supabase_notification_api_impl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../support/supabase_api_stub.dart';
+import '../../../support/supabase_api_stub.dart';
 
 void main() {
   group('SupabaseNotificationApiImpl', () {

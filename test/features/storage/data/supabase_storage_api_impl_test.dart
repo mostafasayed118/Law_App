@@ -5,7 +5,7 @@ import 'package:legalhub/features/storage/data/supabase_storage_api.dart';
 import 'package:legalhub/features/storage/data/supabase_storage_api_impl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../support/supabase_api_stub.dart';
+import '../../../support/supabase_api_stub.dart';
 
 void main() {
   group('SupabaseStorageApiImpl', () {

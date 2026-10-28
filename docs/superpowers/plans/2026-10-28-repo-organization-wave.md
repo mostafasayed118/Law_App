@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Clear the repo root of ignored clutter and dissolve `lib/data/` into `lib/core/{supabase,persistence,platform}` and `lib/features/<x>/{domain,data}`, so every feature is self-contained — with zero behavior change.
+**Goal:** Clear the repo root of ignored clutter and dissolve `lib/data/` into `lib/core/{supabase,persistence}` and `lib/features/<x>/{domain,data}`, so every feature is self-contained — with zero behavior change.
 
 **Architecture:** Pure relocation. Each task runs `git mv` for a fixed file set, rewrites package-path imports with one parameterized helper, then proves the tree green with `flutter analyze` + the full suite. No class, file, or API is renamed; the only editable lines are `import` statements plus three documentation paragraphs.
 
@@ -249,22 +249,22 @@ git commit -m "refactor(lib): move persistence stores to core/persistence"
 
 ---
 
-### Task 4: Extract platform adapters to `lib/core/platform/`
+### Task 4: Extract platform adapters into `lib/features/storage/data/`
 
 **Files:**
 - Move: `lib/data/files/file_selector_file_picker.dart`, `lib/data/files/url_launcher_uri_opener.dart`
 
 **Interfaces:**
 - Consumes: the helper script.
-- Produces: `package:legalhub/core/platform/{file_selector_file_picker,url_launcher_uri_opener}.dart`.
+- Produces: `package:legalhub/features/storage/data/{file_selector_file_picker,url_launcher_uri_opener}.dart`.
 
 - [ ] **Step 1: Move and rewrite (4 refs)**
 
 ```powershell
-New-Item -ItemType Directory -Force lib\core\platform | Out-Null
-git mv lib/data/files/file_selector_file_picker.dart lib/core/platform/file_selector_file_picker.dart
-git mv lib/data/files/url_launcher_uri_opener.dart    lib/core/platform/url_launcher_uri_opener.dart
-powershell -NoProfile -File "$env:TEMP\opencode\reorg_rewrite.ps1" -From "package:legalhub/data/files/" -To "package:legalhub/core/platform/"
+New-Item -ItemType Directory -Force lib\features\storage\data | Out-Null
+git mv lib/data/files/file_selector_file_picker.dart lib/features/storage/data/file_selector_file_picker.dart
+git mv lib/data/files/url_launcher_uri_opener.dart    lib/features/storage/data/url_launcher_uri_opener.dart
+powershell -NoProfile -File "$env:TEMP\opencode\reorg_rewrite.ps1" -From "package:legalhub/data/files/" -To "package:legalhub/features/storage/data/"
 ```
 
 - [ ] **Step 2: Verify and gate**
@@ -277,7 +277,7 @@ Run: `flutter test` → all pass.
 
 ```bash
 git add -A lib test
-git commit -m "refactor(lib): move platform adapters to core/platform"
+git commit -m "refactor(lib): house platform adapters with the storage feature"
 ```
 
 ---

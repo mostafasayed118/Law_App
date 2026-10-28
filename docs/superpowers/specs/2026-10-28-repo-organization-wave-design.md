@@ -113,7 +113,7 @@ The filename already encodes the lifecycle phase: `_scope` (24), `_plan` (25), `
 |---|---|---|
 | `lib/data/<feature>/*` | `lib/features/<feature>/data/` | 70 across 16 features |
 | `lib/data/local/*` | `lib/core/persistence/` | 11 |
-| `lib/data/files/*` | `lib/core/platform/` | 2 |
+| `lib/data/files/*` | `lib/features/storage/data/` | 2 |
 | `lib/data/*.dart` | `lib/core/supabase/` | 5 |
 | `lib/data/auth/supabase_env.dart` | `lib/core/supabase/` | 1 (build-time config consumed by `main.dart` before any feature exists) |
 | `lib/data/.gitkeep` | deleted | 1 |
@@ -164,7 +164,6 @@ lib/
     async/ contracts/ errors/ localization/ observability/ roles/ state/ use_cases/ validation/
     supabase/     # NEW: row_reader, supabase_wire, postgrest_failures, list_query_guards, supabase_seam
     persistence/  # NEW: *locale/theme/onboarding/org_selection*_store.dart + in_memory_* + shared_preferences_*
-    platform/     # NEW: file_selector_file_picker, url_launcher_uri_opener
   features/<20 features>/{data,domain,presentation}
   shared/
   l10n/
@@ -217,11 +216,13 @@ Each phase is independently landable, independently revertable, and leaves the r
 
 ### P1 — Consolidate the data layer (D1 + D4)
 
+**Status: landed (2026-10-28).** All seven commits below shipped in this wave; `lib/data/` no longer exists and the tree is green at 2119 declarations. The numbered list is kept as the executed record.
+
 Seven landable commits, least entangled first. Every commit leaves `flutter analyze` clean and the suite green.
 
 1. **`lib/core/supabase/`** — the 5 provider primitives + `supabase_env.dart`; rewrite 61 package refs and 1 of the 2 `main.dart` relative imports.
 2. **`lib/core/persistence/`** — 11 stores from `data/local/` + `core/onboarding/onboarding_store.dart`; rewrite 48 refs.
-3. **`lib/core/platform/`** — 2 adapters from `data/files/`; rewrite 4 refs.
+3. **`lib/features/storage/data/`** — 2 adapters from `data/files/`; rewrite 4 refs.
 4. **Feature-owned seams** (13 features) — 44 files into `features/<x>/data/`; 142 refs.
 5. **Core-owned seams** (D4) — 9 contracts into `features/{auth,admin,orgs}/domain/`, then 26 implementations into `features/<x>/data/`; 140 refs + 5 contract import sites.
 6. **`test/data/` mirror** — 17 subdirectories and 6 root files into `test/features/<x>/data/`, `test/core/persistence/`, `test/core/supabase/`.
