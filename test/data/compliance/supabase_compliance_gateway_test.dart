@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
-import 'package:legalhub/data/compliance/supabase_compliance_api.dart';
+import 'package:legalhub/features/compliance/data/supabase_compliance_api.dart';
 import 'package:legalhub/features/compliance/data/supabase_compliance_gateway.dart';
 import 'package:legalhub/features/compliance/domain/compliance_alert.dart';
 import 'package:legalhub/features/compliance/domain/compliance_gateway.dart';

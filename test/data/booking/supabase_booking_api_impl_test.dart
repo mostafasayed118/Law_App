@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/data/booking/supabase_booking_api.dart';
-import 'package:legalhub/data/booking/supabase_booking_api_impl.dart';
+import 'package:legalhub/features/booking/data/supabase_booking_api.dart';
+import 'package:legalhub/features/booking/data/supabase_booking_api_impl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() {

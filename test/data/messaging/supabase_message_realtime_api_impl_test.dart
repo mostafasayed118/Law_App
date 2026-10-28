@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/data/messaging/supabase_message_realtime_api.dart';
-import 'package:legalhub/data/messaging/supabase_message_realtime_api_impl.dart';
+import 'package:legalhub/features/messaging/data/supabase_message_realtime_api.dart';
+import 'package:legalhub/features/messaging/data/supabase_message_realtime_api_impl.dart';
 
 void main() {
   group('SupabaseMessageRealtimeApiImpl (D-LV4)', () {

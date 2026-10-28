@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/data/video/supabase_video_api.dart';
-import 'package:legalhub/data/video/supabase_video_api_impl.dart';
+import 'package:legalhub/features/video/data/supabase_video_api.dart';
+import 'package:legalhub/features/video/data/supabase_video_api_impl.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

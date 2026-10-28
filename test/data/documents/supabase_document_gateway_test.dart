@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
-import 'package:legalhub/data/documents/supabase_document_api.dart';
-import 'package:legalhub/data/documents/supabase_document_gateway.dart';
+import 'package:legalhub/features/documents/data/supabase_document_api.dart';
+import 'package:legalhub/features/documents/data/supabase_document_gateway.dart';
 import 'package:legalhub/features/documents/domain/document.dart';
 
 /// Hand-rolled fake of the [SupabaseDocumentApi] seam: records calls and

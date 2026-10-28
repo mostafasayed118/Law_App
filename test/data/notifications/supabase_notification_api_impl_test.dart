@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/data/notifications/supabase_notification_api.dart';
-import 'package:legalhub/data/notifications/supabase_notification_api_impl.dart';
+import 'package:legalhub/features/notifications/data/supabase_notification_api.dart';
+import 'package:legalhub/features/notifications/data/supabase_notification_api_impl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../support/supabase_api_stub.dart';

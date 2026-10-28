@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/data/billing/supabase_payment_api.dart';
-import 'package:legalhub/data/billing/supabase_payment_api_impl.dart';
+import 'package:legalhub/features/billing/data/supabase_payment_api.dart';
+import 'package:legalhub/features/billing/data/supabase_payment_api_impl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() {

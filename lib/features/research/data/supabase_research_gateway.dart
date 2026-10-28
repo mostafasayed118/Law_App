@@ -3,7 +3,7 @@ import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/supabase/row_reader.dart';
-import 'package:legalhub/data/research/supabase_research_api.dart';
+import 'package:legalhub/features/research/data/supabase_research_api.dart';
 import 'package:legalhub/features/research/domain/ai_finding.dart';
 import 'package:legalhub/features/research/domain/ai_gateway.dart';
 import 'package:legalhub/features/research/domain/research_outcome.dart';

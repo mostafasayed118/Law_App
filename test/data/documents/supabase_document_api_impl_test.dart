@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/data/documents/supabase_document_api.dart';
-import 'package:legalhub/data/documents/supabase_document_api_impl.dart';
+import 'package:legalhub/features/documents/data/supabase_document_api.dart';
+import 'package:legalhub/features/documents/data/supabase_document_api_impl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../support/supabase_api_stub.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
-import 'package:legalhub/data/research/supabase_research_api_impl.dart';
+import 'package:legalhub/features/research/data/supabase_research_api_impl.dart';
 import 'package:legalhub/features/research/data/supabase_research_gateway.dart';
 import 'package:legalhub/features/research/domain/ai_finding.dart';
 import 'package:legalhub/features/research/domain/research_outcome.dart';

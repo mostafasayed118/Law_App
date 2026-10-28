@@ -3,8 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
-import 'package:legalhub/data/storage/supabase_storage_api.dart';
-import 'package:legalhub/data/storage/supabase_storage_gateway.dart';
+import 'package:legalhub/features/storage/data/supabase_storage_api.dart';
+import 'package:legalhub/features/storage/data/supabase_storage_gateway.dart';
 import 'package:legalhub/features/storage/domain/file_metadata.dart';
 import 'package:legalhub/features/storage/domain/storage_gateway.dart';
 

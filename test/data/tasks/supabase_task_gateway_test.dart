@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
-import 'package:legalhub/data/tasks/supabase_task_api.dart';
+import 'package:legalhub/features/tasks/data/supabase_task_api.dart';
 import 'package:legalhub/features/tasks/data/supabase_task_gateway.dart';
 import 'package:legalhub/features/tasks/domain/task_gateway.dart';
 import 'package:legalhub/features/tasks/domain/task_item.dart';

@@ -2,7 +2,7 @@ import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/core/supabase/row_reader.dart';
-import 'package:legalhub/data/compliance/supabase_compliance_api.dart';
+import 'package:legalhub/features/compliance/data/supabase_compliance_api.dart';
 import 'package:legalhub/features/compliance/domain/compliance_alert.dart';
 import 'package:legalhub/features/compliance/domain/compliance_gateway.dart';
 

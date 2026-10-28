@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
-import 'package:legalhub/data/billing/supabase_payment_api.dart';
-import 'package:legalhub/data/billing/supabase_payment_gateway.dart';
+import 'package:legalhub/features/billing/data/supabase_payment_api.dart';
+import 'package:legalhub/features/billing/data/supabase_payment_gateway.dart';
 import 'package:legalhub/features/billing/domain/payment_session.dart';
 import 'package:legalhub/features/billing/domain/payment_status.dart';
 

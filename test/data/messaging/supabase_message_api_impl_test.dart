@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/data/messaging/supabase_message_api.dart';
-import 'package:legalhub/data/messaging/supabase_message_api_impl.dart';
+import 'package:legalhub/features/messaging/data/supabase_message_api.dart';
+import 'package:legalhub/features/messaging/data/supabase_message_api_impl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() {

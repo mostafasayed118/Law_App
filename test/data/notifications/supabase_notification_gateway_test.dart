@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
-import 'package:legalhub/data/notifications/supabase_notification_api.dart';
-import 'package:legalhub/data/notifications/supabase_notification_gateway.dart';
+import 'package:legalhub/features/notifications/data/supabase_notification_api.dart';
+import 'package:legalhub/features/notifications/data/supabase_notification_gateway.dart';
 import 'package:legalhub/features/notifications/domain/notification.dart';
 
 /// Hand-rolled fake of the [SupabaseNotificationApi] seam: records calls and

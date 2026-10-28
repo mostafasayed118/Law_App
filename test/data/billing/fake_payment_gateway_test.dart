@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/result.dart';
-import 'package:legalhub/data/billing/fake_payment_gateway.dart';
+import 'package:legalhub/features/billing/data/fake_payment_gateway.dart';
 import 'package:legalhub/features/billing/domain/payment_session.dart';
 import 'package:legalhub/features/billing/domain/payment_status.dart';
 

@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
-import 'package:legalhub/data/billing/supabase_billing_api.dart';
-import 'package:legalhub/data/billing/supabase_billing_gateway.dart';
+import 'package:legalhub/features/billing/data/supabase_billing_api.dart';
+import 'package:legalhub/features/billing/data/supabase_billing_gateway.dart';
 import 'package:legalhub/features/billing/domain/invoice.dart';
 
 /// Hand-rolled fake of the [SupabaseBillingApi] seam: records calls and
