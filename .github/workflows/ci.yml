@@ -49,7 +49,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           # Full history (not shallow): the ledger gate below validates cited
           # hashes against the whole object database (`git rev-list --all`,
@@ -151,7 +151,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       # The Android Gradle build requires JDK 17 (AGP requirement); the
       # runner default does not reliably satisfy it, so pin it the same way
