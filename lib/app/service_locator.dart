@@ -17,6 +17,8 @@ import 'package:legalhub/core/persistence/shared_preferences_onboarding_store.da
 import 'package:legalhub/core/persistence/shared_preferences_org_selection_store.dart';
 import 'package:legalhub/core/persistence/shared_preferences_theme_mode_store.dart';
 import 'package:legalhub/core/persistence/theme_mode_store.dart';
+import 'package:legalhub/core/platform/file_selector_file_picker.dart';
+import 'package:legalhub/core/platform/url_launcher_uri_opener.dart';
 import 'package:legalhub/core/supabase/supabase_env.dart';
 import 'package:legalhub/data/admin/fake_platform_admin_gateway.dart';
 import 'package:legalhub/data/admin/supabase_platform_admin_api.dart';
@@ -46,8 +48,6 @@ import 'package:legalhub/data/discovery/supabase_attorney_api_impl.dart';
 import 'package:legalhub/data/documents/supabase_document_api.dart';
 import 'package:legalhub/data/documents/supabase_document_api_impl.dart';
 import 'package:legalhub/data/documents/supabase_document_gateway.dart';
-import 'package:legalhub/data/files/file_selector_file_picker.dart';
-import 'package:legalhub/data/files/url_launcher_uri_opener.dart';
 import 'package:legalhub/data/matters/supabase_matter_api.dart';
 import 'package:legalhub/data/matters/supabase_matter_api_impl.dart';
 import 'package:legalhub/data/matters/supabase_matter_gateway.dart';
