@@ -507,7 +507,7 @@ Expected: `2119`. A lower number means a test was orphaned in a deleted director
 - [ ] **Step 6: Rewrite the two live documentation claims**
 
 - `README.md` L403: replace the `lib/data/**/supabase_*_impl.dart` phrasing with the new placement — provider adapters now live in `lib/features/<feature>/data/`, and provider primitives in `lib/core/supabase/`.
-- `INSTRUCTIONS.md` §4.1: replace the whole "Adapter placement — the seam's owner decides the home" paragraph with the single rule: **a feature owns its `domain/`, `data/` and `presentation/`; `lib/core/` holds only primitives with no product noun; `lib/data/` no longer exists.** Also update the `lib/data/list_query_guards.dart` path in L214 to `lib/core/supabase/list_query_guards.dart`.
+- `INSTRUCTIONS.md` §4.1: replace the whole "Adapter placement — the seam's owner decides the home" paragraph with the single rule: **a feature owns its `domain/`, `data/` and `presentation/`; `lib/core/` holds shared primitives and cross-feature vocabulary that no single feature owns — e.g. `roles/`, `practice_area.dart`, `contracts/`; anything a single feature owns lives in that feature; `lib/data/` no longer exists.** Also update the `lib/data/list_query_guards.dart` path in L214 to `lib/core/supabase/list_query_guards.dart`.
 - Do **not** touch `docs/*_YYYY-MM-DD*.md` — frozen records.
 - In the spec (`docs/superpowers/specs/2026-10-28-repo-organization-wave-design.md`), update the P1 phase line to record that commits 1–7 landed in this wave, so the spec stops describing already-executed work.
 

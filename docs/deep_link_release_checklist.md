@@ -9,9 +9,9 @@ change only the owner can provide.
 | Item | State |
 |---|---|
 | Session from URI | `initializeSupabase` sets `detectSessionInUri: false`. The provider observer no longer decides which URI may mint a session. |
-| Accepted auth callback | `lib/data/auth/auth_callback.dart` accepts **only** `com.legalhub.app://auth/v1/callback` or `https://legalhub.app/auth/v1/callback`, with a non-empty query `code`, no fragment, and no `access_token` / `refresh_token` / `provider_token` / `provider_refresh_token`. |
-| Exchange | `lib/data/auth/auth_callback_observer.dart` calls `exchangeCodeForSession` (PKCE-only, verifier-bound) and ignores everything else without logging the URI/code. Started once from `SupabaseAuthApiImpl.bind`. |
-| Tests | `test/data/auth/auth_callback_test.dart` pins accept + reject cases (not run in this change; see §7). |
+| Accepted auth callback | `lib/features/auth/data/auth_callback.dart` accepts **only** `com.legalhub.app://auth/v1/callback` or `https://legalhub.app/auth/v1/callback`, with a non-empty query `code`, no fragment, and no `access_token` / `refresh_token` / `provider_token` / `provider_refresh_token`. |
+| Exchange | `lib/features/auth/data/auth_callback_observer.dart` calls `exchangeCodeForSession` (PKCE-only, verifier-bound) and ignores everything else without logging the URI/code. Started once from `SupabaseAuthApiImpl.bind`. |
+| Tests | `test/features/auth/data/auth_callback_test.dart` pins accept + reject cases (not run in this change; see §7). |
 | Android custom scheme | Retained (shipped producers still emit it) but host-scoped to `accept-invite` and `auth`/`/v1/callback`. It remains hijackable by design; see §5 for the removal gate. |
 | assetlinks.json | Release/upload keystore SHA-256 filled (see §2). |
 | AASA | Intentionally inert (`details: []`) until the Apple Team ID is known (see §3). No invented values. The associated-domains entitlement now lives in `ios/Runner/Runner.entitlements` (wired to the six production configs); the AASA itself is still the owner blocker. |

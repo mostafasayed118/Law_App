@@ -40,7 +40,7 @@ Two consequences, both measured:
 1. **The data layer depends on feature internals.** `lib/data/**` imports `package:legalhub/features/**` **28 times** (14 files, e.g. `supabase_matter_gateway.dart` importing `features/matters/domain/matter.dart`). The outermost layer reaches into the feature tree.
 2. **The same feature is spread over three directories.** `matters` = `features/matters/{domain,presentation}` + `features/matters/data` (2 test doubles) + `lib/data/matters` (6 implementations). `orgs` = `features/orgs/presentation` + `core/organizations` (3 contracts) + `lib/data/orgs` (14 files, including 8 test doubles). `auth` = `features/auth/{domain,data,presentation}` + `core/auth` (4) + `lib/data/auth` (9).
 
-`lib/core/` otherwise holds genuinely cross-cutting infrastructure with no product noun: `async`, `contracts`, `errors`, `localization`, `observability`, `roles`, `state`, `use_cases`, `validation`.
+`lib/core/` otherwise holds genuinely cross-cutting infrastructure and shared cross-feature vocabulary: `async`, `contracts`, `errors`, `localization`, `observability`, `roles`, `state`, `use_cases`, `validation`.
 
 Persistence is split the same way: contract + implementation pairs live in `lib/data/local/` (11 files) — **except** `onboarding`, whose contract lives in `lib/core/onboarding/` and whose implementations live in `lib/data/local/`.
 
@@ -142,7 +142,7 @@ Authoring stays in the 83 readable files: `policies/` and `rpc/` remain the sour
 
 ### D4 — Domain placement rule (**accepted 2026-10-28**)
 
-> `lib/core/` holds no product noun.
+> `lib/core/` holds shared primitives and cross-feature vocabulary that no single feature owns — e.g. `roles/`, `practice_area.dart`, `contracts/`. Anything a single feature owns lives in that feature.
 
 Under that rule, `core/auth` → `features/auth/domain/`, `core/admin` → `features/admin/domain/`, `core/organizations` → `features/orgs/domain/`, and `core/onboarding/onboarding_store.dart` joins `lib/core/persistence/`. Total: 10 files, and **5 import sites across the three domain directories** (`core/auth` 2, `core/organizations` 2, `core/admin` 1); the onboarding store's own import sites need counting during execution.
 
@@ -216,7 +216,7 @@ Each phase is independently landable, independently revertable, and leaves the r
 
 ### P1 — Consolidate the data layer (D1 + D4)
 
-**Status: landed (2026-10-28).** All seven commits below shipped in this wave; `lib/data/` no longer exists and the tree is green at 2119 declarations. The numbered list is kept as the executed record.
+**Status: landed (2026-10-28).** All seven steps below shipped in this wave; `lib/data/` no longer exists and the tree is green at 2119 declarations. The numbered list is kept as the executed record.
 
 Seven landable commits, least entangled first. Every commit leaves `flutter analyze` clean and the suite green.
 
@@ -298,7 +298,7 @@ Filenames and class names are unchanged throughout, so the diff is import lines 
 
 ## 9. Open owner decisions
 
-1. ~~**D4** — adopt "`lib/core/` holds no product noun"?~~ **Accepted 2026-10-28**; it ships as part of P1 (commit 5).
+1. ~~**D4** — adopt "`lib/core/` holds shared primitives and cross-feature vocabulary that no single feature owns"?~~ **Accepted 2026-10-28**; it ships as part of P1 (commit 5).
 2. **P0** — confirm the nested worktree `.kilo/worktrees/trail-fall` can be removed.
 3. **P0** — confirm the destination for the 20 MB design archive (`C:\flutter_projects\_design_refs\legalhub_stitch\`).
 4. **Order** — P2 and P3 are independent. If you prefer the riskiest move last, run P0 → P1 → P3 → P2 → P4.

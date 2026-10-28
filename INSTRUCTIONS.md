@@ -229,7 +229,7 @@ Use the existing repository structure. For new work, prefer the planned shape:
 ```plain
 lib/
   app/              # bootstrap, router, DI, theme, localization
-  core/             # primitives with no product noun: errors, Result, use cases, supabase, persistence
+  core/             # shared primitives + cross-feature vocabulary: errors, Result, use cases, supabase, persistence, roles
   shared/           # genuinely reusable widgets/forms/extensions/services
   features/
     <feature>/
@@ -248,7 +248,7 @@ Rules:
 - Use GetIt registrations deliberately: lazy singletons for stateless/shared services and repositories; factories for feature-scoped Cubits unless lifecycle requirements require otherwise.
 - Use GoRouter route names/typed parameters consistently. Redirects improve navigation UX but do not substitute for server authorization.
 - Put code in `shared/` only after a real second use or a demonstrated app-level cross-cutting responsibility.
-- **Placement rule.** A feature owns its `domain/`, `data/` and `presentation/`; `lib/core/` holds only primitives with no product noun; `lib/data/` no longer exists. A feature-declared contract is implemented in that feature's `data/`, next to its fake; a core-declared primitive keeps its implementation beside it in `core/` — e.g. the `core/persistence/` stores (`LocaleStore`, `ThemeModeStore`, `OnboardingStore`, `OrgSelectionStore`).
+- **Placement rule.** A feature owns its `domain/`, `data/` and `presentation/`; `lib/core/` holds shared primitives and cross-feature vocabulary that no single feature owns — e.g. `roles/`, `practice_area.dart`, `contracts/`. Anything a single feature owns lives in that feature. `lib/data/` no longer exists. A feature-declared contract is implemented in that feature's `data/`, next to its fake; a core-declared primitive keeps its implementation beside it in `core/` — e.g. the `core/persistence/` stores (`LocaleStore`, `ThemeModeStore`, `OnboardingStore`, `OrgSelectionStore`).
 
 ### 4.2 State, errors, and async behavior
 

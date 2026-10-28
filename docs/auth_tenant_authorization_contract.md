@@ -23,7 +23,7 @@ Define the smallest reviewable contract for the next production slice:
 ### Existing behavior and source of truth
 
 - The B1–B13 checkpoint is tagged `bootstrap-b13` at commit `1d57e96`.
-- `lib/core/auth/auth_gateway.dart` contains a deliberately credential-free
+- `lib/features/auth/domain/auth_gateway.dart` contains a deliberately credential-free
   `AuthGateway` and a synthetic `Session`.
 - `lib/core/roles/user_role.dart` contains six placeholder roles and a
   capability map explicitly documented as UX-only.
