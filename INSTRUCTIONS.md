@@ -248,7 +248,7 @@ Rules:
 - Use GetIt registrations deliberately: lazy singletons for stateless/shared services and repositories; factories for feature-scoped Cubits unless lifecycle requirements require otherwise.
 - Use GoRouter route names/typed parameters consistently. Redirects improve navigation UX but do not substitute for server authorization.
 - Put code in `shared/` only after a real second use or a demonstrated app-level cross-cutting responsibility.
-- **Placement rule.** A feature owns its `domain/`, `data/` and `presentation/`; `lib/core/` holds only primitives with no product noun; `lib/data/` no longer exists. Whatever a contract's home — a feature's `domain/` or a `core/` primitive — its implementation lives in the owning feature's `data/`, next to its fake.
+- **Placement rule.** A feature owns its `domain/`, `data/` and `presentation/`; `lib/core/` holds only primitives with no product noun; `lib/data/` no longer exists. A feature-declared contract is implemented in that feature's `data/`, next to its fake; a core-declared primitive keeps its implementation beside it in `core/` — e.g. the `core/persistence/` stores (`LocaleStore`, `ThemeModeStore`, `OnboardingStore`, `OrgSelectionStore`).
 
 ### 4.2 State, errors, and async behavior
 

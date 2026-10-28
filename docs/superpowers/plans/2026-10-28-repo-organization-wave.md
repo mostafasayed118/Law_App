@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- **Suite baseline is 2119 test declarations**, and `README.md` L458 claims `**2119 tests**`. Every task must leave that number unchanged.
+- **Suite baseline is 2119 test declarations**, and `README.md` `## Run and verify` claims `**2119 tests**`. Every task must leave that number unchanged.
 - **Gate commands must exit 0** after every task: `flutter analyze`, `flutter test`, `bash scripts/verify_ledger.sh`, `bash scripts/verify_format.sh`, `bash scripts/verify_policy_tests.sh --check`.
 - **No renames.** Only directory placement and import paths change. If a task tempts you to rename a file to fit, stop — the plan is wrong, not the file.
 - **Never run a search-replace over `docs/`.** It holds ~50 frozen campaign records that mention `lib/data`; they are history. Only `README.md`, `INSTRUCTIONS.md`, and the spec are edited.
@@ -456,7 +456,7 @@ git commit -m "refactor(lib): give auth, admin and orgs one folder each (D4)"
 **Files:**
 - Move: `test/data/<feature>/` → `test/features/<feature>/data/` (16 features); `test/data/local/` → `test/core/persistence/`; 6 root test files → `test/core/supabase/`
 - Delete: `lib/data/` (now empty) and its `.gitkeep`
-- Modify: `README.md` L403, `INSTRUCTIONS.md` L252 (and its `INSTRUCTIONS.md` L214 mention of the path), the spec's phase status
+- Modify: `README.md` L403, `INSTRUCTIONS.md` §4.1 (the placement rule, plus its L214 mention of the path), the spec's phase status
 
 **Interfaces:**
 - Consumes: all prior tasks.
@@ -507,7 +507,7 @@ Expected: `2119`. A lower number means a test was orphaned in a deleted director
 - [ ] **Step 6: Rewrite the two live documentation claims**
 
 - `README.md` L403: replace the `lib/data/**/supabase_*_impl.dart` phrasing with the new placement — provider adapters now live in `lib/features/<feature>/data/`, and provider primitives in `lib/core/supabase/`.
-- `INSTRUCTIONS.md` L252: replace the whole "Adapter placement — the seam's owner decides the home" paragraph with the single rule: **a feature owns its `domain/`, `data/` and `presentation/`; `lib/core/` holds only primitives with no product noun; `lib/data/` no longer exists.** Also update the `lib/data/list_query_guards.dart` path in L214 to `lib/core/supabase/list_query_guards.dart`.
+- `INSTRUCTIONS.md` §4.1: replace the whole "Adapter placement — the seam's owner decides the home" paragraph with the single rule: **a feature owns its `domain/`, `data/` and `presentation/`; `lib/core/` holds only primitives with no product noun; `lib/data/` no longer exists.** Also update the `lib/data/list_query_guards.dart` path in L214 to `lib/core/supabase/list_query_guards.dart`.
 - Do **not** touch `docs/*_YYYY-MM-DD*.md` — frozen records.
 - In the spec (`docs/superpowers/specs/2026-10-28-repo-organization-wave-design.md`), update the P1 phase line to record that commits 1–7 landed in this wave, so the spec stops describing already-executed work.
 

@@ -18,7 +18,7 @@ import 'package:legalhub/app/deep_link/deep_link_config.dart';
 ///   session parameters and no fragment anywhere.
 ///
 /// Dependency-free so the accept/reject rule is unit-testable:
-/// `test/data/auth/auth_callback_test.dart`.
+/// `test/features/auth/data/auth_callback_test.dart`.
 class AuthCallbackUri {
   const AuthCallbackUri._();
 

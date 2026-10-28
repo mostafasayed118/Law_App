@@ -146,7 +146,7 @@ Authoring stays in the 83 readable files: `policies/` and `rpc/` remain the sour
 
 Under that rule, `core/auth` → `features/auth/domain/`, `core/admin` → `features/admin/domain/`, `core/organizations` → `features/orgs/domain/`, and `core/onboarding/onboarding_store.dart` joins `lib/core/persistence/`. Total: 10 files, and **5 import sites across the three domain directories** (`core/auth` 2, `core/organizations` 2, `core/admin` 1); the onboarding store's own import sites need counting during execution.
 
-**D4 is required by D1, not optional.** `INSTRUCTIONS.md` L252 documents the pre-existing rule ("a *core-owned* contract is implemented in `lib/data/<name>/`"), introduced by audit 2026-09-21 finding H-2 to end three coexisting conventions. Executing D1 while keeping that rule would put `auth`/`orgs`/`admin` contracts in `core/` and their implementations in `features/` — re-creating the split D1 removes. D4 supersedes L252, and P1 rewrites that section in the same commit.
+**D4 is required by D1, not optional.** `INSTRUCTIONS.md` §4.1 documented the pre-existing rule ("a *core-owned* contract is implemented in `lib/data/<name>/`"), introduced by audit 2026-09-21 finding H-2 to end three coexisting conventions. Executing D1 while keeping that rule would put `auth`/`orgs`/`admin` contracts in `core/` and their implementations in `features/` — re-creating the split D1 removes. D4 supersedes that rule, and P1 rewrites that section in the same commit.
 
 Note the repo is already mid-migration under the old rule: `matters`, `documents`, `messaging`, `storage`, `billing`, `notifications` were documented as moving to `features/<x>/data/` "when next touched". This wave is that moment.
 
@@ -226,7 +226,7 @@ Seven landable commits, least entangled first. Every commit leaves `flutter anal
 4. **Feature-owned seams** (13 features) — 44 files into `features/<x>/data/`; 142 refs.
 5. **Core-owned seams** (D4) — 9 contracts into `features/{auth,admin,orgs}/domain/`, then 26 implementations into `features/<x>/data/`; 140 refs + 5 contract import sites.
 6. **`test/data/` mirror** — 17 subdirectories and 6 root files into `test/features/<x>/data/`, `test/core/persistence/`, `test/core/supabase/`.
-7. **Delete `lib/data/`** and run the docs truth pass: `README.md` L403, `INSTRUCTIONS.md` L252 (the superseded adapter-placement rule), and `docs/superpowers/specs/2026-10-28-repo-organization-wave-design.md`.
+7. **Delete `lib/data/`** and run the docs truth pass: `README.md` L403, `INSTRUCTIONS.md` §4.1 (the superseded adapter-placement rule), and `docs/superpowers/specs/2026-10-28-repo-organization-wave-design.md`.
 
 Filenames and class names are unchanged throughout, so the diff is import lines plus `git mv` renames.
 
@@ -235,7 +235,7 @@ Filenames and class names are unchanged throughout, so the diff is import lines 
 - No test asserts the adapter-placement paths; `test/bootstrap_boundaries_test.dart` covers `Result`/`ViewState`/`Redactor` behavior only.
 - Frozen campaign records under `docs/` mention `lib/data` in ~50 files. They are history and must **not** be rewritten.
 
-**Acceptance:** `Test-Path lib/data` → False · `flutter analyze` clean · suite count equals the pre-P1 baseline (2119 declarations, matching `README.md` L458) · zero `package:legalhub/data/` references · zero imports of `core/{auth,admin,organizations}` · `verify_ledger.sh` exits 0 · `verify_format.sh` exits 0.
+**Acceptance:** `Test-Path lib/data` → False · `flutter analyze` clean · suite count equals the pre-P1 baseline (2119 declarations, matching the `**2119 tests**` line in `README.md` `## Run and verify`) · zero `package:legalhub/data/` references · zero imports of `core/{auth,admin,organizations}` · `verify_ledger.sh` exits 0 · `verify_format.sh` exits 0.
 
 **Rollback:** `git revert` per commit.
 
