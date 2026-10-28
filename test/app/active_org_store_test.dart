@@ -5,9 +5,9 @@ import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/core/auth/auth_gateway.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
 import 'package:legalhub/core/organizations/membership_repository.dart';
+import 'package:legalhub/core/persistence/in_memory_org_selection_store.dart';
+import 'package:legalhub/core/persistence/org_selection_store.dart';
 import 'package:legalhub/core/roles/user_role.dart';
-import 'package:legalhub/data/local/in_memory_org_selection_store.dart';
-import 'package:legalhub/data/local/org_selection_store.dart';
 import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 

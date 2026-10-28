@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/data/local/in_memory_onboarding_store.dart';
+import 'package:legalhub/core/persistence/in_memory_onboarding_store.dart';
 import 'package:legalhub/features/onboarding/presentation/onboarding_cubit.dart';
 
 void main() {

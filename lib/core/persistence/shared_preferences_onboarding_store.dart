@@ -1,4 +1,4 @@
-import 'package:legalhub/core/onboarding/onboarding_store.dart';
+import 'package:legalhub/core/persistence/onboarding_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesOnboardingStore implements OnboardingStore {

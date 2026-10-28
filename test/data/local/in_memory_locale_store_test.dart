@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/data/local/in_memory_locale_store.dart';
+import 'package:legalhub/core/persistence/in_memory_locale_store.dart';
 
 // InMemoryLocaleStore is the non-persistent fallback used by tests and
 // preference-less environments (see the class doc). These tests pin its

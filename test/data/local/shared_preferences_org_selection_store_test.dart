@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/data/local/shared_preferences_org_selection_store.dart';
+import 'package:legalhub/core/persistence/shared_preferences_org_selection_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {

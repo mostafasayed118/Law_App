@@ -2,7 +2,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/localization/locale_cubit.dart';
-import 'package:legalhub/data/local/in_memory_locale_store.dart';
+import 'package:legalhub/core/persistence/in_memory_locale_store.dart';
 
 void main() {
   group('LocaleCubit initial state', () {

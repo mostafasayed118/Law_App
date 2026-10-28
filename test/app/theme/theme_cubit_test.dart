@@ -2,7 +2,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/theme/theme_cubit.dart';
-import 'package:legalhub/data/local/in_memory_theme_mode_store.dart';
+import 'package:legalhub/core/persistence/in_memory_theme_mode_store.dart';
 
 void main() {
   group('ThemeCubit initial state', () {

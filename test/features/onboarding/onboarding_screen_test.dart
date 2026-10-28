@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:legalhub/app/router.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/observability/error_reporter.dart';
-import 'package:legalhub/core/onboarding/onboarding_store.dart';
+import 'package:legalhub/core/persistence/onboarding_store.dart';
 import 'package:legalhub/data/auth/fake_auth_gateway.dart';
 import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/data/orgs/fake_organization_gateway.dart';

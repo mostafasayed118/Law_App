@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:legalhub/data/local/in_memory_theme_mode_store.dart';
+import 'package:legalhub/core/persistence/in_memory_theme_mode_store.dart';
 
 // InMemoryThemeModeStore is the non-persistent fallback used by tests and
 // preference-less environments (the InMemoryLocaleStore pattern). These
