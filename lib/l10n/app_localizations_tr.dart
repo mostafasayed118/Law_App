@@ -1547,6 +1547,15 @@ class AppLocalizationsTr extends AppLocalizations {
   String get orgAuditOutcomeDenied => 'Reddedildi';
 
   @override
+  String get auditEventMemberRoleChange => 'Üye rolü değiştirildi';
+
+  @override
+  String get auditEventMemberInvite => 'Üye davet edildi';
+
+  @override
+  String get auditEventMemberSuspend => 'Üyelik askıya alındı';
+
+  @override
   String get alertsTitle => 'Uyum uyarıları';
 
   @override

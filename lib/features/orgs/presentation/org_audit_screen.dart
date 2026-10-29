@@ -5,6 +5,7 @@ import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/features/orgs/domain/organization_gateway.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/audit_labels.dart';
 import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
 import 'org_audit_cubit.dart';
