@@ -1542,6 +1542,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get orgAuditOutcomeDenied => 'مرفوض';
 
   @override
+  String get auditEventMemberRoleChange => 'تغيير دور العضو';
+
+  @override
+  String get auditEventMemberInvite => 'دعوة عضو';
+
+  @override
+  String get auditEventMemberSuspend => 'تعليق عضوية';
+
+  @override
   String get alertsTitle => 'تنبيهات الامتثال';
 
   @override

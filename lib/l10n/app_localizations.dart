@@ -2848,6 +2848,24 @@ abstract class AppLocalizations {
   /// **'Denied'**
   String get orgAuditOutcomeDenied;
 
+  /// No description provided for @auditEventMemberRoleChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Member role changed'**
+  String get auditEventMemberRoleChange;
+
+  /// No description provided for @auditEventMemberInvite.
+  ///
+  /// In en, this message translates to:
+  /// **'Member invited'**
+  String get auditEventMemberInvite;
+
+  /// No description provided for @auditEventMemberSuspend.
+  ///
+  /// In en, this message translates to:
+  /// **'Member suspended'**
+  String get auditEventMemberSuspend;
+
   /// No description provided for @alertsTitle.
   ///
   /// In en, this message translates to:

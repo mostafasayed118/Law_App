@@ -34,7 +34,12 @@ class _AuditRow extends StatelessWidget {
                   color: scheme.primary,
                 ),
                 const SizedBox(width: LegalHubTheme.spaceSm),
-                Expanded(child: Text(entry.action, style: text.titleSmall)),
+                Expanded(
+                  child: Text(
+                    auditEventLabel(l10n, entry.action),
+                    style: text.titleSmall,
+                  ),
+                ),
                 // Server vocabulary rendered verbatim; color is never the
                 // sole carrier (the chip also names the outcome).
                 _OutcomeChip(outcome: entry.outcome, l10n: l10n),

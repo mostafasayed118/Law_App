@@ -1547,6 +1547,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get orgAuditOutcomeDenied => 'Denied';
 
   @override
+  String get auditEventMemberRoleChange => 'Member role changed';
+
+  @override
+  String get auditEventMemberInvite => 'Member invited';
+
+  @override
+  String get auditEventMemberSuspend => 'Member suspended';
+
+  @override
   String get alertsTitle => 'Compliance alerts';
 
   @override
