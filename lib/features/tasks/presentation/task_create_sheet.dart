@@ -23,9 +23,8 @@ Future<bool?> showTaskCreateSheet(
   BuildContext context, {
   required TaskBoardCubit cubit,
 }) {
-  return showModalBottomSheet<bool>(
+  return showAppSheet<bool>(
     context: context,
-    isScrollControlled: true,
     builder: (BuildContext context) => BlocProvider<TaskBoardCubit>.value(
       value: cubit,
       child: const TaskCreateSheet(),
@@ -221,6 +220,7 @@ class _TaskCreateSheetState extends State<TaskCreateSheet> {
             ),
             const SizedBox(height: LegalHubTheme.spaceMd),
             DropdownButtonFormField<String>(
+              isExpanded: true,
               initialValue: _selectedMatterId,
               decoration: InputDecoration(
                 labelText: l10n.taskCreateMatterLabel,
@@ -231,7 +231,11 @@ class _TaskCreateSheetState extends State<TaskCreateSheet> {
                 for (final Matter matter in matters)
                   DropdownMenuItem<String>(
                     value: matter.id,
-                    child: Text(labels.matterTitle(matter.title)),
+                    child: Text(
+                      labels.matterTitle(matter.title),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
               ],
               onChanged: (String? value) {

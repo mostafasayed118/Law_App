@@ -8,6 +8,7 @@ import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/features/compliance/domain/compliance_alert.dart';
 import 'package:legalhub/features/compliance/domain/compliance_gateway.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/widgets/app_modal_sheet.dart';
 import 'package:legalhub/shared/widgets/form_sheet_scaffold.dart';
 
 import 'compliance_alert_error_messages.dart';
@@ -24,9 +25,8 @@ Future<bool?> showComplianceAlertCreateSheet(
   BuildContext context, {
   required ComplianceAlertsCubit cubit,
 }) {
-  return showModalBottomSheet<bool>(
+  return showAppSheet<bool>(
     context: context,
-    isScrollControlled: true,
     builder: (BuildContext context) =>
         BlocProvider<ComplianceAlertsCubit>.value(
           value: cubit,

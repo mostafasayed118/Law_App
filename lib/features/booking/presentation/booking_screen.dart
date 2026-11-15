@@ -10,6 +10,7 @@ import 'package:legalhub/features/booking/domain/booking_gateway.dart';
 import 'package:legalhub/features/booking/domain/booking_prefill.dart';
 import 'package:legalhub/features/booking/domain/booking_slot.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/responsive/breakpoints.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
 
 import 'booking_cubit.dart';
@@ -17,6 +18,7 @@ import 'booking_state.dart';
 
 part 'booking_category_step.dart';
 part 'booking_datetime_step.dart';
+part 'booking_draft_summary.dart';
 part 'booking_prefill_note.dart';
 part 'booking_review_step.dart';
 part 'booking_selectable_tile.dart';

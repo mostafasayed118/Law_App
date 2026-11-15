@@ -26,12 +26,15 @@ class LoadingElevatedButton extends StatelessWidget {
             child: CircularProgressIndicator(strokeWidth: 2),
           )
         : (icon == null
-              ? Text(label)
+              ? Text(label, textAlign: TextAlign.center)
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text(label),
+                    // Flexible so the label wraps instead of overflowing the
+                    // button at large text scales (320px / 2.0 broke the
+                    // sign-up and password-reset CTAs by 121px).
+                    Flexible(child: Text(label, textAlign: TextAlign.center)),
                     const SizedBox(width: LegalHubTheme.spaceSm),
                     Icon(icon, size: 18),
                   ],

@@ -464,6 +464,16 @@ class _ParticipantsGrid extends StatelessWidget {
               track: _videoTrackOf(remote),
             ),
         ];
+        // Landscape call layout: wider 16:9 tiles and a third column once the
+        // room grows, instead of stretching portrait 3:4 tiles past the short
+        // viewport. Portrait keeps the existing two-up 3:4 grid.
+        final Size viewport = MediaQuery.sizeOf(context);
+        final bool landscape = viewport.width > viewport.height;
+        final int columns = tiles.length <= 1
+            ? 1
+            : landscape
+            ? (tiles.length >= 5 ? 3 : 2)
+            : 2;
         return SliverPadding(
           padding: EdgeInsetsDirectional.fromSTEB(
             LegalHubTheme.marginMobile,
@@ -473,8 +483,8 @@ class _ParticipantsGrid extends StatelessWidget {
           ),
           sliver: SliverGrid.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: tiles.length > 1 ? 2 : 1,
-              childAspectRatio: 3 / 4,
+              crossAxisCount: columns,
+              childAspectRatio: landscape ? 16 / 9 : 3 / 4,
               mainAxisSpacing: LegalHubTheme.spaceSm,
               crossAxisSpacing: LegalHubTheme.spaceSm,
             ),

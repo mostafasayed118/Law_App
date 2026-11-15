@@ -15,6 +15,23 @@ class _AuditRow extends StatelessWidget {
       l10n,
       entry.serverTimestamp.toLocal(),
     );
+    // At extreme text scales the fixed-intrinsic outcome chip plus the
+    // action label no longer share a line (50px right overflow at 3.0).
+    // Above 2.0 the chip drops to its own line instead of truncating either
+    // the action name or the outcome.
+    final bool stackOutcome = MediaQuery.textScalerOf(context).scale(12) > 24;
+    final Widget actionTitle = Row(
+      children: <Widget>[
+        Icon(Icons.receipt_long_outlined, size: 18, color: scheme.primary),
+        const SizedBox(width: LegalHubTheme.spaceSm),
+        Expanded(child: Text(entry.action, style: text.titleSmall)),
+        if (!stackOutcome) ...<Widget>[
+          // Server vocabulary rendered verbatim; color is never the sole
+          // carrier (the chip also names the outcome).
+          _OutcomeChip(outcome: entry.outcome, l10n: l10n),
+        ],
+      ],
+    );
     return Material(
       color: scheme.surfaceContainerLowest,
       shape: RoundedRectangleBorder(
@@ -26,20 +43,11 @@ class _AuditRow extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Row(
-              children: <Widget>[
-                Icon(
-                  Icons.receipt_long_outlined,
-                  size: 18,
-                  color: scheme.primary,
-                ),
-                const SizedBox(width: LegalHubTheme.spaceSm),
-                Expanded(child: Text(entry.action, style: text.titleSmall)),
-                // Server vocabulary rendered verbatim; color is never the
-                // sole carrier (the chip also names the outcome).
-                _OutcomeChip(outcome: entry.outcome, l10n: l10n),
-              ],
-            ),
+            actionTitle,
+            if (stackOutcome) ...<Widget>[
+              const SizedBox(height: LegalHubTheme.spaceXs),
+              _OutcomeChip(outcome: entry.outcome, l10n: l10n),
+            ],
             const SizedBox(height: LegalHubTheme.spaceXs),
             Text(
               labels.auditSummary(entry.redactedSummary),

@@ -27,12 +27,37 @@ class _BookingWizard extends StatelessWidget {
       body: SafeArea(
         child: BlocBuilder<BookingCubit, BookingState>(
           builder: (BuildContext context, BookingState state) {
-            return switch (state.step) {
+            final Widget step = switch (state.step) {
               BookingStep.category => _CategoryStep(state: state),
               BookingStep.dateTime => _DateTimeStep(state: state),
               BookingStep.review => _ReviewStep(state: state),
               BookingStep.success => _SuccessStep(state: state),
             };
+            return LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                // Landscape/tablet: the step column plus a persistent draft
+                // summary. The review and success steps already are a
+                // summary/confirmation, so they keep the full width.
+                final bool showSummary =
+                    constraints.maxWidth >= AppBreakpoints.expanded &&
+                    state.step != BookingStep.review &&
+                    state.step != BookingStep.success;
+                if (!showSummary) {
+                  return step;
+                }
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Expanded(child: step),
+                    const VerticalDivider(width: 1),
+                    SizedBox(
+                      width: 320,
+                      child: _DraftSummaryPanel(state: state),
+                    ),
+                  ],
+                );
+              },
+            );
           },
         ),
       ),

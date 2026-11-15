@@ -8,6 +8,7 @@ import 'package:legalhub/features/compliance/domain/compliance_alert.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
+import 'package:legalhub/shared/widgets/app_modal_sheet.dart';
 
 import 'compliance_alert_error_messages.dart';
 import 'compliance_alert_labels.dart';
@@ -29,9 +30,8 @@ Future<ComplianceAlertDetailOutcome?> showComplianceAlertDetailSheet(
   required ComplianceAlertsCubit cubit,
   required bool canManage,
 }) {
-  return showModalBottomSheet<ComplianceAlertDetailOutcome>(
+  return showAppSheet<ComplianceAlertDetailOutcome>(
     context: context,
-    isScrollControlled: true,
     builder: (BuildContext context) =>
         BlocProvider<ComplianceAlertsCubit>.value(
           value: cubit,

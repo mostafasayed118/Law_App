@@ -5,6 +5,7 @@ import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/features/tasks/domain/task_item.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/widgets/app_modal_sheet.dart';
 
 import 'task_board_cubit.dart';
 import 'task_error_messages.dart';
@@ -20,9 +21,8 @@ Future<bool?> showTaskAssignSheet(
   required TaskBoardCubit cubit,
   required TaskItem task,
 }) {
-  return showModalBottomSheet<bool>(
+  return showAppSheet<bool>(
     context: context,
-    isScrollControlled: true,
     builder: (BuildContext context) => BlocProvider<TaskBoardCubit>.value(
       value: cubit,
       child: TaskAssignSheet(task: task),
@@ -176,6 +176,7 @@ class _TaskAssignSheetState extends State<TaskAssignSheet> {
         !members.any((AssignableMember member) => member.userId == currentId);
     return <Widget>[
       DropdownButtonFormField<String?>(
+        isExpanded: true,
         initialValue: _selectedId,
         decoration: InputDecoration(
           labelText: l10n.taskAssignMemberLabel,
@@ -184,18 +185,30 @@ class _TaskAssignSheetState extends State<TaskAssignSheet> {
         items: <DropdownMenuItem<String?>>[
           DropdownMenuItem<String?>(
             value: null,
-            child: Text(l10n.taskAssignUnassigned),
+            child: Text(
+              l10n.taskAssignUnassigned,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
           if (currentUnavailable)
             DropdownMenuItem<String?>(
               value: currentId,
               enabled: false,
-              child: Text(l10n.taskAssigneeUnavailable),
+              child: Text(
+                l10n.taskAssigneeUnavailable,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           for (final AssignableMember member in members)
             DropdownMenuItem<String?>(
               value: member.userId,
-              child: Text(member.displayName),
+              child: Text(
+                member.displayName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
         ],
         onChanged: (String? value) {

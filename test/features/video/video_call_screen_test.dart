@@ -326,4 +326,24 @@ void main() {
       expect(find.byIcon(Icons.call_end), findsOneWidget);
     });
   });
+
+  testWidgets('landscape viewport keeps the connected controls visible', (
+    tester,
+  ) async {
+    // Short landscape phone: the controls must stay on screen and the grid
+    // must not overflow its viewport.
+    tester.view.physicalSize = const Size(844, 390);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final _MockRoom room = _newRoom();
+    await pumpCall(
+      tester,
+      roomFactory: () => room,
+      connector: (_, _, _) async {},
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byIcon(Icons.call_end), findsOneWidget);
+  });
 }

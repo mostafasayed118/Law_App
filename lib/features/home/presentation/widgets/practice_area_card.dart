@@ -34,6 +34,9 @@ class PracticeAreaCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
+        mouseCursor: onTap == null
+            ? MouseCursor.defer
+            : SystemMouseCursors.click,
         // Min-height (not a fixed 192) so the label can grow at large text
         // scales instead of overflowing; the bottom-aligned column keeps the
         // original visual posture at the default scale.

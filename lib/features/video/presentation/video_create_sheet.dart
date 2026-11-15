@@ -9,6 +9,7 @@ import 'package:legalhub/features/matters/domain/matter.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
+import 'package:legalhub/shared/widgets/app_modal_sheet.dart';
 import 'package:legalhub/shared/widgets/form_sheet_scaffold.dart';
 
 import 'video_cubit.dart';
@@ -24,9 +25,8 @@ Future<bool?> showVideoCreateSheet(
   BuildContext context, {
   required VideoCubit cubit,
 }) {
-  return showModalBottomSheet<bool>(
+  return showAppSheet<bool>(
     context: context,
-    isScrollControlled: true,
     builder: (BuildContext context) => BlocProvider<VideoCubit>.value(
       value: cubit,
       child: const VideoCreateSheet(),
@@ -284,17 +284,28 @@ class _VideoCreateSheetState extends State<VideoCreateSheet> {
   Widget _matterDropdown(AppLocalizations l10n, List<Matter> matters) {
     final DemoLabels labels = DemoLabels(l10n, localOnly: backendIsLocalOnly);
     return DropdownButtonFormField<String?>(
+      isExpanded: true,
       initialValue: _selectedMatterId,
       decoration: InputDecoration(
         labelText: l10n.videoCreateMatterLabel,
         border: const OutlineInputBorder(),
       ),
       items: <DropdownMenuItem<String?>>[
-        DropdownMenuItem<String?>(child: Text(l10n.videoCreateMatterNone)),
+        DropdownMenuItem<String?>(
+          child: Text(
+            l10n.videoCreateMatterNone,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
         for (final Matter matter in matters)
           DropdownMenuItem<String?>(
             value: matter.id,
-            child: Text(labels.matterTitle(matter.title)),
+            child: Text(
+              labels.matterTitle(matter.title),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
       ],
       onChanged: _submitting

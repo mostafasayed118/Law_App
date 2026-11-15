@@ -11,6 +11,7 @@ import 'package:legalhub/features/auth/domain/sign_up_request.dart';
 import 'package:legalhub/features/auth/presentation/sign_up_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/forms/validators.dart';
+import 'package:legalhub/shared/responsive/breakpoints.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
 
 import 'widgets/auth_buttons.dart';
@@ -43,7 +44,7 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  static const double _maxContentWidth = 520;
+  static const double _maxContentWidth = AppBreakpoints.authContentMaxWidth;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _fullName = TextEditingController();

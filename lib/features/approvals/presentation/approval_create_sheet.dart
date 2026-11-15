@@ -11,6 +11,7 @@ import 'package:legalhub/features/approvals/domain/pending_approval.dart';
 import 'package:legalhub/features/matters/domain/matter.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/demo_labels.dart';
+import 'package:legalhub/shared/widgets/app_modal_sheet.dart';
 import 'package:legalhub/shared/widgets/form_sheet_scaffold.dart';
 
 import 'approval_error_messages.dart';
@@ -27,9 +28,8 @@ Future<bool?> showApprovalCreateSheet(
   BuildContext context, {
   required ApprovalsCubit cubit,
 }) {
-  return showModalBottomSheet<bool>(
+  return showAppSheet<bool>(
     context: context,
-    isScrollControlled: true,
     builder: (BuildContext context) => BlocProvider<ApprovalsCubit>.value(
       value: cubit,
       child: const ApprovalCreateSheet(),
@@ -285,17 +285,28 @@ class _ApprovalCreateSheetState extends State<ApprovalCreateSheet> {
   Widget _matterDropdown(AppLocalizations l10n, List<Matter> matters) {
     final DemoLabels labels = DemoLabels(l10n, localOnly: backendIsLocalOnly);
     return DropdownButtonFormField<String?>(
+      isExpanded: true,
       initialValue: _selectedMatterId,
       decoration: InputDecoration(
         labelText: l10n.approvalCreateMatterLabel,
         border: const OutlineInputBorder(),
       ),
       items: <DropdownMenuItem<String?>>[
-        DropdownMenuItem<String?>(child: Text(l10n.approvalCreateMatterNone)),
+        DropdownMenuItem<String?>(
+          child: Text(
+            l10n.approvalCreateMatterNone,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
         for (final Matter matter in matters)
           DropdownMenuItem<String?>(
             value: matter.id,
-            child: Text(labels.matterTitle(matter.title)),
+            child: Text(
+              labels.matterTitle(matter.title),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
       ],
       onChanged: _submitting

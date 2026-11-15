@@ -8,6 +8,7 @@ import 'package:legalhub/features/approvals/domain/pending_approval.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
+import 'package:legalhub/shared/widgets/app_modal_sheet.dart';
 import 'package:legalhub/shared/widgets/confirm_dialog.dart';
 
 import 'approval_error_messages.dart';
@@ -31,9 +32,8 @@ Future<ApprovalDetailOutcome?> showApprovalDetailSheet(
   required bool canDecide,
   required String? currentUserId,
 }) {
-  return showModalBottomSheet<ApprovalDetailOutcome>(
+  return showAppSheet<ApprovalDetailOutcome>(
     context: context,
-    isScrollControlled: true,
     builder: (BuildContext context) => BlocProvider<ApprovalsCubit>.value(
       value: cubit,
       child: ApprovalDetailSheet(

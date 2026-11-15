@@ -30,48 +30,56 @@ class OnboardingSuccessScreen extends StatelessWidget {
     final TextTheme text = Theme.of(context).textTheme;
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsetsDirectional.all(
-              LegalHubTheme.marginMobile,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsetsDirectional.only(
-                    bottom: LegalHubTheme.spaceXl,
-                  ),
-                  child: Center(
-                    child: IconHeroBadge(
-                      icon: Icons.check,
-                      background: scheme.secondaryContainer,
-                      iconColor: scheme.onSecondary,
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsetsDirectional.all(
+                LegalHubTheme.marginMobile,
+              ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight:
+                      constraints.maxHeight - 2 * LegalHubTheme.marginMobile,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsetsDirectional.only(
+                        bottom: LegalHubTheme.spaceXl,
+                      ),
+                      child: Center(
+                        child: IconHeroBadge(
+                          icon: Icons.check,
+                          background: scheme.secondaryContainer,
+                          iconColor: scheme.onSecondary,
+                        ),
+                      ),
                     ),
-                  ),
+                    Text(
+                      l10n.onboardingSuccessTitle,
+                      textAlign: TextAlign.center,
+                      style: text.displayMedium,
+                    ),
+                    const SizedBox(height: LegalHubTheme.spaceSm),
+                    Text(
+                      l10n.onboardingSuccessBody,
+                      textAlign: TextAlign.center,
+                      style: text.bodyMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: LegalHubTheme.spaceXl * 1.5),
+                    ElevatedButton(
+                      onPressed: () => _complete(context),
+                      child: Text(l10n.onboardingSuccessAction),
+                    ),
+                  ],
                 ),
-                Text(
-                  l10n.onboardingSuccessTitle,
-                  textAlign: TextAlign.center,
-                  style: text.displayMedium,
-                ),
-                const SizedBox(height: LegalHubTheme.spaceSm),
-                Text(
-                  l10n.onboardingSuccessBody,
-                  textAlign: TextAlign.center,
-                  style: text.bodyMedium?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: LegalHubTheme.spaceXl * 1.5),
-                ElevatedButton(
-                  onPressed: () => _complete(context),
-                  child: Text(l10n.onboardingSuccessAction),
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         ),
       ),
     );

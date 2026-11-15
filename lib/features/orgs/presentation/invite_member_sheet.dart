@@ -59,9 +59,8 @@ Future<bool?> showInviteMemberSheet(
   required String organizationId,
   required OrgCubit cubit,
 }) {
-  return showModalBottomSheet<bool>(
+  return showAppSheet<bool>(
     context: context,
-    isScrollControlled: true,
     builder: (BuildContext context) => BlocProvider<OrgCubit>.value(
       value: cubit,
       child: InviteMemberSheet(organizationId: organizationId),
