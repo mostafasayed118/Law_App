@@ -2290,6 +2290,36 @@ abstract class AppLocalizations {
   /// **'Demo mode — synthetic document metadata only. No real files are listed.'**
   String get vaultLocalOnlyNote;
 
+  /// No description provided for @documentDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Document details'**
+  String get documentDetailsTitle;
+
+  /// No description provided for @documentDetailsType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get documentDetailsType;
+
+  /// No description provided for @documentDetailsMatter.
+  ///
+  /// In en, this message translates to:
+  /// **'Matter'**
+  String get documentDetailsMatter;
+
+  /// No description provided for @documentDetailsCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get documentDetailsCreated;
+
+  /// No description provided for @documentDetailsNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Document not found.'**
+  String get documentDetailsNotFound;
+
   /// No description provided for @viewMatter.
   ///
   /// In en, this message translates to:
@@ -2625,6 +2655,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Demo mode — synthetic invoice metadata only. No real payments are shown.'**
   String get invoicesLocalOnlyNote;
+
+  /// No description provided for @invoiceDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice details'**
+  String get invoiceDetailsTitle;
+
+  /// No description provided for @invoiceDetailsStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get invoiceDetailsStatus;
+
+  /// No description provided for @invoiceDetailsMatter.
+  ///
+  /// In en, this message translates to:
+  /// **'Matter'**
+  String get invoiceDetailsMatter;
+
+  /// No description provided for @invoiceDetailsIssued.
+  ///
+  /// In en, this message translates to:
+  /// **'Issued'**
+  String get invoiceDetailsIssued;
+
+  /// No description provided for @invoiceDetailsDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Due'**
+  String get invoiceDetailsDue;
+
+  /// No description provided for @invoiceDetailsAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get invoiceDetailsAmount;
+
+  /// No description provided for @invoiceDetailsNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice not found.'**
+  String get invoiceDetailsNotFound;
 
   /// No description provided for @invoicesEntryTitle.
   ///

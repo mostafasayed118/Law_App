@@ -68,24 +68,24 @@ void main() {
       );
     });
 
-    testWidgets('renders metadata only — no body, preview, download, or row '
-        'affordance (AC-2)', (tester) async {
+    testWidgets('renders metadata only — no body, preview, or download — and '
+        'opens the metadata detail (AC-2, D-V1)', (tester) async {
       await pumpVault(tester);
 
       // Absence of any content affordance: no download / preview / open
-      // icons and no action labels anywhere in the vault.
+      // icons and no action labels anywhere in the vault. The row opens a
+      // metadata-only detail; document content still cannot exist here.
       expect(find.byIcon(Icons.download), findsNothing);
       expect(find.byIcon(Icons.visibility), findsNothing);
       expect(find.byIcon(Icons.open_in_new), findsNothing);
       expect(find.textContaining('Preview'), findsNothing);
       expect(find.textContaining('Download'), findsNothing);
 
-      // D-V1 re-scoped by Phase 12 D-C2: rows still carry no chevron (contrast
-      // the matter list, where every row carries the details affordance), and
-      // the ONLY InkWell in the list lives inside a resolved row's "View
-      // matter" chip — the reverse cross-link affordance. Unresolved rows
-      // keep no tap target at all.
-      expect(find.byIcon(Icons.chevron_right), findsNothing);
+      // D-V1 re-scoped by the metadata-detail route: every row is a tap
+      // target now (chevron + row InkWell), and a resolved row additionally
+      // carries the "View matter" chip (D-C2). Unresolved rows keep only the
+      // row target.
+      expect(find.byIcon(Icons.chevron_right), findsNWidgets(5));
       final Finder listInkWells = find.descendant(
         of: find.byType(ListView),
         matching: find.byType(InkWell),
@@ -95,10 +95,13 @@ void main() {
         matching: find.byType(InkWell),
       );
       // Every synthetic document's matterRef resolves to a known matter, so
-      // every row carries exactly one chip — and no other InkWell exists in
-      // the list (the chip is the only tap target, D-C2).
+      // every row carries exactly one chip; the list holds one row InkWell
+      // per row plus those five chips.
       expect(chipInkWells, findsNWidgets(5));
-      expect(listInkWells.evaluate().length, chipInkWells.evaluate().length);
+      expect(
+        listInkWells.evaluate().length,
+        5 + chipInkWells.evaluate().length,
+      );
 
       // The vault carries the metadata-only, local-only note (R1/D-V1).
       expect(
@@ -122,7 +125,8 @@ void main() {
         await pumpVault(tester);
 
         // The row renders its metadata but NO chip: the title-keyed
-        // resolution found no matter (D-C3), so the row is not a tap target.
+        // resolution found no matter (D-C3). The row itself still opens the
+        // metadata detail, so it keeps its own InkWell/chevron.
         expect(find.text('Unlinked demo file'), findsOneWidget);
         expect(find.byType(MatterLinkChip), findsNothing);
         expect(
@@ -130,9 +134,9 @@ void main() {
             of: find.byType(ListView),
             matching: find.byType(InkWell),
           ),
-          findsNothing,
+          findsOneWidget,
         );
-        expect(find.byIcon(Icons.chevron_right), findsNothing);
+        expect(find.byIcon(Icons.chevron_right), findsOneWidget);
       },
     );
 
@@ -165,12 +169,14 @@ void main() {
 
         expect(find.text('Demo engagement letter'), findsOneWidget);
         expect(find.byType(MatterLinkChip), findsNothing);
+        // The chip is gated, but every row still opens the metadata detail,
+        // so the row-level InkWells remain.
         expect(
           find.descendant(
             of: find.byType(ListView),
             matching: find.byType(InkWell),
           ),
-          findsNothing,
+          findsNWidgets(5),
         );
       },
     );

@@ -1,15 +1,16 @@
 part of 'document_list_screen.dart';
 
-/// A read-only metadata row. Carries **no onTap on the row body, no chevron,
-/// and no trailing action other than the Phase 12 "View matter" chip** — the
-/// vault's metadata-only line (D-V1) now allows exactly one tap target per
-/// resolved row: the compact `MatterLinkChip`, which is the ONLY InkWell in
-/// the list (D-C2). The AC-2 pin asserts these absences structurally.
+/// A metadata row. The whole row opens the metadata detail (`/vault/:id`);
+/// the resolved row's compact "View matter" chip remains a second, nested
+/// tap target (D-C2). **No content, preview, download, or share affordance
+/// exists anywhere in the row** — the detail it opens is metadata-only too
+/// (D-V1).
 class _DocumentTile extends StatelessWidget {
   const _DocumentTile({
     required this.document,
     required this.localOnly,
     required this.onViewMatter,
+    required this.onOpen,
   });
 
   final Document document;
@@ -17,11 +18,10 @@ class _DocumentTile extends StatelessWidget {
 
   /// The reverse cross-link tap, or null when the row renders no chip
   /// (no embedded matter title or the nav hint not granted, D-C2/D-C4).
-  ///
-  /// Null-checked with a `case` pattern below: public final fields do not
-  /// promote in Dart 3.2, so a plain `!= null` check would not narrow the
-  /// type here.
   final VoidCallback? onViewMatter;
+
+  /// Whole-row open → the metadata detail.
+  final VoidCallback onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +36,9 @@ class _DocumentTile extends StatelessWidget {
         localOnly: localOnly,
       ).documentTitle(document.title),
       subtitles: <String>['${documentTypeLabel(l10n, document.type)} · $date'],
+      onTap: onOpen,
       // The chips wrap beneath the metadata line (the roster pattern); the
-      // link chip stays the only tap target in the row (D-C2), so the card
-      // itself renders no InkWell and no chevron (AppTile null onTap).
+      // link chip stays a nested secondary tap target in the row (D-C2).
       trailing: switch (onViewMatter) {
         final VoidCallback tap => Padding(
           padding: const EdgeInsetsDirectional.only(top: LegalHubTheme.spaceSm),

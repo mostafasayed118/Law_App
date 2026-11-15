@@ -1218,6 +1218,21 @@ class AppLocalizationsAr extends AppLocalizations {
       'وضع تجريبي — بيانات وصفية اصطناعية للمستندات فقط. لا يتم عرض ملفات حقيقية.';
 
   @override
+  String get documentDetailsTitle => 'تفاصيل المستند';
+
+  @override
+  String get documentDetailsType => 'النوع';
+
+  @override
+  String get documentDetailsMatter => 'الملف';
+
+  @override
+  String get documentDetailsCreated => 'تاريخ الإنشاء';
+
+  @override
+  String get documentDetailsNotFound => 'المستند غير موجود.';
+
+  @override
   String get viewMatter => 'عرض القضية';
 
   @override
@@ -1421,6 +1436,27 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get invoicesLocalOnlyNote =>
       'وضع تجريبي — بيانات وصفية اصطناعية للفواتير فقط. لا توجد مدفوعات حقيقية.';
+
+  @override
+  String get invoiceDetailsTitle => 'تفاصيل الفاتورة';
+
+  @override
+  String get invoiceDetailsStatus => 'الحالة';
+
+  @override
+  String get invoiceDetailsMatter => 'الملف';
+
+  @override
+  String get invoiceDetailsIssued => 'تاريخ الإصدار';
+
+  @override
+  String get invoiceDetailsDue => 'تاريخ الاستحقاق';
+
+  @override
+  String get invoiceDetailsAmount => 'المبلغ';
+
+  @override
+  String get invoiceDetailsNotFound => 'الفاتورة غير موجودة.';
 
   @override
   String get invoicesEntryTitle => 'الفوترة';

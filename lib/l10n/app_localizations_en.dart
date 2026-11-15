@@ -1222,6 +1222,21 @@ class AppLocalizationsEn extends AppLocalizations {
       'Demo mode — synthetic document metadata only. No real files are listed.';
 
   @override
+  String get documentDetailsTitle => 'Document details';
+
+  @override
+  String get documentDetailsType => 'Type';
+
+  @override
+  String get documentDetailsMatter => 'Matter';
+
+  @override
+  String get documentDetailsCreated => 'Created';
+
+  @override
+  String get documentDetailsNotFound => 'Document not found.';
+
+  @override
   String get viewMatter => 'View matter';
 
   @override
@@ -1424,6 +1439,27 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get invoicesLocalOnlyNote =>
       'Demo mode — synthetic invoice metadata only. No real payments are shown.';
+
+  @override
+  String get invoiceDetailsTitle => 'Invoice details';
+
+  @override
+  String get invoiceDetailsStatus => 'Status';
+
+  @override
+  String get invoiceDetailsMatter => 'Matter';
+
+  @override
+  String get invoiceDetailsIssued => 'Issued';
+
+  @override
+  String get invoiceDetailsDue => 'Due';
+
+  @override
+  String get invoiceDetailsAmount => 'Amount';
+
+  @override
+  String get invoiceDetailsNotFound => 'Invoice not found.';
 
   @override
   String get invoicesEntryTitle => 'Billing';

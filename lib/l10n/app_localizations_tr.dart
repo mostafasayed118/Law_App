@@ -1223,6 +1223,21 @@ class AppLocalizationsTr extends AppLocalizations {
       'Demo modu — yalnızca sentetik belge meta verileri. Gerçek dosyalar listelenmez.';
 
   @override
+  String get documentDetailsTitle => 'Belge ayrıntıları';
+
+  @override
+  String get documentDetailsType => 'Tür';
+
+  @override
+  String get documentDetailsMatter => 'Dosya';
+
+  @override
+  String get documentDetailsCreated => 'Oluşturulma';
+
+  @override
+  String get documentDetailsNotFound => 'Belge bulunamadı.';
+
+  @override
   String get viewMatter => 'Davayı görüntüle';
 
   @override
@@ -1424,6 +1439,27 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get invoicesLocalOnlyNote =>
       'Demo modu — yalnızca sentetik fatura meta verileri. Gerçek ödeme almaz.';
+
+  @override
+  String get invoiceDetailsTitle => 'Fatura ayrıntıları';
+
+  @override
+  String get invoiceDetailsStatus => 'Durum';
+
+  @override
+  String get invoiceDetailsMatter => 'Dosya';
+
+  @override
+  String get invoiceDetailsIssued => 'Düzenlenme';
+
+  @override
+  String get invoiceDetailsDue => 'Vade';
+
+  @override
+  String get invoiceDetailsAmount => 'Tutar';
+
+  @override
+  String get invoiceDetailsNotFound => 'Fatura bulunamadı.';
 
   @override
   String get invoicesEntryTitle => 'Faturalama';

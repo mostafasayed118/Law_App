@@ -1,9 +1,8 @@
 part of 'billing_invoices_screen.dart';
 
-/// An invoice-metadata row with the optional shared pay affordance.
-///
-/// The row stays non-tappable (no row `onTap`, no chevron); the only action is
-/// the [InvoicePayAction] for an `issued` invoice when payments are enabled.
+/// An invoice-metadata row. The row opens the metadata detail; the only
+/// nested action is the [InvoicePayAction] for an `issued` invoice when
+/// payments are enabled.
 class _InvoiceTile extends StatelessWidget {
   const _InvoiceTile({
     required this.invoice,
@@ -12,6 +11,7 @@ class _InvoiceTile extends StatelessWidget {
     required this.launcher,
     required this.localOnly,
     required this.onSettled,
+    required this.onOpen,
   });
 
   final Invoice invoice;
@@ -20,6 +20,9 @@ class _InvoiceTile extends StatelessWidget {
   final CheckoutLauncher launcher;
   final bool localOnly;
   final Future<void> Function() onSettled;
+
+  /// Whole-row open → the metadata detail.
+  final VoidCallback onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +41,7 @@ class _InvoiceTile extends StatelessWidget {
         '${invoice.currency} $amount · $status',
         '${labels.matterTitle(invoice.matterRef)} · $issued',
       ],
+      onTap: onOpen,
       trailing: Align(
         alignment: AlignmentDirectional.centerEnd,
         child: InvoicePayAction(

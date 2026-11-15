@@ -78,8 +78,10 @@ void main() {
         expect(find.text('Pay now'), findsNothing);
         expect(find.byIcon(Icons.payment), findsNothing);
         expect(find.byIcon(Icons.credit_card), findsNothing);
-        expect(find.byType(InkWell), findsNothing);
+        // The metadata row itself is tappable (it opens the metadata detail),
+        // but no pay button exists when payments are disabled (D-BI1/D-11).
         expect(find.byType(TextButton), findsNothing);
+        expect(find.byIcon(Icons.chevron_right), findsWidgets);
       },
     );
 
