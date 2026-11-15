@@ -62,7 +62,10 @@ List<RouteBase> _shellRoutes(
         // re-asserts F2-D1 server-side, so a non-partner caller reaching
         // the create screen gets the typed denial, never empty success.
         final UserRole role = _projectedRole(authCubit);
-        return MatterListScreen(canCreateMatter: role == UserRole.partner);
+        return MatterListScreen(
+          canCreateMatter: role == UserRole.partner,
+          capabilities: capabilityForRole(capabilitiesForRole, role),
+        );
       },
     ),
     GoRoute(
@@ -77,9 +80,23 @@ List<RouteBase> _shellRoutes(
         // membership role (mirrors the shell); the workspace sections are
         // navigation hints, never authorization grants (D-W5).
         final UserRole role = _projectedRole(authCubit);
+        final RoleCapability capabilities = capabilityForRole(
+          capabilitiesForRole,
+          role,
+        );
+        final String matterId = state.pathParameters['matterId'] ?? '';
+        // Expanded windows render the list + this matter side by side; a
+        // deep link keeps the URL and gains the master list.
+        if (MediaQuery.sizeOf(context).width >= AppBreakpoints.expanded) {
+          return MatterListScreen(
+            canCreateMatter: role == UserRole.partner,
+            capabilities: capabilities,
+            initialSelectedMatterId: matterId,
+          );
+        }
         return MatterDetailsScreen(
-          matterId: state.pathParameters['matterId'] ?? '',
-          capabilities: capabilityForRole(capabilitiesForRole, role),
+          matterId: matterId,
+          capabilities: capabilities,
         );
       },
     ),
@@ -93,6 +110,30 @@ List<RouteBase> _shellRoutes(
             authCubit.state.session?.primaryRole ?? UserRole.client;
         return DocumentListScreen(
           capabilities: capabilityForRole(capabilitiesForRole, role),
+        );
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.documentDetails,
+      builder: (BuildContext context, GoRouterState state) {
+        final UserRole role =
+            authCubit.state.session?.primaryRole ?? UserRole.client;
+        final RoleCapability capabilities = capabilityForRole(
+          capabilitiesForRole,
+          role,
+        );
+        final String documentId = state.pathParameters['documentId'] ?? '';
+        // Expanded windows render the vault list + this document side by
+        // side; a deep link keeps the URL and gains the master list.
+        if (MediaQuery.sizeOf(context).width >= AppBreakpoints.expanded) {
+          return DocumentListScreen(
+            capabilities: capabilities,
+            initialSelectedDocumentId: documentId,
+          );
+        }
+        return DocumentDetailsScreen(
+          documentId: documentId,
+          capabilities: capabilities,
         );
       },
     ),
@@ -117,8 +158,20 @@ List<RouteBase> _shellRoutes(
         // client-side); a deep link without it falls back to the
         // localized generic title.
         final Object? extra = state.extra;
+        final String threadId = state.pathParameters['threadId'] ?? '';
+        // Expanded windows render the thread list + this transcript side by
+        // side; a deep link keeps the URL and gains the master list.
+        if (MediaQuery.sizeOf(context).width >= AppBreakpoints.expanded) {
+          final UserRole role =
+              authCubit.state.session?.primaryRole ?? UserRole.client;
+          return MessageListScreen(
+            capabilities: capabilityForRole(capabilitiesForRole, role),
+            initialSelectedThreadId: threadId,
+            initialSelectedThreadTitle: extra is String ? extra : null,
+          );
+        }
         return MessageThreadDetailScreen(
-          threadId: state.pathParameters['threadId'] ?? '',
+          threadId: threadId,
           threadTitle: extra is String ? extra : null,
         );
       },
@@ -141,6 +194,18 @@ List<RouteBase> _shellRoutes(
       path: AppRoutes.invoices,
       builder: (BuildContext context, GoRouterState state) =>
           const BillingInvoicesScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.invoiceDetails,
+      builder: (BuildContext context, GoRouterState state) {
+        final String invoiceId = state.pathParameters['invoiceId'] ?? '';
+        // Expanded windows render the invoices list + this invoice side by
+        // side; a deep link keeps the URL and gains the master list.
+        if (MediaQuery.sizeOf(context).width >= AppBreakpoints.expanded) {
+          return BillingInvoicesScreen(initialSelectedInvoiceId: invoiceId);
+        }
+        return InvoiceDetailsScreen(invoiceId: invoiceId);
+      },
     ),
     GoRoute(
       path: AppRoutes.alerts,

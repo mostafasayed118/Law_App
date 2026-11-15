@@ -19,10 +19,12 @@ import 'package:legalhub/features/auth/presentation/forgot_password/forgot_passw
 import 'package:legalhub/features/auth/presentation/sign_in_screen.dart';
 import 'package:legalhub/features/auth/presentation/sign_up_screen.dart';
 import 'package:legalhub/features/billing/presentation/billing_invoices_screen.dart';
+import 'package:legalhub/features/billing/presentation/invoice_details_screen.dart';
 import 'package:legalhub/features/booking/presentation/booking_screen.dart';
 import 'package:legalhub/features/compliance/presentation/compliance_alerts_screen.dart';
 import 'package:legalhub/features/discovery/presentation/attorney_profile_screen.dart';
 import 'package:legalhub/features/discovery/presentation/attorney_search_screen.dart';
+import 'package:legalhub/features/documents/presentation/document_details_screen.dart';
 import 'package:legalhub/features/documents/presentation/document_list_screen.dart';
 import 'package:legalhub/features/home/presentation/home_screen.dart';
 import 'package:legalhub/features/home/presentation/settings_screen.dart';
@@ -78,9 +80,13 @@ class AppRoutes {
   static const String matterCreate = '/matters/new';
   static const String matterDetails = '/matters/:matterId';
   static const String vault = '/vault';
+  static String documentDetail(String documentId) => '/vault/$documentId';
+  static const String documentDetails = '/vault/:documentId';
   static const String messages = '/messages';
   static const String messageThreadDetail = '/messages/:threadId';
   static const String invoices = '/invoices';
+  static String invoiceDetail(String invoiceId) => '/invoices/$invoiceId';
+  static const String invoiceDetails = '/invoices/:invoiceId';
   static const String alerts = '/alerts';
   static const String tasks = '/tasks';
   static const String approvals = '/approvals';
