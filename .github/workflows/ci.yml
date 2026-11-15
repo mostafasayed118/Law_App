@@ -122,6 +122,37 @@ jobs:
       - name: Run tests
         run: flutter test
 
+  golden-pins:
+    # Pixel pins for the responsive breakpoints (home 320/1024, matters and
+    # messages two-pane at 1024). The baselines are generated in the pinned
+    # renderer image `tool/ci/flutter-golden.Dockerfile` (Ubuntu 24.04 +
+    # Flutter 3.44.4) and compared here on the same ubuntu-latest + Flutter
+    # version. The normal test step skips them (RUN_GOLDENS unset), so a
+    # Windows developer never compares against Linux pixels.
+    name: golden pins (pinned renderer)
+    needs: quality-gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.4'
+          channel: stable
+          cache: true
+
+      - name: Download dependencies
+        run: flutter pub get
+
+      - name: Golden pins
+        env:
+          RUN_GOLDENS: '1'
+        run: flutter test test/golden
+
   release-build-proof:
     # B2 amendment (spec §7.1, audit §12.20, owner-approved 2026-09-23):
     # prove the release app bundle still compiles on a clean machine after
