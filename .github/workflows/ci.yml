@@ -29,6 +29,17 @@ on:
   pull_request:
     branches:
       - main
+  # On-demand baseline regeneration. `gh workflow run ci.yml -f
+  # update_goldens=true` rebuilds the four PNGs in the same pinned renderer the
+  # comparison job uses and uploads them as an artifact, so a toolchain bump can
+  # be absorbed without Docker on the developer's machine. Without this input
+  # the job stays a pure comparison.
+  workflow_dispatch:
+    inputs:
+      update_goldens:
+        description: 'Regenerate the golden baselines and upload them as an artifact'
+        type: boolean
+        default: false
 
 # Least privilege: read-only on the triggering repo. The quality gates need no
 # secrets at all (the B1 widget test needs no environment configuration); the
@@ -150,9 +161,24 @@ jobs:
         run: flutter pub get
 
       - name: Golden pins
+        if: ${{ !inputs.update_goldens }}
         env:
           RUN_GOLDENS: '1'
         run: flutter test test/golden
+
+      - name: Regenerate golden baselines
+        if: ${{ inputs.update_goldens }}
+        env:
+          RUN_GOLDENS: '1'
+        run: flutter test test/golden --update-goldens
+
+      - name: Upload regenerated baselines
+        if: ${{ inputs.update_goldens }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-baselines
+          path: test/golden/goldens/*.png
+          if-no-files-found: error
 
   release-build-proof:
     # B2 amendment (spec §7.1, audit §12.20, owner-approved 2026-09-23):
