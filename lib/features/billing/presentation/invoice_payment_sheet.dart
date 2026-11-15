@@ -8,6 +8,7 @@ import 'package:legalhub/features/billing/domain/invoice.dart';
 import 'package:legalhub/features/billing/domain/payment_gateway.dart';
 import 'package:legalhub/features/billing/domain/payment_status.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/widgets/app_modal_sheet.dart';
 
 import 'invoice_labels.dart';
 import 'payment_cubit.dart';
@@ -27,9 +28,8 @@ Future<void> showInvoicePaymentSheet({
 }) async {
   final PaymentCubit cubit = PaymentCubit(gateway);
   try {
-    await showModalBottomSheet<void>(
+    await showAppSheet<void>(
       context: context,
-      isScrollControlled: true,
       builder: (BuildContext sheetContext) => BlocProvider<PaymentCubit>.value(
         value: cubit,
         child: InvoicePaymentSheet(
