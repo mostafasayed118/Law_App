@@ -4,4 +4,5 @@
 /// responsive audit note in docs/).
 library;
 
+export 'breakpoints.dart';
 export 'responsive_content.dart';

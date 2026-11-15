@@ -55,6 +55,9 @@ class AppEntryCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
+        mouseCursor: onTap == null
+            ? MouseCursor.defer
+            : SystemMouseCursors.click,
         child: Padding(
           padding: const EdgeInsetsDirectional.all(LegalHubTheme.spaceMd),
           child: Row(

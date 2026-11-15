@@ -121,7 +121,16 @@ class AppTile extends StatelessWidget {
         side: BorderSide(color: scheme.outlineVariant),
       ),
       clipBehavior: onTap == null ? Clip.none : Clip.antiAlias,
-      child: onTap == null ? content : InkWell(onTap: onTap, child: content),
+      child: onTap == null
+          ? content
+          : InkWell(
+              onTap: onTap,
+              // Explicit click cursor: Material's adaptive default resolves
+              // to `basic` on touch platforms, which made desktop/web rows
+              // indistinguishable from static text.
+              mouseCursor: SystemMouseCursors.click,
+              child: content,
+            ),
     );
   }
 }

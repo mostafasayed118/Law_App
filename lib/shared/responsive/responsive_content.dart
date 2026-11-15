@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'breakpoints.dart';
+
 /// Centers and caps the width of a screen's body content.
 ///
 /// On compact (phone) widths the constraint is a no-op: the child keeps the
@@ -15,7 +17,7 @@ import 'package:flutter/material.dart';
 class ResponsiveContent extends StatelessWidget {
   const ResponsiveContent({
     required this.child,
-    this.maxWidth = 840,
+    this.maxWidth = AppBreakpoints.expanded,
     this.padding = EdgeInsets.zero,
     super.key,
   });

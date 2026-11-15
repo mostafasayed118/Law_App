@@ -23,45 +23,49 @@ class MatterLinkChip extends StatelessWidget {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
-    return Material(
-      color: scheme.secondaryContainer,
-      shape: RoundedRectangleBorder(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(LegalHubTheme.radiusFull),
-        ),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsetsDirectional.symmetric(
-            horizontal: LegalHubTheme.spaceSm,
-            vertical: LegalHubTheme.spaceXs,
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: Material(
+        color: scheme.secondaryContainer,
+        shape: RoundedRectangleBorder(
+          borderRadius: const BorderRadius.all(
+            Radius.circular(LegalHubTheme.radiusFull),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Icon(
-                Icons.folder_open,
-                size: 14,
-                color: scheme.onSecondaryContainer,
-              ),
-              const SizedBox(width: LegalHubTheme.spaceXs),
-              // Flexible + ellipsis lets the chip shrink (instead of
-              // overflowing) when a tight transient layout or large text
-              // scale squeezes the row it sits in.
-              Flexible(
-                child: Text(
-                  l10n.viewMatter,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: text.labelSmall?.copyWith(
-                    color: scheme.onSecondaryContainer,
-                    fontWeight: FontWeight.w600,
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          mouseCursor: SystemMouseCursors.click,
+          child: Padding(
+            padding: const EdgeInsetsDirectional.symmetric(
+              horizontal: LegalHubTheme.spaceSm,
+              vertical: LegalHubTheme.spaceXs,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Icon(
+                  Icons.folder_open,
+                  size: 14,
+                  color: scheme.onSecondaryContainer,
+                ),
+                const SizedBox(width: LegalHubTheme.spaceXs),
+                // Flexible + ellipsis lets the chip shrink (instead of
+                // overflowing) when a tight transient layout or large text
+                // scale squeezes the row it sits in.
+                Flexible(
+                  child: Text(
+                    l10n.viewMatter,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: text.labelSmall?.copyWith(
+                      color: scheme.onSecondaryContainer,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
