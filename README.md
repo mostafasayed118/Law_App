@@ -24,7 +24,7 @@ A 30–40 second walkthrough is planned at `docs/media/demo.gif`; the capture ch
 ## Highlights
 
 - **Clean Architecture with gateway seams.** Every feature splits into domain, data and presentation, and each data source sits behind a provider-neutral interface. The same UI runs on credential-free fakes or on Supabase; the build decides which.
-- **Authorization is server-side.** 25 tables, 28 RLS policy files and 26 pgTAP suites, with every write funnelled through an RPC. The client refuses to start if it is handed a service-role key.
+- **Authorization is server-side.** 25 tables, 26 RLS policy files and 26 pgTAP suites, with every write funnelled through an RPC. The client refuses to start if it is handed a service-role key.
 - **Three languages, right-to-left included.** English, Arabic and Turkish, 866 localized strings each, with Arabic typography and a layout matrix that proves RTL at 320px.
 - **Phone to tablet.** One breakpoint contract drives the navigation rail, master/detail two-pane layouts, centred sheets and readable content width, down to foldable hinge geometry.
 - **Genuinely tested.** 2,163 tests run and pass, 83% line coverage, plus a matrix that pumps every route across five widths and three text scales.
