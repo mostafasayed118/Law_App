@@ -1,10 +1,15 @@
 part of 'matter_details_screen.dart';
 
 class _DetailsSurface extends StatefulWidget {
-  const _DetailsSurface({required this.matterId, required this.capabilities});
+  const _DetailsSurface({
+    required this.matterId,
+    required this.capabilities,
+    required this.embedded,
+  });
 
   final String matterId;
   final RoleCapability capabilities;
+  final bool embedded;
 
   @override
   State<_DetailsSurface> createState() => _DetailsSurfaceState();
@@ -27,36 +32,38 @@ class _DetailsSurfaceState extends State<_DetailsSurface> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final Widget body = SafeArea(
+      child: BlocBuilder<MatterCubit, MatterState>(
+        builder: (BuildContext context, MatterState state) {
+          return switch (state.matters) {
+            ViewLoading() => const Center(child: CircularProgressIndicator()),
+            ViewEmpty() => AppCenteredMessage(text: l10n.matterDetailsNotFound),
+            ViewError() => AppCenteredRetry(
+              message: l10n.matterError,
+              onRetry: context.read<MatterCubit>().load,
+              retryLabel: l10n.retry,
+            ),
+            // The sealed ViewState set also carries offline/unauthorized
+            // variants (shared vocabulary); a synthetic list has neither
+            // state, so both render the not-found copy.
+            ViewOffline() || ViewUnauthorized() => AppCenteredMessage(
+              text: l10n.matterDetailsNotFound,
+            ),
+            ViewSuccess(data: final List<Matter> matters) => _details(
+              context,
+              l10n,
+              _findById(matters, widget.matterId),
+            ),
+          };
+        },
+      ),
+    );
+    if (widget.embedded) {
+      return body;
+    }
     return Scaffold(
       appBar: AppBar(title: Text(l10n.matterDetailsTitle)),
-      body: SafeArea(
-        child: BlocBuilder<MatterCubit, MatterState>(
-          builder: (BuildContext context, MatterState state) {
-            return switch (state.matters) {
-              ViewLoading() => const Center(child: CircularProgressIndicator()),
-              ViewEmpty() => AppCenteredMessage(
-                text: l10n.matterDetailsNotFound,
-              ),
-              ViewError() => AppCenteredRetry(
-                message: l10n.matterError,
-                onRetry: context.read<MatterCubit>().load,
-                retryLabel: l10n.retry,
-              ),
-              // The sealed ViewState set also carries offline/unauthorized
-              // variants (shared vocabulary); a synthetic list has neither
-              // state, so both render the not-found copy.
-              ViewOffline() || ViewUnauthorized() => AppCenteredMessage(
-                text: l10n.matterDetailsNotFound,
-              ),
-              ViewSuccess(data: final List<Matter> matters) => _details(
-                context,
-                l10n,
-                _findById(matters, widget.matterId),
-              ),
-            };
-          },
-        ),
-      ),
+      body: body,
     );
   }
 

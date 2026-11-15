@@ -37,6 +37,7 @@ class MessageThreadDetailScreen extends StatelessWidget {
   const MessageThreadDetailScreen({
     required this.threadId,
     this.threadTitle,
+    this.embedded = false,
     super.key,
   });
 
@@ -47,12 +48,20 @@ class MessageThreadDetailScreen extends StatelessWidget {
   /// localized generic title when absent (e.g. a deep link with no extra).
   final String? threadTitle;
 
+  /// True inside the two-pane detail slot: the pane owns no Scaffold/AppBar
+  /// (the parent two-pane Scaffold owns the chrome) but keeps the composer.
+  final bool embedded;
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider<MessageThreadDetailCubit>(
       create: (BuildContext context) =>
           MessageThreadDetailCubit(serviceLocator<MessageGateway>()),
-      child: _DetailSurface(threadId: threadId, threadTitle: threadTitle),
+      child: _DetailSurface(
+        threadId: threadId,
+        threadTitle: threadTitle,
+        embedded: embedded,
+      ),
     );
   }
 }

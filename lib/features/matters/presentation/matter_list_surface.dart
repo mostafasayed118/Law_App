@@ -1,15 +1,34 @@
 part of 'matter_list_screen.dart';
 
 class _ListSurface extends StatefulWidget {
-  const _ListSurface({required this.canCreateMatter});
+  const _ListSurface({
+    required this.canCreateMatter,
+    this.embedded = false,
+    this.selectedMatterId,
+    this.onSelectMatter,
+  });
 
   final bool canCreateMatter;
+
+  /// True inside the two-pane: the pane owns no Scaffold/AppBar/FAB (the
+  /// parent two-pane Scaffold owns the chrome).
+  final bool embedded;
+
+  /// The matter highlighted/rendered by the detail pane (two-pane only).
+  final String? selectedMatterId;
+
+  /// Selection callback for two-pane. Null restores push navigation.
+  final ValueChanged<String>? onSelectMatter;
 
   @override
   State<_ListSurface> createState() => _ListSurfaceState();
 }
 
 class _ListSurfaceState extends State<_ListSurface> {
+  /// Guards the one-time auto-selection of the first loaded matter so the
+  /// two-pane never opens on an empty detail pane.
+  bool _autoSelected = false;
+
   @override
   void initState() {
     super.initState();
@@ -24,27 +43,26 @@ class _ListSurfaceState extends State<_ListSurface> {
     });
   }
 
-  /// Opens the create screen and RE-READS the list when it closes (W4,
-  /// 2026-10-21).
-  ///
-  /// The create screen runs its OWN cubit ([MatterCreateScreen] provides it),
-  /// so a created matter never reaches this list on its own — before this,
-  /// the list only picked it up when the screen was re-entered. Re-reading
-  /// on close is what makes the creator's own new matter appear in the list
-  /// (the read gate that lets them see it is the D1 creator carve-out).
-  Future<void> _openCreateScreen() async {
-    await context.push(AppRoutes.matterCreate);
-    if (!mounted) {
-      return;
-    }
-    await context.read<MatterCubit>().load();
-  }
-
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final TextTheme text = Theme.of(context).textTheme;
+    final Widget body = SafeArea(
+      child: BlocBuilder<MatterCubit, MatterState>(
+        builder: (BuildContext context, MatterState state) {
+          _maybeAutoSelect(state);
+          // Lazy list surface (audit 2026-09-21, M-20): the filter chips stay
+          // the header of the same scroll view — passed as `header`, they
+          // keep scrolling away with the rows instead of being pinned, and
+          // no nested scrollable is created.
+          return _resultsView(context, state, l10n, text, scheme);
+        },
+      ),
+    );
+    if (widget.embedded) {
+      return body;
+    }
     return Scaffold(
       appBar: AppBar(title: Text(l10n.matterTitle)),
       // F-01 step 2 client swap: the partner-gated create entry (C-D6/Q5) —
@@ -53,23 +71,34 @@ class _ListSurfaceState extends State<_ListSurface> {
           ? FloatingActionButton.extended(
               // E2E BUG-1 fix: forward navigation to the create screen.
               // W4: the list re-reads itself when the create screen closes.
-              onPressed: _openCreateScreen,
+              onPressed: () => _openMatterCreate(context),
               icon: const Icon(Icons.add),
               label: Text(l10n.matterCreateFab),
             )
           : null,
-      body: SafeArea(
-        child: BlocBuilder<MatterCubit, MatterState>(
-          builder: (BuildContext context, MatterState state) {
-            // Lazy list surface (audit 2026-09-21, M-20): the filter chips stay
-            // the header of the same scroll view — passed as `header`, they
-            // keep scrolling away with the rows instead of being pinned, and
-            // no nested scrollable is created.
-            return _resultsView(context, state, l10n, text, scheme);
-          },
-        ),
-      ),
+      body: body,
     );
+  }
+
+  /// Auto-selects the first loaded matter once per list mount, so the
+  /// two-pane detail is populated as soon as the fake resolves.
+  void _maybeAutoSelect(MatterState state) {
+    if (_autoSelected ||
+        widget.onSelectMatter == null ||
+        widget.selectedMatterId != null) {
+      return;
+    }
+    if (state.matters case ViewSuccess<List<Matter>>(
+      data: final List<Matter> matters,
+    ) when matters.isNotEmpty) {
+      _autoSelected = true;
+      final String firstId = matters.first.id;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          widget.onSelectMatter!(firstId);
+        }
+      });
+    }
   }
 
   Widget _resultsView(
@@ -106,8 +135,11 @@ class _ListSurfaceState extends State<_ListSurface> {
             MatterStatusChip(label: matterStatusLabel(l10n, matter.status)),
           ],
         ),
-        // E2E BUG-1 fix: list → detail is a forward navigation.
-        onTap: () => context.push(AppRoutes.matterDetail(matter.id)),
+        // Two-pane: select in place. Compact/medium: forward navigation
+        // (E2E BUG-1 fix).
+        onTap: widget.onSelectMatter == null
+            ? () => context.push(AppRoutes.matterDetail(matter.id))
+            : () => widget.onSelectMatter!(matter.id),
       ),
       header: <Widget>[
         AppFilterChips<MatterStatus>(

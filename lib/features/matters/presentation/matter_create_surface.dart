@@ -99,7 +99,7 @@ class _CreateSurfaceState extends State<_CreateSurface> {
             // ACTIVE org id (a routing hint — the server re-derives
             // membership); without a selection the form would be a silent
             // dead end, so the surface says so instead.
-            ? Padding(
+            ? SingleChildScrollView(
                 padding: const EdgeInsetsDirectional.all(
                   LegalHubTheme.marginMobile,
                 ),

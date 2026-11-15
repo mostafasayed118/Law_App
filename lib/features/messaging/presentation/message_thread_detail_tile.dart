@@ -31,15 +31,19 @@ class _MessageTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Row(
+            // Wrap (not a fixed Row): at the 2.0 text ceiling the localized
+            // date alone is wider than a narrow tile, so it drops to a second
+            // line instead of overflowing the row by 26px.
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: LegalHubTheme.spaceSm,
               children: <Widget>[
-                Expanded(
-                  child: Text(
-                    labels.authorName(message.authorDisplayName),
-                    style: text.bodySmall?.copyWith(
-                      color: scheme.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
+                Text(
+                  labels.authorName(message.authorDisplayName),
+                  style: text.bodySmall?.copyWith(
+                    color: scheme.primary,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(

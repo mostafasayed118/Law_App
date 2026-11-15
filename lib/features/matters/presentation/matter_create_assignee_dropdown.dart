@@ -26,6 +26,7 @@ class _AssigneeDropdown extends StatelessWidget {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final List<OrgMember>? roster = members;
     return DropdownButtonFormField<String?>(
+      isExpanded: true,
       initialValue: value,
       decoration: InputDecoration(
         labelText: label,
@@ -38,12 +39,20 @@ class _AssigneeDropdown extends StatelessWidget {
           : <DropdownMenuItem<String?>>[
               DropdownMenuItem<String?>(
                 value: null,
-                child: Text(l10n.matterCreateAssigneeNone),
+                child: Text(
+                  l10n.matterCreateAssigneeNone,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               for (final OrgMember member in roster)
                 DropdownMenuItem<String?>(
                   value: member.userId,
-                  child: Text(member.displayName),
+                  child: Text(
+                    member.displayName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
             ],
       onChanged: enabled ? onChanged : null,

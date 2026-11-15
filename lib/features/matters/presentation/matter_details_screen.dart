@@ -44,6 +44,7 @@ class MatterDetailsScreen extends StatelessWidget {
   const MatterDetailsScreen({
     required this.matterId,
     required this.capabilities,
+    this.embedded = false,
     super.key,
   });
 
@@ -54,6 +55,10 @@ class MatterDetailsScreen extends StatelessWidget {
   /// and the Messages section under [RoleCapability.canViewMessages].
   /// Navigation hints only — never authorization.
   final RoleCapability capabilities;
+
+  /// True inside the two-pane detail slot: the pane owns no Scaffold/AppBar
+  /// (the parent two-pane Scaffold owns the chrome).
+  final bool embedded;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +77,11 @@ class MatterDetailsScreen extends StatelessWidget {
           serviceLocator<StorageGateway>(),
           matterId: matterId,
         ),
-        child: _DetailsSurface(matterId: matterId, capabilities: capabilities),
+        child: _DetailsSurface(
+          matterId: matterId,
+          capabilities: capabilities,
+          embedded: embedded,
+        ),
       ),
     );
   }
