@@ -1,5 +1,12 @@
-# Placeholder project ref: replace with the linked project id before any deploy.
-project_id = "law_app"
+# The shared DEV project (eu-central-1). Every live-apply record under docs/
+# names this ref: docs/device_e2e_2026-10-21_c835ced.md, the 2026-08/09 apply
+# records, and docs/audit/audit_remediation_2026-09-27.md. The CLI needs a
+# resolvable ref for `link`/`db push`, and "law_app" was never a project.
+#
+# NO PRODUCTION PROJECT EXISTS YET. When one is created, this file is the single
+# place to repoint before a production `db push` — do not run a production
+# migration window with this value unchanged.
+project_id = "eutmvevpskerzpqmwplv"
 
 [functions.paymob-initiate]
 verify_jwt = true
