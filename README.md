@@ -27,7 +27,7 @@ A 30–40 second walkthrough is planned at `docs/media/demo.gif`; the capture ch
 - **Authorization is server-side.** 25 tables, 26 RLS policy files and 26 pgTAP suites, with every write funnelled through an RPC. The client refuses to start if it is handed a service-role key.
 - **Three languages, right-to-left included.** English, Arabic and Turkish, 866 localized strings each, with Arabic typography and a layout matrix that proves RTL at 320px.
 - **Phone to tablet.** One breakpoint contract drives the navigation rail, master/detail two-pane layouts, centred sheets and readable content width, down to foldable hinge geometry.
-- **Genuinely tested.** 2,163 tests run and pass, 83% line coverage, plus a matrix that pumps every route across five widths and three text scales.
+- **Genuinely tested.** 2,163 tests run and pass, 86% line coverage, plus a matrix that pumps every route across five widths and three text scales.
 - **Runs without credentials.** Clone it, run it, click through every screen on a deterministic demo dataset.
 
 ## Architecture
