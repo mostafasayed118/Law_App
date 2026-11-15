@@ -295,10 +295,15 @@ EOF
   head_plain=$(git grep --untracked -hE '(^|[^A-Za-z])(test|testWidgets|blocTest)\(' -- test/ 2>/dev/null | wc -l | tr -d ' ')
   head_gen=$(git grep --untracked -hE 'blocTest<' -- test/ 2>/dev/null | wc -l | tr -d ' ')
   head_total=$((head_plain + head_gen))
-  if [ -f README.md ] && grep -qE "Tests \($head_total total\)" README.md && grep -qE "\*\*$head_total tests\*\*" README.md; then
-    ok "README test count ($head_total) matches suite in working tree"
+  # The suite-count claim moved to docs/DEEP_DIVE.md on 2026-11-16, when the
+  # README became a short portfolio front page (a count that changes on every
+  # test edit does not belong in a showcase page). The gate follows the claim,
+  # not the filename: it still fails when the declared count drifts from the
+  # tree, which is the property that matters.
+  if [ -f docs/DEEP_DIVE.md ] && grep -qE "Tests \($head_total total\)" docs/DEEP_DIVE.md && grep -qE "\*\*$head_total tests\*\*" docs/DEEP_DIVE.md; then
+    ok "suite count ($head_total) matches the tree (docs/DEEP_DIVE.md)"
   else
-    fail "README test count stale: suite in working tree is $head_total, README claim differs"
+    fail "suite count stale: tree declares $head_total, docs/DEEP_DIVE.md claim differs"
   fi
 }
 
@@ -387,17 +392,18 @@ selftest() {
   expect_fail "dropped verdict" "evidence verdict '38 PASS + 2 RECORDED' MISSING"
   ( cd "$wt" && git checkout -- docs/p2_rehearsal_evidence_r4_2026-08-01.md )
 
-  # 5. Stale README count — the README claim drifts behind the suite
-  #    (derived from the worktree, not hardcoded: the injection must still
-  #    land as the suite count grows past any fixed figure)
+  # 5. Stale suite count — the declared count drifts behind the suite
+  #    (the claim lives in docs/DEEP_DIVE.md since the README became a
+  #    portfolio front page; derived from the worktree, not hardcoded, so the
+  #    injection still lands as the suite grows past any fixed figure)
   local cur_plain cur_gen cur_total wrong_total
   cur_plain=$( ( cd "$wt" && git grep -hE '(^|[^A-Za-z])(test|testWidgets|blocTest)\(' -- test/ 2>/dev/null ) | wc -l | tr -d ' ')
   cur_gen=$( ( cd "$wt" && git grep -hE 'blocTest<' -- test/ 2>/dev/null ) | wc -l | tr -d ' ')
   cur_total=$((cur_plain + cur_gen))
   wrong_total=$((cur_total + 1))
-  ( cd "$wt" && sed -i "s/Tests ($cur_total total)/Tests ($wrong_total total)/g; s/\*\*$cur_total tests\*\*/**$wrong_total tests**/g" README.md )
-  expect_fail "stale README count" "README test count stale"
-  ( cd "$wt" && git checkout -- README.md )
+  ( cd "$wt" && sed -i "s/Tests ($cur_total total)/Tests ($wrong_total total)/g; s/\*\*$cur_total tests\*\*/**$wrong_total tests**/g" docs/DEEP_DIVE.md )
+  expect_fail "stale suite count" "suite count stale"
+  ( cd "$wt" && git checkout -- docs/DEEP_DIVE.md )
 
   # 6. Dropped citation — the rehearsal plan loses an evidence landing hash
   ( cd "$wt" && sed -i 's/d0379d2/9999999/g' docs/p2_rehearsal_plan.md )
