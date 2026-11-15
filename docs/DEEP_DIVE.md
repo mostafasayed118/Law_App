@@ -1,4 +1,11 @@
-# LegalHub Flutter bootstrap
+# LegalHub — engineering deep dive
+
+> This page is the full engineering record that used to be the repository
+> README. It is kept verbatim (apart from corrected counters) because it is the
+> most accurate description of what is actually implemented, slice by slice.
+> The front page is now [`../README.md`](../README.md).
+
+## LegalHub Flutter bootstrap
 
 LegalHub implements the approved **B1–B13 foundation scope** plus the
 Supabase-backed auth, organization, matter, document, messaging, billing,
@@ -21,7 +28,7 @@ LegalHub is a legal-services client app: consultation booking, attorney
 discovery (with practice-area deep links), matter management, a document
 vault, messaging, approvals, task/compliance boards, organization +
 membership administration (create / roster / invites / roles), a
-platform-admin surface, and a demo-posture video-consultation room — 36
+platform-admin surface, and a demo-posture video-consultation room — 38
 screens behind an auth-aware GoRouter shell.
 
 - **Architecture** — feature-first Clean Architecture (domain / data /
@@ -37,7 +44,8 @@ screens behind an auth-aware GoRouter shell.
   collection stays disabled until the Paymob secrets and a dated D-11 exception
   are in place. `research-analyze` and `video-token` are deployed but return
   `provider_not_configured` until `RIVER_*` / `LIVEKIT_*` are added.
-- **Quality gates** — 2119 tests, analyzer-clean, `dart format` pinned to the
+- **Quality gates** — 2167 test declarations (2163 at runtime, 10 skipped
+  capture/golden-only), analyzer-clean, `dart format` pinned to the
   CI toolchain, a hash-pinned governance ledger (`scripts/verify_ledger.sh`)
   reconciling docs claims against the git object database, and
   `docs/audit/LegalHub_AUDIT_2026-09-21.md` as the running build journal.
