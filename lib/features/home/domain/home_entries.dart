@@ -99,6 +99,7 @@ enum HomeEntryIcon {
   tasks,
   approvals,
   research,
+  library,
 }
 
 /// Presentation-boundary route token for a [HomeEntry].
@@ -119,6 +120,7 @@ enum HomeEntryRoute {
   tasks,
   approvals,
   research,
+  library,
 }
 
 /// The dashboard entries in render order, with their capability gates.
@@ -238,6 +240,19 @@ List<HomeEntry> homeEntriesFor(RoleCapability capabilities) {
       route: HomeEntryRoute.research,
       isVisible: _canUseAiResearch,
     ),
+    // The Legal Library is global reference data, so its gate is simply "is
+    // signed in" — every role reads the same corpus. It sits last because it
+    // is the newest module and the practice-management entries are the daily
+    // workflow (ADR-0009).
+    HomeEntry(
+      id: 'library',
+      icon: HomeEntryIcon.library,
+      title: _libraryTitle,
+      subtitle: _librarySubtitle,
+      configuredSubtitle: _libraryConfiguredSubtitle,
+      route: HomeEntryRoute.library,
+      isVisible: _canViewLibrary,
+    ),
   ];
   return all.where((HomeEntry e) => e.isVisible(capabilities)).toList();
 }
@@ -252,6 +267,13 @@ bool _canViewAlerts(RoleCapability c) => c.canViewAlerts;
 bool _canViewTasks(RoleCapability c) => c.canViewTasks;
 bool _canViewApprovals(RoleCapability c) => c.canViewApprovals;
 bool _canUseAiResearch(RoleCapability c) => c.canUseAiResearch;
+
+/// The library is readable by every signed-in member: it is global reference
+/// data, not tenant data. `canViewDocuments` is the closest existing "this
+/// member works with documents" hint, but gating the library on it would hide
+/// statute browsing from clients — so the gate is the session itself, which the
+/// shell already enforces for every route.
+bool _canViewLibrary(RoleCapability c) => true;
 
 String _bookingTitle(AppLocalizations l10n) => l10n.bookingEntryTitle;
 String _bookingSubtitle(AppLocalizations l10n) => l10n.bookingEntrySubtitle;
@@ -303,3 +325,7 @@ String _researchTitle(AppLocalizations l10n) => l10n.aiResearchEntryTitle;
 String _researchSubtitle(AppLocalizations l10n) => l10n.aiResearchEntrySubtitle;
 String _researchConfiguredSubtitle(AppLocalizations l10n) =>
     l10n.aiResearchEntrySubtitleConfigured;
+String _libraryTitle(AppLocalizations l10n) => l10n.libraryEntryTitle;
+String _librarySubtitle(AppLocalizations l10n) => l10n.libraryEntrySubtitle;
+String _libraryConfiguredSubtitle(AppLocalizations l10n) =>
+    l10n.libraryEntrySubtitleConfigured;

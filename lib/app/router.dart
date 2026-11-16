@@ -28,6 +28,10 @@ import 'package:legalhub/features/documents/presentation/document_details_screen
 import 'package:legalhub/features/documents/presentation/document_list_screen.dart';
 import 'package:legalhub/features/home/presentation/home_screen.dart';
 import 'package:legalhub/features/home/presentation/settings_screen.dart';
+import 'package:legalhub/features/library/presentation/library_article_screen.dart';
+import 'package:legalhub/features/library/presentation/library_document_screen.dart';
+import 'package:legalhub/features/library/presentation/library_home_screen.dart';
+import 'package:legalhub/features/library/presentation/library_search_screen.dart';
 import 'package:legalhub/features/matters/presentation/matter_create_screen.dart';
 import 'package:legalhub/features/matters/presentation/matter_details_screen.dart';
 import 'package:legalhub/features/matters/presentation/matter_list_screen.dart';

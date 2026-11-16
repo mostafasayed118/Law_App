@@ -101,21 +101,17 @@ class _ArticleReader extends StatelessWidget {
               LegalHubTheme.marginMobile,
             ),
             children: <Widget>[
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      detail.documentTitleAr,
-                      style: text.titleMedium,
-                    ),
+              Text(detail.documentTitleAr, style: text.titleMedium),
+              if (detail.isSample)
+                Padding(
+                  padding: const EdgeInsetsDirectional.only(
+                    top: LegalHubTheme.spaceXs,
                   ),
-                  if (detail.isSample) ...<Widget>[
-                    const SizedBox(width: LegalHubTheme.spaceXs),
-                    const SampleBadge(),
-                  ],
-                ],
-              ),
+                  child: Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: const SampleBadge(),
+                  ),
+                ),
               const SizedBox(height: LegalHubTheme.space2xs),
               Text(
                 l10n.libraryArticlePosition(
@@ -155,26 +151,24 @@ class _ArticleReader extends StatelessWidget {
               LegalHubTheme.marginMobile,
               LegalHubTheme.spaceSm,
             ),
-            child: Row(
+            child: Wrap(
+              spacing: LegalHubTheme.spaceSm,
+              runSpacing: LegalHubTheme.spaceXs,
+              alignment: WrapAlignment.spaceBetween,
               children: <Widget>[
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: detail.previousArticleId == null
-                        ? null
-                        : cubit.openPrevious,
-                    icon: const Icon(Icons.chevron_left),
-                    label: Text(l10n.libraryPreviousArticle),
-                  ),
+                OutlinedButton.icon(
+                  onPressed: detail.previousArticleId == null
+                      ? null
+                      : cubit.openPrevious,
+                  icon: const Icon(Icons.chevron_left),
+                  label: Text(l10n.libraryPreviousArticle),
                 ),
-                const SizedBox(width: LegalHubTheme.spaceSm),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: detail.nextArticleId == null
-                        ? null
-                        : cubit.openNext,
-                    icon: const Icon(Icons.chevron_right),
-                    label: Text(l10n.libraryNextArticle),
-                  ),
+                OutlinedButton.icon(
+                  onPressed: detail.nextArticleId == null
+                      ? null
+                      : cubit.openNext,
+                  icon: const Icon(Icons.chevron_right),
+                  label: Text(l10n.libraryNextArticle),
                 ),
               ],
             ),

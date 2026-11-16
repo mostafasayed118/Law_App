@@ -105,16 +105,17 @@ class _DocumentDetail extends StatelessWidget {
     return ListView(
       padding: const EdgeInsetsDirectional.all(LegalHubTheme.marginMobile),
       children: <Widget>[
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Expanded(child: Text(document.titleAr, style: text.headlineSmall)),
-            if (document.isSample) ...<Widget>[
-              const SizedBox(width: LegalHubTheme.spaceXs),
-              const SampleBadge(),
-            ],
-          ],
-        ),
+        Text(document.titleAr, style: text.headlineSmall),
+        if (document.isSample)
+          Padding(
+            padding: const EdgeInsetsDirectional.only(
+              top: LegalHubTheme.spaceXs,
+            ),
+            child: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: const SampleBadge(),
+            ),
+          ),
         if (document.titleEn != null) ...<Widget>[
           const SizedBox(height: LegalHubTheme.space2xs),
           Text(

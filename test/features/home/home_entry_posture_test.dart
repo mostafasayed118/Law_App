@@ -78,6 +78,7 @@ void main() {
         'tasks': true,
         'approvals': true,
         'research': true,
+        'library': true,
       };
       final List<HomeEntry> entries = allEntries();
 

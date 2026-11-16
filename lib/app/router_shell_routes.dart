@@ -273,6 +273,34 @@ List<RouteBase> _shellRoutes(
       },
     ),
     GoRoute(
+      path: AppRoutes.library,
+      builder: (BuildContext context, GoRouterState state) =>
+          const LibraryHomeScreen(),
+    ),
+    // Declared before /library/:documentId so the literal segment wins the
+    // match: go_router resolves in declaration order.
+    GoRoute(
+      path: AppRoutes.librarySearch,
+      builder: (BuildContext context, GoRouterState state) =>
+          LibrarySearchScreen(
+            initialQuery: state.uri.queryParameters['q'] ?? '',
+          ),
+    ),
+    GoRoute(
+      path: AppRoutes.libraryDocument,
+      builder: (BuildContext context, GoRouterState state) =>
+          LibraryDocumentScreen(
+            documentId: state.pathParameters['documentId'] ?? '',
+          ),
+    ),
+    GoRoute(
+      path: AppRoutes.libraryArticle,
+      builder: (BuildContext context, GoRouterState state) =>
+          LibraryArticleScreen(
+            articleId: state.pathParameters['articleId'] ?? '',
+          ),
+    ),
+    GoRoute(
       path: AppRoutes.settings,
       builder: (BuildContext context, GoRouterState state) =>
           const SettingsScreen(),

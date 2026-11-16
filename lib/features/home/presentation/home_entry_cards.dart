@@ -65,6 +65,7 @@ IconData _iconFor(HomeEntryIcon icon) => switch (icon) {
   HomeEntryIcon.tasks => Icons.checklist_outlined,
   HomeEntryIcon.approvals => Icons.approval_outlined,
   HomeEntryIcon.research => Icons.auto_awesome_outlined,
+  HomeEntryIcon.library => Icons.menu_book_outlined,
 };
 
 /// Resolves a domain [HomeEntryRoute] token to its `AppRoutes.*` string.
@@ -85,4 +86,5 @@ String _routeFor(HomeEntryRoute route) => switch (route) {
   HomeEntryRoute.tasks => AppRoutes.tasks,
   HomeEntryRoute.approvals => AppRoutes.approvals,
   HomeEntryRoute.research => AppRoutes.research,
+  HomeEntryRoute.library => AppRoutes.library,
 };

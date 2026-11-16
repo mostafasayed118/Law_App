@@ -155,20 +155,24 @@ class _SearchHitTile extends StatelessWidget {
     return Card(
       margin: const EdgeInsetsDirectional.only(bottom: LegalHubTheme.spaceSm),
       child: ListTile(
-        title: Row(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Expanded(
-              child: Text(
-                '${hit.documentTitleAr} · '
-                '${l10n.libraryArticleNumberLabel(hit.articleNumber)}',
-                style: text.titleSmall,
-              ),
+            Text(
+              '${hit.documentTitleAr} · '
+              '${l10n.libraryArticleNumberLabel(hit.articleNumber)}',
+              style: text.titleSmall,
             ),
-            if (hit.isSample) ...<Widget>[
-              const SizedBox(width: LegalHubTheme.spaceXs),
-              const SampleBadge(),
-            ],
+            if (hit.isSample)
+              Padding(
+                padding: const EdgeInsetsDirectional.only(
+                  top: LegalHubTheme.space2xs,
+                ),
+                child: const Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: SampleBadge(),
+                ),
+              ),
           ],
         ),
         subtitle: Column(

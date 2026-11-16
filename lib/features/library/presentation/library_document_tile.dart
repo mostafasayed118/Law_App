@@ -46,18 +46,17 @@ class LibraryDocumentTile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                    child: Text(document.titleAr, style: text.titleMedium),
+              Text(document.titleAr, style: text.titleMedium),
+              if (document.isSample)
+                Padding(
+                  padding: const EdgeInsetsDirectional.only(
+                    top: LegalHubTheme.space2xs,
                   ),
-                  if (document.isSample) ...<Widget>[
-                    const SizedBox(width: LegalHubTheme.spaceXs),
-                    const SampleBadge(),
-                  ],
-                ],
-              ),
+                  child: Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: SampleBadge(),
+                  ),
+                ),
               const SizedBox(height: LegalHubTheme.spaceXs),
               Text(
                 meta.join(' · '),
