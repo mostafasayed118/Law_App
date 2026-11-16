@@ -212,6 +212,10 @@ class LegalHubTheme {
       fontFamily: kRtlLocaleCodes.contains(locale.languageCode)
           ? 'NotoNaskhArabic'
           : 'NotoSans',
+      // The Legal Library corpus is Arabic source text even when the UI
+      // locale is English. Without an explicit fallback those glyphs render
+      // as tofu in the English theme (caught by the screenshot review).
+      fontFamilyFallback: const <String>['NotoNaskhArabic', 'NotoSans'],
       textTheme: _legalHubTextTheme(
         locale,
         isDark: isDark,
