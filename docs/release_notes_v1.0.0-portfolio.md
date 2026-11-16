@@ -13,19 +13,19 @@ reading history. English, Arabic (RTL) and Turkish are supported.
 
 ## Install the demo APK
 
-Asset: `LegalHub-development-demo.apk` (development flavor, debug-signed).
+Asset: `LegalHub-development-demo-arm64.apk` (development flavor, debug-signed, arm64-v8a only).
 
 ```bash
-adb install -r LegalHub-development-demo.apk
+adb install -r LegalHub-development-demo-arm64.apk
 ```
 
-Minimum Android version is set by the project's `minSdk` (Android 21+). The
-APK carries `arm64-v8a`, `armeabi-v7a` and `x86_64` libraries, so it runs on
-phones and on most x86 emulators.
+Minimum Android version is `minSdk` 24 (Android 7.0). This is the arm64-v8a
+split: it installs on virtually every current Android phone. Use `flutter run`
+from source for an emulator.
 
-- SHA-256: `9503568EE8C393495C2D820BFE2728D4E9B96ED98578B20C8C125DEAE38F292B`
-- Size: 240,250,909 bytes
-- Built with: `flutter build apk --debug --flavor development -t lib/main_development.dart`
+- SHA-256: `419190dcad9e9c6604224c9faf9572622fbc8d3c8169fc4b213207f3e4ee6c7a`
+- Size: 111,657,495 bytes
+- Built with: `flutter build apk --debug --flavor development -t lib/main_development.dart --split-per-abi`
 - Signing: Android debug key only. **No store key, no real signing credential.**
 
 ## Demo versus real

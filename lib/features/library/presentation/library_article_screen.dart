@@ -292,7 +292,17 @@ class _ArticleReader extends StatelessWidget {
                       HighlightedBody(
                         body: detail.article.bodyAr,
                         highlights: state.drawableHighlights,
-                        textStyle: text.bodyLarge?.copyWith(height: 1.7),
+                        // The Library corpus is Arabic source text even when
+                        // the UI locale is English. Using the Latin family as
+                        // the primary font splits the span into per-word
+                        // fallback runs, which makes a single highlight paint
+                        // as separate boxes. Pin the Arabic family so the
+                        // highlight is one continuous span.
+                        textStyle: text.bodyLarge?.copyWith(
+                          height: 1.7,
+                          fontFamily: 'NotoNaskhArabic',
+                          fontFamilyFallback: const <String>['NotoSans'],
+                        ),
                         onSelectionHighlight: (int start, int end) =>
                             _createHighlight(context, start, end),
                         onHighlightTapped: (LegalHighlight highlight) =>
