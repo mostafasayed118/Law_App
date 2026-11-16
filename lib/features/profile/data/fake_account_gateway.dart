@@ -9,10 +9,12 @@ class FakeAccountGateway implements AccountGateway {
   FakeAccountGateway({
     this.platformOwner = false,
     this.lastActivePartner = false,
+    this.rejectUpdates = false,
   });
 
   final bool platformOwner;
   final bool lastActivePartner;
+  final bool rejectUpdates;
 
   String displayName = 'Demo user';
   int updateCalls = 0;
@@ -22,6 +24,9 @@ class FakeAccountGateway implements AccountGateway {
   @override
   Future<Result<void>> updateDisplayName(String name) async {
     updateCalls++;
+    if (rejectUpdates) {
+      return const Result<void>.failure(AccountErrors.invalidName);
+    }
     final String trimmed = name.trim();
     if (trimmed.length < 2 ||
         trimmed.length > 120 ||
