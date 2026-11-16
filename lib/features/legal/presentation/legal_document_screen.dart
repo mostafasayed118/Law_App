@@ -166,28 +166,26 @@ class LegalLink extends StatelessWidget {
     return Semantics(
       button: true,
       label: label,
-      child: SizedBox(
-        // Inside a RichText WidgetSpan the link is only as tall as its text;
-        // give it a 48dp target so the Android guideline (and real fingers)
-        // can hit it reliably.
-        height: 48,
+      child: ConstrainedBox(
+        // Inside a RichText WidgetSpan the link is only as tall as its text.
+        // Padding (not a Row) gives it a 48dp target without forcing an
+        // unbounded intrinsic width, which overflowed on a 320px phone.
+        constraints: const BoxConstraints(minHeight: 48),
         child: InkWell(
           onTap: () => context.push(
             kind == LegalDocumentKind.privacy
                 ? AppRoutes.privacy
                 : AppRoutes.terms,
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Text(
-                label,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                  decoration: TextDecoration.underline,
-                ),
+          child: Padding(
+            padding: const EdgeInsetsDirectional.symmetric(vertical: 12),
+            child: Text(
+              label,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                decoration: TextDecoration.underline,
               ),
-            ],
+            ),
           ),
         ),
       ),

@@ -1616,7 +1616,12 @@ void main() {
         await tester.pumpAndSettle();
         expect(topUri(router).path, AppRoutes.settings);
 
-        // 4. Profile tile → the profile screen.
+        // 4. Profile tile → the profile screen. The settings list grew with
+        //    the Polish account/legal tiles, so step 2's scroll offset can now
+        //    leave Profile outside the built window when we return; bring it
+        //    back into view first (view/scroll only, no assertion change).
+        await tester.drag(find.byType(ListView), const Offset(0, 500));
+        await tester.pumpAndSettle();
         await tester.tap(find.text('Profile'));
         await tester.pumpAndSettle();
         expect(topUri(router).path, AppRoutes.profile);
