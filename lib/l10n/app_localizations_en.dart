@@ -2562,6 +2562,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'The request is no longer pending.';
 
   @override
+  String get errTheSearchQueryIsTooLong =>
+      'The search query is too long. Shorten it and try again.';
+
+  @override
   String get errUnableToAcknowledgeTheAlertPleaseTryAgain =>
       'Unable to acknowledge the alert. Please try again.';
 
@@ -2752,12 +2756,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'The directory is temporarily unavailable. Try again.';
 
   @override
+  String get errTheLegalArticleWasNotFound => 'The article was not found.';
+
+  @override
+  String get errTheLegalDocumentWasNotFound => 'The document was not found.';
+
+  @override
   String get errTheProfileDetailsAreInvalidCheckThemAnd =>
       'The profile details are invalid. Check them and retry.';
 
   @override
   String get errUnableToLoadTheDirectoryPleaseTryAgain =>
       'Unable to load the directory. Please try again.';
+
+  @override
+  String get errUnableToLoadTheLibraryPleaseTryAgain =>
+      'Unable to load the library. Please try again.';
 
   @override
   String get errYouDoNotHavePermissionToManageThe =>

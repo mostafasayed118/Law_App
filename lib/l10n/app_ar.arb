@@ -1054,6 +1054,10 @@
   "@errTheRequestIsNoLongerPending": {
     "description": "[REVIEW] machine-drafted; human review required before release"
   },
+  "errTheSearchQueryIsTooLong": "عبارة البحث طويلة جدًا. اختصرها وحاول مرة أخرى.",
+  "@errTheSearchQueryIsTooLong": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
   "errUnableToAcknowledgeTheAlertPleaseTryAgain": "تعذّر الاطلاع على التنبيه. حاول مرة أخرى.",
   "@errUnableToAcknowledgeTheAlertPleaseTryAgain": {
     "description": "[REVIEW] machine-drafted; human review required before release"
@@ -1247,12 +1251,24 @@
   "@errTheDirectoryIsTemporarilyUnavailableTryAgain": {
     "description": "[REVIEW] machine-drafted; human review required before release"
   },
+  "errTheLegalArticleWasNotFound": "لم يتم العثور على المادة.",
+  "@errTheLegalArticleWasNotFound": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheLegalDocumentWasNotFound": "لم يتم العثور على الوثيقة.",
+  "@errTheLegalDocumentWasNotFound": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
   "errTheProfileDetailsAreInvalidCheckThemAnd": "بيانات الملف الشخصي غير صالحة. تحقق منها وأعد المحاولة.",
   "@errTheProfileDetailsAreInvalidCheckThemAnd": {
     "description": "[REVIEW] machine-drafted; human review required before release"
   },
   "errUnableToLoadTheDirectoryPleaseTryAgain": "تعذّر تحميل الدليل. حاول مرة أخرى.",
   "@errUnableToLoadTheDirectoryPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadTheLibraryPleaseTryAgain": "تعذّر تحميل المكتبة. حاول مرة أخرى.",
+  "@errUnableToLoadTheLibraryPleaseTryAgain": {
     "description": "[REVIEW] machine-drafted; human review required before release"
   },
   "errYouDoNotHavePermissionToManageThe": "ليس لديك إذن لإدارة الدليل.",

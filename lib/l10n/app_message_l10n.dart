@@ -61,6 +61,7 @@ String appMessage(
       l10n.errTheRequestCouldNotBeDecidedItMay,
     AppMessageKey.errTheRequestIsNoLongerPending =>
       l10n.errTheRequestIsNoLongerPending,
+    AppMessageKey.errTheSearchQueryIsTooLong => l10n.errTheSearchQueryIsTooLong,
     AppMessageKey.errUnableToAcknowledgeTheAlertPleaseTryAgain =>
       l10n.errUnableToAcknowledgeTheAlertPleaseTryAgain,
     AppMessageKey.errUnableToCancelTheRequestPleaseTryAgain =>
@@ -162,10 +163,16 @@ String appMessage(
     AppMessageKey.errAttorneyNotFound => l10n.errAttorneyNotFound,
     AppMessageKey.errTheDirectoryIsTemporarilyUnavailableTryAgain =>
       l10n.errTheDirectoryIsTemporarilyUnavailableTryAgain,
+    AppMessageKey.errTheLegalArticleWasNotFound =>
+      l10n.errTheLegalArticleWasNotFound,
+    AppMessageKey.errTheLegalDocumentWasNotFound =>
+      l10n.errTheLegalDocumentWasNotFound,
     AppMessageKey.errTheProfileDetailsAreInvalidCheckThemAnd =>
       l10n.errTheProfileDetailsAreInvalidCheckThemAnd,
     AppMessageKey.errUnableToLoadTheDirectoryPleaseTryAgain =>
       l10n.errUnableToLoadTheDirectoryPleaseTryAgain,
+    AppMessageKey.errUnableToLoadTheLibraryPleaseTryAgain =>
+      l10n.errUnableToLoadTheLibraryPleaseTryAgain,
     AppMessageKey.errYouDoNotHavePermissionToManageThe =>
       l10n.errYouDoNotHavePermissionToManageThe,
     AppMessageKey.errYouDoNotHavePermissionToViewThe =>

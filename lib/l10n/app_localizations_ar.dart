@@ -2540,6 +2540,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get errTheRequestIsNoLongerPending => 'الطلب لم يعد معلّقًا.';
 
   @override
+  String get errTheSearchQueryIsTooLong =>
+      'عبارة البحث طويلة جدًا. اختصرها وحاول مرة أخرى.';
+
+  @override
   String get errUnableToAcknowledgeTheAlertPleaseTryAgain =>
       'تعذّر الاطلاع على التنبيه. حاول مرة أخرى.';
 
@@ -2730,12 +2734,22 @@ class AppLocalizationsAr extends AppLocalizations {
       'الدليل غير متاح مؤقتًا. حاول مرة أخرى.';
 
   @override
+  String get errTheLegalArticleWasNotFound => 'لم يتم العثور على المادة.';
+
+  @override
+  String get errTheLegalDocumentWasNotFound => 'لم يتم العثور على الوثيقة.';
+
+  @override
   String get errTheProfileDetailsAreInvalidCheckThemAnd =>
       'بيانات الملف الشخصي غير صالحة. تحقق منها وأعد المحاولة.';
 
   @override
   String get errUnableToLoadTheDirectoryPleaseTryAgain =>
       'تعذّر تحميل الدليل. حاول مرة أخرى.';
+
+  @override
+  String get errUnableToLoadTheLibraryPleaseTryAgain =>
+      'تعذّر تحميل المكتبة. حاول مرة أخرى.';
 
   @override
   String get errYouDoNotHavePermissionToManageThe =>

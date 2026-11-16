@@ -1054,6 +1054,10 @@
   "@errTheRequestIsNoLongerPending": {
     "description": "[REVIEW] machine-drafted; human review required before release"
   },
+  "errTheSearchQueryIsTooLong": "Arama sorgusu çok uzun. Kısaltıp tekrar deneyin.",
+  "@errTheSearchQueryIsTooLong": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
   "errUnableToAcknowledgeTheAlertPleaseTryAgain": "Uyarı görüldü olarak işaretlenemedi. Lütfen tekrar deneyin.",
   "@errUnableToAcknowledgeTheAlertPleaseTryAgain": {
     "description": "[REVIEW] machine-drafted; human review required before release"
@@ -1247,12 +1251,24 @@
   "@errTheDirectoryIsTemporarilyUnavailableTryAgain": {
     "description": "[REVIEW] machine-drafted; human review required before release"
   },
+  "errTheLegalArticleWasNotFound": "Madde bulunamadı.",
+  "@errTheLegalArticleWasNotFound": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheLegalDocumentWasNotFound": "Belge bulunamadı.",
+  "@errTheLegalDocumentWasNotFound": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
   "errTheProfileDetailsAreInvalidCheckThemAnd": "Profil bilgileri geçersiz. Kontrol edip tekrar deneyin.",
   "@errTheProfileDetailsAreInvalidCheckThemAnd": {
     "description": "[REVIEW] machine-drafted; human review required before release"
   },
   "errUnableToLoadTheDirectoryPleaseTryAgain": "Dizin yüklenemedi. Lütfen tekrar deneyin.",
   "@errUnableToLoadTheDirectoryPleaseTryAgain": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadTheLibraryPleaseTryAgain": "Kütüphane yüklenemedi. Lütfen tekrar deneyin.",
+  "@errUnableToLoadTheLibraryPleaseTryAgain": {
     "description": "[REVIEW] machine-drafted; human review required before release"
   },
   "errYouDoNotHavePermissionToManageThe": "Dizini yönetme izniniz yok.",

@@ -2564,6 +2564,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get errTheRequestIsNoLongerPending => 'Talep artık beklemede değil.';
 
   @override
+  String get errTheSearchQueryIsTooLong =>
+      'Arama sorgusu çok uzun. Kısaltıp tekrar deneyin.';
+
+  @override
   String get errUnableToAcknowledgeTheAlertPleaseTryAgain =>
       'Uyarı görüldü olarak işaretlenemedi. Lütfen tekrar deneyin.';
 
@@ -2754,12 +2758,22 @@ class AppLocalizationsTr extends AppLocalizations {
       'Dizin geçici olarak kullanılamıyor. Lütfen tekrar deneyin.';
 
   @override
+  String get errTheLegalArticleWasNotFound => 'Madde bulunamadı.';
+
+  @override
+  String get errTheLegalDocumentWasNotFound => 'Belge bulunamadı.';
+
+  @override
   String get errTheProfileDetailsAreInvalidCheckThemAnd =>
       'Profil bilgileri geçersiz. Kontrol edip tekrar deneyin.';
 
   @override
   String get errUnableToLoadTheDirectoryPleaseTryAgain =>
       'Dizin yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errUnableToLoadTheLibraryPleaseTryAgain =>
+      'Kütüphane yüklenemedi. Lütfen tekrar deneyin.';
 
   @override
   String get errYouDoNotHavePermissionToManageThe =>

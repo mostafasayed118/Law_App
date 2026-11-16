@@ -4684,6 +4684,12 @@ abstract class AppLocalizations {
   /// **'The request is no longer pending.'**
   String get errTheRequestIsNoLongerPending;
 
+  /// No description provided for @errTheSearchQueryIsTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'The search query is too long. Shorten it and try again.'**
+  String get errTheSearchQueryIsTooLong;
+
   /// No description provided for @errUnableToAcknowledgeTheAlertPleaseTryAgain.
   ///
   /// In en, this message translates to:
@@ -4966,6 +4972,18 @@ abstract class AppLocalizations {
   /// **'The directory is temporarily unavailable. Try again.'**
   String get errTheDirectoryIsTemporarilyUnavailableTryAgain;
 
+  /// No description provided for @errTheLegalArticleWasNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'The article was not found.'**
+  String get errTheLegalArticleWasNotFound;
+
+  /// No description provided for @errTheLegalDocumentWasNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'The document was not found.'**
+  String get errTheLegalDocumentWasNotFound;
+
   /// No description provided for @errTheProfileDetailsAreInvalidCheckThemAnd.
   ///
   /// In en, this message translates to:
@@ -4977,6 +4995,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unable to load the directory. Please try again.'**
   String get errUnableToLoadTheDirectoryPleaseTryAgain;
+
+  /// No description provided for @errUnableToLoadTheLibraryPleaseTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load the library. Please try again.'**
+  String get errUnableToLoadTheLibraryPleaseTryAgain;
 
   /// No description provided for @errYouDoNotHavePermissionToManageThe.
   ///
