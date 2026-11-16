@@ -101,14 +101,14 @@ Available today:
 - [x] Organizations, roles and a platform-admin surface
 - [x] English / Arabic / Turkish with RTL, responsive phone and tablet layouts
 - [x] **Legal Library** — browse, read, search, bookmark, highlight and history (sample data; official text is imported by the owner)
+- [x] **Polish** — in-app privacy policy and terms (en/ar/tr), profile editing, password change, honest account deletion, unread badge and accessibility gates
 
 Planned:
 
 - [ ] Push notification delivery
 - [ ] Offline send queue
-- [ ] Account deletion and profile editing
-- [ ] Privacy policy and terms screens
 - [ ] iOS release build and signing
+- [ ] Provider-side deletion of LiveKit / Paymob / AI records (owner decision; see ADR-0011)
 
 ## Engineering docs
 

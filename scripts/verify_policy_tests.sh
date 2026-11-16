@@ -395,7 +395,8 @@ apply_slice() {
   psql_apply "$SUPABASE_DIR/migrations/30_profiles_mutations_rpc_only.sql" "apply migrations/30_profiles_mutations_rpc_only.sql"
   psql_apply "$SUPABASE_DIR/migrations/31_profile_display_name_and_invite_email.sql" "apply migrations/31_profile_display_name_and_invite_email.sql"
   psql_apply "$SUPABASE_DIR/migrations/32_legal_library.sql" "apply migrations/32_legal_library.sql"
-  psql_apply "$SUPABASE_DIR/migrations/33_library_user_data.sql" "apply migrations/33_library_user_data.sql"`n  psql_apply "$SUPABASE_DIR/migrations/34_polish_profile_and_deletion.sql" "apply migrations/34_polish_profile_and_deletion.sql"
+  psql_apply "$SUPABASE_DIR/migrations/33_library_user_data.sql" "apply migrations/33_library_user_data.sql"
+  psql_apply "$SUPABASE_DIR/migrations/34_polish_profile_and_deletion.sql" "apply migrations/34_polish_profile_and_deletion.sql"
   # 03_platform_config_seed.sql is deliberately NOT applied: its owner token
   # is an apply-time substitution placeholder for the dev project; the
   # battery's fixtures seed the rehearsal project's own owner row (D-P0C3
