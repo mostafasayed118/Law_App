@@ -23,8 +23,8 @@ Minimum Android version is `minSdk` 24 (Android 7.0). This is the arm64-v8a
 split: it installs on virtually every current Android phone. Use `flutter run`
 from source for an emulator.
 
-- SHA-256: `419190dcad9e9c6604224c9faf9572622fbc8d3c8169fc4b213207f3e4ee6c7a`
-- Size: 111,657,495 bytes
+- SHA-256: `b81e94dbb7896897f00d09adda272297bd02aedfd3c3031d1c125f69c209524d`
+- Size: 142,811,183 bytes
 - Built with: `flutter build apk --debug --flavor development -t lib/main_development.dart --split-per-abi`
 - Signing: Android debug key only. **No store key, no real signing credential.**
 
