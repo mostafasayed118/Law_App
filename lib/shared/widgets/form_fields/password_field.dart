@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:legalhub/l10n/app_localizations.dart';
+
 import 'labelled_field.dart';
 
 /// A password field with a built-in show/hide toggle.
@@ -46,7 +48,11 @@ class _PasswordFieldState extends State<PasswordField> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    // An icon-only control must carry a localized label, otherwise the
+    // labeledTapTargetGuideline cannot see it and TalkBack announces nothing.
     final toggle = IconButton(
+      tooltip: _obscured ? l10n.passwordShow : l10n.passwordHide,
       icon: Icon(
         _obscured ? Icons.visibility_outlined : Icons.visibility_off_outlined,
         size: 20,

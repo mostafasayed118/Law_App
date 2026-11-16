@@ -4,7 +4,7 @@ import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
 /// The Phase 12 reverse cross-link affordance: a compact "View matter" chip
-/// that is the **only tap target** in a vault/messages row (D-C2).
+/// that is the only tap target in a vault/messages row (D-C2).
 ///
 /// Deliberately NOT a chevron / download / visibility / open_in_new
 /// affordance — the Phase 8/9 AC-2 absence lines stay meaningful: this is a
@@ -36,35 +36,41 @@ class MatterLinkChip extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           mouseCursor: SystemMouseCursors.click,
-          child: Padding(
-            padding: const EdgeInsetsDirectional.symmetric(
-              horizontal: LegalHubTheme.spaceSm,
-              vertical: LegalHubTheme.spaceXs,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Icon(
-                  Icons.folder_open,
-                  size: 14,
-                  color: scheme.onSecondaryContainer,
-                ),
-                const SizedBox(width: LegalHubTheme.spaceXs),
-                // Flexible + ellipsis lets the chip shrink (instead of
-                // overflowing) when a tight transient layout or large text
-                // scale squeezes the row it sits in.
-                Flexible(
-                  child: Text(
-                    l10n.viewMatter,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: text.labelSmall?.copyWith(
-                      color: scheme.onSecondaryContainer,
-                      fontWeight: FontWeight.w600,
+          child: ConstrainedBox(
+            // The chip reads as compact, but its semantics node is the row's
+            // only tap target: keep it at the 48dp floor so TalkBack/Android
+            // tap-target checks (and real fingers) can hit it reliably.
+            constraints: const BoxConstraints(minHeight: 48),
+            child: Padding(
+              padding: const EdgeInsetsDirectional.symmetric(
+                horizontal: LegalHubTheme.spaceSm,
+                vertical: LegalHubTheme.spaceXs,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Icon(
+                    Icons.folder_open,
+                    size: 14,
+                    color: scheme.onSecondaryContainer,
+                  ),
+                  const SizedBox(width: LegalHubTheme.spaceXs),
+                  // Flexible + ellipsis lets the chip shrink (instead of
+                  // overflowing) when a tight transient layout or large text
+                  // scale squeezes the row it sits in.
+                  Flexible(
+                    child: Text(
+                      l10n.viewMatter,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: text.labelSmall?.copyWith(
+                        color: scheme.onSecondaryContainer,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

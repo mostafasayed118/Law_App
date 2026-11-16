@@ -166,17 +166,28 @@ class LegalLink extends StatelessWidget {
     return Semantics(
       button: true,
       label: label,
-      child: InkWell(
-        onTap: () => context.push(
-          kind == LegalDocumentKind.privacy
-              ? AppRoutes.privacy
-              : AppRoutes.terms,
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.primary,
-            decoration: TextDecoration.underline,
+      child: SizedBox(
+        // Inside a RichText WidgetSpan the link is only as tall as its text;
+        // give it a 48dp target so the Android guideline (and real fingers)
+        // can hit it reliably.
+        height: 48,
+        child: InkWell(
+          onTap: () => context.push(
+            kind == LegalDocumentKind.privacy
+                ? AppRoutes.privacy
+                : AppRoutes.terms,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text(
+                label,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ],
           ),
         ),
       ),

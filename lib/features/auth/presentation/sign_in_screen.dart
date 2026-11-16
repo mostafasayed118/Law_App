@@ -104,6 +104,7 @@ class _SignInBackButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
+      tooltip: AppLocalizations.of(context).back,
       icon: const DirectionalIcon(
         icon: Icons.arrow_back,
         mirroredIcon: Icons.arrow_forward,

@@ -9,6 +9,7 @@ import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/features/auth/domain/sign_up_gateway.dart';
 import 'package:legalhub/features/auth/domain/sign_up_request.dart';
 import 'package:legalhub/features/auth/presentation/sign_up_cubit.dart';
+import 'package:legalhub/features/legal/presentation/legal_document_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/forms/validators.dart';
 import 'package:legalhub/shared/responsive/breakpoints.dart';
@@ -74,6 +75,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           final bool signedUp = state is ViewSuccess<void>;
           return AuthScaffold(
             leading: IconButton(
+              tooltip: l10n.back,
               icon: const DirectionalIcon(
                 icon: Icons.arrow_back,
                 mirroredIcon: Icons.arrow_forward,
@@ -189,12 +191,47 @@ class _SignUpScreenState extends State<SignUpScreen> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Checkbox(
-                value: _agreedToTerms,
-                onChanged: (bool? value) =>
-                    setState(() => _agreedToTerms = value ?? false),
+              MergeSemantics(
+                child: Semantics(
+                  label:
+                      '${l10n.legalAcceptTerms} ${l10n.legalPrivacyTitle}, '
+                      '${l10n.legalTermsTitle}',
+                  checked: _agreedToTerms,
+                  child: Checkbox(
+                    value: _agreedToTerms,
+                    onChanged: (bool? value) =>
+                        setState(() => _agreedToTerms = value ?? false),
+                  ),
+                ),
               ),
-              Expanded(child: Text(l10n.agreeToTerms, style: text.bodySmall)),
+              Expanded(
+                child: RichText(
+                  text: TextSpan(
+                    style: text.bodySmall,
+                    children: <InlineSpan>[
+                      TextSpan(text: '${l10n.legalAcceptTerms} '),
+                      WidgetSpan(
+                        alignment: PlaceholderAlignment.baseline,
+                        baseline: TextBaseline.alphabetic,
+                        child: LegalLink(
+                          kind: LegalDocumentKind.privacy,
+                          label: l10n.legalPrivacyTitle,
+                        ),
+                      ),
+                      const TextSpan(text: ' '),
+                      WidgetSpan(
+                        alignment: PlaceholderAlignment.baseline,
+                        baseline: TextBaseline.alphabetic,
+                        child: LegalLink(
+                          kind: LegalDocumentKind.terms,
+                          label: l10n.legalTermsTitle,
+                        ),
+                      ),
+                      const TextSpan(text: '.'),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: LegalHubTheme.spaceMd),
