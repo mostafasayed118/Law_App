@@ -1,6 +1,6 @@
 # LegalHub
 
-A legal practice-management platform for law firms and their clients, built with Flutter and Supabase.
+A legal practice-management platform with a Legal Library — Flutter, Supabase, and a credential-free demo mode.
 
 [![CI](https://github.com/mostafasayed118/Law_App/actions/workflows/ci.yml/badge.svg)](https://github.com/mostafasayed118/Law_App/actions/workflows/ci.yml)
 [![Flutter](https://img.shields.io/badge/Flutter-3.47.5-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
@@ -8,56 +8,51 @@ A legal practice-management platform for law firms and their clients, built with
 
 ## What it is
 
-LegalHub is a multi-tenant workspace where a law firm runs its day-to-day work: matters, a document vault, secure client messaging, consultation booking, invoicing, approvals and compliance alerts, plus video consultations and an AI research surface.
-It is a real client/server application, not a UI mockup on local fixtures: Supabase Postgres with row-level security, 69 RPC functions, Realtime, Storage and five Edge Functions.
-The **Legal Library** ships browse, read, full-text search, bookmarks, highlights and reading history — on **sample data only**: every seeded row is marked and badged as invented, and official text is imported by the owner.
+A multi-tenant practice workspace: matters, document vault, secure messaging, consultation booking, invoicing, approvals, compliance alerts, video and AI research. The Legal Library adds browse, read, search, bookmarks, highlights and reading history over a **sample corpus** — every seeded row is badged as invented, and an importer brings in real text when supplied. Authorization is enforced in Supabase (RLS, RPC-only writes); the same UI runs on fakes or a configured backend.
 
 ## Screenshots
 
 | | | |
 |---|---|---|
-| ![Home](docs/media/screenshots/01_home.png) | ![Matters](docs/media/screenshots/02_matters.png) | ![Discovery](docs/media/screenshots/03_discovery.png) |
-| ![Messages](docs/media/screenshots/04_messages.png) | ![Research](docs/media/screenshots/05_research.png) | ![Settings](docs/media/screenshots/06_settings.png) |
+| ![Home](docs/media/screenshots/01_home.png) | ![Matters](docs/media/screenshots/02_matters.png) | ![Library](docs/media/screenshots/07_library.png) |
 
-A 30–40 second walkthrough is planned at `docs/media/demo.gif`; the capture checklist is in [`docs/media/README.md`](docs/media/README.md).
+| Surface | EN | AR / RTL | Dark |
+|---|---|---|---|
+| Home | ![Home EN](docs/media/screenshots/01_home.png) | ![Home AR](docs/media/screenshots/01_home_ar.png) | ![Home dark](docs/media/screenshots/01_home_dark.png) |
+| Library | ![Library EN](docs/media/screenshots/07_library.png) | ![Library AR](docs/media/screenshots/07_library_ar.png) | — |
+| Reader | ![Reader EN](docs/media/screenshots/08_article_reader.png) | ![Reader AR](docs/media/screenshots/08_article_reader_ar.png) | ![Reader dark](docs/media/screenshots/08_article_reader_dark.png) |
+
+All 15 images are generated from the demo build by `CAPTURE_SCREENSHOTS=1 flutter test test/screenshots --update-goldens`; see [`docs/media/README.md`](docs/media/README.md). The demo GIF is a manual owner item and is not linked until it exists.
 
 ## Highlights
 
-- **Clean Architecture with gateway seams.** Every feature splits into domain, data and presentation, and each data source sits behind a provider-neutral interface. The same UI runs on credential-free fakes or on Supabase; the build decides which.
-- **Authorization is server-side.** 31 tables, 32 RLS policy files and 28 pgTAP suites, with every write funnelled through an RPC. The client refuses to start if it is handed a service-role key.
-- **Three languages, right-to-left included.** English, Arabic and Turkish, 937 localized strings each, with Arabic typography and a layout matrix that proves RTL at 320px.
-- **Phone to tablet.** One breakpoint contract drives the navigation rail, master/detail two-pane layouts, centred sheets and readable content width, down to foldable hinge geometry.
-- **Genuinely tested.** 2,346 tests run and pass, 85% line coverage, plus a matrix that pumps every route across five widths and three text scales.
-- **Runs without credentials.** Clone it, run it, click through every screen on a deterministic demo dataset.
+- **Clean Architecture with gateway seams.** Domain/data/presentation per feature; a provider-neutral interface, a fake and a Supabase adapter per data source. No credentials needed for the demo.
+- **Server-side authorization.** 31 tables, 32 policy files (43 RLS policies), 86 unique public RPC functions, 30 pgTAP batteries. Writes are RPC-only; a service-role key is rejected at startup.
+- **Arabic-aware search.** Unicode normalization and Arabic letter-form folding, so `أ`/`إ`/`آ`/`ا` match; snippets come from matched text, never invented.
+- **Anchored highlights.** Offset + quote + body hash with stale detection when source text changes.
+- **Three languages, RTL throughout.** English, Arabic and Turkish; 982 l10n keys per locale with an enforced parity gate.
+- **Phone to tablet.** One breakpoint contract for the navigation rail, two-pane master/detail and RTL-aware spacing.
+- **Accessibility gates.** Tap-target/label guidelines on 12 surfaces; 14 theme token pairs pinned at 4.5:1. See [`docs/accessibility_statement.md`](docs/accessibility_statement.md).
+- **Measured verification.** 2,390 tracked test declarations (2,417 run, 13 skipped), 83.77% line coverage, 45 screens, 32 migrations, 11 ADRs — all gates run in CI.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-  subgraph P[Presentation]
-    S[Screens] --> C[Cubits]
-  end
-  subgraph D[Domain]
-    G[Gateway interfaces] --- E[Entities]
-  end
-  subgraph DA[Data]
-    F[Fake gateway]
-    SB[Supabase gateway]
-  end
-  C --> G
-  F -->|implements| G
-  SB -->|implements| G
-  SB --> PG[(Postgres + RLS)]
-  SB --> RT[Realtime]
+  P[Presentation: 45 screens + Cubits] --> D[Domain: gateway interfaces + Results]
+  F[Fake gateways] --> D
+  SB[Supabase adapters] --> D
+  SB --> PG[(Postgres + RLS + RPCs)]
   SB --> ST[Storage]
-  SB --> EF[Edge Functions]
+  D --> L[Legal Library: index, reader, per-user bookmarks / highlights / history]
 ```
 
 ```mermaid
 flowchart LR
   O[Onboarding] --> SI[Sign in] --> H[Home]
-  H --> BK[Booking] & MT[Matters] & DC[Documents] & MS[Messages]
-  H --> BL[Billing] & TK[Tasks] & AP[Approvals] & RS[Research] & SS[Settings]
+  H --> MT[Matters] & DC[Documents] & MS[Messages] & RS[Research] & LB[Library] & SS[Settings]
+  LB --> LA[Article reader] & LS[Saved]
+  SS --> AC[Account / legal documents]
 ```
 
 ## Tech stack
@@ -65,8 +60,7 @@ flowchart LR
 | Concern | Choice |
 |---|---|
 | Framework | Flutter 3.47.5 / Dart 3.13.4 |
-| State | `bloc` + `flutter_bloc` (Cubits) |
-| Routing and DI | `go_router` 17, `get_it` 9 |
+| State and routing | `flutter_bloc` Cubits, `go_router` 17, `get_it` 9 |
 | Backend | `supabase_flutter` 2 (Postgres, Realtime, Storage, Functions) |
 | Storage | `flutter_secure_storage` 11 (session), `shared_preferences` 2 (preferences) |
 | Media and links | `livekit_client` 2, `file_selector` 1, `url_launcher` 6, `app_links` 7 |
@@ -74,47 +68,42 @@ flowchart LR
 
 ## Quick start
 
-Demo mode needs no account, no `.env` and no backend — every screen runs on the credential-free fakes:
+Demo mode needs no account, no `.env` and no backend:
 
 ```bash
 flutter pub get
 flutter run --flavor development -t lib/main_development.dart
 ```
 
-To point the app at a Supabase project, copy the example file and fill in the URL and the **anon** key (a service-role key is rejected at startup):
+To point the app at Supabase, fill the URL and **anon** key (a service-role key is rejected at startup):
 
 ```bash
 cp .env.development.example .env.development
 flutter run --flavor development -t lib/main_development.dart --dart-define-from-file=.env.development
 ```
 
-Release builds and the full verification set (analyze, format, tests, SQL policy checks) are documented in [`docs/DEEP_DIVE.md`](docs/DEEP_DIVE.md).
+Full verification commands and release notes are in [`docs/DEEP_DIVE.md`](docs/DEEP_DIVE.md).
 
-## Roadmap
+## Honest status
 
-Available today:
-
-- [x] Practice management: matters, tasks, approvals, compliance alerts
-- [x] Authentication: email/password, OTP and deep-link recovery, Google sign-in
-- [x] Booking, attorney discovery, realtime messaging
-- [x] Document vault, invoicing (demo-mode payments), video consults, AI research
-- [x] Organizations, roles and a platform-admin surface
-- [x] English / Arabic / Turkish with RTL, responsive phone and tablet layouts
-- [x] **Legal Library** — browse, read, search, bookmark, highlight and history (sample data; official text is imported by the owner)
-- [x] **Polish** — in-app privacy policy and terms (en/ar/tr), profile editing, password change, honest account deletion, unread badge and accessibility gates
-
-Planned:
-
-- [ ] Push notification delivery
-- [ ] Offline send queue
-- [ ] iOS release build and signing
-- [ ] Provider-side deletion of LiveKit / Paymob / AI records (owner decision; see ADR-0011)
+| Area | State |
+|---|---|
+| Practice management, auth, messaging, vault, invoicing demo | Done |
+| Legal Library | Done over **sample corpus**; importer for real text is owner-supplied |
+| Profile edit, password change, in-app privacy/terms | Done |
+| Account deletion | Done for app-owned data; **partial** — provider-side records are not removed |
+| Payments, AI research, video consultations | Provider-gated demo surfaces, not live services |
+| Push delivery, offline outbox, iOS release, live payments | Planned / not done |
+| Legal text | Draft for counsel review; owner fills `LegalConfig` and hosts the docs |
 
 ## Engineering docs
 
-- [`docs/DEEP_DIVE.md`](docs/DEEP_DIVE.md) — the full engineering record, slice by slice
-- [`docs/adr/`](docs/adr/) — architecture decision records
+- [`docs/DEEP_DIVE.md`](docs/DEEP_DIVE.md) — engineering record
+- [`docs/adr/`](docs/adr/) — 11 architecture decision records
 - [`docs/permission_matrix.md`](docs/permission_matrix.md) — roles versus capabilities
+- [`docs/accessibility_statement.md`](docs/accessibility_statement.md) — accessibility test scope
+- [`docs/legal/`](docs/legal/) — privacy and terms drafts
+- [`docs/media/README.md`](docs/media/README.md) — screenshot regeneration and GIF script
 
 ## License
 
