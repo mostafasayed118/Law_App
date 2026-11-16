@@ -11,6 +11,7 @@ import 'package:legalhub/features/matters/domain/matter_gateway.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/responsive/breakpoints.dart';
+import 'package:legalhub/shared/widgets/search_action.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
 
 import 'matter_cubit.dart';
@@ -101,7 +102,10 @@ class _MatterListScreenState extends State<MatterListScreen> {
   Widget _buildTwoPane(BuildContext context, AppLocalizations l10n) {
     final String? selectedId = _selectedMatterId;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.matterTitle)),
+      appBar: AppBar(
+        title: Text(l10n.matterTitle),
+        actions: <Widget>[SearchAction(label: l10n.searchTitle)],
+      ),
       floatingActionButton: widget.canCreateMatter
           ? FloatingActionButton.extended(
               onPressed: () => _openMatterCreate(context),

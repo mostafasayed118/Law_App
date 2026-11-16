@@ -12,6 +12,7 @@ import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
 import 'package:legalhub/shared/responsive/breakpoints.dart';
+import 'package:legalhub/shared/widgets/search_action.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
 
 import 'document_cubit.dart';
@@ -93,7 +94,10 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
   Widget _buildTwoPane(AppLocalizations l10n) {
     final String? selectedId = _selectedDocumentId;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.vaultTitle)),
+      appBar: AppBar(
+        title: Text(l10n.vaultTitle),
+        actions: <Widget>[SearchAction(label: l10n.searchTitle)],
+      ),
       body: SafeArea(
         child: TwoPane(
           list: _ListSurface(
@@ -173,7 +177,10 @@ class _ListSurfaceState extends State<_ListSurface> {
       return body;
     }
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.vaultTitle)),
+      appBar: AppBar(
+        title: Text(l10n.vaultTitle),
+        actions: <Widget>[SearchAction(label: l10n.searchTitle)],
+      ),
       body: body,
     );
   }

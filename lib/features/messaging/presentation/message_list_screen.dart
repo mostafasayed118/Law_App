@@ -12,6 +12,7 @@ import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
 import 'package:legalhub/shared/responsive/breakpoints.dart';
+import 'package:legalhub/shared/widgets/search_action.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
 
 import 'message_count_chip.dart';
@@ -103,7 +104,10 @@ class _MessageListScreenState extends State<MessageListScreen> {
   Widget _buildTwoPane(BuildContext context, AppLocalizations l10n) {
     final String? selectedId = _selectedThreadId;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.messagesTitle)),
+      appBar: AppBar(
+        title: Text(l10n.messagesTitle),
+        actions: <Widget>[SearchAction(label: l10n.searchTitle)],
+      ),
       body: SafeArea(
         child: TwoPane(
           list: _ListSurface(
@@ -186,7 +190,10 @@ class _ListSurfaceState extends State<_ListSurface> {
       return body;
     }
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.messagesTitle)),
+      appBar: AppBar(
+        title: Text(l10n.messagesTitle),
+        actions: <Widget>[SearchAction(label: l10n.searchTitle)],
+      ),
       body: body,
     );
   }
