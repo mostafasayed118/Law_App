@@ -1534,8 +1534,8 @@ void main() {
 
         expect(
           occurrences,
-          hasLength(133),
-          reason: 'app_$code.arb must define 133 err* keys',
+          hasLength(138),
+          reason: 'app_$code.arb must define 138 err* keys',
         );
         expect(
           occurrences.toSet(),

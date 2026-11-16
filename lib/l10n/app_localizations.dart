@@ -5539,6 +5539,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open document'**
   String get libraryOpenDocument;
+
+  /// No description provided for @errTheBookmarkCouldNotBeUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'The bookmark could not be updated. Please try again.'**
+  String get errTheBookmarkCouldNotBeUpdated;
+
+  /// No description provided for @errTheHighlightCouldNotBeSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'That selection could not be highlighted. Select the text again and retry.'**
+  String get errTheHighlightCouldNotBeSaved;
+
+  /// No description provided for @errTheHighlightWasNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'The highlight was not found.'**
+  String get errTheHighlightWasNotFound;
+
+  /// No description provided for @errTheSavedItemsLimitWasReached.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached the limit for saved items.'**
+  String get errTheSavedItemsLimitWasReached;
+
+  /// No description provided for @errUnableToLoadYourSavedItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load your saved items. Please try again.'**
+  String get errUnableToLoadYourSavedItems;
 }
 
 class _AppLocalizationsDelegate

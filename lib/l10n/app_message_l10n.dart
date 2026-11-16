@@ -62,6 +62,15 @@ String appMessage(
     AppMessageKey.errTheRequestIsNoLongerPending =>
       l10n.errTheRequestIsNoLongerPending,
     AppMessageKey.errTheSearchQueryIsTooLong => l10n.errTheSearchQueryIsTooLong,
+    AppMessageKey.errTheBookmarkCouldNotBeUpdated =>
+      l10n.errTheBookmarkCouldNotBeUpdated,
+    AppMessageKey.errTheHighlightCouldNotBeSaved =>
+      l10n.errTheHighlightCouldNotBeSaved,
+    AppMessageKey.errTheHighlightWasNotFound => l10n.errTheHighlightWasNotFound,
+    AppMessageKey.errTheSavedItemsLimitWasReached =>
+      l10n.errTheSavedItemsLimitWasReached,
+    AppMessageKey.errUnableToLoadYourSavedItems =>
+      l10n.errUnableToLoadYourSavedItems,
     AppMessageKey.errUnableToAcknowledgeTheAlertPleaseTryAgain =>
       l10n.errUnableToAcknowledgeTheAlertPleaseTryAgain,
     AppMessageKey.errUnableToCancelTheRequestPleaseTryAgain =>

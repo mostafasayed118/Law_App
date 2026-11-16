@@ -3103,4 +3103,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get libraryOpenDocument => 'Open document';
+
+  @override
+  String get errTheBookmarkCouldNotBeUpdated =>
+      'The bookmark could not be updated. Please try again.';
+
+  @override
+  String get errTheHighlightCouldNotBeSaved =>
+      'That selection could not be highlighted. Select the text again and retry.';
+
+  @override
+  String get errTheHighlightWasNotFound => 'The highlight was not found.';
+
+  @override
+  String get errTheSavedItemsLimitWasReached =>
+      'You have reached the limit for saved items.';
+
+  @override
+  String get errUnableToLoadYourSavedItems =>
+      'Unable to load your saved items. Please try again.';
 }

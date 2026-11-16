@@ -3077,4 +3077,23 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get libraryOpenDocument => 'فتح الوثيقة';
+
+  @override
+  String get errTheBookmarkCouldNotBeUpdated =>
+      'تعذّر تحديث العلامة المرجعية. حاول مرة أخرى.';
+
+  @override
+  String get errTheHighlightCouldNotBeSaved =>
+      'تعذّر تظليل هذا التحديد. حدّد النص مرة أخرى ثم أعد المحاولة.';
+
+  @override
+  String get errTheHighlightWasNotFound => 'لم يتم العثور على التظليل.';
+
+  @override
+  String get errTheSavedItemsLimitWasReached =>
+      'لقد بلغت الحد الأقصى للعناصر المحفوظة.';
+
+  @override
+  String get errUnableToLoadYourSavedItems =>
+      'تعذّر تحميل عناصرك المحفوظة. حاول مرة أخرى.';
 }

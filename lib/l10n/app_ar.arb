@@ -1526,5 +1526,25 @@
   "libraryNextArticle": "المادة التالية",
   "libraryArticleNumberLabel": "المادة {number}",
   "libraryArticlePosition": "{current} من {total}",
-  "libraryOpenDocument": "فتح الوثيقة"
+  "libraryOpenDocument": "فتح الوثيقة",
+  "errTheBookmarkCouldNotBeUpdated": "تعذّر تحديث العلامة المرجعية. حاول مرة أخرى.",
+  "@errTheBookmarkCouldNotBeUpdated": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheHighlightCouldNotBeSaved": "تعذّر تظليل هذا التحديد. حدّد النص مرة أخرى ثم أعد المحاولة.",
+  "@errTheHighlightCouldNotBeSaved": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheHighlightWasNotFound": "لم يتم العثور على التظليل.",
+  "@errTheHighlightWasNotFound": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheSavedItemsLimitWasReached": "لقد بلغت الحد الأقصى للعناصر المحفوظة.",
+  "@errTheSavedItemsLimitWasReached": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadYourSavedItems": "تعذّر تحميل عناصرك المحفوظة. حاول مرة أخرى.",
+  "@errUnableToLoadYourSavedItems": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  }
 }

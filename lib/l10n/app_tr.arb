@@ -1526,5 +1526,25 @@
   "libraryNextArticle": "Sonraki madde",
   "libraryArticleNumberLabel": "Madde {number}",
   "libraryArticlePosition": "{current} / {total}",
-  "libraryOpenDocument": "Belgeyi aç"
+  "libraryOpenDocument": "Belgeyi aç",
+  "errTheBookmarkCouldNotBeUpdated": "Yer imi güncellenemedi. Lütfen tekrar deneyin.",
+  "@errTheBookmarkCouldNotBeUpdated": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheHighlightCouldNotBeSaved": "Bu seçim vurgulanamadı. Metni yeniden seçip tekrar deneyin.",
+  "@errTheHighlightCouldNotBeSaved": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheHighlightWasNotFound": "Vurgu bulunamadı.",
+  "@errTheHighlightWasNotFound": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errTheSavedItemsLimitWasReached": "Kaydedilen öğeler için sınıra ulaştınız.",
+  "@errTheSavedItemsLimitWasReached": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToLoadYourSavedItems": "Kaydedilen öğeleriniz yüklenemedi. Lütfen tekrar deneyin.",
+  "@errUnableToLoadYourSavedItems": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  }
 }

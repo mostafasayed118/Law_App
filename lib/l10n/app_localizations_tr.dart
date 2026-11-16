@@ -3106,4 +3106,23 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get libraryOpenDocument => 'Belgeyi aç';
+
+  @override
+  String get errTheBookmarkCouldNotBeUpdated =>
+      'Yer imi güncellenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get errTheHighlightCouldNotBeSaved =>
+      'Bu seçim vurgulanamadı. Metni yeniden seçip tekrar deneyin.';
+
+  @override
+  String get errTheHighlightWasNotFound => 'Vurgu bulunamadı.';
+
+  @override
+  String get errTheSavedItemsLimitWasReached =>
+      'Kaydedilen öğeler için sınıra ulaştınız.';
+
+  @override
+  String get errUnableToLoadYourSavedItems =>
+      'Kaydedilen öğeleriniz yüklenemedi. Lütfen tekrar deneyin.';
 }

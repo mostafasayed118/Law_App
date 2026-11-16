@@ -1190,5 +1190,10 @@
       }
     }
   },
-  "libraryOpenDocument": "Open document"
+  "libraryOpenDocument": "Open document",
+  "errTheBookmarkCouldNotBeUpdated": "The bookmark could not be updated. Please try again.",
+  "errTheHighlightCouldNotBeSaved": "That selection could not be highlighted. Select the text again and retry.",
+  "errTheHighlightWasNotFound": "The highlight was not found.",
+  "errTheSavedItemsLimitWasReached": "You have reached the limit for saved items.",
+  "errUnableToLoadYourSavedItems": "Unable to load your saved items. Please try again."
 }
