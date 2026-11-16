@@ -10,6 +10,7 @@
 | [0006](0006-primarycontainer-tracked-deviation.md) | primaryContainer remains #1A2B3C (tracked deviation from spec #0b1d2e) | **Superseded by 0008** |
 | [0007](0007-no-backend-until-p0-closes.md) | No backend package until P0 closes; backend-free batches proceed | Accepted |
 | [0008](0008-primarycontainer-code-value-canonical.md) | primaryContainer canonical value is #1A2B3C (spec table updated) | Accepted |
+| [0009](0009-legal-library-scope-and-sample-data.md) | Legal Library is a global reference module with sample-only seed data | Accepted |
 
 ADRs record decisions that are expensive to reverse or that deviate from an
 approved specification. They do not approve deferred work; they make implicit

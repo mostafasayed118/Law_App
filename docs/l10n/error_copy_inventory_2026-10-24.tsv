@@ -1,4 +1,4 @@
-literal	key	count	files
+﻿literal	key	count	files
 A rejection note is required.	errARejectionNoteIsRequired	1	lib/features/approvals/data/fake_approvals_gateway.dart:187
 AI research is not configured for this deployment. No analysis was run.	errAIResearchIsNotConfiguredForThisDeployment	1	lib/data/research/supabase_research_gateway.dart:323
 Acknowledging the alert is temporarily unavailable. Please try again.	errAcknowledgingTheAlertIsTemporarilyUnavailablePleaseTry	1	lib/data/compliance/supabase_compliance_gateway.dart:103
@@ -138,3 +138,11 @@ This account is disabled	-	1	lib/features/auth/data/supabase_sign_up_gateway.dar
 Too many attempts, try again later	-	1	lib/features/auth/data/supabase_sign_up_gateway.dart:67
 # UNPARSED
 # none
+Unable to load the library. Please try again.`terrUnableToLoadTheLibraryPleaseTryAgain`t1`tlib/features/library/domain/library_errors.dart:29
+The document was not found.`terrTheLegalDocumentWasNotFound`t1`tlib/features/library/domain/library_errors.dart:17
+The article was not found.`terrTheLegalArticleWasNotFound`t1`tlib/features/library/domain/library_errors.dart:23
+The search query is too long.`terrTheSearchQueryIsTooLong`t1`tlib/features/library/domain/library_errors.dart:36
+Unable to load the library. Please try again.	errUnableToLoadTheLibraryPleaseTryAgain	1	lib/features/library/domain/library_errors.dart:29
+The document was not found.	errTheLegalDocumentWasNotFound	1	lib/features/library/domain/library_errors.dart:17
+The article was not found.	errTheLegalArticleWasNotFound	1	lib/features/library/domain/library_errors.dart:23
+The search query is too long.	errTheSearchQueryIsTooLong	1	lib/features/library/domain/library_errors.dart:36

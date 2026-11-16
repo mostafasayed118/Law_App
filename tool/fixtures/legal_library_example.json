@@ -1,0 +1,39 @@
+{
+  "_comment": "Sample import file for tool/import_legal_library.dart. Every row here is invented demonstration content (is_sample = true) and must not be replaced with a guess at real legal text: official text is imported by the owner from an authoritative source.",
+  "source": {
+    "name_ar": "مصدر نموذجي للاستيراد",
+    "name_en": "Sample Import Source",
+    "kind": "statute",
+    "jurisdiction": "EG",
+    "is_sample": true
+  },
+  "documents": [
+    {
+      "title_ar": "وثيقة استيراد تجريبية (نموذج)",
+      "title_en": "Sample Import Document (sample)",
+      "official_number": "نموذج-١",
+      "year": 2024,
+      "category": "other",
+      "status": "unknown",
+      "summary_ar": "نموذج توضيحي يبيّن شكل ملف الاستيراد. النص مصطنع بالكامل.",
+      "published_at": "2024-01-01",
+      "is_sample": true,
+      "articles": [
+        {
+          "article_number": "1",
+          "ordinal": 1,
+          "heading_ar": "مادة تجريبية أولى",
+          "body_ar": "نص تجريبي قصير يوضح كيف تُكتب المادة الأولى في ملف الاستيراد.",
+          "is_sample": true
+        },
+        {
+          "article_number": "2",
+          "ordinal": 2,
+          "heading_ar": "مادة تجريبية ثانية",
+          "body_ar": "نص تجريبي قصير يوضح كيف تُكتب المادة الثانية، بما في ذلك علامة اقتباس ' داخل النص.",
+          "is_sample": true
+        }
+      ]
+    }
+  ]
+}

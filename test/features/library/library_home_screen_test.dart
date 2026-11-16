@@ -8,6 +8,7 @@ import 'package:legalhub/features/library/domain/library_errors.dart';
 import 'package:legalhub/features/library/domain/library_gateway.dart';
 import 'package:legalhub/features/library/presentation/library_home_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/widgets/layout/two_pane.dart';
 
 import '../../support/library_gateway_stub.dart';
 
@@ -17,6 +18,7 @@ void main() {
   Future<void> pumpLibrary(
     WidgetTester tester, {
     LibraryGateway? gateway,
+    Size size = const Size(800, 1800),
   }) async {
     if (gateway == null) {
       configureDependencies();
@@ -24,7 +26,7 @@ void main() {
       await resetServiceLocator();
       serviceLocator.registerLazySingleton<LibraryGateway>(() => gateway);
     }
-    tester.view.physicalSize = const Size(900, 1800);
+    tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -101,6 +103,26 @@ void main() {
       await pumpLibrary(tester);
 
       expect(find.text('Search articles'), findsOneWidget);
+    });
+
+    testWidgets('an expanded window renders the list beside the detail', (
+      WidgetTester tester,
+    ) async {
+      // 1200 > AppBreakpoints.expanded: master/detail, with the first document
+      // auto-selected so the pane is never half-empty.
+      await pumpLibrary(tester, size: const Size(1200, 1800));
+
+      expect(find.byType(TwoPane), findsOneWidget);
+      // The selected document's header renders twice: once as the list row,
+      // once as the detail pane's title.
+      expect(
+        find.text('لائحة تجريبية لعلاقات العمل (نموذج)'),
+        findsNWidgets(2),
+      );
+      expect(
+        find.text('Informational only. Not legal advice.'),
+        findsOneWidget,
+      );
     });
   });
 }

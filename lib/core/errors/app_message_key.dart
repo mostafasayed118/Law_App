@@ -271,4 +271,8 @@ const List<AppMessageKey> allAppMessageKeys = <AppMessageKey>[
   AppMessageKey.errYouDoNotHavePermissionToViewThese2,
   AppMessageKey.errYouDoNotHavePermissionToViewThese3,
   AppMessageKey.errYouDoNotHavePermissionToViewVideo,
+  AppMessageKey.errUnableToLoadTheLibraryPleaseTryAgain,
+  AppMessageKey.errTheLegalDocumentWasNotFound,
+  AppMessageKey.errTheLegalArticleWasNotFound,
+  AppMessageKey.errTheSearchQueryIsTooLong,
 ];

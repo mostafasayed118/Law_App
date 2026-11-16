@@ -288,10 +288,15 @@ List<RouteBase> _shellRoutes(
     ),
     GoRoute(
       path: AppRoutes.libraryDocument,
-      builder: (BuildContext context, GoRouterState state) =>
-          LibraryDocumentScreen(
-            documentId: state.pathParameters['documentId'] ?? '',
-          ),
+      builder: (BuildContext context, GoRouterState state) {
+        final String documentId = state.pathParameters['documentId'] ?? '';
+        // Expanded windows render the list + this document side by side; a deep
+        // link keeps the URL and gains the master list.
+        if (MediaQuery.sizeOf(context).width >= AppBreakpoints.expanded) {
+          return LibraryHomeScreen(initialSelectedDocumentId: documentId);
+        }
+        return LibraryDocumentScreen(documentId: documentId);
+      },
     ),
     GoRoute(
       path: AppRoutes.libraryArticle,
