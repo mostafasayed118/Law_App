@@ -201,6 +201,17 @@ void main() {
     expect(find.text('Demo engagement letter'), findsNWidgets(2));
     expect(find.text('Type'), findsOneWidget);
 
+    // The Polish 48dp tap-target fix made the "View matter" chip taller, so
+    // the fourth document row can sit outside the lazy list's built window.
+    // Scroll the list pane before reaching for it (no assertion change).
+    for (
+      int i = 0;
+      i < 5 && find.text('Correspondence log — demo').evaluate().isEmpty;
+      i++
+    ) {
+      await tester.drag(find.byType(ListView).first, const Offset(0, -200));
+      await tester.pumpAndSettle();
+    }
     await tester.ensureVisible(find.text('Correspondence log — demo'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Correspondence log — demo'));
@@ -231,6 +242,16 @@ void main() {
     await pumpApp(tester, size: const Size(1024, 768));
     await go(tester, '/vault/doc-4');
     expect(find.byType(TwoPane), findsOneWidget);
+    // See the note in the previous test: taller tap targets push the fourth
+    // row out of the lazy list window at this viewport height.
+    for (
+      int i = 0;
+      i < 5 && find.text('Correspondence log — demo').evaluate().length < 2;
+      i++
+    ) {
+      await tester.drag(find.byType(ListView).first, const Offset(0, -200));
+      await tester.pumpAndSettle();
+    }
     expect(find.text('Correspondence log — demo'), findsNWidgets(2));
 
     await go(tester, '/invoices/invoice-2');
