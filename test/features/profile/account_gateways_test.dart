@@ -3,7 +3,6 @@ import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/profile/data/fake_account_gateway.dart';
 import 'package:legalhub/features/profile/data/fake_password_gateway.dart';
 import 'package:legalhub/features/profile/domain/account_errors.dart';
-import 'package:legalhub/features/profile/domain/password_gateway.dart';
 
 /// The fakes are the demo posture, so their guards are pinned as tightly as the
 /// RPCs in migration 34: a fake more permissive than the server would let the
