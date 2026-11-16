@@ -4,8 +4,10 @@ import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/library/data/fake_library_gateway.dart';
+import 'package:legalhub/features/library/data/fake_library_user_data_gateway.dart';
 import 'package:legalhub/features/library/domain/legal_article_detail.dart';
 import 'package:legalhub/features/library/domain/library_gateway.dart';
+import 'package:legalhub/features/library/domain/library_user_data_gateway.dart';
 import 'package:legalhub/features/library/presentation/library_article_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 
@@ -39,6 +41,11 @@ void main() {
     } else {
       await resetServiceLocator();
       serviceLocator.registerLazySingleton<LibraryGateway>(() => gateway);
+      // The reader also resolves the reader's own data seam; a stub-based pump
+      // has to provide it, exactly as it provides the corpus gateway.
+      serviceLocator.registerLazySingleton<LibraryUserDataGateway>(
+        FakeLibraryUserDataGateway.new,
+      );
     }
     tester.view.physicalSize = const Size(900, 2400);
     tester.view.devicePixelRatio = 1.0;

@@ -3122,4 +3122,86 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errUnableToLoadYourSavedItems =>
       'Unable to load your saved items. Please try again.';
+
+  @override
+  String get libraryBookmarkAdd => 'Save article';
+
+  @override
+  String get libraryBookmarkRemove => 'Remove from saved';
+
+  @override
+  String get libraryHighlightAction => 'Highlight';
+
+  @override
+  String get libraryHighlightSheetTitle => 'New highlight';
+
+  @override
+  String get libraryHighlightEditTitle => 'Edit highlight';
+
+  @override
+  String get libraryHighlightColourLabel => 'Colour';
+
+  @override
+  String get libraryHighlightNoteLabel => 'Note (optional)';
+
+  @override
+  String get libraryHighlightSaveAction => 'Save highlight';
+
+  @override
+  String get libraryHighlightDeleteAction => 'Delete highlight';
+
+  @override
+  String get libraryHighlightDeleteConfirm => 'Delete this highlight?';
+
+  @override
+  String get libraryHighlightStaleTitle => 'Highlighted text has changed';
+
+  @override
+  String get libraryHighlightStaleBody =>
+      'The article was amended after you highlighted this. The saved quote is shown instead.';
+
+  @override
+  String get librarySavedTitle => 'Saved';
+
+  @override
+  String get librarySavedBookmarks => 'Bookmarks';
+
+  @override
+  String get librarySavedHighlights => 'Highlights';
+
+  @override
+  String get librarySavedHistory => 'History';
+
+  @override
+  String get librarySavedEmptyBookmarks =>
+      'No saved articles yet. Bookmark an article to find it here.';
+
+  @override
+  String get librarySavedEmptyHighlights =>
+      'No highlights yet. Select text in an article to highlight it.';
+
+  @override
+  String get librarySavedEmptyHistory => 'No reading history yet.';
+
+  @override
+  String get librarySavedClearHistory => 'Clear history';
+
+  @override
+  String get librarySavedClearHistoryConfirm =>
+      'Clear your reading history? This cannot be undone.';
+
+  @override
+  String get librarySavedCleared => 'Reading history cleared.';
+
+  @override
+  String get libraryColourYellow => 'Yellow';
+
+  @override
+  String get libraryColourGreen => 'Green';
+
+  @override
+  String get libraryColourBlue => 'Blue';
+
+  @override
+  String get libraryColourPink => 'Pink';
 }

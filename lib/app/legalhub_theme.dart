@@ -82,6 +82,21 @@ class LegalHubTheme {
   static const Color darkInfo = Color(0xFF8FD0F0);
   static const Color darkOnInfo = Color(0xFF00354C);
 
+  // --- Highlight slots (ADR-0010) ----------------------------------------
+  // Four slots for reader highlights. Each is a BACKGROUND tint only: the body
+  // text keeps `onSurface`, so contrast is text-on-tint and stays well past
+  // 4.5:1 in both brightnesses. Light tints are pale enough for the near-black
+  // onSurface; dark tints are deep enough for the near-white one.
+  static const Color highlightYellow = Color(0xFFFFF1A8);
+  static const Color highlightGreen = Color(0xFFC8EFC8);
+  static const Color highlightBlue = Color(0xFFCFE4FF);
+  static const Color highlightPink = Color(0xFFFBD3E4);
+
+  static const Color darkHighlightYellow = Color(0xFF4A3D00);
+  static const Color darkHighlightGreen = Color(0xFF16401F);
+  static const Color darkHighlightBlue = Color(0xFF12314F);
+  static const Color darkHighlightPink = Color(0xFF4A2036);
+
   static const double space2xs = 2;
   static const double spaceXs = 4;
   static const double spaceSm = 8;

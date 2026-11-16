@@ -1546,5 +1546,31 @@
   "errUnableToLoadYourSavedItems": "تعذّر تحميل عناصرك المحفوظة. حاول مرة أخرى.",
   "@errUnableToLoadYourSavedItems": {
     "description": "[REVIEW] machine-drafted; human review required before release"
-  }
+  },
+  "libraryBookmarkAdd": "حفظ المادة",
+  "libraryBookmarkRemove": "إزالة من المحفوظات",
+  "libraryHighlightAction": "تظليل",
+  "libraryHighlightSheetTitle": "تظليل جديد",
+  "libraryHighlightEditTitle": "تعديل التظليل",
+  "libraryHighlightColourLabel": "اللون",
+  "libraryHighlightNoteLabel": "ملاحظة (اختياري)",
+  "libraryHighlightSaveAction": "حفظ التظليل",
+  "libraryHighlightDeleteAction": "حذف التظليل",
+  "libraryHighlightDeleteConfirm": "حذف هذا التظليل؟",
+  "libraryHighlightStaleTitle": "تغيّر النص المظلل",
+  "libraryHighlightStaleBody": "عُدّلت المادة بعد تظليلك. يُعرض الاقتباس المحفوظ بدلاً من موضعه القديم.",
+  "librarySavedTitle": "المحفوظات",
+  "librarySavedBookmarks": "العلامات المرجعية",
+  "librarySavedHighlights": "التظليلات",
+  "librarySavedHistory": "السجل",
+  "librarySavedEmptyBookmarks": "لا توجد مواد محفوظة بعد. احفظ مادة لتجدها هنا.",
+  "librarySavedEmptyHighlights": "لا توجد تظليلات بعد. حدّد نصاً في مادة لتظليله.",
+  "librarySavedEmptyHistory": "لا يوجد سجل قراءة بعد.",
+  "librarySavedClearHistory": "مسح السجل",
+  "librarySavedClearHistoryConfirm": "مسح سجل القراءة؟ لا يمكن التراجع عن هذا الإجراء.",
+  "librarySavedCleared": "تم مسح سجل القراءة.",
+  "libraryColourYellow": "أصفر",
+  "libraryColourGreen": "أخضر",
+  "libraryColourBlue": "أزرق",
+  "libraryColourPink": "وردي"
 }

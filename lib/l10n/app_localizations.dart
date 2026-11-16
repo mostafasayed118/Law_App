@@ -5569,6 +5569,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unable to load your saved items. Please try again.'**
   String get errUnableToLoadYourSavedItems;
+
+  /// No description provided for @libraryBookmarkAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Save article'**
+  String get libraryBookmarkAdd;
+
+  /// No description provided for @libraryBookmarkRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from saved'**
+  String get libraryBookmarkRemove;
+
+  /// No description provided for @libraryHighlightAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Highlight'**
+  String get libraryHighlightAction;
+
+  /// No description provided for @libraryHighlightSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New highlight'**
+  String get libraryHighlightSheetTitle;
+
+  /// No description provided for @libraryHighlightEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit highlight'**
+  String get libraryHighlightEditTitle;
+
+  /// No description provided for @libraryHighlightColourLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Colour'**
+  String get libraryHighlightColourLabel;
+
+  /// No description provided for @libraryHighlightNoteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (optional)'**
+  String get libraryHighlightNoteLabel;
+
+  /// No description provided for @libraryHighlightSaveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Save highlight'**
+  String get libraryHighlightSaveAction;
+
+  /// No description provided for @libraryHighlightDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete highlight'**
+  String get libraryHighlightDeleteAction;
+
+  /// No description provided for @libraryHighlightDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this highlight?'**
+  String get libraryHighlightDeleteConfirm;
+
+  /// No description provided for @libraryHighlightStaleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Highlighted text has changed'**
+  String get libraryHighlightStaleTitle;
+
+  /// No description provided for @libraryHighlightStaleBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The article was amended after you highlighted this. The saved quote is shown instead.'**
+  String get libraryHighlightStaleBody;
+
+  /// No description provided for @librarySavedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get librarySavedTitle;
+
+  /// No description provided for @librarySavedBookmarks.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmarks'**
+  String get librarySavedBookmarks;
+
+  /// No description provided for @librarySavedHighlights.
+  ///
+  /// In en, this message translates to:
+  /// **'Highlights'**
+  String get librarySavedHighlights;
+
+  /// No description provided for @librarySavedHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get librarySavedHistory;
+
+  /// No description provided for @librarySavedEmptyBookmarks.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved articles yet. Bookmark an article to find it here.'**
+  String get librarySavedEmptyBookmarks;
+
+  /// No description provided for @librarySavedEmptyHighlights.
+  ///
+  /// In en, this message translates to:
+  /// **'No highlights yet. Select text in an article to highlight it.'**
+  String get librarySavedEmptyHighlights;
+
+  /// No description provided for @librarySavedEmptyHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'No reading history yet.'**
+  String get librarySavedEmptyHistory;
+
+  /// No description provided for @librarySavedClearHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear history'**
+  String get librarySavedClearHistory;
+
+  /// No description provided for @librarySavedClearHistoryConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear your reading history? This cannot be undone.'**
+  String get librarySavedClearHistoryConfirm;
+
+  /// No description provided for @librarySavedCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading history cleared.'**
+  String get librarySavedCleared;
+
+  /// No description provided for @libraryColourYellow.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow'**
+  String get libraryColourYellow;
+
+  /// No description provided for @libraryColourGreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Green'**
+  String get libraryColourGreen;
+
+  /// No description provided for @libraryColourBlue.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue'**
+  String get libraryColourBlue;
+
+  /// No description provided for @libraryColourPink.
+  ///
+  /// In en, this message translates to:
+  /// **'Pink'**
+  String get libraryColourPink;
 }
 
 class _AppLocalizationsDelegate

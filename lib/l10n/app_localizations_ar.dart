@@ -3096,4 +3096,86 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get errUnableToLoadYourSavedItems =>
       'تعذّر تحميل عناصرك المحفوظة. حاول مرة أخرى.';
+
+  @override
+  String get libraryBookmarkAdd => 'حفظ المادة';
+
+  @override
+  String get libraryBookmarkRemove => 'إزالة من المحفوظات';
+
+  @override
+  String get libraryHighlightAction => 'تظليل';
+
+  @override
+  String get libraryHighlightSheetTitle => 'تظليل جديد';
+
+  @override
+  String get libraryHighlightEditTitle => 'تعديل التظليل';
+
+  @override
+  String get libraryHighlightColourLabel => 'اللون';
+
+  @override
+  String get libraryHighlightNoteLabel => 'ملاحظة (اختياري)';
+
+  @override
+  String get libraryHighlightSaveAction => 'حفظ التظليل';
+
+  @override
+  String get libraryHighlightDeleteAction => 'حذف التظليل';
+
+  @override
+  String get libraryHighlightDeleteConfirm => 'حذف هذا التظليل؟';
+
+  @override
+  String get libraryHighlightStaleTitle => 'تغيّر النص المظلل';
+
+  @override
+  String get libraryHighlightStaleBody =>
+      'عُدّلت المادة بعد تظليلك. يُعرض الاقتباس المحفوظ بدلاً من موضعه القديم.';
+
+  @override
+  String get librarySavedTitle => 'المحفوظات';
+
+  @override
+  String get librarySavedBookmarks => 'العلامات المرجعية';
+
+  @override
+  String get librarySavedHighlights => 'التظليلات';
+
+  @override
+  String get librarySavedHistory => 'السجل';
+
+  @override
+  String get librarySavedEmptyBookmarks =>
+      'لا توجد مواد محفوظة بعد. احفظ مادة لتجدها هنا.';
+
+  @override
+  String get librarySavedEmptyHighlights =>
+      'لا توجد تظليلات بعد. حدّد نصاً في مادة لتظليله.';
+
+  @override
+  String get librarySavedEmptyHistory => 'لا يوجد سجل قراءة بعد.';
+
+  @override
+  String get librarySavedClearHistory => 'مسح السجل';
+
+  @override
+  String get librarySavedClearHistoryConfirm =>
+      'مسح سجل القراءة؟ لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get librarySavedCleared => 'تم مسح سجل القراءة.';
+
+  @override
+  String get libraryColourYellow => 'أصفر';
+
+  @override
+  String get libraryColourGreen => 'أخضر';
+
+  @override
+  String get libraryColourBlue => 'أزرق';
+
+  @override
+  String get libraryColourPink => 'وردي';
 }

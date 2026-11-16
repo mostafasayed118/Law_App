@@ -3125,4 +3125,86 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get errUnableToLoadYourSavedItems =>
       'Kaydedilen öğeleriniz yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get libraryBookmarkAdd => 'Makaleyi kaydet';
+
+  @override
+  String get libraryBookmarkRemove => 'Kaydedilenlerden çıkar';
+
+  @override
+  String get libraryHighlightAction => 'Vurgula';
+
+  @override
+  String get libraryHighlightSheetTitle => 'Yeni vurgu';
+
+  @override
+  String get libraryHighlightEditTitle => 'Vurguyu düzenle';
+
+  @override
+  String get libraryHighlightColourLabel => 'Renk';
+
+  @override
+  String get libraryHighlightNoteLabel => 'Not (isteğe bağlı)';
+
+  @override
+  String get libraryHighlightSaveAction => 'Vurguyu kaydet';
+
+  @override
+  String get libraryHighlightDeleteAction => 'Vurguyu sil';
+
+  @override
+  String get libraryHighlightDeleteConfirm => 'Bu vurgu silinsin mi?';
+
+  @override
+  String get libraryHighlightStaleTitle => 'Vurgulanan metin değişti';
+
+  @override
+  String get libraryHighlightStaleBody =>
+      'Makale siz vurguladıktan sonra değiştirildi. Eski konum yerine kaydedilen alıntı gösteriliyor.';
+
+  @override
+  String get librarySavedTitle => 'Kaydedilenler';
+
+  @override
+  String get librarySavedBookmarks => 'Yer imleri';
+
+  @override
+  String get librarySavedHighlights => 'Vurgular';
+
+  @override
+  String get librarySavedHistory => 'Geçmiş';
+
+  @override
+  String get librarySavedEmptyBookmarks =>
+      'Henüz kaydedilmiş makale yok. Burada bulmak için bir makaleyi kaydedin.';
+
+  @override
+  String get librarySavedEmptyHighlights =>
+      'Henüz vurgu yok. Vurgulamak için bir makalede metin seçin.';
+
+  @override
+  String get librarySavedEmptyHistory => 'Henüz okuma geçmişi yok.';
+
+  @override
+  String get librarySavedClearHistory => 'Geçmişi temizle';
+
+  @override
+  String get librarySavedClearHistoryConfirm =>
+      'Okuma geçmişiniz temizlensin mi? Bu işlem geri alınamaz.';
+
+  @override
+  String get librarySavedCleared => 'Okuma geçmişi temizlendi.';
+
+  @override
+  String get libraryColourYellow => 'Sarı';
+
+  @override
+  String get libraryColourGreen => 'Yeşil';
+
+  @override
+  String get libraryColourBlue => 'Mavi';
+
+  @override
+  String get libraryColourPink => 'Pembe';
 }

@@ -1546,5 +1546,31 @@
   "errUnableToLoadYourSavedItems": "Kaydedilen öğeleriniz yüklenemedi. Lütfen tekrar deneyin.",
   "@errUnableToLoadYourSavedItems": {
     "description": "[REVIEW] machine-drafted; human review required before release"
-  }
+  },
+  "libraryBookmarkAdd": "Makaleyi kaydet",
+  "libraryBookmarkRemove": "Kaydedilenlerden çıkar",
+  "libraryHighlightAction": "Vurgula",
+  "libraryHighlightSheetTitle": "Yeni vurgu",
+  "libraryHighlightEditTitle": "Vurguyu düzenle",
+  "libraryHighlightColourLabel": "Renk",
+  "libraryHighlightNoteLabel": "Not (isteğe bağlı)",
+  "libraryHighlightSaveAction": "Vurguyu kaydet",
+  "libraryHighlightDeleteAction": "Vurguyu sil",
+  "libraryHighlightDeleteConfirm": "Bu vurgu silinsin mi?",
+  "libraryHighlightStaleTitle": "Vurgulanan metin değişti",
+  "libraryHighlightStaleBody": "Makale siz vurguladıktan sonra değiştirildi. Eski konum yerine kaydedilen alıntı gösteriliyor.",
+  "librarySavedTitle": "Kaydedilenler",
+  "librarySavedBookmarks": "Yer imleri",
+  "librarySavedHighlights": "Vurgular",
+  "librarySavedHistory": "Geçmiş",
+  "librarySavedEmptyBookmarks": "Henüz kaydedilmiş makale yok. Burada bulmak için bir makaleyi kaydedin.",
+  "librarySavedEmptyHighlights": "Henüz vurgu yok. Vurgulamak için bir makalede metin seçin.",
+  "librarySavedEmptyHistory": "Henüz okuma geçmişi yok.",
+  "librarySavedClearHistory": "Geçmişi temizle",
+  "librarySavedClearHistoryConfirm": "Okuma geçmişiniz temizlensin mi? Bu işlem geri alınamaz.",
+  "librarySavedCleared": "Okuma geçmişi temizlendi.",
+  "libraryColourYellow": "Sarı",
+  "libraryColourGreen": "Yeşil",
+  "libraryColourBlue": "Mavi",
+  "libraryColourPink": "Pembe"
 }
