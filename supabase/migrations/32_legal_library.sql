@@ -77,13 +77,16 @@ begin
   v_text := regexp_replace(v_text, '\u0640', '', 'g');
 
   -- Alef variants (hamza above/below, madda, wasla) fold to bare alef.
-  v_text := translate(v_text, '\u0623\u0625\u0622\u0671', '\u0627\u0627\u0627\u0627');
+  -- E-strings on purpose: translate() does NOT interpret \uXXXX the way the
+  -- regex engine does, so a plain literal here would map the six characters
+  -- "\u0623" and silently corrupt ASCII digits instead of folding alef.
+  v_text := translate(v_text, E'\u0623\u0625\u0622\u0671', E'\u0627\u0627\u0627\u0627');
 
   -- Alef maqsura folds to ya.
-  v_text := translate(v_text, '\u0649', '\u064A');
+  v_text := translate(v_text, E'\u0649', E'\u064A');
 
   -- Ta marbuta folds to ha.
-  v_text := translate(v_text, '\u0629', '\u0647');
+  v_text := translate(v_text, E'\u0629', E'\u0647');
 
   -- Collapse runs of whitespace so tokenisation is stable.
   return btrim(regexp_replace(v_text, '\s+', ' ', 'g'));
@@ -522,9 +525,11 @@ begin
          ),
          a.is_sample,
          d.is_sample,
-         coalesce(ts_rank_cd(a.search_tsv, v_tsquery), 0::real)
+         (
+           coalesce(ts_rank_cd(a.search_tsv, v_tsquery), 0::real)
            + case when a.search_text like '%' || v_normalized || '%'
-                  then 0.1 else 0 end,
+                  then 0.1::real else 0::real end
+         )::real,
          count(*) over ()
     from public.legal_articles a
     join public.legal_documents d on d.id = a.document_id
@@ -544,7 +549,7 @@ begin
    -- repeats or skips a row.
    order by coalesce(ts_rank_cd(a.search_tsv, v_tsquery), 0::real)
               + case when a.search_text like '%' || v_normalized || '%'
-                     then 0.1 else 0 end desc,
+                     then 0.1::real else 0::real end desc,
             d.title_ar,
             a.ordinal,
             a.id
@@ -556,6 +561,15 @@ $$;
 -- ---------------------------------------------------------------------------
 -- 32.7 Execute grants: authenticated only, never anon, never PUBLIC
 -- ---------------------------------------------------------------------------
+-- is_platform_owner() is default-deny: 02_rls_functions.sql revokes EXECUTE
+-- from public, anon AND authenticated, then re-grants only the predicates a
+-- policy needs (is_active_member, has_org_role). The write policies below call
+-- it as the CALLER, so without the re-grant every INSERT/UPDATE/DELETE — the
+-- platform owner's included — fails with "permission denied for function"
+-- instead of reaching an RLS decision. Caught by executing battery 27 against a
+-- real Postgres; the structural check could not see it.
+grant execute on function public.is_platform_owner() to authenticated;
+
 revoke all on function public.list_legal_documents(public.legal_category, integer, integer)
   from public, anon;
 revoke all on function public.get_legal_document(uuid, integer) from public, anon;

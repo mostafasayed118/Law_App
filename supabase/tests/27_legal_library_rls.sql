@@ -622,7 +622,7 @@ begin
      and (not p.prosecdef
           or p.proconfig is null
           or not exists (select 1 from unnest(p.proconfig) c
-                          where c like 'search\\_path=%'));
+                          where c like 'search_path=%'));
   if v_bad <> 0 then
     raise exception 'POLICY-BATTERY FAIL 27.22: % library RPC(s) are not definer+pinned', v_bad;
   end if;
