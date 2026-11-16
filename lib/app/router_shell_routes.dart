@@ -280,6 +280,11 @@ List<RouteBase> _shellRoutes(
     // Declared before /library/:documentId so the literal segment wins the
     // match: go_router resolves in declaration order.
     GoRoute(
+      path: AppRoutes.librarySaved,
+      builder: (BuildContext context, GoRouterState state) =>
+          const LibrarySavedScreen(),
+    ),
+    GoRoute(
       path: AppRoutes.librarySearch,
       builder: (BuildContext context, GoRouterState state) =>
           LibrarySearchScreen(

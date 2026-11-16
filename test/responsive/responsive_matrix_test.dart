@@ -113,6 +113,7 @@ void main() {
     AppRoutes.approvals,
     AppRoutes.research,
     AppRoutes.library,
+    AppRoutes.librarySaved,
     '${AppRoutes.librarySearch}?q=demo',
     '/library/legal-doc-1',
     '/library/articles/legal-art-1-1',

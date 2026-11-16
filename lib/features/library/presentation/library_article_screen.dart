@@ -248,22 +248,22 @@ class _ArticleReader extends StatelessWidget {
               LegalHubTheme.marginMobile,
             ),
             children: <Widget>[
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      detail.documentTitleAr,
-                      style: text.titleMedium,
-                    ),
+              Text(detail.documentTitleAr, style: text.titleMedium),
+              if (detail.isSample)
+                Padding(
+                  padding: const EdgeInsetsDirectional.only(
+                    top: LegalHubTheme.spaceXs,
                   ),
-                  if (detail.isSample) ...<Widget>[
-                    const SizedBox(width: LegalHubTheme.spaceXs),
-                    const SampleBadge(),
-                  ],
-                  if (embedded) _BookmarkAction(),
-                ],
-              ),
+                  child: const Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: SampleBadge(),
+                  ),
+                ),
+              if (embedded)
+                Align(
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: _BookmarkAction(),
+                ),
               const SizedBox(height: LegalHubTheme.space2xs),
               Text(
                 l10n.libraryArticlePosition(

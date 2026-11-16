@@ -31,6 +31,7 @@ import 'package:legalhub/features/home/presentation/settings_screen.dart';
 import 'package:legalhub/features/library/presentation/library_article_screen.dart';
 import 'package:legalhub/features/library/presentation/library_document_screen.dart';
 import 'package:legalhub/features/library/presentation/library_home_screen.dart';
+import 'package:legalhub/features/library/presentation/library_saved_screen.dart';
 import 'package:legalhub/features/library/presentation/library_search_screen.dart';
 import 'package:legalhub/features/matters/presentation/matter_create_screen.dart';
 import 'package:legalhub/features/matters/presentation/matter_details_screen.dart';
@@ -98,6 +99,9 @@ class AppRoutes {
   static const String search = '/search';
   static const String video = '/video';
   static const String library = '/library';
+
+  /// Declared as a literal so it must be matched before `/library/:documentId`.
+  static const String librarySaved = '/library/saved';
   static const String librarySearch = '/library/search';
   static const String libraryDocument = '/library/:documentId';
   static const String libraryArticle = '/library/articles/:articleId';

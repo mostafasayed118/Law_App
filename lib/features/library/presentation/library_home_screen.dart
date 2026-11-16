@@ -75,7 +75,16 @@ class _LibraryHomeSurfaceState extends State<_LibraryHomeSurface> {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.libraryTitle)),
+      appBar: AppBar(
+        title: Text(l10n.libraryTitle),
+        actions: <Widget>[
+          IconButton(
+            tooltip: l10n.librarySavedTitle,
+            icon: const Icon(Icons.bookmarks_outlined),
+            onPressed: () => context.push(AppRoutes.librarySaved),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
