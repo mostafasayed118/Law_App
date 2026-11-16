@@ -9,8 +9,8 @@ A legal practice-management platform for law firms and their clients, built with
 ## What it is
 
 LegalHub is a multi-tenant workspace where a law firm runs its day-to-day work: matters, a document vault, secure client messaging, consultation booking, invoicing, approvals and compliance alerts, plus video consultations and an AI research surface.
-It is a real client/server application, not a UI mockup on local fixtures: Supabase Postgres with row-level security, 60 RPC functions, Realtime, Storage and five Edge Functions.
-The **Legal Library** ships slice 1 — browse statutes, read an article, full-text search — on **sample data only**: every seeded row is marked and badged as invented, and official text is imported by the owner. Bookmarks, highlights and reading history are **planned, not built**.
+It is a real client/server application, not a UI mockup on local fixtures: Supabase Postgres with row-level security, 69 RPC functions, Realtime, Storage and five Edge Functions.
+The **Legal Library** ships browse, read, full-text search, bookmarks, highlights and reading history — on **sample data only**: every seeded row is marked and badged as invented, and official text is imported by the owner.
 
 ## Screenshots
 
@@ -24,10 +24,10 @@ A 30–40 second walkthrough is planned at `docs/media/demo.gif`; the capture ch
 ## Highlights
 
 - **Clean Architecture with gateway seams.** Every feature splits into domain, data and presentation, and each data source sits behind a provider-neutral interface. The same UI runs on credential-free fakes or on Supabase; the build decides which.
-- **Authorization is server-side.** 28 tables, 29 RLS policy files and 27 pgTAP suites, with every write funnelled through an RPC. The client refuses to start if it is handed a service-role key.
-- **Three languages, right-to-left included.** English, Arabic and Turkish, 906 localized strings each, with Arabic typography and a layout matrix that proves RTL at 320px.
+- **Authorization is server-side.** 31 tables, 32 RLS policy files and 28 pgTAP suites, with every write funnelled through an RPC. The client refuses to start if it is handed a service-role key.
+- **Three languages, right-to-left included.** English, Arabic and Turkish, 937 localized strings each, with Arabic typography and a layout matrix that proves RTL at 320px.
 - **Phone to tablet.** One breakpoint contract drives the navigation rail, master/detail two-pane layouts, centred sheets and readable content width, down to foldable hinge geometry.
-- **Genuinely tested.** 2,275 tests run and pass, 86% line coverage, plus a matrix that pumps every route across five widths and three text scales.
+- **Genuinely tested.** 2,346 tests run and pass, 85% line coverage, plus a matrix that pumps every route across five widths and three text scales.
 - **Runs without credentials.** Clone it, run it, click through every screen on a deterministic demo dataset.
 
 ## Architecture
@@ -100,11 +100,10 @@ Available today:
 - [x] Document vault, invoicing (demo-mode payments), video consults, AI research
 - [x] Organizations, roles and a platform-admin surface
 - [x] English / Arabic / Turkish with RTL, responsive phone and tablet layouts
-- [x] **Legal Library slice 1** — browse, read and search (sample data; official text is imported by the owner)
+- [x] **Legal Library** — browse, read, search, bookmark, highlight and history (sample data; official text is imported by the owner)
 
 Planned:
 
-- [ ] Legal Library slice 2 — bookmarks, highlights, reading history
 - [ ] Push notification delivery
 - [ ] Offline send queue
 - [ ] Account deletion and profile editing

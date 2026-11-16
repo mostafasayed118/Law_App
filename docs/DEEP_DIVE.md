@@ -28,17 +28,19 @@ LegalHub is a legal-services client app: consultation booking, attorney
 discovery (with practice-area deep links), matter management, a document
 vault, messaging, approvals, task/compliance boards, organization +
 membership administration (create / roster / invites / roles), a
-platform-admin surface, and a demo-posture video-consultation room — 42
+platform-admin surface, and a demo-posture video-consultation room — 43
 screens behind an auth-aware GoRouter shell.
 
-The **Legal Library** (ADR-0009) is the newest module and the only one whose
-rows no tenant owns: statutes, regulations and rulings are global reference
-data, readable by any authenticated user and writable only by the platform
-owner. Slice 1 ships browse, article reading and full-text search over
-**sample data only** — three invented documents, every row marked
-`is_sample = true` and badged in the UI. Official text is imported by the owner
-through `tool/import_legal_library.dart`; bookmarks, highlights and history are
-a later slice.
+The **Legal Library** (ADR-0009, ADR-0010) is the newest module and the only one
+whose corpus no tenant owns: statutes, regulations and rulings are global
+reference data, readable by any authenticated user and writable only by the
+platform owner. Browsing, article reading, full-text search, bookmarks,
+highlights and reading history all ship — over **sample data only**: three
+invented documents, every row marked `is_sample = true` and badged in the UI.
+Official text is imported by the owner through `tool/import_legal_library.dart`.
+Per-user data is the first in the repo that belongs to a person rather than an
+organization, so it carries the narrowest policy in the schema: own rows only,
+SELECT-only grant, RPC-only writes, and no platform-owner access at all.
 
 - **Architecture** — feature-first Clean Architecture (domain / data /
   presentation per feature), Cubit state management, GetIt wiring, and a
@@ -119,7 +121,7 @@ recorded prerequisites are approved — see
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (2279 total) — full suite green 2026-11-16 (2274 at runtime; 10 capture/golden-only tests skipped by default): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (2350 total) — full suite green 2026-11-16 (2346 at runtime; 10 capture/golden-only tests skipped by default): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), ThemeCubit (mode persistence + restart
   restore), Redactor (password/OTP/email/Bearer redaction with leak guards),
@@ -472,8 +474,8 @@ HTTP layer and lock the exact postgrest await shape the app depends on —
 (2: `from().select()` plain + chained `.eq()` → raw row list). A future
 postgrest upgrade that changes the await contract fails loudly in CI, not on
 a device (the on-device create-org crash this class caused is recorded in
-`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **2279 tests**
-(2279 tracked declarations, 2275 at runtime; 10 capture/golden-only tests
+`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **2350 tests**
+(2350 tracked declarations, 2346 at runtime; 10 capture/golden-only tests
 skipped by default; ledger `verify_ledger.sh` PASS).
 
 ## Fonts and licenses
