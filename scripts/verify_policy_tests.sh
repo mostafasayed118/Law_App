@@ -250,6 +250,7 @@ BATTERY_FILES=(
   "26_video_session_rls.sql"
   "27_legal_library_rls.sql"
   "28_library_user_data_rls.sql"
+  "29_polish_profile_deletion.sql"
 )
 
 usage() {
@@ -311,7 +312,8 @@ static_check() {
       "$TESTS_DIR/23_approval_rls.sql" "$TESTS_DIR/24_compliance_alert_rls.sql" \
       "$TESTS_DIR/25_research_rls.sql" "$TESTS_DIR/26_video_session_rls.sql" \
       "$TESTS_DIR/27_legal_library_rls.sql" \
-      "$TESTS_DIR/28_library_user_data_rls.sql" | sort -u)
+      "$TESTS_DIR/28_library_user_data_rls.sql" \
+      "$TESTS_DIR/29_polish_profile_deletion.sql" | sort -u)
   for ref in $uuids_from; do
     if grep -q "$ref" "$TESTS_DIR/00_fixtures.sql"; then
       ok "fixture UUID $ref resolves in 00_fixtures.sql"
@@ -322,7 +324,7 @@ static_check() {
 
   note "static check: every battery check block carries the FAIL marker"
   local file blocks
-  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql 11_invoice_rls.sql 12_owner_assignment.sql 13_matter_write_rls.sql 14_notification_rls.sql 15_notification_producer_rls.sql 16_notification_read_flag.sql 17_task_rls.sql 18_booking_rls.sql 19_file_write_rls.sql 20_payment_rls.sql 21_task_assignable_members_rls.sql 22_attorney_directory_rls.sql 23_approval_rls.sql 24_compliance_alert_rls.sql 25_research_rls.sql 26_video_session_rls.sql 27_legal_library_rls.sql 28_library_user_data_rls.sql; do
+  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql 11_invoice_rls.sql 12_owner_assignment.sql 13_matter_write_rls.sql 14_notification_rls.sql 15_notification_producer_rls.sql 16_notification_read_flag.sql 17_task_rls.sql 18_booking_rls.sql 19_file_write_rls.sql 20_payment_rls.sql 21_task_assignable_members_rls.sql 22_attorney_directory_rls.sql 23_approval_rls.sql 24_compliance_alert_rls.sql 25_research_rls.sql 26_video_session_rls.sql 27_legal_library_rls.sql 28_library_user_data_rls.sql 29_polish_profile_deletion.sql; do
     blocks=$(grep -c 'POLICY-BATTERY FAIL' "$TESTS_DIR/$f")
     if [ "$blocks" -ge 10 ]; then
       ok "$f: $blocks named check blocks"
@@ -393,7 +395,7 @@ apply_slice() {
   psql_apply "$SUPABASE_DIR/migrations/30_profiles_mutations_rpc_only.sql" "apply migrations/30_profiles_mutations_rpc_only.sql"
   psql_apply "$SUPABASE_DIR/migrations/31_profile_display_name_and_invite_email.sql" "apply migrations/31_profile_display_name_and_invite_email.sql"
   psql_apply "$SUPABASE_DIR/migrations/32_legal_library.sql" "apply migrations/32_legal_library.sql"
-  psql_apply "$SUPABASE_DIR/migrations/33_library_user_data.sql" "apply migrations/33_library_user_data.sql"
+  psql_apply "$SUPABASE_DIR/migrations/33_library_user_data.sql" "apply migrations/33_library_user_data.sql"`n  psql_apply "$SUPABASE_DIR/migrations/34_polish_profile_and_deletion.sql" "apply migrations/34_polish_profile_and_deletion.sql"
   # 03_platform_config_seed.sql is deliberately NOT applied: its owner token
   # is an apply-time substitution placeholder for the dev project; the
   # battery's fixtures seed the rehearsal project's own owner row (D-P0C3
@@ -802,7 +804,7 @@ run_battery() {
   expect_eq "exactly one platform_config row after fixtures" \
     "$(run_sql "select count(*) from public.platform_config;")" "1"
 
-  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql 11_invoice_rls.sql 12_owner_assignment.sql 13_matter_write_rls.sql 14_notification_rls.sql 15_notification_producer_rls.sql 16_notification_read_flag.sql 17_task_rls.sql 18_booking_rls.sql 19_file_write_rls.sql 20_payment_rls.sql 21_task_assignable_members_rls.sql 22_attorney_directory_rls.sql 23_approval_rls.sql 24_compliance_alert_rls.sql 25_research_rls.sql 26_video_session_rls.sql 27_legal_library_rls.sql 28_library_user_data_rls.sql; do
+  for f in 01_identity_session.sql 02_organization_membership.sql 03_platform_owner_boundary.sql 04_matter_rls.sql 05_document_rls.sql 06_message_rls.sql 07_storage_rls.sql 08_message_rls.sql 09_realtime_push.sql 10_send_message_rls.sql 11_invoice_rls.sql 12_owner_assignment.sql 13_matter_write_rls.sql 14_notification_rls.sql 15_notification_producer_rls.sql 16_notification_read_flag.sql 17_task_rls.sql 18_booking_rls.sql 19_file_write_rls.sql 20_payment_rls.sql 21_task_assignable_members_rls.sql 22_attorney_directory_rls.sql 23_approval_rls.sql 24_compliance_alert_rls.sql 25_research_rls.sql 26_video_session_rls.sql 27_legal_library_rls.sql 28_library_user_data_rls.sql 29_polish_profile_deletion.sql; do
     note "--- 2c. Battery file: $f ---"
     out=$(psql "$SUPABASE_TEST_DB_URL" -X -q -v ON_ERROR_STOP=1 -f "$TESTS_DIR/$f" 2>&1)
     rc=$?
