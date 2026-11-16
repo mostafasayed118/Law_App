@@ -83,6 +83,16 @@ abstract final class SupabaseRpcs {
   static const String getLegalDocument = 'get_legal_document';
   static const String getLegalArticle = 'get_legal_article';
   static const String searchLegalLibrary = 'search_legal_library';
+  // legal library, per-user data
+  static const String toggleLegalBookmark = 'toggle_legal_bookmark';
+  static const String listMyLegalBookmarks = 'list_my_legal_bookmarks';
+  static const String createLegalHighlight = 'create_legal_highlight';
+  static const String updateLegalHighlight = 'update_legal_highlight';
+  static const String deleteLegalHighlight = 'delete_legal_highlight';
+  static const String listMyLegalHighlights = 'list_my_legal_highlights';
+  static const String recordLegalReading = 'record_legal_reading';
+  static const String listMyLegalHistory = 'list_my_legal_history';
+  static const String clearMyLegalHistory = 'clear_my_legal_history';
 }
 
 abstract final class SupabaseEdgeFunctions {

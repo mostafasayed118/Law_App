@@ -39,6 +39,8 @@ import 'package:legalhub/data/files/file_selector_file_picker.dart';
 import 'package:legalhub/data/files/url_launcher_uri_opener.dart';
 import 'package:legalhub/data/library/supabase_library_api.dart';
 import 'package:legalhub/data/library/supabase_library_api_impl.dart';
+import 'package:legalhub/data/library/supabase_library_user_data_api.dart';
+import 'package:legalhub/data/library/supabase_library_user_data_api_impl.dart';
 import 'package:legalhub/data/local/in_memory_locale_store.dart';
 import 'package:legalhub/data/local/in_memory_onboarding_store.dart';
 import 'package:legalhub/data/local/in_memory_org_selection_store.dart';
@@ -109,8 +111,11 @@ import 'package:legalhub/features/discovery/domain/attorney_gateway.dart';
 import 'package:legalhub/features/documents/data/fake_document_gateway.dart';
 import 'package:legalhub/features/documents/domain/document_gateway.dart';
 import 'package:legalhub/features/library/data/fake_library_gateway.dart';
+import 'package:legalhub/features/library/data/fake_library_user_data_gateway.dart';
 import 'package:legalhub/features/library/data/supabase_library_gateway.dart';
+import 'package:legalhub/features/library/data/supabase_library_user_data_gateway.dart';
 import 'package:legalhub/features/library/domain/library_gateway.dart';
+import 'package:legalhub/features/library/domain/library_user_data_gateway.dart';
 import 'package:legalhub/features/matters/data/fake_matter_gateway.dart';
 import 'package:legalhub/features/matters/data/fake_matter_write_gateway.dart';
 import 'package:legalhub/features/matters/domain/matter_gateway.dart';
@@ -192,6 +197,7 @@ void configureDependencies({
   SupabaseResearchApi Function()? supabaseResearchApiFactory,
   SupabaseVideoApi Function()? supabaseVideoApiFactory,
   SupabaseLibraryApi Function()? supabaseLibraryApiFactory,
+  SupabaseLibraryUserDataApi Function()? supabaseLibraryUserDataApiFactory,
   PaymentMode? paymentMode,
 }) {
   // Lazy singleton: stateless service, created on first resolution.
@@ -238,6 +244,10 @@ void configureDependencies({
   _registerLibrarySeams(
     env,
     supabaseLibraryApiFactory: supabaseLibraryApiFactory,
+  );
+  _registerLibraryUserDataSeams(
+    env,
+    supabaseLibraryUserDataApiFactory: supabaseLibraryUserDataApiFactory,
   );
   _registerMatterSeams(
     env,

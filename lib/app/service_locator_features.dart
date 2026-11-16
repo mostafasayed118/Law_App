@@ -393,3 +393,22 @@ void _registerLibrarySeams(
     fake: FakeLibraryGateway.new,
   );
 }
+
+/// Registers the per-user library seam (ADR-0010).
+///
+/// A separate flip from the corpus: the read-only gateway and the mutable
+/// per-user one have different lifetimes and different failure vocabularies, and
+/// a configured build must never write demo bookmarks into a real account.
+void _registerLibraryUserDataSeams(
+  SupabaseEnv env, {
+  SupabaseLibraryUserDataApi Function()? supabaseLibraryUserDataApiFactory,
+}) {
+  _registerSeam<LibraryUserDataGateway>(
+    env,
+    supabase: () => SupabaseLibraryUserDataGateway(
+      (supabaseLibraryUserDataApiFactory ??
+          SupabaseLibraryUserDataApiImpl.bind)(),
+    ),
+    fake: FakeLibraryUserDataGateway.new,
+  );
+}
