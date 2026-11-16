@@ -1669,7 +1669,7 @@
   "@accountDeleteRemovesLibrary": {
     "description": "[REVIEW] machine-drafted; human review required before release"
   },
-  "accountDeleteRemovesFiles": "Yüklediğiniz dosyalar ve meta verileri.",
+  "accountDeleteRemovesFiles": "Dosya kayıtları ve üst verileri.",
   "@accountDeleteRemovesFiles": {
     "description": "[REVIEW] machine-drafted; human review required before release"
   },
@@ -1697,7 +1697,7 @@
   "@accountDeleteSubmit": {
     "description": "[REVIEW] machine-drafted; human review required before release"
   },
-  "accountDeleteSuccess": "Hesabınız silindi. Oturum, profil, kaydedilen kütüphane verileri ve yüklediğiniz dosyalar kaldırıldı.",
+  "accountDeleteSuccess": "Hesabınız silindi. Oturum, profil, kaydedilen kütüphane verileri ve dosya kayıtlarınız kaldırıldı. Depolanan dosya baytları, operatörün depolama temizliği çalışana kadar kalabilir.",
   "@accountDeleteSuccess": {
     "description": "[REVIEW] machine-drafted; human review required before release"
   },
@@ -1756,6 +1756,10 @@
   },
   "passwordHide": "Şifreyi gizle",
   "@passwordHide": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteKeepsStorage": "Barındırılan kurulumlarda depolanan dosya baytları, operatörün depolama temizliği çalışana kadar.",
+  "@accountDeleteKeepsStorage": {
     "description": "[REVIEW] machine-drafted; human review required before release"
   }
 }

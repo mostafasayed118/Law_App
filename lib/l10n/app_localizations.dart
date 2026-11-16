@@ -5873,7 +5873,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountDeleteRemovesFiles.
   ///
   /// In en, this message translates to:
-  /// **'Files you uploaded, with their metadata.'**
+  /// **'File records and their metadata.'**
   String get accountDeleteRemovesFiles;
 
   /// No description provided for @accountDeleteKeepsTitle.
@@ -5915,7 +5915,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountDeleteSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Your account was deleted. Sign-in, profile, saved library data and your uploaded files were removed.'**
+  /// **'Your account was deleted. Sign-in, profile, saved library data and your file records were removed. Stored file bytes may remain until the operator\'s storage cleanup runs.'**
   String get accountDeleteSuccess;
 
   /// No description provided for @accountDeleteLastPartner.
@@ -5995,6 +5995,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hide password'**
   String get passwordHide;
+
+  /// Third keeps bullet for the deletion sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Stored file bytes on hosted deployments, until the operator\'s storage cleanup runs.'**
+  String get accountDeleteKeepsStorage;
 }
 
 class _AppLocalizationsDelegate

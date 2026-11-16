@@ -127,12 +127,25 @@ begin
    where exists (
      select 1 from storage.objects o
       where o.name = f.storage_path
-        and o.owner_id = v_user
+        -- storage.objects.owner_id is TEXT on hosted Supabase but UUID on
+        -- some local shapes; casting both sides keeps the predicate valid.
+        and (o.owner = v_user or o.owner_id::text = v_user::text)
    );
 
   -- Bytes this user uploaded. Objects owned by others in the same orgs are
   -- deliberately left alone.
-  delete from storage.objects where owner_id = v_user;
+  -- Hosted Supabase forbids direct DELETE on storage.objects (SQLSTATE
+  -- 42501: "Use the Storage API instead"). Attempt it for local/self-hosted
+  -- shapes, but never block identity deletion when the platform guard fires.
+  -- The in-app deletion contract and the ADR say this explicitly: file RECORDS
+  -- are removed here; stored BYTES need the operator's Storage-API cleanup.
+  begin
+    delete from storage.objects
+     where owner = v_user or owner_id::text = v_user::text;
+  exception
+    when insufficient_privilege then
+      raise warning 'account deletion: storage bytes require the Storage API cleanup';
+  end;
 
   -- Profiles, memberships and migration-33 library rows cascade from here.
   delete from auth.users where id = v_user;

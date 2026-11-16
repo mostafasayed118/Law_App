@@ -29,4 +29,4 @@ You can edit your display name and change your password in Account settings. You
 
 ## Deletion and contact
 
-Account deletion removes your sign-in, profile, memberships, Legal Library rows and files you uploaded with their metadata. It does not remove records owned by other people or provider-side records. Redacted audit entries are retained with the actor reference cleared. For questions, use the contact address in the in-app legal notice.
+Account deletion removes your sign-in, profile, memberships, Legal Library rows and your file records with their metadata. Stored file bytes on hosted deployments are removed by the operator's storage cleanup, not by the in-app step. It does not remove records owned by other people or provider-side records. Redacted audit entries are retained with the actor reference cleared. For questions, use the contact address in the in-app legal notice.

@@ -40,7 +40,8 @@ from source for an emulator.
 ## Known limitations
 
 - Account deletion is **partial**: it removes app-owned identity, profile,
-  memberships, library rows and the caller's uploaded files, but not
+  memberships, library rows and file records, but not stored file bytes on
+  hosted Supabase (the platform forbids direct storage-table deletes) or
   provider-side records. The UI says this before confirmation (ADR-0011).
 - Push delivery, offline outbox, iOS release and live payments are not done.
 - Migrations 32–34 are not applied to any live project by this repository's

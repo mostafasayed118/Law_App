@@ -208,7 +208,7 @@ begin
   end if;
 
   select count(*) into v_cnt
-    from storage.objects where owner_id = v_a;
+    from storage.objects where owner_id::text = v_a::text;
   if v_cnt <> 0 then
     raise exception 'POLICY-BATTERY FAIL 29.05: % storage object(s) survived deletion', v_cnt;
   end if;
@@ -377,5 +377,55 @@ begin
     raise exception 'POLICY-BATTERY FAIL 29.13: a client deletion was refused';
   end if;
 end $$;
+
+
+-- ############################################################################
+-- 29.14 — the hosted Supabase guard against direct storage-table deletes
+-- (SQLSTATE 42501) must NOT block identity deletion. File records are removed;
+-- stored bytes are left for the operator's Storage-API cleanup.
+-- ############################################################################
+do $$
+declare
+  v_user uuid := gen_random_uuid();
+  v_org  uuid := current_setting('battery29.org')::uuid;
+begin
+  insert into auth.users (id, email) values (v_user, 'battery29-guard@test.local');
+  insert into public.memberships (user_id, organization_id, role, status)
+  values (v_user, v_org, 'client', 'active');
+  insert into storage.objects (bucket_id, name, owner_id)
+  values ('matter-files', v_org::text || '/battery29/guard.pdf', v_user);
+  perform set_config('battery29.guard_user', v_user::text, true);
+end $$;
+
+create or replace function storage.battery29_refuse_delete()
+returns trigger
+language plpgsql
+as $$
+begin
+  raise exception 'Direct deletion from storage tables is not allowed. Use the Storage API instead.'
+    using errcode = '42501';
+end $$;
+
+create trigger battery29_refuse_delete
+before delete on storage.objects
+for each row execute function storage.battery29_refuse_delete();
+
+do $$
+declare
+  v_user uuid := current_setting('battery29.guard_user')::uuid;
+begin
+  set local role authenticated;
+  perform set_config('request.jwt.claim.sub', v_user::text, false);
+  perform set_config('request.jwt.claims', json_build_object('sub', v_user)::text, false);
+  perform public.delete_my_account();
+  reset role;
+
+  if exists (select 1 from auth.users where id = v_user) then
+    raise exception 'POLICY-BATTERY FAIL 29.14: the hosted storage guard blocked identity deletion';
+  end if;
+end $$;
+
+drop trigger battery29_refuse_delete on storage.objects;
+drop function storage.battery29_refuse_delete();
 
 rollback;

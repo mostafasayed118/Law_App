@@ -103,6 +103,7 @@ class _DeleteAccountSheetState extends State<_DeleteAccountSheet> {
               Text(l10n.accountDeleteKeepsTitle, style: text.titleSmall),
               const SizedBox(height: LegalHubTheme.spaceXs),
               _FactRow(text: l10n.accountDeleteKeepsOthers),
+              _FactRow(text: l10n.accountDeleteKeepsStorage),
               _FactRow(text: l10n.accountDeleteKeepsAudit),
               const SizedBox(height: LegalHubTheme.spaceLg),
               Semantics(

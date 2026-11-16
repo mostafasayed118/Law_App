@@ -1246,14 +1246,14 @@
   "accountDeleteRemovesTitle": "This removes",
   "accountDeleteRemovesIdentity": "Your sign-in and profile.",
   "accountDeleteRemovesLibrary": "Your saved articles, highlights and reading history.",
-  "accountDeleteRemovesFiles": "Files you uploaded, with their metadata.",
+  "accountDeleteRemovesFiles": "File records and their metadata.",
   "accountDeleteKeepsTitle": "This does not remove",
   "accountDeleteKeepsOthers": "Files or records owned by other people in your organizations.",
   "accountDeleteKeepsAudit": "Redacted audit records; the actor reference is cleared.",
   "accountDeleteConfirmLabel": "Type DELETE to confirm",
   "accountDeleteConfirmHint": "DELETE",
   "accountDeleteSubmit": "Permanently delete my account",
-  "accountDeleteSuccess": "Your account was deleted. Sign-in, profile, saved library data and your uploaded files were removed.",
+  "accountDeleteSuccess": "Your account was deleted. Sign-in, profile, saved library data and your file records were removed. Stored file bytes may remain until the operator's storage cleanup runs.",
   "accountDeleteLastPartner": "Add another active partner to this organization before deleting your account.",
   "accountDeleteOwner": "Transfer platform ownership before deleting your account.",
   "accountDeleteGenericError": "Unable to delete your account. Please try again.",
@@ -1274,5 +1274,9 @@
     }
   },
   "passwordShow": "Show password",
-  "passwordHide": "Hide password"
+  "passwordHide": "Hide password",
+  "accountDeleteKeepsStorage": "Stored file bytes on hosted deployments, until the operator's storage cleanup runs.",
+  "@accountDeleteKeepsStorage": {
+    "description": "Third keeps bullet for the deletion sheet."
+  }
 }

@@ -31,10 +31,11 @@ The probe did find three real gaps the old RPC did not cover:
 |---|---|
 | `storage.objects` owned by the caller | 1 → 1 (orphaned bytes survived) |
 | `public.files` metadata | survived with the object |
+| Hosted Supabase storage guard | discovered later: direct DELETE on `storage.objects` raises 42501 |
 | Last-active-partner guard | bypassed by the cascade; org left with 0 active partners |
 | Platform owner deletion | failed with raw SQLSTATE 23503 from `platform_config` |
 
-Migration 34 removes the caller's own objects and their metadata first, refuses
+Migration 34 removes the caller's file records and their metadata first, refuses
 the two governance-invalid cases with stable codes
 (`account_deletion_last_partner`, `account_deletion_platform_owner`, both
 23514), audits before deletion, then hard-deletes the identity so profiles,
@@ -44,11 +45,18 @@ duplicated byte-identically in the migration and in `supabase/rpc/*.sql`
 because the rehearsal harness applies RPCs after migrations — if one changes,
 both must.
 
+On a hosted project the storage-table delete is wrapped in an exception handler:
+Supabase raises `42501` ("Use the Storage API instead") for direct
+`storage.objects` deletes, and that guard must never block identity deletion.
+File **records** are removed by the RPC; stored **bytes** remain until the
+operator runs a Storage-API cleanup with the service role.
+
 ### 2. The UI tells the truth about what deletion removes
 
 The deletion sheet states both halves explicitly: it removes sign-in, profile,
-memberships, library rows and files the reader uploaded with their metadata;
-it does **not** remove other people's objects or provider-side records
+memberships, library rows and the reader's file records with their metadata;
+it does **not** remove stored file bytes on hosted Supabase, other people's
+objects, or provider-side records
 (LiveKit / Paymob / AI provider), and redacted audit entries are retained with
 the actor reference cleared. The cubit sets `done` only after the RPC succeeds,
 and the success message names exactly what was removed. It never says a generic
@@ -97,7 +105,8 @@ WCAG conformance or a device TalkBack pass.
 - **Avatar upload and email change** are out of scope: they need Storage/Auth
   flows unrelated to the deletion contract.
 - **A provider-side deletion edge function** is not written here. The identity
-  and all repo-owned data are deleted by the RPC; touching LiveKit/Paymob/AI
+  and all repo-owned data are deleted by the RPC; touching Storage bytes
+  (hosted Supabase forbids direct table deletes), LiveKit, Paymob or AI
   records requires service-role credentials and a separate owner decision.
 - **Golden PNGs** were not hand-edited. The 48dp tap-target fixes may shift
   baselines; regeneration is an owner action via the CI workflow.

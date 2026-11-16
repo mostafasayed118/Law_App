@@ -3288,8 +3288,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Kaydettiğiniz makaleler, vurgular ve okuma geçmişiniz.';
 
   @override
-  String get accountDeleteRemovesFiles =>
-      'Yüklediğiniz dosyalar ve meta verileri.';
+  String get accountDeleteRemovesFiles => 'Dosya kayıtları ve üst verileri.';
 
   @override
   String get accountDeleteKeepsTitle => 'Kaldırılmayanlar';
@@ -3313,7 +3312,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get accountDeleteSuccess =>
-      'Hesabınız silindi. Oturum, profil, kaydedilen kütüphane verileri ve yüklediğiniz dosyalar kaldırıldı.';
+      'Hesabınız silindi. Oturum, profil, kaydedilen kütüphane verileri ve dosya kayıtlarınız kaldırıldı. Depolanan dosya baytları, operatörün depolama temizliği çalışana kadar kalabilir.';
 
   @override
   String get accountDeleteLastPartner =>
@@ -3369,4 +3368,8 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get passwordHide => 'Şifreyi gizle';
+
+  @override
+  String get accountDeleteKeepsStorage =>
+      'Barındırılan kurulumlarda depolanan dosya baytları, operatörün depolama temizliği çalışana kadar.';
 }

@@ -5,7 +5,10 @@
 --
 -- What this really does, verified on a disposable Postgres 2026-11-16:
 --   hard-deletes auth.users; cascades profiles, memberships and the migration-33
---   library rows; deletes the caller's own storage objects and their metadata;
+--   library rows; deletes the caller's file records and their metadata;
+--   attempts the caller's storage objects but tolerates the hosted Supabase
+--   guard (42501) so identity deletion still completes - bytes need a
+--   service-role Storage-API cleanup on hosted projects;
 --   refuses the platform owner and a last-active-partner with stable codes.
 -- What it does NOT do: delete other people's objects in the caller's orgs, or
 -- touch provider-side data (LiveKit / Paymob / AI provider). The UI message must
@@ -60,10 +63,23 @@ begin
    where exists (
      select 1 from storage.objects o
       where o.name = f.storage_path
-        and o.owner_id = v_user
+        -- storage.objects.owner_id is TEXT on hosted Supabase but UUID on
+        -- some local shapes; casting both sides keeps the predicate valid.
+        and (o.owner = v_user or o.owner_id::text = v_user::text)
    );
 
-  delete from storage.objects where owner_id = v_user;
+  -- Hosted Supabase forbids direct DELETE on storage.objects (SQLSTATE
+  -- 42501: "Use the Storage API instead"). Attempt it for local/self-hosted
+  -- shapes, but never block identity deletion when the platform guard fires.
+  -- The in-app deletion contract and the ADR say this explicitly: file RECORDS
+  -- are removed here; stored BYTES need the operator's Storage-API cleanup.
+  begin
+    delete from storage.objects
+     where owner = v_user or owner_id::text = v_user::text;
+  exception
+    when insufficient_privilege then
+      raise warning 'account deletion: storage bytes require the Storage API cleanup';
+  end;
 
   delete from auth.users where id = v_user;
 end;

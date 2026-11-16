@@ -46,7 +46,7 @@
       "id": "p7",
       "heading": "Silme ve iletişim",
       "paragraphs": [
-        "Hesap silme işlemi oturumu, profili, üyelikleri, Legal Library kayıtlarını ve yüklediğiniz dosyaları üst verileriyle kaldırır. Başkalarına ait kayıtlar ve sağlayıcı taraflındaki kayıtlar kaldırılmaz. Maskelenmiş denetim kayıtları aktör referansı temizlenerek saklanır. Sorularınız için uygulama içi yasal bildirimdeki iletişim adresini kullanın."
+        "Hesap silme işlemi oturumu, profili, üyelikleri, Legal Library kayıtlarını ve dosya kayıtlarınızı üst verileriyle kaldırır. Barındırılan kurulumlarda depolanan dosya baytları, uygulama içi adımla değil operatörün depolama temizliğiyle kaldırılır. Başkalarına ait kayıtlar ve sağlayıcı taraflındaki kayıtlar kaldırılmaz. Maskelenmiş denetim kayıtları aktör referansı temizlenerek saklanır. Sorularınız için uygulama içi yasal bildirimdeki iletişim adresini kullanın."
       ]
     }
   ],

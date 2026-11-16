@@ -30,7 +30,7 @@ All 15 images are generated from the demo build by `CAPTURE_SCREENSHOTS=1 flutte
 - **Server-side authorization.** 31 tables, 32 policy files (43 RLS policies), 86 unique public RPC functions, 30 pgTAP batteries. Writes are RPC-only; a service-role key is rejected at startup.
 - **Arabic-aware search.** Unicode normalization and Arabic letter-form folding, so `أ`/`إ`/`آ`/`ا` match; snippets come from matched text, never invented.
 - **Anchored highlights.** Offset + quote + body hash with stale detection when source text changes.
-- **Three languages, RTL throughout.** English, Arabic and Turkish; 982 l10n keys per locale with an enforced parity gate.
+- **Three languages, RTL throughout.** English, Arabic and Turkish; 983 l10n keys per locale with an enforced parity gate.
 - **Phone to tablet.** One breakpoint contract for the navigation rail, two-pane master/detail and RTL-aware spacing.
 - **Accessibility gates.** Tap-target/label guidelines on 12 surfaces; 14 theme token pairs pinned at 4.5:1. See [`docs/accessibility_statement.md`](docs/accessibility_statement.md).
 - **Measured verification.** 2,390 tracked test declarations (2,417 run, 13 skipped), 83.77% line coverage, 45 screens, 32 migrations, 11 ADRs — all gates run in CI.

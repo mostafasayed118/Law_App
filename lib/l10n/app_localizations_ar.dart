@@ -3258,8 +3258,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'مقالاتك المحفوظة وتظليلاتك وسجل قراءتك.';
 
   @override
-  String get accountDeleteRemovesFiles =>
-      'الملفات التي رفعتها مع بياناتها الوصفية.';
+  String get accountDeleteRemovesFiles => 'سجلات الملفات وبياناتها الوصفية.';
 
   @override
   String get accountDeleteKeepsTitle => 'ما الذي لا تتم إزالته';
@@ -3283,7 +3282,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get accountDeleteSuccess =>
-      'تم حذف حسابك. أُزيل تسجيل الدخول والملف الشخصي وبيانات المكتبة المحفوظة وملفاتك التي رفعتها.';
+      'تم حذف حسابك. أُزيل تسجيل الدخول والملف الشخصي وبيانات المكتبة المحفوظة وسجلات ملفاتك. قد تبقى بايتات الملفات المخزّنة حتى ينفّذ المشغّل تنظيف التخزين.';
 
   @override
   String get accountDeleteLastPartner =>
@@ -3337,4 +3336,8 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get passwordHide => 'إخفاء كلمة المرور';
+
+  @override
+  String get accountDeleteKeepsStorage =>
+      'بايتات الملفات المخزّنة على النشر المستضاف، حتى ينفّذ المشغّل تنظيف التخزين.';
 }

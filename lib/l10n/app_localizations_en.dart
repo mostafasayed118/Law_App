@@ -3286,8 +3286,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your saved articles, highlights and reading history.';
 
   @override
-  String get accountDeleteRemovesFiles =>
-      'Files you uploaded, with their metadata.';
+  String get accountDeleteRemovesFiles => 'File records and their metadata.';
 
   @override
   String get accountDeleteKeepsTitle => 'This does not remove';
@@ -3311,7 +3310,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountDeleteSuccess =>
-      'Your account was deleted. Sign-in, profile, saved library data and your uploaded files were removed.';
+      'Your account was deleted. Sign-in, profile, saved library data and your file records were removed. Stored file bytes may remain until the operator\'s storage cleanup runs.';
 
   @override
   String get accountDeleteLastPartner =>
@@ -3367,4 +3366,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordHide => 'Hide password';
+
+  @override
+  String get accountDeleteKeepsStorage =>
+      'Stored file bytes on hosted deployments, until the operator\'s storage cleanup runs.';
 }
