@@ -5323,6 +5323,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You do not have permission to view video consultations.'**
   String get errYouDoNotHavePermissionToViewVideo;
+
+  /// No description provided for @libraryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Legal Library'**
+  String get libraryTitle;
+
+  /// No description provided for @libraryEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Legal Library'**
+  String get libraryEntryTitle;
+
+  /// No description provided for @libraryEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse sample legal documents — development demo.'**
+  String get libraryEntrySubtitle;
+
+  /// No description provided for @libraryEntrySubtitleConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse statutes, regulations and rulings.'**
+  String get libraryEntrySubtitleConfigured;
+
+  /// No description provided for @librarySearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search articles'**
+  String get librarySearchHint;
+
+  /// No description provided for @librarySearchNoQuery.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a word to search the articles.'**
+  String get librarySearchNoQuery;
+
+  /// No description provided for @librarySearchNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No articles match this search.'**
+  String get librarySearchNoResults;
+
+  /// No description provided for @librarySearchError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to search the library.'**
+  String get librarySearchError;
+
+  /// No description provided for @libraryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No documents are available.'**
+  String get libraryEmpty;
+
+  /// No description provided for @libraryError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load the library.'**
+  String get libraryError;
+
+  /// No description provided for @libraryLocalOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo mode — sample documents only. Not official legal text.'**
+  String get libraryLocalOnlyNote;
+
+  /// No description provided for @libraryCategoryAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get libraryCategoryAll;
+
+  /// No description provided for @libraryCategoryCivil.
+  ///
+  /// In en, this message translates to:
+  /// **'Civil'**
+  String get libraryCategoryCivil;
+
+  /// No description provided for @libraryCategoryCriminal.
+  ///
+  /// In en, this message translates to:
+  /// **'Criminal'**
+  String get libraryCategoryCriminal;
+
+  /// No description provided for @libraryCategoryLabor.
+  ///
+  /// In en, this message translates to:
+  /// **'Labour'**
+  String get libraryCategoryLabor;
+
+  /// No description provided for @libraryCategoryCommercial.
+  ///
+  /// In en, this message translates to:
+  /// **'Commercial'**
+  String get libraryCategoryCommercial;
+
+  /// No description provided for @libraryCategoryFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Family'**
+  String get libraryCategoryFamily;
+
+  /// No description provided for @libraryCategoryAdministrative.
+  ///
+  /// In en, this message translates to:
+  /// **'Administrative'**
+  String get libraryCategoryAdministrative;
+
+  /// No description provided for @libraryCategoryConstitutional.
+  ///
+  /// In en, this message translates to:
+  /// **'Constitutional'**
+  String get libraryCategoryConstitutional;
+
+  /// No description provided for @libraryCategoryOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get libraryCategoryOther;
+
+  /// No description provided for @libraryStatusInForce.
+  ///
+  /// In en, this message translates to:
+  /// **'In force'**
+  String get libraryStatusInForce;
+
+  /// No description provided for @libraryStatusAmended.
+  ///
+  /// In en, this message translates to:
+  /// **'Amended'**
+  String get libraryStatusAmended;
+
+  /// No description provided for @libraryStatusRepealed.
+  ///
+  /// In en, this message translates to:
+  /// **'Repealed'**
+  String get libraryStatusRepealed;
+
+  /// No description provided for @libraryStatusUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Status unknown'**
+  String get libraryStatusUnknown;
+
+  /// No description provided for @librarySampleBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Sample content'**
+  String get librarySampleBadge;
+
+  /// No description provided for @librarySampleNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Sample content, not official legal text.'**
+  String get librarySampleNotice;
+
+  /// No description provided for @libraryDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Informational only. Not legal advice.'**
+  String get libraryDisclaimer;
+
+  /// No description provided for @libraryDocumentArticles.
+  ///
+  /// In en, this message translates to:
+  /// **'Articles'**
+  String get libraryDocumentArticles;
+
+  /// No description provided for @libraryDocumentEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'This document has no articles yet.'**
+  String get libraryDocumentEmpty;
+
+  /// No description provided for @libraryDocumentError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load this document.'**
+  String get libraryDocumentError;
+
+  /// No description provided for @libraryArticleMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'This article could not be found.'**
+  String get libraryArticleMissing;
+
+  /// No description provided for @libraryPreviousArticle.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous article'**
+  String get libraryPreviousArticle;
+
+  /// No description provided for @libraryNextArticle.
+  ///
+  /// In en, this message translates to:
+  /// **'Next article'**
+  String get libraryNextArticle;
+
+  /// No description provided for @libraryArticleNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Article {number}'**
+  String libraryArticleNumberLabel(String number);
+
+  /// No description provided for @libraryArticlePosition.
+  ///
+  /// In en, this message translates to:
+  /// **'{current} of {total}'**
+  String libraryArticlePosition(int current, int total);
+
+  /// No description provided for @libraryOpenDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Open document'**
+  String get libraryOpenDocument;
 }
 
 class _AppLocalizationsDelegate

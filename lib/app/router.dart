@@ -93,6 +93,21 @@ class AppRoutes {
   static const String research = '/research';
   static const String search = '/search';
   static const String video = '/video';
+  static const String library = '/library';
+  static const String librarySearch = '/library/search';
+  static const String libraryDocument = '/library/:documentId';
+  static const String libraryArticle = '/library/articles/:articleId';
+
+  /// The reader route for one article (path-param substitution).
+  static String libraryArticleFor(String articleId) =>
+      '/library/articles/$articleId';
+
+  /// The reader route for one document (path-param substitution).
+  static String libraryDocumentFor(String documentId) => '/library/$documentId';
+
+  /// The search route with its `q` query param (URL-encoded).
+  static String librarySearchQuery(String query) =>
+      '$librarySearch?q=${Uri.encodeQueryComponent(query)}';
 
   /// The profile route for one attorney (path-param substitution).
   static String attorneyProfile(String attorneyId) => '/discovery/$attorneyId';

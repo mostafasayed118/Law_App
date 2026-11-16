@@ -2989,4 +2989,121 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get errYouDoNotHavePermissionToViewVideo =>
       'Video görüşmelerini görüntüleme izniniz yok.';
+
+  @override
+  String get libraryTitle => 'Hukuk Kütüphanesi';
+
+  @override
+  String get libraryEntryTitle => 'Hukuk Kütüphanesi';
+
+  @override
+  String get libraryEntrySubtitle =>
+      'Örnek hukuki belgelere göz atın — geliştirme demosu.';
+
+  @override
+  String get libraryEntrySubtitleConfigured =>
+      'Kanunlara, yönetmeliklere ve kararlara göz atın.';
+
+  @override
+  String get librarySearchHint => 'Maddelerde ara';
+
+  @override
+  String get librarySearchNoQuery => 'Maddelerde aramak için bir kelime yazın.';
+
+  @override
+  String get librarySearchNoResults => 'Bu aramayla eşleşen madde yok.';
+
+  @override
+  String get librarySearchError => 'Kütüphanede arama yapılamadı.';
+
+  @override
+  String get libraryEmpty => 'Kullanılabilir belge yok.';
+
+  @override
+  String get libraryError => 'Kütüphane yüklenemedi.';
+
+  @override
+  String get libraryLocalOnlyNote =>
+      'Demo modu — yalnızca örnek belgeler. Resmî hukuki metin değildir.';
+
+  @override
+  String get libraryCategoryAll => 'Tümü';
+
+  @override
+  String get libraryCategoryCivil => 'Medeni';
+
+  @override
+  String get libraryCategoryCriminal => 'Ceza';
+
+  @override
+  String get libraryCategoryLabor => 'İş';
+
+  @override
+  String get libraryCategoryCommercial => 'Ticari';
+
+  @override
+  String get libraryCategoryFamily => 'Aile';
+
+  @override
+  String get libraryCategoryAdministrative => 'İdari';
+
+  @override
+  String get libraryCategoryConstitutional => 'Anayasal';
+
+  @override
+  String get libraryCategoryOther => 'Diğer';
+
+  @override
+  String get libraryStatusInForce => 'Yürürlükte';
+
+  @override
+  String get libraryStatusAmended => 'Değiştirilmiş';
+
+  @override
+  String get libraryStatusRepealed => 'Yürürlükten kaldırılmış';
+
+  @override
+  String get libraryStatusUnknown => 'Durum bilinmiyor';
+
+  @override
+  String get librarySampleBadge => 'Örnek içerik';
+
+  @override
+  String get librarySampleNotice =>
+      'Örnek içerik, resmî hukuki metin değildir.';
+
+  @override
+  String get libraryDisclaimer =>
+      'Yalnızca bilgilendirme amaçlıdır. Hukuki tavsiye değildir.';
+
+  @override
+  String get libraryDocumentArticles => 'Maddeler';
+
+  @override
+  String get libraryDocumentEmpty => 'Bu belgede henüz madde yok.';
+
+  @override
+  String get libraryDocumentError => 'Bu belge yüklenemedi.';
+
+  @override
+  String get libraryArticleMissing => 'Bu madde bulunamadı.';
+
+  @override
+  String get libraryPreviousArticle => 'Önceki madde';
+
+  @override
+  String get libraryNextArticle => 'Sonraki madde';
+
+  @override
+  String libraryArticleNumberLabel(String number) {
+    return 'Madde $number';
+  }
+
+  @override
+  String libraryArticlePosition(int current, int total) {
+    return '$current / $total';
+  }
+
+  @override
+  String get libraryOpenDocument => 'Belgeyi aç';
 }

@@ -2988,4 +2988,119 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errYouDoNotHavePermissionToViewVideo =>
       'You do not have permission to view video consultations.';
+
+  @override
+  String get libraryTitle => 'Legal Library';
+
+  @override
+  String get libraryEntryTitle => 'Legal Library';
+
+  @override
+  String get libraryEntrySubtitle =>
+      'Browse sample legal documents — development demo.';
+
+  @override
+  String get libraryEntrySubtitleConfigured =>
+      'Browse statutes, regulations and rulings.';
+
+  @override
+  String get librarySearchHint => 'Search articles';
+
+  @override
+  String get librarySearchNoQuery => 'Type a word to search the articles.';
+
+  @override
+  String get librarySearchNoResults => 'No articles match this search.';
+
+  @override
+  String get librarySearchError => 'Unable to search the library.';
+
+  @override
+  String get libraryEmpty => 'No documents are available.';
+
+  @override
+  String get libraryError => 'Unable to load the library.';
+
+  @override
+  String get libraryLocalOnlyNote =>
+      'Demo mode — sample documents only. Not official legal text.';
+
+  @override
+  String get libraryCategoryAll => 'All';
+
+  @override
+  String get libraryCategoryCivil => 'Civil';
+
+  @override
+  String get libraryCategoryCriminal => 'Criminal';
+
+  @override
+  String get libraryCategoryLabor => 'Labour';
+
+  @override
+  String get libraryCategoryCommercial => 'Commercial';
+
+  @override
+  String get libraryCategoryFamily => 'Family';
+
+  @override
+  String get libraryCategoryAdministrative => 'Administrative';
+
+  @override
+  String get libraryCategoryConstitutional => 'Constitutional';
+
+  @override
+  String get libraryCategoryOther => 'Other';
+
+  @override
+  String get libraryStatusInForce => 'In force';
+
+  @override
+  String get libraryStatusAmended => 'Amended';
+
+  @override
+  String get libraryStatusRepealed => 'Repealed';
+
+  @override
+  String get libraryStatusUnknown => 'Status unknown';
+
+  @override
+  String get librarySampleBadge => 'Sample content';
+
+  @override
+  String get librarySampleNotice => 'Sample content, not official legal text.';
+
+  @override
+  String get libraryDisclaimer => 'Informational only. Not legal advice.';
+
+  @override
+  String get libraryDocumentArticles => 'Articles';
+
+  @override
+  String get libraryDocumentEmpty => 'This document has no articles yet.';
+
+  @override
+  String get libraryDocumentError => 'Unable to load this document.';
+
+  @override
+  String get libraryArticleMissing => 'This article could not be found.';
+
+  @override
+  String get libraryPreviousArticle => 'Previous article';
+
+  @override
+  String get libraryNextArticle => 'Next article';
+
+  @override
+  String libraryArticleNumberLabel(String number) {
+    return 'Article $number';
+  }
+
+  @override
+  String libraryArticlePosition(int current, int total) {
+    return '$current of $total';
+  }
+
+  @override
+  String get libraryOpenDocument => 'Open document';
 }

@@ -2963,4 +2963,118 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get errYouDoNotHavePermissionToViewVideo =>
       'ليس لديك إذن لعرض استشارات الفيديو.';
+
+  @override
+  String get libraryTitle => 'المكتبة القانونية';
+
+  @override
+  String get libraryEntryTitle => 'المكتبة القانونية';
+
+  @override
+  String get libraryEntrySubtitle => 'تصفح وثائق قانونية تجريبية — عرض تطويري.';
+
+  @override
+  String get libraryEntrySubtitleConfigured =>
+      'تصفح القوانين واللوائح والأحكام.';
+
+  @override
+  String get librarySearchHint => 'ابحث في المواد';
+
+  @override
+  String get librarySearchNoQuery => 'اكتب كلمة للبحث في المواد.';
+
+  @override
+  String get librarySearchNoResults => 'لا توجد مواد مطابقة لهذا البحث.';
+
+  @override
+  String get librarySearchError => 'تعذّر البحث في المكتبة.';
+
+  @override
+  String get libraryEmpty => 'لا توجد وثائق متاحة.';
+
+  @override
+  String get libraryError => 'تعذّر تحميل المكتبة.';
+
+  @override
+  String get libraryLocalOnlyNote =>
+      'وضع تجريبي — وثائق تجريبية فقط. ليست نصوصاً قانونية رسمية.';
+
+  @override
+  String get libraryCategoryAll => 'الكل';
+
+  @override
+  String get libraryCategoryCivil => 'مدني';
+
+  @override
+  String get libraryCategoryCriminal => 'جنائي';
+
+  @override
+  String get libraryCategoryLabor => 'عمل';
+
+  @override
+  String get libraryCategoryCommercial => 'تجاري';
+
+  @override
+  String get libraryCategoryFamily => 'أحوال شخصية';
+
+  @override
+  String get libraryCategoryAdministrative => 'إداري';
+
+  @override
+  String get libraryCategoryConstitutional => 'دستوري';
+
+  @override
+  String get libraryCategoryOther => 'أخرى';
+
+  @override
+  String get libraryStatusInForce => 'ساري';
+
+  @override
+  String get libraryStatusAmended => 'معدّل';
+
+  @override
+  String get libraryStatusRepealed => 'ملغى';
+
+  @override
+  String get libraryStatusUnknown => 'الحالة غير معروفة';
+
+  @override
+  String get librarySampleBadge => 'محتوى تجريبي';
+
+  @override
+  String get librarySampleNotice => 'محتوى تجريبي وليس نصاً قانونياً رسمياً.';
+
+  @override
+  String get libraryDisclaimer => 'للاطلاع فقط. ليس استشارة قانونية.';
+
+  @override
+  String get libraryDocumentArticles => 'المواد';
+
+  @override
+  String get libraryDocumentEmpty => 'لا تحتوي هذه الوثيقة على مواد بعد.';
+
+  @override
+  String get libraryDocumentError => 'تعذّر تحميل هذه الوثيقة.';
+
+  @override
+  String get libraryArticleMissing => 'تعذّر العثور على هذه المادة.';
+
+  @override
+  String get libraryPreviousArticle => 'المادة السابقة';
+
+  @override
+  String get libraryNextArticle => 'المادة التالية';
+
+  @override
+  String libraryArticleNumberLabel(String number) {
+    return 'المادة $number';
+  }
+
+  @override
+  String libraryArticlePosition(int current, int total) {
+    return '$current من $total';
+  }
+
+  @override
+  String get libraryOpenDocument => 'فتح الوثيقة';
 }

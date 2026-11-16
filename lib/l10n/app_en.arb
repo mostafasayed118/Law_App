@@ -1137,5 +1137,58 @@
   "errWeCouldnTCompleteThatRequestPleaseTry": "We couldn't complete that request. Please try again.",
   "errYouDoNotHavePermissionToJoinThis": "You do not have permission to join this consultation.",
   "errYouDoNotHavePermissionToStartThis": "You do not have permission to start this consultation.",
-  "errYouDoNotHavePermissionToViewVideo": "You do not have permission to view video consultations."
+  "errYouDoNotHavePermissionToViewVideo": "You do not have permission to view video consultations.",
+  "libraryTitle": "Legal Library",
+  "libraryEntryTitle": "Legal Library",
+  "libraryEntrySubtitle": "Browse sample legal documents — development demo.",
+  "libraryEntrySubtitleConfigured": "Browse statutes, regulations and rulings.",
+  "librarySearchHint": "Search articles",
+  "librarySearchNoQuery": "Type a word to search the articles.",
+  "librarySearchNoResults": "No articles match this search.",
+  "librarySearchError": "Unable to search the library.",
+  "libraryEmpty": "No documents are available.",
+  "libraryError": "Unable to load the library.",
+  "libraryLocalOnlyNote": "Demo mode — sample documents only. Not official legal text.",
+  "libraryCategoryAll": "All",
+  "libraryCategoryCivil": "Civil",
+  "libraryCategoryCriminal": "Criminal",
+  "libraryCategoryLabor": "Labour",
+  "libraryCategoryCommercial": "Commercial",
+  "libraryCategoryFamily": "Family",
+  "libraryCategoryAdministrative": "Administrative",
+  "libraryCategoryConstitutional": "Constitutional",
+  "libraryCategoryOther": "Other",
+  "libraryStatusInForce": "In force",
+  "libraryStatusAmended": "Amended",
+  "libraryStatusRepealed": "Repealed",
+  "libraryStatusUnknown": "Status unknown",
+  "librarySampleBadge": "Sample content",
+  "librarySampleNotice": "Sample content, not official legal text.",
+  "libraryDisclaimer": "Informational only. Not legal advice.",
+  "libraryDocumentArticles": "Articles",
+  "libraryDocumentEmpty": "This document has no articles yet.",
+  "libraryDocumentError": "Unable to load this document.",
+  "libraryArticleMissing": "This article could not be found.",
+  "libraryPreviousArticle": "Previous article",
+  "libraryNextArticle": "Next article",
+  "libraryArticleNumberLabel": "Article {number}",
+  "@libraryArticleNumberLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryArticlePosition": "{current} of {total}",
+  "@libraryArticlePosition": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryOpenDocument": "Open document"
 }
