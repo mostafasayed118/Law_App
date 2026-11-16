@@ -487,6 +487,11 @@ begin
   -- Tokenise, strip anything that is not alphanumeric, and require every
   -- token as a prefix match. Prefix matching is what lets a bare "ايجار"
   -- reach "الايجار" through the article-stripped half of search_text.
+  --
+  -- v_tsquery can legitimately come back NULL: `[[:alnum:]]` only classifies
+  -- Arabic letters as alphanumeric when the database locale says so. A NULL
+  -- tsquery must NOT abort the search, because the substring arm below still
+  -- has a job to do — that is the whole reason it exists.
   select to_tsquery('simple', string_agg(term || ':*', ' & '))
     into v_tsquery
     from (
@@ -494,10 +499,6 @@ begin
         from unnest(string_to_array(v_normalized, ' ')) as t
     ) s
    where term <> '';
-
-  if v_tsquery is null then
-    return;
-  end if;
 
   v_limit  := least(greatest(coalesce(p_limit, 20), 1), 50);
   v_offset := greatest(coalesce(p_offset, 0), 0);
@@ -521,7 +522,7 @@ begin
          ),
          a.is_sample,
          d.is_sample,
-         ts_rank_cd(a.search_tsv, v_tsquery)
+         coalesce(ts_rank_cd(a.search_tsv, v_tsquery), 0::real)
            + case when a.search_text like '%' || v_normalized || '%'
                   then 0.1 else 0 end,
          count(*) over ()
@@ -534,12 +535,14 @@ begin
    -- and a library that returns no results looks broken rather than empty.
    -- The substring arm is unindexed: fine for a reference corpus of this
    -- size, and the first thing to revisit if the corpus grows.
-   where (a.search_tsv @@ v_tsquery
-          or a.search_text like '%' || v_normalized || '%')
+   where (
+           (v_tsquery is not null and a.search_tsv @@ v_tsquery)
+           or a.search_text like '%' || v_normalized || '%'
+         )
      and (p_category is null or d.category = p_category)
    -- Stable ordering: rank, then a deterministic tiebreak, so paging never
    -- repeats or skips a row.
-   order by ts_rank_cd(a.search_tsv, v_tsquery)
+   order by coalesce(ts_rank_cd(a.search_tsv, v_tsquery), 0::real)
               + case when a.search_text like '%' || v_normalized || '%'
                      then 0.1 else 0 end desc,
             d.title_ar,
