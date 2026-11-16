@@ -21,8 +21,10 @@ abstract interface class LibraryUserDataGateway {
   /// (`true` = now bookmarked). The note applies only when adding.
   Future<Result<bool>> toggleBookmark(String articleId, {String? note});
 
-  /// The caller's bookmarks, newest first.
+  /// The caller's bookmarks, newest first. [articleId] narrows to one article —
+  /// the reader uses it to answer "is this one bookmarked" without paging.
   Future<Result<List<LegalBookmark>>> listBookmarks({
+    String? articleId,
     int limit = 50,
     int offset = 0,
   });

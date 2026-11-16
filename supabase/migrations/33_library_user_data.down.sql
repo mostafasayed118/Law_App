@@ -11,7 +11,7 @@ drop function if exists public.list_my_legal_highlights(uuid, integer, integer);
 drop function if exists public.delete_legal_highlight(uuid);
 drop function if exists public.update_legal_highlight(uuid, public.legal_highlight_color, text);
 drop function if exists public.create_legal_highlight(uuid, integer, integer, text, public.legal_highlight_color, text);
-drop function if exists public.list_my_legal_bookmarks(integer, integer);
+drop function if exists public.list_my_legal_bookmarks(uuid, integer, integer);
 drop function if exists public.toggle_legal_bookmark(uuid, text);
 
 drop function if exists public.legal_cap(text);

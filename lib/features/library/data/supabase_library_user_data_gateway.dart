@@ -34,11 +34,13 @@ class SupabaseLibraryUserDataGateway implements LibraryUserDataGateway {
 
   @override
   Future<Result<List<LegalBookmark>>> listBookmarks({
+    String? articleId,
     int limit = 50,
     int offset = 0,
   }) async {
     try {
       final List<Map<String, dynamic>> rows = await _api.listBookmarks(
+        articleId: articleId,
         limit: limit,
         offset: offset,
       );

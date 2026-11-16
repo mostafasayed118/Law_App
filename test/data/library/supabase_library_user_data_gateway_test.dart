@@ -292,6 +292,7 @@ class _StubApi implements SupabaseLibraryUserDataApi {
 
   @override
   Future<List<Map<String, dynamic>>> listBookmarks({
+    String? articleId,
     int limit = 50,
     int offset = 0,
   }) async {

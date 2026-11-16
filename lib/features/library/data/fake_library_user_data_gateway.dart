@@ -92,13 +92,21 @@ class FakeLibraryUserDataGateway implements LibraryUserDataGateway {
 
   @override
   Future<Result<List<LegalBookmark>>> listBookmarks({
+    String? articleId,
     int limit = 50,
     int offset = 0,
   }) async {
-    final List<_BookmarkRow> rows = _bookmarks.values.toList(growable: false)
-      ..sort(
-        (_BookmarkRow a, _BookmarkRow b) => b.sequence.compareTo(a.sequence),
-      );
+    final List<_BookmarkRow> rows =
+        _bookmarks.values
+            .where(
+              (_BookmarkRow row) =>
+                  articleId == null || row.articleId == articleId,
+            )
+            .toList(growable: false)
+          ..sort(
+            (_BookmarkRow a, _BookmarkRow b) =>
+                b.sequence.compareTo(a.sequence),
+          );
     return Result<List<LegalBookmark>>.success(
       List<LegalBookmark>.unmodifiable(
         _page(rows, limit: limit, offset: offset).map(_toBookmark),

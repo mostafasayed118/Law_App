@@ -206,8 +206,9 @@ end;
 $$;
 
 create or replace function public.list_my_legal_bookmarks(
-  p_limit  integer default 50,
-  p_offset integer default 0
+  p_article_id uuid default null,
+  p_limit      integer default 50,
+  p_offset     integer default 0
 )
 returns table (
   bookmark_id       uuid,
@@ -242,6 +243,10 @@ as $$
     join public.legal_articles a on a.id = b.article_id
     join public.legal_documents d on d.id = a.document_id
    where b.user_id = auth.uid()
+     -- The reader asks "is THIS article bookmarked" through the same read that
+     -- the saved list uses, because paging a 50-row cap to find one row would be
+     -- both wrong past the cap and a wasteful round trip.
+     and (p_article_id is null or b.article_id = p_article_id)
    order by b.created_at desc, b.id
    limit least(greatest(coalesce(p_limit, 50), 1), 50)
   offset greatest(coalesce(p_offset, 0), 0);
@@ -527,7 +532,7 @@ $$;
 -- 33.9 Execute grants: authenticated only
 -- ---------------------------------------------------------------------------
 revoke all on function public.toggle_legal_bookmark(uuid, text) from public, anon;
-revoke all on function public.list_my_legal_bookmarks(integer, integer) from public, anon;
+revoke all on function public.list_my_legal_bookmarks(uuid, integer, integer) from public, anon;
 revoke all on function public.create_legal_highlight(uuid, integer, integer, text, public.legal_highlight_color, text) from public, anon;
 revoke all on function public.update_legal_highlight(uuid, public.legal_highlight_color, text) from public, anon;
 revoke all on function public.delete_legal_highlight(uuid) from public, anon;
@@ -537,7 +542,7 @@ revoke all on function public.list_my_legal_history(integer, integer) from publi
 revoke all on function public.clear_my_legal_history() from public, anon;
 
 grant execute on function public.toggle_legal_bookmark(uuid, text) to authenticated;
-grant execute on function public.list_my_legal_bookmarks(integer, integer) to authenticated;
+grant execute on function public.list_my_legal_bookmarks(uuid, integer, integer) to authenticated;
 grant execute on function public.create_legal_highlight(uuid, integer, integer, text, public.legal_highlight_color, text) to authenticated;
 grant execute on function public.update_legal_highlight(uuid, public.legal_highlight_color, text) to authenticated;
 grant execute on function public.delete_legal_highlight(uuid) to authenticated;

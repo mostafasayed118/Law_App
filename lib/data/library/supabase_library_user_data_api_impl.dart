@@ -54,11 +54,13 @@ class SupabaseLibraryUserDataApiImpl implements SupabaseLibraryUserDataApi {
 
   @override
   Future<List<Map<String, dynamic>>> listBookmarks({
+    String? articleId,
     int limit = 50,
     int offset = 0,
   }) {
     return _guardRows(
       () => _rpcCaller(SupabaseRpcs.listMyLegalBookmarks, <String, dynamic>{
+        'p_article_id': articleId,
         'p_limit': limit,
         'p_offset': offset,
       }),

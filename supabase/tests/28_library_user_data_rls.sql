@@ -664,7 +664,7 @@ declare
 begin
   foreach v_sig in array array[
     'public.toggle_legal_bookmark(uuid, text)',
-    'public.list_my_legal_bookmarks(integer, integer)',
+    'public.list_my_legal_bookmarks(uuid, integer, integer)',
     'public.create_legal_highlight(uuid, integer, integer, text, public.legal_highlight_color, text)',
     'public.update_legal_highlight(uuid, public.legal_highlight_color, text)',
     'public.delete_legal_highlight(uuid)',
@@ -727,6 +727,45 @@ begin
   if v_write <> 0 then
     raise exception 'POLICY-BATTERY FAIL 28.23: % per-user table(s) grant a write privilege', v_write;
   end if;
+end $$;
+
+-- ############################################################################
+-- 28.24 — BOOKMARKS: the article filter returns only that article's row. This
+-- is how the reader answers "is the open article bookmarked" without paging past
+-- the 50-row read cap.
+-- ############################################################################
+do $$
+declare
+  v_user uuid := '10000000-0000-4000-8000-000000000003';
+  v_art  uuid := current_setting('battery28.art')::uuid;
+  v_art2 uuid := current_setting('battery28.art2')::uuid;
+  v_cnt  integer;
+  v_only uuid;
+begin
+  delete from public.legal_bookmarks where user_id = v_user;
+
+  execute 'set local role authenticated';
+  perform set_config('request.jwt.claim.sub', v_user::text, false);
+  perform set_config('request.jwt.claims', json_build_object('sub', v_user)::text, false);
+
+  perform public.toggle_legal_bookmark(v_art);
+  perform public.toggle_legal_bookmark(v_art2);
+
+  select count(*) into v_cnt from public.list_my_legal_bookmarks(v_art);
+  if v_cnt <> 1 then
+    raise exception 'POLICY-BATTERY FAIL 28.24: the article filter returned % rows, expected 1', v_cnt;
+  end if;
+
+  select article_id into v_only from public.list_my_legal_bookmarks(v_art);
+  if v_only <> v_art then
+    raise exception 'POLICY-BATTERY FAIL 28.24: the filter returned the wrong article';
+  end if;
+
+  select count(*) into v_cnt from public.list_my_legal_bookmarks();
+  if v_cnt <> 2 then
+    raise exception 'POLICY-BATTERY FAIL 28.24: the unfiltered read returned % rows, expected 2', v_cnt;
+  end if;
+  execute 'reset role';
 end $$;
 
 rollback;

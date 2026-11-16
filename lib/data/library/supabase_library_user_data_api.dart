@@ -48,6 +48,7 @@ abstract interface class SupabaseLibraryUserDataApi {
   Future<bool> toggleBookmark(String articleId, String? note);
 
   Future<List<Map<String, dynamic>>> listBookmarks({
+    String? articleId,
     int limit = 50,
     int offset = 0,
   });
