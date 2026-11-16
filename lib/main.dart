@@ -23,6 +23,8 @@ import 'core/onboarding/onboarding_store.dart';
 import 'data/auth/supabase_auth_api_impl.dart';
 import 'data/auth/supabase_env.dart';
 import 'features/auth/presentation/auth_cubit.dart';
+import 'features/notifications/domain/notification_gateway.dart';
+import 'features/notifications/presentation/notification_badge_cubit.dart';
 import 'l10n/app_localizations.dart';
 
 /// Every entrypoint's error boundary (R2). Module-level so the bootstrap zone
@@ -189,6 +191,17 @@ class LegalHubApp extends StatelessWidget {
         BlocProvider<AuthCubit>.value(value: authCubit),
         BlocProvider<LocaleCubit>.value(value: localeCubit),
         BlocProvider<ThemeCubit>.value(value: themeCubit),
+        // One badge count above the router: the Home bell and the feed's
+        // mark-read path share it, so the badge updates after a read without
+        // a second fetch. Null when no gateway is registered (decorative hint,
+        // never a reason to fail app startup).
+        BlocProvider<NotificationBadgeCubit>(
+          create: (BuildContext context) => NotificationBadgeCubit(
+            serviceLocator.isRegistered<NotificationGateway>()
+                ? serviceLocator<NotificationGateway>()
+                : null,
+          )..refresh(),
+        ),
       ],
       child: BlocBuilder<LocaleCubit, LocaleState>(
         builder: (BuildContext context, LocaleState state) {

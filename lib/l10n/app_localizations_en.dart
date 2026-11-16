@@ -3349,4 +3349,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get legalContactNotConfigured =>
       'The operator has not provided contact details in this build.';
+
+  @override
+  String notificationsUnreadBadge(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count unread notifications',
+      one: '1 unread notification',
+      zero: 'No unread notifications',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get passwordShow => 'Show password';
+
+  @override
+  String get passwordHide => 'Hide password';
 }

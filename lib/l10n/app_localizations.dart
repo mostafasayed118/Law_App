@@ -5977,6 +5977,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The operator has not provided contact details in this build.'**
   String get legalContactNotConfigured;
+
+  /// Accessible label for the Home notification unread badge.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No unread notifications} =1{1 unread notification} other{{count} unread notifications}}'**
+  String notificationsUnreadBadge(int count);
+
+  /// No description provided for @passwordShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get passwordShow;
+
+  /// No description provided for @passwordHide.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get passwordHide;
 }
 
 class _AppLocalizationsDelegate

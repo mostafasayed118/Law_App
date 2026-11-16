@@ -1740,5 +1740,22 @@
   "legalContactNotConfigured": "Operatör bu sürümde iletişim bilgisi sağlamadı.",
   "@legalContactNotConfigured": {
     "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "notificationsUnreadBadge": "{count, plural, =0{Okunmamış bildirim yok} =1{1 okunmamış bildirim} other{{count} okunmamış bildirim}}",
+  "@notificationsUnreadBadge": {
+    "description": "Accessible label for the Home notification unread badge.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "passwordShow": "Şifreyi göster",
+  "@passwordShow": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "passwordHide": "Şifreyi gizle",
+  "@passwordHide": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
   }
 }

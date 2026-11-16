@@ -10,6 +10,7 @@ import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart'
     show AuthCubit;
 import 'package:legalhub/features/home/domain/home_entries.dart';
+import 'package:legalhub/features/notifications/presentation/notification_badge_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
 
@@ -18,6 +19,7 @@ import 'widgets/home_cards.dart';
 part 'home_activity_cards.dart';
 part 'home_entry_cards.dart';
 part 'home_info_row.dart';
+part 'home_notification_bell.dart';
 
 /// Home dashboard matching `stitch_legalhub_mobile_app/home_dashboard`.
 ///
@@ -143,16 +145,7 @@ class _HomeAppBar extends StatelessWidget {
           ),
         ),
       ),
-      actions: <Widget>[
-        IconButton(
-          icon: const Icon(Icons.notifications_outlined),
-          // The bell opens the org-scoped notification feed — the same surface
-          // the home entry card reaches (D-N1). A navigation hint only, never
-          // an authorization grant.
-          tooltip: l10n.notificationsFeedTitle,
-          onPressed: () => context.push(AppRoutes.notificationsFeed),
-        ),
-      ],
+      actions: <Widget>[_NotificationBell(l10n: l10n)],
     );
   }
 }

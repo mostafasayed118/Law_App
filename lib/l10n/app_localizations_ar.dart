@@ -3319,4 +3319,22 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get legalContactNotConfigured =>
       'لم يقدّم المشغّل بيانات اتصال في هذا الإصدار.';
+
+  @override
+  String notificationsUnreadBadge(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count إشعارات غير مقروءة',
+      one: 'إشعار واحد غير مقروء',
+      zero: 'لا توجد إشعارات غير مقروءة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get passwordShow => 'إظهار كلمة المرور';
+
+  @override
+  String get passwordHide => 'إخفاء كلمة المرور';
 }

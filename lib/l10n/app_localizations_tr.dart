@@ -3351,4 +3351,22 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get legalContactNotConfigured =>
       'Operatör bu sürümde iletişim bilgisi sağlamadı.';
+
+  @override
+  String notificationsUnreadBadge(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count okunmamış bildirim',
+      one: '1 okunmamış bildirim',
+      zero: 'Okunmamış bildirim yok',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get passwordShow => 'Şifreyi göster';
+
+  @override
+  String get passwordHide => 'Şifreyi gizle';
 }

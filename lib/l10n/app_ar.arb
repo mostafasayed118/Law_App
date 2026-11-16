@@ -1740,5 +1740,22 @@
   "legalContactNotConfigured": "لم يقدّم المشغّل بيانات اتصال في هذا الإصدار.",
   "@legalContactNotConfigured": {
     "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "notificationsUnreadBadge": "{count, plural, =0{لا توجد إشعارات غير مقروءة} =1{إشعار واحد غير مقروء} other{{count} إشعارات غير مقروءة}}",
+  "@notificationsUnreadBadge": {
+    "description": "Accessible label for the Home notification unread badge.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "passwordShow": "إظهار كلمة المرور",
+  "@passwordShow": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "passwordHide": "إخفاء كلمة المرور",
+  "@passwordHide": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
   }
 }

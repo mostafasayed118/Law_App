@@ -5,6 +5,7 @@ import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/features/notifications/domain/notification.dart';
 import 'package:legalhub/features/notifications/domain/notification_gateway.dart';
 import 'package:legalhub/features/notifications/domain/notification_prefs_store.dart';
+import 'package:legalhub/features/notifications/presentation/notification_badge_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
@@ -59,8 +60,24 @@ class NotificationFeedScreen extends StatelessWidget {
                 _NotificationTile(
                   notification: notification,
                   labels: labels,
-                  onMarkRead: (String id) =>
-                      context.read<NotificationCubit>().markRead(id),
+                  onMarkRead: (String id) {
+                    // Resolve both cubits before the await — no BuildContext
+                    // crosses the async gap. The badge is provided above the
+                    // router in the real app; a standalone feed test has none.
+                    final NotificationCubit feed = context
+                        .read<NotificationCubit>();
+                    final NotificationBadgeCubit? badge =
+                        context
+                                .findAncestorWidgetOfExactType<
+                                  BlocProvider<NotificationBadgeCubit>
+                                >() !=
+                            null
+                        ? context.read<NotificationBadgeCubit>()
+                        : null;
+                    feed.markRead(id).then((_) async {
+                      await badge?.refresh();
+                    });
+                  },
                 ),
             empty: (BuildContext context, NotificationState state) => Padding(
               padding: const EdgeInsetsDirectional.only(

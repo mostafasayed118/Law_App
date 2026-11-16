@@ -1263,5 +1263,16 @@
   "legalLastUpdated": "Last updated: {date}",
   "legalAcceptTerms": "I have read and accept the",
   "legalAcceptTermsHint": "Both links open in this app and can be read before you agree.",
-  "legalContactNotConfigured": "The operator has not provided contact details in this build."
+  "legalContactNotConfigured": "The operator has not provided contact details in this build.",
+  "notificationsUnreadBadge": "{count, plural, =0{No unread notifications} =1{1 unread notification} other{{count} unread notifications}}",
+  "@notificationsUnreadBadge": {
+    "description": "Accessible label for the Home notification unread badge.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "passwordShow": "Show password",
+  "passwordHide": "Hide password"
 }
