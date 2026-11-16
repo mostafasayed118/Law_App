@@ -118,7 +118,6 @@ class SettingsScreen extends StatelessWidget {
               localOnly ? l10n.demoSessionNotice : l10n.sessionNoticeConfigured,
             ),
           ),
-          const SizedBox(height: LegalHubTheme.spaceXl),
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.person_outline),
@@ -155,6 +154,26 @@ class SettingsScreen extends StatelessWidget {
             leading: const Icon(Icons.admin_panel_settings_outlined),
             title: Text(l10n.platformAdminTitle),
             onTap: () => context.push(AppRoutes.platformAdmin),
+          ),
+          const SizedBox(height: LegalHubTheme.spaceXl),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.manage_accounts_outlined),
+            title: Text(l10n.accountTitle),
+            onTap: () => context.push(AppRoutes.settingsAccount),
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.privacy_tip_outlined),
+            title: Text(l10n.legalPrivacyTitle),
+            onTap: () => context.push(AppRoutes.privacy),
+          ),
+          const SizedBox(height: LegalHubTheme.spaceSm),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.description_outlined),
+            title: Text(l10n.legalTermsTitle),
+            onTap: () => context.push(AppRoutes.terms),
           ),
           const SizedBox(height: LegalHubTheme.spaceXl),
           OutlinedButton.icon(

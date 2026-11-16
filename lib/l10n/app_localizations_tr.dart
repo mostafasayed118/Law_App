@@ -3225,4 +3225,130 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get errUnableToUpdateYourAccount =>
       'Hesabınız güncellenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get accountTitle => 'Hesap';
+
+  @override
+  String get accountProfileTitle => 'Profili düzenle';
+
+  @override
+  String get accountDisplayNameLabel => 'Görünen ad';
+
+  @override
+  String get accountSave => 'Kaydet';
+
+  @override
+  String get accountSaved => 'Profil kaydedildi.';
+
+  @override
+  String get accountPasswordTitle => 'Şifre değiştir';
+
+  @override
+  String get accountNewPasswordLabel => 'Yeni şifre';
+
+  @override
+  String get accountConfirmPasswordLabel => 'Yeni şifreyi onayla';
+
+  @override
+  String get accountChangePassword => 'Şifreyi değiştir';
+
+  @override
+  String get accountPasswordChanged => 'Şifre değiştirildi.';
+
+  @override
+  String get accountPasswordMismatch => 'Şifreler eşleşmiyor.';
+
+  @override
+  String get accountPasswordReauth =>
+      'Şifrenizi değiştirmeden önce tekrar oturum açın.';
+
+  @override
+  String get accountDangerTitle => 'Tehlikeli bölge';
+
+  @override
+  String get accountDeleteAction => 'Hesabı sil';
+
+  @override
+  String get accountDeleteTitle => 'Hesabınız silinsin mi?';
+
+  @override
+  String get accountDeleteIntro =>
+      'Bu işlem oturum açma bilgilerinizi ve aşağıda listelenen kişisel verilerinizi kalıcı olarak kaldırır. Dikkatlice okuyun.';
+
+  @override
+  String get accountDeleteRemovesTitle => 'Kaldırılanlar';
+
+  @override
+  String get accountDeleteRemovesIdentity =>
+      'Oturum açma bilgileriniz ve profiliniz.';
+
+  @override
+  String get accountDeleteRemovesLibrary =>
+      'Kaydettiğiniz makaleler, vurgular ve okuma geçmişiniz.';
+
+  @override
+  String get accountDeleteRemovesFiles =>
+      'Yüklediğiniz dosyalar ve meta verileri.';
+
+  @override
+  String get accountDeleteKeepsTitle => 'Kaldırılmayanlar';
+
+  @override
+  String get accountDeleteKeepsOthers =>
+      'Kuruluşlarınızdaki diğer kişilere ait dosyalar veya kayıtlar.';
+
+  @override
+  String get accountDeleteKeepsAudit =>
+      'Maskelenmiş denetim kayıtları; aktör referansı temizlenir.';
+
+  @override
+  String get accountDeleteConfirmLabel => 'Onaylamak için DELETE yazın';
+
+  @override
+  String get accountDeleteConfirmHint => 'DELETE';
+
+  @override
+  String get accountDeleteSubmit => 'Hesabımı kalıcı olarak sil';
+
+  @override
+  String get accountDeleteSuccess =>
+      'Hesabınız silindi. Oturum, profil, kaydedilen kütüphane verileri ve yüklediğiniz dosyalar kaldırıldı.';
+
+  @override
+  String get accountDeleteLastPartner =>
+      'Hesabınızı silmeden önce bu kuruluşa başka bir etkin ortak ekleyin.';
+
+  @override
+  String get accountDeleteOwner =>
+      'Hesabınızı silmeden önce platform sahipliğini devredin.';
+
+  @override
+  String get accountDeleteGenericError =>
+      'Hesabınız silinemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get accountDeleteInProgress => 'Hesabınız siliniyor…';
+
+  @override
+  String get legalPrivacyTitle => 'Gizlilik Politikası';
+
+  @override
+  String get legalTermsTitle => 'Kullanım Koşulları';
+
+  @override
+  String legalLastUpdated(Object date) {
+    return 'Son güncelleme: $date';
+  }
+
+  @override
+  String get legalAcceptTerms => 'Okudum ve kabul ediyorum:';
+
+  @override
+  String get legalAcceptTermsHint =>
+      'Her iki bağlantı da uygulama içinde açılır ve onaylamadan önce okunabilir.';
+
+  @override
+  String get legalContactNotConfigured =>
+      'Operatör bu sürümde iletişim bilgisi sağlamadı.';
 }

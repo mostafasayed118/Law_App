@@ -5755,6 +5755,228 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unable to update your account. Please try again.'**
   String get errUnableToUpdateYourAccount;
+
+  /// No description provided for @accountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get accountTitle;
+
+  /// No description provided for @accountProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit profile'**
+  String get accountProfileTitle;
+
+  /// No description provided for @accountDisplayNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name'**
+  String get accountDisplayNameLabel;
+
+  /// No description provided for @accountSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get accountSave;
+
+  /// No description provided for @accountSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile saved.'**
+  String get accountSaved;
+
+  /// No description provided for @accountPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change password'**
+  String get accountPasswordTitle;
+
+  /// No description provided for @accountNewPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get accountNewPasswordLabel;
+
+  /// No description provided for @accountConfirmPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm new password'**
+  String get accountConfirmPasswordLabel;
+
+  /// No description provided for @accountChangePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Change password'**
+  String get accountChangePassword;
+
+  /// No description provided for @accountPasswordChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Password changed.'**
+  String get accountPasswordChanged;
+
+  /// No description provided for @accountPasswordMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'The two passwords do not match.'**
+  String get accountPasswordMismatch;
+
+  /// No description provided for @accountPasswordReauth.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in again before changing your password.'**
+  String get accountPasswordReauth;
+
+  /// No description provided for @accountDangerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Danger zone'**
+  String get accountDangerTitle;
+
+  /// No description provided for @accountDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get accountDeleteAction;
+
+  /// No description provided for @accountDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete your account?'**
+  String get accountDeleteTitle;
+
+  /// No description provided for @accountDeleteIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'This permanently removes your sign-in and the personal data listed below. Read this carefully.'**
+  String get accountDeleteIntro;
+
+  /// No description provided for @accountDeleteRemovesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This removes'**
+  String get accountDeleteRemovesTitle;
+
+  /// No description provided for @accountDeleteRemovesIdentity.
+  ///
+  /// In en, this message translates to:
+  /// **'Your sign-in and profile.'**
+  String get accountDeleteRemovesIdentity;
+
+  /// No description provided for @accountDeleteRemovesLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Your saved articles, highlights and reading history.'**
+  String get accountDeleteRemovesLibrary;
+
+  /// No description provided for @accountDeleteRemovesFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Files you uploaded, with their metadata.'**
+  String get accountDeleteRemovesFiles;
+
+  /// No description provided for @accountDeleteKeepsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This does not remove'**
+  String get accountDeleteKeepsTitle;
+
+  /// No description provided for @accountDeleteKeepsOthers.
+  ///
+  /// In en, this message translates to:
+  /// **'Files or records owned by other people in your organizations.'**
+  String get accountDeleteKeepsOthers;
+
+  /// No description provided for @accountDeleteKeepsAudit.
+  ///
+  /// In en, this message translates to:
+  /// **'Redacted audit records; the actor reference is cleared.'**
+  String get accountDeleteKeepsAudit;
+
+  /// No description provided for @accountDeleteConfirmLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Type DELETE to confirm'**
+  String get accountDeleteConfirmLabel;
+
+  /// No description provided for @accountDeleteConfirmHint.
+  ///
+  /// In en, this message translates to:
+  /// **'DELETE'**
+  String get accountDeleteConfirmHint;
+
+  /// No description provided for @accountDeleteSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently delete my account'**
+  String get accountDeleteSubmit;
+
+  /// No description provided for @accountDeleteSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account was deleted. Sign-in, profile, saved library data and your uploaded files were removed.'**
+  String get accountDeleteSuccess;
+
+  /// No description provided for @accountDeleteLastPartner.
+  ///
+  /// In en, this message translates to:
+  /// **'Add another active partner to this organization before deleting your account.'**
+  String get accountDeleteLastPartner;
+
+  /// No description provided for @accountDeleteOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer platform ownership before deleting your account.'**
+  String get accountDeleteOwner;
+
+  /// No description provided for @accountDeleteGenericError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to delete your account. Please try again.'**
+  String get accountDeleteGenericError;
+
+  /// No description provided for @accountDeleteInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting your account…'**
+  String get accountDeleteInProgress;
+
+  /// No description provided for @legalPrivacyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get legalPrivacyTitle;
+
+  /// No description provided for @legalTermsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service'**
+  String get legalTermsTitle;
+
+  /// No description provided for @legalLastUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Last updated: {date}'**
+  String legalLastUpdated(Object date);
+
+  /// No description provided for @legalAcceptTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'I have read and accept the'**
+  String get legalAcceptTerms;
+
+  /// No description provided for @legalAcceptTermsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Both links open in this app and can be read before you agree.'**
+  String get legalAcceptTermsHint;
+
+  /// No description provided for @legalContactNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'The operator has not provided contact details in this build.'**
+  String get legalContactNotConfigured;
 }
 
 class _AppLocalizationsDelegate

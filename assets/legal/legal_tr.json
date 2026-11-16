@@ -1,0 +1,104 @@
+{
+  "privacy": [
+    {
+      "id": "p1",
+      "heading": "Biz kimiz",
+      "paragraphs": [
+        "LegalHub, Legal Library modülü bulunan bir hukuki uygulama yönetim uygulamasıdır. Uygulama gösterim amaçlı sunulur ve işletmecisi uygulama içi iletişim sabitinde belirtilir. Bu taslak kod incelemesinden üretilmiştir ve üretim öncesinde nitelikli hukuk danışmanınca incelenmelidir."
+      ]
+    },
+    {
+      "id": "p2",
+      "heading": "Topladığımız veriler",
+      "paragraphs": [
+        "Hesap e-postası ve görünen adı; rolünüz ve kuruluş üyelikleriniz; dosya, belge ve mesaj üst verileri; faturalar ve bildirimler; Legal Library yer imleri, vurguları ve okuma geçmişi; yapay zekâ araştırma çalışması ve görüntülü görüşme üst verileri. Demo sürüm sentetik kayıtlar kullanır ve gerçek müvekkil verisi toplamaz."
+      ]
+    },
+    {
+      "id": "p3",
+      "heading": "Veriler nasıl işlenir",
+      "paragraphs": [
+        "Veriler satır düzeyi güvenlik ile Supabase Postgres üzerinde tutulur. Uygulama verileri kuruluşa bağlıdır, Legal Library referans içeriği geneldir; yer imleri, vurgular ve geçmiş yalnızca size görünür. Tüm değişiklikler oturumdan kimliği türeten sunucu işlevleriyle yapılır."
+      ]
+    },
+    {
+      "id": "p4",
+      "heading": "Depolama ve dosyalar",
+      "paragraphs": [
+        "Dosyalar özel bir depolama alanında, dosya başına en fazla 25 MiB ve kısıtlı tür listesiyle tutulur. Bir dosyaya erişim için kuruluşta etkin üyelik ve ilgili dosyaya atanmış olmak gerekir."
+      ]
+    },
+    {
+      "id": "p5",
+      "heading": "Toplamadığımız veriler",
+      "paragraphs": [
+        "Uygulamada analiz paketi, reklam veya üçüncü taraf hata bildirim paketi yoktur. Hatalar veriyi maskeliyen bir konsol raporlayıcısıyla bildirilir. Ödemeler, yapay zekâ araştırması ve görüntülü aramalar sağlayıcıya bağlıdır ve açıkça etkinleştirilmedikçe kapalıdır."
+      ]
+    },
+    {
+      "id": "p6",
+      "heading": "Kontrolleriniz",
+      "paragraphs": [
+        "Görünen adınızı düzenleyebilir ve şifrenizi Hesap ayarlarından değiştirebilirsiniz. Aynı ekrandan, silinecekleri okuduktan sonra hesabınızı silebilirsiniz. Okuma geçmişinizi Kütüphane Kaydedilenler ekranından temizleyebilirsiniz."
+      ]
+    },
+    {
+      "id": "p7",
+      "heading": "Silme ve iletişim",
+      "paragraphs": [
+        "Hesap silme işlemi oturumu, profili, üyelikleri, Legal Library kayıtlarını ve yüklediğiniz dosyaları üst verileriyle kaldırır. Başkalarına ait kayıtlar ve sağlayıcı taraflındaki kayıtlar kaldırılmaz. Maskelenmiş denetim kayıtları aktör referansı temizlenerek saklanır. Sorularınız için uygulama içi yasal bildirimdeki iletişim adresini kullanın."
+      ]
+    }
+  ],
+  "terms": [
+    {
+      "id": "t1",
+      "heading": "Yalnızca bilgilendirme amaçlı",
+      "paragraphs": [
+        "LegalHub bilgilendirme amaçlı bir yazılımdır. Uygulamadaki yapay zekâ araştırmaları ve örnek Legal Library içeriği dâhil hiçbir şey hukuki tavsiye veya nitelikli bir avukatın yerine geçmez."
+      ]
+    },
+    {
+      "id": "t2",
+      "heading": "Avukat-müvekkil ilişkisi yok",
+      "paragraphs": [
+        "Uygulamayı kullanmak avukat-müvekkil ilişkisi oluşturmaz. Avukat dizininde yalnızca mesleki profil verileri bulunur; kimlik doğrulaması yapılmaz."
+      ]
+    },
+    {
+      "id": "t3",
+      "heading": "Örnek içerik",
+      "paragraphs": [
+        "Ekteki Legal Library içeriği yapay gösterim verisidir. Her örnek kayıt arayüzde etiketlidir. Gerçek hukuki metinler operatör tarafından güvenilir bir kaynaktan aktarılmalı ve kullanımdan önce incelenmelidir."
+      ]
+    },
+    {
+      "id": "t4",
+      "heading": "Sorumluluklarınız",
+      "paragraphs": [
+        "Uygulamayı yasal olarak kullanın, saklama hakkınız olmayan içerik yüklemeyin ve başka bir kuruluşa veya kullanıcıya ait verilere erişmeye çalışmayın."
+      ]
+    },
+    {
+      "id": "t5",
+      "heading": "Hesaplar ve sonlandırma",
+      "paragraphs": [
+        "Giriş bilgilerinizin güvenliğinden siz sorumlusunuz. Hesabınızı Hesap ayarlarından silebilirsiniz; silmeden sonra bazı maskelenmiş denetim kayıtları saklanır. Operatör, diğer kullanıcıları veya hizmeti korumak için erişimi kısıtlayabilir."
+      ]
+    },
+    {
+      "id": "t6",
+      "heading": "Garantiler ve sorumluluk",
+      "paragraphs": [
+        "Yazılım olduğu gibi sunulur ve hiçbir garanti verilmez. Yasağın izin verdiği ölçüde operatör, kullanımdan doğan dolaylı veya sonuçsal kayıplardan sorumlu değildir. Bu madde, yasaca sınırlandırılamayacak sorumlulukları ortadan kaldırmaz."
+      ]
+    },
+    {
+      "id": "t7",
+      "heading": "Geçerli hukuk",
+      "paragraphs": [
+        "Operatör üretim kullanımından önce geçerli hukuku ve yetkili mercii belirtmelidir. Bu taslak herhangi bir yargı alanı iddia etmez."
+      ]
+    }
+  ]
+}

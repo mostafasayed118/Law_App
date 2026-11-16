@@ -118,6 +118,7 @@ void main() {
     '/library/legal-doc-1',
     '/library/articles/legal-art-1-1',
     AppRoutes.settings,
+    AppRoutes.settingsAccount,
     AppRoutes.organizations,
     AppRoutes.orgAudit,
     AppRoutes.acceptInvitation,
@@ -137,6 +138,10 @@ void main() {
     AppRoutes.onboarding,
     AppRoutes.onboardingSuccess,
   ];
+
+  // Legal documents are reachable while signed out. They get their own matrix
+  // because the redirect allowlist (not the shell) is what must hold for them.
+  const List<String> legalRoutes = <String>[AppRoutes.privacy, AppRoutes.terms];
 
   const List<Size> widths = <Size>[
     Size(320, 568), // smallest supported phone
@@ -224,6 +229,49 @@ void main() {
           route,
           size: size,
           textScale: 2.0,
+          failures: failures,
+        );
+      }
+    }
+    expect(failures, isEmpty, reason: failures.join('\n\n'));
+  });
+
+  testWidgets('legal documents survive every width while signed out', (
+    WidgetTester tester,
+  ) async {
+    final List<String> failures = <String>[];
+    for (final Size size in widths) {
+      await pumpApp(tester, size: size, signIn: false);
+      for (final String route in legalRoutes) {
+        await open(
+          tester,
+          route,
+          size: size,
+          textScale: 1.0,
+          failures: failures,
+        );
+      }
+    }
+    expect(failures, isEmpty, reason: failures.join('\n\n'));
+  });
+
+  testWidgets('legal documents survive text scale 2.0 and 3.0 signed out', (
+    WidgetTester tester,
+  ) async {
+    final List<String> failures = <String>[];
+    for (final double scale in <double>[2.0, 3.0]) {
+      await pumpApp(
+        tester,
+        size: const Size(320, 568),
+        textScale: scale,
+        signIn: false,
+      );
+      for (final String route in legalRoutes) {
+        await open(
+          tester,
+          route,
+          size: const Size(320, 568),
+          textScale: scale,
           failures: failures,
         );
       }

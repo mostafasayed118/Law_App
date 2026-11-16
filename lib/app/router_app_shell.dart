@@ -62,6 +62,7 @@ class _AppShell extends StatelessWidget {
         location.startsWith('${AppRoutes.platformAdmin}/');
     final bool onSettingsSurface =
         location == AppRoutes.settings ||
+        location == AppRoutes.settingsAccount ||
         location == AppRoutes.profile ||
         location == AppRoutes.notifications ||
         location == AppRoutes.organizations ||

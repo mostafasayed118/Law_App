@@ -28,6 +28,7 @@ import 'package:legalhub/features/documents/presentation/document_details_screen
 import 'package:legalhub/features/documents/presentation/document_list_screen.dart';
 import 'package:legalhub/features/home/presentation/home_screen.dart';
 import 'package:legalhub/features/home/presentation/settings_screen.dart';
+import 'package:legalhub/features/legal/presentation/legal_document_screen.dart';
 import 'package:legalhub/features/library/presentation/library_article_screen.dart';
 import 'package:legalhub/features/library/presentation/library_document_screen.dart';
 import 'package:legalhub/features/library/presentation/library_home_screen.dart';
@@ -45,6 +46,7 @@ import 'package:legalhub/features/onboarding/presentation/onboarding_success_scr
 import 'package:legalhub/features/orgs/presentation/accept_invitation_screen.dart';
 import 'package:legalhub/features/orgs/presentation/org_audit_screen.dart';
 import 'package:legalhub/features/orgs/presentation/organization_hub_screen.dart';
+import 'package:legalhub/features/profile/presentation/account_screen.dart';
 import 'package:legalhub/features/profile/presentation/profile_screen.dart';
 import 'package:legalhub/features/research/presentation/ai_research_screen.dart';
 import 'package:legalhub/features/search/presentation/search_screen.dart';
@@ -70,6 +72,9 @@ class AppRoutes {
   static const String onboardingSuccess = '/onboarding/success';
   static const String home = '/home';
   static const String settings = '/settings';
+  static const String settingsAccount = '/settings/account';
+  static const String privacy = '/privacy';
+  static const String terms = '/terms';
   static const String organizations = '/organizations';
   static const String orgAudit = '/organizations/audit';
   static const String acceptInvitation = '/accept-invitation';
@@ -173,6 +178,16 @@ GoRouter createAppRouter(
   refreshListenable: GoRouterRefreshStream(authCubit.stream),
   routes: <RouteBase>[
     GoRoute(
+      path: AppRoutes.privacy,
+      builder: (BuildContext context, GoRouterState state) =>
+          const LegalDocumentScreen(kind: LegalDocumentKind.privacy),
+    ),
+    GoRoute(
+      path: AppRoutes.terms,
+      builder: (BuildContext context, GoRouterState state) =>
+          const LegalDocumentScreen(kind: LegalDocumentKind.terms),
+    ),
+    GoRoute(
       path: AppRoutes.signIn,
       builder: (BuildContext context, GoRouterState state) =>
           const SignInScreen(),
@@ -233,7 +248,11 @@ GoRouter createAppRouter(
         path == AppRoutes.forgotPasswordReset;
     final bool onOnboarding =
         path == AppRoutes.onboarding || path == AppRoutes.onboardingSuccess;
-    if (!authenticated && !onAuthRoute && !onOnboarding) {
+    // Legal documents must be readable before signing up: the sign-up checkbox
+    // links to them, so gating them behind auth would make consent impossible.
+    final bool onLegalRoute =
+        path == AppRoutes.privacy || path == AppRoutes.terms;
+    if (!authenticated && !onAuthRoute && !onOnboarding && !onLegalRoute) {
       return AppRoutes.signIn;
     }
     // Phase 4.1 deep-link recovery: a recovery session (PKCE exchange of a

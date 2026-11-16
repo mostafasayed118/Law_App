@@ -1592,5 +1592,153 @@
   "errUnableToUpdateYourAccount": "Hesabınız güncellenemedi. Lütfen tekrar deneyin.",
   "@errUnableToUpdateYourAccount": {
     "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountTitle": "Hesap",
+  "@accountTitle": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountProfileTitle": "Profili düzenle",
+  "@accountProfileTitle": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDisplayNameLabel": "Görünen ad",
+  "@accountDisplayNameLabel": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountSave": "Kaydet",
+  "@accountSave": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountSaved": "Profil kaydedildi.",
+  "@accountSaved": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountPasswordTitle": "Şifre değiştir",
+  "@accountPasswordTitle": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountNewPasswordLabel": "Yeni şifre",
+  "@accountNewPasswordLabel": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountConfirmPasswordLabel": "Yeni şifreyi onayla",
+  "@accountConfirmPasswordLabel": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountChangePassword": "Şifreyi değiştir",
+  "@accountChangePassword": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountPasswordChanged": "Şifre değiştirildi.",
+  "@accountPasswordChanged": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountPasswordMismatch": "Şifreler eşleşmiyor.",
+  "@accountPasswordMismatch": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountPasswordReauth": "Şifrenizi değiştirmeden önce tekrar oturum açın.",
+  "@accountPasswordReauth": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDangerTitle": "Tehlikeli bölge",
+  "@accountDangerTitle": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteAction": "Hesabı sil",
+  "@accountDeleteAction": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteTitle": "Hesabınız silinsin mi?",
+  "@accountDeleteTitle": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteIntro": "Bu işlem oturum açma bilgilerinizi ve aşağıda listelenen kişisel verilerinizi kalıcı olarak kaldırır. Dikkatlice okuyun.",
+  "@accountDeleteIntro": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteRemovesTitle": "Kaldırılanlar",
+  "@accountDeleteRemovesTitle": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteRemovesIdentity": "Oturum açma bilgileriniz ve profiliniz.",
+  "@accountDeleteRemovesIdentity": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteRemovesLibrary": "Kaydettiğiniz makaleler, vurgular ve okuma geçmişiniz.",
+  "@accountDeleteRemovesLibrary": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteRemovesFiles": "Yüklediğiniz dosyalar ve meta verileri.",
+  "@accountDeleteRemovesFiles": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteKeepsTitle": "Kaldırılmayanlar",
+  "@accountDeleteKeepsTitle": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteKeepsOthers": "Kuruluşlarınızdaki diğer kişilere ait dosyalar veya kayıtlar.",
+  "@accountDeleteKeepsOthers": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteKeepsAudit": "Maskelenmiş denetim kayıtları; aktör referansı temizlenir.",
+  "@accountDeleteKeepsAudit": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteConfirmLabel": "Onaylamak için DELETE yazın",
+  "@accountDeleteConfirmLabel": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteConfirmHint": "DELETE",
+  "@accountDeleteConfirmHint": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteSubmit": "Hesabımı kalıcı olarak sil",
+  "@accountDeleteSubmit": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteSuccess": "Hesabınız silindi. Oturum, profil, kaydedilen kütüphane verileri ve yüklediğiniz dosyalar kaldırıldı.",
+  "@accountDeleteSuccess": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteLastPartner": "Hesabınızı silmeden önce bu kuruluşa başka bir etkin ortak ekleyin.",
+  "@accountDeleteLastPartner": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteOwner": "Hesabınızı silmeden önce platform sahipliğini devredin.",
+  "@accountDeleteOwner": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteGenericError": "Hesabınız silinemedi. Lütfen tekrar deneyin.",
+  "@accountDeleteGenericError": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteInProgress": "Hesabınız siliniyor…",
+  "@accountDeleteInProgress": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "legalPrivacyTitle": "Gizlilik Politikası",
+  "@legalPrivacyTitle": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "legalTermsTitle": "Kullanım Koşulları",
+  "@legalTermsTitle": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "legalLastUpdated": "Son güncelleme: {date}",
+  "@legalLastUpdated": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "legalAcceptTerms": "Okudum ve kabul ediyorum:",
+  "@legalAcceptTerms": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "legalAcceptTermsHint": "Her iki bağlantı da uygulama içinde açılır ve onaylamadan önce okunabilir.",
+  "@legalAcceptTermsHint": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "legalContactNotConfigured": "Operatör bu sürümde iletişim bilgisi sağlamadı.",
+  "@legalContactNotConfigured": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
   }
 }

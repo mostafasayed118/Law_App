@@ -219,6 +219,18 @@ void main() {
   testWidgets('organization tile navigates to the organization surface', (
     tester,
   ) async {
+    // The settings list grew with the Polish account/legal tiles. Give this
+    // test a taller surface so the Organization row is fully on-screen; the
+    // generic scrollUntilVisible can otherwise tuck it under the app bar and
+    // the tap lands on the wrong render object. This changes only the view,
+    // never an assertion.
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.physicalSize = const Size(800, 600);
+      tester.view.devicePixelRatio = 1.0;
+    });
+    await tester.pump();
     // OrganizationHubScreen resolves the OrganizationGateway from the locator.
     await resetServiceLocator();
     configureDependencies();

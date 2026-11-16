@@ -3224,4 +3224,129 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errUnableToUpdateYourAccount =>
       'Unable to update your account. Please try again.';
+
+  @override
+  String get accountTitle => 'Account';
+
+  @override
+  String get accountProfileTitle => 'Edit profile';
+
+  @override
+  String get accountDisplayNameLabel => 'Display name';
+
+  @override
+  String get accountSave => 'Save';
+
+  @override
+  String get accountSaved => 'Profile saved.';
+
+  @override
+  String get accountPasswordTitle => 'Change password';
+
+  @override
+  String get accountNewPasswordLabel => 'New password';
+
+  @override
+  String get accountConfirmPasswordLabel => 'Confirm new password';
+
+  @override
+  String get accountChangePassword => 'Change password';
+
+  @override
+  String get accountPasswordChanged => 'Password changed.';
+
+  @override
+  String get accountPasswordMismatch => 'The two passwords do not match.';
+
+  @override
+  String get accountPasswordReauth =>
+      'Sign in again before changing your password.';
+
+  @override
+  String get accountDangerTitle => 'Danger zone';
+
+  @override
+  String get accountDeleteAction => 'Delete account';
+
+  @override
+  String get accountDeleteTitle => 'Delete your account?';
+
+  @override
+  String get accountDeleteIntro =>
+      'This permanently removes your sign-in and the personal data listed below. Read this carefully.';
+
+  @override
+  String get accountDeleteRemovesTitle => 'This removes';
+
+  @override
+  String get accountDeleteRemovesIdentity => 'Your sign-in and profile.';
+
+  @override
+  String get accountDeleteRemovesLibrary =>
+      'Your saved articles, highlights and reading history.';
+
+  @override
+  String get accountDeleteRemovesFiles =>
+      'Files you uploaded, with their metadata.';
+
+  @override
+  String get accountDeleteKeepsTitle => 'This does not remove';
+
+  @override
+  String get accountDeleteKeepsOthers =>
+      'Files or records owned by other people in your organizations.';
+
+  @override
+  String get accountDeleteKeepsAudit =>
+      'Redacted audit records; the actor reference is cleared.';
+
+  @override
+  String get accountDeleteConfirmLabel => 'Type DELETE to confirm';
+
+  @override
+  String get accountDeleteConfirmHint => 'DELETE';
+
+  @override
+  String get accountDeleteSubmit => 'Permanently delete my account';
+
+  @override
+  String get accountDeleteSuccess =>
+      'Your account was deleted. Sign-in, profile, saved library data and your uploaded files were removed.';
+
+  @override
+  String get accountDeleteLastPartner =>
+      'Add another active partner to this organization before deleting your account.';
+
+  @override
+  String get accountDeleteOwner =>
+      'Transfer platform ownership before deleting your account.';
+
+  @override
+  String get accountDeleteGenericError =>
+      'Unable to delete your account. Please try again.';
+
+  @override
+  String get accountDeleteInProgress => 'Deleting your account…';
+
+  @override
+  String get legalPrivacyTitle => 'Privacy Policy';
+
+  @override
+  String get legalTermsTitle => 'Terms of Service';
+
+  @override
+  String legalLastUpdated(Object date) {
+    return 'Last updated: $date';
+  }
+
+  @override
+  String get legalAcceptTerms => 'I have read and accept the';
+
+  @override
+  String get legalAcceptTermsHint =>
+      'Both links open in this app and can be read before you agree.';
+
+  @override
+  String get legalContactNotConfigured =>
+      'The operator has not provided contact details in this build.';
 }

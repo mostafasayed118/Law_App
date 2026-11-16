@@ -3196,4 +3196,127 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get errUnableToUpdateYourAccount =>
       'تعذّر تحديث حسابك. حاول مرة أخرى.';
+
+  @override
+  String get accountTitle => 'الحساب';
+
+  @override
+  String get accountProfileTitle => 'تعديل الملف الشخصي';
+
+  @override
+  String get accountDisplayNameLabel => 'الاسم المعروض';
+
+  @override
+  String get accountSave => 'حفظ';
+
+  @override
+  String get accountSaved => 'تم حفظ الملف الشخصي.';
+
+  @override
+  String get accountPasswordTitle => 'تغيير كلمة المرور';
+
+  @override
+  String get accountNewPasswordLabel => 'كلمة المرور الجديدة';
+
+  @override
+  String get accountConfirmPasswordLabel => 'تأكيد كلمة المرور الجديدة';
+
+  @override
+  String get accountChangePassword => 'تغيير كلمة المرور';
+
+  @override
+  String get accountPasswordChanged => 'تم تغيير كلمة المرور.';
+
+  @override
+  String get accountPasswordMismatch => 'كلمتا المرور غير متطابقتين.';
+
+  @override
+  String get accountPasswordReauth =>
+      'سجّل الدخول مرة أخرى قبل تغيير كلمة المرور.';
+
+  @override
+  String get accountDangerTitle => 'منطقة الخطر';
+
+  @override
+  String get accountDeleteAction => 'حذف الحساب';
+
+  @override
+  String get accountDeleteTitle => 'حذف حسابك؟';
+
+  @override
+  String get accountDeleteIntro =>
+      'يؤدي هذا إلى إزالة تسجيل الدخول والبيانات الشخصية الموضحة أدناه نهائياً. اقرأ بعناية.';
+
+  @override
+  String get accountDeleteRemovesTitle => 'ما الذي تتم إزالته';
+
+  @override
+  String get accountDeleteRemovesIdentity => 'تسجيل دخولك وملفك الشخصي.';
+
+  @override
+  String get accountDeleteRemovesLibrary =>
+      'مقالاتك المحفوظة وتظليلاتك وسجل قراءتك.';
+
+  @override
+  String get accountDeleteRemovesFiles =>
+      'الملفات التي رفعتها مع بياناتها الوصفية.';
+
+  @override
+  String get accountDeleteKeepsTitle => 'ما الذي لا تتم إزالته';
+
+  @override
+  String get accountDeleteKeepsOthers =>
+      'ملفات أو سجلات يملكها أشخاص آخرون في مؤسساتك.';
+
+  @override
+  String get accountDeleteKeepsAudit =>
+      'سجلات التدقيق المُخفاة؛ تتم إزالة مرجع الفاعل.';
+
+  @override
+  String get accountDeleteConfirmLabel => 'اكتب DELETE للتأكيد';
+
+  @override
+  String get accountDeleteConfirmHint => 'DELETE';
+
+  @override
+  String get accountDeleteSubmit => 'حذف حسابي نهائياً';
+
+  @override
+  String get accountDeleteSuccess =>
+      'تم حذف حسابك. أُزيل تسجيل الدخول والملف الشخصي وبيانات المكتبة المحفوظة وملفاتك التي رفعتها.';
+
+  @override
+  String get accountDeleteLastPartner =>
+      'أضف شريكاً نشطاً آخر إلى هذه المؤسسة قبل حذف حسابك.';
+
+  @override
+  String get accountDeleteOwner => 'انقل ملكية المنصة قبل حذف حسابك.';
+
+  @override
+  String get accountDeleteGenericError => 'تعذّر حذف حسابك. حاول مرة أخرى.';
+
+  @override
+  String get accountDeleteInProgress => 'جارٍ حذف حسابك…';
+
+  @override
+  String get legalPrivacyTitle => 'سياسة الخصوصية';
+
+  @override
+  String get legalTermsTitle => 'شروط الخدمة';
+
+  @override
+  String legalLastUpdated(Object date) {
+    return 'آخر تحديث: $date';
+  }
+
+  @override
+  String get legalAcceptTerms => 'قرأت وأوافق على';
+
+  @override
+  String get legalAcceptTermsHint =>
+      'يمكن فتح الرابطين داخل التطبيق وقراءتهما قبل الموافقة.';
+
+  @override
+  String get legalContactNotConfigured =>
+      'لم يقدّم المشغّل بيانات اتصال في هذا الإصدار.';
 }

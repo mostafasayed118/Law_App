@@ -311,6 +311,12 @@ List<RouteBase> _shellRoutes(
           ),
     ),
     GoRoute(
+      path: AppRoutes.settingsAccount,
+      builder: (BuildContext context, GoRouterState state) => AccountScreen(
+        initialDisplayName: authCubit.state.session?.displayName ?? '',
+      ),
+    ),
+    GoRoute(
       path: AppRoutes.settings,
       builder: (BuildContext context, GoRouterState state) =>
           const SettingsScreen(),

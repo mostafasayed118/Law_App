@@ -1,0 +1,104 @@
+{
+  "privacy": [
+    {
+      "id": "p1",
+      "heading": "Who we are",
+      "paragraphs": [
+        "LegalHub is a legal practice-management app with a Legal Library module. The app is offered for demonstration; it is operated by the owner identified in the in-app contact constant. This draft was generated from a code review and requires review by qualified counsel before production use."
+      ]
+    },
+    {
+      "id": "p2",
+      "heading": "What we collect",
+      "paragraphs": [
+        "Account email and display name; your role and organization memberships; matters, documents and message metadata; invoices and notifications; Legal Library bookmarks, highlights and reading history; AI research run metadata and video session metadata. The demo build uses synthetic records and no real client data."
+      ]
+    },
+    {
+      "id": "p3",
+      "heading": "How it is processed",
+      "paragraphs": [
+        "Data is stored in Supabase Postgres with row-level security. Practice data is organization-scoped; Legal Library reference content is global; bookmarks, highlights and history are visible only to you. Mutations go through server-side functions that derive your identity from the session."
+      ]
+    },
+    {
+      "id": "p4",
+      "heading": "Storage and files",
+      "paragraphs": [
+        "Files are kept in a private storage bucket at 25 MiB maximum per file with a restricted file-type allowlist. Access to a file requires active membership in its organization and assignment to its matter."
+      ]
+    },
+    {
+      "id": "p5",
+      "heading": "What we do not collect",
+      "paragraphs": [
+        "The app contains no analytics SDK, no advertising and no third-party crash-reporting SDK. Errors are reported through a redacting console reporter. Payment collection, AI research and video calls are provider-gated and disabled unless explicitly configured."
+      ]
+    },
+    {
+      "id": "p6",
+      "heading": "Your controls",
+      "paragraphs": [
+        "You can edit your display name and change your password in Account settings. You can delete your account from the same screen after reading exactly what is removed. You can clear your reading history in the Library Saved screen."
+      ]
+    },
+    {
+      "id": "p7",
+      "heading": "Deletion and contact",
+      "paragraphs": [
+        "Account deletion removes your sign-in, profile, memberships, Legal Library rows and files you uploaded with their metadata. It does not remove records owned by other people or provider-side records. Redacted audit entries are retained with the actor reference cleared. For questions, use the contact address in the in-app legal notice."
+      ]
+    }
+  ],
+  "terms": [
+    {
+      "id": "t1",
+      "heading": "Informational only",
+      "paragraphs": [
+        "LegalHub provides informational software. Nothing in the app, including AI-generated research and sample Legal Library content, is legal advice or a substitute for a qualified lawyer."
+      ]
+    },
+    {
+      "id": "t2",
+      "heading": "No attorney-client relationship",
+      "paragraphs": [
+        "Using the app does not create an attorney-client relationship. The attorney directory contains professional profile data only; no credential verification is performed."
+      ]
+    },
+    {
+      "id": "t3",
+      "heading": "Sample content",
+      "paragraphs": [
+        "The bundled Legal Library corpus is artificial demonstration data. Every sample row is labelled in the interface. Real legal text must be imported from an authoritative source by the operator and reviewed before reliance."
+      ]
+    },
+    {
+      "id": "t4",
+      "heading": "Your responsibilities",
+      "paragraphs": [
+        "Use the app lawfully, do not upload content you are not entitled to store, and do not attempt to access data belonging to another organization or another user."
+      ]
+    },
+    {
+      "id": "t5",
+      "heading": "Accounts and termination",
+      "paragraphs": [
+        "You are responsible for keeping your credentials secure. You may delete your account in Account settings; some redacted audit records are retained after deletion. The operator may restrict access where required to protect other users or the service."
+      ]
+    },
+    {
+      "id": "t6",
+      "heading": "Warranties and liability",
+      "paragraphs": [
+        "The software is provided as-is without warranties. To the extent permitted by law, the operator is not liable for indirect or consequential loss arising from its use. Nothing in these terms limits liability that cannot lawfully be limited."
+      ]
+    },
+    {
+      "id": "t7",
+      "heading": "Governing law",
+      "paragraphs": [
+        "The governing law and venue must be filled in by the operator before production use. No jurisdiction is asserted by this draft."
+      ]
+    }
+  ]
+}

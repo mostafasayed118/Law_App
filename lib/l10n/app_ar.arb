@@ -1592,5 +1592,153 @@
   "errUnableToUpdateYourAccount": "تعذّر تحديث حسابك. حاول مرة أخرى.",
   "@errUnableToUpdateYourAccount": {
     "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountTitle": "الحساب",
+  "@accountTitle": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountProfileTitle": "تعديل الملف الشخصي",
+  "@accountProfileTitle": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDisplayNameLabel": "الاسم المعروض",
+  "@accountDisplayNameLabel": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountSave": "حفظ",
+  "@accountSave": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountSaved": "تم حفظ الملف الشخصي.",
+  "@accountSaved": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountPasswordTitle": "تغيير كلمة المرور",
+  "@accountPasswordTitle": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountNewPasswordLabel": "كلمة المرور الجديدة",
+  "@accountNewPasswordLabel": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountConfirmPasswordLabel": "تأكيد كلمة المرور الجديدة",
+  "@accountConfirmPasswordLabel": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountChangePassword": "تغيير كلمة المرور",
+  "@accountChangePassword": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountPasswordChanged": "تم تغيير كلمة المرور.",
+  "@accountPasswordChanged": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountPasswordMismatch": "كلمتا المرور غير متطابقتين.",
+  "@accountPasswordMismatch": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountPasswordReauth": "سجّل الدخول مرة أخرى قبل تغيير كلمة المرور.",
+  "@accountPasswordReauth": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDangerTitle": "منطقة الخطر",
+  "@accountDangerTitle": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteAction": "حذف الحساب",
+  "@accountDeleteAction": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteTitle": "حذف حسابك؟",
+  "@accountDeleteTitle": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteIntro": "يؤدي هذا إلى إزالة تسجيل الدخول والبيانات الشخصية الموضحة أدناه نهائياً. اقرأ بعناية.",
+  "@accountDeleteIntro": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteRemovesTitle": "ما الذي تتم إزالته",
+  "@accountDeleteRemovesTitle": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteRemovesIdentity": "تسجيل دخولك وملفك الشخصي.",
+  "@accountDeleteRemovesIdentity": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteRemovesLibrary": "مقالاتك المحفوظة وتظليلاتك وسجل قراءتك.",
+  "@accountDeleteRemovesLibrary": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteRemovesFiles": "الملفات التي رفعتها مع بياناتها الوصفية.",
+  "@accountDeleteRemovesFiles": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteKeepsTitle": "ما الذي لا تتم إزالته",
+  "@accountDeleteKeepsTitle": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteKeepsOthers": "ملفات أو سجلات يملكها أشخاص آخرون في مؤسساتك.",
+  "@accountDeleteKeepsOthers": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteKeepsAudit": "سجلات التدقيق المُخفاة؛ تتم إزالة مرجع الفاعل.",
+  "@accountDeleteKeepsAudit": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteConfirmLabel": "اكتب DELETE للتأكيد",
+  "@accountDeleteConfirmLabel": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteConfirmHint": "DELETE",
+  "@accountDeleteConfirmHint": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteSubmit": "حذف حسابي نهائياً",
+  "@accountDeleteSubmit": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteSuccess": "تم حذف حسابك. أُزيل تسجيل الدخول والملف الشخصي وبيانات المكتبة المحفوظة وملفاتك التي رفعتها.",
+  "@accountDeleteSuccess": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteLastPartner": "أضف شريكاً نشطاً آخر إلى هذه المؤسسة قبل حذف حسابك.",
+  "@accountDeleteLastPartner": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteOwner": "انقل ملكية المنصة قبل حذف حسابك.",
+  "@accountDeleteOwner": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteGenericError": "تعذّر حذف حسابك. حاول مرة أخرى.",
+  "@accountDeleteGenericError": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "accountDeleteInProgress": "جارٍ حذف حسابك…",
+  "@accountDeleteInProgress": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "legalPrivacyTitle": "سياسة الخصوصية",
+  "@legalPrivacyTitle": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "legalTermsTitle": "شروط الخدمة",
+  "@legalTermsTitle": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "legalLastUpdated": "آخر تحديث: {date}",
+  "@legalLastUpdated": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "legalAcceptTerms": "قرأت وأوافق على",
+  "@legalAcceptTerms": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "legalAcceptTermsHint": "يمكن فتح الرابطين داخل التطبيق وقراءتهما قبل الموافقة.",
+  "@legalAcceptTermsHint": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "legalContactNotConfigured": "لم يقدّم المشغّل بيانات اتصال في هذا الإصدار.",
+  "@legalContactNotConfigured": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
   }
 }
