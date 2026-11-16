@@ -369,3 +369,27 @@ void _registerContentSeams(
     fake: FakeTaskGateway.new,
   );
 }
+
+/// Registers the Legal Library read seam (ADR-0009).
+///
+/// The library is GLOBAL reference data: the fake serves the same three
+/// invented sample documents as `supabase/seed/legal_library_sample.sql`, so the
+/// demo build and a seeded configured build look alike. A configured build
+/// never serves synthetic rows — the flip is the same one every other feature
+/// uses, which is what keeps "demo mode" an honest label rather than a mixed
+/// state.
+///
+/// There is no write seam in this slice: the library is populated by the
+/// owner's importer, not by the app.
+void _registerLibrarySeams(
+  SupabaseEnv env, {
+  SupabaseLibraryApi Function()? supabaseLibraryApiFactory,
+}) {
+  _registerSeam<LibraryGateway>(
+    env,
+    supabase: () => SupabaseLibraryGateway(
+      (supabaseLibraryApiFactory ?? SupabaseLibraryApiImpl.bind)(),
+    ),
+    fake: FakeLibraryGateway.new,
+  );
+}

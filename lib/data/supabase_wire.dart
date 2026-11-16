@@ -78,6 +78,11 @@ abstract final class SupabaseRpcs {
   static const String advanceTaskStatus = 'advance_task_status';
   static const String assignTask = 'assign_task';
   static const String acknowledgeTask = 'acknowledge_task';
+  // legal library
+  static const String listLegalDocuments = 'list_legal_documents';
+  static const String getLegalDocument = 'get_legal_document';
+  static const String getLegalArticle = 'get_legal_article';
+  static const String searchLegalLibrary = 'search_legal_library';
 }
 
 abstract final class SupabaseEdgeFunctions {
