@@ -3204,4 +3204,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get libraryColourPink => 'Pink';
+
+  @override
+  String get errTheNameIsInvalid =>
+      'Enter a name between 2 and 120 characters.';
+
+  @override
+  String get errYourProfileCouldNotBeFound =>
+      'Your profile could not be found.';
+
+  @override
+  String get errYouAreTheLastActivePartner =>
+      'You are the last active partner. Add another partner before deleting your account.';
+
+  @override
+  String get errYouAreThePlatformOwner =>
+      'You are the platform owner. Transfer ownership before deleting your account.';
+
+  @override
+  String get errUnableToUpdateYourAccount =>
+      'Unable to update your account. Please try again.';
 }

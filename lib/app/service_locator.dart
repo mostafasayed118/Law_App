@@ -18,6 +18,8 @@ import 'package:legalhub/data/auth/supabase_auth_api.dart';
 import 'package:legalhub/data/auth/supabase_auth_api_impl.dart';
 import 'package:legalhub/data/auth/supabase_auth_gateway.dart';
 import 'package:legalhub/data/auth/supabase_env.dart';
+import 'package:legalhub/data/auth/supabase_password_api.dart';
+import 'package:legalhub/data/auth/supabase_password_api_impl.dart';
 import 'package:legalhub/data/billing/fake_payment_gateway.dart';
 import 'package:legalhub/data/billing/supabase_billing_api.dart';
 import 'package:legalhub/data/billing/supabase_billing_api_impl.dart';
@@ -72,6 +74,8 @@ import 'package:legalhub/data/orgs/supabase_membership_repository.dart';
 import 'package:legalhub/data/orgs/supabase_org_api.dart';
 import 'package:legalhub/data/orgs/supabase_org_api_impl.dart';
 import 'package:legalhub/data/orgs/supabase_organization_gateway.dart';
+import 'package:legalhub/data/profile/supabase_account_api.dart';
+import 'package:legalhub/data/profile/supabase_account_api_impl.dart';
 import 'package:legalhub/data/research/supabase_research_api.dart';
 import 'package:legalhub/data/research/supabase_research_api_impl.dart';
 import 'package:legalhub/data/storage/supabase_storage_api.dart';
@@ -128,6 +132,12 @@ import 'package:legalhub/features/notifications/data/shared_preferences_notifica
 import 'package:legalhub/features/notifications/domain/notification_gateway.dart';
 import 'package:legalhub/features/notifications/domain/notification_prefs_store.dart';
 import 'package:legalhub/features/onboarding/presentation/onboarding_cubit.dart';
+import 'package:legalhub/features/profile/data/fake_account_gateway.dart';
+import 'package:legalhub/features/profile/data/fake_password_gateway.dart';
+import 'package:legalhub/features/profile/data/supabase_account_gateway.dart';
+import 'package:legalhub/features/profile/data/supabase_password_gateway.dart';
+import 'package:legalhub/features/profile/domain/account_gateway.dart';
+import 'package:legalhub/features/profile/domain/password_gateway.dart';
 import 'package:legalhub/features/research/data/supabase_research_gateway.dart';
 import 'package:legalhub/features/research/data/synthetic_ai_gateway.dart';
 import 'package:legalhub/features/research/domain/ai_gateway.dart';
@@ -198,6 +208,8 @@ void configureDependencies({
   SupabaseVideoApi Function()? supabaseVideoApiFactory,
   SupabaseLibraryApi Function()? supabaseLibraryApiFactory,
   SupabaseLibraryUserDataApi Function()? supabaseLibraryUserDataApiFactory,
+  AccountApi Function()? supabaseAccountApiFactory,
+  PasswordApi Function()? supabasePasswordApiFactory,
   PaymentMode? paymentMode,
 }) {
   // Lazy singleton: stateless service, created on first resolution.
@@ -248,6 +260,11 @@ void configureDependencies({
   _registerLibraryUserDataSeams(
     env,
     supabaseLibraryUserDataApiFactory: supabaseLibraryUserDataApiFactory,
+  );
+  _registerAccountSeams(
+    env,
+    supabaseAccountApiFactory: supabaseAccountApiFactory,
+    supabasePasswordApiFactory: supabasePasswordApiFactory,
   );
   _registerMatterSeams(
     env,

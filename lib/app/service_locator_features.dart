@@ -370,6 +370,27 @@ void _registerContentSeams(
   );
 }
 
+void _registerAccountSeams(
+  SupabaseEnv env, {
+  AccountApi Function()? supabaseAccountApiFactory,
+  PasswordApi Function()? supabasePasswordApiFactory,
+}) {
+  _registerSeam<AccountGateway>(
+    env,
+    supabase: () => SupabaseAccountGateway(
+      (supabaseAccountApiFactory ?? SupabaseAccountApiImpl.new)(),
+    ),
+    fake: () => FakeAccountGateway(),
+  );
+  _registerSeam<PasswordGateway>(
+    env,
+    supabase: () => SupabasePasswordGateway(
+      (supabasePasswordApiFactory ?? SupabasePasswordApiImpl.new)(),
+    ),
+    fake: () => FakePasswordGateway(),
+  );
+}
+
 /// Registers the Legal Library read seam (ADR-0009).
 ///
 /// The library is GLOBAL reference data: the fake serves the same three

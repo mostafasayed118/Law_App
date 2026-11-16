@@ -1572,5 +1572,25 @@
   "libraryColourYellow": "Sarı",
   "libraryColourGreen": "Yeşil",
   "libraryColourBlue": "Mavi",
-  "libraryColourPink": "Pembe"
+  "libraryColourPink": "Pembe",
+  "errTheNameIsInvalid": "2 ile 120 karakter arasında bir ad girin.",
+  "@errTheNameIsInvalid": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYourProfileCouldNotBeFound": "Profiliniz bulunamadı.",
+  "@errYourProfileCouldNotBeFound": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouAreTheLastActivePartner": "Etkin tek ortağınız sizsiniz. Hesabınızı silmeden önce başka bir ortak ekleyin.",
+  "@errYouAreTheLastActivePartner": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouAreThePlatformOwner": "Platform sahibisiniz. Hesabınızı silmeden önce sahipliği devredin.",
+  "@errYouAreThePlatformOwner": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToUpdateYourAccount": "Hesabınız güncellenemedi. Lütfen tekrar deneyin.",
+  "@errUnableToUpdateYourAccount": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  }
 }

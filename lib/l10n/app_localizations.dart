@@ -5725,6 +5725,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pink'**
   String get libraryColourPink;
+
+  /// No description provided for @errTheNameIsInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a name between 2 and 120 characters.'**
+  String get errTheNameIsInvalid;
+
+  /// No description provided for @errYourProfileCouldNotBeFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Your profile could not be found.'**
+  String get errYourProfileCouldNotBeFound;
+
+  /// No description provided for @errYouAreTheLastActivePartner.
+  ///
+  /// In en, this message translates to:
+  /// **'You are the last active partner. Add another partner before deleting your account.'**
+  String get errYouAreTheLastActivePartner;
+
+  /// No description provided for @errYouAreThePlatformOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'You are the platform owner. Transfer ownership before deleting your account.'**
+  String get errYouAreThePlatformOwner;
+
+  /// No description provided for @errUnableToUpdateYourAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to update your account. Please try again.'**
+  String get errUnableToUpdateYourAccount;
 }
 
 class _AppLocalizationsDelegate

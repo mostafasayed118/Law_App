@@ -71,6 +71,14 @@ String appMessage(
       l10n.errTheSavedItemsLimitWasReached,
     AppMessageKey.errUnableToLoadYourSavedItems =>
       l10n.errUnableToLoadYourSavedItems,
+    AppMessageKey.errTheNameIsInvalid => l10n.errTheNameIsInvalid,
+    AppMessageKey.errYourProfileCouldNotBeFound =>
+      l10n.errYourProfileCouldNotBeFound,
+    AppMessageKey.errYouAreTheLastActivePartner =>
+      l10n.errYouAreTheLastActivePartner,
+    AppMessageKey.errYouAreThePlatformOwner => l10n.errYouAreThePlatformOwner,
+    AppMessageKey.errUnableToUpdateYourAccount =>
+      l10n.errUnableToUpdateYourAccount,
     AppMessageKey.errUnableToAcknowledgeTheAlertPleaseTryAgain =>
       l10n.errUnableToAcknowledgeTheAlertPleaseTryAgain,
     AppMessageKey.errUnableToCancelTheRequestPleaseTryAgain =>

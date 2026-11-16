@@ -3207,4 +3207,22 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get libraryColourPink => 'Pembe';
+
+  @override
+  String get errTheNameIsInvalid => '2 ile 120 karakter arasında bir ad girin.';
+
+  @override
+  String get errYourProfileCouldNotBeFound => 'Profiliniz bulunamadı.';
+
+  @override
+  String get errYouAreTheLastActivePartner =>
+      'Etkin tek ortağınız sizsiniz. Hesabınızı silmeden önce başka bir ortak ekleyin.';
+
+  @override
+  String get errYouAreThePlatformOwner =>
+      'Platform sahibisiniz. Hesabınızı silmeden önce sahipliği devredin.';
+
+  @override
+  String get errUnableToUpdateYourAccount =>
+      'Hesabınız güncellenemedi. Lütfen tekrar deneyin.';
 }

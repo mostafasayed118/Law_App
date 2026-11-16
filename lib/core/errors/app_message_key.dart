@@ -63,6 +63,8 @@ enum AppMessageKey {
   errTheHighlightCouldNotBeSaved,
   errTheHighlightWasNotFound,
   errTheLegalArticleWasNotFound,
+  errTheNameIsInvalid,
+  errYourProfileCouldNotBeFound,
   errTheLegalDocumentWasNotFound,
   errTheProfileDetailsAreInvalidCheckThemAnd,
   errTheRequestCanNoLongerBeCancelled,
@@ -108,6 +110,7 @@ enum AppMessageKey {
   errUnableToLoadThreadsPleaseTryAgain,
   errUnableToLoadVideoConsultationsPleaseTryAgain,
   errUnableToLoadYourSavedItems,
+  errUnableToUpdateYourAccount,
   errUnableToOpenTheFilePleaseTryAgain,
   errUnableToReAssignTheTaskPleaseTry,
   errUnableToReadTheVideoConsultationPleaseTry,
@@ -141,6 +144,8 @@ enum AppMessageKey {
   errYouDoNotHavePermissionToViewThese,
   errYouDoNotHavePermissionToViewThese2,
   errYouDoNotHavePermissionToViewThese3,
+  errYouAreTheLastActivePartner,
+  errYouAreThePlatformOwner,
   errYouDoNotHavePermissionToViewVideo,
 }
 
@@ -285,4 +290,9 @@ const List<AppMessageKey> allAppMessageKeys = <AppMessageKey>[
   AppMessageKey.errTheHighlightWasNotFound,
   AppMessageKey.errTheSavedItemsLimitWasReached,
   AppMessageKey.errUnableToLoadYourSavedItems,
+  AppMessageKey.errTheNameIsInvalid,
+  AppMessageKey.errYourProfileCouldNotBeFound,
+  AppMessageKey.errUnableToUpdateYourAccount,
+  AppMessageKey.errYouAreTheLastActivePartner,
+  AppMessageKey.errYouAreThePlatformOwner,
 ];

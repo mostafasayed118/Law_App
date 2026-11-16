@@ -6,10 +6,10 @@ import 'package:legalhub/l10n/app_message_l10n.dart';
 
 void main() {
   group('AppMessageKey inventory', () {
-    test('has 138 unique values matching allAppMessageKeys', () {
-      expect(AppMessageKey.values, hasLength(138));
-      expect(allAppMessageKeys, hasLength(138));
-      expect(allAppMessageKeys.toSet(), hasLength(138));
+    test('has 143 unique values matching allAppMessageKeys', () {
+      expect(AppMessageKey.values, hasLength(143));
+      expect(allAppMessageKeys, hasLength(143));
+      expect(allAppMessageKeys.toSet(), hasLength(143));
       expect(allAppMessageKeys.toSet(), AppMessageKey.values.toSet());
     });
   });

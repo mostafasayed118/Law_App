@@ -1572,5 +1572,25 @@
   "libraryColourYellow": "أصفر",
   "libraryColourGreen": "أخضر",
   "libraryColourBlue": "أزرق",
-  "libraryColourPink": "وردي"
+  "libraryColourPink": "وردي",
+  "errTheNameIsInvalid": "أدخل اسماً بين ٢ و١٢٠ حرفاً.",
+  "@errTheNameIsInvalid": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYourProfileCouldNotBeFound": "تعذّر العثور على ملفك الشخصي.",
+  "@errYourProfileCouldNotBeFound": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouAreTheLastActivePartner": "أنت الشريك النشط الوحيد. أضف شريكاً آخر قبل حذف حسابك.",
+  "@errYouAreTheLastActivePartner": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errYouAreThePlatformOwner": "أنت مالك المنصة. انقل الملكية قبل حذف حسابك.",
+  "@errYouAreThePlatformOwner": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  },
+  "errUnableToUpdateYourAccount": "تعذّر تحديث حسابك. حاول مرة أخرى.",
+  "@errUnableToUpdateYourAccount": {
+    "description": "[REVIEW] machine-drafted; human review required before release"
+  }
 }

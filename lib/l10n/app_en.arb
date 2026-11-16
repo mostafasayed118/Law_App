@@ -1221,5 +1221,10 @@
   "libraryColourYellow": "Yellow",
   "libraryColourGreen": "Green",
   "libraryColourBlue": "Blue",
-  "libraryColourPink": "Pink"
+  "libraryColourPink": "Pink",
+  "errTheNameIsInvalid": "Enter a name between 2 and 120 characters.",
+  "errYourProfileCouldNotBeFound": "Your profile could not be found.",
+  "errYouAreTheLastActivePartner": "You are the last active partner. Add another partner before deleting your account.",
+  "errYouAreThePlatformOwner": "You are the platform owner. Transfer ownership before deleting your account.",
+  "errUnableToUpdateYourAccount": "Unable to update your account. Please try again."
 }

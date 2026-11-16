@@ -3178,4 +3178,22 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get libraryColourPink => 'وردي';
+
+  @override
+  String get errTheNameIsInvalid => 'أدخل اسماً بين ٢ و١٢٠ حرفاً.';
+
+  @override
+  String get errYourProfileCouldNotBeFound => 'تعذّر العثور على ملفك الشخصي.';
+
+  @override
+  String get errYouAreTheLastActivePartner =>
+      'أنت الشريك النشط الوحيد. أضف شريكاً آخر قبل حذف حسابك.';
+
+  @override
+  String get errYouAreThePlatformOwner =>
+      'أنت مالك المنصة. انقل الملكية قبل حذف حسابك.';
+
+  @override
+  String get errUnableToUpdateYourAccount =>
+      'تعذّر تحديث حسابك. حاول مرة أخرى.';
 }
