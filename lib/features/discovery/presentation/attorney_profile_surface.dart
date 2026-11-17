@@ -82,7 +82,10 @@ class _ProfileSurfaceState extends State<_ProfileSurface> {
             backgroundColor: scheme.primaryContainer,
             child: Text(
               _initialOf(attorney.name),
-              style: TextStyle(fontSize: 28, color: scheme.onPrimaryContainer),
+              style: TextStyle(
+                fontSize: LegalHubTheme.fontSizeAvatarInitial,
+                color: scheme.onPrimaryContainer,
+              ),
             ),
           ),
         ),

@@ -113,6 +113,12 @@ class LegalHubTheme {
   static const double radius2xl = 24;
   static const double radiusFull = 9999;
 
+  /// Caption-sized validation copy (e.g. inline form errors).
+  static const double fontSizeCaption = 12;
+
+  /// Monogram inside the attorney-profile avatar.
+  static const double fontSizeAvatarInitial = 28;
+
   static ThemeData get light => forBrightness(Brightness.light);
   static ThemeData get dark => forBrightness(Brightness.dark);
 

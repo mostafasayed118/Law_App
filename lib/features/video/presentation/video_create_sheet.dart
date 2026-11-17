@@ -259,7 +259,7 @@ class _VideoCreateSheetState extends State<VideoCreateSheet> {
                   : l10n.videoCreateDateRequired,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.error,
-                fontSize: 12,
+                fontSize: LegalHubTheme.fontSizeCaption,
               ),
             ),
           ],
