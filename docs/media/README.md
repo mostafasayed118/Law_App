@@ -47,10 +47,17 @@ Library screenshots are seeded with one bookmark, one highlight and one
 history row so the saved state is populated. All Library rows are **sample
 data** (`is_sample = true`) and badged as such in the UI.
 
-## Demo GIF (manual — owner item)
+## Demo GIF (recorded)
 
-`docs/media/demo.gif`, 30–40 seconds, captured on a phone-shaped emulator or
-device from the demo build, downscaled to ~540 px wide and kept under 10 MB.
+`docs/media/demo.gif` — 41 seconds, 540 × 1230, 2.4 MB, recorded on an Infinix
+X6882 (Android 14) from the demo build. The take starts on Home, scrolls to the
+Legal Library, opens a SAMPLE article, selects the whole Arabic body, saves a
+highlight and holds it so the continuous background is visible, then ends on
+Settings. The dark-mode switch was verified separately with screenshots; it did
+not land inside this take.
+
+The script below is the fuller target (it adds matters, messages, Arabic UI and
+a dark-mode hold) if you want to re-record:
 
 One continuous take, no cuts:
 
