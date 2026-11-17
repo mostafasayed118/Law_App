@@ -19,6 +19,7 @@ import 'package:legalhub/features/library/domain/library_user_data_gateway.dart'
 import 'package:legalhub/main.dart';
 
 import '../support/render_fonts.dart';
+import '../support/screenshot_research_fixture.dart';
 
 /// Deterministic portfolio screenshots from the REAL app, the fake gateways
 /// and the bundled fonts — no emulator, no credentials, no device frame.
@@ -133,6 +134,9 @@ void main() {
     await capture('03_discovery');
     await open('/messages/thread-1');
     await capture('04_messages');
+    // Screenshot-only fixture: a clearly synthetic completed run so the
+    // portfolio image shows a populated history, never "no runs yet".
+    await seedScreenshotResearchFixture();
     await open(AppRoutes.research);
     await capture('05_research');
     await open(AppRoutes.settings);

@@ -31,7 +31,7 @@ comparator purely as a deterministic byte writer; never hand-edit the PNGs.
 | `02_matters.png` | Matters list | English / light |
 | `03_discovery.png` | Attorney directory | English / light |
 | `04_messages.png` | Message thread detail | English / light |
-| `05_research.png` | AI research (with the not-legal-advice banner) | English / light |
+| `05_research.png` | AI research (not-legal-advice banner + one clearly synthetic completed demo run) | English / light |
 | `06_settings.png` | Settings | English / light |
 | `07_library.png` | Library index with category chips | English / light |
 | `08_article_reader.png` | Article with a visible highlight and sample badge | English / light |
