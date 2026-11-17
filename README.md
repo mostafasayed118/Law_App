@@ -22,7 +22,7 @@ A multi-tenant practice workspace: matters, document vault, secure messaging, co
 | Library | ![Library EN](docs/media/screenshots/07_library.png) | ![Library AR](docs/media/screenshots/07_library_ar.png) | — |
 | Reader | ![Reader EN](docs/media/screenshots/08_article_reader.png) | ![Reader AR](docs/media/screenshots/08_article_reader_ar.png) | ![Reader dark](docs/media/screenshots/08_article_reader_dark.png) |
 
-All 15 images are generated from the demo build by `CAPTURE_SCREENSHOTS=1 flutter test test/screenshots --update-goldens`; see [`docs/media/README.md`](docs/media/README.md). A 41-second demo capture is available at [`docs/media/demo.gif`](docs/media/demo.gif).
+All 15 images are generated from the demo build by `CAPTURE_SCREENSHOTS=1 flutter test test/screenshots --update-goldens`; see [`docs/media/README.md`](docs/media/README.md). A 41-second demo capture is available at [`docs/media/demo.gif`](docs/media/demo.gif). The current take was recorded from a debug build and shows a DEBUG ribbon in every frame; a non-debug re-record is pending.
 
 ## Highlights
 

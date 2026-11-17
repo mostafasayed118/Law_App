@@ -52,9 +52,16 @@ data** (`is_sample = true`) and badged as such in the UI.
 `docs/media/demo.gif` — 41 seconds, 540 × 1230, 2.4 MB, recorded on an Infinix
 X6882 (Android 14) from the demo build. The take starts on Home, scrolls to the
 Legal Library, opens a SAMPLE article, selects the whole Arabic body, saves a
-highlight and holds it so the continuous background is visible, then ends on
-Settings. The dark-mode switch was verified separately with screenshots; it did
-not land inside this take.
+highlight and holds it so the continuous background is visible, visits Settings
+around the 30-second mark and returns to Home in its final frames. The dark-mode
+switch was verified separately with screenshots; it did not land inside this
+take.
+
+Known limitation: the take was recorded from a **debug** build, so a red DEBUG
+ribbon is visible in every frame along with status-bar notification icons. This
+conflicts with the "no debug banner / no notifications in frame" rule below; a
+re-record from a non-debug (release or profile) build is pending and is an owner
+action. The GIF file in this repository is unchanged by that pending work.
 
 The script below is the fuller target (it adds matters, messages, Arabic UI and
 a dark-mode hold) if you want to re-record:
@@ -76,9 +83,10 @@ Record with `adb shell screenrecord --time-limit 40 /sdcard/demo.mp4` (or
 ffmpeg -i demo.mp4 -vf "fps=12,scale=540:-1:flags=lanczos" -loop 0 demo.gif
 ```
 
-If the GIF is over 10 MB, drop `fps` to 8 before scaling. It is deliberately
-not generated here: screen recording is a manual human step, and the README
-links to it only once the file exists.
+If the GIF is over 10 MB, drop `fps` to 8 before scaling. The recorded GIF is
+committed at `docs/media/demo.gif` (41 s, 540 × 1230, 2.4 MB) and linked from the
+project README; the script above is the target for the owner's pending non-debug
+re-record.
 
 ## Rules
 
