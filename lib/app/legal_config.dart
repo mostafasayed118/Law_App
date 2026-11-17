@@ -2,10 +2,9 @@
 /// (ADR-0011).
 ///
 /// These are the ONLY places the operator name, contact address, last-updated
-/// date and governing law are set. The values are deliberately obvious
-/// placeholders: nothing here invents a legal entity or a jurisdiction. Until
-/// the owner replaces them, the screens render an honest "not configured"
-/// notice instead of a fabricated contact address.
+/// date and governing law are set. The values are owner-confirmed portfolio
+/// demo values (filled 2026-11-17) and are rendered by the in-app legal screen.
+/// Counsel review of the bundled legal drafts is still pending.
 abstract final class LegalConfig {
   static const String operatorName = 'AL-3TAR';
   static const String contactEmail = 'al3rar401@gmail.com';

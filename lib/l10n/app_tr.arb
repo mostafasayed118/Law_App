@@ -1726,6 +1726,9 @@
     "description": "[REVIEW] machine-drafted; human review required before release"
   },
   "legalLastUpdated": "Son güncelleme: {date}",
+  "legalOperator": "Operat?r",
+  "legalContact": "?leti?im",
+  "legalGoverningLaw": "Ge?erli yasa",
   "@legalLastUpdated": {
     "description": "[REVIEW] machine-drafted; human review required before release"
   },

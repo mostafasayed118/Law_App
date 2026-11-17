@@ -5960,6 +5960,24 @@ abstract class AppLocalizations {
   /// **'Last updated: {date}'**
   String legalLastUpdated(Object date);
 
+  /// No description provided for @legalOperator.
+  ///
+  /// In en, this message translates to:
+  /// **'Operator'**
+  String get legalOperator;
+
+  /// No description provided for @legalContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get legalContact;
+
+  /// No description provided for @legalGoverningLaw.
+  ///
+  /// In en, this message translates to:
+  /// **'Governing law'**
+  String get legalGoverningLaw;
+
   /// No description provided for @legalAcceptTerms.
   ///
   /// In en, this message translates to:

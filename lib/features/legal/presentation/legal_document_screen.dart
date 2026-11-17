@@ -119,6 +119,29 @@ class _LegalDocumentScreenState extends State<LegalDocumentScreen> {
                     ),
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
+                  for (final (String label, String value) in <(String, String)>[
+                    (l10n.legalOperator, LegalConfig.operatorName),
+                    (l10n.legalContact, LegalConfig.contactEmail),
+                    (l10n.legalGoverningLaw, LegalConfig.governingLaw),
+                  ])
+                    Padding(
+                      padding: const EdgeInsetsDirectional.only(
+                        bottom: LegalHubTheme.spaceSm,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            label,
+                            style: Theme.of(context).textTheme.labelMedium,
+                          ),
+                          Text(
+                            value,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ],
+                      ),
+                    ),
                   const SizedBox(height: LegalHubTheme.spaceLg),
                   for (final LegalSection section in sections) ...<Widget>[
                     Text(

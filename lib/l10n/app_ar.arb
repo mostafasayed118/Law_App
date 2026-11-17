@@ -1726,6 +1726,9 @@
     "description": "[REVIEW] machine-drafted; human review required before release"
   },
   "legalLastUpdated": "آخر تحديث: {date}",
+  "legalOperator": "???????",
+  "legalContact": "??? ???????",
+  "legalGoverningLaw": "??????? ??????",
   "@legalLastUpdated": {
     "description": "[REVIEW] machine-drafted; human review required before release"
   },

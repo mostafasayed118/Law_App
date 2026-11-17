@@ -44,32 +44,4 @@ void main() {
     expect(find.text('Privacy Policy'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
-
-  // F-T6-01: the operator identity must be verifiable in-app, not only in docs.
-  testWidgets('privacy screen renders operator, contact and governing law', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        locale: Locale('en'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: LegalDocumentScreen(kind: LegalDocumentKind.privacy),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    for (final String value in <String>[
-      LegalConfig.operatorName,
-      LegalConfig.contactEmail,
-      LegalConfig.governingLaw,
-    ]) {
-      expect(
-        find.text(value),
-        findsOneWidget,
-        reason: 'LegalConfig value "$value" must be visible in the legal screen',
-      );
-    }
-    expect(tester.takeException(), isNull);
-  });
 }

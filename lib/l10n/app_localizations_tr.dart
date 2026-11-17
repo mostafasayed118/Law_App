@@ -3341,6 +3341,15 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get legalOperator => 'Operat?r';
+
+  @override
+  String get legalContact => '?leti?im';
+
+  @override
+  String get legalGoverningLaw => 'Ge?erli yasa';
+
+  @override
   String get legalAcceptTerms => 'Okudum ve kabul ediyorum:';
 
   @override

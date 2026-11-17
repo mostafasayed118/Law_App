@@ -3309,6 +3309,15 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get legalOperator => '???????';
+
+  @override
+  String get legalContact => '??? ???????';
+
+  @override
+  String get legalGoverningLaw => '??????? ??????';
+
+  @override
   String get legalAcceptTerms => 'قرأت وأوافق على';
 
   @override
