@@ -8,7 +8,7 @@ A legal practice-management platform with a Legal Library — Flutter, Supabase,
 
 ## What it is
 
-A multi-tenant practice workspace: matters, document vault, secure messaging, consultation booking, invoicing, approvals, compliance alerts, video and AI research. The Legal Library adds browse, read, search, bookmarks, highlights and reading history over a **sample corpus** — every seeded row is badged as invented, and an importer brings in real text when supplied. Authorization is enforced in Supabase (RLS, RPC-only writes); the same UI runs on fakes or a configured backend.
+A multi-tenant practice workspace: matters, document vault, secure messaging, consultation booking, invoicing, approvals, compliance alerts, video and AI research. The Legal Library adds browse, read, search, bookmarks, highlights and reading history over a **sample corpus** — every seeded row is badged as invented, and an importer brings in real text when supplied. Authorization is enforced in Supabase (RLS; app and user-data writes are RPC-only, while the three Legal Library corpus tables are RLS-restricted to the platform owner and written by the owner-run importer); the same UI runs on fakes or a configured backend.
 
 ## Screenshots
 
@@ -27,13 +27,13 @@ All 15 images are generated from the demo build by `CAPTURE_SCREENSHOTS=1 flutte
 ## Highlights
 
 - **Clean Architecture with gateway seams.** Domain/data/presentation per feature; a provider-neutral interface, a fake and a Supabase adapter per data source. No credentials needed for the demo.
-- **Server-side authorization.** 31 tables, 32 policy files (43 RLS policies), 86 unique public RPC functions, 30 pgTAP batteries. Writes are RPC-only; a service-role key is rejected at startup.
+- **Server-side authorization.** 31 tables, 32 policy files (43 RLS policies), 86 unique public RPC functions, 30 pgTAP batteries. App/user-data writes are RPC-only; Legal Library corpus writes are restricted by RLS to the platform owner (the owner-run importer uses direct SQL); a service-role key is rejected at startup.
 - **Arabic-aware search.** Unicode normalization and Arabic letter-form folding, so `أ`/`إ`/`آ`/`ا` match; snippets come from matched text, never invented.
 - **Anchored highlights.** Offset + quote + body hash with stale detection when source text changes.
 - **Three languages, RTL throughout.** English, Arabic and Turkish; 986 l10n keys per locale with an enforced parity gate.
 - **Phone to tablet.** One breakpoint contract for the navigation rail, two-pane master/detail and RTL-aware spacing.
 - **Accessibility gates.** Tap-target/label guidelines on 12 surfaces; 14 theme token pairs pinned at 4.5:1. See [`docs/accessibility_statement.md`](docs/accessibility_statement.md).
-- **Measured verification.** 2,398 tracked test declarations (2,425 run, 13 skipped), 83.76% line coverage (lcov aggregate LH=17,238 / LF=20,581), 45 screens, 32 migrations, 11 ADRs — all gates run in CI.
+- **Measured verification.** 2,398 tracked test declarations (2,425 run, 13 skipped), 83.76% line coverage (lcov aggregate LH=17,238 / LF=20,581), 45 screens, 33 migration files, 11 ADRs — all gates run in CI.
 
 ## Architecture
 

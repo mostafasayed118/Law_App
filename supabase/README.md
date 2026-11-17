@@ -40,6 +40,7 @@
 | `migrations/27_audit_remediation.sql` | Participant read helpers `can_read_matter` / `can_access_video_session` (security definer, auth-only EXECUTE) | `migrations/27_audit_remediation.down.sql` |
 | `migrations/32_legal_library.sql` | **Legal Library slice 1** (ADR-0009): global reference tables `legal_sources` / `legal_documents` / `legal_articles` + `legal_normalize_ar` + 4 read RPCs. RLS on; authenticated read, platform-owner write, anon denied | `migrations/32_legal_library.down.sql` |
 | `migrations/33_library_user_data.sql` | **Library slice 2** (ADR-0010): per-user `legal_bookmarks` / `legal_highlights` / `legal_reading_history` + 9 RPCs. RLS on; own rows only, SELECT-only grant, RPC-only writes, caps in `legal_cap()` | `migrations/33_library_user_data.down.sql` |
+| `migrations/35_helper_function_revokes.sql` | Explicit `REVOKE ... FROM public, anon, authenticated` for the four internal helpers `legal_normalize_ar`, `legal_cap`, `legal_library_touch`, `legal_user_data_touch` (F-T4-02). File only — not applied to any live project | `migrations/35_helper_function_revokes.down.sql` |
 | `policies/*.sql` | Per-table RLS policies (versioned in git, never edited in dashboard) | `git revert` of the policy commit (design §7) |
 | `rpc/*.sql` | Narrow RPC surface (security definer, each audited) | `rpc/_down.sql` (drops the whole surface) |
 
@@ -55,6 +56,11 @@
 7. policies/*.sql                           (all reference 01/02/27 objects)
 8. rpc/*.sql                                (all reference 01/02/27 objects)
 ```
+
+Migration 35 is file-only: it has **not** been applied to any live project, and
+applying it is an owner action. Its revokes were verified on a disposable local
+PostgreSQL 16 cluster (all four helpers went from EXECUTE-granted to revoked
+for public/anon/authenticated; a trigger path still inserted a row).
 
 `03_platform_config_seed.sql` is apply-time only (owner-token substitution);
 the harness seeds its own owner fixture. The exact executable order lives in

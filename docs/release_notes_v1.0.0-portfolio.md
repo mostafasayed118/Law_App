@@ -35,7 +35,7 @@ from source for an emulator.
 | Credential-free fake gateways; seeded deterministic data | Connection to any Supabase project |
 | Legal Library sample corpus, every row badged `Sample content` | Official legal text (owner supplies it through the importer) |
 | Provider-gated demo screens for payments, AI research and video | Live Paymob / AI / LiveKit accounts |
-| In-app privacy policy and terms drafts | Owner contact details and governing law (`LegalConfig` placeholders) |
+| In-app privacy policy and terms drafts; the owner-confirmed `LegalConfig` values (AL-3TAR, al3rar401@gmail.com, Laws of Egypt) are filled and compiled into this APK/tree | Counsel review of the legal drafts |
 
 ## Known limitations
 
