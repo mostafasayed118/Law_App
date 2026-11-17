@@ -7,10 +7,10 @@
 /// the owner replaces them, the screens render an honest "not configured"
 /// notice instead of a fabricated contact address.
 abstract final class LegalConfig {
-  static const String operatorName = 'REPLACE_WITH_LEGAL_ENTITY_NAME';
-  static const String contactEmail = 'REPLACE_WITH_CONTACT_EMAIL';
-  static const String lastUpdated = 'REPLACE_WITH_YYYY-MM-DD';
-  static const String governingLaw = 'REPLACE_WITH_GOVERNING_LAW';
+  static const String operatorName = 'AL-3TAR';
+  static const String contactEmail = 'al3rar401@gmail.com';
+  static const String lastUpdated = '2026-11-17';
+  static const String governingLaw = 'Laws of Egypt';
 
   static bool get isConfigured =>
       !operatorName.startsWith('REPLACE_') &&
