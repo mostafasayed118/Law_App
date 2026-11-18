@@ -6,6 +6,7 @@ import 'package:legalhub/app/legal_config.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/app/router.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/formatting/date_formatting.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Which bundled document a screen renders.
@@ -113,7 +114,10 @@ class _LegalDocumentScreenState extends State<LegalDocumentScreen> {
                   Text(
                     l10n.legalLastUpdated(
                       LegalConfig.isConfigured
-                          ? LegalConfig.lastUpdated
+                          ? formatMediumDate(
+                              l10n,
+                              DateTime.parse(LegalConfig.lastUpdated),
+                            )
                           : l10n.legalContactNotConfigured,
                     ),
                     style: Theme.of(context).textTheme.bodySmall,

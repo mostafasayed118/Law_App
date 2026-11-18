@@ -33,7 +33,7 @@ All 15 images are generated from the demo build by `CAPTURE_SCREENSHOTS=1 flutte
 - **Three languages, RTL throughout.** English, Arabic and Turkish; 1,074 l10n keys per locale with an enforced parity gate.
 - **Phone to tablet.** One breakpoint contract for the navigation rail, two-pane master/detail and RTL-aware spacing.
 - **Accessibility gates.** Tap-target/label guidelines on 12 surfaces; 14 theme token pairs pinned at 4.5:1. See [`docs/accessibility_statement.md`](docs/accessibility_statement.md).
-- **Measured verification.** 2,419 tracked test declarations (2,446 run, 13 skipped), 84.55% line coverage (lcov aggregate LH=18,453 / LF=21,825), 45 screens, 33 migration files, 11 ADRs — all gates run in CI.
+- **Measured verification.** 2,420 tracked test declarations (2,447 run, 13 skipped), 84.60% line coverage (lcov aggregate LH=18,466 / LF=21,827), 45 screens, 33 migration files, 11 ADRs — all gates run in CI.
 
 ## Architecture
 

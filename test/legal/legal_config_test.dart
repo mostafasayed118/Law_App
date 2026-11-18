@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/legal_config.dart';
 import 'package:legalhub/features/legal/presentation/legal_document_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:legalhub/shared/formatting/date_formatting.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Pins the owner-confirmed LegalConfig values and proves the privacy screen
@@ -40,7 +41,14 @@ void main() {
     final AppLocalizations l10n = AppLocalizations.of(
       tester.element(find.byType(LegalDocumentScreen)),
     );
-    expect(find.text(l10n.legalLastUpdated('2026-11-17')), findsOneWidget);
+    expect(
+      find.text(
+        l10n.legalLastUpdated(
+          formatMediumDate(l10n, DateTime.parse(LegalConfig.lastUpdated)),
+        ),
+      ),
+      findsOneWidget,
+    );
     expect(find.text('Privacy Policy'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
