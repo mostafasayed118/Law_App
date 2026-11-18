@@ -428,4 +428,28 @@ end $$;
 drop trigger battery29_refuse_delete on storage.objects;
 drop function storage.battery29_refuse_delete();
 
+-- ############################################################################
+-- 29.15 — the scheduled byte cleanup is absent: account deletion MUST still
+-- hard-delete the identity and return normally (the 204 contract). This is the
+-- guard that the new optional migration 36 can never regress.
+-- ############################################################################
+do $$
+declare
+  v_user uuid := gen_random_uuid();
+begin
+  insert into auth.users (id, email) values (v_user, 'battery29-no-cleanup@test.local');
+  insert into public.memberships (user_id, organization_id, role, status)
+  values (v_user, current_setting('battery29.org')::uuid, 'client', 'active');
+
+  perform set local role authenticated;
+  perform set_config('request.jwt.claim.sub', v_user::text, false);
+  perform set_config('request.jwt.claims', json_build_object('sub', v_user)::text, false);
+  perform public.delete_my_account();
+  reset role;
+
+  if exists (select 1 from auth.users where id = v_user) then
+    raise exception 'POLICY-BATTERY FAIL 29.15: identity deletion depended on the byte cleanup';
+  end if;
+end $$;
+
 rollback;

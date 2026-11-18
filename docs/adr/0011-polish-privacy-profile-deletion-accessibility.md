@@ -49,7 +49,12 @@ On a hosted project the storage-table delete is wrapped in an exception handler:
 Supabase raises `42501` ("Use the Storage API instead") for direct
 `storage.objects` deletes, and that guard must never block identity deletion.
 File **records** are removed by the RPC; stored **bytes** remain until the
-operator runs a Storage-API cleanup with the service role.
+operator runs a Storage-API cleanup with the service role. The scheduled
+service-role cleanup (Edge Function `cleanup-deleted-user-storage` plus
+migration `36_storage_bytes_cleanup_wiring.sql`) now exists as **code on a
+feature branch**, not deployed: account deletion stays PARTIAL until the owner
+deploys the function, sets the secret, applies the migration and verifies with a
+disposable test user. See `docs/internal/STORAGE_BYTES_CLEANUP_RUNBOOK.md`.
 
 ### 2. The UI tells the truth about what deletion removes
 
