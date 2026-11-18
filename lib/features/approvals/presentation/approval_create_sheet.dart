@@ -27,12 +27,17 @@ import 'approvals_cubit.dart';
 Future<bool?> showApprovalCreateSheet(
   BuildContext context, {
   required ApprovalsCubit cubit,
+  String? initialMatterId,
+  String? initialTitle,
 }) {
   return showAppSheet<bool>(
     context: context,
     builder: (BuildContext context) => BlocProvider<ApprovalsCubit>.value(
       value: cubit,
-      child: const ApprovalCreateSheet(),
+      child: ApprovalCreateSheet(
+        initialMatterId: initialMatterId,
+        initialTitle: initialTitle,
+      ),
     ),
   );
 }
@@ -46,7 +51,14 @@ Future<bool?> showApprovalCreateSheet(
 /// organization id is a routing hint — the create RPC re-derives membership
 /// and the matter gate in-function.
 class ApprovalCreateSheet extends StatefulWidget {
-  const ApprovalCreateSheet({super.key});
+  const ApprovalCreateSheet({
+    super.key,
+    this.initialMatterId,
+    this.initialTitle,
+  });
+
+  final String? initialMatterId;
+  final String? initialTitle;
 
   @override
   State<ApprovalCreateSheet> createState() => _ApprovalCreateSheetState();
@@ -67,6 +79,10 @@ class _ApprovalCreateSheetState extends State<ApprovalCreateSheet> {
   @override
   void initState() {
     super.initState();
+    _selectedMatterId = widget.initialMatterId;
+    if (widget.initialTitle != null) {
+      _title.text = widget.initialTitle!;
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadMatters());
   }
 

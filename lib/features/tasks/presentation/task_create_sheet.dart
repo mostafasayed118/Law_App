@@ -22,12 +22,17 @@ import 'task_error_messages.dart';
 Future<bool?> showTaskCreateSheet(
   BuildContext context, {
   required TaskBoardCubit cubit,
+  String? initialMatterId,
+  String? initialTitle,
 }) {
   return showAppSheet<bool>(
     context: context,
     builder: (BuildContext context) => BlocProvider<TaskBoardCubit>.value(
       value: cubit,
-      child: const TaskCreateSheet(),
+      child: TaskCreateSheet(
+        initialMatterId: initialMatterId,
+        initialTitle: initialTitle,
+      ),
     ),
   );
 }
@@ -41,7 +46,10 @@ Future<bool?> showTaskCreateSheet(
 /// honest (never a fabricated matter). Submit is disabled while loading or
 /// in flight, and a failure renders localized inline copy.
 class TaskCreateSheet extends StatefulWidget {
-  const TaskCreateSheet({super.key});
+  const TaskCreateSheet({super.key, this.initialMatterId, this.initialTitle});
+
+  final String? initialMatterId;
+  final String? initialTitle;
 
   @override
   State<TaskCreateSheet> createState() => _TaskCreateSheetState();
@@ -60,6 +68,10 @@ class _TaskCreateSheetState extends State<TaskCreateSheet> {
   @override
   void initState() {
     super.initState();
+    _selectedMatterId = widget.initialMatterId;
+    if (widget.initialTitle != null) {
+      _title.text = widget.initialTitle!;
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadMatters());
   }
 
@@ -101,7 +113,7 @@ class _TaskCreateSheetState extends State<TaskCreateSheet> {
       if (result case Success<List<Matter>>(
         value: final List<Matter> matters,
       ) when matters.isNotEmpty) {
-        _selectedMatterId = matters.first.id;
+        _selectedMatterId = widget.initialMatterId ?? matters.first.id;
       }
     });
   }

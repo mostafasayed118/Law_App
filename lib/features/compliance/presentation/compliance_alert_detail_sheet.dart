@@ -5,6 +5,7 @@ import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/contracts/server_limits.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/features/compliance/domain/compliance_alert.dart';
+import 'package:legalhub/features/conflicts/presentation/conflict_take_action_sheet.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
@@ -200,6 +201,15 @@ class _ComplianceAlertDetailSheetState
                     labelText: l10n.alertResolveNoteLabel,
                     border: const OutlineInputBorder(),
                   ),
+                ),
+              ],
+              if (!_submitting) ...<Widget>[
+                const SizedBox(height: LegalHubTheme.spaceLg),
+                OutlinedButton.icon(
+                  onPressed: () =>
+                      showComplianceTakeActionSheet(context, alert: alert),
+                  icon: const Icon(Icons.gavel_outlined),
+                  label: Text(l10n.alertTakeAction),
                 ),
               ],
               if (_canAcknowledge) ...<Widget>[
