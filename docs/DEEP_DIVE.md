@@ -121,7 +121,7 @@ recorded prerequisites are approved — see
   Wired into presentation via `SignUpCubit`/`SignUpGateway`; the redaction
   invariant is pinned by a failure-path `blocTest` in
   `test/features/auth/sign_up_cubit_test.dart`.
-- Tests (2415 total) — full suite green 2026-11-18 (2442 at runtime; 13 capture/golden-only tests skipped by default): Result, AppError, UseCase, ViewState, AuthCubit (demo
+- Tests (2419 total) — full suite green 2026-11-18 (2446 at runtime; 13 capture/golden-only tests skipped by default): Result, AppError, UseCase, ViewState, AuthCubit (demo
   session + gateway-failure error path), LocaleCubit (locale persistence +
   unsupported-code rejection), ThemeCubit (mode persistence + restart
   restore), Redactor (password/OTP/email/Bearer redaction with leak guards),
@@ -474,8 +474,8 @@ HTTP layer and lock the exact postgrest await shape the app depends on —
 (2: `from().select()` plain + chained `.eq()` → raw row list). A future
 postgrest upgrade that changes the await contract fails loudly in CI, not on
 a device (the on-device create-org crash this class caused is recorded in
-`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **2415 tests**
-(2415 tracked declarations, 2442 at runtime; 13 capture/golden-only tests
+`docs/current_applied_surface_2026-08-08.md` §1d). Current suite: **2419 tests**
+(2419 tracked declarations, 2446 at runtime; 13 capture/golden-only tests
 skipped by default; ledger `verify_ledger.sh` PASS).
 
 ## Fonts and licenses
