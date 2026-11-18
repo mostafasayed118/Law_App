@@ -34,7 +34,7 @@ dependencies:
   livekit_client: ^2.13.1
   material_ui: ^1.10.0
   shared_preferences: ^2.5.5
-  supabase_flutter: ^2.16.0
+  supabase_flutter: ^2.18.3
   url_launcher: ^6.3.2
 
 dev_dependencies:
