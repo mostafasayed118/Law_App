@@ -30,10 +30,10 @@ All 15 images are generated from the demo build by `CAPTURE_SCREENSHOTS=1 flutte
 - **Server-side authorization.** 31 tables, 32 policy files (43 RLS policies), 86 unique public RPC functions, 30 pgTAP batteries. App/user-data writes are RPC-only; Legal Library corpus writes are restricted by RLS to the platform owner (the owner-run importer uses direct SQL); a service-role key is rejected at startup.
 - **Arabic-aware search.** Unicode normalization and Arabic letter-form folding, so `أ`/`إ`/`آ`/`ا` match; snippets come from matched text, never invented.
 - **Anchored highlights.** Offset + quote + body hash with stale detection when source text changes.
-- **Three languages, RTL throughout.** English, Arabic and Turkish; 986 l10n keys per locale with an enforced parity gate.
+- **Three languages, RTL throughout.** English, Arabic and Turkish; 1,074 l10n keys per locale with an enforced parity gate.
 - **Phone to tablet.** One breakpoint contract for the navigation rail, two-pane master/detail and RTL-aware spacing.
 - **Accessibility gates.** Tap-target/label guidelines on 12 surfaces; 14 theme token pairs pinned at 4.5:1. See [`docs/accessibility_statement.md`](docs/accessibility_statement.md).
-- **Measured verification.** 2,398 tracked test declarations (2,425 run, 13 skipped), 83.75% line coverage (lcov aggregate LH=17,254 / LF=20,603), 45 screens, 33 migration files, 11 ADRs — all gates run in CI.
+- **Measured verification.** 2,415 tracked test declarations (2,442 run, 13 skipped), 83.75% line coverage (lcov aggregate LH=18,275 / LF=21,820), 45 screens, 33 migration files, 11 ADRs — all gates run in CI.
 
 ## Architecture
 
