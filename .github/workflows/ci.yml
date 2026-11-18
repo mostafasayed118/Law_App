@@ -112,6 +112,13 @@ jobs:
       - name: Download dependencies
         run: flutter pub get
 
+      # Flutter 3.50's gen-l10n template still imports the deprecated in-SDK
+      # global delegates; pub get regenerates this file on every CI checkout.
+      # The checked-in script re-applies the material_ui/cupertino_ui imports
+      # and fails loudly if the generated shape ever changes.
+      - name: Fix generated l10n delegate imports
+        run: dart run tool/fix_l10n_delegate_imports.dart
+
       - name: Audit dependencies (R11)
         # Surfaces resolvable-upgrade drift in the log (informational — the
         # gate itself never fails on staleness; Dependabot, via
