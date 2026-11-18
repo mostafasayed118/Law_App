@@ -22,6 +22,8 @@ import 'package:legalhub/features/billing/presentation/billing_invoices_screen.d
 import 'package:legalhub/features/billing/presentation/invoice_details_screen.dart';
 import 'package:legalhub/features/booking/presentation/booking_screen.dart';
 import 'package:legalhub/features/compliance/presentation/compliance_alerts_screen.dart';
+import 'package:legalhub/features/conflicts/presentation/conflict_check_screen.dart';
+import 'package:legalhub/features/conflicts/presentation/disclosure_wizard_screen.dart';
 import 'package:legalhub/features/discovery/presentation/attorney_profile_screen.dart';
 import 'package:legalhub/features/discovery/presentation/attorney_search_screen.dart';
 import 'package:legalhub/features/documents/presentation/document_details_screen.dart';
@@ -98,6 +100,8 @@ class AppRoutes {
   static String invoiceDetail(String invoiceId) => '/invoices/$invoiceId';
   static const String invoiceDetails = '/invoices/:invoiceId';
   static const String alerts = '/alerts';
+  static const String conflictsDisclose = '/conflicts/disclose';
+  static const String conflictsCheck = '/conflicts/check';
   static const String tasks = '/tasks';
   static const String approvals = '/approvals';
   static const String research = '/research';
@@ -221,6 +225,18 @@ GoRouter createAppRouter(
       path: AppRoutes.onboardingSuccess,
       builder: (BuildContext context, GoRouterState state) =>
           const OnboardingSuccessScreen(),
+    ),
+    // Conflict flows are standalone full-screen routes, not shell destinations
+    // (the shell still has only Home and Settings), mirroring /book and /search.
+    GoRoute(
+      path: AppRoutes.conflictsDisclose,
+      builder: (BuildContext context, GoRouterState state) =>
+          const DisclosureWizardScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.conflictsCheck,
+      builder: (BuildContext context, GoRouterState state) =>
+          const ConflictCheckScreen(),
     ),
     ShellRoute(
       builder: (BuildContext context, GoRouterState state, Widget child) =>

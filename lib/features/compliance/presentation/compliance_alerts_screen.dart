@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:legalhub/app/router.dart';
 import 'package:legalhub/app/service_locator.dart';
+import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/features/compliance/domain/compliance_alert.dart';
 import 'package:legalhub/features/compliance/domain/compliance_gateway.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
@@ -14,6 +17,7 @@ import 'compliance_alert_labels.dart';
 import 'compliance_alerts_cubit.dart';
 import 'compliance_alerts_state.dart';
 
+part 'compliance_alert_summary.dart';
 part 'compliance_alert_tile.dart';
 
 /// Org-scoped compliance-alerts list (design §4).
@@ -44,7 +48,21 @@ class _ComplianceAlertsScreenState extends State<ComplianceAlertsScreen> {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final bool localOnly = backendIsLocalOnly;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.alertsTitle)),
+      appBar: AppBar(
+        title: Text(l10n.alertsTitle),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.search),
+            tooltip: l10n.conflictsCheckEntry,
+            onPressed: () => context.go(AppRoutes.conflictsCheck),
+          ),
+          IconButton(
+            icon: const Icon(Icons.gavel_outlined),
+            tooltip: l10n.conflictsNewDisclosure,
+            onPressed: () => context.go(AppRoutes.conflictsDisclose),
+          ),
+        ],
+      ),
       floatingActionButton: widget.canManage
           ? FloatingActionButton.extended(
               onPressed: _openCreate,
@@ -68,6 +86,23 @@ class _ComplianceAlertsScreenState extends State<ComplianceAlertsScreen> {
                   onTap: () => _openDetail(alert),
                 ),
             header: <Widget>[
+              BlocBuilder<ComplianceAlertsCubit, ComplianceAlertsState>(
+                buildWhen:
+                    (
+                      ComplianceAlertsState previous,
+                      ComplianceAlertsState next,
+                    ) => previous.alerts != next.alerts,
+                builder: (BuildContext context, ComplianceAlertsState state) {
+                  final List<ComplianceAlert> loaded = switch (state.alerts) {
+                    ViewSuccess<List<ComplianceAlert>>(
+                      data: final List<ComplianceAlert> alerts,
+                    ) =>
+                      alerts,
+                    _ => const <ComplianceAlert>[],
+                  };
+                  return _AlertsSummary(alerts: loaded);
+                },
+              ),
               BlocBuilder<ComplianceAlertsCubit, ComplianceAlertsState>(
                 buildWhen:
                     (

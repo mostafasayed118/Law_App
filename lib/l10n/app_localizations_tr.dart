@@ -3381,4 +3381,296 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get accountDeleteKeepsStorage =>
       'Barındırılan kurulumlarda depolanan dosya baytları, operatörün depolama temizliği çalışana kadar.';
+
+  @override
+  String get conflictsDiscloseTitle => 'Çıkar Çatışması Beyanı';
+
+  @override
+  String get conflictsStepMatter => 'Dosya';
+
+  @override
+  String get conflictsStepParties => 'Taraflar';
+
+  @override
+  String get conflictsStepAnalysis => 'Analiz';
+
+  @override
+  String get conflictsStepReview => 'İnceleme';
+
+  @override
+  String conflictsStepOf(Object step) {
+    return 'ADIM $step / 4';
+  }
+
+  @override
+  String get conflictsIdentifyMatter => 'Dosyayı Belirle';
+
+  @override
+  String get conflictsIdentifyBody =>
+      'Aktif bir kayda bağlamak için dosya numarası, müvekkil adı veya başsavcı ile arayın.';
+
+  @override
+  String get conflictsSearchMatters => 'Dosyalarda ara...';
+
+  @override
+  String get conflictsRecentMatters => 'SON DOSYALAR';
+
+  @override
+  String conflictsLead(Object attorney) {
+    return 'Sorumlu: $attorney';
+  }
+
+  @override
+  String get conflictsNextStep => 'Sonraki Adım';
+
+  @override
+  String get conflictsBack => 'Geri';
+
+  @override
+  String get conflictsContinueReview => 'İncelemeye Devam Et';
+
+  @override
+  String get conflictsSubmitDisclosure => 'Beyanı Gönder';
+
+  @override
+  String get conflictsPartyIdentification => 'Taraf Tespiti';
+
+  @override
+  String get conflictsPartyBody =>
+      'Kapsamlı çıkar çatışması kontrolü için dosyada yer alan tüm kişi ve kurumları belirtin.';
+
+  @override
+  String get conflictsAddInvolvedParty => 'Taraf Ekle';
+
+  @override
+  String get conflictsPartyName => 'Taraf Adı';
+
+  @override
+  String get conflictsPartyNameHint => 'Bir taraf adı girin';
+
+  @override
+  String get conflictsPartyRole => 'Rol';
+
+  @override
+  String get conflictsRoleAdverse => 'Karşı Taraf';
+
+  @override
+  String get conflictsRoleCoCounsel => 'Ortak Savunucu';
+
+  @override
+  String get conflictsRoleRelated => 'İlgili Kurum';
+
+  @override
+  String get conflictsRoleWitness => 'Ana Tanık';
+
+  @override
+  String get conflictsPartyJurisdiction => 'Yargı Bölgesi';
+
+  @override
+  String get conflictsPartyJurisdictionHint => 'Bir yargı bölgesi girin';
+
+  @override
+  String get conflictsAddParty => 'Taraf Ekle';
+
+  @override
+  String conflictsIdentifiedParties(Object count) {
+    return 'Tespit Edilen Taraflar ($count)';
+  }
+
+  @override
+  String get conflictsRemoveParty => 'Tarafı Kaldır';
+
+  @override
+  String get conflictsAnalysisFindings => 'Analiz Sonuçları';
+
+  @override
+  String get conflictsRiskAssessment => 'RİSK DEĞERLENDİRMESİ';
+
+  @override
+  String get conflictsMatchFound => 'Eşleşme bulundu — inceleme gerekli';
+
+  @override
+  String get conflictsNoMatches => 'Eşleşme bulunamadı';
+
+  @override
+  String get conflictsAnalysisSummary => 'Analiz Özeti';
+
+  @override
+  String conflictsCheckedParties(Object matters, Object parties) {
+    return '$parties taraf, $matters dosyaya karşı kontrol edildi.';
+  }
+
+  @override
+  String get conflictsDirectMatch => 'Doğrudan Eşleşme';
+
+  @override
+  String get conflictsIndirectLink => 'Dolaylı Bağ';
+
+  @override
+  String get conflictsViewDetails => 'Detayları Gör';
+
+  @override
+  String get conflictsNoConflicts =>
+      'Kontrol edilen kayıtlarda olası bir çıkar çatışması bulunamadı.';
+
+  @override
+  String get conflictsRecommendation =>
+      'Görev almadan önce bir muafiyet alın veya etik duvar oluşturun.';
+
+  @override
+  String get conflictsFinalReview => 'Son İnceleme';
+
+  @override
+  String get conflictsReviewBody =>
+      'Beyanı göndermeden önce aşağıdaki bilgileri inceleyin.';
+
+  @override
+  String get conflictsEdit => 'Düzenle';
+
+  @override
+  String get conflictsMatterDetails => 'Dosya Detayları';
+
+  @override
+  String get conflictsMatterType => 'Dosya Türü';
+
+  @override
+  String get conflictsDescription => 'Açıklama';
+
+  @override
+  String get conflictsProposedResolution => 'Önerilen Çözüm';
+
+  @override
+  String get conflictsCertifyLabel => 'Doğruluk Beyanı';
+
+  @override
+  String get conflictsCertification =>
+      'Bu beyanda verilen bilgilerin bilgim dahilinde eksiksiz ve doğru olduğunu, ilgili bilgilerin açıklanmamasının mesleki disiplin cezasına yol açabileceğini onaylıyorum.';
+
+  @override
+  String get conflictsSubmitSuccess => 'Beyan gönderildi.';
+
+  @override
+  String get conflictsCheckTitle => 'Çıkar Çatışması Kontrolü';
+
+  @override
+  String get conflictsCheckHeading => 'Yeni Taraf veya Kurum Kontrolü';
+
+  @override
+  String get conflictsCheckBody =>
+      'Bir taraf veya kurumla ilişki için büronun dosyalarında, belgelerinde, mesajlarında ve avukatlarında arama yapın.';
+
+  @override
+  String get conflictsCheckPlaceholder =>
+      'Kurum adı, dosya numarası veya kişi girin...';
+
+  @override
+  String get conflictsFilterBy => 'FİLTRELE:';
+
+  @override
+  String get conflictsFilterClient => 'Müvekkil';
+
+  @override
+  String get conflictsFilterAdverse => 'Karşı Taraf';
+
+  @override
+  String get conflictsFilterRelated => 'İlgili Kurum';
+
+  @override
+  String get conflictsStartSearch => 'ARAMAYI BAŞLAT';
+
+  @override
+  String get conflictsRecentSearches => 'Son Aramalar';
+
+  @override
+  String get conflictsClearHistory => 'Geçmişi Temizle';
+
+  @override
+  String get conflictsWatchlist => 'İzleme Listesi';
+
+  @override
+  String get conflictsAddWatchlist => 'İzleme listesine ekle';
+
+  @override
+  String conflictsSearchedAgo(Object time) {
+    return '$time önce arandı';
+  }
+
+  @override
+  String get conflictsJustNow => 'şimdi';
+
+  @override
+  String conflictsMinutesAgo(Object count) {
+    return '$count dk';
+  }
+
+  @override
+  String conflictsHoursAgo(Object count) {
+    return '$count sa';
+  }
+
+  @override
+  String get conflictsConflictMarker => 'Çatışma';
+
+  @override
+  String get conflictsNoResults => 'Henüz sonuç yok. Yukarıda bir arama yapın.';
+
+  @override
+  String get conflictsActionRequired => 'İŞLEM GEREKLİ';
+
+  @override
+  String get conflictsResolution => 'Çatışma Çözümü';
+
+  @override
+  String conflictsActionBody(Object id) {
+    return '$id dosyasındaki çıkar çatışması uyarısı için bir prosedür seçin.';
+  }
+
+  @override
+  String conflictsEstTime(Object time) {
+    return 'Tahmini: $time';
+  }
+
+  @override
+  String get conflictsInitiateWall => 'Etik Duvar Başlat';
+
+  @override
+  String get conflictsRequestWaiver => 'Muafiyet Talep Et';
+
+  @override
+  String get conflictsEscalatePartner => 'Ortağa Yönlendir';
+
+  @override
+  String get conflictsFileDisclosure => 'Düzenleyici Beyan Sun';
+
+  @override
+  String get conflictsSelectProcedure => 'PROSEDÜR SEÇ';
+
+  @override
+  String get conflictsWallDisabled =>
+      'Etik duvar özelliğini gerektirir (bu sürümde yok)';
+
+  @override
+  String get conflictsFilingDisabled =>
+      'Dosyalama özelliğini gerektirir (bu sürümde yok)';
+
+  @override
+  String get conflictsCancel => 'İPTAL';
+
+  @override
+  String get conflictsSummaryHighOpen => 'Yüksek önem açık';
+
+  @override
+  String get conflictsSummaryInvestigations => 'Açık soruşturmalar';
+
+  @override
+  String get conflictsSummaryCleared => 'Kapatıldı';
+
+  @override
+  String get conflictsCheckEntry => 'Çıkar çatışması kontrolü';
+
+  @override
+  String get conflictsNewDisclosure => 'Yeni beyan';
+
+  @override
+  String get alertTakeAction => 'İşlem yap';
 }

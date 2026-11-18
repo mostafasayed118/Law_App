@@ -3379,4 +3379,296 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get accountDeleteKeepsStorage =>
       'Stored file bytes on hosted deployments, until the operator\'s storage cleanup runs.';
+
+  @override
+  String get conflictsDiscloseTitle => 'Conflict Disclosure';
+
+  @override
+  String get conflictsStepMatter => 'Matter';
+
+  @override
+  String get conflictsStepParties => 'Parties';
+
+  @override
+  String get conflictsStepAnalysis => 'Analysis';
+
+  @override
+  String get conflictsStepReview => 'Review';
+
+  @override
+  String conflictsStepOf(Object step) {
+    return 'STEP $step OF 4';
+  }
+
+  @override
+  String get conflictsIdentifyMatter => 'Identify Matter';
+
+  @override
+  String get conflictsIdentifyBody =>
+      'Search by case ID, client name, or primary attorney to link this disclosure to an active record.';
+
+  @override
+  String get conflictsSearchMatters => 'Search matters...';
+
+  @override
+  String get conflictsRecentMatters => 'RECENT MATTERS';
+
+  @override
+  String conflictsLead(Object attorney) {
+    return 'Lead: $attorney';
+  }
+
+  @override
+  String get conflictsNextStep => 'Next Step';
+
+  @override
+  String get conflictsBack => 'Back';
+
+  @override
+  String get conflictsContinueReview => 'Continue to Review';
+
+  @override
+  String get conflictsSubmitDisclosure => 'Submit Disclosure';
+
+  @override
+  String get conflictsPartyIdentification => 'Party Identification';
+
+  @override
+  String get conflictsPartyBody =>
+      'Identify all entities and individuals involved in the matter to ensure comprehensive conflict checking.';
+
+  @override
+  String get conflictsAddInvolvedParty => 'Add Involved Party';
+
+  @override
+  String get conflictsPartyName => 'Party Name';
+
+  @override
+  String get conflictsPartyNameHint => 'Enter a party name';
+
+  @override
+  String get conflictsPartyRole => 'Role';
+
+  @override
+  String get conflictsRoleAdverse => 'Adverse Party';
+
+  @override
+  String get conflictsRoleCoCounsel => 'Co-Counsel';
+
+  @override
+  String get conflictsRoleRelated => 'Related Entity';
+
+  @override
+  String get conflictsRoleWitness => 'Key Witness';
+
+  @override
+  String get conflictsPartyJurisdiction => 'Jurisdiction';
+
+  @override
+  String get conflictsPartyJurisdictionHint => 'Enter a jurisdiction';
+
+  @override
+  String get conflictsAddParty => 'Add Party';
+
+  @override
+  String conflictsIdentifiedParties(Object count) {
+    return 'Identified Parties ($count)';
+  }
+
+  @override
+  String get conflictsRemoveParty => 'Remove Party';
+
+  @override
+  String get conflictsAnalysisFindings => 'Analysis Findings';
+
+  @override
+  String get conflictsRiskAssessment => 'RISK ASSESSMENT';
+
+  @override
+  String get conflictsMatchFound => 'Match found — review required';
+
+  @override
+  String get conflictsNoMatches => 'No matches found';
+
+  @override
+  String get conflictsAnalysisSummary => 'Analysis Summary';
+
+  @override
+  String conflictsCheckedParties(Object matters, Object parties) {
+    return 'Checked $parties parties against $matters matters.';
+  }
+
+  @override
+  String get conflictsDirectMatch => 'Direct Match';
+
+  @override
+  String get conflictsIndirectLink => 'Indirect Link';
+
+  @override
+  String get conflictsViewDetails => 'View Details';
+
+  @override
+  String get conflictsNoConflicts =>
+      'No potential conflicts found in the checked records.';
+
+  @override
+  String get conflictsRecommendation =>
+      'Obtain a waiver or establish an ethical wall prior to onboarding.';
+
+  @override
+  String get conflictsFinalReview => 'Final Review';
+
+  @override
+  String get conflictsReviewBody =>
+      'Please review the details below before submitting your disclosure.';
+
+  @override
+  String get conflictsEdit => 'Edit';
+
+  @override
+  String get conflictsMatterDetails => 'Matter Details';
+
+  @override
+  String get conflictsMatterType => 'Matter Type';
+
+  @override
+  String get conflictsDescription => 'Description';
+
+  @override
+  String get conflictsProposedResolution => 'Proposed Resolution';
+
+  @override
+  String get conflictsCertifyLabel => 'Certification of Accuracy';
+
+  @override
+  String get conflictsCertification =>
+      'I certify that, to the best of my knowledge, the information provided in this disclosure is complete and accurate. I understand that failure to disclose relevant information may result in professional disciplinary action.';
+
+  @override
+  String get conflictsSubmitSuccess => 'Disclosure submitted.';
+
+  @override
+  String get conflictsCheckTitle => 'Conflict Check';
+
+  @override
+  String get conflictsCheckHeading => 'Check New Party or Entity';
+
+  @override
+  String get conflictsCheckBody =>
+      'Search the firm\'s matters, documents, messages, and attorneys for associations with a party or entity.';
+
+  @override
+  String get conflictsCheckPlaceholder =>
+      'Enter Entity Name, Case ID, or Individual...';
+
+  @override
+  String get conflictsFilterBy => 'FILTER BY:';
+
+  @override
+  String get conflictsFilterClient => 'Client';
+
+  @override
+  String get conflictsFilterAdverse => 'Adverse Party';
+
+  @override
+  String get conflictsFilterRelated => 'Related Entity';
+
+  @override
+  String get conflictsStartSearch => 'START SEARCH';
+
+  @override
+  String get conflictsRecentSearches => 'Recent Searches';
+
+  @override
+  String get conflictsClearHistory => 'Clear History';
+
+  @override
+  String get conflictsWatchlist => 'Watchlist';
+
+  @override
+  String get conflictsAddWatchlist => 'Add to watchlist';
+
+  @override
+  String conflictsSearchedAgo(Object time) {
+    return 'Searched $time ago';
+  }
+
+  @override
+  String get conflictsJustNow => 'just now';
+
+  @override
+  String conflictsMinutesAgo(Object count) {
+    return '$count min';
+  }
+
+  @override
+  String conflictsHoursAgo(Object count) {
+    return '$count h';
+  }
+
+  @override
+  String get conflictsConflictMarker => 'Conflict';
+
+  @override
+  String get conflictsNoResults => 'No results yet. Start a search above.';
+
+  @override
+  String get conflictsActionRequired => 'ACTION REQUIRED';
+
+  @override
+  String get conflictsResolution => 'Conflict Resolution';
+
+  @override
+  String conflictsActionBody(Object id) {
+    return 'Choose a procedure for the conflict alert on matter $id.';
+  }
+
+  @override
+  String conflictsEstTime(Object time) {
+    return 'Est. $time';
+  }
+
+  @override
+  String get conflictsInitiateWall => 'Initiate Ethical Wall';
+
+  @override
+  String get conflictsRequestWaiver => 'Request Waiver';
+
+  @override
+  String get conflictsEscalatePartner => 'Escalate to Partner';
+
+  @override
+  String get conflictsFileDisclosure => 'File Regulatory Disclosure';
+
+  @override
+  String get conflictsSelectProcedure => 'SELECT PROCEDURE';
+
+  @override
+  String get conflictsWallDisabled =>
+      'Requires the ethical-wall feature (not in this build)';
+
+  @override
+  String get conflictsFilingDisabled =>
+      'Requires the filings feature (not in this build)';
+
+  @override
+  String get conflictsCancel => 'CANCEL';
+
+  @override
+  String get conflictsSummaryHighOpen => 'High-severity open';
+
+  @override
+  String get conflictsSummaryInvestigations => 'Open investigations';
+
+  @override
+  String get conflictsSummaryCleared => 'Cleared';
+
+  @override
+  String get conflictsCheckEntry => 'Conflict check';
+
+  @override
+  String get conflictsNewDisclosure => 'New disclosure';
+
+  @override
+  String get alertTakeAction => 'Take action';
 }

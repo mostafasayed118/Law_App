@@ -3349,4 +3349,296 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get accountDeleteKeepsStorage =>
       'بايتات الملفات المخزّنة على النشر المستضاف، حتى ينفّذ المشغّل تنظيف التخزين.';
+
+  @override
+  String get conflictsDiscloseTitle => 'إفصاح عن تضارب المصالح';
+
+  @override
+  String get conflictsStepMatter => 'المسألة';
+
+  @override
+  String get conflictsStepParties => 'الأطراف';
+
+  @override
+  String get conflictsStepAnalysis => 'التحليل';
+
+  @override
+  String get conflictsStepReview => 'المراجعة';
+
+  @override
+  String conflictsStepOf(Object step) {
+    return 'الخطوة $step من 4';
+  }
+
+  @override
+  String get conflictsIdentifyMatter => 'تحديد المسألة';
+
+  @override
+  String get conflictsIdentifyBody =>
+      'ابحث برقم القضية أو اسم العميل أو المحامي الرئيسي لربط هذا الإفصاح بسجل نشط.';
+
+  @override
+  String get conflictsSearchMatters => 'ابحث في المسائل...';
+
+  @override
+  String get conflictsRecentMatters => 'المسائل الأخيرة';
+
+  @override
+  String conflictsLead(Object attorney) {
+    return 'المسؤول: $attorney';
+  }
+
+  @override
+  String get conflictsNextStep => 'الخطوة التالية';
+
+  @override
+  String get conflictsBack => 'رجوع';
+
+  @override
+  String get conflictsContinueReview => 'المتابعة إلى المراجعة';
+
+  @override
+  String get conflictsSubmitDisclosure => 'إرسال الإفصاح';
+
+  @override
+  String get conflictsPartyIdentification => 'تحديد الأطراف';
+
+  @override
+  String get conflictsPartyBody =>
+      'حدد كل الكيانات والأفراد المشاركين في المسألة لضمان فحص شامل لتضارب المصالح.';
+
+  @override
+  String get conflictsAddInvolvedParty => 'إضافة طرف مشارك';
+
+  @override
+  String get conflictsPartyName => 'اسم الطرف';
+
+  @override
+  String get conflictsPartyNameHint => 'أدخل اسم الطرف';
+
+  @override
+  String get conflictsPartyRole => 'الدور';
+
+  @override
+  String get conflictsRoleAdverse => 'الطرف الخصم';
+
+  @override
+  String get conflictsRoleCoCounsel => 'المحامي المشارك';
+
+  @override
+  String get conflictsRoleRelated => 'الكيان ذو الصلة';
+
+  @override
+  String get conflictsRoleWitness => 'شاهد رئيسي';
+
+  @override
+  String get conflictsPartyJurisdiction => 'الاختصاص القضائي';
+
+  @override
+  String get conflictsPartyJurisdictionHint => 'أدخل الاختصاص القضائي';
+
+  @override
+  String get conflictsAddParty => 'إضافة طرف';
+
+  @override
+  String conflictsIdentifiedParties(Object count) {
+    return 'الأطراف المحددة ($count)';
+  }
+
+  @override
+  String get conflictsRemoveParty => 'إزالة الطرف';
+
+  @override
+  String get conflictsAnalysisFindings => 'نتائج التحليل';
+
+  @override
+  String get conflictsRiskAssessment => 'تقييم المخاطر';
+
+  @override
+  String get conflictsMatchFound => 'تم العثور على تطابق — يلزم المراجعة';
+
+  @override
+  String get conflictsNoMatches => 'لم يتم العثور على تطابقات';
+
+  @override
+  String get conflictsAnalysisSummary => 'ملخص التحليل';
+
+  @override
+  String conflictsCheckedParties(Object matters, Object parties) {
+    return 'تم فحص $parties طرفًا مقابل $matters مسألة.';
+  }
+
+  @override
+  String get conflictsDirectMatch => 'تطابق مباشر';
+
+  @override
+  String get conflictsIndirectLink => 'صلة غير مباشرة';
+
+  @override
+  String get conflictsViewDetails => 'عرض التفاصيل';
+
+  @override
+  String get conflictsNoConflicts =>
+      'لم يتم العثور على تضاربات محتملة في السجلات التي تم فحصها.';
+
+  @override
+  String get conflictsRecommendation =>
+      'احصل على إبراء ذمة أو أنشئ حاجزًا أخلاقيًا قبل قبول العميل.';
+
+  @override
+  String get conflictsFinalReview => 'المراجعة النهائية';
+
+  @override
+  String get conflictsReviewBody =>
+      'يرجى مراجعة التفاصيل أدناه قبل إرسال الإفصاح.';
+
+  @override
+  String get conflictsEdit => 'تعديل';
+
+  @override
+  String get conflictsMatterDetails => 'تفاصيل المسألة';
+
+  @override
+  String get conflictsMatterType => 'نوع المسألة';
+
+  @override
+  String get conflictsDescription => 'الوصف';
+
+  @override
+  String get conflictsProposedResolution => 'الحل المقترح';
+
+  @override
+  String get conflictsCertifyLabel => 'إقرار الدقة';
+
+  @override
+  String get conflictsCertification =>
+      'أقر بأن المعلومات الواردة في هذا الإفصاح كاملة ودقيقة حسب علمي، وأتفهم أن الإخفاء قد يؤدي إلى إجراءات تأديبية مهنية.';
+
+  @override
+  String get conflictsSubmitSuccess => 'تم إرسال الإفصاح.';
+
+  @override
+  String get conflictsCheckTitle => 'فحص تضارب المصالح';
+
+  @override
+  String get conflictsCheckHeading => 'فحص طرف أو كيان جديد';
+
+  @override
+  String get conflictsCheckBody =>
+      'ابحث في مسائل المكتب ووثائقه ورسائله ومحاميه عن صلات بطرف أو كيان.';
+
+  @override
+  String get conflictsCheckPlaceholder =>
+      'أدخل اسم الكيان أو رقم القضية أو الفرد...';
+
+  @override
+  String get conflictsFilterBy => 'تصفية حسب:';
+
+  @override
+  String get conflictsFilterClient => 'العميل';
+
+  @override
+  String get conflictsFilterAdverse => 'الطرف الخصم';
+
+  @override
+  String get conflictsFilterRelated => 'الكيان ذو الصلة';
+
+  @override
+  String get conflictsStartSearch => 'بدء البحث';
+
+  @override
+  String get conflictsRecentSearches => 'عمليات البحث الأخيرة';
+
+  @override
+  String get conflictsClearHistory => 'مسح السجل';
+
+  @override
+  String get conflictsWatchlist => 'قائمة المتابعة';
+
+  @override
+  String get conflictsAddWatchlist => 'إضافة إلى المتابعة';
+
+  @override
+  String conflictsSearchedAgo(Object time) {
+    return 'تم البحث قبل $time';
+  }
+
+  @override
+  String get conflictsJustNow => 'الآن';
+
+  @override
+  String conflictsMinutesAgo(Object count) {
+    return '$count دقيقة';
+  }
+
+  @override
+  String conflictsHoursAgo(Object count) {
+    return '$count ساعة';
+  }
+
+  @override
+  String get conflictsConflictMarker => 'تضارب';
+
+  @override
+  String get conflictsNoResults => 'لا توجد نتائج بعد. ابدأ البحث أعلاه.';
+
+  @override
+  String get conflictsActionRequired => 'إجراء مطلوب';
+
+  @override
+  String get conflictsResolution => 'تسوية تضارب المصالح';
+
+  @override
+  String conflictsActionBody(Object id) {
+    return 'اختر إجراءً لتنبيه تضارب المصالح المرتبط بالمسألة $id.';
+  }
+
+  @override
+  String conflictsEstTime(Object time) {
+    return 'المدة المتوقعة: $time';
+  }
+
+  @override
+  String get conflictsInitiateWall => 'إنشاء حاجز أخلاقي';
+
+  @override
+  String get conflictsRequestWaiver => 'طلب إبراء ذمة';
+
+  @override
+  String get conflictsEscalatePartner => 'إحالة إلى الشريك';
+
+  @override
+  String get conflictsFileDisclosure => 'تقديم إفصاح تنظيمي';
+
+  @override
+  String get conflictsSelectProcedure => 'اختيار الإجراء';
+
+  @override
+  String get conflictsWallDisabled =>
+      'يتطلب ميزة الحاجز الأخلاقي (غير متوفرة في هذا الإصدار)';
+
+  @override
+  String get conflictsFilingDisabled =>
+      'يتطلب ميزة التقديمات التنظيمية (غير متوفرة في هذا الإصدار)';
+
+  @override
+  String get conflictsCancel => 'إلغاء';
+
+  @override
+  String get conflictsSummaryHighOpen => 'مفتوحة عالية الخطورة';
+
+  @override
+  String get conflictsSummaryInvestigations => 'تحقيقات مفتوحة';
+
+  @override
+  String get conflictsSummaryCleared => 'تمت التسوية';
+
+  @override
+  String get conflictsCheckEntry => 'فحص تضارب المصالح';
+
+  @override
+  String get conflictsNewDisclosure => 'إفصاح جديد';
+
+  @override
+  String get alertTakeAction => 'اتخاذ إجراء';
 }

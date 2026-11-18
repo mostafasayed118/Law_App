@@ -6019,6 +6019,534 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stored file bytes on hosted deployments, until the operator\'s storage cleanup runs.'**
   String get accountDeleteKeepsStorage;
+
+  /// No description provided for @conflictsDiscloseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Conflict Disclosure'**
+  String get conflictsDiscloseTitle;
+
+  /// No description provided for @conflictsStepMatter.
+  ///
+  /// In en, this message translates to:
+  /// **'Matter'**
+  String get conflictsStepMatter;
+
+  /// No description provided for @conflictsStepParties.
+  ///
+  /// In en, this message translates to:
+  /// **'Parties'**
+  String get conflictsStepParties;
+
+  /// No description provided for @conflictsStepAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis'**
+  String get conflictsStepAnalysis;
+
+  /// No description provided for @conflictsStepReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get conflictsStepReview;
+
+  /// No description provided for @conflictsStepOf.
+  ///
+  /// In en, this message translates to:
+  /// **'STEP {step} OF 4'**
+  String conflictsStepOf(Object step);
+
+  /// No description provided for @conflictsIdentifyMatter.
+  ///
+  /// In en, this message translates to:
+  /// **'Identify Matter'**
+  String get conflictsIdentifyMatter;
+
+  /// No description provided for @conflictsIdentifyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by case ID, client name, or primary attorney to link this disclosure to an active record.'**
+  String get conflictsIdentifyBody;
+
+  /// No description provided for @conflictsSearchMatters.
+  ///
+  /// In en, this message translates to:
+  /// **'Search matters...'**
+  String get conflictsSearchMatters;
+
+  /// No description provided for @conflictsRecentMatters.
+  ///
+  /// In en, this message translates to:
+  /// **'RECENT MATTERS'**
+  String get conflictsRecentMatters;
+
+  /// No description provided for @conflictsLead.
+  ///
+  /// In en, this message translates to:
+  /// **'Lead: {attorney}'**
+  String conflictsLead(Object attorney);
+
+  /// No description provided for @conflictsNextStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Next Step'**
+  String get conflictsNextStep;
+
+  /// No description provided for @conflictsBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get conflictsBack;
+
+  /// No description provided for @conflictsContinueReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to Review'**
+  String get conflictsContinueReview;
+
+  /// No description provided for @conflictsSubmitDisclosure.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Disclosure'**
+  String get conflictsSubmitDisclosure;
+
+  /// No description provided for @conflictsPartyIdentification.
+  ///
+  /// In en, this message translates to:
+  /// **'Party Identification'**
+  String get conflictsPartyIdentification;
+
+  /// No description provided for @conflictsPartyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Identify all entities and individuals involved in the matter to ensure comprehensive conflict checking.'**
+  String get conflictsPartyBody;
+
+  /// No description provided for @conflictsAddInvolvedParty.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Involved Party'**
+  String get conflictsAddInvolvedParty;
+
+  /// No description provided for @conflictsPartyName.
+  ///
+  /// In en, this message translates to:
+  /// **'Party Name'**
+  String get conflictsPartyName;
+
+  /// No description provided for @conflictsPartyNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a party name'**
+  String get conflictsPartyNameHint;
+
+  /// No description provided for @conflictsPartyRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get conflictsPartyRole;
+
+  /// No description provided for @conflictsRoleAdverse.
+  ///
+  /// In en, this message translates to:
+  /// **'Adverse Party'**
+  String get conflictsRoleAdverse;
+
+  /// No description provided for @conflictsRoleCoCounsel.
+  ///
+  /// In en, this message translates to:
+  /// **'Co-Counsel'**
+  String get conflictsRoleCoCounsel;
+
+  /// No description provided for @conflictsRoleRelated.
+  ///
+  /// In en, this message translates to:
+  /// **'Related Entity'**
+  String get conflictsRoleRelated;
+
+  /// No description provided for @conflictsRoleWitness.
+  ///
+  /// In en, this message translates to:
+  /// **'Key Witness'**
+  String get conflictsRoleWitness;
+
+  /// No description provided for @conflictsPartyJurisdiction.
+  ///
+  /// In en, this message translates to:
+  /// **'Jurisdiction'**
+  String get conflictsPartyJurisdiction;
+
+  /// No description provided for @conflictsPartyJurisdictionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a jurisdiction'**
+  String get conflictsPartyJurisdictionHint;
+
+  /// No description provided for @conflictsAddParty.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Party'**
+  String get conflictsAddParty;
+
+  /// No description provided for @conflictsIdentifiedParties.
+  ///
+  /// In en, this message translates to:
+  /// **'Identified Parties ({count})'**
+  String conflictsIdentifiedParties(Object count);
+
+  /// No description provided for @conflictsRemoveParty.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Party'**
+  String get conflictsRemoveParty;
+
+  /// No description provided for @conflictsAnalysisFindings.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis Findings'**
+  String get conflictsAnalysisFindings;
+
+  /// No description provided for @conflictsRiskAssessment.
+  ///
+  /// In en, this message translates to:
+  /// **'RISK ASSESSMENT'**
+  String get conflictsRiskAssessment;
+
+  /// No description provided for @conflictsMatchFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Match found — review required'**
+  String get conflictsMatchFound;
+
+  /// No description provided for @conflictsNoMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'No matches found'**
+  String get conflictsNoMatches;
+
+  /// No description provided for @conflictsAnalysisSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis Summary'**
+  String get conflictsAnalysisSummary;
+
+  /// No description provided for @conflictsCheckedParties.
+  ///
+  /// In en, this message translates to:
+  /// **'Checked {parties} parties against {matters} matters.'**
+  String conflictsCheckedParties(Object matters, Object parties);
+
+  /// No description provided for @conflictsDirectMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Direct Match'**
+  String get conflictsDirectMatch;
+
+  /// No description provided for @conflictsIndirectLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Indirect Link'**
+  String get conflictsIndirectLink;
+
+  /// No description provided for @conflictsViewDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'View Details'**
+  String get conflictsViewDetails;
+
+  /// No description provided for @conflictsNoConflicts.
+  ///
+  /// In en, this message translates to:
+  /// **'No potential conflicts found in the checked records.'**
+  String get conflictsNoConflicts;
+
+  /// No description provided for @conflictsRecommendation.
+  ///
+  /// In en, this message translates to:
+  /// **'Obtain a waiver or establish an ethical wall prior to onboarding.'**
+  String get conflictsRecommendation;
+
+  /// No description provided for @conflictsFinalReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Final Review'**
+  String get conflictsFinalReview;
+
+  /// No description provided for @conflictsReviewBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Please review the details below before submitting your disclosure.'**
+  String get conflictsReviewBody;
+
+  /// No description provided for @conflictsEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get conflictsEdit;
+
+  /// No description provided for @conflictsMatterDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Matter Details'**
+  String get conflictsMatterDetails;
+
+  /// No description provided for @conflictsMatterType.
+  ///
+  /// In en, this message translates to:
+  /// **'Matter Type'**
+  String get conflictsMatterType;
+
+  /// No description provided for @conflictsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get conflictsDescription;
+
+  /// No description provided for @conflictsProposedResolution.
+  ///
+  /// In en, this message translates to:
+  /// **'Proposed Resolution'**
+  String get conflictsProposedResolution;
+
+  /// No description provided for @conflictsCertifyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Certification of Accuracy'**
+  String get conflictsCertifyLabel;
+
+  /// No description provided for @conflictsCertification.
+  ///
+  /// In en, this message translates to:
+  /// **'I certify that, to the best of my knowledge, the information provided in this disclosure is complete and accurate. I understand that failure to disclose relevant information may result in professional disciplinary action.'**
+  String get conflictsCertification;
+
+  /// No description provided for @conflictsSubmitSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Disclosure submitted.'**
+  String get conflictsSubmitSuccess;
+
+  /// No description provided for @conflictsCheckTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Conflict Check'**
+  String get conflictsCheckTitle;
+
+  /// No description provided for @conflictsCheckHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Check New Party or Entity'**
+  String get conflictsCheckHeading;
+
+  /// No description provided for @conflictsCheckBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Search the firm\'s matters, documents, messages, and attorneys for associations with a party or entity.'**
+  String get conflictsCheckBody;
+
+  /// No description provided for @conflictsCheckPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Entity Name, Case ID, or Individual...'**
+  String get conflictsCheckPlaceholder;
+
+  /// No description provided for @conflictsFilterBy.
+  ///
+  /// In en, this message translates to:
+  /// **'FILTER BY:'**
+  String get conflictsFilterBy;
+
+  /// No description provided for @conflictsFilterClient.
+  ///
+  /// In en, this message translates to:
+  /// **'Client'**
+  String get conflictsFilterClient;
+
+  /// No description provided for @conflictsFilterAdverse.
+  ///
+  /// In en, this message translates to:
+  /// **'Adverse Party'**
+  String get conflictsFilterAdverse;
+
+  /// No description provided for @conflictsFilterRelated.
+  ///
+  /// In en, this message translates to:
+  /// **'Related Entity'**
+  String get conflictsFilterRelated;
+
+  /// No description provided for @conflictsStartSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'START SEARCH'**
+  String get conflictsStartSearch;
+
+  /// No description provided for @conflictsRecentSearches.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Searches'**
+  String get conflictsRecentSearches;
+
+  /// No description provided for @conflictsClearHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear History'**
+  String get conflictsClearHistory;
+
+  /// No description provided for @conflictsWatchlist.
+  ///
+  /// In en, this message translates to:
+  /// **'Watchlist'**
+  String get conflictsWatchlist;
+
+  /// No description provided for @conflictsAddWatchlist.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to watchlist'**
+  String get conflictsAddWatchlist;
+
+  /// No description provided for @conflictsSearchedAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'Searched {time} ago'**
+  String conflictsSearchedAgo(Object time);
+
+  /// No description provided for @conflictsJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'just now'**
+  String get conflictsJustNow;
+
+  /// No description provided for @conflictsMinutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} min'**
+  String conflictsMinutesAgo(Object count);
+
+  /// No description provided for @conflictsHoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} h'**
+  String conflictsHoursAgo(Object count);
+
+  /// No description provided for @conflictsConflictMarker.
+  ///
+  /// In en, this message translates to:
+  /// **'Conflict'**
+  String get conflictsConflictMarker;
+
+  /// No description provided for @conflictsNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No results yet. Start a search above.'**
+  String get conflictsNoResults;
+
+  /// No description provided for @conflictsActionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'ACTION REQUIRED'**
+  String get conflictsActionRequired;
+
+  /// No description provided for @conflictsResolution.
+  ///
+  /// In en, this message translates to:
+  /// **'Conflict Resolution'**
+  String get conflictsResolution;
+
+  /// No description provided for @conflictsActionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a procedure for the conflict alert on matter {id}.'**
+  String conflictsActionBody(Object id);
+
+  /// No description provided for @conflictsEstTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Est. {time}'**
+  String conflictsEstTime(Object time);
+
+  /// No description provided for @conflictsInitiateWall.
+  ///
+  /// In en, this message translates to:
+  /// **'Initiate Ethical Wall'**
+  String get conflictsInitiateWall;
+
+  /// No description provided for @conflictsRequestWaiver.
+  ///
+  /// In en, this message translates to:
+  /// **'Request Waiver'**
+  String get conflictsRequestWaiver;
+
+  /// No description provided for @conflictsEscalatePartner.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalate to Partner'**
+  String get conflictsEscalatePartner;
+
+  /// No description provided for @conflictsFileDisclosure.
+  ///
+  /// In en, this message translates to:
+  /// **'File Regulatory Disclosure'**
+  String get conflictsFileDisclosure;
+
+  /// No description provided for @conflictsSelectProcedure.
+  ///
+  /// In en, this message translates to:
+  /// **'SELECT PROCEDURE'**
+  String get conflictsSelectProcedure;
+
+  /// No description provided for @conflictsWallDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Requires the ethical-wall feature (not in this build)'**
+  String get conflictsWallDisabled;
+
+  /// No description provided for @conflictsFilingDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Requires the filings feature (not in this build)'**
+  String get conflictsFilingDisabled;
+
+  /// No description provided for @conflictsCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'CANCEL'**
+  String get conflictsCancel;
+
+  /// No description provided for @conflictsSummaryHighOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'High-severity open'**
+  String get conflictsSummaryHighOpen;
+
+  /// No description provided for @conflictsSummaryInvestigations.
+  ///
+  /// In en, this message translates to:
+  /// **'Open investigations'**
+  String get conflictsSummaryInvestigations;
+
+  /// No description provided for @conflictsSummaryCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleared'**
+  String get conflictsSummaryCleared;
+
+  /// No description provided for @conflictsCheckEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Conflict check'**
+  String get conflictsCheckEntry;
+
+  /// No description provided for @conflictsNewDisclosure.
+  ///
+  /// In en, this message translates to:
+  /// **'New disclosure'**
+  String get conflictsNewDisclosure;
+
+  /// No description provided for @alertTakeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Take action'**
+  String get alertTakeAction;
 }
 
 class _AppLocalizationsDelegate
