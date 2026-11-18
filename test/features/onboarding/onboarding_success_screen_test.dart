@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/features/onboarding/presentation/onboarding_success_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 // Direct render contract for OnboardingSuccessScreen. The routing contract
 // ("Continue to Sign In" navigating to /sign-in) is pinned in

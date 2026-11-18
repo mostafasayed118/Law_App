@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/shared/widgets/directional_icon.dart';
+import 'package:material_ui/material_ui.dart';
 
 // DirectionalIcon mirrors direction-carrying icons under RTL (INSTRUCTIONS
 // §4.5: verify RTL mirroring intentionally). In LTR it must render exactly

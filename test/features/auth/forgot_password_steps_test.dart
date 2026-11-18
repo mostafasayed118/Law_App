@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -11,6 +10,7 @@ import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/auth/presentation/forgot_password/recovery_routing_context.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 // These tests pin the step-level behavior after the email/OTP threading
 // change (83f5bbf) and the P3.1 wiring. Step 1 threads the entered email to

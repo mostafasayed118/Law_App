@@ -1,11 +1,10 @@
-import 'package:flutter/material.dart';
-
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/features/library/domain/legal_document.dart';
 import 'package:legalhub/features/library/presentation/library_labels.dart';
 import 'package:legalhub/features/library/presentation/sample_badge.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/label_chip.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// One document row in the library index.
 ///

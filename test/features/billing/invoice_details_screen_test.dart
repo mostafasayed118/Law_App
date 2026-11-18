@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/features/billing/domain/payment_mode.dart';
 import 'package:legalhub/features/billing/presentation/invoice_details_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   tearDown(resetServiceLocator);
@@ -19,7 +19,7 @@ void main() {
     await resetServiceLocator();
     configureDependencies();
     if (serviceLocator.isRegistered<PaymentMode>()) {
-      serviceLocator.unregister<PaymentMode>();
+      await serviceLocator.unregister<PaymentMode>();
     }
     serviceLocator.registerSingleton<PaymentMode>(mode);
     tester.view.physicalSize = const Size(800, 1600);

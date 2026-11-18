@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:legalhub/app/localization/locale_cubit.dart';
@@ -13,6 +12,7 @@ import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/main.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Flutter's built-in accessibility guidelines on a representative slice of
 /// the app. The two tap-target guidelines and the label guideline are the

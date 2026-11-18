@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-
 import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// An identity card with a 4px left accent bar (Secondary Gold by default).
 class IdentityCard extends StatelessWidget {

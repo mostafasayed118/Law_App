@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -14,6 +13,7 @@ import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/orgs/presentation/member_roster_screen.dart';
 import 'package:legalhub/features/orgs/presentation/org_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A gateway emitting a fixed [Session] with the demo org membership so the
 /// roster test can pin partner vs non-partner presentation.

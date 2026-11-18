@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -18,6 +17,7 @@ import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A deep link the app does not own: the URI a VIEW intent carried on the
 /// device (F2, `docs/device_e2e_2026-10-21_c835ced.md` §2). The app owns

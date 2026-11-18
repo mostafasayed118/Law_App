@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
+import 'package:material_ui/material_ui.dart';
 
 // E6 extraction pins: the centralized yMMMd helper must produce the same
 // locale-aware output the 12 inlined DateFormat.yMMMd(l10n.localeName) sites

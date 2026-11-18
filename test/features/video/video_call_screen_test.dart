@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/features/video/domain/video_gateway.dart';
@@ -10,6 +9,7 @@ import 'package:legalhub/features/video/domain/video_token.dart';
 import 'package:legalhub/features/video/presentation/video_call_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:livekit_client/livekit_client.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:mocktail/mocktail.dart';
 
 class _StubVideoGateway implements VideoGateway {

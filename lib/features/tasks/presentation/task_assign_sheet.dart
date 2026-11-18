@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/core/errors/app_error.dart';
@@ -6,6 +5,7 @@ import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/features/tasks/domain/task_item.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/app_modal_sheet.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'task_board_cubit.dart';
 import 'task_error_messages.dart';

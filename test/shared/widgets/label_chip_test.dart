@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/shared/widgets/label_chip.dart';
+import 'package:material_ui/material_ui.dart';
 
 // LabelChip is the E5 extraction: the matter status, document type, message
 // count, and roster role/status chips previously duplicated this container

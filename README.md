@@ -3,7 +3,7 @@
 A legal practice-management platform with a Legal Library — Flutter, Supabase, and a credential-free demo mode.
 
 [![CI](https://github.com/mostafasayed118/legalhub/actions/workflows/ci.yml/badge.svg)](https://github.com/mostafasayed118/legalhub/actions/workflows/ci.yml)
-[![Flutter](https://img.shields.io/badge/Flutter-3.47.5-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
+[![Flutter](https://img.shields.io/badge/Flutter-3.50.0-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## What it is

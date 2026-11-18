@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A single-line text field with optional label, prefix icon, hint, suffix,
 /// keyboard type, input formatters, and validator.

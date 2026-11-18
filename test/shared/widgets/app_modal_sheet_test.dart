@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/shared/widgets/app_modal_sheet.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Proves the shared sheet helper keeps the bottom-sheet contract (scroll
 /// controlled, keyboard-aware) while capping the sheet on wide windows.

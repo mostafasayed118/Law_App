@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -14,6 +13,7 @@ import 'package:legalhub/features/auth/domain/sign_up_gateway.dart';
 import 'package:legalhub/features/auth/domain/sign_up_request.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 // SignUpScreen now builds a redaction-safe SignUpRequest on submit and hands
 // it to a SignUpCubit backed by a SignUpGateway seam. On success (Phase 4.2)

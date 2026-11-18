@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/features/documents/presentation/document_details_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   tearDown(resetServiceLocator);

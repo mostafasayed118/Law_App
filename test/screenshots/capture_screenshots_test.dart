@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:legalhub/app/localization/locale_cubit.dart';
@@ -17,6 +16,7 @@ import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/library/domain/highlight_color_slot.dart';
 import 'package:legalhub/features/library/domain/library_user_data_gateway.dart';
 import 'package:legalhub/main.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../support/render_fonts.dart';
 import '../support/screenshot_research_fixture.dart';
@@ -73,6 +73,10 @@ void main() {
     required ThemeMode themeMode,
   }) async {
     await loadRenderFonts();
+    // Flutter 3.50 schedules a frame callback on font change; flush it before
+    // the capture tree is mounted so it cannot outlive the test.
+    await view.pumpWidget(const SizedBox.shrink());
+    await view.pumpAndSettle();
     view.view.physicalSize = const Size(1170, 2532); // 390x844 @3x
     view.view.devicePixelRatio = 3.0;
     view.view.viewInsets = FakeViewPadding.zero;

@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:legalhub/features/approvals/domain/pending_approval.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Localized status label (design §3).
 String approvalStatusLabel(AppLocalizations l10n, ApprovalStatus status) {

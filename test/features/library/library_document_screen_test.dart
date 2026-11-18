@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/errors/app_error.dart';
@@ -8,6 +7,7 @@ import 'package:legalhub/features/library/domain/legal_document_detail.dart';
 import 'package:legalhub/features/library/domain/library_gateway.dart';
 import 'package:legalhub/features/library/presentation/library_document_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../support/library_gateway_stub.dart';
 

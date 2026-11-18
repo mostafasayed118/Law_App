@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/core/state/view_state.dart';
+import 'package:material_ui/material_ui.dart';
+
 import 'view_state_switch.dart';
 
 /// The state-shell of a matter-workspace section: the `ViewStateSwitch` arms

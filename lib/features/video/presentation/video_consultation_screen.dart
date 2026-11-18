@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/errors/app_error.dart';
@@ -12,6 +11,7 @@ import 'package:legalhub/features/video/domain/video_token.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'join_gate.dart';
 import 'video_call_screen.dart';

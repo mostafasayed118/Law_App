@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/app/router.dart';
 import 'package:legalhub/app/service_locator.dart';
@@ -16,6 +14,7 @@ import 'package:legalhub/features/profile/presentation/profile_edit_state.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/forms/validators.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Account settings: display name, password, and the deletion danger zone
 /// (ADR-0011).

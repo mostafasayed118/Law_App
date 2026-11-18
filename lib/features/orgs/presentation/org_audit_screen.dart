@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
@@ -7,11 +6,14 @@ import 'package:legalhub/core/organizations/organization_gateway.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
+import 'package:material_ui/material_ui.dart';
+
 import 'org_audit_cubit.dart';
-part 'org_audit_list.dart';
-part 'org_audit_row.dart';
-part 'org_audit_outcome_chip.dart';
+
 part 'org_audit_centered_state.dart';
+part 'org_audit_list.dart';
+part 'org_audit_outcome_chip.dart';
+part 'org_audit_row.dart';
 
 /// Partner org-audit read surface (partner org-audit slice 2026-08-09,
 /// scope `docs/partner_org_audit_scope_2026-08-09.md`).

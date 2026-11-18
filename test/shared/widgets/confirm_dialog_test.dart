@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/confirm_dialog.dart';
+import 'package:material_ui/material_ui.dart';
 
 // showConfirmDialog is the E4 extraction: the member-removal (roster),
 // delete-account (profile), and demo-account-delete (admin) dialogs

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/errors/app_error.dart';
@@ -7,6 +6,7 @@ import 'package:legalhub/features/auth/domain/password_recovery_gateway.dart';
 import 'package:legalhub/features/auth/domain/password_recovery_request.dart';
 import 'package:legalhub/features/auth/presentation/forgot_password/forgot_password_reset_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   // The reset screen resolves PasswordRecoveryGateway from the service

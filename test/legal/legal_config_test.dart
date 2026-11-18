@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/legal_config.dart';
 import 'package:legalhub/features/legal/presentation/legal_document_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Pins the owner-confirmed LegalConfig values and proves the privacy screen
 /// renders them through the existing localisation path (no new formatting).

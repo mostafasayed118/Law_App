@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/app/service_locator.dart';
@@ -9,6 +8,7 @@ import 'package:legalhub/features/compliance/domain/compliance_gateway.dart';
 import 'package:legalhub/features/compliance/presentation/compliance_alert_create_sheet.dart';
 import 'package:legalhub/features/compliance/presentation/compliance_alerts_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   late _StubComplianceGateway gateway;

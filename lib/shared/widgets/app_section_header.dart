@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-
 import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A section header plus its content — the C2 consolidation: the search
 /// `_GroupSection` (titleMedium w700 primary + children) and the

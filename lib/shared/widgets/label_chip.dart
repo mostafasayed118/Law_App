@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-
 import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A small colored status chip: a `spaceSm`-padded, `radiusSm` rounded
 /// container with a single-line label.

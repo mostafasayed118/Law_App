@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/service_locator.dart';
@@ -12,6 +11,7 @@ import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/home/domain/home_entries.dart';
 import 'package:legalhub/features/home/presentation/home_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// W3 / device finding F1: in a configured (real-backend) build the
 /// dashboard must not advertise server-backed features as demo data. Every

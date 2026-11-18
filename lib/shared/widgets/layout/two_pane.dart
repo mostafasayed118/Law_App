@@ -1,6 +1,6 @@
 import 'dart:ui' show DisplayFeature, DisplayFeatureType;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Side-by-side master/detail layout for expanded windows (≥840dp).
 ///

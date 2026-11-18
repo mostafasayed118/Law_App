@@ -1,10 +1,9 @@
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
-
 import 'package:legalhub/features/library/domain/highlight_offsets.dart';
 import 'package:legalhub/features/library/domain/legal_highlight.dart';
 import 'package:legalhub/features/library/presentation/highlight_palette.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The article body, selectable, with highlights painted behind their spans.
 ///

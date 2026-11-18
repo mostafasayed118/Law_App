@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/features/video/domain/video_gateway.dart';
 import 'package:legalhub/features/video/domain/video_session.dart';
 import 'package:legalhub/features/video/domain/video_token.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:livekit_client/livekit_client.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Connects a room the screen created. Injected by tests so the pre-connect
 /// UI can be exercised without native WebRTC.

@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/demo_labels.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Pins the demo-copy localization contract (2026-09-24; posture-aware
 /// 2026-10-26):

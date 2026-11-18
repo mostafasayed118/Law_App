@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/features/messaging/domain/message_thread.dart';
@@ -6,6 +5,7 @@ import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'matter_workspace_cubit.dart';
 import 'matter_workspace_state.dart';

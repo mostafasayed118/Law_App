@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart' hide Notification;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:legalhub/app/service_locator.dart';
@@ -13,6 +12,7 @@ import 'package:legalhub/features/notifications/domain/notification_prefs_store.
 import 'package:legalhub/features/notifications/presentation/notification_feed_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/demo_labels.dart';
+import 'package:material_ui/material_ui.dart' hide Notification;
 
 void main() {
   tearDown(resetServiceLocator);

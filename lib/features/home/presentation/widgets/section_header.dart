@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
-
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/shared/formatting/display_case.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A section header with an optional trailing "VIEW ALL"-style action.
 class SectionHeader extends StatelessWidget {

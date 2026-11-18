@@ -1,13 +1,12 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:legalhub/app/legal_config.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/app/router.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Which bundled document a screen renders.
 enum LegalDocumentKind { privacy, terms }

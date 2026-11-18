@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/app/service_locator.dart';
@@ -9,6 +8,7 @@ import 'package:legalhub/features/approvals/domain/approvals_gateway.dart';
 import 'package:legalhub/features/approvals/domain/pending_approval.dart';
 import 'package:legalhub/features/approvals/presentation/approvals_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   tearDown(resetServiceLocator);
@@ -458,7 +458,7 @@ Future<void> pumpApprovals(
   // Test isolation: a previous case may have left a configured posture in
   // the locator. Clear it so the demo-corpus label mapping is exercised.
   if (serviceLocator.isRegistered<BackendPosture>()) {
-    serviceLocator.unregister<BackendPosture>();
+    await serviceLocator.unregister<BackendPosture>();
   }
   if (configured) {
     serviceLocator.registerSingleton<BackendPosture>(

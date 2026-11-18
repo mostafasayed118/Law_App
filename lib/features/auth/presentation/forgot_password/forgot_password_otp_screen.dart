@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
@@ -9,6 +8,7 @@ import 'package:legalhub/features/auth/domain/password_recovery_gateway.dart';
 import 'package:legalhub/features/auth/presentation/password_recovery_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'otp_field_row.dart';
 import 'recovery_error_localizer.dart';

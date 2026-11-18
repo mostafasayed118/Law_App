@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A compact app bar used by the auth/onboarding flows.
 ///

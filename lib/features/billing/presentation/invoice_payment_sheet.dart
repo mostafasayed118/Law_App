@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/features/billing/domain/checkout_launcher.dart';
@@ -9,6 +8,7 @@ import 'package:legalhub/features/billing/domain/payment_gateway.dart';
 import 'package:legalhub/features/billing/domain/payment_status.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/app_modal_sheet.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'invoice_labels.dart';
 import 'payment_cubit.dart';

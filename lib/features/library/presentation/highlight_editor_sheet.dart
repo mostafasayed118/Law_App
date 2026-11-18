@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/features/library/domain/highlight_color_slot.dart';
 import 'package:legalhub/features/library/presentation/highlight_palette.dart';
@@ -7,6 +5,7 @@ import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/app_modal_sheet.dart';
 import 'package:legalhub/shared/widgets/confirm_dialog.dart';
 import 'package:legalhub/shared/widgets/form_fields/legalhub_text_field.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// What the highlight editor resolved to.
 sealed class HighlightEditorResult {

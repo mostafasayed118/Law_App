@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -14,6 +13,7 @@ import 'package:legalhub/data/orgs/fake_membership_repository.dart';
 import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// E2E BUG-1 regression (2026-09-24) — the missing back-stack coverage.
 ///

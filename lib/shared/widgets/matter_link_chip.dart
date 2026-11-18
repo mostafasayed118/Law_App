@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
-
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The Phase 12 reverse cross-link affordance: a compact "View matter" chip
 /// that is the only tap target in a vault/messages row (D-C2).

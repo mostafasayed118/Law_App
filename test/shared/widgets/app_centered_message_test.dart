@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/shared/widgets/app_centered_message.dart';
+import 'package:material_ui/material_ui.dart';
 
 // AppCenteredMessage is the Candidate-A extraction: the attorney-profile
 // and matter-details _message helpers (previously duplicated the centered,

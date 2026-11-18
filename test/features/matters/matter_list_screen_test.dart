@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:legalhub/app/active_org_store.dart';
@@ -13,6 +12,7 @@ import 'package:legalhub/features/matters/domain/matter_gateway.dart';
 import 'package:legalhub/features/matters/presentation/matter_create_screen.dart';
 import 'package:legalhub/features/matters/presentation/matter_list_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   tearDown(resetServiceLocator);

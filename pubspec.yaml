@@ -14,11 +14,12 @@ environment:
   # 3.48.0-pre local toolchain, which blocks every local gate
   # (analyze/test/format) for anyone not on the pinned SDK. The Dart constraint
   # above still guards the API level.
-  flutter: '>=3.44.4 <4.0.0'
+  flutter: '>=3.50.0 <4.0.0'
 
 dependencies:
   app_links: ^7.2.1
   bloc: ^9.2.1
+  cupertino_ui: ^1.1.6
   equatable: ^2.1.0
   file_selector: ^1.1.0
   flutter:
@@ -31,6 +32,7 @@ dependencies:
   go_router: ^17.3.0
   intl: ^0.20.2
   livekit_client: ^2.13.1
+  material_ui: ^1.10.0
   shared_preferences: ^2.5.5
   supabase_flutter: ^2.16.0
   url_launcher: ^6.3.2

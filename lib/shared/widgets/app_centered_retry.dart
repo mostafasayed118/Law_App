@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A centered error message with a retry action — the E9 extraction: the
 /// attorney-profile and matter-details error arms previously duplicated

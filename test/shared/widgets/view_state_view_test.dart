@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/app_message_key.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/view_state_view.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   Widget pumpViewState<T>(

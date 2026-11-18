@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -28,6 +27,7 @@ import 'package:legalhub/features/matters/domain/matter.dart';
 import 'package:legalhub/features/matters/domain/matter_gateway.dart';
 import 'package:legalhub/features/tasks/presentation/task_create_sheet.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Phase 0 RED: both conflict routes and the disclosure wizard state machine
 /// are missing at the base commit. These assertions use only existing strings,

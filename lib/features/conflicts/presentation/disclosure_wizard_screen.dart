@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:legalhub/app/active_org_store.dart';
@@ -18,6 +17,7 @@ import 'package:legalhub/features/matters/domain/matter_gateway.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
+import 'package:material_ui/material_ui.dart';
 
 part 'disclosure_steps.dart';
 

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +12,7 @@ import 'package:legalhub/features/auth/domain/password_recovery_gateway.dart';
 import 'package:legalhub/features/auth/domain/password_recovery_request.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 // Closes the recovery half of D-T2 (Batch 2): the email and OTP captured in
 // steps 1-2 are threaded through the route `extra` to the reset screen, which

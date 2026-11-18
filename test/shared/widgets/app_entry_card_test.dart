@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/shared/widgets/app_entry_card.dart';
+import 'package:material_ui/material_ui.dart';
 
 // AppEntryCard is the E1 extraction: nine feature entry cards (booking,
 // discovery, matters, documents, messaging, billing, compliance, tasks,

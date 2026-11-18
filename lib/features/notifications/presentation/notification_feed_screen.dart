@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart' hide Notification;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/app/service_locator.dart';
@@ -10,6 +9,7 @@ import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
+import 'package:material_ui/material_ui.dart' hide Notification;
 
 import 'notification_category_chip.dart';
 import 'notification_cubit.dart';

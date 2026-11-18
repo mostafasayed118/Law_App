@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
@@ -13,6 +12,7 @@ import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/widgets/app_modal_sheet.dart';
 import 'package:legalhub/shared/widgets/form_sheet_scaffold.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'approval_error_messages.dart';
 import 'approval_labels.dart';

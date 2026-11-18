@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
 import 'package:legalhub/core/errors/result.dart';
@@ -7,6 +6,7 @@ import 'package:legalhub/features/admin/presentation/attorney_admin_screen.dart'
 import 'package:legalhub/features/discovery/domain/attorney.dart';
 import 'package:legalhub/features/discovery/domain/attorney_admin_gateway.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 class _StubAttorneyAdminGateway implements AttorneyAdminGateway {
   _StubAttorneyAdminGateway({List<Attorney>? rows})

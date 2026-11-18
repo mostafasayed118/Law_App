@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
-
 import 'package:legalhub/core/localization/locale_rules.dart';
+import 'package:material_ui/material_ui.dart';
 
-part 'legalhub_text_theme.dart';
 part 'legalhub_color_scheme.dart';
+part 'legalhub_text_theme.dart';
 
 /// The canonical LegalHub design-system tokens, light and dark.
 ///

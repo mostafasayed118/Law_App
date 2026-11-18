@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// WCAG 2.2 contrast floor for body text (4.5:1), computed on the real theme
 /// tokens rather than eyeballed. Both brightnesses are pinned; a future token

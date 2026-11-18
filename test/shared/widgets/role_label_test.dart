@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/role_label.dart';
+import 'package:material_ui/material_ui.dart';
 
 // RoleLabel is the canonical role→label mapping (ADR-0004 second use: it
 // replaces the duplicated private _roleLabel switches on the settings and

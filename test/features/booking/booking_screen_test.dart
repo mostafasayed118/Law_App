@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/core/errors/app_error.dart';
@@ -13,6 +12,7 @@ import 'package:legalhub/features/booking/domain/booking_request.dart';
 import 'package:legalhub/features/booking/domain/booking_slot.dart';
 import 'package:legalhub/features/booking/presentation/booking_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Gateway with a mutable slot outcome so the date-time step's loading,
 /// empty, and error arms are reachable in a widget test (the error arm's

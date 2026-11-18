@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:legalhub/app/localization/locale_cubit.dart';
@@ -13,6 +12,7 @@ import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/features/auth/presentation/sign_in_screen.dart';
 import 'package:legalhub/main.dart';
+import 'package:material_ui/material_ui.dart';
 
 // The app-level theme-mode wiring: LegalHubApp reads ThemeCubit.state for
 // MaterialApp.themeMode (system by default), so the persisted choice flips

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/result.dart';
 import 'package:legalhub/data/billing/fake_payment_gateway.dart';
@@ -11,6 +10,7 @@ import 'package:legalhub/features/billing/domain/payment_session.dart';
 import 'package:legalhub/features/billing/domain/payment_status.dart';
 import 'package:legalhub/features/billing/presentation/invoice_payment_sheet.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 final Invoice _issuedInvoice = Invoice(
   id: 'invoice-1',

@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:legalhub/app/router.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A single, accessible way into the existing `/search` surface from list
 /// screens that do not own a search field (D-S4 quick win).

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/app/service_locator.dart';
@@ -22,6 +21,7 @@ import 'package:legalhub/features/research/domain/research_run.dart';
 import 'package:legalhub/features/research/presentation/ai_research_screen.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/demo/demo_corpus.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Registers a synthetic engine over stubbed upstream seams so screen tests
 /// control the corpus results deterministically (the DI-pin pattern).

@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/shared/widgets/app_section_header.dart';
+import 'package:material_ui/material_ui.dart';
 
 // AppSectionHeader is the C2 consolidation: the search _GroupSection
 // (titleMedium w700 primary) and the matter-details _WorkspaceBlock

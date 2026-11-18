@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:material_ui/material_ui.dart';
 
 // B5 acceptance (bootstrap spec §7): the theme package passes when the light
 // ColorScheme.primary is Midnight Blue #0b1d2e. ADR-0005 reconciled the

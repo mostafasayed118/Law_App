@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/app/router.dart';
 import 'package:legalhub/core/auth/auth_state.dart';
@@ -9,6 +7,8 @@ import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/forms/validators.dart';
 import 'package:legalhub/shared/responsive/breakpoints.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
+import 'package:material_ui/material_ui.dart';
+
 import 'auth_cubit.dart';
 import 'widgets/auth_buttons.dart';
 

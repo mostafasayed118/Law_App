@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/features/library/domain/highlight_color_slot.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Maps a highlight slot to its theme colour and its localized name.
 ///

@@ -1,7 +1,6 @@
 import 'dart:ui' show DisplayFeature, DisplayFeatureState, DisplayFeatureType;
 
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -21,6 +20,7 @@ import 'package:legalhub/features/home/presentation/widgets/practice_area_card.d
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/main.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Desktop/foldable adaptive behavior: hinge-aware two-pane geometry, the
 /// click cursor on every tappable card, and keyboard traversal order.

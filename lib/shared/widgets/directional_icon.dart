@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A direction-aware icon that renders [icon] in LTR and [mirroredIcon] under
 /// RTL, so forward/back affordances and chevrons follow the reading direction

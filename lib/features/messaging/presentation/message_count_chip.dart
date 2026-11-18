@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-
 import 'package:legalhub/shared/widgets/label_chip.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Small chip rendering a thread's synthetic message count on the list tile.
 ///

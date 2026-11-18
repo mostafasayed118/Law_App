@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/service_locator.dart';
@@ -19,6 +18,7 @@ import 'package:legalhub/features/search/presentation/search_screen.dart';
 import 'package:legalhub/features/storage/domain/storage_gateway.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/view_state_view.dart';
+import 'package:material_ui/material_ui.dart';
 
 const List<String> _arbLocales = <String>['en', 'ar', 'tr'];
 

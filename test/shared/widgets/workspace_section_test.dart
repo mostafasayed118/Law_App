@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/core/errors/app_error.dart';
@@ -6,6 +5,7 @@ import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/app_tile.dart';
 import 'package:legalhub/shared/widgets/workspace_section.dart';
+import 'package:material_ui/material_ui.dart';
 
 // WorkspaceSection is the E10 extraction: the four matter workspace
 // sections (documents/files/invoices/messages) previously duplicated the

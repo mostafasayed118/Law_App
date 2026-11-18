@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/organizations/organization_gateway.dart';
@@ -9,6 +8,7 @@ import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/orgs/presentation/create_organization_screen.dart';
 import 'package:legalhub/features/orgs/presentation/org_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A gateway whose create call waits on a caller-controlled gate so tests can
 /// pin the in-flight state; everything else delegates to the fake.

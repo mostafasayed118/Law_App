@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/shared/widgets/app_filter_chips.dart';
+import 'package:material_ui/material_ui.dart';
 
 // AppFilterChips is the E7 extraction: the matter status filter
 // (matter_list_screen.dart) and the practice-area filter

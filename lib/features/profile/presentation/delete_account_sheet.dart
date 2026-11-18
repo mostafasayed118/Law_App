@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/app/service_locator.dart';
 import 'package:legalhub/features/profile/domain/account_gateway.dart';
@@ -8,6 +6,7 @@ import 'package:legalhub/features/profile/presentation/account_deletion_cubit.da
 import 'package:legalhub/features/profile/presentation/account_deletion_state.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The account-deletion danger sheet (ADR-0011).
 ///

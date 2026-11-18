@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/core/auth/auth_state.dart';
@@ -11,6 +10,7 @@ import 'package:legalhub/features/orgs/presentation/org_error_messages.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/formatting/date_formatting.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
+import 'package:material_ui/material_ui.dart';
 
 part 'profile_body.dart';
 

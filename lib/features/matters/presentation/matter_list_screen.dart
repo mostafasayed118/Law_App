@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
@@ -13,6 +12,7 @@ import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/responsive/breakpoints.dart';
 import 'package:legalhub/shared/widgets/search_action.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'matter_cubit.dart';
 import 'matter_details_screen.dart';

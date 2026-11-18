@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:legalhub/app/active_org_store.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
@@ -20,6 +19,7 @@ import 'package:legalhub/l10n/app_message_l10n.dart';
 import 'package:legalhub/shared/demo/demo_corpus.dart';
 import 'package:legalhub/shared/demo_labels.dart';
 import 'package:legalhub/shared/widgets/widgets.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'ai_research_cubit.dart';
 import 'ai_research_state.dart';

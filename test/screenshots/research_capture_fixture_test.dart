@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:legalhub/app/localization/locale_cubit.dart';
@@ -14,8 +13,8 @@ import 'package:legalhub/data/orgs/fake_organization_gateway.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/main.dart';
+import 'package:material_ui/material_ui.dart';
 
-import '../support/render_fonts.dart';
 import '../support/screenshot_research_fixture.dart';
 
 /// F-T8-02 RED: the screenshot path must show a completed demo run, never the
@@ -45,7 +44,9 @@ void main() {
       return resetServiceLocator();
     });
 
-    await loadRenderFonts();
+    // This test asserts data, not glyphs: skip loadRenderFonts so Flutter 3.50
+    // does not schedule a font-change frame callback that outlives the test.
+    await seedScreenshotResearchFixture();
     await locale.setLocale(const Locale('en'));
     await theme.setThemeMode(ThemeMode.light);
     await tester.pumpWidget(
@@ -60,11 +61,16 @@ void main() {
     await auth.startDemoSession();
     await tester.pumpAndSettle();
 
-    await seedScreenshotResearchFixture();
     router.go(AppRoutes.research);
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 50)),
+    );
     await tester.pumpAndSettle();
 
-    expect(find.text('Demo research: sample matter brief'), findsOneWidget);
+    expect(
+      find.text('Demo research: sample matter brief', skipOffstage: false),
+      findsOneWidget,
+    );
     expect(
       find.text(
         AppLocalizations.of(

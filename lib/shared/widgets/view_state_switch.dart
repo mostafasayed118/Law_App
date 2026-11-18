@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
-
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/core/state/view_state.dart';
 import 'package:legalhub/l10n/app_error_label.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Renders the non-success arms of a `ViewState<T>` list switch and delegates
 /// the success arm to [builder].

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart' hide Notification;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/core/errors/app_error.dart';
@@ -13,6 +12,7 @@ import 'package:legalhub/features/notifications/domain/notification.dart';
 import 'package:legalhub/features/notifications/domain/notification_gateway.dart';
 import 'package:legalhub/features/notifications/presentation/notification_badge_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart' hide Notification;
 
 /// The unread badge is a derived count, not a second source of truth: it reads
 /// the existing org-scoped notification list (no new RPC) and keeps its last

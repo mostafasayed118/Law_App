@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/forms/validators.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Live password-strength indicator for the auth forms.
 ///

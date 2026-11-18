@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/shared/widgets/app_tile.dart';
+import 'package:material_ui/material_ui.dart';
 
 // AppTile is the E2 extraction: the search result tiles and the list-screen
 // rows (matters, documents, messaging, approvals, tasks) previously

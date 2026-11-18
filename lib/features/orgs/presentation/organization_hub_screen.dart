@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:legalhub/app/active_org_store.dart';
@@ -11,6 +10,7 @@ import 'package:legalhub/core/roles/user_role.dart';
 import 'package:legalhub/features/auth/presentation/auth_cubit.dart';
 import 'package:legalhub/l10n/app_localizations.dart';
 import 'package:legalhub/shared/widgets/directional_icon.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'create_organization_screen.dart';
 import 'member_roster_screen.dart';

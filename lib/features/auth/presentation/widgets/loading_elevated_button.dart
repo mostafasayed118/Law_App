@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-
 import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// An [ElevatedButton] that shows a small spinner in place of its label while
 /// [loading] is true and is disabled in that state.

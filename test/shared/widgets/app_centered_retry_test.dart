@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:legalhub/app/legalhub_theme.dart';
 import 'package:legalhub/shared/widgets/app_centered_retry.dart';
+import 'package:material_ui/material_ui.dart';
 
 // AppCenteredRetry is the E9 extraction: the attorney-profile and
 // matter-details error arms (previously duplicated Center → Column → error

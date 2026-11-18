@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-
 import 'package:legalhub/shared/responsive/breakpoints.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The widest a modal sheet may be on tablet/desktop windows.
 ///

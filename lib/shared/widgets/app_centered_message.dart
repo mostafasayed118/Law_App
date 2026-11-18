@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-
 import 'package:legalhub/app/legalhub_theme.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A centered, padded, secondary-colored message — the Candidate-A
 /// extraction: the attorney-profile and matter-details `_message` helpers
