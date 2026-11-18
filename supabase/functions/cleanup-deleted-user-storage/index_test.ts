@@ -118,6 +118,24 @@ Deno.test("partial failure is reported in failed without crashing", async () => 
   assertEquals(result.body.failed, [`${TARGET}/bad.pdf`], "failed names");
 });
 
+Deno.test("a failing Admin API check aborts and deletes nothing", async () => {
+  const { deps, removed } = mockDeps([
+    { bucket_id: "matter-files", name: `${TARGET}/a.pdf`, metadata: bytes(100) },
+  ]);
+  deps.userExists = async () => {
+    await Promise.resolve();
+    throw new Error("admin api 500");
+  };
+  let threw = false;
+  try {
+    await cleanup(TARGET, deps);
+  } catch {
+    threw = true;
+  }
+  assertEquals(threw, true, "cleanup aborts");
+  assertEquals(removed.length, 0, "no deletes after a failed identity check");
+});
+
 Deno.test("authorization requires the service-role key in the Bearer header", async () => {
   const key = "service-role-test-value";
   const withKey = new Request("https://example.test/", { headers: { authorization: `Bearer ${key}` } });

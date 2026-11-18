@@ -4,7 +4,7 @@ begin;
 do $$
 begin
   begin
-    perform extensions.cron.unschedule('storage-bytes-cleanup');
+    perform cron.unschedule('storage-bytes-cleanup');
   exception when others then
     null;
   end;

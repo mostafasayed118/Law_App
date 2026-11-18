@@ -59,9 +59,9 @@ begin
   end if;
 
   for r in select user_id from public.deleted_users_with_orphan_storage() loop
-    perform extensions.net.http_post(
+    perform net.http_post(
       v_url,
-      jsonb_build_object('user_id', r.user_id)::text,
+      jsonb_build_object('user_id', r.user_id),
       jsonb_build_object(
         'Content-Type', 'application/json',
         'Authorization', 'Bearer ' || v_key
@@ -81,11 +81,11 @@ grant execute on function public.enqueue_deleted_user_storage_cleanup() to servi
 do $$
 begin
   begin
-    perform extensions.cron.unschedule('storage-bytes-cleanup');
+    perform cron.unschedule('storage-bytes-cleanup');
   exception when others then
     null; -- no prior schedule
   end;
-  perform extensions.cron.schedule(
+  perform cron.schedule(
     'storage-bytes-cleanup',
     '*/10 * * * *',
     'select public.enqueue_deleted_user_storage_cleanup();'

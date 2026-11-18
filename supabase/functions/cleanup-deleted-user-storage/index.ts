@@ -111,15 +111,30 @@ export async function cleanup(
   return { status: 200, body: body as unknown as Record<string, unknown> };
 }
 
+/** Only a genuine 404 / "not found" means the identity is gone. */
+function isNotFound(error: { status?: number; message?: string } | null): boolean {
+  if (!error) return false;
+  if (error.status === 404) return true;
+  const message = (error.message ?? "").toLowerCase();
+  return message.includes("user not found") || message.includes("not found");
+}
+
 function realDeps(client: SupabaseClient): CleanupDeps {
   return {
     userExists: async (userId) => {
       const { data, error } = await client.auth.admin.getUserById(userId);
-      return !error && Boolean(data?.user);
+      if (error) {
+        if (isNotFound(error)) return false;
+        throw error; // fail closed: an outage must never authorize a delete
+      }
+      return Boolean(data?.user);
     },
     listOwnedObjects: async (userId) => {
+      // supabase-js: .from("storage.objects") is a literal table name in the
+      // default (public) schema. Storage metadata lives in the storage schema.
       const { data, error } = await client
-        .from("storage.objects")
+        .schema("storage")
+        .from("objects")
         .select("bucket_id,name,metadata")
         .eq("owner_id", userId);
       if (error) throw error;
@@ -159,7 +174,13 @@ export async function handler(request: Request): Promise<Response> {
   const client = createClient(serviceUrl, serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
-  const result = await cleanup(userId, realDeps(client));
+  let result;
+  try {
+    result = await cleanup(userId, realDeps(client));
+  } catch {
+    // A failed identity check (or list read) must never delete bytes.
+    return json(500, { error: "user_check_failed" });
+  }
   return json(result.status, result.body);
 }
 
