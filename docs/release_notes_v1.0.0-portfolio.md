@@ -39,12 +39,15 @@ from source for an emulator.
 
 ## Known limitations
 
-- Account deletion is **partial until the service-role byte-cleanup function is
-  deployed and verified**: it removes app-owned identity, profile, memberships,
-  library rows and file records, but not stored file bytes on hosted Supabase
-  (the platform forbids direct storage-table deletes) or provider-side records.
-  A cleanup Edge Function and scheduled wiring now exist as code on a feature
-  branch, NOT deployed; the UI says this before confirmation (ADR-0011).
+- Account deletion removes app-owned identity, profile, memberships, library
+  rows and file records. The byte-cleanup function and scheduled wiring are
+  **deployed and live-verified on the dev project** (`eutmvevpskerzpqmwplv`,
+  commit `1d4d594`): a disposable-user check returned `deleted: 1, bytes: 19`
+  then `deleted: 0`, with 0 objects remaining. Stored file bytes are removed by
+  a sweeper that runs every 10 minutes, so they may take up to about 10 minutes
+  to disappear after the account is gone — deletion is not instant. On any
+  other project or environment where the cleanup is not deployed and verified,
+  deletion stays partial. Provider-side records are not removed (ADR-0011).
 - Push delivery, offline outbox, iOS release and live payments are not done.
 - Migrations 32–34 are not applied to any live project by this repository's
   automation; applying them to dev is an owner action.

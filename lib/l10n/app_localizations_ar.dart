@@ -3282,7 +3282,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get accountDeleteSuccess =>
-      'تم حذف حسابك. أُزيل تسجيل الدخول والملف الشخصي وبيانات المكتبة المحفوظة وسجلات ملفاتك. قد تبقى بايتات الملفات المخزّنة حتى ينفّذ المشغّل تنظيف التخزين.';
+      'تم حذف حسابك. أُزيل تسجيل الدخول والملف الشخصي وبيانات المكتبة المحفوظة وسجلات ملفاتك. تُزال بايتات الملفات المخزّنة تلقائيًا، وعادةً خلال دقائق قليلة.';
 
   @override
   String get accountDeleteLastPartner =>
@@ -3348,7 +3348,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get accountDeleteKeepsStorage =>
-      'بايتات الملفات المخزّنة على النشر المستضاف، حتى ينفّذ المشغّل تنظيف التخزين.';
+      'تُزال بايتات الملفات المخزّنة عبر تنظيف تلقائي، عادةً خلال دقائق قليلة.';
 
   @override
   String get conflictsDiscloseTitle => 'إفصاح عن تضارب المصالح';

@@ -1697,7 +1697,7 @@
   "@accountDeleteSubmit": {
     "description": "[REVIEW] machine-drafted; human review required before release"
   },
-  "accountDeleteSuccess": "تم حذف حسابك. أُزيل تسجيل الدخول والملف الشخصي وبيانات المكتبة المحفوظة وسجلات ملفاتك. قد تبقى بايتات الملفات المخزّنة حتى ينفّذ المشغّل تنظيف التخزين.",
+  "accountDeleteSuccess": "تم حذف حسابك. أُزيل تسجيل الدخول والملف الشخصي وبيانات المكتبة المحفوظة وسجلات ملفاتك. تُزال بايتات الملفات المخزّنة تلقائيًا، وعادةً خلال دقائق قليلة.",
   "@accountDeleteSuccess": {
     "description": "[REVIEW] machine-drafted; human review required before release"
   },
@@ -1761,7 +1761,7 @@
   "@passwordHide": {
     "description": "[REVIEW] machine-drafted; human review required before release"
   },
-  "accountDeleteKeepsStorage": "بايتات الملفات المخزّنة على النشر المستضاف، حتى ينفّذ المشغّل تنظيف التخزين.",
+  "accountDeleteKeepsStorage": "تُزال بايتات الملفات المخزّنة عبر تنظيف تلقائي، عادةً خلال دقائق قليلة.",
   "@accountDeleteKeepsStorage": {
     "description": "[REVIEW] machine-drafted; human review required before release"
   },

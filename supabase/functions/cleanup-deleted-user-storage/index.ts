@@ -37,7 +37,7 @@ export function json(status: number, body: Record<string, unknown>): Response {
   });
 }
 
-/** Constant-time comparison of the Bearer token with the service-role key. */
+/** Constant-time comparison of the caller's Bearer token with the dedicated CLEANUP_AUTH_TOKEN. */
 export async function constantTimeEqual(left: string, right: string): Promise<boolean> {
   const encoder = new TextEncoder();
   const a = encoder.encode(left);

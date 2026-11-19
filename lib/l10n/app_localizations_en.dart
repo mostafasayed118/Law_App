@@ -3310,7 +3310,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountDeleteSuccess =>
-      'Your account was deleted. Sign-in, profile, saved library data and your file records were removed. Stored file bytes may remain until the operator\'s storage cleanup runs.';
+      'Your account was deleted. Sign-in, profile, saved library data and your file records were removed. Stored file bytes are removed automatically, usually within a few minutes.';
 
   @override
   String get accountDeleteLastPartner =>
@@ -3378,7 +3378,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountDeleteKeepsStorage =>
-      'Stored file bytes on hosted deployments, until the operator\'s storage cleanup runs.';
+      'Stored file bytes are removed by an automatic cleanup, usually within a few minutes.';
 
   @override
   String get conflictsDiscloseTitle => 'Conflict Disclosure';

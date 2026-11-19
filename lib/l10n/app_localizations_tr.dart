@@ -3312,7 +3312,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get accountDeleteSuccess =>
-      'Hesabınız silindi. Oturum, profil, kaydedilen kütüphane verileri ve dosya kayıtlarınız kaldırıldı. Depolanan dosya baytları, operatörün depolama temizliği çalışana kadar kalabilir.';
+      'Hesabınız silindi. Oturum, profil, kaydedilen kütüphane verileri ve dosya kayıtlarınız kaldırıldı. Depolanan dosya baytları otomatik olarak, genellikle birkaç dakika içinde kaldırılır.';
 
   @override
   String get accountDeleteLastPartner =>
@@ -3380,7 +3380,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get accountDeleteKeepsStorage =>
-      'Barındırılan kurulumlarda depolanan dosya baytları, operatörün depolama temizliği çalışana kadar.';
+      'Depolanan dosya baytları otomatik bir temizlikle kaldırılır, genellikle birkaç dakika içinde.';
 
   @override
   String get conflictsDiscloseTitle => 'Çıkar Çatışması Beyanı';

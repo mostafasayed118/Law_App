@@ -48,20 +48,27 @@ both must.
 On a hosted project the storage-table delete is wrapped in an exception handler:
 Supabase raises `42501` ("Use the Storage API instead") for direct
 `storage.objects` deletes, and that guard must never block identity deletion.
-File **records** are removed by the RPC; stored **bytes** remain until the
-operator runs a Storage-API cleanup with the service role. The scheduled
-service-role cleanup (Edge Function `cleanup-deleted-user-storage` plus
-migration `36_storage_bytes_cleanup_wiring.sql`) now exists as **code on a
-feature branch**, not deployed: account deletion stays PARTIAL until the owner
-deploys the function, sets the secret, applies the migration and verifies with a
-disposable test user. See `docs/internal/STORAGE_BYTES_CLEANUP_RUNBOOK.md`.
+File **records** are removed by the RPC. The scheduled Storage-API cleanup
+(Edge Function `cleanup-deleted-user-storage` plus migration
+`36_storage_bytes_cleanup_wiring.sql`) is **deployed and live-verified on the dev
+project** (`eutmvevpskerzpqmwplv`), so stored **bytes** are removed there too.
+Verification evidence (commit `1d4d594`, CI run `44430493306` success): a
+disposable-user check returned `deleted: 1, failed: [], bytes: 19` on the first
+call and `deleted: 0` on the second (idempotent), with 0 objects remaining and
+an empty orphan query. The sweeper runs every 10 minutes, so bytes may take up
+to about 10 minutes to disappear after the identity is gone — deletion is not
+instant. On any other project or environment where this cleanup is not deployed
+and verified, deletion stays PARTIAL. See
+`docs/internal/STORAGE_BYTES_CLEANUP_RUNBOOK.md`.
 
 ### 2. The UI tells the truth about what deletion removes
 
 The deletion sheet states both halves explicitly: it removes sign-in, profile,
 memberships, library rows and the reader's file records with their metadata;
-it does **not** remove stored file bytes on hosted Supabase, other people's
-objects, or provider-side records
+stored file bytes are removed by the automatic cleanup where it is deployed and
+verified (within ~10 minutes, not instantly), and are **not** removed on projects
+where it is not deployed; it also does not remove other people's objects or
+provider-side records
 (LiveKit / Paymob / AI provider), and redacted audit entries are retained with
 the actor reference cleared. The cubit sets `done` only after the RPC succeeds,
 and the success message names exactly what was removed. It never says a generic

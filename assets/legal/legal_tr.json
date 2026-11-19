@@ -46,7 +46,7 @@
       "id": "p7",
       "heading": "Silme ve iletişim",
       "paragraphs": [
-        "Hesap silme işlemi oturumu, profili, üyelikleri, Legal Library kayıtlarını ve dosya kayıtlarınızı üst verileriyle kaldırır. Barındırılan kurulumlarda depolanan dosya baytları, uygulama içi adımla değil operatörün depolama temizliğiyle kaldırılır. Başkalarına ait kayıtlar ve sağlayıcı taraflındaki kayıtlar kaldırılmaz. Maskelenmiş denetim kayıtları aktör referansı temizlenerek saklanır. Sorularınız için uygulama içi yasal bildirimdeki iletişim adresini kullanın. Servis rolüne sahip bir temizleme işlevi kodda mevcuttur ancak henüz dağıtılmamıştır; hesap silme, operatör dağıtıp baytların kalktığını doğrulayana kadar kısmi kalır."
+        "Hesap silme işlemi oturumu, profili, üyelikleri, Legal Library kayıtlarını ve dosya kayıtlarınızı üst verileriyle kaldırır. Otomatik depolama temizliğinin dağıtılıp doğrulandığı projelerde depolanan dosya baytları da her 10 dakikada bir çalışan bir temizlikle kaldırılır; bu nedenle hesabınız silindikten sonra kaybolmaları yaklaşık 10 dakikayı bulabilir. Bu temizliğin dağıtılıp doğrulanmadığı diğer projelerde veya ortamlarda silme kısmi kalır ve depolanan baytlar operatör bir temizlik çalıştırana kadar kalabilir. Başkalarına ait kayıtlar ve sağlayıcı taraflındaki kayıtlar kaldırılmaz. Maskelenmiş denetim kayıtları aktör referansı temizlenerek saklanır. Sorularınız için uygulama içi yasal bildirimdeki iletişim adresini kullanın."
       ]
     }
   ],

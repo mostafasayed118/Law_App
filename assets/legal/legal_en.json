@@ -46,7 +46,7 @@
       "id": "p7",
       "heading": "Deletion and contact",
       "paragraphs": [
-        "Account deletion removes your sign-in, profile, memberships, Legal Library rows and your file records with their metadata. Stored file bytes on hosted deployments are removed by the operator's storage cleanup, not by the in-app step. It does not remove records owned by other people or provider-side records. Redacted audit entries are retained with the actor reference cleared. For questions, use the contact address in the in-app legal notice. A service-role cleanup function is provided in code but is not deployed yet; deletion stays partial until the operator deploys it and verifies that the bytes are gone."
+        "Account deletion removes your sign-in, profile, memberships, Legal Library rows and your file records with their metadata. On projects where the automatic storage cleanup is deployed and verified, stored file bytes are also removed by a cleanup that runs every 10 minutes, so they may take up to about 10 minutes to disappear after your account is gone. On any other project or environment where that cleanup is not deployed and verified, deletion stays partial and stored bytes may remain until the operator runs a cleanup. It does not remove records owned by other people or provider-side records. Redacted audit entries are retained with the actor reference cleared. For questions, use the contact address in the in-app legal notice."
       ]
     }
   ],

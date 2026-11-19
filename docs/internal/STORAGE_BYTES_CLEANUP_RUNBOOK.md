@@ -81,7 +81,11 @@ other project as deployed until the owner deploys and verifies it there.
    - confirm `delete_my_account` still returns 204 when the function is absent
      (pgTAP 29.15 covers this locally).
 6. Only after the verification above passes, update the UI/privacy wording from
-   "partial until deployed" to the verified state. Until then, leave it as is.
+   "partial until deployed" to the verified state. On dev this is now done (the
+   UI, ADR-0011, privacy policy, release notes and in-app legal copy state the
+   verified state, with the ~10-minute and other-projects-stay-partial
+   qualifications); any other project stays partial until deployed and verified
+   there.
 
 ## Live verification (dev project `eutmvevpskerzpqmwplv`, 2026-11-19)
 

@@ -5919,7 +5919,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountDeleteSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Your account was deleted. Sign-in, profile, saved library data and your file records were removed. Stored file bytes may remain until the operator\'s storage cleanup runs.'**
+  /// **'Your account was deleted. Sign-in, profile, saved library data and your file records were removed. Stored file bytes are removed automatically, usually within a few minutes.'**
   String get accountDeleteSuccess;
 
   /// No description provided for @accountDeleteLastPartner.
@@ -6021,7 +6021,7 @@ abstract class AppLocalizations {
   /// Third keeps bullet for the deletion sheet.
   ///
   /// In en, this message translates to:
-  /// **'Stored file bytes on hosted deployments, until the operator\'s storage cleanup runs.'**
+  /// **'Stored file bytes are removed by an automatic cleanup, usually within a few minutes.'**
   String get accountDeleteKeepsStorage;
 
   /// No description provided for @conflictsDiscloseTitle.

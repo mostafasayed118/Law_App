@@ -1,5 +1,6 @@
 -- 36_storage_bytes_cleanup_wiring.sql — scheduled Storage-API byte cleanup
--- (FILE ONLY — never applied by this repo's automation; owner decision).
+-- Applied to the dev project (eutmvevpskerzpqmwplv) on 2026-11-19 (commit
+-- 1d4d594, verified); other projects still need their own owner-gated apply.
 --
 -- Why Option B (pg_cron sweeper) and not an immediate pg_net call from
 -- delete_my_account: the Edge Function authenticates callers with a dedicated

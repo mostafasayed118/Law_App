@@ -1253,7 +1253,7 @@
   "accountDeleteConfirmLabel": "Type DELETE to confirm",
   "accountDeleteConfirmHint": "DELETE",
   "accountDeleteSubmit": "Permanently delete my account",
-  "accountDeleteSuccess": "Your account was deleted. Sign-in, profile, saved library data and your file records were removed. Stored file bytes may remain until the operator's storage cleanup runs.",
+  "accountDeleteSuccess": "Your account was deleted. Sign-in, profile, saved library data and your file records were removed. Stored file bytes are removed automatically, usually within a few minutes.",
   "accountDeleteLastPartner": "Add another active partner to this organization before deleting your account.",
   "accountDeleteOwner": "Transfer platform ownership before deleting your account.",
   "accountDeleteGenericError": "Unable to delete your account. Please try again.",
@@ -1278,7 +1278,7 @@
   },
   "passwordShow": "Show password",
   "passwordHide": "Hide password",
-  "accountDeleteKeepsStorage": "Stored file bytes on hosted deployments, until the operator's storage cleanup runs.",
+  "accountDeleteKeepsStorage": "Stored file bytes are removed by an automatic cleanup, usually within a few minutes.",
   "@accountDeleteKeepsStorage": {
     "description": "Third keeps bullet for the deletion sheet."
   },
