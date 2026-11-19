@@ -79,14 +79,17 @@ begin
   end if;
 
   for r in select user_id from public.deleted_users_with_orphan_storage() loop
+    -- pg_net 0.20.4 signature: http_post(url, body, params, headers, timeout_ms).
+    -- The 3rd argument is params; headers is the 4th. Passing headers 3rd sends
+    -- the request with default headers (no Authorization) and the function 401s.
     perform net.http_post(
       v_url,
       jsonb_build_object('user_id', r.user_id),
+      '{}'::jsonb,
       jsonb_build_object(
         'Content-Type', 'application/json',
         'Authorization', 'Bearer ' || v_key
       ),
-      null::jsonb,
       5000
     );
   end loop;

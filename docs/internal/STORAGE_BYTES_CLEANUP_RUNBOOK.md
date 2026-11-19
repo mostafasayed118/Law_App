@@ -1,10 +1,15 @@
 # Storage-bytes cleanup — owner deployment runbook
 
-**Status as of 2026-11-19: DEPLOYED + LIVE-VERIFIED on the dev project
-(`eutmvevpskerzpqmwplv`).** The Edge Function, custom token, Vault secrets and
-migration 36 have been applied and exercised with a disposable test user:
-`deleted: 1, bytes: 19` on the first call, `deleted: 0` on the second, and zero
-objects remaining. See the "Live verification" section below. Do NOT treat any
+**Status as of 2026-11-19: DEPLOYED + LIVE-VERIFIED end-to-end on the dev
+project (`eutmvevpskerzpqmwplv`).** The Edge Function, custom token, Vault
+secrets and migration 36 are applied. Two verifications passed: (1) direct
+calls returned `deleted: 1, bytes: 19` then `deleted: 0`; (2) a disposable user
+created + deleted with NO manual function call was swept by the pg_cron job
+alone — a `200 {"deleted":1,"failed":[],"bytes":17}` appeared in
+`net._http_response` at the 15:50 run, `files_remaining: 0`, `orphans: 0`.
+A pg_net argument-order defect (headers must be the 4th arg, params the 3rd, in
+pg_net 0.20.4) was found by that E2E check and corrected in migration 36 +
+live before the passing run. See "Live verification" below. Do NOT treat any
 other project as deployed until the owner deploys and verifies it there.
 
 ## What was added
@@ -99,6 +104,23 @@ uploaded object's owner uuid, matching a real JWT upload):
 - Function call #2: `200 {"user_id":"…","deleted":0,"failed":[],"bytes":0}`.
 - `select count(*) from storage.objects where name like '<uid>%'` → `0`.
 - Orphan query → `[]`.
+
+### Cron-only E2E (no manual function call) — 2026-11-19
+
+After finding that direct calls worked but the sweeper's HTTP returned 401, the
+root cause was a pg_net 0.20.4 argument-order bug: `net.http_post(url, body,
+params, headers, timeout)` — the migration had put the headers jsonb in the 3rd
+(`params`) slot and `null` in the headers slot, so requests went out without
+`Authorization`. Corrected in migration 36 and applied live. Then a disposable
+user was created, a file uploaded with its `owner` set to that uid, the auth
+user deleted, and NO function call was made. The pg_cron job alone swept it:
+- cron run at `2026-11-19 15:50:00Z` → `succeeded`;
+- `net._http_response` → `200 {"user_id":"…","deleted":1,"failed":[],"bytes":17}`;
+- `files_remaining: 0`, `orphans: 0`, auth user gone.
+
+Cron firing itself was separately confirmed from `cron.job_run_details`:
+`succeeded` at 15:30, 15:40, 15:50 UTC (exact 10-minute boundaries),
+active=true, schedule `*/10 * * * *`.
 
 ## Never
 

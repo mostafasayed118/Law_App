@@ -55,7 +55,10 @@ project** (`eutmvevpskerzpqmwplv`), so stored **bytes** are removed there too.
 Verification evidence (commit `1d4d594`, CI run `44430493306` success): a
 disposable-user check returned `deleted: 1, failed: [], bytes: 19` on the first
 call and `deleted: 0` on the second (idempotent), with 0 objects remaining and
-an empty orphan query. The sweeper runs every 10 minutes, so bytes may take up
+an empty orphan query. A separate cron-only E2E (no manual function call)
+created + deleted a disposable user and confirmed the pg_cron job swept the file
+alone: `200 {"deleted":1,"bytes":17}` in `net._http_response` at the 15:50 run,
+`files_remaining: 0`. The sweeper runs every 10 minutes, so bytes may take up
 to about 10 minutes to disappear after the identity is gone — deletion is not
 instant. On any other project or environment where this cleanup is not deployed
 and verified, deletion stays PARTIAL. See
