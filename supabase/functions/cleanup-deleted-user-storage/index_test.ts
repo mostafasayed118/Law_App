@@ -1,4 +1,4 @@
-import { authorize, cleanup, type CleanupDeps, type OwnedObject } from "./index.ts";
+import { authorize, cleanup, configuredAuthToken, realDeps, STORAGE_PATHS_RPC, type CleanupDeps, type OwnedObject } from "./index.ts";
 
 function assertEquals(actual: unknown, expected: unknown, label: string): void {
   const a = JSON.stringify(actual);
@@ -136,12 +136,39 @@ Deno.test("a failing Admin API check aborts and deletes nothing", async () => {
   assertEquals(removed.length, 0, "no deletes after a failed identity check");
 });
 
-Deno.test("authorization requires the service-role key in the Bearer header", async () => {
-  const key = "service-role-test-value";
+Deno.test("realDeps reads storage metadata through the RPC, never .schema('storage')", async () => {
+  let rpcName = "";
+  let rpcArgs: Record<string, unknown> = {};
+  const fakeClient = {
+    rpc: (name: string, args: Record<string, unknown>) => {
+      rpcName = name;
+      rpcArgs = args;
+      return Promise.resolve({ data: [] as OwnedObject[], error: null });
+    },
+  } as unknown as Parameters<typeof realDeps>[0];
+  const deps = realDeps(fakeClient);
+  const rows = await deps.listOwnedObjects(TARGET);
+  assertEquals(rpcName, STORAGE_PATHS_RPC, "rpc name");
+  assertEquals(rpcArgs, { p_user_id: TARGET }, "rpc args");
+  assertEquals(rows, [], "rows");
+});
+
+Deno.test("caller authorization reads the dedicated CLEANUP_AUTH_TOKEN", async () => {
+  const key = "cln_test_custom_token";
+  assertEquals(
+    configuredAuthToken((name) => name === "CLEANUP_AUTH_TOKEN" ? key : undefined),
+    key,
+    "reads CLEANUP_AUTH_TOKEN",
+  );
+  assertEquals(
+    configuredAuthToken((name) => name === "SUPABASE_SERVICE_ROLE_KEY" ? key : undefined),
+    undefined,
+    "does not fall back to the deprecated service-role key",
+  );
   const withKey = new Request("https://example.test/", { headers: { authorization: `Bearer ${key}` } });
   const without = new Request("https://example.test/");
-  assertEquals(await authorize(withKey, key), true, "valid key");
-  assertEquals(await authorize(without, key), false, "missing key");
-  assertEquals(await authorize(withKey, "different"), false, "wrong key");
-  assertEquals(await authorize(withKey, undefined), false, "no configured key");
+  assertEquals(await authorize(withKey, configuredAuthToken((n) => n === "CLEANUP_AUTH_TOKEN" ? key : undefined)), true, "valid custom token");
+  assertEquals(await authorize(without, key), false, "missing token");
+  assertEquals(await authorize(withKey, "different"), false, "wrong token");
+  assertEquals(await authorize(withKey, undefined), false, "no configured token");
 });

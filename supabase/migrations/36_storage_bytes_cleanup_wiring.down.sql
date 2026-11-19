@@ -11,6 +11,7 @@ begin
 end $$;
 
 drop function if exists public.enqueue_deleted_user_storage_cleanup();
+drop function if exists public.deleted_user_storage_paths(uuid);
 drop function if exists public.deleted_users_with_orphan_storage();
 
 commit;

@@ -5,6 +5,9 @@ import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
 // and lib/data/supabase_wire.dart:15-17. Never invent another bucket.
 export const BUCKETS = ["matter-files"] as const;
 
+/** SECURITY DEFINER RPC from migration 36; public schema, service_role only. */
+export const STORAGE_PATHS_RPC = "deleted_user_storage_paths" as const;
+
 export type OwnedObject = {
   bucket_id: string;
   name: string;
@@ -50,7 +53,20 @@ export async function constantTimeEqual(left: string, right: string): Promise<bo
   return diff === 0;
 }
 
-/** The caller must present the service-role key; no anonymous deletion. */
+/**
+ * Caller credential is a dedicated custom token, never a Supabase API key.
+ * Supabase's legacy SUPABASE_SERVICE_ROLE_KEY is deprecated and its injected
+ * value can differ from the key returned by the Management API, so callers are
+ * authenticated against an explicit secret instead. The internal client below
+ * still uses the platform-injected service key for Admin/Storage API calls.
+ */
+export function configuredAuthToken(
+  getEnv: (key: string) => string | undefined = (key) => Deno.env.get(key),
+): string | undefined {
+  return getEnv("CLEANUP_AUTH_TOKEN");
+}
+
+/** The caller must present the configured custom token; no anonymous deletion. */
 export async function authorize(
   request: Request,
   expectedServiceKey: string | undefined,
@@ -119,7 +135,7 @@ function isNotFound(error: { status?: number; message?: string } | null): boolea
   return message.includes("user not found") || message.includes("not found");
 }
 
-function realDeps(client: SupabaseClient): CleanupDeps {
+export function realDeps(client: SupabaseClient): CleanupDeps {
   return {
     userExists: async (userId) => {
       const { data, error } = await client.auth.admin.getUserById(userId);
@@ -130,13 +146,11 @@ function realDeps(client: SupabaseClient): CleanupDeps {
       return Boolean(data?.user);
     },
     listOwnedObjects: async (userId) => {
-      // supabase-js: .from("storage.objects") is a literal table name in the
-      // default (public) schema. Storage metadata lives in the storage schema.
-      const { data, error } = await client
-        .schema("storage")
-        .from("objects")
-        .select("bucket_id,name,metadata")
-        .eq("owner_id", userId);
+      // Supabase's /rest/v1 only exposes public + graphql_public (PGRST106),
+      // never the storage schema. The SECURITY DEFINER RPC in migration 36
+      // reads storage.objects inside the database and returns exactly the
+      // rows owned by userId, so no direct storage-schema HTTP access exists.
+      const { data, error } = await client.rpc(STORAGE_PATHS_RPC, { p_user_id: userId });
       if (error) throw error;
       return (data ?? []) as OwnedObject[];
     },
@@ -151,7 +165,7 @@ function realDeps(client: SupabaseClient): CleanupDeps {
 export async function handler(request: Request): Promise<Response> {
   if (!(await authorize(
     request,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? Deno.env.get("SUPABASE_SECRET_KEY"),
+    configuredAuthToken(),
   ))) {
     return json(401, { error: "unauthorized" });
   }
